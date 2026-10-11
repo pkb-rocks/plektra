@@ -188,7 +188,7 @@ class AospKeyboardView @JvmOverloads constructor(
             profileFileRevision = revision
             val mappings = JsonLayoutLoader.loadLayout(context.assets, normalized, context).orEmpty()
             cyrillicMappings = mappings.takeIf { profile ->
-                profile.values.any { mapping ->
+                normalized == "uyghur" || profile.values.any { mapping ->
                     mapping.lowercase.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.CYRILLIC }
                 }
             }.orEmpty()

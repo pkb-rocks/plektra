@@ -5,9 +5,15 @@ import android.content.res.AssetManager
 import rocks.pkb.plektra.AltModifierBinding
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.SymPagesConfig
+import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 
 object AltModifierMappingResolver {
-    fun resolve(assets: AssetManager, context: Context): Map<Int, String> {
+    fun resolve(assets: AssetManager, context: Context): Map<Int, String> =
+        LayoutMappingRepository.applyAltMappings(resolveBaseMappings(assets, context))
+
+    // Keep cached device bindings separate from the active layout, which can
+    // change without reloading the device profile.
+    fun resolveBaseMappings(assets: AssetManager, context: Context): Map<Int, String> {
         val configuredBinding = SettingsManager.getAltModifierBinding(context)
         val binding = if (configuredBinding == AltModifierBinding.FirstEnabledSymKeyLayer) {
             when (SettingsManager.getSymPagesConfig(context).firstEnabledKeyLayer()) {

@@ -439,6 +439,72 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun uyghurLayout_neverAutomaticallySelectsExtraLettersButManualShiftWorks() {
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, "uyghur")
+        LayoutMappingRepository.loadLayout(service.assets, "uyghur", service)
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+
+        service.onStartInput(editorInfo, false)
+        assertFalse(modifierController().shiftOneShot)
+        assertFalse(LayoutMappingRepository.supportsAutoCapitalization)
+        tapShift(3_000L)
+        assertTrue(modifierController().shiftOneShot)
+
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+        service.onStartInput(editorInfo, false)
+        assertFalse(modifierController().capsLockEnabled)
+
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        assertTrue(LayoutMappingRepository.supportsAutoCapitalization)
+    }
+
+    @Test
+    fun switchingToUyghur_clearsPendingCapitalizationFromEnglish() {
+        service.onStartInput(editorInfo, false)
+        assertTrue(modifierController().shiftOneShot)
+        val subtype = rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.createAdditionalSubtypesArray(
+            "ug:uyghur", service.assets, service
+        ).single()
+        PhysicalKeyboardInputMethodService::class.java.getDeclaredMethod(
+            "onCurrentInputMethodSubtypeChanged", android.view.inputmethod.InputMethodSubtype::class.java
+        ).apply { isAccessible = true }.invoke(service, subtype)
+        assertFalse(modifierController().shiftOneShot)
+        assertEquals("د", LayoutMappingRepository.getLowercase(KeyEvent.KEYCODE_D))
+    }
+
+    @Test
+    fun uyghurOnQ25_routesAllLettersAndPunctuationThroughRealImePath() {
+        DeviceSpecific.setBuildFingerprintForTests("zinwa", "zinwa", "Q25", "Q25", "q25")
+        SettingsManager.setPhysicalKeyboardProfileOverride(service, "Q25")
+        setField(service, "physicalKeyboardProfileOverride", "Q25")
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, "uyghur")
+        SettingsManager.setAutoCorrectEnabled(service, false)
+        SettingsManager.setLongPressModifier(service, "alt")
+        LayoutMappingRepository.loadLayout(service.assets, "uyghur", service)
+        service.onStartInput(editorInfo, false)
+
+        val shift = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+        val alt = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+        var time = 10_000L
+        fun press(key: Int, meta: Int = 0) {
+            service.onKeyDown(key, keyEvent(KeyEvent.ACTION_DOWN, key, time, time, meta))
+            service.onKeyUp(key, keyEvent(KeyEvent.ACTION_UP, key, time, time + 30L, meta))
+            time += 1_000L
+        }
+        "QWERTYUIOPASDFGHJKLZXCVBNM".forEach { press(KeyEvent.KEYCODE_A + (it - 'A')) }
+        "DFGHJKLMNVX".forEach { press(KeyEvent.KEYCODE_A + (it - 'A'), shift) }
+        listOf(KeyEvent.KEYCODE_SLASH, KeyEvent.KEYCODE_COMMA, KeyEvent.KEYCODE_SEMICOLON).forEach { press(it) }
+        "NVJRHBIM".forEach { press(KeyEvent.KEYCODE_A + (it - 'A'), alt) }
+
+        assertEquals(
+            "چۋېرتيۇڭوپھسداەىقكلزشغۈبنمژفگخجۆلائنۈشئ،؛،؟؛3:!-.",
+            recorder.committedTexts.joinToString("")
+        )
+    }
+
+    @Test
     fun autoCap_manualShiftOff_survivesRestartOfCurrentField() {
         val context = RuntimeEnvironment.getApplication()
         SettingsManager.setAutoCapitalizeFirstLetter(context, true)

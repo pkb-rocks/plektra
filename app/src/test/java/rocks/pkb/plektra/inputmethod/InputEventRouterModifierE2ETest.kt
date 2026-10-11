@@ -50,6 +50,7 @@ class InputEventRouterModifierE2ETest {
     @Before
     fun setUp() {
         context = RuntimeEnvironment.getApplication()
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         SettingsManager.setSymPagesConfig(context, SymPagesConfig())
         SettingsManager.resetSymMappings(context)
         SettingsManager.resetSymMappingsPage2(context)
@@ -79,6 +80,7 @@ class InputEventRouterModifierE2ETest {
 
     @After
     fun tearDown() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         DeviceSpecific.clearTestOverrides()
         SettingsManager.resetVariationsToDefault(context)
         SettingsManager.setLongPressModifier(context, "alt")
@@ -858,17 +860,107 @@ class InputEventRouterModifierE2ETest {
         assertEquals(0, inputConnectionRecorder.deleteSurroundingTextCalls)
     }
 
+    @Test
+    fun uyghurLayout_typesWordInLogicalOrderAndShiftLetters() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        SettingsManager.setLongPressModifier(context, "variations")
+        val callbacks = callbacksWithCurrentLayout()
+        val wordKeys = listOf(
+            KeyEvent.KEYCODE_SLASH, KeyEvent.KEYCODE_U, KeyEvent.KEYCODE_Y, KeyEvent.KEYCODE_C,
+            KeyEvent.KEYCODE_U, KeyEvent.KEYCODE_R, KeyEvent.KEYCODE_Q, KeyEvent.KEYCODE_G
+        )
+        wordKeys.forEach { key ->
+            assertTrue(routeKeyDown(key, keyDown(key), callbacks) is InputEventRouter.EditableFieldRoutingResult.Consume)
+        }
+        assertEquals("ئۇيغۇرچە", inputConnectionRecorder.committedTexts.joinToString(""))
+
+        inputConnectionRecorder.committedTexts.clear()
+        listOf(KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
+            KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_M,
+            KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_X).forEach { key ->
+            routeKeyDown(key, keyDown(key, KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON), callbacks)
+        }
+        assertEquals(listOf("ژ", "ف", "گ", "خ", "ج", "ۆ", "لا", "ئ", "ن", "ۈ", "ش"), inputConnectionRecorder.committedTexts)
+    }
+
+    @Test
+    fun uyghurLayout_compactPunctuationConsumesOneShotAlt() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val callbacks = callbacksWithCurrentLayout()
+        listOf(KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_J).forEach { key ->
+            primeAltOneShot(callbacks)
+            // The IME service records intervening letters before calling the router.
+            modifierStateController.registerNonModifierKey()
+            assertTrue(routeKeyDown(key, keyDown(key), callbacks) is InputEventRouter.EditableFieldRoutingResult.Consume)
+            assertFalse(modifierStateController.altOneShot)
+        }
+        assertEquals(listOf("؟", "،", "؛"), inputConnectionRecorder.committedTexts)
+    }
+
+    @Test
+    fun uyghurAltPunctuation_followsLayoutSwitchesForHardwareAndSoftwareInput() {
+        DeviceSpecific.setBuildFingerprintForTests("zinwa", "zinwa", "Q25", "Q25", "q25")
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        // Initialize the cached device map while Uyghur is selected to catch
+        // overrides leaking into English after a language switch.
+        rebuildAltSymControllers()
+        val callbacks = callbacksWithCurrentLayout()
+        val altMeta = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+
+        listOf("uyghur", "qwerty", "uyghur").forEach { layout ->
+            rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, layout, context)
+            val expected = if (layout == "uyghur") listOf("،", "؟", "؛") else listOf(",", "?", ";")
+            listOf(false, true).forEach { softwareInput ->
+                inputConnectionRecorder.committedTexts.clear()
+                val override = if (softwareInput) {
+                    rocks.pkb.plektra.data.mappings.AltModifierMappingResolver.resolve(context.assets, context)
+                } else null
+                listOf(KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_J).forEach { key ->
+                    assertTrue(routeKeyDown(key, keyDown(key, altMeta), callbacks,
+                        altMappingsOverride = override) is InputEventRouter.EditableFieldRoutingResult.Consume)
+                }
+                assertEquals(expected, inputConnectionRecorder.committedTexts)
+            }
+        }
+    }
+
+    @Test
+    fun uyghurLayout_fullKeyboardPunctuationUsesMappedOutput() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val callbacks = callbacksWithCurrentLayout()
+        listOf(KeyEvent.KEYCODE_COMMA, KeyEvent.KEYCODE_PERIOD, KeyEvent.KEYCODE_SEMICOLON,
+            KeyEvent.KEYCODE_MINUS).forEach { key -> routeKeyDown(key, keyDown(key), callbacks) }
+        listOf(KeyEvent.KEYCODE_SLASH, KeyEvent.KEYCODE_SEMICOLON, KeyEvent.KEYCODE_1).forEach { key ->
+            routeKeyDown(key, keyDown(key, KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON), callbacks)
+        }
+        assertEquals(listOf("،", ".", "؛", "-", "؟", ":", "!"), inputConnectionRecorder.committedTexts)
+    }
+
+    @Test
+    fun uyghurLayout_preservesQ25AltNumbersAndSymbols() {
+        DeviceSpecific.setBuildFingerprintForTests("zinwa", "zinwa", "Q25", "Q25", "q25")
+        rebuildAltSymControllers()
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val callbacks = callbacksWithCurrentLayout()
+        listOf(KeyEvent.KEYCODE_R, KeyEvent.KEYCODE_H, KeyEvent.KEYCODE_B,
+            KeyEvent.KEYCODE_I, KeyEvent.KEYCODE_M).forEach { key ->
+            routeKeyDown(key, keyDown(key, KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON), callbacks)
+        }
+        assertEquals(listOf("3", ":", "!", "-", "."), inputConnectionRecorder.committedTexts)
+    }
+
     private fun routeKeyDown(
         keyCode: Int,
         event: KeyEvent,
         callbacks: TestCallbacks,
         clearAltOnSpaceEnabled: Boolean = false,
-        isNumericField: Boolean = false
+        isNumericField: Boolean = false,
+        altMappingsOverride: Map<Int, String>? = null
     ): InputEventRouter.EditableFieldRoutingResult {
         return router.routeEditableFieldKeyDown(
             keyCode = keyCode,
             event = event,
-            params = buildParams(clearAltOnSpaceEnabled, isNumericField),
+            params = buildParams(clearAltOnSpaceEnabled, isNumericField).copy(altMappingsOverride = altMappingsOverride),
             controllers = InputEventRouter.EditableFieldKeyDownControllers(
                 modifierStateController = modifierStateController,
                 symLayoutController = symLayoutController,

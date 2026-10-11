@@ -251,6 +251,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     private val shouldDisableAutoCapitalize: Boolean
         get() {
+            if (!LayoutMappingRepository.supportsAutoCapitalization) return true
             if (!inputContextState.shouldDisableAutoCapitalize) return false
             val includeRestrictedFields = SettingsManager.getAutoCapitalizeRestrictedFields(this)
             return !includeRestrictedFields || inputContextState.isPasswordField
@@ -1514,6 +1515,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun requestAutoCapShiftOneShot(): Boolean {
+        if (shouldDisableAutoCapitalize) return false
         if (isAutoCapSuppressedAtCursor()) return false
         return modifierStateController.requestShiftOneShotFromAutoCap()
     }
@@ -1631,6 +1633,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private fun switchToLayout(layoutName: String, showToast: Boolean) {
         activeKeyboardLayoutName = layoutName
         LayoutMappingRepository.loadLayout(assets, layoutName, this)
+        if (!LayoutMappingRepository.supportsAutoCapitalization) {
+            modifierStateController.consumeShiftOneShot()
+        }
         variationStateController = VariationStateController(
             VariationRepository.loadVariations(assets, this, activeKeyboardLayoutName)
         )
@@ -3629,7 +3634,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { modifierStateController.capsLockEnabled = true },
+                enableCapsLock = {
+                    if (LayoutMappingRepository.supportsAutoCapitalization) modifierStateController.capsLockEnabled = true
+                },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
@@ -3678,7 +3685,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { modifierStateController.capsLockEnabled = true },
+                enableCapsLock = {
+                    if (LayoutMappingRepository.supportsAutoCapitalization) modifierStateController.capsLockEnabled = true
+                },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
@@ -5110,6 +5119,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ctrlLatchActive ||
             ctrlOneShot ||
             ctrlLatchFromNavMode
+        val layoutTextForKey = if (!altActiveNow && !ctrlActiveNow && LayoutMappingRepository.isMapped(keyCode)) {
+            LayoutMappingRepository.getCharacterStringWithModifiers(
+                keyCode, event?.isShiftPressed == true || shiftLayerLatched, capsLockEnabled, shiftOneShot
+            )
+        } else null
         when {
             keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DEL -> {
                 DeferredPunctuationSpaceTracker.clear()
@@ -5117,6 +5131,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             !altActiveNow && !ctrlActiveNow && ic != null -> {
                 val typedText = when {
                     keyCode == KeyEvent.KEYCODE_SPACE -> " "
+                    layoutTextForKey != null -> layoutTextForKey
                     event?.unicodeChar?.takeIf { it != 0 } != null -> event.unicodeChar.toChar().toString()
                     else -> ""
                 }
@@ -5148,7 +5163,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
-        if (!altActiveNow) {
+        // Remapped characters must go through the layout-aware path below.
+        // In particular, a Uyghur / key is a letter, not an ASCII boundary.
+        val hasRemappedText = layoutTextForKey != null &&
+            layoutTextForKey != event?.unicodeChar?.takeIf { it != 0 }?.toChar()?.toString()
+        if (!altActiveNow && !hasRemappedText) {
             if (
                 inputEventRouter.handleTextInputPipeline(
                     context = this,

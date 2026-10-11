@@ -76,7 +76,7 @@ class AlternateCharacterManager(
 
     init {
         context?.let {
-            altModifierMappings.putAll(AltModifierMappingResolver.resolve(assets, it))
+            altModifierMappings.putAll(AltModifierMappingResolver.resolveBaseMappings(assets, it))
             deviceSymMappings.putAll(DeviceSymMappingRepository.load(assets, it))
         }
         symKeyMap.putAll(KeyMappingLoader.loadSymKeyMappings(assets))
@@ -92,12 +92,12 @@ class AlternateCharacterManager(
 
     fun reloadModifierAndDeviceSymMappings() {
         altModifierMappings.clear()
-        context?.let { altModifierMappings.putAll(AltModifierMappingResolver.resolve(assets, it)) }
+        context?.let { altModifierMappings.putAll(AltModifierMappingResolver.resolveBaseMappings(assets, it)) }
         deviceSymMappings.clear()
         context?.let { deviceSymMappings.putAll(DeviceSymMappingRepository.load(assets, it)) }
     }
 
-    fun getAltModifierMappings(): Map<Int, String> = altModifierMappings
+    fun getAltModifierMappings(): Map<Int, String> = LayoutMappingRepository.applyAltMappings(altModifierMappings)
 
     fun getDeviceSymMappings(): Map<Int, String> = deviceSymMappings
 
@@ -153,7 +153,7 @@ class AlternateCharacterManager(
         }
     }
 
-    fun hasAltMapping(keyCode: Int): Boolean = altModifierMappings.containsKey(keyCode)
+    fun hasAltMapping(keyCode: Int): Boolean = getAltModifierMappings().containsKey(keyCode)
 
     fun hasSymLongPressMapping(keyCode: Int, shiftPressed: Boolean): Boolean {
         val page = context?.let(SettingsManager::resolveLongPressSymPage) ?: 1
@@ -305,7 +305,7 @@ class AlternateCharacterManager(
                 shiftPressed = keyPressWasShifted[keyCode] == true
             )
             "shift" -> LayoutMappingRepository.isMapped(keyCode) && normalChar.isNotEmpty()
-            else -> altModifierMappings.containsKey(keyCode)
+            else -> hasAltMapping(keyCode)
         }
         
         if (shouldScheduleLongPress) {
@@ -322,7 +322,7 @@ class AlternateCharacterManager(
         mappingsOverride: Map<Int, String>? = null,
         defaultHandler: (Int, KeyEvent?) -> Boolean
     ): Boolean {
-        val altChar = (mappingsOverride ?: altModifierMappings)[keyCode]
+        val altChar = (mappingsOverride ?: getAltModifierMappings())[keyCode]
         return if (altChar != null) {
             if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
                 altChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
@@ -563,7 +563,7 @@ class AlternateCharacterManager(
 
                     else -> {
                         // Long press with Alt: use existing Alt mapping (default).
-                        val altChar = altModifierMappings[keyCode]
+                        val altChar = getAltModifierMappings()[keyCode]
 
                         if (altChar != null) {
                             longPressActivated[keyCode] = true

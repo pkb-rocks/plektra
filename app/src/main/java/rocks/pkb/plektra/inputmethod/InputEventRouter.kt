@@ -615,6 +615,25 @@ class InputEventRouter(
             return EditableFieldRoutingResult.Consume
         }
 
+        // Layouts can put punctuation on letter keys (e.g. Uyghur Shift+V)
+        // and letters on punctuation keys (e.g. Uyghur /). Neither may fall
+        // through to the system's Latin keymap or the alphabetic-only path.
+        val mappedText = mapping?.let {
+            LayoutMappingRepository.resolveText(it, resolvedUppercase)
+        }
+        if (
+            mapping?.isRealMultiTap == false && !mappedText.isNullOrEmpty() &&
+            (!callbacks.isAlphabeticKey(keyCode) || !mappedText.first().isLetter())
+        ) {
+            controllers.alternateCharacterManager.cancelPendingLongPress(keyCode)
+            if (shiftOneShotActive) callbacks.disableShiftOneShot()
+            if (!callbacks.handleBoundaryText(mappedText, ic)) {
+                commitTextWithTracking(ic, mappedText)
+            }
+            callbacks.updateStatusBar()
+            return EditableFieldRoutingResult.Consume
+        }
+
         val shouldUseMultiTap = mapping?.isRealMultiTap == true &&
             !shouldSuppressUppercaseEszettMultiTap(mapping, resolvedUppercase)
 

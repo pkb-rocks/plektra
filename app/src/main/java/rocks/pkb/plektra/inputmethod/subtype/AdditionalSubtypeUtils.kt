@@ -31,7 +31,7 @@ object AdditionalSubtypeUtils {
     private const val EXTRA_KEY_IS_ADDITIONAL_SUBTYPE = "isAdditionalSubtype"
     private val BASE_SUBTYPE_LOCALES = setOf(
         "en_US", "it_IT", "fr_FR", "de_DE", "pl_PL", "da_DK",
-        "no_NO", "es_ES", "pt_PT", "ru_RU", "sr_RS", "uk_UA"
+        "no_NO", "es_ES", "pt_PT", "ru_RU", "sr_RS", "uk_UA", "ug_CN"
     )
 
     fun InputMethodSubtype.localeString(): String =
@@ -294,6 +294,7 @@ object AdditionalSubtypeUtils {
             "es" -> R.string.input_method_name_es
             "pt" -> R.string.input_method_name_pt
             "ru" -> R.string.input_method_name_ru
+            "ug" -> R.string.input_method_name_ug
             else -> 0 // Use 0 for custom locales - Android will auto-generate name from locale
         }
     }

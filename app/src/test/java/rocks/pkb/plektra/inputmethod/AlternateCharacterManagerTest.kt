@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,6 +30,7 @@ class AlternateCharacterManagerTest {
     @Before
     fun setUp() {
         context = RuntimeEnvironment.getApplication()
+        LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         prefs = context.getSharedPreferences("alt_sym_manager_tests", Context.MODE_PRIVATE)
         prefs.edit().clear().putLong("long_press_threshold", 50L).commit()
         SettingsManager.setLongPressModifier(context, "variations")
@@ -43,8 +45,26 @@ class AlternateCharacterManagerTest {
 
     @After
     fun tearDown() {
+        LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         SettingsManager.resetVariationsToDefault(context)
         SettingsManager.setLongPressModifier(context, "alt")
+    }
+
+    @Test
+    fun uyghurAltLongPress_usesLayoutPunctuation() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val manager = AlternateCharacterManager(context.assets, prefs, context)
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+
+        listOf(KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_J).forEach { key ->
+            manager.handleKeyWithAltMapping(key, KeyEvent(KeyEvent.ACTION_DOWN, key), false, inputConnection)
+            shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+            manager.handleKeyUp(key, symKeyActive = false)
+        }
+
+        assertEquals("،؟؛", recorder.text)
     }
 
     @Test
@@ -271,6 +291,11 @@ class AlternateCharacterManagerTest {
                         val before = args?.getOrNull(0) as Int
                         val after = args.getOrNull(1) as Int
                         deleteCalls += before to after
+                        val start = (selectionStart - before).coerceAtLeast(0)
+                        val end = (selectionEnd + after).coerceAtMost(text.length)
+                        text = text.removeRange(selectionEnd, end).removeRange(start, selectionStart)
+                        selectionEnd -= selectionStart - start
+                        selectionStart = start
                         true
                     }
                     "finishComposingText" -> {

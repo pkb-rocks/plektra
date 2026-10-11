@@ -71,10 +71,10 @@ class AospKeyboardViewTest {
     }
 
     @Test
-    fun cyrillicProfilesRenderAndCommitTheirOwnMappingsInEverySoftwareStyle() {
+    fun nonLatinProfilesRenderAndCommitTheirOwnMappingsInEverySoftwareStyle() {
         val context = RuntimeEnvironment.getApplication()
         val layouts = listOf("russian_standard", "russian_jcuken", "russian_translit", "ukrainian",
-            "serbian_cyrillic", "bulgarian_phonetic", "bulgarian_phonetic_traditional", "Cyrillic_Translite")
+            "serbian_cyrillic", "bulgarian_phonetic", "bulgarian_phonetic_traditional", "Cyrillic_Translite", "uyghur")
         layouts.forEach { layout ->
             val mappings = requireNotNull(rocks.pkb.plektra.data.layout.JsonLayoutLoader.loadLayout(context.assets, layout, context))
             AospKeyboardView.SoftwareLayoutStyle.entries.forEach { style ->

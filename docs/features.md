@@ -4,7 +4,7 @@ Plektra focuses on efficient text input on Android devices with physical keyboar
 
 ## Physical keyboard
 
-- QWERTY, QWERTZ, AZERTY, Greek, Cyrillic, Arabic, and transliteration layouts
+- QWERTY, QWERTZ, AZERTY, Greek, Cyrillic, Arabic, Uyghur, and transliteration layouts
 - Importable JSON layouts and per-layout variations
 - Configurable Shift, Ctrl, Alt, SYM, long-press, multi-tap, and navigation behaviour
 - App launch shortcuts and command mappings
@@ -30,6 +30,8 @@ Plektra focuses on efficient text input on Android devices with physical keyboar
 ## Languages
 
 German, English and Italian dictionaries are bundled. Download other base dictionaries from Installed dictionaries. User words remain available without a base dictionary. Installing or removing a package refreshes the active keyboard.
+
+Uyghur (ئۇيغۇرچە) includes a typing layout without a dictionary. Add `ug` in Settings → Input Languages and choose the Uyghur layout. It uses Uyghur computer key positions with extra Shift and Alt shortcuts for compact keyboards such as the Zinwa Q25. See [the key mappings](development.md#uyghur-layout).
 
 ## Data
 

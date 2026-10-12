@@ -4437,6 +4437,21 @@ object SettingsManager {
             .putBoolean(KEY_POWER_SHORTCUTS_ENABLED, enabled)
             .apply()
     }
+
+    // djb/sym-shortcuts: Sym+C/V/X/A edit shortcuts toggle
+    private const val KEY_SYM_EDIT_SHORTCUTS = "sym_edit_shortcuts"
+    private const val DEFAULT_SYM_EDIT_SHORTCUTS = true
+
+    /** Sym+C/V/X/A copy, paste, cut and select all in text fields; on by default. */
+    fun getSymEditShortcutsEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_SYM_EDIT_SHORTCUTS, DEFAULT_SYM_EDIT_SHORTCUTS)
+    }
+
+    fun setSymEditShortcutsEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SYM_EDIT_SHORTCUTS, enabled)
+            .apply()
+    }
     
     /**
      * Returns whether nav mode is enabled.

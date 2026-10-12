@@ -60,6 +60,135 @@ class AlternateCharacterManagerTest {
         LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         SettingsManager.resetVariationsToDefault(context)
         SettingsManager.setLongPressModifier(context, "alt")
+        SettingsManager.setLongPressCycleNext(context, "off")
+        SettingsManager.setLongPressCycleEnd(context, "stop")
+    }
+
+    private fun pressT(manager: AlternateCharacterManager, inputConnection: InputConnection) {
+        manager.handleKeyWithAltMapping(
+            keyCode = KeyEvent.KEYCODE_T,
+            inputConnection = inputConnection,
+            event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_T),
+            capsLockEnabled = false,
+            layoutChar = 't'
+        )
+    }
+
+    private fun cycleManager(first: String, next: String, end: String): AlternateCharacterManager {
+        SettingsManager.setLongPressModifier(context, first)
+        SettingsManager.setLongPressCycleNext(context, next)
+        SettingsManager.setLongPressCycleEnd(context, end)
+        return AlternateCharacterManager(context.assets, prefs, context).apply {
+            addAltKeyMapping(KeyEvent.KEYCODE_T, "(")
+        }
+    }
+
+    private fun idle(ms: Long) {
+        shadowOf(Looper.getMainLooper()).idleFor(ms, TimeUnit.MILLISECONDS)
+    }
+
+    @Test
+    fun longPressCycle_stepsThroughShiftThenAltAndStops() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+
+        pressT(manager, inputConnection)
+        assertEquals("t", recorder.text)
+        idle(60)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("(", recorder.text)
+        idle(500)
+        assertEquals("(", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_altThenShiftReturnsToTypedCharacterAndStops() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "alt", next = "shift", end = "original")
+        val normalCommits = mutableListOf<String>()
+        manager.onNormalCharCommitted = { normalCommits += it }
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("(", recorder.text)
+        idle(50)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("t", recorder.text)
+        idle(500)
+        assertEquals("t", recorder.text)
+
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+        assertEquals(listOf("t"), normalCommits)
+    }
+
+    @Test
+    fun longPressCycle_loopKeepsCyclingWhileHeld() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "loop")
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("(", recorder.text)
+        idle(50)
+        assertEquals("t", recorder.text)
+        idle(50)
+        assertEquals("T", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_releaseKeepsShownCharacter() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "loop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(60)
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+        idle(500)
+
+        assertEquals("T", recorder.text)
+        assertEquals(listOf('T'), altInserted)
+    }
+
+    @Test
+    fun longPressCycle_punctuationIsRecommittedThroughAltPathOnRelease() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("a ", 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(110)
+        assertEquals("a (", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+
+        assertEquals("a (", recorder.text)
+        assertEquals(listOf(1 to 0), recorder.deleteCalls)
+        assertEquals(listOf('('), altInserted)
+    }
+
+    @Test
+    fun longPressCycle_offKeepsSingleStepLongPress() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "alt", next = "off", end = "loop")
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("(", recorder.text)
+        idle(500)
+        assertEquals("(", recorder.text)
     }
 
     @Test
@@ -750,9 +879,10 @@ class AlternateCharacterManagerTest {
                         deleteCalls += before to after
                         val start = (selectionStart - before).coerceAtLeast(0)
                         val end = (selectionEnd + after).coerceAtMost(text.length)
-                        text = text.removeRange(start, end)
+                        val selected = text.substring(selectionStart, selectionEnd)
+                        text = text.substring(0, start) + selected + text.substring(end)
                         selectionStart = start
-                        selectionEnd = start
+                        selectionEnd = start + selected.length
                         true
                     }
                     "finishComposingText" -> {

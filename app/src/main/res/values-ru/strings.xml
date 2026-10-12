@@ -938,4 +938,12 @@ Nav Mode использует физическое положение клави
     <string name="software_keyboard_key_hints_title">Показывать дополнительные подписи</string>
     <string name="software_keyboard_key_hints_description">Показывает справа вверху альтернативу долгого нажатия, а слева внизу — символ Alt или SYM клавиши.</string>
     <string name="kw_on_screen_key_hints">подсказки клавиш, угловые подписи, долгое нажатие, Alt, SYM, дополнительные символы</string>
+    <string name="long_press_cycle_next_title">Удерживать дольше для</string>
+    <string name="long_press_cycle_next_description">Удерживайте после первого долгого нажатия, чтобы перейти ко второму символу, — заглавные буквы и символы одной рукой.</string>
+    <string name="long_press_cycle_next_off">Ничего (выкл.)</string>
+    <string name="long_press_cycle_end_title">После последнего шага</string>
+    <string name="long_press_cycle_end_stop">Оставить последний символ</string>
+    <string name="long_press_cycle_end_original">Вернуться к набранному символу</string>
+    <string name="long_press_cycle_end_loop">Продолжать переключать, пока удерживается</string>
+    <string name="kw_modifiers_long_press_cycle">долгое нажатие, удержание, переключение, одной рукой, shift, символы</string>
 </resources>

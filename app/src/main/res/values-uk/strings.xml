@@ -938,4 +938,12 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="software_keyboard_key_hints_title">Показувати додаткові підписи</string>
     <string name="software_keyboard_key_hints_description">Показує праворуч угорі альтернативу довгого натискання, а ліворуч унизу — символ Alt або SYM клавіші.</string>
     <string name="kw_on_screen_key_hints">підказки клавіш, кутові підписи, довге натискання, Alt, SYM, додаткові символи</string>
+    <string name="long_press_cycle_next_title">Утримувати довше для</string>
+    <string name="long_press_cycle_next_description">Утримуйте після першого довгого натискання, щоб перейти до другого символу, — великі літери й символи однією рукою.</string>
+    <string name="long_press_cycle_next_off">Нічого (вимк.)</string>
+    <string name="long_press_cycle_end_title">Після останнього кроку</string>
+    <string name="long_press_cycle_end_stop">Залишити останній символ</string>
+    <string name="long_press_cycle_end_original">Повернутися до набраного символу</string>
+    <string name="long_press_cycle_end_loop">Перемикати далі, доки утримується</string>
+    <string name="kw_modifiers_long_press_cycle">довге натискання, утримання, перемикання, однією рукою, shift, символи</string>
 </resources>

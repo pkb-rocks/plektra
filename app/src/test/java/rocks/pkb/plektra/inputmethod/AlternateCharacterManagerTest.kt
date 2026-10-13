@@ -7,6 +7,7 @@ import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
+import rocks.pkb.plektra.core.DeferredPunctuationSpaceTracker
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -62,6 +63,8 @@ class AlternateCharacterManagerTest {
         SettingsManager.setLongPressModifier(context, "alt")
         SettingsManager.setLongPressCycleNext(context, "off")
         SettingsManager.setLongPressCycleEnd(context, "stop")
+        SettingsManager.setSpaceAfterPunctuation(context, "")
+        DeferredPunctuationSpaceTracker.clear()
     }
 
     private fun pressT(manager: AlternateCharacterManager, inputConnection: InputConnection) {
@@ -176,6 +179,40 @@ class AlternateCharacterManagerTest {
         assertEquals("a (", recorder.text)
         assertEquals(listOf(1 to 0), recorder.deleteCalls)
         assertEquals(listOf('('), altInserted)
+    }
+
+    @Test
+    fun longPressCycle_colonRecommitIsOneBatchEditAndKeepsDeferredSpace() {
+        SettingsManager.setSpaceAfterPunctuation(context, ":")
+        DeferredPunctuationSpaceTracker.clear()
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("a", 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop").apply {
+            addAltKeyMapping(KeyEvent.KEYCODE_H, ":")
+        }
+        // Same as the service: a long-press character counts as committed text.
+        manager.onAltCharInserted = { DeferredPunctuationSpaceTracker.onTextCommitted(context, it.toString()) }
+
+        manager.handleKeyWithAltMapping(
+            keyCode = KeyEvent.KEYCODE_H,
+            inputConnection = inputConnection,
+            event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_H),
+            capsLockEnabled = false,
+            layoutChar = 'h'
+        )
+        idle(110)
+        assertEquals("a:", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_H, symKeyActive = false)
+
+        assertEquals("a:", recorder.text)
+        assertEquals(listOf(1 to 0), recorder.deleteCalls)
+        assertEquals("delete and re-commit must share one batch edit", listOf(1), recorder.deleteBatchDepths)
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+
+        DeferredPunctuationSpaceTracker.prepareForTextCommit(context, inputConnection, "b")
+        inputConnection.commitText("b", 1)
+        assertEquals("a: b", recorder.text)
     }
 
     @Test
@@ -823,6 +860,7 @@ class AlternateCharacterManagerTest {
         private var composingEnd: Int = -1
         val composingRegions = mutableListOf<Pair<Int, Int>>()
         val deleteCalls = mutableListOf<Pair<Int, Int>>()
+        val deleteBatchDepths = mutableListOf<Int>()
 
         fun replaceTextDirectly(start: Int, end: Int, replacement: String) {
             text = text.replaceRange(start, end, replacement)
@@ -877,6 +915,7 @@ class AlternateCharacterManagerTest {
                         val before = args?.getOrNull(0) as Int
                         val after = args.getOrNull(1) as Int
                         deleteCalls += before to after
+                        deleteBatchDepths += batchDepth
                         val start = (selectionStart - before).coerceAtLeast(0)
                         val end = (selectionEnd + after).coerceAtMost(text.length)
                         val selected = text.substring(selectionStart, selectionEnd)
@@ -900,8 +939,8 @@ class AlternateCharacterManagerTest {
                         true
                     }
                     "endBatchEdit" -> {
-                        batchDepth--
-                        true
+                        if (batchDepth > 0) batchDepth--
+                        batchDepth > 0
                     }
                     "getTextBeforeCursor" -> if (textBeforeCursorAvailable) {
                         val length = args?.getOrNull(0) as Int

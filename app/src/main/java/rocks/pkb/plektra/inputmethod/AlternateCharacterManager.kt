@@ -761,14 +761,22 @@ class AlternateCharacterManager(
         if (shownBeforeCursor) {
             // Re-commit punctuation through the Alt path so boundary handling,
             // French spacing and auto-space replacement apply to the final choice.
-            inputConnection.deleteSurroundingText(text.length, 0)
-            handleAltCombination(
-                keyCode = keyCode,
-                inputConnection = inputConnection,
-                event = null,
-                mappingsOverride = mapOf(keyCode to text),
-                defaultHandler = { _, _ -> false }
-            )
+            // One batch edit, so editors that honour it report a single selection
+            // change rather than the delete on its own (which would look like a
+            // cursor move and drop a deferred punctuation space).
+            inputConnection.beginBatchEdit()
+            try {
+                inputConnection.deleteSurroundingText(text.length, 0)
+                handleAltCombination(
+                    keyCode = keyCode,
+                    inputConnection = inputConnection,
+                    event = null,
+                    mappingsOverride = mapOf(keyCode to text),
+                    defaultHandler = { _, _ -> false }
+                )
+            } finally {
+                inputConnection.endBatchEdit()
+            }
             return
         }
         text.firstOrNull()?.let { onAltCharInserted?.invoke(it) }

@@ -720,7 +720,13 @@ class AlternateCharacterManager(
     }
 
     private fun advanceLongPressCycle(keyCode: Int, cycle: LongPressCycle): Boolean {
-        val nextIndex = (cycle.index + 1) % cycle.steps.size
+        var nextIndex = (cycle.index + 1) % cycle.steps.size
+        // Never spend a step on the text already shown: skip to the one after it.
+        if (cycle.steps[nextIndex] == cycle.displayed && cycle.steps.size > 1 &&
+            (cycle.loop || nextIndex < cycle.steps.lastIndex)
+        ) {
+            nextIndex = (nextIndex + 1) % cycle.steps.size
+        }
         val next = cycle.steps[nextIndex]
         if (next != cycle.displayed) {
             val replaced = replaceLongPressCycleText(
@@ -822,11 +828,8 @@ class AlternateCharacterManager(
                     }
                 }
             }
-            "shift" -> if (LayoutMappingRepository.isMapped(keyCode)) {
-                LayoutMappingRepository.getUppercase(keyCode)
-            } else {
-                insertedChar.takeIf { it[0].isLetter() }?.uppercase()
-            }
+            // Toggles case, so an auto-capitalized T steps to t rather than repeating T.
+            "shift" -> resolveShiftLongPressText(keyCode, insertedChar)
             else -> getAltModifierMappings()[keyCode]
         }
     }

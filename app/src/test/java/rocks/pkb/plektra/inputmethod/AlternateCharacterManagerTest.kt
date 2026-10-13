@@ -216,6 +216,41 @@ class AlternateCharacterManagerTest {
     }
 
     @Test
+    fun longPressCycle_autoCapitalizedOriginalLoopsThroughLowercase() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "loop")
+
+        pressT(manager, inputConnection, shiftOneShot = true)
+        assertEquals("T", recorder.text)
+        idle(60)
+        assertEquals("t", recorder.text)
+        idle(50)
+        assertEquals("(", recorder.text)
+        idle(50)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("t", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_autoCapitalizedOriginalShiftThenSymStopsOnSym() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+
+        pressT(manager, inputConnection, shiftOneShot = true)
+        assertEquals("T", recorder.text)
+        // The first step is a real change (T -> t), not a pause on T.
+        idle(60)
+        assertEquals("t", recorder.text)
+        idle(50)
+        assertEquals("(", recorder.text)
+        idle(500)
+        assertEquals("(", recorder.text)
+    }
+
+    @Test
     fun longPressCycle_offKeepsSingleStepLongPress() {
         val recorder = RecordingInputConnection()
         val inputConnection = recorder.asProxy()

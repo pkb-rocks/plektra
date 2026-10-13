@@ -2,6 +2,8 @@ package rocks.pkb.plektra.inputmethod
 
 import android.content.Context
 import android.os.Build
+import rocks.pkb.plektra.toolbox.BloatCatalog
+import rocks.pkb.plektra.toolbox.SystemTweaks
 
 /**
  * The closed set of shell commands the app may run through the embedded ADB broker.
@@ -17,9 +19,10 @@ import android.os.Build
  * A group that needs another privileged command adds one case below, with a comment naming the
  * group and a stable [id] for the audit log, and runs it through [PrivilegedShell].
  *
- * The backlight adds its cases below the broker's own, each with an [id]. The app's package name
- * is validated with [isValidPackageName], and settings keys and values come from constants and
- * enums here.
+ * The backlight and toolbox add their cases below the broker's own, each with an
+ * [id]. Package names are validated with [isValidPackageName] (removal also needs the toolbox
+ * catalog's approval), numbers are Ints in a fixed range, and settings keys and values come from
+ * constants and enums here and in `toolbox.SystemTweaks`.
  */
 internal sealed class PrivilegedCommand {
 
@@ -145,6 +148,136 @@ internal sealed class PrivilegedCommand {
         STOCK("30000")
     }
 
+    // the commands the Titan 2 Elite toolbox needs (bloat remover, display density,
+    // system tweaks, Fn -> Ctrl). Package names are validated with [isValidPackageName], removal
+    // also needs the catalog's approval; numbers are Ints in a fixed range; settings keys and
+    // values come from constants and enums in this block and in `toolbox.SystemTweaks`.
+
+    /** Three read-only listings in one round trip: enabled, disabled, and everything. */
+    object ListPackageStates : PrivilegedCommand() {
+        override val id = "list_package_states"
+        override val readOnly: Boolean get() = true
+        override fun commandLine(appPackage: String): String =
+            "echo __E__; pm list packages -e; echo __D__; pm list packages -d; echo __U__; pm list packages -u"
+    }
+
+    /** Hide a catalog package and stop it running. Reversible. */
+    class DisablePackage(val packageName: String) : PrivilegedCommand() {
+        override val id = "disable_package"
+        override fun commandLine(appPackage: String): String {
+            require(isRemovableCatalogPackage(packageName)) { "package is not removable" }
+            return "pm disable-user --user 0 $packageName"
+        }
+    }
+
+    /** Uninstall a catalog package for user 0. The APK stays on /system, so it can come back. */
+    class UninstallPackage(val packageName: String) : PrivilegedCommand() {
+        override val id = "uninstall_package"
+        override fun commandLine(appPackage: String): String {
+            require(isRemovableCatalogPackage(packageName)) { "package is not removable" }
+            return "pm uninstall --user 0 $packageName"
+        }
+    }
+
+    /**
+     * Bring back a package the journal says the toolbox removed. Only the name shape is checked:
+     * the catalog may have retired the entry since, and a journaled package must still come back.
+     */
+    class InstallExistingPackage(val packageName: String) : PrivilegedCommand() {
+        override val id = "install_existing_package"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(packageName)) { "invalid package name" }
+            return "cmd package install-existing --user 0 $packageName"
+        }
+    }
+
+    /** Re-enable a package that was disabled. Same name rule as [InstallExistingPackage]. */
+    class EnablePackage(val packageName: String) : PrivilegedCommand() {
+        override val id = "enable_package"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(packageName)) { "invalid package name" }
+            return "pm enable --user 0 $packageName"
+        }
+    }
+
+    object ReadDensity : PrivilegedCommand() {
+        override val id = "read_density"
+        override val readOnly: Boolean get() = true
+        override fun commandLine(appPackage: String): String = "wm density"
+    }
+
+    object ResetDensity : PrivilegedCommand() {
+        override val id = "reset_density"
+        override fun commandLine(appPackage: String): String = "wm density reset"
+    }
+
+    /** `wm density <dpi>`, the dpi an Int inside [MIN_DPI]..[MAX_DPI]. */
+    class SetDensity(val dpi: Int) : PrivilegedCommand() {
+        override val id = "set_density"
+        override fun commandLine(appPackage: String): String {
+            require(dpi in MIN_DPI..MAX_DPI) { "density out of range" }
+            return "wm density $dpi"
+        }
+
+        companion object {
+            const val MIN_DPI = 100
+            const val MAX_DPI = 1000
+        }
+    }
+
+    /** One `settings get` per tweak, in the order `SystemTweaks.parse` reads them. */
+    object ReadSystemTweaks : PrivilegedCommand() {
+        override val id = "read_system_tweaks"
+        override val readOnly: Boolean get() = true
+        override fun commandLine(appPackage: String): String = buildList {
+            add("settings get global ${SystemTweaks.ANIMATION_KEYS.first()}")
+            SystemTweaks.Toggle.entries.forEach { add("settings get ${it.namespace} ${it.key}") }
+        }.joinToString("; ")
+    }
+
+    class SetAnimationSpeed(val speed: SystemTweaks.AnimationSpeed) : PrivilegedCommand() {
+        override val id = "set_animation_speed"
+        override fun commandLine(appPackage: String): String =
+            SystemTweaks.ANIMATION_KEYS.joinToString("; ") { "settings put global $it ${speed.arg}" }
+    }
+
+    /** On writes 1; off DELETES the key, because these ship unset. */
+    class SetTweak(val toggle: SystemTweaks.Toggle, val enabled: Boolean) : PrivilegedCommand() {
+        override val id = "set_tweak"
+        override fun commandLine(appPackage: String): String =
+            if (enabled) {
+                "settings put ${toggle.namespace} ${toggle.key} 1"
+            } else {
+                "settings delete ${toggle.namespace} ${toggle.key}"
+            }
+    }
+
+    object ResetSystemTweaks : PrivilegedCommand() {
+        override val id = "reset_system_tweaks"
+        override fun commandLine(appPackage: String): String = (
+            SystemTweaks.ANIMATION_KEYS.map { "settings put global $it 1.0" } +
+                SystemTweaks.Toggle.entries.map { "settings delete ${it.namespace} ${it.key}" }
+            ).joinToString("; ")
+    }
+
+    /**
+     * Writes the two vendor programmable-key rows. Both are Ints in 0..[MAX_VALUE]: 1/1 maps Fn to
+     * Ctrl, and a revert writes back whatever small integers were there before.
+     */
+    class SetFnProgrammableKey(val enable: Int, val function: Int) : PrivilegedCommand() {
+        override val id = "set_fn_programmable_key"
+        override fun commandLine(appPackage: String): String {
+            require(enable in 0..MAX_VALUE && function in 0..MAX_VALUE) { "value out of range" }
+            return "settings put system $KEY_ENABLE $enable; settings put system $KEY_FUNCTION $function"
+        }
+
+        companion object {
+            const val KEY_ENABLE = "fn_programmable_key_enable"
+            const val KEY_FUNCTION = "fn_programmable_key_function"
+            const val MAX_VALUE = 1000
+        }
+    }
+
     companion object {
         /** Dotted Java package, no shell metacharacters. */
         private val PACKAGE_NAME = Regex("^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$")
@@ -170,6 +303,10 @@ internal sealed class PrivilegedCommand {
         val UNPAIR_VERIFIED_SDKS = Build.VERSION_CODES.R..36
 
         fun canUnpairOnSdk(sdkInt: Int): Boolean = sdkInt in UNPAIR_VERIFIED_SDKS
+
+        // valid AND approved by the toolbox catalog (its deny-list and patterns apply).
+        fun isRemovableCatalogPackage(name: String): Boolean =
+            isValidPackageName(name) && BloatCatalog.isRemovable(name)
 
         // the vendor binder service. transaction 2 = SET(String key, String value),
         // transaction 1 = GET(String key); GET returns a String16 parcel with the current value.

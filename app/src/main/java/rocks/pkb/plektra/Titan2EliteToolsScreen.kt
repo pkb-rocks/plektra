@@ -45,6 +45,14 @@ fun Titan2EliteToolsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit
 ) {
+    // a toolbox page opens as a child settings activity (ToolboxSection.kt) and
+    // replaces this list while it is showing.
+    val toolboxPage = ToolboxPage.fromChild(settingsChild(LocalContext.current, ToolboxPage.SECTION))
+    if (toolboxPage != null) {
+        ToolboxPageHost(page = toolboxPage, modifier = modifier, onBack = onBack)
+        return
+    }
+
     Scaffold(
         topBar = {
             Surface(
@@ -93,8 +101,11 @@ fun Titan2EliteToolsScreen(
             // Broker safety: Wireless debugging off after setup, the key-expiry advice, the audit log.
             BrokerSafetySection()
 
+            // bloat remover, density, system tweaks, key mapping, Fn -> Ctrl, status bar, reset
+            ToolboxSection()
+
             // add one section per feature below, each a composable in its own file
-            // (backlight, ...). Register its settings in
+            // (backlight, toolbox, ...). Register its settings in
             // Titan2EliteToolsSettingEntries.kt so search and deep links reach it.
 
             // smart keyboard backlight

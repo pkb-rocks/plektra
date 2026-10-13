@@ -46,6 +46,63 @@ internal fun titan2EliteToolsSettingEntries(): List<SettingEntry> = listOf(
         route = SettingRoute(SettingsDestination.Titan2EliteTools),
         availabilityCheck = titan2EliteOnly,
         unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    // the toolbox rows, rendered by ToolboxSection.kt
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_BLOAT,
+        titleRes = R.string.bloat_title,
+        summaryRes = R.string.bloat_row_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_DENSITY,
+        titleRes = R.string.density_title,
+        summaryRes = R.string.density_row_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_TWEAKS,
+        titleRes = R.string.tweaks_title,
+        summaryRes = R.string.tweaks_row_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_KEY_MAPPING,
+        titleRes = R.string.keymap_title,
+        summaryRes = R.string.keymap_row_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_FN_CTRL,
+        titleRes = R.string.fn_ctrl_map_title,
+        summaryRes = R.string.fn_ctrl_map_summary,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_SHOW_STATUS_BAR,
+        titleRes = R.string.show_status_bar_title,
+        summaryRes = R.string.show_status_bar_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_RESET_TO_STOCK,
+        titleRes = R.string.reset_to_stock_title,
+        summaryRes = R.string.reset_to_stock_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
     )
 )
 

@@ -81,8 +81,12 @@ class BrokerGateTest {
     fun aScreenTriggerRefusesEveryWritingCommand() {
         val screen = BrokerTrigger.forTest(BrokerTrigger.Kind.SCREEN)
         val writes = listOf(
+            PrivilegedCommand.SetDensity(320),
+            PrivilegedCommand.ResetDensity,
             PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON),
-            PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.STOCK),
+            PrivilegedCommand.SetTweak(rocks.pkb.plektra.toolbox.SystemTweaks.Toggle.entries.first(), true),
+            PrivilegedCommand.SetFnProgrammableKey(1, 1),
+            PrivilegedCommand.InstallExistingPackage("com.agui.factorytest"),
             PrivilegedCommand.GrantWriteSecureSettings,
             PrivilegedCommand.DisableWirelessDebugging,
         )
@@ -94,15 +98,11 @@ class BrokerGateTest {
         }
         // A read followed by a write is refused as a whole, before anything connects.
         val mixed = PrivilegedShell.runSession(
-            context, listOf(
-                PrivilegedCommand.ReadBacklightTimeout,
-                PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON)
-            ),
-            screen
+            context, listOf(PrivilegedCommand.ReadDensity, PrivilegedCommand.SetDensity(320)), screen
         )
         assertTrue(mixed.all { it.failure == EmbeddedAdbShell.REFUSED_NOT_ALLOWED })
         // Every refusal is audited (repeats of one id coalesce into one entry).
-        assertEquals((writes.map { it.id } + PrivilegedCommand.ReadBacklightTimeout.id).toSet(), refusals().map { it.id }.toSet())
+        assertEquals((writes.map { it.id } + "read_density").toSet(), refusals().map { it.id }.toSet())
     }
 
     @Test
@@ -112,6 +112,9 @@ class BrokerGateTest {
         Settings.Global.putInt(context.contentResolver, "adb_wifi_enabled", 0)
         val reads = listOf(
             PrivilegedCommand.Verify,
+            PrivilegedCommand.ReadDensity,
+            PrivilegedCommand.ReadSystemTweaks,
+            PrivilegedCommand.ListPackageStates,
             PrivilegedCommand.ReadBacklightTimeout,
         )
         reads.forEach { command ->

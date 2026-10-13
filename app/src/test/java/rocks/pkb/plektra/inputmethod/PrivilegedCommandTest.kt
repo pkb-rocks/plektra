@@ -29,6 +29,19 @@ class PrivilegedCommandTest {
         PrivilegedCommand.DisableWirelessDebugging,
         PrivilegedCommand.UnpairSelf.forThisDevice(fp),
         PrivilegedCommand.ReadBacklightTimeout,
+        PrivilegedCommand.ListPackageStates,
+        PrivilegedCommand.DisablePackage("com.agui.factorytest"),
+        PrivilegedCommand.UninstallPackage("com.agui.factorytest"),
+        PrivilegedCommand.InstallExistingPackage("com.agui.factorytest"),
+        PrivilegedCommand.EnablePackage("com.agui.factorytest"),
+        PrivilegedCommand.ReadDensity,
+        PrivilegedCommand.ResetDensity,
+        PrivilegedCommand.SetDensity(320),
+        PrivilegedCommand.ReadSystemTweaks,
+        PrivilegedCommand.SetAnimationSpeed(rocks.pkb.plektra.toolbox.SystemTweaks.AnimationSpeed.entries.first()),
+        PrivilegedCommand.SetTweak(rocks.pkb.plektra.toolbox.SystemTweaks.Toggle.entries.first(), true),
+        PrivilegedCommand.ResetSystemTweaks,
+        PrivilegedCommand.SetFnProgrammableKey(1, 1),
     ) + PrivilegedCommand.BacklightTimeout.entries.map { PrivilegedCommand.WriteBacklightTimeout(it) }
 
     @Test
@@ -96,7 +109,7 @@ class PrivilegedCommandTest {
     fun onlyTheReadsAreReadOnly() {
         val readOnly = everyCase().filter { it.readOnly }.map { it.id }.toSet()
         assertEquals(
-            setOf("verify", "read_backlight_timeout"),
+            setOf("verify", "read_backlight_timeout", "list_package_states", "read_density", "read_system_tweaks"),
             readOnly
         )
         everyCase().filter { it.readOnly }.forEach { command ->
@@ -104,6 +117,7 @@ class PrivilegedCommandTest {
             listOf("put", "delete", "grant", "revoke", "disable", "enable", "install", "uninstall", "reset", " s16 \"-1\"")
                 .forEach { verb -> assertFalse("${command.id}: $verb", line.contains(" $verb ") || line.endsWith(" $verb")) }
             assertFalse(command.id, line.contains("service call agui_functional_service 2"))
+            assertFalse(command.id, Regex("wm density \\d").containsMatchIn(line))
         }
     }
 

@@ -1563,6 +1563,29 @@ object SettingsManager {
         getPreferences(context).edit().putInt(KEY_TITAN2_ELITE_MAX_ICON_SHRINK, percent.coerceIn(0, 90)).apply()
     }
 
+    // master "Show status bar" toggle (Titan 2 Elite tools screen)
+    // Public so the running IME's SharedPreferences listener can match it for live apply.
+    const val KEY_SHOW_STATUS_BAR = "show_status_bar"
+
+    /**
+     * Master toggle for the on-screen IME status-bar strip. When false the strip collapses to zero
+     * height regardless of presentation mode, suggestions or LED state. Independent of the
+     * pastierina vs full-status-bar presentation mode. Defaults to true.
+     */
+    fun getShowStatusBar(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SHOW_STATUS_BAR, true)
+
+    fun setShowStatusBar(context: Context, show: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SHOW_STATUS_BAR, show).apply()
+    }
+
+    /**
+     * What the renderer obeys. The switch exists only on the Titan 2 Elite tools screen, so an
+     * "off" restored from a backup onto any other phone must not hide a bar nobody can bring back.
+     */
+    fun isStatusBarHidden(context: Context): Boolean =
+        DeviceSpecific.isTitan2EliteDevice() && !getShowStatusBar(context)
+
     fun setTitan2EliteRoundedCornerInsetsEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS, enabled)

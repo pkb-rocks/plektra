@@ -45,7 +45,17 @@ class BrokerSourceRulesTest {
         // Plektra features. Screens mint the trigger (a tap; a SCREEN trigger for reads on open);
         // the feature objects only pass the caller's trigger through.
         "java/rocks/pkb/plektra/SmartBacklightSection.kt" to "backlight and tile switches and Apply button (tap), on-phone read (screen)",
+        "java/rocks/pkb/plektra/SystemTweaksScreen.kt" to "tweak changes (tap), read on open (screen)",
+        "java/rocks/pkb/plektra/DisplayDensityScreen.kt" to "density apply/keep/revert/reset (tap), read on open (screen)",
+        "java/rocks/pkb/plektra/BloatRemoverScreen.kt" to "disable/uninstall/restore (tap), census on open (screen)",
+        "java/rocks/pkb/plektra/ToolboxSection.kt" to "Fn -> Ctrl and reset to stock, on a tap",
         "java/rocks/pkb/plektra/inputmethod/KeyboardBacklightManager.kt" to "takes the caller's trigger",
+        "java/rocks/pkb/plektra/toolbox/SystemTweaks.kt" to "takes the caller's trigger",
+        "java/rocks/pkb/plektra/toolbox/DisplayDensity.kt" to "takes the caller's trigger",
+        "java/rocks/pkb/plektra/toolbox/RevertibleChange.kt" to
+            "takes the caller's trigger; the timed revert reuses the applying tap's (still fresh)",
+        "java/rocks/pkb/plektra/toolbox/FnCtrlRemap.kt" to "takes the caller's trigger",
+        "java/rocks/pkb/plektra/toolbox/PackageRemover.kt" to "takes the caller's trigger",
     )
 
     private val callPattern = Regex(
@@ -75,6 +85,10 @@ class BrokerSourceRulesTest {
                 "java/rocks/pkb/plektra/DeviceSetupCard.kt",
                 // Plektra's screens: taps, and SCREEN triggers (read-only) through BrokerStatus.kt.
                 "java/rocks/pkb/plektra/SmartBacklightSection.kt",
+                "java/rocks/pkb/plektra/SystemTweaksScreen.kt",
+                "java/rocks/pkb/plektra/DisplayDensityScreen.kt",
+                "java/rocks/pkb/plektra/BloatRemoverScreen.kt",
+                "java/rocks/pkb/plektra/ToolboxSection.kt",
             ),
             minters
         )

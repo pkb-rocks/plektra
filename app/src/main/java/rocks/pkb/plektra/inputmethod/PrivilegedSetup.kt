@@ -89,7 +89,7 @@ object PrivilegedSetup {
 
     /**
      * Queues [finishSetup] after the privileged steps already queued, for a user action that ran
-     * broker commands outside [applyAll] (a feature switched off), so Wireless
+     * broker commands outside [applyAll] (a toolbox action, a feature switched off), so Wireless
      * debugging is switched off after it too when the user keeps that setting on. Never throws.
      */
     fun queueFinishSetup(context: Context, trigger: BrokerTrigger?) {

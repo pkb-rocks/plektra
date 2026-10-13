@@ -410,6 +410,7 @@ internal object BackupPreferenceContract {
             "titan2_elite_fill_bottom_corners" to PreferenceValueType.BOOLEAN,
             "titan2_elite_top_corner_multiplier" to PreferenceValueType.INT,
             "titan2_elite_max_icon_shrink" to PreferenceValueType.INT,
+            "show_status_bar" to PreferenceValueType.BOOLEAN,
             "experimental_candidates_view_enabled" to PreferenceValueType.BOOLEAN,
             "experimental_smooth_caret" to PreferenceValueType.BOOLEAN,
             "alt_shift_layout_switch" to PreferenceValueType.BOOLEAN,

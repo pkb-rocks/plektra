@@ -32,6 +32,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+
+    <!-- write Settings.System (Fn -> Ctrl on the Titan 2 Elite). The user grants it on the
+         "Modify system settings" screen; without it the paired broker is used instead. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
+
     <!-- Query per vedere tutte le app installate che possono essere avviate -->
     <queries>
         <package android:name="org.futo.voiceinput" />
@@ -52,6 +57,37 @@
         <package android:name="io.homeassistant.companion.android" />
         <package android:name="com.clicks.companionapp" />
 
+        <!-- the bloat catalog's packages (BloatCatalog.kt), so the app can read back through
+             PackageManager whether a disable/uninstall/restore really happened. Kept in step by
+             BloatCatalogTest. -->
+        <package android:name="com.bhpme.AgingTest" />
+        <package android:name="com.agui.factorytest" />
+        <package android:name="com.agui.calibration" />
+        <package android:name="com.agui.app.memtester" />
+        <package android:name="com.agui.app.imei" />
+        <package android:name="com.agui.batterystatsdumper" />
+        <package android:name="com.agui.app.apninfocollector" />
+        <package android:name="com.debug.loggerui" />
+        <package android:name="com.devices116" />
+        <package android:name="com.swatch.gps" />
+        <package android:name="com.example.feedback" />
+        <package android:name="com.agui.systemmanager" />
+        <package android:name="com.agui.aguigrabageclear" />
+        <package android:name="com.agui.frozen" />
+        <package android:name="com.agui.appblock" />
+        <package android:name="com.agui.applock" />
+        <package android:name="com.agui.privatespace" />
+        <package android:name="com.agui.studentmodel" />
+        <package android:name="com.agui.game" />
+        <package android:name="com.agui.toolbox" />
+        <package android:name="com.agui.bedtimesetting" />
+        <package android:name="com.agui.callrecord" />
+        <package android:name="com.agui.providers.pedometer" />
+        <package android:name="com.agui.rotationcontrol" />
+        <package android:name="com.agold.autopoweronoff" />
+        <package android:name="com.agui.nfc" />
+        <package android:name="com.agold.cyclocomputer" />
+        <package android:name="com.tiqiaa.icontrol" />
     </queries>
 
     <application

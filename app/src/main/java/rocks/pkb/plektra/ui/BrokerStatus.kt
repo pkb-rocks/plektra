@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
  * The one place the app decides whether the ADB broker actually works.
  *
  * Every screen used to answer this for itself, and the answers disagreed: the home tile could read
- * "needs pairing" while the tools screen next to it said the tools could reach the system.
+ * "needs pairing" while the toolbox on the very next screen said the tools could reach the system.
  * Two independent checks against a device whose state moves between them will always be able to
  * drift, so there is one verdict here and every surface shows it.
  *

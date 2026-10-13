@@ -24,7 +24,7 @@
     <!-- Permesso per mostrare finestre overlay (per debug trackpad) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- djb/sym-shortcuts: open the notification shade / quick settings from a key command -->
+    <!-- open the notification shade / quick settings from a key command -->
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
 
     <!-- Query per vedere tutte le app installate che possono essere avviate -->

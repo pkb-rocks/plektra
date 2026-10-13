@@ -4438,7 +4438,7 @@ object SettingsManager {
             .apply()
     }
 
-    // djb/sym-shortcuts: Sym+C/V/X/A edit shortcuts toggle
+    // Sym+C/V/X/A edit shortcuts toggle
     private const val KEY_SYM_EDIT_SHORTCUTS = "sym_edit_shortcuts"
     private const val DEFAULT_SYM_EDIT_SHORTCUTS = true
 

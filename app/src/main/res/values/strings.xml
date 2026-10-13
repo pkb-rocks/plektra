@@ -284,7 +284,7 @@
     
     <!-- SYM Customization Screen -->
     <string name="sym_customize_title">Customize SYM Keyboard</string>
-    <!-- djb/sym-shortcuts: Sym+C/V/X/A edit shortcuts toggle -->
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
     <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: copy, paste, cut, select all</string>
     <string name="sym_edit_shortcuts_description">In a text field, Sym with C, V, X or A edits the text instead of typing a symbol or launching an app. Off, those four chords go back to the SYM layer.</string>
     <string name="sym_auto_close_title">Auto-Close SYM Layout</string>

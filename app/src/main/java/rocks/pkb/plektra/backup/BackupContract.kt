@@ -438,7 +438,7 @@ internal object BackupPreferenceContract {
             "shift_backspace_delete" to PreferenceValueType.BOOLEAN,
             "alt_backspace_delete" to PreferenceValueType.BOOLEAN,
             "backspace_at_start_delete" to PreferenceValueType.BOOLEAN,
-            // djb/sym-shortcuts: Sym+C/V/X/A edit shortcuts toggle
+            // Sym+C/V/X/A edit shortcuts toggle
             "sym_edit_shortcuts" to PreferenceValueType.BOOLEAN
         ),
         dynamicKeys = listOf(

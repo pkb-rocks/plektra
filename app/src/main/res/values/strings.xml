@@ -2052,6 +2052,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="broker_forgetting">Forgetting the pairing…</string>
     <string name="broker_forget_done">Unpaired. Plektra removed its key from Wireless debugging and deleted it here.</string>
     <string name="broker_forget_manual">Plektra deleted its key here but could not remove it from your phone. Open Wireless debugging, tap %1$s under Paired devices, then tap Forget.</string>
+    <string name="broker_forget_permission_kept">Plektra still holds permission to change secure settings, because the phone could not be reached to take it back. Pair again and forget the pairing, or uninstall Plektra, to remove it.</string>
     <string name="broker_wireless_off_after_setup_title">Turn Wireless debugging off after setup</string>
     <string name="broker_wireless_off_after_setup_description">When Plektra finishes a setup step, it turns Wireless debugging off again, so nothing on your network can reach it. Plektra can\'t reach the system again until you turn Wireless debugging back on in Developer options.</string>
     <string name="broker_auth_timeout_help">Leave \"Disable adb authorization timeout\" in Developer options off. Android then forgets a paired key that has not been used for 7 days, so a pairing you no longer use stops working by itself. Plektra never changes this setting.</string>
@@ -2065,5 +2066,31 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, toolbox, tools, device setup, broker, adb, wireless debugging, pairing, privileged</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, wireless debugging, pair, pairing, broker, shizuku, grant, secure settings</string>
 
+    <!-- smart keyboard backlight and its Quick Settings tile -->
+    <string name="smart_backlight_title">Smart keyboard backlight</string>
+    <string name="smart_backlight_row_description">Keep the keyboard lit in the dark, past the 30s limit</string>
+    <string name="smart_backlight_enable_title">Smart backlight</string>
+    <string name="smart_backlight_setup_ready">Always on — set up once, survives reboots.</string>
+    <string name="smart_backlight_blocked_wireless_debugging">Wireless debugging is off, so the backlight setting cannot be applied. Android turns it off after a restart — turn it back on in Developer options.</string>
+    <string name="smart_backlight_last_error">Last attempt failed: %1$s</string>
+    <string name="backlight_tile_label">Keyboard light</string>
+    <string name="backlight_tile_no_permission_subtitle">Needs ADB grant</string>
+    <string name="smart_backlight_enable_description">Keeps the keyboard backlight on whenever the screen is on. Needs the device setup above once, and survives reboots.</string>
+    <string name="smart_backlight_not_on_device">Your phone is no longer holding the always-on setting — a system update or another app reset it. The backlight will time out until it is applied again.</string>
+    <string name="smart_backlight_reapply">Apply again</string>
+    <string name="smart_backlight_not_applied_yet">The device setup is ready, but the always-on setting has not been written to your phone yet.</string>
+    <string name="smart_backlight_apply_now">Apply now</string>
+    <string name="backlight_tile_permission_missing">The keyboard light tile needs a permission that Plektra holds only while you ask for it. Open Titan 2 Elite tools in Plektra settings, finish the device setup and turn on \"Quick Settings tile\" under Smart backlight.</string>
+    <string name="backlight_tile_holder_title">Quick Settings tile</string>
+    <string name="backlight_tile_holder_description">Keep the permission the keyboard-light tile needs, even when Smart backlight is off.</string>
+    <string name="kw_titan2_elite_tools_backlight_tile">keyboard light, keyboard backlight, tile, quick settings, toggle, permission, write secure settings</string>
+    <string name="kw_titan2_elite_tools_smart_backlight">keyboard backlight, keyboard light, led, backlight, dark, timeout, 30 seconds, always on, tile, quick settings</string>
 
+    <string name="kw_titan2_elite_tools_bloat">bloat, debloat, uninstall, disable, apps, unihertz, vendor, factory, android auto, privacy</string>
+    <string name="kw_titan2_elite_tools_density">density, dpi, display size, screen size, zoom, smaller, larger</string>
+    <string name="kw_titan2_elite_tools_tweaks">animation, animations, speed, one-handed, notification history, system</string>
+    <string name="kw_titan2_elite_tools_key_mapping">keys, key map, orange key, side key, space, fn, sym, bindings</string>
+    <string name="kw_titan2_elite_tools_fn_ctrl">fn, ctrl, control, modifier, remap, programmable key</string>
+    <string name="kw_titan2_elite_tools_show_status_bar">status bar, hide, strip, collapse, bar, full screen</string>
+    <string name="kw_titan2_elite_tools_reset_to_stock">reset, stock, undo, revert, uninstall, factory, default</string>
 </resources>

@@ -320,9 +320,11 @@ fun DeviceSetupCard(modifier: Modifier = Modifier) {
 
 private const val OUTCOME_UNPAIRED = "unpaired"
 private const val OUTCOME_MANUAL = "manual"
+private const val SUFFIX_PERMISSION_KEPT = "+permission"
 
 private fun forgetOutcomeOf(result: PrivilegedSetup.ResetResult): String =
-    if (result.unpaired) OUTCOME_UNPAIRED else OUTCOME_MANUAL
+    (if (result.unpaired) OUTCOME_UNPAIRED else OUTCOME_MANUAL) +
+        (if (result.writeSecureSettingsStillHeld) SUFFIX_PERMISSION_KEPT else "")
 
 /** What "Forget pairing" achieved, and the step left to the user when the broker could not unpair. */
 @Composable
@@ -339,6 +341,14 @@ private fun ForgetOutcomeNotice(outcome: String, onOpenWireless: () -> Unit) {
         style = MaterialTheme.typography.bodyMedium,
         color = if (manual) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
     )
+    if (outcome.endsWith(SUFFIX_PERMISSION_KEPT)) {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.broker_forget_permission_kept),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
     if (manual) {
         Spacer(modifier = Modifier.height(6.dp))
         Button(onClick = onOpenWireless) {

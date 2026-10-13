@@ -961,6 +961,15 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="device_setup_dnd_on">Tryb Nie przeszkadzać jest włączony i może ukryć kod parowania. Wyłącz go do czasu sparowania.</string>
     <string name="device_setup_needs_notifications">Najpierw zezwól na powiadomienia Plektra — kod parowania przychodzi jako powiadomienie.</string>
 
+    <!-- carried from PhysiBoard, unchanged strings only -->
+    <string name="smart_backlight_title">Inteligentne podświetlenie klawiatury</string>
+    <string name="smart_backlight_row_description">Utrzymuj podświetlenie klawiatury w ciemności, dłużej niż limit 30 s</string>
+    <string name="smart_backlight_enable_title">Inteligentne podświetlenie</string>
+    <string name="smart_backlight_setup_ready">Zawsze włączone — skonfigurowane raz, działa po ponownym uruchomieniu.</string>
+    <string name="smart_backlight_blocked_wireless_debugging">Debugowanie bezprzewodowe jest wyłączone, więc nie można zastosować ustawienia podświetlenia. Android wyłącza je po ponownym uruchomieniu — włącz je ponownie w opcjach programisty.</string>
+    <string name="smart_backlight_last_error">Ostatnia próba nie powiodła się: %1$s</string>
+    <string name="backlight_tile_label">Podświetlenie klawiatury</string>
+    <string name="backlight_tile_no_permission_subtitle">Wymaga uprawnienia przez ADB</string>
 
     <string name="broker_forget_open_wireless">Usuń %1$s w Debugowaniu bezprzewodowym</string>
     <string name="device_setup_forget_pairing">Zapomnij parowanie</string>
@@ -982,6 +991,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="broker_forgetting">Zapominanie parowania…</string>
     <string name="broker_forget_done">Rozparowano. Plektra usunęła swój klucz z Debugowania bezprzewodowego i skasowała go tutaj.</string>
     <string name="broker_forget_manual">Plektra skasowała swój klucz tutaj, ale nie mogła go usunąć z telefonu. Otwórz Debugowanie bezprzewodowe, dotknij %1$s w sekcji Sparowane urządzenia, a następnie dotknij Zapomnij.</string>
+    <string name="broker_forget_permission_kept">Plektra nadal ma uprawnienie do zmiany ustawień zabezpieczeń, ponieważ nie udało się połączyć z telefonem, aby je cofnąć. Sparuj ponownie i zapomnij parowanie albo odinstaluj Plektra, aby je usunąć.</string>
     <string name="broker_wireless_off_after_setup_title">Wyłącz Debugowanie bezprzewodowe po konfiguracji</string>
     <string name="broker_wireless_off_after_setup_description">Gdy Plektra zakończy krok konfiguracji, ponownie wyłącza Debugowanie bezprzewodowe, aby nic w Twojej sieci nie mogło się z nią połączyć. Plektra nie będzie miała dostępu do systemu, dopóki nie włączysz Debugowania bezprzewodowego w opcjach programisty.</string>
     <string name="broker_auth_timeout_help">Pozostaw wyłączoną opcję \"Wyłącz limit czasu autoryzacji adb\" w opcjach programisty. Android zapomina wtedy sparowany klucz nieużywany od 7 dni, więc parowanie, z którego już nie korzystasz, przestaje działać samo. Plektra nigdy nie zmienia tego ustawienia.</string>
@@ -1006,4 +1016,21 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, konfiguracja urządzenia, broker, adb, debugowanie bezprzewodowe, parowanie, uprzywilejowany</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, uprzywilejowany, root, powłoka, shell, adb, automatycznie, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, debugowanie bezprzewodowe, sparuj, parowanie, broker, shizuku, przyznaj, ustawienia zabezpieczeń</string>
+    <string name="smart_backlight_enable_description">Utrzymuje podświetlenie klawiatury, gdy ekran jest włączony. Wymaga jednorazowej konfiguracji urządzenia powyżej i działa po ponownym uruchomieniu.</string>
+    <string name="smart_backlight_not_on_device">Telefon nie utrzymuje już ustawienia stałego włączenia — zresetowała je aktualizacja systemu lub inna aplikacja. Podświetlenie będzie gasnąć po czasie, dopóki nie zostanie zastosowane ponownie.</string>
+    <string name="smart_backlight_reapply">Zastosuj ponownie</string>
+    <string name="smart_backlight_not_applied_yet">Konfiguracja urządzenia jest gotowa, ale ustawienie stałego włączenia nie zostało jeszcze zapisane w telefonie.</string>
+    <string name="smart_backlight_apply_now">Zastosuj teraz</string>
+    <string name="backlight_tile_permission_missing">Kafelek światła klawiatury wymaga uprawnienia, które Plektra ma tylko wtedy, gdy o to poprosisz. Otwórz Narzędzia Titan 2 Elite w ustawieniach Plektra, dokończ konfigurację urządzenia i włącz \"Kafelek Szybkich ustawień\" w sekcji Inteligentne podświetlenie.</string>
+    <string name="backlight_tile_holder_title">Kafelek Szybkich ustawień</string>
+    <string name="backlight_tile_holder_description">Zachowaj uprawnienie potrzebne kafelkowi światła klawiatury, nawet gdy Inteligentne podświetlenie jest wyłączone.</string>
+    <string name="kw_titan2_elite_tools_backlight_tile">światło klawiatury, podświetlenie klawiatury, kafelek, szybkie ustawienia, przełącznik, uprawnienie, write secure settings, keyboard light, tile, quick settings</string>
+    <string name="kw_titan2_elite_tools_smart_backlight">podświetlenie klawiatury, światło klawiatury, led, podświetlenie, ciemno, limit czasu, 30 sekund, zawsze włączone, kafelek, szybkie ustawienia, keyboard backlight, timeout, always on, tile</string>
+    <string name="kw_titan2_elite_tools_bloat">bloatware, usuwanie bloatware, odinstaluj, wyłącz, aplikacje, unihertz, producent, fabryczne, android auto, prywatność</string>
+    <string name="kw_titan2_elite_tools_density">gęstość, dpi, rozmiar wyświetlacza, rozmiar ekranu, powiększenie, mniejsze, większe</string>
+    <string name="kw_titan2_elite_tools_tweaks">animacja, animacje, szybkość, jedna ręka, obsługa jedną ręką, historia powiadomień, system</string>
+    <string name="kw_titan2_elite_tools_key_mapping">klawisze, mapa klawiszy, pomarańczowy klawisz, klawisz boczny, spacja, fn, sym, przypisania</string>
+    <string name="kw_titan2_elite_tools_fn_ctrl">fn, ctrl, control, modyfikator, przemapowanie, klawisz programowalny</string>
+    <string name="kw_titan2_elite_tools_show_status_bar">pasek stanu, ukryj, pasek, zwiń, pełny ekran</string>
+    <string name="kw_titan2_elite_tools_reset_to_stock">reset, fabryczne, cofnij, przywróć, odinstaluj, domyślne</string>
 </resources>

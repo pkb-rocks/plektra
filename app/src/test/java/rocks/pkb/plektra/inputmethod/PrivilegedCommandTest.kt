@@ -5,6 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -18,19 +19,42 @@ class PrivilegedCommandTest {
     private val pkg = "rocks.pkb.plektra"
     private val fp = "AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89"
 
+    // The tests below name the package `app`.
     private val app = pkg
 
     private fun everyCase(): List<PrivilegedCommand> = listOfNotNull(
         PrivilegedCommand.Verify,
+        PrivilegedCommand.GrantWriteSecureSettings,
+        PrivilegedCommand.RevokeWriteSecureSettings,
         PrivilegedCommand.DisableWirelessDebugging,
         PrivilegedCommand.UnpairSelf.forThisDevice(fp),
-)
+        PrivilegedCommand.ReadBacklightTimeout,
+    ) + PrivilegedCommand.BacklightTimeout.entries.map { PrivilegedCommand.WriteBacklightTimeout(it) }
 
     @Test
     fun brokerCommandLinesAreConstantsPlusValidatedValues() {
         assertEquals("echo pastiera_verify", PrivilegedCommand.Verify.commandLine(pkg))
+        assertEquals(
+            "pm grant $pkg android.permission.WRITE_SECURE_SETTINGS",
+            PrivilegedCommand.GrantWriteSecureSettings.commandLine(pkg)
+        )
+        assertEquals(
+            "pm revoke $pkg android.permission.WRITE_SECURE_SETTINGS",
+            PrivilegedCommand.RevokeWriteSecureSettings.commandLine(pkg)
+        )
         assertEquals("settings put global adb_wifi_enabled 0", PrivilegedCommand.DisableWirelessDebugging.commandLine(pkg))
         assertEquals("service call adb 7 s16 $fp", PrivilegedCommand.UnpairSelf.forThisDevice(fp)!!.commandLine(pkg))
+    }
+
+    @Test
+    fun anInvalidPackageNameNeverReachesTheShell() {
+        listOf("x; reboot", "rocks.pkb.plektra && id", "").forEach { bad ->
+            try {
+                PrivilegedCommand.RevokeWriteSecureSettings.commandLine(bad)
+                fail("accepted '$bad'")
+            } catch (_: IllegalArgumentException) {
+            }
+        }
     }
 
     @Test
@@ -71,11 +95,15 @@ class PrivilegedCommandTest {
     @Test
     fun onlyTheReadsAreReadOnly() {
         val readOnly = everyCase().filter { it.readOnly }.map { it.id }.toSet()
-        assertEquals(setOf("verify"), readOnly)
+        assertEquals(
+            setOf("verify", "read_backlight_timeout"),
+            readOnly
+        )
         everyCase().filter { it.readOnly }.forEach { command ->
             val line = command.commandLine(pkg)
-            listOf("put", "delete", "grant", "revoke", "disable", "enable", "install", "uninstall", "reset")
+            listOf("put", "delete", "grant", "revoke", "disable", "enable", "install", "uninstall", "reset", " s16 \"-1\"")
                 .forEach { verb -> assertFalse("${command.id}: $verb", line.contains(" $verb ") || line.endsWith(" $verb")) }
+            assertFalse(command.id, line.contains("service call agui_functional_service 2"))
         }
     }
 
@@ -95,10 +123,93 @@ class PrivilegedCommandTest {
     }
 
     @Test
+    fun writeSecureSettingsIsHeldOnlyWhileNeeded() {
+        assertEquals(PrivilegedCommand.GrantWriteSecureSettings, WriteSecureSettingsHolders.action(needed = true, held = false))
+        assertEquals(PrivilegedCommand.RevokeWriteSecureSettings, WriteSecureSettingsHolders.action(needed = false, held = true))
+        assertNull(WriteSecureSettingsHolders.action(needed = true, held = true))
+        assertNull(WriteSecureSettingsHolders.action(needed = false, held = false))
+    }
+
+    // Backlight: exact command lines and package-name validation.
+
+    @Test
+    fun grantIsExactlyPmGrantOfWriteSecureSettingsToTheAppItself() {
+        assertEquals(
+            "pm grant rocks.pkb.plektra android.permission.WRITE_SECURE_SETTINGS",
+            PrivilegedCommand.GrantWriteSecureSettings.commandLine(app)
+        )
+    }
+
+    @Test
+    fun grantRefusesAnythingThatIsNotAPlainPackageName() {
+        listOf(
+            "",
+            "pastiera",
+            "a.b; reboot",
+            "a.b && id",
+            "a.b\nid",
+            "a.b `id`",
+            "a.b\$(id)",
+            "a.b|id",
+            "a. b",
+            "1a.b",
+            "a..b",
+            ".a.b",
+            "a.b."
+        ).forEach { name ->
+            try {
+                PrivilegedCommand.GrantWriteSecureSettings.commandLine(name)
+                fail("accepted '$name'")
+            } catch (_: IllegalArgumentException) {
+                // expected
+            }
+        }
+    }
+
+    @Test
+    fun packageNameValidationAcceptsRealPackageNames() {
+        listOf("rocks.pkb.plektra", "rocks.pkb.plektra.nightly", "com.a_b.c1").forEach {
+            assertTrue(it, PrivilegedCommand.isValidPackageName(it))
+        }
+    }
+
+    @Test
+    fun backlightTimeoutCommandsAreBuiltFromConstantsOnly() {
+        assertEquals(
+            "service call agui_functional_service 1 s16 \"keyboard_brightness_timeout\"",
+            PrivilegedCommand.ReadBacklightTimeout.commandLine(app)
+        )
+        assertEquals(
+            "service call agui_functional_service 2 s16 \"keyboard_brightness_timeout\" s16 \"-1\"",
+            PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON)
+                .commandLine(app)
+        )
+        assertEquals(
+            "service call agui_functional_service 2 s16 \"keyboard_brightness_timeout\" s16 \"30000\"",
+            PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.STOCK)
+                .commandLine(app)
+        )
+    }
+
+    @Test
+    fun theTimeoutValuesAreTheOnlyTwoTheAppEverWrites() {
+        assertEquals(
+            listOf("-1", "30000"),
+            PrivilegedCommand.BacklightTimeout.entries.map { it.wireValue }
+        )
+    }
+
+    @Test
     fun noCommandLineCarriesShellMetacharacters() {
-        everyCase().forEach { command ->
-            val line = command.commandLine(app)
-            assertFalse(command.id + ": " + line, line.any { it in ";&|`$<>\\\n\r\"'" })
+        val lines = listOf(
+            PrivilegedCommand.GrantWriteSecureSettings.commandLine(app),
+            PrivilegedCommand.ReadBacklightTimeout.commandLine(app)
+        ) + PrivilegedCommand.BacklightTimeout.entries.map {
+            PrivilegedCommand.WriteBacklightTimeout(it).commandLine(app)
+        }
+        lines.forEach { line ->
+            // The double quotes around the vendor key and value are the only quoting in use.
+            assertFalse(line, line.any { it in ";&|`$<>\\\n\r" })
         }
     }
 }

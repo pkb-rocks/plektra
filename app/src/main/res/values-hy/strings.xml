@@ -959,6 +959,15 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="device_setup_dnd_on">«Չանհանգստացնել» ռեժիմը միացված է և կարող է թաքցնել զուգակցման կոդը։ Անջատեք այն մինչև զուգակցվելը։</string>
     <string name="device_setup_needs_notifications">Նախ թույլատրեք Plektra-ի ծանուցումները՝ զուգակցման կոդը հասնում է որպես ծանուցում։</string>
 
+    <!-- carried from PhysiBoard, unchanged strings only -->
+    <string name="smart_backlight_title">Ստեղնաշարի խելացի լուսավորում</string>
+    <string name="smart_backlight_row_description">Պահել ստեղնաշարը լուսավորված մթության մեջ՝ 30 վրկ սահմանից հետո էլ</string>
+    <string name="smart_backlight_enable_title">Խելացի լուսավորում</string>
+    <string name="smart_backlight_setup_ready">Միշտ միացած՝ մեկ անգամ կարգաբերված, պահպանվում է վերագործարկումներից հետո։</string>
+    <string name="smart_backlight_blocked_wireless_debugging">Անլար վրիպազերծումն անջատված է, ուստի ստեղնաշարի լուսավորության կարգավորումը հնարավոր չէ կիրառել։ Android-ը այն անջատում է վերագործարկումից հետո — միացրեք այն կրկին մշակողի ընտրանքներում։</string>
+    <string name="smart_backlight_last_error">Վերջին փորձը ձախողվեց՝ %1$s</string>
+    <string name="backlight_tile_label">Ստեղնաշարի լույս</string>
+    <string name="backlight_tile_no_permission_subtitle">Պահանջում է ADB թույլտվություն</string>
 
     <string name="broker_forget_open_wireless">Հեռացնել %1$s-ը անլար վրիպազերծումից</string>
     <string name="device_setup_forget_pairing">Մոռանալ զուգակցումը</string>
@@ -980,6 +989,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="broker_forgetting">Զուգակցումը մոռացվում է…</string>
     <string name="broker_forget_done">Զուգակցումը չեղարկվեց։ Plektra-ն հեռացրեց իր բանալին անլար վրիպազերծումից և ջնջեց այն այստեղ։</string>
     <string name="broker_forget_manual">Plektra-ն ջնջեց իր բանալին այստեղ, բայց չկարողացավ հեռացնել այն ձեր հեռախոսից։ Բացեք անլար վրիպազերծումը, «Զուգակցված սարքեր» բաժնում հպեք %1$s-ին, ապա հպեք «Մոռանալ»։</string>
+    <string name="broker_forget_permission_kept">Plektra-ն դեռ ունի անվտանգ կարգավորումները փոփոխելու թույլտվություն, քանի որ այն հետ վերցնելու համար հեռախոսին հասնել չհաջողվեց։ Այն հեռացնելու համար նորից զուգակցեք և մոռացեք զուգակցումը, կամ ջնջեք Plektra-ն։</string>
     <string name="broker_wireless_off_after_setup_title">Կարգավորումից հետո անջատել անլար վրիպազերծումը</string>
     <string name="broker_wireless_off_after_setup_description">Երբ Plektra-ն ավարտում է կարգավորման քայլը, այն նորից անջատում է անլար վրիպազերծումը, որպեսզի ցանցում ոչինչ չկարողանա հասնել դրան։ Plektra-ն չի կարող նորից հասնել համակարգին, քանի դեռ անլար վրիպազերծումը նորից չեք միացրել Մշակողի ընտրանքներում։</string>
     <string name="broker_auth_timeout_help">Մշակողի ընտրանքներում թողեք անջատված «Disable adb authorization timeout» կարգավորումը։ Այդ դեպքում Android-ը մոռանում է 7 օր չօգտագործված զուգակցված բանալին, ուստի այլևս չօգտագործվող զուգակցումն ինքնին դադարում է աշխատել։ Plektra-ն երբեք չի փոխում այս կարգավորումը։</string>
@@ -1004,4 +1014,21 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, սարքի կարգավորում, բրոքեր, adb, անլար վրիպազերծում, զուգակցում, արտոնյալ, wireless debugging, pairing, broker</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, բրոքեր, արտոնյալ, root, shell, adb, ավտոմատ, հենք, backend, broker</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, անլար վրիպազերծում, զուգակցել, զուգակցում, բրոքեր, shizuku, տրամադրել, անվտանգ կարգավորումներ, wireless debugging, pairing, broker</string>
+    <string name="smart_backlight_enable_description">Ստեղնաշարի հետևի լույսը միացված է պահում, քանի դեռ էկրանը միացված է։ Մեկ անգամ պահանջում է վերևի սարքի կարգավորումը և պահպանվում է վերաբեռնումներից հետո։</string>
+    <string name="smart_backlight_not_on_device">Ձեր հեռախոսն այլևս չի պահում «միշտ միացված» կարգավորումը․ համակարգի թարմացումը կամ մեկ այլ հավելված այն զրոյացրել է։ Մինչև այն նորից կիրառվի, հետևի լույսը կանջատվի ժամանակի ավարտից հետո։</string>
+    <string name="smart_backlight_reapply">Կիրառել նորից</string>
+    <string name="smart_backlight_not_applied_yet">Սարքի կարգավորումը պատրաստ է, բայց «միշտ միացված» կարգավորումը դեռ չի գրվել ձեր հեռախոսում։</string>
+    <string name="smart_backlight_apply_now">Կիրառել հիմա</string>
+    <string name="backlight_tile_permission_missing">Ստեղնաշարի լույսի սալիկին պետք է թույլտվություն, որը Plektra-ն պահում է միայն ձեր պահանջով։ Բացեք Plektra-ի կարգավորումներում Titan 2 Elite-ի գործիքները, ավարտեք սարքի կարգավորումը և «Խելացի հետևի լույս» բաժնում միացրեք «Արագ կարգավորումների սալիկը»։</string>
+    <string name="backlight_tile_holder_title">Արագ կարգավորումների սալիկ</string>
+    <string name="backlight_tile_holder_description">Պահել ստեղնաշարի լույսի սալիկին անհրաժեշտ թույլտվությունը՝ նույնիսկ երբ «Խելացի հետևի լույսը» անջատված է։</string>
+    <string name="kw_titan2_elite_tools_backlight_tile">ստեղնաշարի լույս, ստեղնաշարի հետևի լույս, սալիկ, արագ կարգավորումներ, փոխարկիչ, թույլտվություն, write secure settings, keyboard light, tile, quick settings</string>
+    <string name="kw_titan2_elite_tools_smart_backlight">ստեղնաշարի հետևի լույս, ստեղնաշարի լույս, led, հետևի լույս, մութ, ժամանակի ավարտ, 30 վայրկյան, միշտ միացված, սալիկ, արագ կարգավորումներ, backlight, timeout, always on</string>
+    <string name="kw_titan2_elite_tools_bloat">ավելորդ հավելվածներ, ջնջել, անջատել, հավելվածներ, unihertz, արտադրող, գործարանային, android auto, գաղտնիություն, bloat, debloat, uninstall, disable, apps</string>
+    <string name="kw_titan2_elite_tools_density">խտություն, dpi, էկրանի չափ, մեծացում, փոքր, մեծ, density, display size, zoom</string>
+    <string name="kw_titan2_elite_tools_tweaks">անիմացիա, անիմացիաներ, արագություն, մեկ ձեռքով, ծանուցումների պատմություն, համակարգ, animation, speed, one-handed</string>
+    <string name="kw_titan2_elite_tools_key_mapping">ստեղներ, ստեղների քարտեզ, նարնջագույն ստեղն, կողային ստեղն, բացատ, fn, sym, կապակցումներ, key map, bindings</string>
+    <string name="kw_titan2_elite_tools_fn_ctrl">fn, ctrl, կառավարում, ձևափոխիչ, վերաքարտեզավորում, ծրագրավորվող ստեղն, modifier, remap</string>
+    <string name="kw_titan2_elite_tools_show_status_bar">կարգավիճակի գոտի, թաքցնել, գոտի, ծալել, ամբողջ էկրան, status bar, hide, full screen</string>
+    <string name="kw_titan2_elite_tools_reset_to_stock">վերականգնել, գործարանային, չեղարկել, հետ շրջել, ջնջել, լռելյայն, reset, stock, undo, revert, uninstall, factory, default</string>
 </resources>

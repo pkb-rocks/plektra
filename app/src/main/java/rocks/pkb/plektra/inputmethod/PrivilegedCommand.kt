@@ -10,11 +10,16 @@ import android.os.Build
  * given as the `shell` user, so nothing may reach it except a case of this class, and the only
  * door is [EmbeddedAdbShell.execute], which takes these cases and never a string. Every case is
  * built from constants. A value that has to vary is either an enum of constants or validated here
- * first (a key fingerprint against [FINGERPRINT]). No user text, intent extra, deep-link parameter, preference or other config
+ * first (the app's own package name against [isValidPackageName], a key fingerprint against
+ * [FINGERPRINT]). No user text, intent extra, deep-link parameter, preference or other config
  * value ever becomes part of a command line.
  *
  * A group that needs another privileged command adds one case below, with a comment naming the
  * group and a stable [id] for the audit log, and runs it through [PrivilegedShell].
+ *
+ * The backlight adds its cases below the broker's own, each with an [id]. The app's package name
+ * is validated with [isValidPackageName], and settings keys and values come from constants and
+ * enums here.
  */
 internal sealed class PrivilegedCommand {
 
@@ -38,7 +43,8 @@ internal sealed class PrivilegedCommand {
      * True for a command that only reads state and changes nothing on the phone. An open,
      * resumed screen ([BrokerTrigger.Kind.SCREEN]) may run these to show what the phone holds;
      * everything that writes needs a tap ([BrokerTrigger.Kind.TAP]) or a pairing code. Set it only
-     * on a command whose every line is a read (`echo`).
+     * on a command whose every line is a read (`echo`, `settings get`, `pm list`, `wm density`
+     * without an argument, a vendor GET).
      */
     open val readOnly: Boolean get() = false
 
@@ -49,6 +55,28 @@ internal sealed class PrivilegedCommand {
         override val id = "verify"
         override val readOnly: Boolean get() = true
         override fun commandLine(appPackage: String): String = "echo ${EmbeddedAdbShell.VERIFY_MARKER}"
+    }
+
+    /**
+     * `pm grant` of WRITE_SECURE_SETTINGS to this app, only while a feature needs it
+     * ([WriteSecureSettingsHolders]). The result is confirmed with `checkSelfPermission`, never by
+     * reading the shell's output.
+     */
+    object GrantWriteSecureSettings : PrivilegedCommand() {
+        override val id = "grant_write_secure_settings"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(appPackage)) { "invalid package name" }
+            return "pm grant $appPackage $WRITE_SECURE_SETTINGS"
+        }
+    }
+
+    /** Undo of [GrantWriteSecureSettings]: the last feature needing it was turned off, or a reset. */
+    object RevokeWriteSecureSettings : PrivilegedCommand() {
+        override val id = "revoke_write_secure_settings"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(appPackage)) { "invalid package name" }
+            return "pm revoke $appPackage $WRITE_SECURE_SETTINGS"
+        }
     }
 
     /**
@@ -91,10 +119,42 @@ internal sealed class PrivilegedCommand {
         override fun commandLine(appPackage: String): String = "settings put global $ADB_WIFI_ENABLED 0"
     }
 
+    // the commands the smart keyboard backlight and its Quick Settings tile need.
+
+    /** Reads the vendor keyboard-backlight timeout (`GET` on the vendor binder service). */
+    object ReadBacklightTimeout : PrivilegedCommand() {
+        override val id = "read_backlight_timeout"
+        override val readOnly: Boolean get() = true
+        override fun commandLine(appPackage: String): String =
+            "service call $VENDOR_SERVICE $TXN_GET s16 \"$KEY_BACKLIGHT_TIMEOUT\""
+    }
+
+    /** Writes the vendor keyboard-backlight timeout (`SET` on the vendor binder service). */
+    class WriteBacklightTimeout(val timeout: BacklightTimeout) : PrivilegedCommand() {
+        override val id = "write_backlight_timeout_${timeout.name.lowercase()}"
+        override fun commandLine(appPackage: String): String =
+            "service call $VENDOR_SERVICE $TXN_SET s16 \"$KEY_BACKLIGHT_TIMEOUT\" s16 \"${timeout.wireValue}\""
+    }
+
+    /** The only two values the app ever writes for the vendor timeout. */
+    enum class BacklightTimeout(val wireValue: String) {
+        /** Sentinel: never turn off. Verified on a Titan 2 Elite, 2026-08-21. Survives reboots. */
+        ALWAYS_ON("-1"),
+
+        /** The stock 30 s default. */
+        STOCK("30000")
+    }
+
     companion object {
+        /** Dotted Java package, no shell metacharacters. */
+        private val PACKAGE_NAME = Regex("^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$")
+
+        fun isValidPackageName(name: String): Boolean = PACKAGE_NAME.matches(name)
+
         /** An adb key fingerprint: 16 MD5 bytes as uppercase hex pairs joined by colons. */
         val FINGERPRINT = Regex("^([0-9A-F]{2}:){15}[0-9A-F]{2}$")
 
+        const val WRITE_SECURE_SETTINGS = "android.permission.WRITE_SECURE_SETTINGS"
         const val ADB_WIFI_ENABLED = "adb_wifi_enabled"
 
         /**
@@ -110,6 +170,14 @@ internal sealed class PrivilegedCommand {
         val UNPAIR_VERIFIED_SDKS = Build.VERSION_CODES.R..36
 
         fun canUnpairOnSdk(sdkInt: Int): Boolean = sdkInt in UNPAIR_VERIFIED_SDKS
+
+        // the vendor binder service. transaction 2 = SET(String key, String value),
+        // transaction 1 = GET(String key); GET returns a String16 parcel with the current value.
+        // Confirmed on a Titan 2 Elite, 2026-08-31.
+        private const val VENDOR_SERVICE = "agui_functional_service"
+        private const val TXN_SET = "2"
+        private const val TXN_GET = "1"
+        private const val KEY_BACKLIGHT_TIMEOUT = "keyboard_brightness_timeout"
     }
 }
 

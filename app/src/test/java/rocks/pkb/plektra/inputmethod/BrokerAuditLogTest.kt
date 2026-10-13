@@ -28,11 +28,11 @@ class BrokerAuditLogTest {
     @Test
     fun entriesRoundTripOldestFirst() {
         BrokerAuditLog.record(context, BrokerAuditLog.Kind.COMMAND, "verify", ok = true)
-        BrokerAuditLog.record(context, BrokerAuditLog.Kind.KEY, "deleted", ok = false, detail = "no service")
+        BrokerAuditLog.record(context, BrokerAuditLog.Kind.REVOKE, "write_secure_settings", ok = false, detail = "no service")
 
         val entries = BrokerAuditLog.entries(context)
-        assertEquals(listOf("verify", "deleted"), entries.map { it.id })
-        assertEquals(BrokerAuditLog.Kind.KEY, entries[1].kind)
+        assertEquals(listOf("verify", "write_secure_settings"), entries.map { it.id })
+        assertEquals(BrokerAuditLog.Kind.REVOKE, entries[1].kind)
         assertFalse(entries[1].ok)
         assertEquals("no service", entries[1].detail)
         assertTrue(entries[0].atMs > 0)

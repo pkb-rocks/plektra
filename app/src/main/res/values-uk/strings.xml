@@ -961,6 +961,15 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="device_setup_dnd_on">Увімкнено режим «Не турбувати», який може приховати код сполучення. Вимкніть його, поки не сполучитеся.</string>
     <string name="device_setup_needs_notifications">Спершу дозвольте сповіщення Plektra — код сполучення надходить як сповіщення.</string>
 
+    <!-- carried from PhysiBoard, unchanged strings only -->
+    <string name="smart_backlight_title">Розумне підсвічування клавіатури</string>
+    <string name="smart_backlight_row_description">Тримати клавіатуру підсвіченою в темряві довше за ліміт у 30 с</string>
+    <string name="smart_backlight_enable_title">Розумне підсвічування</string>
+    <string name="smart_backlight_setup_ready">Завжди увімкнено — налаштовано один раз, зберігається після перезавантаження.</string>
+    <string name="smart_backlight_blocked_wireless_debugging">Бездротове налагодження вимкнено, тому налаштування підсвічування не застосувати. Android вимикає його після перезавантаження — увімкніть його знову в параметрах розробника.</string>
+    <string name="smart_backlight_last_error">Остання спроба не вдалася: %1$s</string>
+    <string name="backlight_tile_label">Підсвічування клавіатури</string>
+    <string name="backlight_tile_no_permission_subtitle">Потрібен дозвіл через ADB</string>
 
     <string name="broker_forget_open_wireless">Видалити %1$s у бездротовому налагодженні</string>
     <string name="device_setup_forget_pairing">Забути сполучення</string>
@@ -982,6 +991,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="broker_forgetting">Забування сполучення…</string>
     <string name="broker_forget_done">Сполучення скасовано. Plektra видалила свій ключ із бездротового налагодження та стерла його тут.</string>
     <string name="broker_forget_manual">Plektra видалила свій ключ тут, але не змогла видалити його з вашого телефону. Відкрийте бездротове налагодження, торкніться %1$s у розділі «Сполучені пристрої», потім торкніться «Забути».</string>
+    <string name="broker_forget_permission_kept">Plektra досі має дозвіл змінювати захищені налаштування, оскільки телефон був недоступний, щоб його забрати. Сполучіть знову й забудьте сполучення або видаліть Plektra, щоб прибрати цей дозвіл.</string>
     <string name="broker_wireless_off_after_setup_title">Вимикати бездротове налагодження після налаштування</string>
     <string name="broker_wireless_off_after_setup_description">Коли Plektra завершує крок налаштування, вона знову вимикає бездротове налагодження, щоб ніщо у вашій мережі не могло до неї дістатися. Plektra не матиме доступу до системи, доки ви знову не ввімкнете бездротове налагодження в параметрах розробника.</string>
     <string name="broker_auth_timeout_help">Залиште вимкненим параметр \"Вимкнути тайм-аут авторизації adb\" у параметрах розробника. Тоді Android забуває сполучений ключ, який не використовувався 7 днів, тож сполучення, яким ви більше не користуєтеся, перестає діяти само. Plektra ніколи не змінює цей параметр.</string>
@@ -1006,4 +1016,21 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, налаштування пристрою, брокер, adb, бездротове налагодження, сполучення, привілейований, device setup, broker, wireless debugging, pairing, privileged</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, брокер, привілейований, root, рут, shell, оболонка, adb, автоматично, бекенд, broker, privileged, automatic, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, бездротове налагодження, сполучити, сполучення, брокер, shizuku, надати, захищені налаштування, wireless debugging, pair, pairing, broker, grant, secure settings</string>
+    <string name="smart_backlight_enable_description">Тримає підсвітку клавіатури ввімкненою, поки ввімкнено екран. Потрібне одноразове налаштування пристрою вище; зберігається після перезавантажень.</string>
+    <string name="smart_backlight_not_on_device">Ваш телефон більше не зберігає налаштування постійної підсвітки — його скинуло оновлення системи або інший застосунок. Підсвітка вимикатиметься за часом, доки налаштування не буде застосовано знову.</string>
+    <string name="smart_backlight_reapply">Застосувати знову</string>
+    <string name="smart_backlight_not_applied_yet">Налаштування пристрою готове, але налаштування постійної підсвітки ще не записано на ваш телефон.</string>
+    <string name="smart_backlight_apply_now">Застосувати зараз</string>
+    <string name="backlight_tile_permission_missing">Плитці підсвітки клавіатури потрібен дозвіл, який Plektra має лише тоді, коли ви про це просите. Відкрийте Інструменти Titan 2 Elite в налаштуваннях Plektra, завершіть налаштування пристрою та ввімкніть \"Плитка швидких налаштувань\" у розділі «Розумна підсвітка».</string>
+    <string name="backlight_tile_holder_title">Плитка швидких налаштувань</string>
+    <string name="backlight_tile_holder_description">Зберігати дозвіл, потрібний плитці підсвітки клавіатури, навіть коли розумну підсвітку вимкнено.</string>
+    <string name="kw_titan2_elite_tools_backlight_tile">підсвітка клавіатури, світло клавіатури, плитка, швидкі налаштування, перемикач, дозвіл, write secure settings, keyboard light, keyboard backlight, tile, quick settings, toggle, permission</string>
+    <string name="kw_titan2_elite_tools_smart_backlight">підсвітка клавіатури, світло клавіатури, led, підсвітка, темно, тайм-аут, 30 секунд, завжди ввімкнено, плитка, швидкі налаштування, keyboard backlight, keyboard light, backlight, dark, timeout, always on, tile, quick settings</string>
+    <string name="kw_titan2_elite_tools_bloat">блоатвер, видалення, видалити, вимкнути, застосунки, unihertz, виробник, заводські, android auto, приватність, bloat, debloat, uninstall, disable, apps, vendor, factory, privacy</string>
+    <string name="kw_titan2_elite_tools_density">щільність, dpi, розмір екрана, масштаб, менше, більше, density, display size, screen size, zoom, smaller, larger</string>
+    <string name="kw_titan2_elite_tools_tweaks">анімація, анімації, швидкість, однією рукою, історія сповіщень, система, animation, animations, speed, one-handed, notification history, system</string>
+    <string name="kw_titan2_elite_tools_key_mapping">клавіші, розкладка клавіш, оранжева клавіша, бічна клавіша, пробіл, fn, sym, прив\'язки, keys, key map, orange key, side key, space, bindings</string>
+    <string name="kw_titan2_elite_tools_fn_ctrl">fn, ctrl, контрол, модифікатор, перепризначення, програмована клавіша, control, modifier, remap, programmable key</string>
+    <string name="kw_titan2_elite_tools_show_status_bar">панель стану, приховати, смуга, згорнути, панель, повний екран, status bar, hide, strip, collapse, bar, full screen</string>
+    <string name="kw_titan2_elite_tools_reset_to_stock">скинути, заводські, скасувати, повернути, видалити, за замовчуванням, reset, stock, undo, revert, uninstall, factory, default</string>
 </resources>

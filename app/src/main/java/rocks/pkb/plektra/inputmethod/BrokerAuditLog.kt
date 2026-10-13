@@ -26,7 +26,7 @@ object BrokerAuditLog {
     private const val COALESCE_MS = 10 * 60_000L
     private const val MAX_DETAIL = 160
 
-    enum class Kind { COMMAND, REFUSED, PAIRING, KEY, UNPAIR, WIRELESS_DEBUGGING }
+    enum class Kind { COMMAND, REFUSED, GRANT, REVOKE, PAIRING, KEY, UNPAIR, WIRELESS_DEBUGGING }
 
     data class Entry(
         val atMs: Long,

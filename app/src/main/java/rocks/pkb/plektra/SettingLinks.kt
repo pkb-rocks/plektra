@@ -27,6 +27,10 @@ object SettingLinkIds {
     const val MAIN_ABOUT = "main.about"
     const val MAIN_TITAN2_ELITE_TOOLS = "main.titan2_elite_tools"
     const val TITAN2_ELITE_TOOLS_DEVICE_SETUP = "titan2_elite_tools.device_setup"
+    // smart keyboard backlight row on the Titan 2 Elite tools screen
+    const val TITAN2_ELITE_TOOLS_SMART_BACKLIGHT = "titan2_elite_tools.smart_backlight"
+    // the keyboard-light tile's own switch in the Smart backlight section
+    const val TITAN2_ELITE_TOOLS_BACKLIGHT_TILE = "titan2_elite_tools.backlight_tile"
 
     // App appearance
     const val CUSTOMIZATION_APP_ICON = "customization.app_icon"
@@ -1037,6 +1041,9 @@ object SettingLinkRegistry {
         // Titan 2 Elite tools keywords
         SettingLinkIds.MAIN_TITAN2_ELITE_TOOLS to R.string.kw_main_titan2_elite_tools,
         SettingLinkIds.TITAN2_ELITE_TOOLS_DEVICE_SETUP to R.string.kw_titan2_elite_tools_device_setup,
+        // smart keyboard backlight keywords
+        SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT to R.string.kw_titan2_elite_tools_smart_backlight,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_BACKLIGHT_TILE to R.string.kw_titan2_elite_tools_backlight_tile,
         SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION to R.string.kw_text_input_auto_space_punctuation,
         SettingLinkIds.TEXT_INPUT_SPACED_HYPHEN_TO_EN_DASH to R.string.kw_text_input_spaced_hyphen,
         SettingLinkIds.TEXT_INPUT_SMART_QUOTES to R.string.kw_text_input_smart_quotes,

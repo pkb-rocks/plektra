@@ -93,8 +93,12 @@ fun Titan2EliteToolsScreen(
             // Broker safety: Wireless debugging off after setup, the key-expiry advice, the audit log.
             BrokerSafetySection()
 
-            // add one section per feature below, each a composable in its own file. Register its
-            // settings in Titan2EliteToolsSettingEntries.kt so search and deep links reach it.
+            // add one section per feature below, each a composable in its own file
+            // (backlight, ...). Register its settings in
+            // Titan2EliteToolsSettingEntries.kt so search and deep links reach it.
+
+            // smart keyboard backlight
+            SmartBacklightSection(modifier = Modifier.settingRow(SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT))
         }
     }
 }

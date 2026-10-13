@@ -1819,6 +1819,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="broker_forgetting">Διαγραφή της σύζευξης…</string>
     <string name="broker_forget_done">Η σύζευξη αφαιρέθηκε. Το Plektra αφαίρεσε το κλειδί του από την Ασύρματη αποσφαλμάτωση και το διέγραψε εδώ.</string>
     <string name="broker_forget_manual">Το Plektra διέγραψε το κλειδί του εδώ, αλλά δεν μπόρεσε να το αφαιρέσει από το τηλέφωνό σας. Ανοίξτε την Ασύρματη αποσφαλμάτωση, πατήστε %1$s στις Συζευγμένες συσκευές και μετά πατήστε Διαγραφή.</string>
+    <string name="broker_forget_permission_kept">Το Plektra εξακολουθεί να έχει άδεια αλλαγής ασφαλών ρυθμίσεων, επειδή δεν ήταν δυνατή η επικοινωνία με το τηλέφωνο για να την ανακαλέσει. Συζεύξτε ξανά και διαγράψτε τη σύζευξη ή απεγκαταστήστε το Plektra για να την αφαιρέσετε.</string>
     <string name="broker_wireless_off_after_setup_title">Απενεργοποίηση της Ασύρματης αποσφαλμάτωσης μετά τη ρύθμιση</string>
     <string name="broker_wireless_off_after_setup_description">Όταν το Plektra ολοκληρώνει ένα βήμα ρύθμισης, απενεργοποιεί ξανά την Ασύρματη αποσφαλμάτωση, ώστε τίποτα στο δίκτυό σας να μην έχει πρόσβαση σε αυτήν. Το Plektra δεν έχει ξανά πρόσβαση στο σύστημα μέχρι να ενεργοποιήσετε ξανά την Ασύρματη αποσφαλμάτωση στις Επιλογές για προγραμματιστές.</string>
     <string name="broker_auth_timeout_help">Αφήστε απενεργοποιημένη την επιλογή \"Απενεργοποίηση χρονικού ορίου εξουσιοδότησης adb\" στις Επιλογές για προγραμματιστές. Έτσι το Android ξεχνά ένα συζευγμένο κλειδί που δεν έχει χρησιμοποιηθεί για 7 ημέρες και μια σύζευξη που δεν χρησιμοποιείτε πια σταματά να λειτουργεί από μόνη της. Το Plektra δεν αλλάζει ποτέ αυτή τη ρύθμιση.</string>
@@ -1843,4 +1844,29 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, ρύθμιση συσκευής, device setup, broker, adb, ασύρματη αποσφαλμάτωση, wireless debugging, σύζευξη, pairing, αυξημένα δικαιώματα, privileged</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, αυξημένα δικαιώματα, privileged, root, shell, adb, αυτόματο, automatic, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, ασύρματη αποσφαλμάτωση, wireless debugging, σύζευξη, pair, pairing, broker, shizuku, έγκριση, grant, ασφαλείς ρυθμίσεις, secure settings</string>
+    <string name="smart_backlight_title">Έξυπνος οπίσθιος φωτισμός πληκτρολογίου</string>
+    <string name="smart_backlight_row_description">Κρατά το πληκτρολόγιο φωτισμένο στο σκοτάδι, πέρα από το όριο των 30 s</string>
+    <string name="smart_backlight_enable_title">Έξυπνος οπίσθιος φωτισμός</string>
+    <string name="smart_backlight_setup_ready">Πάντα ενεργός — ρυθμίζεται μία φορά, διατηρείται μετά από επανεκκινήσεις.</string>
+    <string name="smart_backlight_blocked_wireless_debugging">Η ασύρματη αποσφαλμάτωση είναι απενεργοποιημένη, οπότε η ρύθμιση του οπίσθιου φωτισμού δεν μπορεί να εφαρμοστεί. Το Android την απενεργοποιεί μετά από επανεκκίνηση — ενεργοποιήστε την ξανά στις Επιλογές για προγραμματιστές.</string>
+    <string name="smart_backlight_last_error">Η τελευταία προσπάθεια απέτυχε: %1$s</string>
+    <string name="backlight_tile_label">Φωτισμός πληκτρολογίου</string>
+    <string name="backlight_tile_no_permission_subtitle">Απαιτείται άδεια ADB</string>
+    <string name="smart_backlight_enable_description">Κρατά τον οπίσθιο φωτισμό του πληκτρολογίου αναμμένο όποτε η οθόνη είναι αναμμένη. Απαιτεί μία φορά τη ρύθμιση συσκευής παραπάνω και διατηρείται μετά από επανεκκινήσεις.</string>
+    <string name="smart_backlight_not_on_device">Το τηλέφωνό σας δεν διατηρεί πλέον τη ρύθμιση «πάντα ενεργό» — μια ενημέρωση συστήματος ή άλλη εφαρμογή την επανέφερε. Ο οπίσθιος φωτισμός θα σβήνει μετά από χρονικό όριο μέχρι να εφαρμοστεί ξανά.</string>
+    <string name="smart_backlight_reapply">Εφαρμογή ξανά</string>
+    <string name="smart_backlight_not_applied_yet">Η ρύθμιση συσκευής είναι έτοιμη, αλλά η ρύθμιση «πάντα ενεργό» δεν έχει γραφτεί ακόμη στο τηλέφωνό σας.</string>
+    <string name="smart_backlight_apply_now">Εφαρμογή τώρα</string>
+    <string name="backlight_tile_permission_missing">Το πλακίδιο φωτισμού πληκτρολογίου χρειάζεται μια άδεια που το Plektra διατηρεί μόνο όσο τη ζητάτε. Ανοίξτε τα Εργαλεία Titan 2 Elite στις ρυθμίσεις του Plektra, ολοκληρώστε τη ρύθμιση συσκευής και ενεργοποιήστε το \"Πλακίδιο Γρήγορων ρυθμίσεων\" στον Έξυπνο οπίσθιο φωτισμό.</string>
+    <string name="backlight_tile_holder_title">Πλακίδιο Γρήγορων ρυθμίσεων</string>
+    <string name="backlight_tile_holder_description">Διατηρεί την άδεια που χρειάζεται το πλακίδιο φωτισμού πληκτρολογίου, ακόμη και όταν ο Έξυπνος οπίσθιος φωτισμός είναι απενεργοποιημένος.</string>
+    <string name="kw_titan2_elite_tools_backlight_tile">φωτισμός πληκτρολογίου, keyboard light, οπίσθιος φωτισμός, keyboard backlight, πλακίδιο, tile, γρήγορες ρυθμίσεις, quick settings, εναλλαγή, toggle, άδεια, permission, write secure settings</string>
+    <string name="kw_titan2_elite_tools_smart_backlight">οπίσθιος φωτισμός πληκτρολογίου, keyboard backlight, keyboard light, led, backlight, σκοτάδι, dark, χρονικό όριο, timeout, 30 δευτερόλεπτα, 30 seconds, πάντα ενεργό, always on, πλακίδιο, tile, γρήγορες ρυθμίσεις, quick settings</string>
+    <string name="kw_titan2_elite_tools_bloat">περιττές εφαρμογές, bloat, debloat, απεγκατάσταση, uninstall, απενεργοποίηση, disable, εφαρμογές, apps, unihertz, κατασκευαστής, vendor, εργοστάσιο, factory, android auto, απόρρητο, privacy</string>
+    <string name="kw_titan2_elite_tools_density">πυκνότητα, density, dpi, μέγεθος οθόνης, display size, screen size, ζουμ, zoom, μικρότερο, smaller, μεγαλύτερο, larger</string>
+    <string name="kw_titan2_elite_tools_tweaks">animation, animations, κινούμενες εικόνες, ταχύτητα, speed, ένα χέρι, one-handed, ιστορικό ειδοποιήσεων, notification history, σύστημα, system</string>
+    <string name="kw_titan2_elite_tools_key_mapping">πλήκτρα, keys, αντιστοίχιση πλήκτρων, key map, πορτοκαλί πλήκτρο, orange key, πλευρικό πλήκτρο, side key, space, fn, sym, bindings</string>
+    <string name="kw_titan2_elite_tools_fn_ctrl">fn, ctrl, control, τροποποιητής, modifier, αντιστοίχιση, remap, προγραμματιζόμενο πλήκτρο, programmable key</string>
+    <string name="kw_titan2_elite_tools_show_status_bar">γραμμή κατάστασης, status bar, απόκρυψη, hide, strip, collapse, bar, πλήρης οθόνη, full screen</string>
+    <string name="kw_titan2_elite_tools_reset_to_stock">επαναφορά, reset, αρχικές, stock, αναίρεση, undo, revert, απεγκατάσταση, uninstall, εργοστασιακές, factory, προεπιλογή, default</string>
 </resources>

@@ -52,10 +52,10 @@ class BrokerGateTest {
 
     @Test
     fun noTriggerMeansNoConnection() {
-        val result = PrivilegedShell.run(context, PrivilegedCommand.DisableWirelessDebugging, null)
+        val result = PrivilegedShell.run(context, PrivilegedCommand.GrantWriteSecureSettings, null)
         assertFalse(result.ok)
         assertEquals(EmbeddedAdbShell.REFUSED_NO_TRIGGER, result.failure)
-        assertEquals(listOf("wireless_debugging_off"), refusals().map { it.id })
+        assertEquals(listOf("grant_write_secure_settings"), refusals().map { it.id })
     }
 
     @Test
@@ -72,7 +72,7 @@ class BrokerGateTest {
     fun anOpenScreenMayOnlyVerify() {
         val screen = BrokerTrigger.forTest(BrokerTrigger.Kind.SCREEN)
         assertTrue(screen.allows(PrivilegedCommand.Verify))
-        val result = PrivilegedShell.run(context, PrivilegedCommand.DisableWirelessDebugging, screen)
+        val result = PrivilegedShell.run(context, PrivilegedCommand.RevokeWriteSecureSettings, screen)
         assertEquals(EmbeddedAdbShell.REFUSED_NOT_ALLOWED, result.failure)
     }
 
@@ -81,8 +81,10 @@ class BrokerGateTest {
     fun aScreenTriggerRefusesEveryWritingCommand() {
         val screen = BrokerTrigger.forTest(BrokerTrigger.Kind.SCREEN)
         val writes = listOf(
+            PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON),
+            PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.STOCK),
+            PrivilegedCommand.GrantWriteSecureSettings,
             PrivilegedCommand.DisableWirelessDebugging,
-            PrivilegedCommand.UnpairSelf.forThisDevice("AB:CD:EF:01:23:45:67:89:AB:CD:EF:01:23:45:67:89")!!,
         )
         writes.forEach { command ->
             assertFalse(command.id, command.readOnly)
@@ -92,11 +94,15 @@ class BrokerGateTest {
         }
         // A read followed by a write is refused as a whole, before anything connects.
         val mixed = PrivilegedShell.runSession(
-            context, listOf(PrivilegedCommand.Verify, PrivilegedCommand.DisableWirelessDebugging), screen
+            context, listOf(
+                PrivilegedCommand.ReadBacklightTimeout,
+                PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON)
+            ),
+            screen
         )
         assertTrue(mixed.all { it.failure == EmbeddedAdbShell.REFUSED_NOT_ALLOWED })
         // Every refusal is audited (repeats of one id coalesce into one entry).
-        assertEquals((writes.map { it.id } + PrivilegedCommand.Verify.id).toSet(), refusals().map { it.id }.toSet())
+        assertEquals((writes.map { it.id } + PrivilegedCommand.ReadBacklightTimeout.id).toSet(), refusals().map { it.id }.toSet())
     }
 
     @Test
@@ -104,7 +110,10 @@ class BrokerGateTest {
         val screen = BrokerTrigger.forTest(BrokerTrigger.Kind.SCREEN)
         // Wireless debugging off, so a command the gate lets through stops before discovery.
         Settings.Global.putInt(context.contentResolver, "adb_wifi_enabled", 0)
-        val reads = listOf(PrivilegedCommand.Verify)
+        val reads = listOf(
+            PrivilegedCommand.Verify,
+            PrivilegedCommand.ReadBacklightTimeout,
+        )
         reads.forEach { command ->
             assertTrue(command.id, command.readOnly)
             val result = PrivilegedShell.run(context, command, screen)
@@ -152,6 +161,7 @@ class BrokerGateTest {
     @Test
     fun resetWithoutAReachableBrokerStillDeletesTheKeyAndSaysWhatIsLeft() {
         Settings.Global.putInt(context.contentResolver, "adb_wifi_enabled", 0)
+        WriteSecureSettingsHolders.set(context, "test_feature", true)
 
         val result = PrivilegedSetup.resetToStock(context, BrokerTrigger.forTest(BrokerTrigger.Kind.TAP))
 
@@ -159,6 +169,7 @@ class BrokerGateTest {
         assertEquals(EmbeddedAdbShell.REASON_WIRELESS_DEBUGGING_OFF, result.reason)
         assertFalse(source.exists())
         assertFalse(EmbeddedAdbShell.isPaired(context))
+        assertFalse(WriteSecureSettingsHolders.anyNeeded(context))
         val kinds = BrokerAuditLog.entries(context).map { it.kind to it.id }
         assertTrue(kinds.toString(), (BrokerAuditLog.Kind.COMMAND to "unpair_self") in kinds)
         assertTrue(kinds.toString(), (BrokerAuditLog.Kind.UNPAIR to "self") in kinds)
@@ -182,7 +193,18 @@ class BrokerGateTest {
         assertFalse("the local key is forgotten anyway", source.exists())
     }
 
-    // ---- the Wireless debugging setting ---------------------------------------------------
+    // ---- WRITE_SECURE_SETTINGS holders and the Wireless debugging setting ------------------
+
+    @Test
+    fun holdersAreTrackedPerFeature() {
+        assertFalse(WriteSecureSettingsHolders.anyNeeded(context))
+        WriteSecureSettingsHolders.set(context, "a", true)
+        WriteSecureSettingsHolders.set(context, "b", true)
+        WriteSecureSettingsHolders.set(context, "a", false)
+        assertEquals(setOf("b"), WriteSecureSettingsHolders.holders(context))
+        WriteSecureSettingsHolders.set(context, "b", false)
+        assertFalse(WriteSecureSettingsHolders.anyNeeded(context))
+    }
 
     @Test
     fun wirelessDebuggingOffAfterSetupIsOnByDefault() {

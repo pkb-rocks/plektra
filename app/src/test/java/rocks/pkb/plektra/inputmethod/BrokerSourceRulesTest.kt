@@ -42,11 +42,15 @@ class BrokerSourceRulesTest {
         "java/moe/shizuku/manager/adb/AdbPairingService.kt" to "setup after the user typed a pairing code",
         "java/rocks/pkb/plektra/ui/BrokerStatus.kt" to "verify while the broker screen is resumed",
         "java/rocks/pkb/plektra/DeviceSetupCard.kt" to "forget pairing, on a tap",
+        // Plektra features. Screens mint the trigger (a tap; a SCREEN trigger for reads on open);
+        // the feature objects only pass the caller's trigger through.
+        "java/rocks/pkb/plektra/SmartBacklightSection.kt" to "backlight and tile switches and Apply button (tap), on-phone read (screen)",
+        "java/rocks/pkb/plektra/inputmethod/KeyboardBacklightManager.kt" to "takes the caller's trigger",
     )
 
     private val callPattern = Regex(
         "PrivilegedShell\\.(run|runSession)\\b|EmbeddedAdbShell\\.(execute|verify)\\b|" +
-            "PrivilegedSetup\\.(applyAll|resetToStock|finishSetup)\\b|" +
+            "PrivilegedSetup\\.(applyAll|resetToStock|setWriteSecureSettingsNeeded|finishSetup|queueFinishSetup)\\b|" +
             "BrokerStatusMonitor\\.refresh\\b"
     )
 
@@ -69,6 +73,8 @@ class BrokerSourceRulesTest {
                 "java/moe/shizuku/manager/adb/AdbPairingService.kt",
                 "java/rocks/pkb/plektra/ui/BrokerStatus.kt",
                 "java/rocks/pkb/plektra/DeviceSetupCard.kt",
+                // Plektra's screens: taps, and SCREEN triggers (read-only) through BrokerStatus.kt.
+                "java/rocks/pkb/plektra/SmartBacklightSection.kt",
             ),
             minters
         )

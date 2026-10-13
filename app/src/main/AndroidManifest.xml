@@ -24,7 +24,10 @@
     <!-- Permesso per mostrare finestre overlay (per debug trackpad) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Embedded wireless-ADB broker -->
+    <!-- Embedded wireless-ADB broker. WRITE_SECURE_SETTINGS can only be granted over adb. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -293,6 +296,18 @@
             android:name="moe.shizuku.manager.adb.AdbPairingService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <!-- Quick Settings tile for the Titan 2 Elite keyboard backlight -->
+        <service
+            android:name="rocks.pkb.plektra.KeyboardBacklightTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_lightbulb_24"
+            android:label="@string/backlight_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <!-- Shizuku provider -->
         <provider

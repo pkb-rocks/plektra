@@ -1138,6 +1138,15 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="broker_audit_clear">Xóa nhật ký</string>
     <string name="broker_audit_ok">xong</string>
     <string name="broker_audit_failed">thất bại</string>
+    <string name="privileged_access_title">Quyền truy cập đặc quyền qua</string>
+    <string name="privileged_access_description">Cách Plektra chạy các lệnh mà công cụ bên dưới cần. Tự động dùng Shizuku khi nó đang chạy và Plektra được cho phép, nếu không thì dùng broker tích hợp.</string>
+    <string name="privileged_access_mode_auto">Tự động</string>
+    <string name="privileged_access_mode_shizuku">Chỉ Shizuku</string>
+    <string name="privileged_access_mode_broker">Chỉ broker tích hợp</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: đang chạy và được cho phép</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: đang chạy, chưa được cho phép</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: không chạy</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: chưa cài đặt</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: quá cũ (cần phiên bản 11 trở lên)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): Plektra đã bị từ chối và sẽ không được hỏi lại</string>
     <string name="shizuku_blocked_not_allowed">Shizuku được chọn trong Quyền truy cập đặc quyền qua và đang chạy, nhưng Plektra chưa được cho phép trong đó.</string>
@@ -1150,6 +1159,11 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="shizuku_blocked_open_sui">Mở Tùy chọn nhà phát triển (Sui)</string>
     <string name="shizuku_blocked_use_broker">Để dùng broker tích hợp, hãy chọn nó trong Công cụ Titan 2 Elite > Quyền truy cập đặc quyền qua.</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku cũng dùng được: hãy khởi động nó và cho phép Plektra trong đó, các công cụ sẽ dùng nó mà không cần ghép nối.</string>
+    <string name="privileged_access_shizuku_allow">Cho phép</string>
+    <string name="privileged_access_using_shizuku">Các lệnh chạy qua Shizuku. Plektra không động đến Gỡ lỗi không dây.</string>
+    <string name="privileged_access_using_broker">Các lệnh chạy qua broker tích hợp (gỡ lỗi không dây).</string>
+    <string name="device_setup_ready_shizuku_title">Đã kết nối qua Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">Các công cụ bên dưới truy cập hệ thống qua Shizuku, nên Plektra không cần ghép nối riêng. Chọn \"Chỉ broker tích hợp\" để dùng ghép nối.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, thiết lập thiết bị, broker, adb, gỡ lỗi không dây, ghép nối, đặc quyền</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, đặc quyền, root, shell, adb, tự động, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, gỡ lỗi không dây, ghép, ghép nối, broker, shizuku, cấp quyền, cài đặt bảo mật</string>

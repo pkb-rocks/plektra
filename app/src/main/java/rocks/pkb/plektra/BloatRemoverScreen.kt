@@ -100,7 +100,7 @@ fun BloatRemoverScreen(
             busy = null
             message = when (result) {
                 is PackageRemover.Result.Success -> null
-                is PackageRemover.Result.NotPaired -> context.getString(R.string.bloat_not_paired)
+                is PackageRemover.Result.NotPaired -> privilegedBlockedMessage(context)
                 is PackageRemover.Result.Refused -> result.reason
                 is PackageRemover.Result.Failed -> result.reason
             }
@@ -136,11 +136,7 @@ fun BloatRemoverScreen(
                 return@ToolboxPageScaffold
             }
             if (!paired) {
-                Notice(stringResource(R.string.bloat_not_paired))
-                Button(
-                    onClick = onOpenPairing,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text(stringResource(R.string.bloat_set_up_pairing)) }
+                PrivilegedBlockedNotice(onOpenPairing = onOpenPairing)
                 return@ToolboxPageScaffold
             }
 

@@ -61,7 +61,7 @@ class BrokerSourceRulesTest {
     )
 
     private val callPattern = Regex(
-        "PrivilegedShell\\.(run|runSession)\\b|EmbeddedAdbShell\\.(execute|verify)\\b|" +
+        "PrivilegedShell\\.(run|runSession)\\b|EmbeddedAdbShell\\.(execute|verify\\w*)\\b|" +
             "PrivilegedSetup\\.(applyAll|resetToStock|setWriteSecureSettingsNeeded|finishSetup|queueFinishSetup)\\b|" +
             "BrokerStatusMonitor\\.refresh\\b"
     )
@@ -104,5 +104,62 @@ class BrokerSourceRulesTest {
         assertTrue(Regex("private fun runSession\\(").containsMatchIn(shell))
         assertTrue(Regex("internal fun execute\\(\\s*context: Context,\\s*commands: List<PrivilegedCommand>").containsMatchIn(shell))
         assertTrue("no string-taking runShell is left", !Regex("fun runShell\\w*\\(").containsMatchIn(shell))
+        // the Shizuku route is the door's private last step too.
+        assertTrue(Regex("private fun runViaShizuku\\(").containsMatchIn(shell))
+    }
+
+    /**
+     * Shizuku's argv runner ([ShizukuShell.runArgv]) is called only by the
+     * door, after its checks, and the UserService binder is touched only by its client and itself.
+     */
+    @Test
+    fun theShizukuStringRunnerIsReachedOnlyThroughTheDoor() {
+        val runLine = Regex("\\bshell\\.runArgv\\(")
+        val callers = sources().filter { it.extension == "kt" && runLine.containsMatchIn(code(it)) }
+            .map { relative(it) }.toSet()
+        assertEquals(setOf("java/rocks/pkb/plektra/inputmethod/EmbeddedAdbShell.kt"), callers)
+
+        val binder = Regex("\\bIPrivilegedShellService\\b")
+        val users = sources().filter { it.extension == "kt" && binder.containsMatchIn(code(it)) }
+            .map { relative(it) }.toSet()
+        assertEquals(
+            setOf(
+                "java/rocks/pkb/plektra/shizuku/ShizukuUserServiceShell.kt",
+                "java/rocks/pkb/plektra/shizuku/PrivilegedShellService.kt",
+            ),
+            users
+        )
+    }
+
+    /** The Shizuku route starts programs from argv arrays: no shell wrapper anywhere in it. */
+    @Test
+    fun theShizukuServiceNeverStartsAShell() {
+        val shizukuDir = "java/rocks/pkb/plektra/shizuku/"
+        val offenders = sources().filter { it.extension == "kt" && relative(it).startsWith(shizukuDir) }
+            .filter { Regex("bin/sh|\"sh\"|\"-c\"").containsMatchIn(code(it)) }
+            .map { relative(it) }.toList()
+        assertEquals(emptyList<String>(), offenders)
+    }
+
+    /**
+     * The UserService version is derived from [AIDL_VERSION] (ShizukuUserServiceShell), which must
+     * be bumped with every change to the AIDL. The hash is of the AIDL without comments or
+     * whitespace; when this fails, bump AIDL_VERSION, then update both numbers here.
+     */
+    @Test
+    fun theAidlVersionIsBumpedWithTheAidl() {
+        val aidl = File(mainRoot, "aidl/rocks/pkb/plektra/shizuku/IPrivilegedShellService.aidl").readText()
+            .replace(Regex("/\\*.*?\\*/", RegexOption.DOT_MATCHES_ALL), "")
+            .replace(Regex("//[^\\n]*"), "")
+            .replace(Regex("\\s+"), "")
+        val hash = java.security.MessageDigest.getInstance("SHA-256").digest(aidl.toByteArray())
+            .joinToString("") { "%02x".format(it) }
+        val shell = File(mainRoot, "java/rocks/pkb/plektra/shizuku/ShizukuUserServiceShell.kt").readText()
+        val version = Regex("const val AIDL_VERSION = (\\d+)").find(shell)!!.groupValues[1].toInt()
+        assertEquals(
+            "AIDL changed: bump AIDL_VERSION and update this pin",
+            2 to "f350efe8558b5992a11eee4eefa62eadb06164ca91aed2a4f4764df5aa00bf9b",
+            version to hash
+        )
     }
 }

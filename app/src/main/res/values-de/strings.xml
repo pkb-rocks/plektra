@@ -1851,6 +1851,15 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="broker_audit_clear">Protokoll löschen</string>
     <string name="broker_audit_ok">ok</string>
     <string name="broker_audit_failed">fehlgeschlagen</string>
+    <string name="privileged_access_title">Privilegierter Zugriff über</string>
+    <string name="privileged_access_description">Wie Plektra die Befehle ausführt, die die Tools unten benötigen. „Automatisch“ verwendet Shizuku, wenn es läuft und Plektra erlaubt ist, sonst den integrierten Broker.</string>
+    <string name="privileged_access_mode_auto">Automatisch</string>
+    <string name="privileged_access_mode_shizuku">Nur Shizuku</string>
+    <string name="privileged_access_mode_broker">Nur integrierter Broker</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: läuft und erlaubt</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: läuft, nicht erlaubt</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: läuft nicht</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: nicht installiert</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: zu alt (benötigt Version 11 oder neuer)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): Plektra wurde abgelehnt und wird nicht erneut gefragt</string>
     <string name="shizuku_blocked_not_allowed">Shizuku ist unter „Privilegierter Zugriff über“ ausgewählt und läuft, aber Plektra ist darin noch nicht erlaubt.</string>
@@ -1863,6 +1872,11 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="shizuku_blocked_open_sui">Entwickleroptionen öffnen (Sui)</string>
     <string name="shizuku_blocked_use_broker">Um stattdessen den integrierten Broker zu verwenden, wähle ihn unter Titan 2 Elite-Tools > Privilegierter Zugriff über.</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku funktioniert auch: Starte es und erlaube Plektra darin, dann nutzen die Tools es ohne Kopplung.</string>
+    <string name="privileged_access_shizuku_allow">Erlauben</string>
+    <string name="privileged_access_using_shizuku">Befehle laufen über Shizuku. Plektra lässt das drahtlose Debugging in Ruhe.</string>
+    <string name="privileged_access_using_broker">Befehle laufen über den integrierten Broker (drahtloses Debugging).</string>
+    <string name="device_setup_ready_shizuku_title">Über Shizuku verbunden</string>
+    <string name="device_setup_ready_shizuku_body">Die Tools unten erreichen das System über Shizuku, daher braucht Plektra keine eigene Kopplung. Wähle „Nur integrierter Broker“, um stattdessen die Kopplung zu verwenden.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, Geräteeinrichtung, device setup, Broker, adb, drahtloses Debugging, wireless debugging, Kopplung, pairing, privilegiert, privileged</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, Broker, privilegiert, root, Shell, adb, automatisch, Backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, drahtloses Debugging, wireless debugging, koppeln, Kopplung, pair, pairing, Broker, shizuku, erteilen, sichere Einstellungen, secure settings</string>

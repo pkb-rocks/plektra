@@ -29,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
 import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackend
 import rocks.pkb.plektra.inputmethod.PrivilegedSetup
 import rocks.pkb.plektra.ui.BrokerStatusMonitor
 import rocks.pkb.plektra.ui.rememberVerifiedBrokerStatus
@@ -63,8 +65,9 @@ import moe.shizuku.manager.adb.EmbeddedAdbInit
  * embedded broker it creates.
  *
  * It sits at the top of the Titan 2 Elite tools screen so the pairing comes before the features
- * that need it. The broker is an extra privilege route beside Shizuku; this card does not touch
- * Shizuku.
+ * that need it. The broker is an extra privilege route beside Shizuku. When
+ * "Privileged access via" picks Shizuku, the verified status is Shizuku's and the card says so
+ * (no pairing needed); the card itself never asks Shizuku for anything.
  *
  * The pairing watcher is armed only when the user taps the setup button, never because this screen
  * opened: the screen can be reached by an external deep link, and a link must not be able to start
@@ -158,6 +161,9 @@ fun DeviceSetupCard(modifier: Modifier = Modifier) {
     // keying this card off `paired` is what let it claim the tools could reach the system while
     // nothing could connect at all.
     val connected = brokerStatus == EmbeddedAdbShell.BrokerStatus.OK
+    // OK can come from Shizuku, which needs no pairing.
+    val verifiedBackend by BrokerStatusMonitor.backend.collectAsState()
+    val viaShizuku = connected && verifiedBackend == PrivilegedBackend.SHIZUKU
     Surface(
         color = if (connected) MaterialTheme.colorScheme.surface
         else MaterialTheme.colorScheme.surfaceVariant,
@@ -177,8 +183,10 @@ fun DeviceSetupCard(modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(
                         when {
+                            viaShizuku -> R.string.device_setup_ready_shizuku_title
                             connected -> R.string.device_setup_ready_title
-                            // No verdict yet means a check is pending, never "Setup needed".
+                            // Whatever the route (a key, or Shizuku just allowed), no verdict yet
+                            // means a check is pending, never "Setup needed".
                             brokerStatus == null -> R.string.device_setup_checking_title
                             paired -> R.string.device_setup_unreachable_title
                             else -> R.string.device_setup_needed_title
@@ -201,12 +209,26 @@ fun DeviceSetupCard(modifier: Modifier = Modifier) {
                 ForgetOutcomeNotice(outcome = outcome, onOpenWireless = { openWirelessDebugging(context) })
             }
 
+            if (viaShizuku && !paired) {
+                // Nothing to pair: Shizuku carries the commands. Choosing "Built-in broker only"
+                // under "Privileged access via" brings the pairing steps back.
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.device_setup_ready_shizuku_body),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                return@Column
+            }
+
             if (paired) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = stringResource(
                         when (brokerStatus) {
-                            EmbeddedAdbShell.BrokerStatus.OK -> R.string.device_setup_ready_body
+                            EmbeddedAdbShell.BrokerStatus.OK ->
+                                if (viaShizuku) R.string.device_setup_ready_shizuku_body
+                                else R.string.device_setup_ready_body
                             EmbeddedAdbShell.BrokerStatus.REJECTED -> R.string.device_setup_rejected_body
                             EmbeddedAdbShell.BrokerStatus.PIN_MISMATCH -> R.string.broker_pin_mismatch_body
                             EmbeddedAdbShell.BrokerStatus.WIRELESS_DEBUGGING_OFF ->
@@ -215,6 +237,8 @@ fun DeviceSetupCard(modifier: Modifier = Modifier) {
                                 R.string.broker_blocked_no_service
                             EmbeddedAdbShell.BrokerStatus.NOT_PAIRED ->
                                 R.string.broker_blocked_not_paired
+                            EmbeddedAdbShell.BrokerStatus.SHIZUKU_UNAVAILABLE ->
+                                R.string.broker_blocked_shizuku
                             null -> R.string.device_setup_checking_body
                         }
                     ),

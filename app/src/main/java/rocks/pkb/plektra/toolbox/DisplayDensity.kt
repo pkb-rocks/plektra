@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.Log
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
-import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackends
 import rocks.pkb.plektra.inputmethod.PrivilegedCommand
 import rocks.pkb.plektra.inputmethod.PrivilegedShell
 
@@ -52,7 +52,7 @@ object DisplayDensity {
      * drawn with, and falls back to the shell's answer.
      */
     fun read(context: Context, trigger: BrokerTrigger?): Info? {
-        if (!EmbeddedAdbShell.isPaired(context)) return null
+        if (!PrivilegedBackends.hasAccess(context)) return null
         val out = PrivilegedShell.run(context, PrivilegedCommand.ReadDensity, trigger).output ?: return null
         val physical = parsePhysical(out) ?: return null
         val shellCurrent = parseOverride(out) ?: physical
@@ -89,7 +89,7 @@ object DisplayDensity {
 
     /** Back to the panel's own density, with no confirmation window — this is always safe. */
     fun reset(context: Context, trigger: BrokerTrigger?): Boolean {
-        if (!EmbeddedAdbShell.isPaired(context)) return false
+        if (!PrivilegedBackends.hasAccess(context)) return false
         val ok = PrivilegedShell.run(context, PrivilegedCommand.ResetDensity, trigger).ok
         if (ok) RevertibleChange.keep(context)
         return ok

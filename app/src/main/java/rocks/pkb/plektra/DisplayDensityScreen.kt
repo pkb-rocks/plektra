@@ -134,15 +134,7 @@ fun DisplayDensityScreen(
 
             val current = info
             if (current == null) {
-                Text(
-                    text = stringResource(R.string.bloat_not_paired),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Button(
-                    onClick = onOpenPairing,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text(stringResource(R.string.bloat_set_up_pairing)) }
+                PrivilegedBlockedNotice(onOpenPairing = onOpenPairing)
                 return@ToolboxPageScaffold
             }
 
@@ -201,7 +193,7 @@ fun DisplayDensityScreen(
                                         deadlineMs = RevertibleChange.pending(context)?.deadlineMs
                                     }
                                     is RevertibleChange.Outcome.NotPaired -> {
-                                        error = context.getString(R.string.bloat_not_paired)
+                                        error = privilegedBlockedMessage(context)
                                     }
                                     is RevertibleChange.Outcome.Failed -> {
                                         error = outcome.reason

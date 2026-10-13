@@ -42,6 +42,8 @@
     <!-- Query per vedere tutte le app installate che possono essere avviate -->
     <queries>
         <package android:name="org.futo.voiceinput" />
+        <!-- tell "Shizuku not installed" from "not running" -->
+        <package android:name="moe.shizuku.privileged.api" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

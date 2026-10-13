@@ -27,6 +27,8 @@ object SettingLinkIds {
     const val MAIN_ABOUT = "main.about"
     const val MAIN_TITAN2_ELITE_TOOLS = "main.titan2_elite_tools"
     const val TITAN2_ELITE_TOOLS_DEVICE_SETUP = "titan2_elite_tools.device_setup"
+    // "Privileged access via" (Shizuku or the built-in broker)
+    const val TITAN2_ELITE_TOOLS_PRIVILEGED_ACCESS = "titan2_elite_tools.privileged_access"
     // smart keyboard backlight row on the Titan 2 Elite tools screen
     const val TITAN2_ELITE_TOOLS_SMART_BACKLIGHT = "titan2_elite_tools.smart_backlight"
     // the keyboard-light tile's own switch in the Smart backlight section
@@ -1060,6 +1062,7 @@ object SettingLinkRegistry {
         // Titan 2 Elite tools keywords
         SettingLinkIds.MAIN_TITAN2_ELITE_TOOLS to R.string.kw_main_titan2_elite_tools,
         SettingLinkIds.TITAN2_ELITE_TOOLS_DEVICE_SETUP to R.string.kw_titan2_elite_tools_device_setup,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_PRIVILEGED_ACCESS to R.string.kw_titan2_elite_tools_privileged_access,
         // smart keyboard backlight keywords
         SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT to R.string.kw_titan2_elite_tools_smart_backlight,
         SettingLinkIds.TITAN2_ELITE_TOOLS_BACKLIGHT_TILE to R.string.kw_titan2_elite_tools_backlight_tile,

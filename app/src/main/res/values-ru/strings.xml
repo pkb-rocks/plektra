@@ -1150,6 +1150,15 @@ Nav Mode использует физическое положение клави
     <string name="broker_audit_clear">Очистить журнал</string>
     <string name="broker_audit_ok">ок</string>
     <string name="broker_audit_failed">ошибка</string>
+    <string name="privileged_access_title">Привилегированный доступ через</string>
+    <string name="privileged_access_description">Как Plektra выполняет команды, нужные инструментам ниже. В автоматическом режиме используется Shizuku, если он запущен и Plektra в нём разрешена, иначе — встроенный брокер.</string>
+    <string name="privileged_access_mode_auto">Автоматически</string>
+    <string name="privileged_access_mode_shizuku">Только Shizuku</string>
+    <string name="privileged_access_mode_broker">Только встроенный брокер</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: запущен и разрешён</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: запущен, не разрешён</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: не запущен</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: не установлен</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: слишком старая версия (нужна версия 11 или новее)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): Plektra отказано, повторно запрашиваться не будет</string>
     <string name="shizuku_blocked_not_allowed">В пункте «Привилегированный доступ через» выбран Shizuku, он запущен, но Plektra в нём ещё не разрешена.</string>
@@ -1162,6 +1171,11 @@ Nav Mode использует физическое положение клави
     <string name="shizuku_blocked_open_sui">Открыть «Для разработчиков» (Sui)</string>
     <string name="shizuku_blocked_use_broker">Чтобы использовать встроенный брокер, выберите его в разделе «Инструменты Titan 2 Elite» > «Привилегированный доступ через».</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku тоже подойдёт: запустите его и разрешите в нём Plektra, и инструменты будут использовать его без сопряжения.</string>
+    <string name="privileged_access_shizuku_allow">Разрешить</string>
+    <string name="privileged_access_using_shizuku">Команды выполняются через Shizuku. Plektra не трогает отладку по Wi-Fi.</string>
+    <string name="privileged_access_using_broker">Команды выполняются через встроенный брокер (отладка по Wi-Fi).</string>
+    <string name="device_setup_ready_shizuku_title">Подключено через Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">Инструменты ниже обращаются к системе через Shizuku, поэтому Plektra не нужно собственное сопряжение. Выберите «Только встроенный брокер», чтобы использовать сопряжение.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, настройка устройства, брокер, adb, отладка по Wi-Fi, беспроводная отладка, сопряжение, привилегированный</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, брокер, привилегированный, root, рут, shell, оболочка, adb, автоматически, бэкенд</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, отладка по Wi-Fi, беспроводная отладка, сопряжение, сопрячь, брокер, shizuku, разрешение, выдать, защищённые настройки</string>

@@ -5,7 +5,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
-import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackends
 import rocks.pkb.plektra.inputmethod.PrivilegedCommand
 import rocks.pkb.plektra.inputmethod.PrivilegedShell
 
@@ -62,12 +62,13 @@ object PackageRemover {
     )
 
     /**
-     * Cheap pre-flight before an action is attempted: is a key stored at all.
+     * Cheap pre-flight before an action is attempted: is a broker key stored at all, or, with
+     * Shizuku chosen, is Shizuku running and allowed ([PrivilegedBackends.hasAccess]).
      *
      * Deliberately NOT a readiness claim for the UI — a stored key does not mean the phone
      * accepts it. Screens use rememberVerifiedBrokerStatus, which actually connects.
      */
-    internal fun isReady(context: Context): Boolean = EmbeddedAdbShell.isPaired(context)
+    internal fun isReady(context: Context): Boolean = PrivilegedBackends.hasAccess(context)
 
     /** A read: the open screen's trigger is enough ([PrivilegedCommand.readOnly]). */
     fun census(context: Context, trigger: BrokerTrigger?): Census? {

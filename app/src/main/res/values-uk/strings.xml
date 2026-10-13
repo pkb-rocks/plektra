@@ -1150,6 +1150,15 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="broker_audit_clear">Очистити журнал</string>
     <string name="broker_audit_ok">ок</string>
     <string name="broker_audit_failed">помилка</string>
+    <string name="privileged_access_title">Привілейований доступ через</string>
+    <string name="privileged_access_description">Як Plektra виконує команди, потрібні інструментам нижче. Автоматично використовує Shizuku, коли він запущений і Plektra дозволено, інакше — вбудований брокер.</string>
+    <string name="privileged_access_mode_auto">Автоматично</string>
+    <string name="privileged_access_mode_shizuku">Лише Shizuku</string>
+    <string name="privileged_access_mode_broker">Лише вбудований брокер</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: запущено і дозволено</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: запущено, не дозволено</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: не запущено</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: не встановлено</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: надто стара версія (потрібна версія 11 або новіша)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): Plektra відмовлено, повторного запиту не буде</string>
     <string name="shizuku_blocked_not_allowed">Shizuku вибрано в розділі «Привілейований доступ через» і він запущений, але Plektra у ньому ще не дозволено.</string>
@@ -1162,6 +1171,11 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="shizuku_blocked_open_sui">Відкрити параметри розробника (Sui)</string>
     <string name="shizuku_blocked_use_broker">Щоб натомість використовувати вбудований брокер, виберіть його в Інструменти Titan 2 Elite &gt; Привілейований доступ через.</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku теж підійде: запустіть його та дозвольте в ньому Plektra — і інструменти використовуватимуть його без сполучення.</string>
+    <string name="privileged_access_shizuku_allow">Дозволити</string>
+    <string name="privileged_access_using_shizuku">Команди виконуються через Shizuku. Plektra не чіпає бездротове налагодження.</string>
+    <string name="privileged_access_using_broker">Команди виконуються через вбудований брокер (бездротове налагодження).</string>
+    <string name="device_setup_ready_shizuku_title">Підключено через Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">Інструменти нижче отримують доступ до системи через Shizuku, тому Plektra не потрібне власне сполучення. Виберіть \"Лише вбудований брокер\", щоб натомість використовувати сполучення.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, налаштування пристрою, брокер, adb, бездротове налагодження, сполучення, привілейований, device setup, broker, wireless debugging, pairing, privileged</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, брокер, привілейований, root, рут, shell, оболонка, adb, автоматично, бекенд, broker, privileged, automatic, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, бездротове налагодження, сполучити, сполучення, брокер, shizuku, надати, захищені налаштування, wireless debugging, pair, pairing, broker, grant, secure settings</string>

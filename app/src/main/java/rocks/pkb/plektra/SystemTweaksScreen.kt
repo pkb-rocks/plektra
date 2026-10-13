@@ -81,15 +81,7 @@ fun SystemTweaksScreen(
             }
             val current = state
             if (current == null) {
-                Text(
-                    text = stringResource(R.string.bloat_not_paired),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Button(
-                    onClick = onOpenPairing,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text(stringResource(R.string.bloat_set_up_pairing)) }
+                PrivilegedBlockedNotice(onOpenPairing = onOpenPairing)
                 return@ToolboxPageScaffold
             }
 

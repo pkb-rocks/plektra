@@ -116,7 +116,7 @@ class PrivilegedCommandTest {
         )
         everyCase().filter { it.readOnly }.forEach { command ->
             val line = command.commandLine(pkg)
-            listOf("put", "delete", "grant", "revoke", "disable", "enable", "install", "uninstall", "reset", " s16 \"-1\"")
+            listOf("put", "delete", "grant", "revoke", "disable", "enable", "install", "uninstall", "reset", " s16 -1")
                 .forEach { verb -> assertFalse("${command.id}: $verb", line.contains(" $verb ") || line.endsWith(" $verb")) }
             assertFalse(command.id, line.contains("service call agui_functional_service 2"))
             assertFalse(command.id, Regex("wm density \\d").containsMatchIn(line))
@@ -192,16 +192,16 @@ class PrivilegedCommandTest {
     @Test
     fun backlightTimeoutCommandsAreBuiltFromConstantsOnly() {
         assertEquals(
-            "service call agui_functional_service 1 s16 \"keyboard_brightness_timeout\"",
+            "service call agui_functional_service 1 s16 keyboard_brightness_timeout",
             PrivilegedCommand.ReadBacklightTimeout.commandLine(app)
         )
         assertEquals(
-            "service call agui_functional_service 2 s16 \"keyboard_brightness_timeout\" s16 \"-1\"",
+            "service call agui_functional_service 2 s16 keyboard_brightness_timeout s16 -1",
             PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.ALWAYS_ON)
                 .commandLine(app)
         )
         assertEquals(
-            "service call agui_functional_service 2 s16 \"keyboard_brightness_timeout\" s16 \"30000\"",
+            "service call agui_functional_service 2 s16 keyboard_brightness_timeout s16 30000",
             PrivilegedCommand.WriteBacklightTimeout(PrivilegedCommand.BacklightTimeout.STOCK)
                 .commandLine(app)
         )
@@ -224,8 +224,74 @@ class PrivilegedCommandTest {
             PrivilegedCommand.WriteBacklightTimeout(it).commandLine(app)
         }
         lines.forEach { line ->
-            // The double quotes around the vendor key and value are the only quoting in use.
-            assertFalse(line, line.any { it in ";&|`$<>\\\n\r" })
+            // Plain words need no quoting, so none is used.
+            assertFalse(line, line.any { it in ";&|`$<>\\\n\r\"'" })
         }
+    }
+
+    // ---- argv (the Shizuku route runs no shell) ------------------------------------------------
+
+    @Test
+    fun everyCaseIsBuiltAsArgvArraysWithNoShellAndNoShellSyntax() {
+        everyCase().forEach { command ->
+            val argvs = command.argvs(pkg)
+            assertTrue(command.id, argvs.isNotEmpty())
+            argvs.forEach { argv ->
+                assertTrue(command.id, argv.isNotEmpty() && argv[0].isNotBlank())
+                assertFalse("${command.id}: $argv", argv[0] == "sh" || argv[0].endsWith("/sh") || "-c" in argv)
+                // No word is, or carries, shell syntax or whitespace the shell would split.
+                argv.forEach { word ->
+                    assertFalse("${command.id}: '$word'", word.any { it in ";&|`$<>\\\"' \t\n\r" })
+                }
+            }
+        }
+    }
+
+    @Test
+    fun theAdbLineIsExactlyTheArgvArraysJoinedWithSemicolons() {
+        everyCase().forEach { command ->
+            assertEquals(
+                command.id,
+                command.argvs(pkg).joinToString("; ") { it.joinToString(" ") },
+                command.commandLine(pkg)
+            )
+        }
+    }
+
+    @Test
+    fun commandsThatWereShellListsAreSeveralArrays() {
+        assertEquals(6, PrivilegedCommand.ListPackageStates.argvs(pkg).size)
+        assertEquals(
+            listOf(listOf("echo", "__E__"), listOf("pm", "list", "packages", "-e")),
+            PrivilegedCommand.ListPackageStates.argvs(pkg).take(2)
+        )
+        assertEquals(
+            listOf(
+                listOf("settings", "put", "system", "fn_programmable_key_enable", "1"),
+                listOf("settings", "put", "system", "fn_programmable_key_function", "1"),
+            ),
+            PrivilegedCommand.SetFnProgrammableKey(1, 1).argvs(pkg)
+        )
+        assertEquals(
+            listOf(
+                listOf("cmd", "notification", "allow_listener", "$pkg/${PrivilegedCommand.RING_LISTENER_CLASS}"),
+                listOf("appops", "set", pkg, "POST_NOTIFICATION", "allow"),
+            ),
+            PrivilegedCommand.RingGrants(
+                listOf(PrivilegedCommand.RingGrant.ALLOW_LISTENER, PrivilegedCommand.RingGrant.ALLOW_POST_NOTIFICATIONS)
+            ).argvs(pkg)
+        )
+        assertEquals(
+            listOf("pm", "revoke", pkg, PrivilegedCommand.WRITE_SECURE_SETTINGS),
+            PrivilegedCommand.RevokeWriteSecureSettings.argvs(pkg).single()
+        )
+    }
+
+    /** The adb route still hands a shell one line, so an odd word must be quoted there. */
+    @Test
+    fun theShellLineQuotesAWordThatIsNotPlain() {
+        assertEquals("echo 'a b' 'it'\\''s'; echo ok", PrivilegedCommand.shellLine(
+            listOf(listOf("echo", "a b", "it's"), listOf("echo", "ok"))
+        ))
     }
 }

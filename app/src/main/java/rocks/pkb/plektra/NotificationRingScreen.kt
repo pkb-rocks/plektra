@@ -305,11 +305,9 @@ fun NotificationRingScreen(
                         Text(stringResource(R.string.ring_grant_via_broker))
                     }
                 } else {
-                    Text(
-                        text = stringResource(R.string.ring_grant_pairing_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    PrivilegedBlockedNotice(
+                        onOpenPairing = null,
+                        pairingRes = R.string.ring_grant_pairing_hint
                     )
                 }
             }

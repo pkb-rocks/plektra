@@ -2,7 +2,6 @@ package rocks.pkb.plektra.inputmethod
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -35,31 +34,31 @@ class RingPrivilegedGrantsTest {
     @Test
     fun noRingGrantGrantsWriteSecureSettings() {
         PrivilegedCommand.RingGrant.entries.forEach { grant ->
-            assertFalse(grant.name, grant.line(app).contains("WRITE_SECURE_SETTINGS"))
+            assertFalse(grant.name, grant.argv(app).any { it.contains("WRITE_SECURE_SETTINGS") })
         }
     }
 
     @Test
-    fun eachGrantIsExactlyOneKnownLine() {
+    fun eachGrantIsExactlyOneKnownArgv() {
         assertEquals(
-            "cmd notification allow_listener $app/$listener",
-            PrivilegedCommand.RingGrant.ALLOW_LISTENER.line(app)
+            listOf("cmd", "notification", "allow_listener", "$app/$listener"),
+            PrivilegedCommand.RingGrant.ALLOW_LISTENER.argv(app)
         )
         assertEquals(
-            "appops set $app USE_FULL_SCREEN_INTENT allow",
-            PrivilegedCommand.RingGrant.ALLOW_FULL_SCREEN_INTENT.line(app)
+            listOf("appops", "set", app, "USE_FULL_SCREEN_INTENT", "allow"),
+            PrivilegedCommand.RingGrant.ALLOW_FULL_SCREEN_INTENT.argv(app)
         )
         assertEquals(
-            "appops set $app POST_NOTIFICATION allow",
-            PrivilegedCommand.RingGrant.ALLOW_POST_NOTIFICATIONS.line(app)
+            listOf("appops", "set", app, "POST_NOTIFICATION", "allow"),
+            PrivilegedCommand.RingGrant.ALLOW_POST_NOTIFICATIONS.argv(app)
         )
         assertEquals(
-            "cmd notification disallow_listener $app/$listener",
-            PrivilegedCommand.RingGrant.DISALLOW_LISTENER.line(app)
+            listOf("cmd", "notification", "disallow_listener", "$app/$listener"),
+            PrivilegedCommand.RingGrant.DISALLOW_LISTENER.argv(app)
         )
         assertEquals(
-            "appops set $app USE_FULL_SCREEN_INTENT default",
-            PrivilegedCommand.RingGrant.RESET_FULL_SCREEN_INTENT.line(app)
+            listOf("appops", "set", app, "USE_FULL_SCREEN_INTENT", "default"),
+            PrivilegedCommand.RingGrant.RESET_FULL_SCREEN_INTENT.argv(app)
         )
     }
 
@@ -102,11 +101,11 @@ class RingPrivilegedGrantsTest {
     }
 
     @Test
-    fun noGrantLineCarriesShellMetacharactersBeyondTheJoiner() {
+    fun noGrantWordCarriesShellMetacharacters() {
         PrivilegedCommand.RingGrant.entries.forEach { grant ->
-            val line = grant.line(app)
-            assertFalse(line, line.any { it in "&|`$<>\n\"'\\" })
-            assertTrue(line, !line.contains(";"))
+            grant.argv(app).forEach { word ->
+                assertFalse(word, word.any { it in "&|`$<>\n\"'\\;" || it.isWhitespace() })
+            }
         }
     }
 }

@@ -32,8 +32,20 @@ internal sealed class PrivilegedCommand {
      */
     abstract val id: String
 
-    /** The command line for this case. Throws if a value fails validation, so it never runs. */
-    abstract fun commandLine(appPackage: String): String
+    /**
+     * The command as a sequence of argv arrays, run one after the other (a case that used to be
+     * `a; b; c` is three arrays). Shizuku starts each with `ProcessBuilder(argv)`, no shell, so
+     * nothing in a value can ever be read as shell syntax. Throws if a value fails validation, so
+     * it never runs. The only builders are [one] and the cases below.
+     */
+    abstract fun argvs(appPackage: String): List<List<String>>
+
+    /**
+     * The same command as one line for adbd's `shell:` service (the broker route), which does hand
+     * it to a shell: [argvs] joined with `;`, each word quoted unless it is plainly safe. Derived,
+     * so the two routes cannot drift apart.
+     */
+    fun commandLine(appPackage: String): String = shellLine(argvs(appPackage))
 
     /**
      * True for a command that may end the connection (unpairing this key, switching Wireless
@@ -57,7 +69,7 @@ internal sealed class PrivilegedCommand {
     object Verify : PrivilegedCommand() {
         override val id = "verify"
         override val readOnly: Boolean get() = true
-        override fun commandLine(appPackage: String): String = "echo ${EmbeddedAdbShell.VERIFY_MARKER}"
+        override fun argvs(appPackage: String) = one("echo", EmbeddedAdbShell.VERIFY_MARKER)
     }
 
     /**
@@ -67,27 +79,27 @@ internal sealed class PrivilegedCommand {
      */
     object GrantWriteSecureSettings : PrivilegedCommand() {
         override val id = "grant_write_secure_settings"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(appPackage)) { "invalid package name" }
-            return "pm grant $appPackage $WRITE_SECURE_SETTINGS"
+            return one("pm", "grant", appPackage, WRITE_SECURE_SETTINGS)
         }
     }
 
     /** Undo of [GrantWriteSecureSettings]: the last feature needing it was turned off, or a reset. */
     object RevokeWriteSecureSettings : PrivilegedCommand() {
         override val id = "revoke_write_secure_settings"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(appPackage)) { "invalid package name" }
-            return "pm revoke $appPackage $WRITE_SECURE_SETTINGS"
+            return one("pm", "revoke", appPackage, WRITE_SECURE_SETTINGS)
         }
     }
 
     /** Withdraws notification access the broker gave one of this app's listeners. */
     class DisallowNotificationListener(val listener: AppNotificationListener) : PrivilegedCommand() {
         override val id = "disallow_listener_${listener.id}"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(appPackage)) { "invalid package name" }
-            return "cmd notification disallow_listener $appPackage/${listener.className}"
+            return one("cmd", "notification", "disallow_listener", "$appPackage/${listener.className}")
         }
     }
 
@@ -101,10 +113,10 @@ internal sealed class PrivilegedCommand {
     class UnpairSelf private constructor(val fingerprint: String) : PrivilegedCommand() {
         override val id = "unpair_self"
         override val terminal: Boolean get() = true
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(FINGERPRINT.matches(fingerprint)) { "invalid key fingerprint" }
             require(canUnpairOnSdk(Build.VERSION.SDK_INT)) { "unpairDevice not verified on this SDK" }
-            return "service call adb $TXN_UNPAIR_DEVICE s16 $fingerprint"
+            return one("service", "call", "adb", "$TXN_UNPAIR_DEVICE", "s16", fingerprint)
         }
 
         companion object {
@@ -128,7 +140,7 @@ internal sealed class PrivilegedCommand {
     object DisableWirelessDebugging : PrivilegedCommand() {
         override val id = "wireless_debugging_off"
         override val terminal: Boolean get() = true
-        override fun commandLine(appPackage: String): String = "settings put global $ADB_WIFI_ENABLED 0"
+        override fun argvs(appPackage: String) = one("settings", "put", "global", ADB_WIFI_ENABLED, "0")
     }
 
     // the commands the smart keyboard backlight and its Quick Settings tile need.
@@ -137,15 +149,15 @@ internal sealed class PrivilegedCommand {
     object ReadBacklightTimeout : PrivilegedCommand() {
         override val id = "read_backlight_timeout"
         override val readOnly: Boolean get() = true
-        override fun commandLine(appPackage: String): String =
-            "service call $VENDOR_SERVICE $TXN_GET s16 \"$KEY_BACKLIGHT_TIMEOUT\""
+        override fun argvs(appPackage: String) =
+            one("service", "call", VENDOR_SERVICE, TXN_GET, "s16", KEY_BACKLIGHT_TIMEOUT)
     }
 
     /** Writes the vendor keyboard-backlight timeout (`SET` on the vendor binder service). */
     class WriteBacklightTimeout(val timeout: BacklightTimeout) : PrivilegedCommand() {
         override val id = "write_backlight_timeout_${timeout.name.lowercase()}"
-        override fun commandLine(appPackage: String): String =
-            "service call $VENDOR_SERVICE $TXN_SET s16 \"$KEY_BACKLIGHT_TIMEOUT\" s16 \"${timeout.wireValue}\""
+        override fun argvs(appPackage: String) =
+            one("service", "call", VENDOR_SERVICE, TXN_SET, "s16", KEY_BACKLIGHT_TIMEOUT, "s16", timeout.wireValue)
     }
 
     /** The only two values the app ever writes for the vendor timeout. */
@@ -162,10 +174,10 @@ internal sealed class PrivilegedCommand {
     // component is the validated package plus a constant class name.
     class RingGrants(val grants: List<RingGrant>) : PrivilegedCommand() {
         override val id = "ring_grants"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(appPackage)) { "invalid package name" }
             require(grants.isNotEmpty()) { "no grants" }
-            return grants.joinToString("; ") { it.line(appPackage) }
+            return grants.map { it.argv(appPackage) }
         }
     }
 
@@ -185,12 +197,12 @@ internal sealed class PrivilegedCommand {
         /** Undo of [ALLOW_FULL_SCREEN_INTENT], for a reset to stock. */
         RESET_FULL_SCREEN_INTENT;
 
-        fun line(appPackage: String): String = when (this) {
-            ALLOW_LISTENER -> "cmd notification allow_listener $appPackage/$RING_LISTENER_CLASS"
-            ALLOW_FULL_SCREEN_INTENT -> "appops set $appPackage USE_FULL_SCREEN_INTENT allow"
-            ALLOW_POST_NOTIFICATIONS -> "appops set $appPackage POST_NOTIFICATION allow"
-            DISALLOW_LISTENER -> "cmd notification disallow_listener $appPackage/$RING_LISTENER_CLASS"
-            RESET_FULL_SCREEN_INTENT -> "appops set $appPackage USE_FULL_SCREEN_INTENT default"
+        fun argv(appPackage: String): List<String> = when (this) {
+            ALLOW_LISTENER -> listOf("cmd", "notification", "allow_listener", "$appPackage/$RING_LISTENER_CLASS")
+            ALLOW_FULL_SCREEN_INTENT -> listOf("appops", "set", appPackage, "USE_FULL_SCREEN_INTENT", "allow")
+            ALLOW_POST_NOTIFICATIONS -> listOf("appops", "set", appPackage, "POST_NOTIFICATION", "allow")
+            DISALLOW_LISTENER -> listOf("cmd", "notification", "disallow_listener", "$appPackage/$RING_LISTENER_CLASS")
+            RESET_FULL_SCREEN_INTENT -> listOf("appops", "set", appPackage, "USE_FULL_SCREEN_INTENT", "default")
         }
     }
 
@@ -203,25 +215,28 @@ internal sealed class PrivilegedCommand {
     object ListPackageStates : PrivilegedCommand() {
         override val id = "list_package_states"
         override val readOnly: Boolean get() = true
-        override fun commandLine(appPackage: String): String =
-            "echo __E__; pm list packages -e; echo __D__; pm list packages -d; echo __U__; pm list packages -u"
+        override fun argvs(appPackage: String) = listOf(
+            listOf("echo", "__E__"), listOf("pm", "list", "packages", "-e"),
+            listOf("echo", "__D__"), listOf("pm", "list", "packages", "-d"),
+            listOf("echo", "__U__"), listOf("pm", "list", "packages", "-u"),
+        )
     }
 
     /** Hide a catalog package and stop it running. Reversible. */
     class DisablePackage(val packageName: String) : PrivilegedCommand() {
         override val id = "disable_package"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isRemovableCatalogPackage(packageName)) { "package is not removable" }
-            return "pm disable-user --user 0 $packageName"
+            return one("pm", "disable-user", "--user", "0", packageName)
         }
     }
 
     /** Uninstall a catalog package for user 0. The APK stays on /system, so it can come back. */
     class UninstallPackage(val packageName: String) : PrivilegedCommand() {
         override val id = "uninstall_package"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isRemovableCatalogPackage(packageName)) { "package is not removable" }
-            return "pm uninstall --user 0 $packageName"
+            return one("pm", "uninstall", "--user", "0", packageName)
         }
     }
 
@@ -231,38 +246,38 @@ internal sealed class PrivilegedCommand {
      */
     class InstallExistingPackage(val packageName: String) : PrivilegedCommand() {
         override val id = "install_existing_package"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(packageName)) { "invalid package name" }
-            return "cmd package install-existing --user 0 $packageName"
+            return one("cmd", "package", "install-existing", "--user", "0", packageName)
         }
     }
 
     /** Re-enable a package that was disabled. Same name rule as [InstallExistingPackage]. */
     class EnablePackage(val packageName: String) : PrivilegedCommand() {
         override val id = "enable_package"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(isValidPackageName(packageName)) { "invalid package name" }
-            return "pm enable --user 0 $packageName"
+            return one("pm", "enable", "--user", "0", packageName)
         }
     }
 
     object ReadDensity : PrivilegedCommand() {
         override val id = "read_density"
         override val readOnly: Boolean get() = true
-        override fun commandLine(appPackage: String): String = "wm density"
+        override fun argvs(appPackage: String) = one("wm", "density")
     }
 
     object ResetDensity : PrivilegedCommand() {
         override val id = "reset_density"
-        override fun commandLine(appPackage: String): String = "wm density reset"
+        override fun argvs(appPackage: String) = one("wm", "density", "reset")
     }
 
     /** `wm density <dpi>`, the dpi an Int inside [MIN_DPI]..[MAX_DPI]. */
     class SetDensity(val dpi: Int) : PrivilegedCommand() {
         override val id = "set_density"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(dpi in MIN_DPI..MAX_DPI) { "density out of range" }
-            return "wm density $dpi"
+            return one("wm", "density", "$dpi")
         }
 
         companion object {
@@ -275,35 +290,34 @@ internal sealed class PrivilegedCommand {
     object ReadSystemTweaks : PrivilegedCommand() {
         override val id = "read_system_tweaks"
         override val readOnly: Boolean get() = true
-        override fun commandLine(appPackage: String): String = buildList {
-            add("settings get global ${SystemTweaks.ANIMATION_KEYS.first()}")
-            SystemTweaks.Toggle.entries.forEach { add("settings get ${it.namespace} ${it.key}") }
-        }.joinToString("; ")
+        override fun argvs(appPackage: String): List<List<String>> = buildList {
+            add(listOf("settings", "get", "global", SystemTweaks.ANIMATION_KEYS.first()))
+            SystemTweaks.Toggle.entries.forEach { add(listOf("settings", "get", it.namespace, it.key)) }
+        }
     }
 
     class SetAnimationSpeed(val speed: SystemTweaks.AnimationSpeed) : PrivilegedCommand() {
         override val id = "set_animation_speed"
-        override fun commandLine(appPackage: String): String =
-            SystemTweaks.ANIMATION_KEYS.joinToString("; ") { "settings put global $it ${speed.arg}" }
+        override fun argvs(appPackage: String) =
+            SystemTweaks.ANIMATION_KEYS.map { listOf("settings", "put", "global", it, speed.arg) }
     }
 
     /** On writes 1; off DELETES the key, because these ship unset. */
     class SetTweak(val toggle: SystemTweaks.Toggle, val enabled: Boolean) : PrivilegedCommand() {
         override val id = "set_tweak"
-        override fun commandLine(appPackage: String): String =
+        override fun argvs(appPackage: String) =
             if (enabled) {
-                "settings put ${toggle.namespace} ${toggle.key} 1"
+                one("settings", "put", toggle.namespace, toggle.key, "1")
             } else {
-                "settings delete ${toggle.namespace} ${toggle.key}"
+                one("settings", "delete", toggle.namespace, toggle.key)
             }
     }
 
     object ResetSystemTweaks : PrivilegedCommand() {
         override val id = "reset_system_tweaks"
-        override fun commandLine(appPackage: String): String = (
-            SystemTweaks.ANIMATION_KEYS.map { "settings put global $it 1.0" } +
-                SystemTweaks.Toggle.entries.map { "settings delete ${it.namespace} ${it.key}" }
-            ).joinToString("; ")
+        override fun argvs(appPackage: String) =
+            SystemTweaks.ANIMATION_KEYS.map { listOf("settings", "put", "global", it, "1.0") } +
+                SystemTweaks.Toggle.entries.map { listOf("settings", "delete", it.namespace, it.key) }
     }
 
     /**
@@ -312,9 +326,12 @@ internal sealed class PrivilegedCommand {
      */
     class SetFnProgrammableKey(val enable: Int, val function: Int) : PrivilegedCommand() {
         override val id = "set_fn_programmable_key"
-        override fun commandLine(appPackage: String): String {
+        override fun argvs(appPackage: String): List<List<String>> {
             require(enable in 0..MAX_VALUE && function in 0..MAX_VALUE) { "value out of range" }
-            return "settings put system $KEY_ENABLE $enable; settings put system $KEY_FUNCTION $function"
+            return listOf(
+                listOf("settings", "put", "system", KEY_ENABLE, "$enable"),
+                listOf("settings", "put", "system", KEY_FUNCTION, "$function"),
+            )
         }
 
         companion object {
@@ -329,6 +346,16 @@ internal sealed class PrivilegedCommand {
         private val PACKAGE_NAME = Regex("^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$")
 
         fun isValidPackageName(name: String): Boolean = PACKAGE_NAME.matches(name)
+
+        /** A command of one argv. */
+        fun one(vararg argv: String): List<List<String>> = listOf(argv.toList())
+
+        private val PLAIN_WORD = Regex("^[A-Za-z0-9_./:=@%+,-]+$")
+
+        /** Argv arrays as one shell line for adbd; a word with anything unusual is single-quoted. */
+        fun shellLine(argvs: List<List<String>>): String = argvs.joinToString("; ") { argv ->
+            argv.joinToString(" ") { if (PLAIN_WORD.matches(it)) it else "'" + it.replace("'", "'\\''") + "'" }
+        }
 
         /** An adb key fingerprint: 16 MD5 bytes as uppercase hex pairs joined by colons. */
         val FINGERPRINT = Regex("^([0-9A-F]{2}:){15}[0-9A-F]{2}$")
@@ -380,13 +407,15 @@ internal enum class AppNotificationListener(val id: String, val className: Strin
 /**
  * What a [PrivilegedCommand] did. [failure] is a short reason when [ok] is false. [status] says
  * why the broker could not run at all (no pairing, Wireless debugging off, a changed adbd
- * certificate, ...), or is null when it ran.
+ * certificate, Shizuku unavailable, ...), or is null when it ran. [backend] is the route the door
+ * chose, or null when the door refused the command before choosing.
  */
 internal data class PrivilegedResult(
     val ok: Boolean,
     val output: String?,
     val failure: String?,
     val status: EmbeddedAdbShell.BrokerStatus? = null,
+    val backend: PrivilegedBackend? = null,
 )
 
 /**

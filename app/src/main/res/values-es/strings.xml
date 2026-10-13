@@ -1146,6 +1146,15 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="broker_audit_clear">Borrar registro</string>
     <string name="broker_audit_ok">ok</string>
     <string name="broker_audit_failed">fallido</string>
+    <string name="privileged_access_title">Acceso con privilegios mediante</string>
+    <string name="privileged_access_description">Cómo ejecuta Plektra los comandos que necesitan las herramientas de abajo. Automático usa Shizuku cuando se está ejecutando y Plektra tiene permiso; en caso contrario, el broker integrado.</string>
+    <string name="privileged_access_mode_auto">Automático</string>
+    <string name="privileged_access_mode_shizuku">Solo Shizuku</string>
+    <string name="privileged_access_mode_broker">Solo el broker integrado</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: en ejecución y permitido</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: en ejecución, sin permiso</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: no se está ejecutando</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: no instalado</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: demasiado antiguo (requiere la versión 11 o posterior)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): se denegó a Plektra y no se volverá a preguntar</string>
     <string name="shizuku_blocked_not_allowed">Shizuku está elegido en Acceso con privilegios mediante y se está ejecutando, pero Plektra aún no tiene permiso en él.</string>
@@ -1158,6 +1167,11 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="shizuku_blocked_open_sui">Abrir Opciones de desarrollador (Sui)</string>
     <string name="shizuku_blocked_use_broker">Para usar en su lugar el broker integrado, elíjalo en Herramientas del Titan 2 Elite > Acceso con privilegios mediante.</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku también funciona: inícielo y permita a Plektra en él, y las herramientas lo usarán sin emparejamiento.</string>
+    <string name="privileged_access_shizuku_allow">Permitir</string>
+    <string name="privileged_access_using_shizuku">Los comandos se ejecutan mediante Shizuku. Plektra no toca la depuración inalámbrica.</string>
+    <string name="privileged_access_using_broker">Los comandos se ejecutan mediante el broker integrado (depuración inalámbrica).</string>
+    <string name="device_setup_ready_shizuku_title">Conectado mediante Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">Las herramientas de abajo acceden al sistema mediante Shizuku, así que Plektra no necesita su propio emparejamiento. Elija \"Solo el broker integrado\" para usar el emparejamiento.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, configuración del dispositivo, broker, adb, depuración inalámbrica, emparejamiento, privilegios</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, privilegios, privilegiado, root, shell, adb, automático, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, depuración inalámbrica, emparejar, emparejamiento, broker, shizuku, conceder, ajustes seguros</string>

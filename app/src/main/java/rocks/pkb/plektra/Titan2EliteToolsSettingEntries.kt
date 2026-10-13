@@ -31,6 +31,15 @@ internal fun titan2EliteToolsSettingEntries(): List<SettingEntry> = listOf(
         availabilityCheck = titan2EliteOnly,
         unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
     ),
+    // "Privileged access via"
+    SettingEntry(
+        id = SettingLinkIds.TITAN2_ELITE_TOOLS_PRIVILEGED_ACCESS,
+        titleRes = R.string.privileged_access_title,
+        summaryRes = R.string.privileged_access_description,
+        route = SettingRoute(SettingsDestination.Titan2EliteTools),
+        availabilityCheck = titan2EliteOnly,
+        unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
+    ),
     // smart keyboard backlight
     SettingEntry(
         id = SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT,

@@ -20,6 +20,7 @@ class BrokerStatusMonitorTest {
         // Screens key their re-check on this value; it must change every time.
         assertEquals(before + 2, BrokerStatusMonitor.invalidations.value)
         assertNull(BrokerStatusMonitor.status.value)
+        assertNull(BrokerStatusMonitor.backend.value)
     }
 
     @Test

@@ -1142,6 +1142,15 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="broker_audit_clear">Մաքրել մատյանը</string>
     <string name="broker_audit_ok">հաջողվեց</string>
     <string name="broker_audit_failed">ձախողվեց</string>
+    <string name="privileged_access_title">Արտոնյալ հասանելիություն՝</string>
+    <string name="privileged_access_description">Ինչպես է Plektra-ն կատարում ստորև գործիքների համար անհրաժեշտ հրամանները։ «Ավտոմատ» ռեժիմը օգտագործում է Shizuku-ն, երբ այն աշխատում է և Plektra-ին թույլատրված է, հակառակ դեպքում՝ ներկառուցված բրոքերը։</string>
+    <string name="privileged_access_mode_auto">Ավտոմատ</string>
+    <string name="privileged_access_mode_shizuku">Միայն Shizuku</string>
+    <string name="privileged_access_mode_broker">Միայն ներկառուցված բրոքեր</string>
+    <string name="privileged_access_shizuku_ready">Shizuku՝ աշխատում է և թույլատրված է</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku՝ աշխատում է, թույլատրված չէ</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku՝ չի աշխատում</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku՝ տեղադրված չէ</string>
     <string name="privileged_access_shizuku_too_old">Shizuku՝ շատ հին է (պահանջվում է տարբերակ 11 կամ ավելի նոր)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui)՝ Plektra-ին մերժվել է և այլևս չի հարցվի</string>
     <string name="shizuku_blocked_not_allowed">«Արտոնյալ հասանելիություն՝» բաժնում ընտրված է Shizuku-ն, և այն աշխատում է, բայց Plektra-ին դեռ թույլատրված չէ դրանում։</string>
@@ -1154,6 +1163,11 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="shizuku_blocked_open_sui">Բացել Մշակողի ընտրանքները (Sui)</string>
     <string name="shizuku_blocked_use_broker">Փոխարենը ներկառուցված բրոքերն օգտագործելու համար ընտրեք այն՝ Titan 2 Elite-ի գործիքներ > Արտոնյալ հասանելիություն։</string>
     <string name="shizuku_blocked_or_shizuku">Shizuku-ն նույնպես աշխատում է․ գործարկեք այն և թույլատրեք Plektra-ին դրանում, և գործիքները կօգտագործեն այն առանց զուգակցման։</string>
+    <string name="privileged_access_shizuku_allow">Թույլատրել</string>
+    <string name="privileged_access_using_shizuku">Հրամանները կատարվում են Shizuku-ով։ Plektra-ն անլար վրիպազերծմանը չի դիպչում։</string>
+    <string name="privileged_access_using_broker">Հրամանները կատարվում են ներկառուցված բրոքերով (անլար վրիպազերծում)։</string>
+    <string name="device_setup_ready_shizuku_title">Միացված է Shizuku-ի միջոցով</string>
+    <string name="device_setup_ready_shizuku_body">Ստորև գործիքները հասնում են համակարգին Shizuku-ի միջոցով, ուստի Plektra-ին սեփական զուգակցում պետք չէ։ Զուգակցումն օգտագործելու համար ընտրեք «Միայն ներկառուցված բրոքեր»։</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, սարքի կարգավորում, բրոքեր, adb, անլար վրիպազերծում, զուգակցում, արտոնյալ, wireless debugging, pairing, broker</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, բրոքեր, արտոնյալ, root, shell, adb, ավտոմատ, հենք, backend, broker</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, անլար վրիպազերծում, զուգակցել, զուգակցում, բրոքեր, shizuku, տրամադրել, անվտանգ կարգավորումներ, wireless debugging, pairing, broker</string>

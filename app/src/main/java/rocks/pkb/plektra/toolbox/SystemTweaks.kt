@@ -4,7 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import android.util.Log
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
-import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackends
 import rocks.pkb.plektra.inputmethod.PrivilegedCommand
 import rocks.pkb.plektra.inputmethod.PrivilegedShell
 
@@ -67,7 +67,7 @@ object SystemTweaks {
 
     /** A read: the open screen's trigger is enough ([PrivilegedCommand.readOnly]). */
     fun read(context: Context, trigger: BrokerTrigger?): State? {
-        if (!EmbeddedAdbShell.isPaired(context)) return null
+        if (!PrivilegedBackends.hasAccess(context)) return null
         val out = PrivilegedShell.run(context, PrivilegedCommand.ReadSystemTweaks, trigger).output ?: return null
         return parse(out)
     }

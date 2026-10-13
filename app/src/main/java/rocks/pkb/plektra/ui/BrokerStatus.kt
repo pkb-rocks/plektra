@@ -15,6 +15,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
 import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackend
+import rocks.pkb.plektra.inputmethod.PrivilegedBackends
 import rocks.pkb.plektra.inputmethod.PrivilegedDiagnostics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,6 +50,11 @@ object BrokerStatusMonitor {
     /** The current verdict, or null before the first check has landed. */
     val status: StateFlow<EmbeddedAdbShell.BrokerStatus?> = _status.asStateFlow()
 
+    private val _backend = MutableStateFlow<PrivilegedBackend?>(null)
+
+    /** the backend the current verdict is about, or null before a check. */
+    val backend: StateFlow<PrivilegedBackend?> = _backend.asStateFlow()
+
     private val refreshMutex = Mutex()
 
     private val _invalidations = MutableStateFlow(0)
@@ -69,7 +76,7 @@ object BrokerStatusMonitor {
     /**
      * Show the last persisted verdict immediately, so a screen never opens blank. Only a problem
      * verdict: a stored OK is exactly what a screen must not claim before a check has run (the
-     * phone may have been unpaired or adbd restarted since), so OK stays "checking".
+     * phone may have been unpaired or Shizuku stopped since), so OK stays "checking".
      */
     @Synchronized
     fun seed(context: Context) {
@@ -93,14 +100,15 @@ object BrokerStatusMonitor {
             val age = System.currentTimeMillis() - lastCheckedAt
             if (!force && lastCheckedAt != 0L && age < FRESH_FOR_MS) return
             val generation = _invalidations.value
-            val result = withContext(Dispatchers.IO) { EmbeddedAdbShell.verify(appContext, trigger) }
+            val verdict = withContext(Dispatchers.IO) { EmbeddedAdbShell.verifyWithBackend(appContext, trigger) }
             // Invalidated while the check ran: it describes the state from before, so publishing it
             // would put a stale verdict back. The status stays unknown, and the bump of
             // [invalidations] already makes every open screen ask again.
             if (_invalidations.value != generation) return
             lastCheckedAt = System.currentTimeMillis()
-            PrivilegedDiagnostics.recordBrokerStatus(appContext, result)
-            _status.value = result
+            PrivilegedDiagnostics.recordBrokerStatus(appContext, verdict.status)
+            _backend.value = verdict.backend
+            _status.value = verdict.status
         }
     }
 
@@ -114,12 +122,13 @@ object BrokerStatusMonitor {
 
     /**
      * Drop the cached verdict after something that invalidates it — forgetting a pairing, pairing
-     * again, or a changed permission. Without this the stale answer would
+     * again, Shizuku's permission answer, a changed backend. Without this the stale answer would
      * stand for up to [FRESH_FOR_MS]. Every screen re-checks as soon as it is resumed.
      */
     fun invalidate() {
         lastCheckedAt = 0L
         _status.value = null
+        _backend.value = null
         _invalidations.update { it + 1 }
     }
 }
@@ -139,18 +148,22 @@ fun rememberVerifiedBrokerStatus(refreshKey: Any = Unit): State<EmbeddedAdbShell
     // Wireless debugging is the setting most likely to change while a screen is open, and the one
     // that silently breaks an otherwise good pairing, so it is polled and drives a re-check.
     var wirelessOn by remember { mutableStateOf(EmbeddedAdbShell.isWirelessDebuggingEnabled(context)) }
+    // so is the backend (Shizuku started or stopped, Plektra allowed, the
+    // setting changed); a change re-checks through the backend now in use.
+    var backendNow by remember { mutableStateOf(PrivilegedBackends.current(context)) }
     LaunchedEffect(Unit) {
         while (true) {
             delay(1_500)
             wirelessOn = EmbeddedAdbShell.isWirelessDebuggingEnabled(context)
+            backendNow = PrivilegedBackends.current(context)
         }
     }
-    // Keyed on [BrokerStatusMonitor.invalidations] too, and run only while RESUMED: a pairing
-    // invalidates the verdict while the user is on another app's page, where a check
+    // Keyed on [BrokerStatusMonitor.invalidations] too, and run only while RESUMED: a pairing or
+    // Shizuku answer invalidates the verdict while the user is on another app's page, where a check
     // has no screen to run for. Without the resume hook the card stayed on "Checking…" forever.
     val invalidations by BrokerStatusMonitor.invalidations.collectAsState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(refreshKey, wirelessOn, invalidations) {
+    LaunchedEffect(refreshKey, wirelessOn, backendNow, invalidations) {
         // Seeding is a side effect, so it belongs here rather than in a remember block.
         BrokerStatusMonitor.seed(context)
         var changed = true

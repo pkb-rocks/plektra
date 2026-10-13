@@ -33,5 +33,8 @@
 -keep class moe.shizuku.manager.adb.** { *; }
 -keepclasseswithmembernames class * { native <methods>; }
 -keep class org.lsposed.hiddenapibypass.** { *; }
+
+# Shizuku starts the UserService by class name in its own process.
+-keep class rocks.pkb.plektra.shizuku.PrivilegedShellService { <init>(...); }
 -dontwarn org.conscrypt.**
 -dontwarn com.android.org.conscrypt.**

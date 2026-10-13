@@ -1881,6 +1881,15 @@ QWERTZ σε φυσικό QWERTY
     <string name="broker_audit_clear">Εκκαθάριση αρχείου</string>
     <string name="broker_audit_ok">ok</string>
     <string name="broker_audit_failed">απέτυχε</string>
+    <string name="privileged_access_title">Πρόσβαση με αυξημένα δικαιώματα μέσω</string>
+    <string name="privileged_access_description">Πώς το Plektra εκτελεί τις εντολές που χρειάζονται τα παρακάτω εργαλεία. Το Αυτόματο χρησιμοποιεί το Shizuku όταν εκτελείται και το Plektra επιτρέπεται, αλλιώς τον ενσωματωμένο broker.</string>
+    <string name="privileged_access_mode_auto">Αυτόματο</string>
+    <string name="privileged_access_mode_shizuku">Μόνο Shizuku</string>
+    <string name="privileged_access_mode_broker">Μόνο ενσωματωμένος broker</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: εκτελείται και επιτρέπεται</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: εκτελείται, δεν επιτρέπεται</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: δεν εκτελείται</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: δεν είναι εγκατεστημένο</string>
     <string name="privileged_access_shizuku_too_old">Shizuku: πολύ παλιά έκδοση (απαιτείται έκδοση 11 ή νεότερη)</string>
     <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): το Plektra απορρίφθηκε και δεν θα ερωτηθεί ξανά</string>
     <string name="shizuku_blocked_not_allowed">Το Shizuku έχει επιλεγεί στο Πρόσβαση με αυξημένα δικαιώματα μέσω και εκτελείται, αλλά το Plektra δεν επιτρέπεται ακόμη σε αυτό.</string>
@@ -1893,6 +1902,11 @@ QWERTZ σε φυσικό QWERTY
     <string name="shizuku_blocked_open_sui">Άνοιγμα Επιλογών για προγραμματιστές (Sui)</string>
     <string name="shizuku_blocked_use_broker">Για να χρησιμοποιήσετε αντ\' αυτού τον ενσωματωμένο broker, επιλέξτε τον στο Εργαλεία Titan 2 Elite > Πρόσβαση με αυξημένα δικαιώματα μέσω.</string>
     <string name="shizuku_blocked_or_shizuku">Λειτουργεί και το Shizuku: ξεκινήστε το και επιτρέψτε το Plektra σε αυτό, και τα εργαλεία το χρησιμοποιούν χωρίς σύζευξη.</string>
+    <string name="privileged_access_shizuku_allow">Να επιτρέπεται</string>
+    <string name="privileged_access_using_shizuku">Οι εντολές εκτελούνται μέσω Shizuku. Το Plektra δεν αγγίζει την Ασύρματη αποσφαλμάτωση.</string>
+    <string name="privileged_access_using_broker">Οι εντολές εκτελούνται μέσω του ενσωματωμένου broker (ασύρματη αποσφαλμάτωση).</string>
+    <string name="device_setup_ready_shizuku_title">Συνδέθηκε μέσω Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">Τα παρακάτω εργαλεία έχουν πρόσβαση στο σύστημα μέσω Shizuku, οπότε το Plektra δεν χρειάζεται δική του σύζευξη. Επιλέξτε \"Μόνο ενσωματωμένος broker\" για να χρησιμοποιήσετε τη σύζευξη.</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, ρύθμιση συσκευής, device setup, broker, adb, ασύρματη αποσφαλμάτωση, wireless debugging, σύζευξη, pairing, αυξημένα δικαιώματα, privileged</string>
     <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, αυξημένα δικαιώματα, privileged, root, shell, adb, αυτόματο, automatic, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, ασύρματη αποσφαλμάτωση, wireless debugging, σύζευξη, pair, pairing, broker, shizuku, έγκριση, grant, ασφαλείς ρυθμίσεις, secure settings</string>

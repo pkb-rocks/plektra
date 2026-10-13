@@ -3,7 +3,7 @@ package rocks.pkb.plektra.toolbox
 import android.content.Context
 import android.util.Log
 import rocks.pkb.plektra.inputmethod.BrokerTrigger
-import rocks.pkb.plektra.inputmethod.EmbeddedAdbShell
+import rocks.pkb.plektra.inputmethod.PrivilegedBackends
 import rocks.pkb.plektra.inputmethod.PrivilegedCommand
 import rocks.pkb.plektra.inputmethod.PrivilegedSetup
 import rocks.pkb.plektra.inputmethod.PrivilegedShell
@@ -121,7 +121,7 @@ object RevertibleChange {
         // and the first arm share a lock, so two concurrent callers cannot both pass it.
         synchronized(armLock) {
             if (pending(appContext) != null) return Outcome.Failed(CHANGE_WAITING)
-            if (!EmbeddedAdbShell.isPaired(context)) return Outcome.NotPaired
+            if (!PrivilegedBackends.hasAccess(context)) return Outcome.NotPaired
 
             // Recorded first: a change we cannot reverse is worse than one that never lands.
             arm(appContext, Pending(kind, System.currentTimeMillis() + CONFIRM_WINDOW_MS + ARM_SLACK_MS, previousDpi))

@@ -2100,6 +2100,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="broker_blocked_wireless_debugging">Wireless debugging is off. Android turns it off after a restart — turn it back on in Developer options.</string>
     <string name="broker_blocked_no_service">Wireless debugging is on but the phone is not advertising it. Turn it off and on again in Developer options.</string>
     <string name="broker_blocked_not_paired">Not paired. Follow the steps to set up wireless debugging.</string>
+    <string name="broker_blocked_shizuku">Shizuku is chosen under \"Privileged access via\" but is not running, or Plektra is not allowed in Shizuku.</string>
     <string name="broker_repair">Re-pair</string>
     <string name="broker_pin_mismatch_body">adbd\'s certificate changed. Forget the pairing and pair again.</string>
     <string name="broker_forgetting">Forgetting the pairing…</string>
@@ -2110,13 +2111,41 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="broker_wireless_off_after_setup_description">When Plektra finishes a setup step, it turns Wireless debugging off again, so nothing on your network can reach it. Plektra can\'t reach the system again until you turn Wireless debugging back on in Developer options.</string>
     <string name="broker_auth_timeout_help">Leave \"Disable adb authorization timeout\" in Developer options off. Android then forgets a paired key that has not been used for 7 days, so a pairing you no longer use stops working by itself. Plektra never changes this setting.</string>
     <string name="broker_audit_title">Broker activity</string>
-    <string name="broker_audit_description">Every command Plektra ran through wireless debugging, and every permission it granted or took back. Kept on this phone only, last 200 entries.</string>
+    <string name="broker_audit_description">Every command Plektra ran through wireless debugging or Shizuku, and every permission it granted or took back. Kept on this phone only, last 200 entries.</string>
     <string name="broker_audit_empty">Nothing yet.</string>
     <string name="broker_audit_clear">Clear log</string>
     <!-- A result word in the broker activity list, not a button label. -->
     <string name="broker_audit_ok" tools:ignore="ButtonCase,Typos">ok</string>
     <string name="broker_audit_failed">failed</string>
     <string name="kw_main_titan2_elite_tools">titan, elite, t2e, toolbox, tools, device setup, broker, adb, wireless debugging, pairing, privileged</string>
+    <!-- "Privileged access via" on the Titan 2 Elite tools screen -->
+    <string name="privileged_access_title">Privileged access via</string>
+    <string name="privileged_access_description">How Plektra runs the commands the tools below need. Automatic uses Shizuku when it is running and Plektra is allowed, otherwise the built-in broker.</string>
+    <string name="privileged_access_mode_auto">Automatic</string>
+    <string name="privileged_access_mode_shizuku">Shizuku only</string>
+    <string name="privileged_access_mode_broker">Built-in broker only</string>
+    <string name="privileged_access_shizuku_ready">Shizuku: running and allowed</string>
+    <string name="privileged_access_shizuku_not_allowed">Shizuku: running, not allowed</string>
+    <string name="privileged_access_shizuku_not_running">Shizuku: not running</string>
+    <string name="privileged_access_shizuku_not_installed">Shizuku: not installed</string>
+    <string name="privileged_access_shizuku_too_old">Shizuku: too old (needs version 11 or newer)</string>
+    <string name="privileged_access_shizuku_denied_permanently">Shizuku (Sui): Plektra was denied and will not be asked again</string>
+    <string name="shizuku_blocked_not_allowed">Shizuku is chosen under Privileged access via, and it is running, but Plektra is not allowed in it yet.</string>
+    <string name="shizuku_blocked_denied_permanently">Shizuku is chosen under Privileged access via, but Plektra was denied in Sui with \"Don\'t ask again\", so Android will not show the prompt again. Allow Plektra in Sui\'s management screen (long-press the Settings icon on the home screen and pick the Sui shortcut).</string>
+    <string name="shizuku_blocked_not_running">Shizuku is chosen under Privileged access via, but it is not running. Start Shizuku, then come back.</string>
+    <string name="shizuku_blocked_not_installed">Shizuku is chosen under Privileged access via, but it is not installed.</string>
+    <string name="shizuku_blocked_too_old">Shizuku is chosen under Privileged access via, but the Shizuku running here is too old. Plektra needs Shizuku 11 or newer.</string>
+    <string name="shizuku_blocked_failed">Shizuku is chosen under Privileged access via and Plektra is allowed, but the tools could not reach the system through it. Check that Shizuku is still running, then reopen this screen.</string>
+    <string name="shizuku_blocked_allow">Allow Shizuku</string>
+    <string name="shizuku_blocked_open_sui">Open Developer options (Sui)</string>
+    <string name="shizuku_blocked_use_broker">To use the built-in broker instead, choose it in Titan 2 Elite tools > Privileged access via.</string>
+    <string name="shizuku_blocked_or_shizuku">Shizuku works too: start it and allow Plektra in it, and the tools use it without pairing.</string>
+    <string name="privileged_access_shizuku_allow">Allow</string>
+    <string name="privileged_access_using_shizuku">Commands run through Shizuku. Plektra leaves Wireless debugging alone.</string>
+    <string name="privileged_access_using_broker">Commands run through the built-in broker (wireless debugging).</string>
+    <string name="device_setup_ready_shizuku_title">Connected through Shizuku</string>
+    <string name="device_setup_ready_shizuku_body">The tools below reach the system through Shizuku, so Plektra doesn\'t need its own pairing. Choose \"Built-in broker only\" to use the pairing instead.</string>
+    <string name="kw_titan2_elite_tools_privileged_access">shizuku, shizukutendcf, broker, privileged, root, shell, adb, automatic, backend</string>
     <string name="kw_titan2_elite_tools_device_setup">adb, wireless debugging, pair, pairing, broker, shizuku, grant, secure settings</string>
 
     <!-- smart keyboard backlight and its Quick Settings tile -->

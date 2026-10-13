@@ -6854,4 +6854,28 @@ object SettingsManager {
     fun setBacklightTileEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit { putBoolean(KEY_BACKLIGHT_TILE_ENABLED, enabled) }
     }
+
+    // "Privileged access via" on the Titan 2 Elite tools screen. Which route the
+    // broker's door uses (see inputmethod/PrivilegedBackend.kt); a choice, not device state, so it
+    // is backed up with the other settings.
+    private const val KEY_PRIVILEGED_ACCESS_BACKEND = "privileged_access_backend"
+    const val PRIVILEGED_ACCESS_AUTO = "auto"
+    const val PRIVILEGED_ACCESS_SHIZUKU = "shizuku"
+    const val PRIVILEGED_ACCESS_BROKER = "broker"
+    private val PRIVILEGED_ACCESS_VALUES = setOf(
+        PRIVILEGED_ACCESS_AUTO,
+        PRIVILEGED_ACCESS_SHIZUKU,
+        PRIVILEGED_ACCESS_BROKER
+    )
+
+    /** One of [PRIVILEGED_ACCESS_AUTO] (default), [PRIVILEGED_ACCESS_SHIZUKU], [PRIVILEGED_ACCESS_BROKER]. */
+    fun getPrivilegedAccessBackend(context: Context): String {
+        val value = getPreferences(context).getString(KEY_PRIVILEGED_ACCESS_BACKEND, PRIVILEGED_ACCESS_AUTO)
+        return if (value in PRIVILEGED_ACCESS_VALUES) value!! else PRIVILEGED_ACCESS_AUTO
+    }
+
+    fun setPrivilegedAccessBackend(context: Context, value: String) {
+        val normalized = if (value in PRIVILEGED_ACCESS_VALUES) value else PRIVILEGED_ACCESS_AUTO
+        getPreferences(context).edit { putString(KEY_PRIVILEGED_ACCESS_BACKEND, normalized) }
+    }
 }

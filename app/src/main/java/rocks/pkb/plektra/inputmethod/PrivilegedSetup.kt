@@ -42,6 +42,14 @@ object PrivilegedSetup {
             return
         }
         Log.i(TAG, "applyAll ($reason)")
+        // with Shizuku chosen, the session below runs through Shizuku and
+        // never touches adbd. Right after a pairing, check the broker itself once anyway: that
+        // connect is what pins adbd's certificate while the pairing code still vouches for it.
+        if (trigger?.kind == BrokerTrigger.Kind.PAIRING &&
+            PrivilegedBackends.current(appContext) == PrivilegedBackend.SHIZUKU
+        ) {
+            PrivilegedShell.runAsync { EmbeddedAdbShell.verify(appContext, trigger, brokerOnly = true) }
+        }
         PrivilegedShell.runAsync {
             // Verify first: right after pairing this is the connect that pins adbd's certificate
             // (trust on first use), seconds after the pairing code authenticated it. Then grant or
@@ -115,11 +123,22 @@ object PrivilegedSetup {
      * The end of a setup run: when the user keeps "Turn Wireless debugging off after
      * setup" on (the default), switch Wireless debugging off through the shell, as the last
      * command. The outcome is read back from the global, not from the shell. BLOCKING.
+     *
+     * skipped while Shizuku is the backend (it ran the setup's commands, being
+     * queued in order before this): Shizuku needs no Wireless debugging, and when Shizuku itself
+     * was started over wireless ADB, switching it off could stop Shizuku. The skip is audited.
      */
     internal fun finishSetup(context: Context, trigger: BrokerTrigger?) {
         val app = context.applicationContext
         if (!BrokerSettings.turnOffWirelessDebuggingAfterSetup(app)) return
         if (!EmbeddedAdbShell.isWirelessDebuggingEnabled(app)) return
+        if (PrivilegedBackends.current(app) == PrivilegedBackend.SHIZUKU) {
+            BrokerAuditLog.record(
+                app, BrokerAuditLog.Kind.WIRELESS_DEBUGGING, ID_LEFT_ON_FOR_SHIZUKU, ok = true,
+                detail = REASON_LEFT_ON_FOR_SHIZUKU
+            )
+            return
+        }
         PrivilegedShell.run(app, PrivilegedCommand.DisableWirelessDebugging, trigger)
         val deadline = SystemClock.elapsedRealtime() + WIRELESS_OFF_CONFIRM_MS
         while (EmbeddedAdbShell.isWirelessDebuggingEnabled(app) && SystemClock.elapsedRealtime() < deadline) {
@@ -256,11 +275,17 @@ object PrivilegedSetup {
      * broker gave, and unpair this key (`IAdbManager.unpairDevice`, last, because adbd then drops
      * the connection). Then confirm the unpair (a new connection must be refused) and delete the
      * key and pins here whatever happened. BLOCKING (two mDNS searches); call off the main thread.
+     *
+     * the session runs through whichever backend the door picks. Shizuku needs
+     * no key, so with Shizuku the revoke and the listeners run even when the broker holds no key;
+     * the unpair is added only when the broker is paired (it is about the broker's own key). The
+     * proof of the unpair is always the broker's: a fresh broker connection must be refused.
      */
     fun resetToStock(context: Context, trigger: BrokerTrigger?): ResetResult {
         val app = context.applicationContext
         var reason: String? = null
         var unpaired = false
+        val backend = PrivilegedBackends.current(app)
         val fingerprint = EmbeddedAdbShell.keyFingerprint(app)
         val unpair = fingerprint?.let { PrivilegedCommand.UnpairSelf.forThisDevice(it) }
         val listeners = BrokerGrantLedger.listenersAllowedByBroker(app)
@@ -274,7 +299,8 @@ object PrivilegedSetup {
             unpair == null -> reason = REASON_UNPAIR_UNVERIFIED_SDK
         }
 
-        if (commands.isNotEmpty() && fingerprint != null) {
+        // The broker cannot connect without its key; Shizuku can.
+        if (commands.isNotEmpty() && (fingerprint != null || backend == PrivilegedBackend.SHIZUKU)) {
             val results = PrivilegedShell.runSession(app, commands, trigger)
             recordPermissionOutcome(app, commands, results)
             commands.forEachIndexed { i, command ->
@@ -284,11 +310,16 @@ object PrivilegedSetup {
             }
             if (unpair != null) {
                 val result = results.last()
-                val sent = (result.ok && PrivilegedCommand.UnpairSelf.replyIsSuccess(result.output)) ||
-                    result.failure == EmbeddedAdbShell.REASON_CONNECTION_CLOSED
+                val replied = result.ok && PrivilegedCommand.UnpairSelf.replyIsSuccess(result.output)
+                // Through the broker, adbd drops the session it is unpairing; Shizuku's shell is
+                // not that session, so there the reply itself must say the call went through.
+                val sent = replied || (
+                    result.backend != PrivilegedBackend.SHIZUKU &&
+                        result.failure == EmbeddedAdbShell.REASON_CONNECTION_CLOSED
+                    )
                 if (sent && trigger != null) {
                     // The proof is adbd refusing this key now, not anything the shell printed.
-                    val after = EmbeddedAdbShell.verify(app, trigger)
+                    val after = EmbeddedAdbShell.verify(app, trigger, brokerOnly = true)
                     unpaired = after == EmbeddedAdbShell.BrokerStatus.REJECTED
                     if (!unpaired) reason = "after unpairing, the broker status is $after"
                 } else {
@@ -306,5 +337,10 @@ object PrivilegedSetup {
     }
 
     const val REASON_NO_KEY = "no readable key to unpair"
+
+    /** [finishSetup]'s audit entry when Shizuku ran the setup. */
+    const val ID_LEFT_ON_FOR_SHIZUKU = "left_on_for_shizuku"
+    const val REASON_LEFT_ON_FOR_SHIZUKU =
+        "skipped: Shizuku ran the commands and needs no Wireless debugging; turning it off could stop Shizuku"
     const val REASON_UNPAIR_UNVERIFIED_SDK = "unpairing is not verified on this Android version"
 }

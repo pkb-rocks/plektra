@@ -31,6 +31,7 @@ object PrivilegedDiagnostics {
     const val REASON_OK = "ok"
     const val REASON_NOT_PAIRED = "not_paired"
     const val REASON_WIRELESS_DEBUGGING_OFF = "wireless_debugging_off"
+    const val REASON_SHIZUKU_UNAVAILABLE = "shizuku_unavailable"
     const val REASON_SHELL_FAILED = "shell_failed"
 
     data class Outcome(
@@ -127,10 +128,17 @@ object PrivilegedDiagnostics {
      * only asks whether a key was ever stored, and Android disables Wireless debugging across
      * reboots, so a paired device is routinely unable to connect.
      */
-    fun brokerBlocker(context: Context): String? = when {
-        !EmbeddedAdbShell.isPaired(context) -> REASON_NOT_PAIRED
-        !EmbeddedAdbShell.isWirelessDebuggingEnabled(context) -> REASON_WIRELESS_DEBUGGING_OFF
-        else -> null
+    fun brokerBlocker(context: Context): String? {
+        // with Shizuku chosen, only Shizuku's own state can block.
+        val resolved = PrivilegedBackends.resolve(context)
+        if (resolved.backend == PrivilegedBackend.SHIZUKU) {
+            return if (resolved.shizukuState == ShizukuState.READY) null else REASON_SHIZUKU_UNAVAILABLE
+        }
+        return when {
+            !EmbeddedAdbShell.isPaired(context) -> REASON_NOT_PAIRED
+            !EmbeddedAdbShell.isWirelessDebuggingEnabled(context) -> REASON_WIRELESS_DEBUGGING_OFF
+            else -> null
+        }
     }
 
     private const val KEY_BACKLIGHT_APPLIED = "privileged_backlight_applied"

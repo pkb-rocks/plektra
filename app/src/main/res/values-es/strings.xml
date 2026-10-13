@@ -938,7 +938,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="software_keyboard_key_hints_description">Muestra arriba a la derecha la alternativa de pulsación larga y abajo a la izquierda el carácter Alt o SYM de las teclas.</string>
     <string name="kw_on_screen_key_hints">indicaciones de teclas, etiquetas de esquina, pulsación larga, Alt, SYM, caracteres secundarios</string>
     <string name="long_press_cycle_next_title">Seguir manteniendo para</string>
-    <string name="long_press_cycle_next_description">Mantén pulsado tras la primera pulsación larga para pasar a un segundo carácter, así las mayúsculas y los símbolos necesitan una sola mano.</string>
+    <string name="long_press_cycle_next_description">Mantén pulsado tras la primera pulsación larga para pasar a un segundo carácter (con Shift y Variaciones o SYM, después a un tercero que aplica ambos), así las mayúsculas y los símbolos necesitan una sola mano.</string>
     <string name="long_press_cycle_next_off">Nada (desactivado)</string>
     <string name="long_press_cycle_end_title">Tras el último paso</string>
     <string name="long_press_cycle_end_stop">Mantener el último carácter</string>

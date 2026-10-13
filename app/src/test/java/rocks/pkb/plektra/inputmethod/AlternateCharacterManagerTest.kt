@@ -67,12 +67,17 @@ class AlternateCharacterManagerTest {
         DeferredPunctuationSpaceTracker.clear()
     }
 
-    private fun pressT(manager: AlternateCharacterManager, inputConnection: InputConnection) {
+    private fun pressT(
+        manager: AlternateCharacterManager,
+        inputConnection: InputConnection,
+        shiftOneShot: Boolean = false
+    ) {
         manager.handleKeyWithAltMapping(
             keyCode = KeyEvent.KEYCODE_T,
             inputConnection = inputConnection,
             event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_T),
             capsLockEnabled = false,
+            shiftOneShot = shiftOneShot,
             layoutChar = 't'
         )
     }
@@ -953,50 +958,29 @@ class AlternateCharacterManagerTest {
         assertEquals("l'", recorder.text)
     }
 
-    private fun pressT(
-        manager: AlternateCharacterManager,
-        inputConnection: InputConnection,
-        shiftOneShot: Boolean
-    ) {
-        manager.handleKeyWithAltMapping(
-            keyCode = KeyEvent.KEYCODE_T,
-            inputConnection = inputConnection,
-            event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_T),
-            capsLockEnabled = false,
-            shiftOneShot = shiftOneShot,
-            layoutChar = 't'
-        )
-    }
-
     @Test
     fun shiftLongPress_autoCapitalizedLetterTogglesToLowercase() {
-        SettingsManager.setLongPressModifier(context, "shift")
         val recorder = RecordingInputConnection()
         val inputConnection = recorder.asProxy()
-        val manager = AlternateCharacterManager(context.assets, prefs, context).apply {
-            addAltKeyMapping(KeyEvent.KEYCODE_T, "(")
-        }
+        val manager = cycleManager(first = "shift", next = "off", end = "stop")
 
         // Auto-capitalization arrives as a one-shot Shift on the typed letter.
         pressT(manager, inputConnection, shiftOneShot = true)
         assertEquals("T", recorder.text)
-        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        idle(60)
         assertEquals("t", recorder.text)
-        shadowOf(Looper.getMainLooper()).idleFor(500, TimeUnit.MILLISECONDS)
+        idle(500)
         assertEquals("t", recorder.text)
     }
 
     @Test
     fun shiftLongPress_lowercaseLetterStillGivesUppercase() {
-        SettingsManager.setLongPressModifier(context, "shift")
         val recorder = RecordingInputConnection()
         val inputConnection = recorder.asProxy()
-        val manager = AlternateCharacterManager(context.assets, prefs, context).apply {
-            addAltKeyMapping(KeyEvent.KEYCODE_T, "(")
-        }
+        val manager = cycleManager(first = "shift", next = "off", end = "stop")
 
-        pressT(manager, inputConnection, shiftOneShot = false)
-        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        pressT(manager, inputConnection)
+        idle(60)
         assertEquals("T", recorder.text)
     }
 

@@ -1116,7 +1116,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="software_keyboard_key_hints_title">Mostra etichette secondarie</string>
     <string name="software_keyboard_key_hints_description">Mostra in alto a destra l\'alternativa della pressione prolungata e in basso a sinistra il carattere Alt o SYM dei tasti.</string>
     <string name="long_press_cycle_next_title">Continua a tenere premuto per</string>
-    <string name="long_press_cycle_next_description">Tieni premuto oltre la prima pressione lunga per passare a un secondo carattere, così maiuscole e simboli richiedono una sola mano.</string>
+    <string name="long_press_cycle_next_description">Tieni premuto oltre la prima pressione lunga per passare a un secondo carattere (con Maiusc e Varianti o SYM, poi a un terzo che applica entrambi), così maiuscole e simboli richiedono una sola mano.</string>
     <string name="long_press_cycle_next_off">Niente (disattivato)</string>
     <string name="long_press_cycle_end_title">Dopo l\'ultimo passo</string>
     <string name="long_press_cycle_end_stop">Mantieni l\'ultimo carattere</string>

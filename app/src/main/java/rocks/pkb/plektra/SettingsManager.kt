@@ -4440,9 +4440,9 @@ object SettingsManager {
 
     // Sym+C/V/X/A edit shortcuts toggle
     private const val KEY_SYM_EDIT_SHORTCUTS = "sym_edit_shortcuts"
-    private const val DEFAULT_SYM_EDIT_SHORTCUTS = true
+    private const val DEFAULT_SYM_EDIT_SHORTCUTS = false
 
-    /** Sym+C/V/X/A copy, paste, cut and select all in text fields; on by default. */
+    /** Sym+C/V/X/A copy, paste, cut and select all in text fields; opt-in, off by default so existing Sym chords keep working. */
     fun getSymEditShortcutsEnabled(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_SYM_EDIT_SHORTCUTS, DEFAULT_SYM_EDIT_SHORTCUTS)
     }

@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 import rocks.pkb.plektra.inputmethod.KeyboardBacklightManager
+import rocks.pkb.plektra.ring.RingBacklight
 
 /**
  * Quick Settings tile that toggles the Unihertz keyboard backlight
@@ -14,12 +15,15 @@ import rocks.pkb.plektra.inputmethod.KeyboardBacklightManager
  * Writing the global needs WRITE_SECURE_SETTINGS. The private build gets it from the embedded ADB
  * broker, and holds it only while a feature that needs it is on: this tile's own switch in the
  * Smart backlight section ([rocks.pkb.plektra.inputmethod.WriteSecureSettingsHolders.BACKLIGHT_TILE]),
- * or Smart backlight ([rocks.pkb.plektra.inputmethod.WriteSecureSettingsHolders.BACKLIGHT]).
- * Without the permission a tap says where that switch is. The tile itself never touches the broker
- * (it cannot mint a [rocks.pkb.plektra.inputmethod.BrokerTrigger]): while the permission is held every write is an
+ * Smart backlight ([rocks.pkb.plektra.inputmethod.WriteSecureSettingsHolders.BACKLIGHT]) or the
+ * ring's keyboard-dark switch. Without the permission a tap says where that switch is. The tile itself never touches the broker (it cannot mint a
+ * [rocks.pkb.plektra.inputmethod.BrokerTrigger]): while the permission is held every write is an
  * ordinary in-process settings write, which is what a tile tap needs.
  *
  * Only offered on the Titan 2 Elite, where the vendor row exists.
+ *
+ * The ring's "keyboard dark while lit" may hold the switch at 0 when the user taps; the tile then
+ * toggles from the value the user really had ([RingBacklight.takeUserValueIfSuppressed]).
  */
 class KeyboardBacklightTileService : TileService() {
 
@@ -43,7 +47,12 @@ class KeyboardBacklightTileService : TileService() {
             updateTile()
             return
         }
-        val newValue = if (readBacklightEnabled()) {
+        // While the ring holds the keyboard dark, the switch reads 0; toggle from the value the
+        // user really had, and take the switch back from the ring so it does not undo this write.
+        val userValue = RingBacklight.takeUserValueIfSuppressed(this)
+        val currentlyLit = userValue?.let { it == KeyboardBacklightManager.KEYBOARD_LIGHT_ON }
+            ?: readBacklightEnabled()
+        val newValue = if (currentlyLit) {
             KeyboardBacklightManager.KEYBOARD_LIGHT_OFF
         } else {
             KeyboardBacklightManager.KEYBOARD_LIGHT_ON

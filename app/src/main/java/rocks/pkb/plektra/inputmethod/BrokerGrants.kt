@@ -11,8 +11,9 @@ import moe.shizuku.manager.adb.EmbeddedAdbInit
  * held only while a feature that needs it is enabled: the grant is taken when the first holder
  * appears and revoked ([PrivilegedCommand.RevokeWriteSecureSettings]) when the last one goes, or
  * on a reset. The broker itself holds nothing. The backlight (the vendor keyboard-light
- * switch the Quick Settings tile writes) calls [PrivilegedSetup.setWriteSecureSettingsNeeded] with
- * its own holder name when the user turns it on or off.
+ * switch the Quick Settings tile writes) and the ring (keyboard dark while the ring is lit) each
+ * call [PrivilegedSetup.setWriteSecureSettingsNeeded] with their
+ * own holder name when the user turns their feature on or off.
  *
  * Stored in the broker's backup-excluded preferences. Holder names are constants of the features;
  * they are only ever compared, never put in a command line.
@@ -31,6 +32,12 @@ object WriteSecureSettingsHolders {
      * permission for the keyboard-light tile on its own, so the tile works with Smart backlight off.
      */
     const val BACKLIGHT_TILE = "backlight_tile"
+
+    /**
+     * "keep the keyboard dark while the ring is lit". While the ring and that switch
+     * are both on, the ring writes the same vendor keyboard-light row in-process.
+     */
+    const val RING_KEYBOARD_DARK = "ring_keyboard_dark"
 
     fun holders(context: Context): Set<String> =
         EmbeddedAdbInit.prefs(context).getStringSet(KEY, emptySet()).orEmpty().toSet()
@@ -55,6 +62,34 @@ object WriteSecureSettingsHolders {
         !needed && held -> PrivilegedCommand.RevokeWriteSecureSettings
         else -> null
     }
+}
+
+/**
+ * Notification access the broker granted, so a reset withdraws exactly what the
+ * broker gave and not access the user granted in Settings themselves.
+ */
+object BrokerGrantLedger {
+    private const val KEY = "broker_allowed_listeners"
+
+    internal fun recordListenerAllowed(context: Context, listener: AppNotificationListener) {
+        val now = allowed(context) + listener.id
+        EmbeddedAdbInit.prefs(context).edit(commit = true) { putStringSet(KEY, now) }
+    }
+
+    internal fun recordListenerDisallowed(context: Context, listener: AppNotificationListener) {
+        val now = allowed(context) - listener.id
+        EmbeddedAdbInit.prefs(context).edit(commit = true) { putStringSet(KEY, now) }
+    }
+
+    internal fun listenersAllowedByBroker(context: Context): List<AppNotificationListener> =
+        allowed(context).let { ids -> AppNotificationListener.entries.filter { it.id in ids } }
+
+    fun clear(context: Context) {
+        EmbeddedAdbInit.prefs(context).edit(commit = true) { remove(KEY) }
+    }
+
+    private fun allowed(context: Context): Set<String> =
+        EmbeddedAdbInit.prefs(context).getStringSet(KEY, emptySet()).orEmpty().toSet()
 }
 
 /** The broker's user settings, kept with its other state in the backup-excluded preferences. */

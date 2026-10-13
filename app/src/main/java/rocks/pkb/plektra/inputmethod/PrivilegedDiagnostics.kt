@@ -23,7 +23,7 @@ object PrivilegedDiagnostics {
      */
     enum class Step(val key: String) {
         // the always-on keyboard backlight, and the WRITE_SECURE_SETTINGS grant that
-        // the Quick Settings tile writes through.
+        // the Quick Settings tile (and the ring group's keyboard-dark switch) write through.
         BACKLIGHT("backlight"),
         WRITE_SECURE_SETTINGS("write_secure_settings")
     }

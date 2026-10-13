@@ -29,6 +29,7 @@ class PrivilegedCommandTest {
         PrivilegedCommand.DisableWirelessDebugging,
         PrivilegedCommand.UnpairSelf.forThisDevice(fp),
         PrivilegedCommand.ReadBacklightTimeout,
+        PrivilegedCommand.RingGrants(PrivilegedCommand.RingGrant.entries),
         PrivilegedCommand.ListPackageStates,
         PrivilegedCommand.DisablePackage("com.agui.factorytest"),
         PrivilegedCommand.UninstallPackage("com.agui.factorytest"),
@@ -42,7 +43,8 @@ class PrivilegedCommandTest {
         PrivilegedCommand.SetTweak(rocks.pkb.plektra.toolbox.SystemTweaks.Toggle.entries.first(), true),
         PrivilegedCommand.ResetSystemTweaks,
         PrivilegedCommand.SetFnProgrammableKey(1, 1),
-    ) + PrivilegedCommand.BacklightTimeout.entries.map { PrivilegedCommand.WriteBacklightTimeout(it) }
+    ) + PrivilegedCommand.BacklightTimeout.entries.map { PrivilegedCommand.WriteBacklightTimeout(it) } +
+        AppNotificationListener.entries.map { PrivilegedCommand.DisallowNotificationListener(it) }
 
     @Test
     fun brokerCommandLinesAreConstantsPlusValidatedValues() {

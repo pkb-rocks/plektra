@@ -164,6 +164,15 @@ object SettingLinkIds {
     const val KEYBOARD_THEME_TOGGLE_CHARACTER_PICKER = "keyboard_theme.toggle_character_picker"
     const val KEYBOARD_THEME_LED_COLORS = "keyboard_theme.led_colors"
 
+    // notification ring, a section on the Titan 2 Elite tools screen and the rows of its own page
+    const val TITAN2_ELITE_TOOLS_NOTIFICATION_RING = "titan2_elite_tools.notification_ring"
+    const val TITAN2_ELITE_TOOLS_RING_ENABLE = "titan2_elite_tools.ring_enable"
+    const val TITAN2_ELITE_TOOLS_RING_DURATION = "titan2_elite_tools.ring_duration"
+    const val TITAN2_ELITE_TOOLS_RING_BRIGHTNESS = "titan2_elite_tools.ring_brightness"
+    const val TITAN2_ELITE_TOOLS_RING_KEYBOARD_DARK = "titan2_elite_tools.ring_keyboard_dark"
+    const val TITAN2_ELITE_TOOLS_RING_DEFAULT_COLOR = "titan2_elite_tools.ring_default_color"
+    const val TITAN2_ELITE_TOOLS_RING_APP_COLORS = "titan2_elite_tools.ring_app_colors"
+    const val TITAN2_ELITE_TOOLS_RING_ADJUST = "titan2_elite_tools.ring_adjust"
     // Modifier indicator chips (rendered on the modifiers screen)
     const val MODIFIERS_INDICATOR_BOTTOM_STRIP = "modifiers.indicator_bottom_strip"
     const val MODIFIERS_INDICATOR_MENU_BAR = "modifiers.indicator_menu_bar"
@@ -1035,6 +1044,8 @@ object SettingLinkRegistry {
      */
     internal val keywordsById: Map<String, Int> = mapOf(
         "status_bar.presentation" to R.string.kw_status_bar_presentation,
+        // notification ring keywords
+        SettingLinkIds.TITAN2_ELITE_TOOLS_NOTIFICATION_RING to R.string.kw_titan2_elite_tools_notification_ring,
         SettingLinkIds.MAIN_KEYBOARDS_DEVICES to R.string.kw_main_keyboards_devices,
         SettingLinkIds.MAIN_MODIFIERS to R.string.kw_main_modifiers,
         SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES to R.string.kw_main_custom_input_styles,

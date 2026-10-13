@@ -46,7 +46,7 @@ object PrivilegedSetup {
             // Verify first: right after pairing this is the connect that pins adbd's certificate
             // (trust on first use), seconds after the pairing code authenticated it. Then grant or
             // revoke WRITE_SECURE_SETTINGS to match the features that hold it (the Quick Settings
-            // tile writes through it).
+            // tile and the ring's keyboard-dark switch write through it).
             val commands = buildList {
                 add(PrivilegedCommand.Verify)
                 writeSecureSettingsAction(appContext)?.let { add(it) }
@@ -57,6 +57,15 @@ object PrivilegedSetup {
         // the always-on timeout, if the user wants it.
         if (SettingsManager.getSmartBacklightEnabled(appContext)) {
             KeyboardBacklightManager.applyAlwaysOn(appContext, trigger)
+        }
+        // the notification ring's grants (notification access, full-screen intent,
+        // posting), in one broker connection. Only when the user turned the ring on; each grant
+        // that is already held is skipped. Its keyboard-dark permission is a holder, which the
+        // session above already granted.
+        if (SettingsManager.isNotificationRingEnabled(appContext)) {
+            rocks.pkb.plektra.ring.NotificationRingSetup.grantViaBroker(
+                appContext, trigger, includeKeyboardDark = false
+            )
         }
         // Queue each feature's steps here, before finishSetup.
         PrivilegedShell.runAsync { finishSetup(appContext, trigger) }
@@ -84,6 +93,11 @@ object PrivilegedSetup {
             context,
             WriteSecureSettingsHolders.BACKLIGHT_TILE,
             SettingsManager.getBacklightTileEnabled(context)
+        )
+        WriteSecureSettingsHolders.set(
+            context,
+            WriteSecureSettingsHolders.RING_KEYBOARD_DARK,
+            rocks.pkb.plektra.ring.NotificationRingSetup.needsKeyboardDarkPermission(context)
         )
     }
 
@@ -238,8 +252,9 @@ object PrivilegedSetup {
 
     /**
      * "Forget pairing", which is also this branch's reset to stock. While the broker can still
-     * connect, in one session: revoke WRITE_SECURE_SETTINGS and unpair this key (`IAdbManager.unpairDevice`, last, because
-     * adbd then drops the connection). Then confirm the unpair (a new connection must be refused) and delete the
+     * connect, in one session: revoke WRITE_SECURE_SETTINGS, withdraw notification access the
+     * broker gave, and unpair this key (`IAdbManager.unpairDevice`, last, because adbd then drops
+     * the connection). Then confirm the unpair (a new connection must be refused) and delete the
      * key and pins here whatever happened. BLOCKING (two mDNS searches); call off the main thread.
      */
     fun resetToStock(context: Context, trigger: BrokerTrigger?): ResetResult {
@@ -248,8 +263,10 @@ object PrivilegedSetup {
         var unpaired = false
         val fingerprint = EmbeddedAdbShell.keyFingerprint(app)
         val unpair = fingerprint?.let { PrivilegedCommand.UnpairSelf.forThisDevice(it) }
+        val listeners = BrokerGrantLedger.listenersAllowedByBroker(app)
         val commands = buildList {
             if (hasWriteSecureSettings(app)) add(PrivilegedCommand.RevokeWriteSecureSettings)
+            listeners.forEach { add(PrivilegedCommand.DisallowNotificationListener(it)) }
             unpair?.let { add(it) }
         }
         when {
@@ -260,6 +277,11 @@ object PrivilegedSetup {
         if (commands.isNotEmpty() && fingerprint != null) {
             val results = PrivilegedShell.runSession(app, commands, trigger)
             recordPermissionOutcome(app, commands, results)
+            commands.forEachIndexed { i, command ->
+                if (command is PrivilegedCommand.DisallowNotificationListener && results[i].ok) {
+                    BrokerGrantLedger.recordListenerDisallowed(app, command.listener)
+                }
+            }
             if (unpair != null) {
                 val result = results.last()
                 val sent = (result.ok && PrivilegedCommand.UnpairSelf.replyIsSuccess(result.output)) ||

@@ -220,8 +220,8 @@ fun SmartBacklightSection(modifier: Modifier = Modifier) {
         }
 
         // the keyboard-light tile's own hold on WRITE_SECURE_SETTINGS, so the tile
-        // keeps working with Smart backlight off. Revoked only when Smart backlight does not
-        // still need it.
+        // keeps working with Smart backlight off. Revoked only when no other
+        // holder (Smart backlight, the ring's keep-dark) still needs it.
         Row(
             modifier = Modifier
                 .settingRow(SettingLinkIds.TITAN2_ELITE_TOOLS_BACKLIGHT_TILE)

@@ -14,7 +14,7 @@ import rocks.pkb.plektra.toolbox.FnCtrlRemap
  *   1. Fn -> Ctrl remap — Settings.System `fn_programmable_key_enable` / `_function`.
  *
  * PhysiBoard's version also reverted the keyboard backlight, the QS backlight tile,
- * and the orange side key. Each of those features adds its own step here
+ * the orange side key and the notification ring. Each of those features adds its own step here
  * when it is ported (one `StepOutcome` field, one line in [resetToStock]). Density, system tweaks
  * and removed apps have reset buttons on their own pages; they are not part of this reset.
  *

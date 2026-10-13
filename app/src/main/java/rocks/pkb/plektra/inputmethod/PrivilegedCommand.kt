@@ -19,7 +19,7 @@ import rocks.pkb.plektra.toolbox.SystemTweaks
  * A group that needs another privileged command adds one case below, with a comment naming the
  * group and a stable [id] for the audit log, and runs it through [PrivilegedShell].
  *
- * The backlight and toolbox add their cases below the broker's own, each with an
+ * The backlight, ring and toolbox add their cases below the broker's own, each with an
  * [id]. Package names are validated with [isValidPackageName] (removal also needs the toolbox
  * catalog's approval), numbers are Ints in a fixed range, and settings keys and values come from
  * constants and enums here and in `toolbox.SystemTweaks`.
@@ -79,6 +79,15 @@ internal sealed class PrivilegedCommand {
         override fun commandLine(appPackage: String): String {
             require(isValidPackageName(appPackage)) { "invalid package name" }
             return "pm revoke $appPackage $WRITE_SECURE_SETTINGS"
+        }
+    }
+
+    /** Withdraws notification access the broker gave one of this app's listeners. */
+    class DisallowNotificationListener(val listener: AppNotificationListener) : PrivilegedCommand() {
+        override val id = "disallow_listener_${listener.id}"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(appPackage)) { "invalid package name" }
+            return "cmd notification disallow_listener $appPackage/${listener.className}"
         }
     }
 
@@ -146,6 +155,43 @@ internal sealed class PrivilegedCommand {
 
         /** The stock 30 s default. */
         STOCK("30000")
+    }
+
+    // the grants the notification ring needs. ONE command carrying a list, so a single broker
+    // connection does all of them; only the cases of [RingGrant] can be named, and the listener
+    // component is the validated package plus a constant class name.
+    class RingGrants(val grants: List<RingGrant>) : PrivilegedCommand() {
+        override val id = "ring_grants"
+        override fun commandLine(appPackage: String): String {
+            require(isValidPackageName(appPackage)) { "invalid package name" }
+            require(grants.isNotEmpty()) { "no grants" }
+            return grants.joinToString("; ") { it.line(appPackage) }
+        }
+    }
+
+    enum class RingGrant {
+        /** Notification access for the ring listener. */
+        ALLOW_LISTENER,
+
+        /** Lets the ring announce itself with a full-screen intent over the lock screen. */
+        ALLOW_FULL_SCREEN_INTENT,
+
+        /** The silent notification the full-screen intent hangs on. */
+        ALLOW_POST_NOTIFICATIONS,
+
+        /** Undo of [ALLOW_LISTENER], for a reset to stock. */
+        DISALLOW_LISTENER,
+
+        /** Undo of [ALLOW_FULL_SCREEN_INTENT], for a reset to stock. */
+        RESET_FULL_SCREEN_INTENT;
+
+        fun line(appPackage: String): String = when (this) {
+            ALLOW_LISTENER -> "cmd notification allow_listener $appPackage/$RING_LISTENER_CLASS"
+            ALLOW_FULL_SCREEN_INTENT -> "appops set $appPackage USE_FULL_SCREEN_INTENT allow"
+            ALLOW_POST_NOTIFICATIONS -> "appops set $appPackage POST_NOTIFICATION allow"
+            DISALLOW_LISTENER -> "cmd notification disallow_listener $appPackage/$RING_LISTENER_CLASS"
+            RESET_FULL_SCREEN_INTENT -> "appops set $appPackage USE_FULL_SCREEN_INTENT default"
+        }
     }
 
     // the commands the Titan 2 Elite toolbox needs (bloat remover, display density,
@@ -304,6 +350,9 @@ internal sealed class PrivilegedCommand {
 
         fun canUnpairOnSdk(sdkInt: Int): Boolean = sdkInt in UNPAIR_VERIFIED_SDKS
 
+        /** the ring's notification listener, as a constant so no class is loaded to name it. */
+        const val RING_LISTENER_CLASS = "rocks.pkb.plektra.ring.NotificationRingListener"
+
         // valid AND approved by the toolbox catalog (its deny-list and patterns apply).
         fun isRemovableCatalogPackage(name: String): Boolean =
             isValidPackageName(name) && BloatCatalog.isRemovable(name)
@@ -316,6 +365,16 @@ internal sealed class PrivilegedCommand {
         private const val TXN_GET = "1"
         private const val KEY_BACKLIGHT_TIMEOUT = "keyboard_brightness_timeout"
     }
+}
+
+/**
+ * Notification listeners of this app that the broker may have allowed (`cmd notification
+ * allow_listener`), so a reset can withdraw that access. Each feature that allows one records it
+ * with [BrokerGrantLedger.recordListenerAllowed] when its grant succeeds.
+ */
+internal enum class AppNotificationListener(val id: String, val className: String) {
+    /** [PrivilegedCommand.RingGrant.ALLOW_LISTENER]. */
+    RING("ring", PrivilegedCommand.RING_LISTENER_CLASS),
 }
 
 /**

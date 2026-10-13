@@ -25,7 +25,7 @@ import android.provider.Settings
  * The second half of this object is the in-process vendor switch (`agui_keyboard_background_light`)
  * that the Quick Settings tile toggles. It needs no broker at all while WRITE_SECURE_SETTINGS is
  * held, which is while a feature that needs it is on ([WriteSecureSettingsHolders.BACKLIGHT_TILE],
- * [WriteSecureSettingsHolders.BACKLIGHT]; see [PrivilegedSetup.setWriteSecureSettingsNeeded]).
+ * [WriteSecureSettingsHolders.BACKLIGHT], [WriteSecureSettingsHolders.RING_KEYBOARD_DARK]; see [PrivilegedSetup.setWriteSecureSettingsNeeded]).
  *
  * Every broker call takes the [BrokerTrigger] of the user action behind it.
  */
@@ -139,8 +139,10 @@ object KeyboardBacklightManager {
     const val KEYBOARD_LIGHT_SWITCH = "agui_keyboard_background_light"
 
     /**
-     * The in-process surface for the vendor switch, the same row the tile toggles, without a
-     * broker. [writeKeyboardLightSwitch] takes only 0 or 1; any other value is refused.
+     * Hook for the ring group ("keyboard dark while the ring is lit", PhysiBoard
+     * e8d997c0): these three are the whole in-process surface for the vendor switch, so the ring
+     * can darken and restore the keyboard through the same row the tile toggles, without a broker.
+     * [writeKeyboardLightSwitch] takes only 0 or 1; any other value is refused.
      */
     fun canWriteKeyboardLightSwitch(context: Context): Boolean =
         PrivilegedSetup.hasWriteSecureSettings(context)

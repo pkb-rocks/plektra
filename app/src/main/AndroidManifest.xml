@@ -4,6 +4,8 @@
 
     <!-- Permesso per le notifiche (richiesto da Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- lets the notification ring turn the screen on over the lock screen -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     
     <!-- Permesso per la vibrazione (richiesto per haptic feedback) -->
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -273,6 +275,34 @@
                 android:name="android.view.im"
                 android:resource="@xml/method" />
         </service>
+
+        <!-- notification ring around the camera hole while the screen is otherwise off.
+             The listener is bound by the system once notification access is granted; the activity is
+             what the system launches for the ring's full-screen notification. -->
+        <service
+            android:name=".ring.NotificationRingListener"
+            android:exported="true"
+            android:label="@string/ring_title"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name=".ring.NotificationRingActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity="rocks.pkb.plektra.ring"
+            android:theme="@style/Theme.Plektra.Ring" />
+        <activity
+            android:name=".ring.RingAdjustActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Plektra.Ring" />
 
         <service
             android:name=".inputmethod.ClicksLauncherButtonAccessibilityService"

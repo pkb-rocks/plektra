@@ -21,6 +21,8 @@ internal fun titan2EliteToolsSettingEntries(): List<SettingEntry> = listOf(
         availabilityCheck = titan2EliteOnly,
         unavailableFallbackId = SettingLinkIds.MAIN_ADVANCED
     ),
+    // the notification ring section and the rows of its page
+    *notificationRingSettingEntries().toTypedArray(),
     SettingEntry(
         id = SettingLinkIds.TITAN2_ELITE_TOOLS_DEVICE_SETUP,
         titleRes = R.string.device_setup_link_title,

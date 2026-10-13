@@ -45,6 +45,24 @@ fun Titan2EliteToolsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit
 ) {
+    // the notification ring has its own page, shown instead of this screen. It opens as a
+    // settings child (the section row below), or here when a deep link or search hit names one of
+    // its rows.
+    val context = LocalContext.current
+    val openedAsRingChild = remember { settingsChild(context, T2E_TOOLS_CHILD_SECTION) == T2E_TOOLS_RING_PAGE }
+    var showRing by remember { mutableStateOf(openedAsRingChild) }
+    val highlightedSettingId = LocalSettingHighlightId.current
+    LaunchedEffect(highlightedSettingId) {
+        if (highlightedSettingId in notificationRingPageRowIds) showRing = true
+    }
+    if (showRing) {
+        NotificationRingScreen(
+            modifier = modifier,
+            onBack = { if (openedAsRingChild) context.settingsActivity().finish() else showRing = false }
+        )
+        return
+    }
+
     // a toolbox page opens as a child settings activity (ToolboxSection.kt) and
     // replaces this list while it is showing.
     val toolboxPage = ToolboxPage.fromChild(settingsChild(LocalContext.current, ToolboxPage.SECTION))
@@ -105,11 +123,14 @@ fun Titan2EliteToolsScreen(
             ToolboxSection()
 
             // add one section per feature below, each a composable in its own file
-            // (backlight, toolbox, ...). Register its settings in
+            // (backlight, ring, toolbox, ...). Register its settings in
             // Titan2EliteToolsSettingEntries.kt so search and deep links reach it.
 
             // smart keyboard backlight
             SmartBacklightSection(modifier = Modifier.settingRow(SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT))
+
+            // notification ring around the camera hole (opens its own page)
+            NotificationRingSection()
         }
     }
 }

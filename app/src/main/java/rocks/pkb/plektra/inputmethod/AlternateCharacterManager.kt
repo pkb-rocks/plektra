@@ -702,8 +702,10 @@ class AlternateCharacterManager(
     ): LongPressCycle? {
         val original = insertedNormalChars[keyCode]?.takeIf { it.isNotEmpty() } ?: return null
         val wasShifted = keyPressWasShifted[keyCode] ?: false
-        val candidates = modes
-            .mapNotNull { resolveLongPressCandidate(it, keyCode, original, wasShifted) }
+        val singleSteps = modes.map { resolveLongPressCandidate(it, keyCode, original, wasShifted) }
+        // The combined step comes last; distinct() drops it when it repeats an earlier step.
+        val candidates = (singleSteps + resolveCombinedShiftCandidate(modes, keyCode, original))
+            .filterNotNull()
             .filter { it.isNotEmpty() && it != original }
             .distinct()
         if (candidates.isEmpty()) return null
@@ -717,6 +719,26 @@ class AlternateCharacterManager(
         )
         longPressCycles[keyCode] = cycle
         return cycle
+    }
+
+    /**
+     * When one cycle mode is Shift and the other is Variations or a SYM page, the step
+     * that applies both: the other mode resolved on the Shift-toggled character
+     * (e -> è -> E -> È; an auto-capitalized E gives E -> È -> e -> è). Device SYM
+     * ("alt") has no Shift-specific map, so it never adds a combined step.
+     */
+    private fun resolveCombinedShiftCandidate(
+        modes: List<String>,
+        keyCode: Int,
+        original: String
+    ): String? {
+        if (modes.size != 2 || "shift" !in modes) return null
+        val other = modes.first { it != "shift" }
+        if (other != "variations" && other != "sym" && other != "sym_symbols" && other != "sym_emoji") {
+            return null
+        }
+        val toggled = resolveShiftLongPressText(keyCode, original)?.takeIf { it.isNotEmpty() } ?: return null
+        return resolveLongPressCandidate(other, keyCode, toggled, wasShifted = toggled[0].isUpperCase())
     }
 
     private fun advanceLongPressCycle(keyCode: Int, cycle: LongPressCycle): Boolean {

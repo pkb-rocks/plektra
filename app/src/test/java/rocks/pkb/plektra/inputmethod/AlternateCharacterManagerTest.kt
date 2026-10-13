@@ -77,6 +77,38 @@ class AlternateCharacterManagerTest {
         )
     }
 
+    private fun pressU(
+        manager: AlternateCharacterManager,
+        inputConnection: InputConnection,
+        shiftOneShot: Boolean = false
+    ) {
+        manager.handleKeyWithAltMapping(
+            keyCode = KeyEvent.KEYCODE_U,
+            inputConnection = inputConnection,
+            event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_U),
+            capsLockEnabled = false,
+            shiftOneShot = shiftOneShot,
+            layoutChar = 'u'
+        )
+    }
+
+    /** Pins SYM page 1 (emoji) for [keyCode]: [lower] unshifted, [upper] shifted or none. */
+    @Suppress("UNCHECKED_CAST")
+    private fun setSymPageOne(
+        manager: AlternateCharacterManager,
+        keyCode: Int = KeyEvent.KEYCODE_T,
+        lower: String,
+        upper: String?
+    ) {
+        fun map(name: String): MutableMap<Int, String> {
+            val field = AlternateCharacterManager::class.java.getDeclaredField(name)
+            field.isAccessible = true
+            return field.get(manager) as MutableMap<Int, String>
+        }
+        map("symKeyMap")[keyCode] = lower
+        if (upper == null) map("symKeyMapUppercase").remove(keyCode) else map("symKeyMapUppercase")[keyCode] = upper
+    }
+
     private fun cycleManager(first: String, next: String, end: String): AlternateCharacterManager {
         SettingsManager.setLongPressModifier(context, first)
         SettingsManager.setLongPressCycleNext(context, next)
@@ -248,6 +280,145 @@ class AlternateCharacterManagerTest {
         assertEquals("(", recorder.text)
         idle(500)
         assertEquals("(", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_variationsThenShiftAddsCombinedStep() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "variations", next = "shift", end = "stop")
+
+        pressU(manager, inputConnection)
+        idle(60)
+        assertEquals("ü", recorder.text)
+        idle(50)
+        assertEquals("U", recorder.text)
+        idle(50)
+        assertEquals("Ü", recorder.text)
+        idle(500)
+        assertEquals("Ü", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_combinedStepJoinsTheLoopAndOriginal() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "variations", next = "shift", end = "loop")
+
+        pressU(manager, inputConnection)
+        idle(60)
+        assertEquals("ü", recorder.text)
+        idle(50)
+        assertEquals("U", recorder.text)
+        idle(50)
+        assertEquals("Ü", recorder.text)
+        idle(50)
+        assertEquals("u", recorder.text)
+        idle(50)
+        assertEquals("ü", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_autoCapitalizedOriginalCombinedStepGoesLowercase() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "variations", next = "shift", end = "stop")
+
+        pressU(manager, inputConnection, shiftOneShot = true)
+        assertEquals("U", recorder.text)
+        idle(60)
+        assertEquals("Ü", recorder.text)
+        idle(50)
+        assertEquals("u", recorder.text)
+        idle(50)
+        assertEquals("ü", recorder.text)
+        idle(500)
+        assertEquals("ü", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_shiftThenSymAddsUppercaseSymStepWhenMapped() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "sym_emoji", end = "stop")
+        setSymPageOne(manager, lower = "{", upper = "}")
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("{", recorder.text)
+        idle(50)
+        assertEquals("}", recorder.text)
+        idle(500)
+        assertEquals("}", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_shiftThenSymWithoutUppercaseSymHasNoCombinedStep() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "sym_emoji", end = "original")
+        setSymPageOne(manager, lower = "{", upper = null)
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("{", recorder.text)
+        // The combined step would repeat "{", so the cycle goes back to the typed letter.
+        idle(50)
+        assertEquals("t", recorder.text)
+        idle(500)
+        assertEquals("t", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_autoCapitalizedOriginalShiftThenSymCombinesWithLowercase() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "sym_emoji", end = "stop")
+        setSymPageOne(manager, lower = "{", upper = "}")
+
+        pressT(manager, inputConnection, shiftOneShot = true)
+        assertEquals("T", recorder.text)
+        idle(60)
+        assertEquals("t", recorder.text)
+        idle(50)
+        assertEquals("}", recorder.text)
+        idle(50)
+        assertEquals("{", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_shiftThenDeviceSymHasNoCombinedStep() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "shift", next = "alt", end = "original")
+
+        pressT(manager, inputConnection)
+        idle(60)
+        assertEquals("T", recorder.text)
+        idle(50)
+        assertEquals("(", recorder.text)
+        idle(50)
+        assertEquals("t", recorder.text)
+    }
+
+    @Test
+    fun longPressCycle_pairWithoutShiftKeepsTwoSteps() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "variations", next = "sym_emoji", end = "original")
+        setSymPageOne(manager, keyCode = KeyEvent.KEYCODE_U, lower = "{", upper = "}")
+
+        pressU(manager, inputConnection)
+        idle(60)
+        assertEquals("ü", recorder.text)
+        idle(50)
+        assertEquals("{", recorder.text)
+        idle(50)
+        assertEquals("u", recorder.text)
     }
 
     @Test

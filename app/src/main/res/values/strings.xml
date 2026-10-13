@@ -366,7 +366,7 @@
     <string name="long_press_modifier_sym_symbols">Symbols Layer</string>
     <string name="long_press_modifier_sym_emoji">Emoji Layer</string>
     <string name="long_press_cycle_next_title">Keep Holding For</string>
-    <string name="long_press_cycle_next_description">Hold past the first long press to step to a second character, so capitals and symbols need only one hand.</string>
+    <string name="long_press_cycle_next_description">Hold past the first long press to step to a second character (with Shift and Variations or SYM, then to a third that applies both), so capitals and symbols need only one hand.</string>
     <string name="long_press_cycle_next_off">Nothing (off)</string>
     <string name="long_press_cycle_end_title">After the Last Step</string>
     <string name="long_press_cycle_end_stop">Keep the last character</string>

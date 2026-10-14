@@ -32,6 +32,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -368,23 +369,16 @@ fun KeyboardSetupScreen(
     var isPlektraEnabled by remember { mutableStateOf(false) }
     var isPlektraSelected by remember { mutableStateOf(false) }
 
-    // Check IME status
-    LaunchedEffect(Unit) {
+    // Check IME status when the window gains focus: on open, on return from the system's keyboard
+    // settings, and after the input method picker closes (it is a dialog over this activity).
+    // Not on a timer: enabledInputMethodList makes system_server run AppsFilter against every
+    // other installed keyboard, which logged a BLOCKED interaction per package every 2 s.
+    val windowFocused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(windowFocused) {
+        if (!windowFocused) return@LaunchedEffect
         checkImeStatus(context) { enabled, selected ->
             isPlektraEnabled = enabled
             isPlektraSelected = selected
-        }
-    }
-
-    // Refresh IME status periodically and when activity resumes
-    LaunchedEffect(Unit) {
-        // Check status every 2 seconds when screen is visible
-        while (true) {
-            kotlinx.coroutines.delay(2000)
-            checkImeStatus(context) { enabled, selected ->
-                isPlektraEnabled = enabled
-                isPlektraSelected = selected
-            }
         }
     }
 

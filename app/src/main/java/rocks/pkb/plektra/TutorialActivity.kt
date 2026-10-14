@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -207,20 +208,13 @@ fun TutorialScreen(
     var isPlektraEnabled by remember { mutableStateOf(false) }
     var isPlektraSelected by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    // On window focus, not a timer: see the note on MainActivity's IME status check.
+    val windowFocused = LocalWindowInfo.current.isWindowFocused
+    LaunchedEffect(windowFocused) {
+        if (!windowFocused) return@LaunchedEffect
         checkImeStatus(context) { enabled, selected ->
             isPlektraEnabled = enabled
             isPlektraSelected = selected
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(2000)
-            checkImeStatus(context) { enabled, selected ->
-                isPlektraEnabled = enabled
-                isPlektraSelected = selected
-            }
         }
     }
 

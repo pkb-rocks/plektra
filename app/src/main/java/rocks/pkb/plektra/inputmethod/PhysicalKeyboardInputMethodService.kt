@@ -78,6 +78,7 @@ import java.util.Locale
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
 import rocks.pkb.plektra.clipboard.ClipboardHistoryManager
+import rocks.pkb.plektra.shizuku.ShizukuUserServiceShell
 import android.content.pm.PackageManager
 import rikka.shizuku.Shizuku
 
@@ -2475,6 +2476,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 attachTrackpadDecorViewMotionHook("provider_changed")
             } else if (key == "slim_mode_override") {
                 keyboardVisibilityController.syncStatusBarPresentationModeFromSettings()
+            } else if (key == SettingsManager.KEY_SHOW_STATUS_BAR) {
+                // master status-bar toggle. Purely visual: invalidate the render cache
+                // so updateStatusBarText() is not skipped, then re-render on the main thread.
+                invalidateRenderedStatusSnapshot()
+                Handler(Looper.getMainLooper()).post {
+                    updateStatusBarText()
+                }
             } else if (key == SettingsManager.KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS ||
                 key == SettingsManager.KEY_TITAN2_ELITE_FILL_BOTTOM_CORNERS ||
                 key == rocks.pkb.plektra.T2eCornerCalibration.KEY ||
@@ -4264,6 +4272,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         super.onWindowHidden()
+        // the keyboard is gone, so stop the Shizuku shell service's process
+        // too (it is rebound on the next command). Unbinding runs no command, mints no trigger.
+        ShizukuUserServiceShell.onKeyboardHidden()
         if (::candidatesBarController.isInitialized) {
             candidatesBarController.dismissEmojiPickerPopups()
         }

@@ -8,6 +8,7 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.edit
 import rocks.pkb.plektra.commands.CommandJson
 import rocks.pkb.plektra.commands.CommandLaunchSpec
 import rocks.pkb.plektra.commands.CommandSourceId
@@ -1482,6 +1483,29 @@ object SettingsManager {
     fun setTitan2EliteMaxIconShrink(context: Context, percent: Int) {
         getPreferences(context).edit().putInt(KEY_TITAN2_ELITE_MAX_ICON_SHRINK, percent.coerceIn(0, 90)).apply()
     }
+
+    // master "Show status bar" toggle (Titan 2 Elite tools screen)
+    // Public so the running IME's SharedPreferences listener can match it for live apply.
+    const val KEY_SHOW_STATUS_BAR = "show_status_bar"
+
+    /**
+     * Master toggle for the on-screen IME status-bar strip. When false the strip collapses to zero
+     * height regardless of presentation mode, suggestions or LED state. Independent of the
+     * pastierina vs full-status-bar presentation mode. Defaults to true.
+     */
+    fun getShowStatusBar(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SHOW_STATUS_BAR, true)
+
+    fun setShowStatusBar(context: Context, show: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SHOW_STATUS_BAR, show).apply()
+    }
+
+    /**
+     * What the renderer obeys. The switch exists only on the Titan 2 Elite tools screen, so an
+     * "off" restored from a backup onto any other phone must not hide a bar nobody can bring back.
+     */
+    fun isStatusBarHidden(context: Context): Boolean =
+        DeviceSpecific.isTitan2EliteDevice() && !getShowStatusBar(context)
 
     fun setTitan2EliteRoundedCornerInsetsEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
@@ -6338,6 +6362,169 @@ object SettingsManager {
         )
     }
 
+    // notification ring — a glow around the camera hole while the screen is otherwise off.
+    // One block; the UI is NotificationRingScreen.kt, the behaviour is in the ring/ package.
+    private const val KEY_NOTIFICATION_RING_ENABLED = "notification_ring_enabled"
+    private const val KEY_NOTIFICATION_RING_MINUTES = "notification_ring_minutes"
+    private const val KEY_NOTIFICATION_RING_BRIGHTNESS = "notification_ring_brightness"
+    private const val KEY_NOTIFICATION_RING_ICONS = "notification_ring_icons"
+    private const val KEY_NOTIFICATION_RING_CX = "notification_ring_cx"
+    private const val KEY_NOTIFICATION_RING_CY = "notification_ring_cy"
+    private const val KEY_NOTIFICATION_RING_RADIUS = "notification_ring_radius"
+    private const val KEY_NOTIFICATION_RING_STROKE = "notification_ring_stroke"
+    private const val KEY_NOTIFICATION_RING_APP_COLORS = "notification_ring_app_colors"
+    private const val KEY_NOTIFICATION_RING_DEFAULT_COLOR = "notification_ring_default_color"
+    private const val KEY_NOTIFICATION_RING_KEYBOARD_DARK = "notification_ring_keyboard_dark"
+
+    // What the vendor keyboard-backlight switch was before a ring turned it off. A capture
+    // record, not a setting: it is the only thing that knows to put the switch back.
+    private const val KEY_RING_BACKLIGHT_SUPPRESSED = "ring_backlight_prev_captured"
+    private const val KEY_RING_BACKLIGHT_PRIOR = "ring_backlight_prev"
+    const val NOTIFICATION_RING_DEFAULT_MINUTES = 10
+    // A slider spans 1..60 minutes; a stored value outside that (a restored backup, say) is clamped on read.
+    const val NOTIFICATION_RING_MIN_MINUTES = 1
+    const val NOTIFICATION_RING_MAX_MINUTES = 60
+
+    fun isNotificationRingEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_NOTIFICATION_RING_ENABLED, false)
+
+    fun setNotificationRingEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_NOTIFICATION_RING_ENABLED, enabled).apply()
+    }
+
+    /** Whether the waiting apps' icons are drawn below the ring. Off: just the ring. */
+    fun isNotificationRingIconsEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_NOTIFICATION_RING_ICONS, false)
+
+    fun setNotificationRingIconsEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_NOTIFICATION_RING_ICONS, enabled).apply()
+    }
+
+    /**
+     * Whether the keyboard stays dark while the ring is lit. On by default: the ring exists so a
+     * notification does not have to light the phone up, and the vendor lights the keyboard on
+     * every screen-on. Needs WRITE_SECURE_SETTINGS; without it this is inert rather than broken.
+     */
+    fun isRingKeyboardDarkEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_NOTIFICATION_RING_KEYBOARD_DARK, true)
+
+    fun setRingKeyboardDarkEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_NOTIFICATION_RING_KEYBOARD_DARK, enabled).apply()
+    }
+
+    /** True while a ring has the vendor keyboard-backlight switch turned off on its behalf. */
+    fun isRingBacklightSuppressed(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_RING_BACKLIGHT_SUPPRESSED, false)
+
+    /** Records the value to put back. Written BEFORE the switch is touched, never after. */
+    // commit(): the record must be on disk before the switch changes, or a process death leaves it unrestorable.
+    @android.annotation.SuppressLint("ApplySharedPref")
+    fun setRingBacklightSuppressed(context: Context, prior: Int) {
+        getPreferences(context).edit()
+            .putInt(KEY_RING_BACKLIGHT_PRIOR, prior)
+            .putBoolean(KEY_RING_BACKLIGHT_SUPPRESSED, true)
+            .commit()
+    }
+
+    /** The value the switch held before the ring; only meaningful while suppressed. */
+    fun getRingBacklightPrior(context: Context): Int =
+        getPreferences(context).getInt(KEY_RING_BACKLIGHT_PRIOR, 1)
+
+    fun clearRingBacklightSuppressed(context: Context) {
+        getPreferences(context).edit()
+            .remove(KEY_RING_BACKLIGHT_SUPPRESSED)
+            .remove(KEY_RING_BACKLIGHT_PRIOR)
+            .apply()
+    }
+
+    /**
+     * The colour the ring falls back to: for an app with no colour of its own, and for one whose
+     * colour is too dark to read against a black screen.
+     */
+    fun getNotificationRingDefaultColor(context: Context): Int =
+        getPreferences(context).getInt(
+            KEY_NOTIFICATION_RING_DEFAULT_COLOR,
+            rocks.pkb.plektra.ring.NotificationRingPolicy.DEFAULT_COLOR
+        )
+
+    fun setNotificationRingDefaultColor(context: Context, argb: Int) {
+        getPreferences(context).edit().putInt(KEY_NOTIFICATION_RING_DEFAULT_COLOR, argb).apply()
+    }
+
+    /** Per-app ring colours, package -> ARGB. Apps not listed use the app's own notification colour. */
+    fun getNotificationRingAppColors(context: Context): Map<String, Int> {
+        val raw = getPreferences(context).getString(KEY_NOTIFICATION_RING_APP_COLORS, null) ?: return emptyMap()
+        return runCatching {
+            val json = JSONObject(raw)
+            json.keys().asSequence().associateWith { json.getInt(it) }
+        }.getOrDefault(emptyMap())
+    }
+
+    /** Null [color] removes the app from the list. */
+    fun setNotificationRingAppColor(context: Context, packageName: String, color: Int?) {
+        val current = getNotificationRingAppColors(context).toMutableMap()
+        if (color == null) current.remove(packageName) else current[packageName] = color
+        val json = JSONObject()
+        current.forEach { (pkg, argb) -> json.put(pkg, argb) }
+        getPreferences(context).edit().putString(KEY_NOTIFICATION_RING_APP_COLORS, json.toString()).apply()
+    }
+
+    /** How long the ring keeps the screen on before letting it sleep, in whole minutes. */
+    fun getNotificationRingMinutes(context: Context): Int =
+        getPreferences(context).getInt(KEY_NOTIFICATION_RING_MINUTES, NOTIFICATION_RING_DEFAULT_MINUTES)
+            .coerceIn(NOTIFICATION_RING_MIN_MINUTES, NOTIFICATION_RING_MAX_MINUTES)
+
+    fun setNotificationRingMinutes(context: Context, minutes: Int) {
+        getPreferences(context).edit()
+            .putInt(
+                KEY_NOTIFICATION_RING_MINUTES,
+                minutes.coerceIn(NOTIFICATION_RING_MIN_MINUTES, NOTIFICATION_RING_MAX_MINUTES)
+            )
+            .apply()
+    }
+
+    fun getNotificationRingBrightness(context: Context): rocks.pkb.plektra.ring.RingBrightness =
+        rocks.pkb.plektra.ring.RingBrightness.fromName(
+            getPreferences(context).getString(KEY_NOTIFICATION_RING_BRIGHTNESS, null)
+        )
+
+    fun setNotificationRingBrightness(context: Context, brightness: rocks.pkb.plektra.ring.RingBrightness) {
+        getPreferences(context).edit().putString(KEY_NOTIFICATION_RING_BRIGHTNESS, brightness.name).apply()
+    }
+
+    /**
+     * A hand-fitted ring, in window pixels, or null to use the fitted default. The default is
+     * measured off one phone; panels differ by a few pixels, so users can refit it.
+     */
+    fun getNotificationRingOverride(context: Context): rocks.pkb.plektra.ring.RingGeometry.Ring? {
+        val prefs = getPreferences(context)
+        if (!prefs.contains(KEY_NOTIFICATION_RING_RADIUS)) return null
+        return rocks.pkb.plektra.ring.RingGeometry.Ring(
+            cx = prefs.getFloat(KEY_NOTIFICATION_RING_CX, 0f),
+            cy = prefs.getFloat(KEY_NOTIFICATION_RING_CY, 0f),
+            radius = prefs.getFloat(KEY_NOTIFICATION_RING_RADIUS, 0f),
+            stroke = prefs.getFloat(KEY_NOTIFICATION_RING_STROKE, 0f)
+        )
+    }
+
+    fun setNotificationRingOverride(context: Context, ring: rocks.pkb.plektra.ring.RingGeometry.Ring) {
+        getPreferences(context).edit()
+            .putFloat(KEY_NOTIFICATION_RING_CX, ring.cx)
+            .putFloat(KEY_NOTIFICATION_RING_CY, ring.cy)
+            .putFloat(KEY_NOTIFICATION_RING_RADIUS, ring.radius)
+            .putFloat(KEY_NOTIFICATION_RING_STROKE, ring.stroke)
+            .apply()
+    }
+
+    fun clearNotificationRingOverride(context: Context) {
+        getPreferences(context).edit()
+            .remove(KEY_NOTIFICATION_RING_CX)
+            .remove(KEY_NOTIFICATION_RING_CY)
+            .remove(KEY_NOTIFICATION_RING_RADIUS)
+            .remove(KEY_NOTIFICATION_RING_STROKE)
+            .apply()
+    }
+
     private fun normalizeEnterBehaviorPreset(preset: String): String {
         return when (preset) {
             ENTER_BEHAVIOR_PRESET_APP_DEFAULT,
@@ -6374,5 +6561,74 @@ object SettingsManager {
             ENTER_ADDITIONAL_SEND_SHORTCUT_SYM_ENTER -> shortcut
             else -> ENTER_ADDITIONAL_SEND_SHORTCUT_NONE
         }
+    }
+
+    // smart keyboard backlight (Titan 2 Elite). The matching "written to the phone"
+    // state is device state, not a setting, so it lives in PrivilegedDiagnostics (backup-excluded).
+    private const val KEY_SMART_BACKLIGHT_ENABLED = "smart_backlight_enabled"
+    private const val DEFAULT_SMART_BACKLIGHT_ENABLED = false
+
+    /**
+     * Smart keyboard backlight: keep the keyboard lit past the vendor's 30 s limit. Needs the
+     * embedded ADB broker once, to write the vendor timeout.
+     */
+    fun getSmartBacklightEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_SMART_BACKLIGHT_ENABLED, DEFAULT_SMART_BACKLIGHT_ENABLED)
+    }
+
+    fun setSmartBacklightEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SMART_BACKLIGHT_ENABLED, enabled).apply()
+    }
+
+    // the keyboard-light Quick Settings tile's own WRITE_SECURE_SETTINGS holder
+    // ([rocks.pkb.plektra.inputmethod.WriteSecureSettingsHolders.BACKLIGHT_TILE]), a switch in the
+    // Smart backlight section.
+    private const val KEY_BACKLIGHT_TILE_ENABLED = "backlight_tile_enabled"
+
+    /**
+     * Keep WRITE_SECURE_SETTINGS for the keyboard-light tile even while Smart backlight is off.
+     *
+     * Never stored until first read: an install where the tile already worked (Smart backlight on,
+     * or the permission held for the ring's keep-dark) starts with it on, so upgrading keeps a
+     * working tile; any other install starts with it off. The first answer is stored, so the
+     * default never shifts under the user afterwards.
+     */
+    fun getBacklightTileEnabled(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        if (prefs.contains(KEY_BACKLIGHT_TILE_ENABLED)) {
+            return prefs.getBoolean(KEY_BACKLIGHT_TILE_ENABLED, false)
+        }
+        val initial = getSmartBacklightEnabled(context) ||
+            rocks.pkb.plektra.inputmethod.PrivilegedSetup.hasWriteSecureSettings(context)
+        setBacklightTileEnabled(context, initial)
+        return initial
+    }
+
+    fun setBacklightTileEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit { putBoolean(KEY_BACKLIGHT_TILE_ENABLED, enabled) }
+    }
+
+    // "Privileged access via" on the Titan 2 Elite tools screen. Which route the
+    // broker's door uses (see inputmethod/PrivilegedBackend.kt); a choice, not device state, so it
+    // is backed up with the other settings.
+    private const val KEY_PRIVILEGED_ACCESS_BACKEND = "privileged_access_backend"
+    const val PRIVILEGED_ACCESS_AUTO = "auto"
+    const val PRIVILEGED_ACCESS_SHIZUKU = "shizuku"
+    const val PRIVILEGED_ACCESS_BROKER = "broker"
+    private val PRIVILEGED_ACCESS_VALUES = setOf(
+        PRIVILEGED_ACCESS_AUTO,
+        PRIVILEGED_ACCESS_SHIZUKU,
+        PRIVILEGED_ACCESS_BROKER
+    )
+
+    /** One of [PRIVILEGED_ACCESS_AUTO] (default), [PRIVILEGED_ACCESS_SHIZUKU], [PRIVILEGED_ACCESS_BROKER]. */
+    fun getPrivilegedAccessBackend(context: Context): String {
+        val value = getPreferences(context).getString(KEY_PRIVILEGED_ACCESS_BACKEND, PRIVILEGED_ACCESS_AUTO)
+        return if (value in PRIVILEGED_ACCESS_VALUES) value!! else PRIVILEGED_ACCESS_AUTO
+    }
+
+    fun setPrivilegedAccessBackend(context: Context, value: String) {
+        val normalized = if (value in PRIVILEGED_ACCESS_VALUES) value else PRIVILEGED_ACCESS_AUTO
+        getPreferences(context).edit { putString(KEY_PRIVILEGED_ACCESS_BACKEND, normalized) }
     }
 }

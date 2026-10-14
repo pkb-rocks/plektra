@@ -862,4 +862,14 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
+    <string name="caret_modifier_badge_title">Показывать модификаторы у курсора</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl и Sym появляются рядом с текстовым курсором, когда включены. Работает только в приложениях, сообщающих положение курсора.</string>
+    <string name="caret_modifier_badge_needs_overlay">Рисовать рядом с курсором — значит рисовать поверх приложения, в котором вы печатаете, поэтому Android сначала требует разрешение.</string>
+    <string name="caret_modifier_badge_grant_overlay">Разрешить рисовать поверх приложений</string>
+    <string name="caret_badge_color_armed">Цвет одного нажатия</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt или Ctrl, взведённые только для следующей клавиши</string>
+    <string name="caret_badge_color_locked">Цвет фиксации</string>
+    <string name="caret_badge_color_locked_description">Caps Lock, фиксация Alt и Ctrl, которые остаются включёнными, пока вы их не выключите</string>
+    <string name="caret_badge_color_pick">Удерживаемый модификатор показывается приглушённой версией этих цветов.</string>
+    <string name="kw_caret_modifier_badge">курсор, каретка, shift, alt, ctrl, sym, caps lock, оверлей, значок, модификатор, индикатор</string>
 </resources>

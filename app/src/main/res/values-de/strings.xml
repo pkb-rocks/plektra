@@ -1611,4 +1611,14 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="alt_space_previous_language_description">Wechselt rückwärts durch sichtbare Eingabesprachen. Aktivieren schaltet Alt+Leertaste für den Quick Launcher aus; Aktivieren des Launcher-Kürzels schaltet diese Option aus.</string>
     <string name="ctrl_language_previous_title">Ctrl+Sprachbutton: vorherige Eingabesprache</string>
     <string name="ctrl_language_previous_description">Auf der Software-Tastatur Ctrl halten oder aktivieren und den Sprachbutton mit dem Tastatursymbol antippen, um rückwärts zu wechseln.</string>
+    <string name="caret_modifier_badge_title">Modifier am Cursor anzeigen</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl und Sym erscheinen neben dem Textcursor, sobald sie aktiv sind. Funktioniert nur in Apps, die melden, wo der Cursor steht.</string>
+    <string name="caret_modifier_badge_needs_overlay">Neben dem Cursor zu zeichnen heißt, über die App zu zeichnen, in der du tippst – dafür braucht Android zuerst eine Berechtigung.</string>
+    <string name="caret_modifier_badge_grant_overlay">Zeichnen über Apps erlauben</string>
+    <string name="caret_badge_color_armed">Farbe für einmaliges Drücken</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt oder Ctrl nur für die nächste Taste scharf</string>
+    <string name="caret_badge_color_locked">Farbe für gelockt</string>
+    <string name="caret_badge_color_locked_description">Caps Lock, Alt-Lock und Ctrl-Lock, die an bleiben, bis du sie ausschaltest</string>
+    <string name="caret_badge_color_pick">Ein gehaltener Modifier wird in einer abgeschwächten Version dieser Farben angezeigt.</string>
+    <string name="kw_caret_modifier_badge">Cursor, Caret, Shift, Alt, Ctrl, Sym, Caps Lock, Overlay, Badge, Modifier, Anzeige</string>
 </resources>

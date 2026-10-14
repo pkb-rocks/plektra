@@ -6178,6 +6178,51 @@ object SettingsManager {
         return MODIFIER_INDICATOR_STATUS_BAR in getModifierIndicators(context)
     }
 
+    // Modifier badge beside the text cursor (on/off and its two colours).
+    private const val KEY_CARET_MODIFIER_BADGE = "caret_modifier_badge"
+    private const val KEY_CARET_BADGE_ARMED_COLOR = "caret_badge_armed_color"
+    private const val KEY_CARET_BADGE_LOCKED_COLOR = "caret_badge_locked_color"
+    private const val DEFAULT_CARET_MODIFIER_BADGE = true
+    /** One click: armed for the next key only. */
+    const val DEFAULT_CARET_BADGE_ARMED_COLOR = 0xFF2563EB.toInt()
+    /** Two clicks: stuck on until it is turned off. */
+    const val DEFAULT_CARET_BADGE_LOCKED_COLOR = 0xFFDC2626.toInt()
+
+    /**
+     * Returns whether the active modifier is shown as a label beside the text cursor.
+     */
+    fun getCaretModifierBadgeEnabled(context: Context): Boolean {
+        return getPreferences(context)
+            .getBoolean(KEY_CARET_MODIFIER_BADGE, DEFAULT_CARET_MODIFIER_BADGE)
+    }
+
+    /**
+     * Shows or hides the modifier label beside the text cursor.
+     */
+    fun setCaretModifierBadgeEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CARET_MODIFIER_BADGE, enabled)
+            .apply()
+    }
+
+    /** Colour of a modifier that is armed for one key only. */
+    fun getCaretBadgeArmedColor(context: Context): Int =
+        getPreferences(context)
+            .getInt(KEY_CARET_BADGE_ARMED_COLOR, DEFAULT_CARET_BADGE_ARMED_COLOR)
+
+    fun setCaretBadgeArmedColor(context: Context, argb: Int) {
+        getPreferences(context).edit().putInt(KEY_CARET_BADGE_ARMED_COLOR, argb).apply()
+    }
+
+    /** Colour of a modifier that stays on until it is turned off. */
+    fun getCaretBadgeLockedColor(context: Context): Int =
+        getPreferences(context)
+            .getInt(KEY_CARET_BADGE_LOCKED_COLOR, DEFAULT_CARET_BADGE_LOCKED_COLOR)
+
+    fun setCaretBadgeLockedColor(context: Context, argb: Int) {
+        getPreferences(context).edit().putInt(KEY_CARET_BADGE_LOCKED_COLOR, argb).apply()
+    }
+
     private fun normalizeModifierIndicators(stored: String?): Set<String> {
         return when (stored) {
             MODIFIER_INDICATOR_MODE_OFF -> emptySet()

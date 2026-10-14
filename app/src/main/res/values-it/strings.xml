@@ -1039,4 +1039,14 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_indicator_bottom_strip">LED, luci, striscia, in basso</string>
     <string name="kw_indicator_menu_bar">LED, luci, icona, barra di stato, indicatori</string>
     <string name="kw_indicator_status_bar">LED, luci, simboli, indicatori, plektra</string>
+    <string name="caret_modifier_badge_title">Mostra i modificatori accanto al cursore</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl e Sym compaiono accanto al cursore di testo quando sono attivi. Funziona solo nelle app che comunicano la posizione del cursore.</string>
+    <string name="caret_modifier_badge_needs_overlay">Disegnare accanto al cursore significa disegnare sopra l\'app in cui stai scrivendo, quindi Android richiede prima un permesso.</string>
+    <string name="caret_modifier_badge_grant_overlay">Consenti di disegnare sopra le app</string>
+    <string name="caret_badge_color_armed">Colore per pressione singola</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt o Ctrl armati solo per il tasto successivo</string>
+    <string name="caret_badge_color_locked">Colore per il blocco</string>
+    <string name="caret_badge_color_locked_description">Blocco maiuscole, blocco Alt e blocco Ctrl, che restano attivi finché non li disattivi</string>
+    <string name="caret_badge_color_pick">Un modificatore tenuto premuto viene mostrato in una versione sbiadita di questi colori.</string>
+    <string name="kw_caret_modifier_badge">cursore, caret, shift, alt, ctrl, sym, blocco maiuscole, overlay, badge, modificatore, indicatore</string>
 </resources>

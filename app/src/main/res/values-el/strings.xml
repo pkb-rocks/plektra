@@ -1710,4 +1710,14 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_indicator_bottom_strip">LED, LEDs, φώτα, λωρίδα, κάτω, strip, bottom</string>
     <string name="kw_indicator_menu_bar">LED, φώτα, εικονίδιο, γραμμή κατάστασης, ενδείξεις, icon, status bar, indicators</string>
     <string name="kw_indicator_status_bar">LED, φώτα, σύμβολα, ενδείξεις, plektra, lights, symbols, indicators</string>
+    <string name="caret_modifier_badge_title">Εμφάνιση τροποποιητών στον δρομέα</string>
+    <string name="caret_modifier_badge_description">Τα Shift, Alt, Ctrl και Sym εμφανίζονται δίπλα στον δρομέα κειμένου όταν είναι ενεργά. Λειτουργεί μόνο σε εφαρμογές που αναφέρουν πού βρίσκεται ο δρομέας.</string>
+    <string name="caret_modifier_badge_needs_overlay">Το σχέδιο δίπλα στον δρομέα σημαίνει σχέδιο πάνω από την εφαρμογή στην οποία πληκτρολογείτε, οπότε το Android χρειάζεται πρώτα άδεια.</string>
+    <string name="caret_modifier_badge_grant_overlay">Να επιτρέπεται η εμφάνιση πάνω από άλλες εφαρμογές</string>
+    <string name="caret_badge_color_armed">Χρώμα για ένα πάτημα</string>
+    <string name="caret_badge_color_armed_description">Τα Shift, Alt ή Ctrl οπλισμένα μόνο για το επόμενο πλήκτρο</string>
+    <string name="caret_badge_color_locked">Χρώμα κλειδώματος</string>
+    <string name="caret_badge_color_locked_description">Caps lock, κλείδωμα Alt και κλείδωμα Ctrl, που μένουν ενεργά μέχρι να τα απενεργοποιήσετε</string>
+    <string name="caret_badge_color_pick">Ένας τροποποιητής που κρατιέται πατημένος εμφανίζεται σε αχνότερη απόχρωση αυτών των χρωμάτων.</string>
+    <string name="kw_caret_modifier_badge">δρομέας, κέρσορας, shift, alt, ctrl, sym, caps lock, επικάλυψη, σήμα, τροποποιητής, ένδειξη</string>
 </resources>

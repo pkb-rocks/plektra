@@ -862,4 +862,14 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="settings_link_with_description">Նկարագրությամբ</string>
     <string name="settings_link_copied_toast">Հղումը պատճենվեց</string>
     <string name="settings_link_unavailable_toast">Այս կարգավորումը հասանելի չէ</string>
+    <string name="caret_modifier_badge_title">Ցուցադրել ձևափոխիչները կուրսորի մոտ</string>
+    <string name="caret_modifier_badge_description">Shift-ը, Alt-ը, Ctrl-ը և Sym-ը հայտնվում են տեքստի կուրսորի կողքին, երբ միացված են։ Աշխատում է միայն այն հավելվածներում, որոնք հաղորդում են կուրսորի դիրքը։</string>
+    <string name="caret_modifier_badge_needs_overlay">Կուրսորի կողքին նկարելը նշանակում է նկարել այն հավելվածի վրա, որտեղ մուտքագրում եք, ուստի Android-ը նախ թույլտվություն է պահանջում։</string>
+    <string name="caret_modifier_badge_grant_overlay">Թույլատրել նկարել հավելվածների վրա</string>
+    <string name="caret_badge_color_armed">Մեկ սեղմման գույն</string>
+    <string name="caret_badge_color_armed_description">Shift-ը, Alt-ը կամ Ctrl-ը պատրաստված են միայն հաջորդ ստեղնի համար</string>
+    <string name="caret_badge_color_locked">Կողպված գույն</string>
+    <string name="caret_badge_color_locked_description">Caps lock, Alt lock և Ctrl lock, որոնք մնում են միացված, մինչև դրանք անջատեք</string>
+    <string name="caret_badge_color_pick">Պահվող ձևափոխիչը ցուցադրվում է սրանց խամրած տարբերակով։</string>
+    <string name="kw_caret_modifier_badge">կուրսոր, caret, shift, alt, ctrl, sym, caps lock, overlay, badge, modifier, ցուցիչ</string>
 </resources>

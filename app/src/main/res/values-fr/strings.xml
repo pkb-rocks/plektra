@@ -862,4 +862,14 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="settings_link_with_description">Avec description</string>
     <string name="settings_link_copied_toast">Lien copié</string>
     <string name="settings_link_unavailable_toast">Ce paramètre n\'est pas disponible</string>
+    <string name="caret_modifier_badge_title">Afficher les modificateurs au curseur</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl et Sym apparaissent à côté du curseur de texte quand ils sont actifs. Ne fonctionne que dans les applications qui indiquent la position du curseur.</string>
+    <string name="caret_modifier_badge_needs_overlay">Dessiner à côté du curseur signifie dessiner par-dessus l\'application où vous tapez, Android a donc besoin d\'une permission d\'abord.</string>
+    <string name="caret_modifier_badge_grant_overlay">Autoriser le dessin par-dessus les applications</string>
+    <string name="caret_badge_color_armed">Couleur d\'appui unique</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt ou Ctrl armé pour la prochaine touche seulement</string>
+    <string name="caret_badge_color_locked">Couleur verrouillée</string>
+    <string name="caret_badge_color_locked_description">Verrouillage majuscules, Alt et Ctrl, qui restent actifs jusqu\'à ce que vous les désactiviez</string>
+    <string name="caret_badge_color_pick">Un modificateur maintenu enfoncé est affiché dans une version atténuée de ces couleurs.</string>
+    <string name="kw_caret_modifier_badge">curseur, caret, shift, alt, ctrl, sym, verrouillage majuscules, superposition, badge, modificateur, indicateur</string>
 </resources>

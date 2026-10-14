@@ -862,4 +862,14 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="settings_link_with_description">Z opisem</string>
     <string name="settings_link_copied_toast">Link skopiowano</string>
     <string name="settings_link_unavailable_toast">To ustawienie jest niedostępne</string>
+    <string name="caret_modifier_badge_title">Pokazuj modyfikatory przy kursorze</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl i Sym pojawiają się obok kursora tekstowego, gdy są włączone. Działa tylko w aplikacjach, które zgłaszają położenie kursora.</string>
+    <string name="caret_modifier_badge_needs_overlay">Rysowanie obok kursora oznacza rysowanie nad aplikacją, w której piszesz, więc Android najpierw wymaga uprawnienia.</string>
+    <string name="caret_modifier_badge_grant_overlay">Zezwól na rysowanie nad aplikacjami</string>
+    <string name="caret_badge_color_armed">Kolor jednorazowego naciśnięcia</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt lub Ctrl uzbrojony tylko dla następnego klawisza</string>
+    <string name="caret_badge_color_locked">Kolor blokady</string>
+    <string name="caret_badge_color_locked_description">Caps lock, blokada Alt i blokada Ctrl, które pozostają włączone, dopóki ich nie wyłączysz</string>
+    <string name="caret_badge_color_pick">Przytrzymany modyfikator jest pokazywany w wyblakłej wersji tych kolorów.</string>
+    <string name="kw_caret_modifier_badge">kursor, caret, shift, alt, ctrl, sym, caps lock, nakładka, plakietka, modyfikator, wskaźnik</string>
 </resources>

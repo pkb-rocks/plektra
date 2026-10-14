@@ -151,6 +151,8 @@ fun ModifierSettingsScreen(
                 }
             )
 
+            CaretBadgeSettingsSection()
+
             SettingsSectionDivider(stringResource(R.string.modifiers_section_sym))
             ModifierNavigationRow(
                 iconRes = R.drawable.ic_emoji_symbols_24,

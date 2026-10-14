@@ -862,4 +862,14 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="settings_link_with_description">Con descripción</string>
     <string name="settings_link_copied_toast">Enlace copiado</string>
     <string name="settings_link_unavailable_toast">Este ajuste no está disponible</string>
+    <string name="caret_modifier_badge_title">Mostrar modificadores junto al cursor</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl y Sym aparecen junto al cursor de texto siempre que estén activos. Solo funciona en aplicaciones que informan de dónde está el cursor.</string>
+    <string name="caret_modifier_badge_needs_overlay">Dibujar junto al cursor implica dibujar sobre la aplicación en la que escribe, así que Android necesita permiso primero.</string>
+    <string name="caret_modifier_badge_grant_overlay">Permitir dibujar sobre aplicaciones</string>
+    <string name="caret_badge_color_armed">Color de una pulsación</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt o Ctrl armados solo para la siguiente tecla</string>
+    <string name="caret_badge_color_locked">Color de bloqueo</string>
+    <string name="caret_badge_color_locked_description">Bloq Mayús, bloqueo de Alt y bloqueo de Ctrl, que permanecen activos hasta que los desactive</string>
+    <string name="caret_badge_color_pick">Un modificador mantenido pulsado se muestra en una versión atenuada de estos.</string>
+    <string name="kw_caret_modifier_badge">cursor, caret, shift, alt, ctrl, sym, bloq mayús, superposición, insignia, modificador, indicador</string>
 </resources>

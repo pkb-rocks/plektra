@@ -862,4 +862,14 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="settings_link_with_description">Kèm mô tả</string>
     <string name="settings_link_copied_toast">Đã sao chép liên kết</string>
     <string name="settings_link_unavailable_toast">Cài đặt này không khả dụng</string>
+    <string name="caret_modifier_badge_title">Hiện phím bổ trợ tại con trỏ</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl và Sym hiện cạnh con trỏ văn bản mỗi khi đang bật. Chỉ hoạt động trong ứng dụng báo vị trí con trỏ.</string>
+    <string name="caret_modifier_badge_needs_overlay">Vẽ cạnh con trỏ nghĩa là vẽ đè lên ứng dụng bạn đang gõ, nên Android cần cấp quyền trước.</string>
+    <string name="caret_modifier_badge_grant_overlay">Cho phép vẽ đè lên ứng dụng</string>
+    <string name="caret_badge_color_armed">Màu khi nhấn một lần</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt hoặc Ctrl chỉ sẵn sàng cho phím tiếp theo</string>
+    <string name="caret_badge_color_locked">Màu khi khóa</string>
+    <string name="caret_badge_color_locked_description">Khóa hoa, khóa Alt và khóa Ctrl, giữ bật cho tới khi bạn tắt</string>
+    <string name="caret_badge_color_pick">Phím bổ trợ đang được giữ hiện bằng phiên bản mờ của các màu này.</string>
+    <string name="kw_caret_modifier_badge">con trỏ, caret, shift, alt, ctrl, sym, caps lock, lớp phủ, huy hiệu, phím bổ trợ, chỉ báo</string>
 </resources>

@@ -1929,4 +1929,15 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="alt_space_previous_language_description">Switch backwards through visible input languages. Enabling this disables Alt+Space for the Quick Launcher; enabling the launcher shortcut disables this option.</string>
     <string name="ctrl_language_previous_title">Ctrl+language button: previous input language</string>
     <string name="ctrl_language_previous_description">On the software keyboard, hold or activate Ctrl and tap the keyboard language button to switch backwards.</string>
+    <!-- Modifier badge beside the text cursor -->
+    <string name="caret_modifier_badge_title">Show modifiers at the cursor</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl and Sym appear next to the text cursor whenever they are on. Only works in apps that report where the cursor is.</string>
+    <string name="caret_modifier_badge_needs_overlay">Drawing next to the cursor means drawing over the app you are typing in, so Android needs permission first.</string>
+    <string name="caret_modifier_badge_grant_overlay">Allow drawing over apps</string>
+    <string name="caret_badge_color_armed">One press colour</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt or Ctrl armed for the next key only</string>
+    <string name="caret_badge_color_locked">Locked colour</string>
+    <string name="caret_badge_color_locked_description">Caps lock, Alt lock and Ctrl lock, which stay on until you turn them off</string>
+    <string name="caret_badge_color_pick">A modifier being held down is shown in a faded version of these.</string>
+    <string name="kw_caret_modifier_badge">cursor, caret, shift, alt, ctrl, sym, caps lock, overlay, badge, modifier, indicator</string>
 </resources>

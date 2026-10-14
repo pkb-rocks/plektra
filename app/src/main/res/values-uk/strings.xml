@@ -862,4 +862,14 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
+    <string name="caret_modifier_badge_title">Показувати модифікатори біля курсора</string>
+    <string name="caret_modifier_badge_description">Shift, Alt, Ctrl і Sym з\'являються поруч із текстовим курсором, коли вони увімкнені. Працює лише в застосунках, які повідомляють, де курсор.</string>
+    <string name="caret_modifier_badge_needs_overlay">Малювання біля курсора означає малювання поверх застосунку, в якому ви друкуєте, тож Android спершу потребує дозволу.</string>
+    <string name="caret_modifier_badge_grant_overlay">Дозволити малювання поверх застосунків</string>
+    <string name="caret_badge_color_armed">Колір одноразового натискання</string>
+    <string name="caret_badge_color_armed_description">Shift, Alt або Ctrl, активовані лише для наступної клавіші</string>
+    <string name="caret_badge_color_locked">Колір фіксації</string>
+    <string name="caret_badge_color_locked_description">Caps Lock, фіксація Alt і Ctrl, які залишаються увімкненими, поки ви їх не вимкнете</string>
+    <string name="caret_badge_color_pick">Утримуваний модифікатор показується блідішою версією цих кольорів.</string>
+    <string name="kw_caret_modifier_badge">курсор, каретка, shift, alt, ctrl, sym, caps lock, оверлей, значок, модифікатор, індикатор</string>
 </resources>

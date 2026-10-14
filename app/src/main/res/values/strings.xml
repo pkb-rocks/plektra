@@ -1929,4 +1929,10 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="alt_space_previous_language_description">Switch backwards through visible input languages. Enabling this disables Alt+Space for the Quick Launcher; enabling the launcher shortcut disables this option.</string>
     <string name="ctrl_language_previous_title">Ctrl+language button: previous input language</string>
     <string name="ctrl_language_previous_description">On the software keyboard, hold or activate Ctrl and tap the keyboard language button to switch backwards.</string>
+    <!-- Exact Typing: per-app raw mode (no autocorrect, suggestions or auto-capitalisation) -->
+    <string name="app_raw_mode_title">Exact typing</string>
+    <string name="app_raw_mode_row_description">For terminals, SSH and code: what you type is what goes in, nothing corrected or capitalised</string>
+    <string name="app_raw_mode_description">In the apps you pick here, Plektra sends every keystroke as-is: no suggestions, no auto-correction, no capital at the start of a line, no full stop from a double space. Meant for terminals, SSH clients, code editors and anything else where a helpful correction turns a command into a typo — `ls -la` should never become `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Web app — types inside %1$s, so %1$s is excluded too</string>
+    <string name="kw_auto_correction_exact_typing">exact typing, raw, per app, terminal, termux, ssh, disable autocorrect, auto-capitalization</string>
 </resources>

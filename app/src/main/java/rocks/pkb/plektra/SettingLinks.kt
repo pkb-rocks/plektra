@@ -74,6 +74,7 @@ object SettingLinkIds {
     const val AUTO_CORRECTION_ACCENT_MATCHING = "auto_correction.accent_matching"
     const val AUTO_CORRECTION_KEYBOARD_PROXIMITY = "auto_correction.keyboard_proximity"
     const val AUTO_CORRECTION_EDIT_TYPE_RANKING = "auto_correction.edit_type_ranking"
+    const val AUTO_CORRECTION_EXACT_TYPING = "auto_correction.exact_typing"
 
     // Accessibility screen
     const val ACCESSIBILITY_LIVE_READ = "accessibility.live_read"
@@ -568,6 +569,12 @@ object SettingLinkRegistry {
             R.string.auto_correct_edit_type_ranking_description,
             destination = SettingsDestination.AutoCorrection
         ),
+        entry(
+            SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING,
+            R.string.app_raw_mode_title,
+            R.string.app_raw_mode_row_description,
+            destination = SettingsDestination.AutoCorrection
+        ),
 
         entry(
             SettingLinkIds.ACCESSIBILITY_LIVE_READ,
@@ -991,6 +998,7 @@ object SettingLinkRegistry {
         SettingLinkIds.AUTO_CORRECTION_LANGUAGES to R.string.kw_auto_correction_languages,
         SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS to R.string.kw_auto_correction_suggestions,
         SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING to R.string.kw_auto_correction_accent_matching,
+        SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING to R.string.kw_auto_correction_exact_typing,
         SettingLinkIds.ACCESSIBILITY_SUGGESTIONS_DELAY to R.string.kw_accessibility_suggestions_delay,
         SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD to R.string.kw_advanced_swipe_threshold,
         SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER to R.string.kw_modifiers_long_press_modifier,

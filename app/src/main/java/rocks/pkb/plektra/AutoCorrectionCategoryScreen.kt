@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Code
@@ -74,10 +75,11 @@ fun AutoCorrectionCategoryScreen(
     val currentDestination = when (val page = settingsChild(context, "autocorrection")) {
         "Settings" -> AutoCorrectionDestination.Settings
         "UserDictionary" -> AutoCorrectionDestination.UserDictionary
+        "AppExactTyping" -> AutoCorrectionDestination.AppExactTyping
         else -> if (page?.startsWith("Edit:") == true) AutoCorrectionDestination.Edit(page.removePrefix("Edit:")) else AutoCorrectionDestination.Main
     }
     fun navigateTo(destination: AutoCorrectionDestination) {
-        openSettingsChild(context, "autocorrection", when (destination) { AutoCorrectionDestination.Main -> "Main"; AutoCorrectionDestination.Settings -> "Settings"; AutoCorrectionDestination.UserDictionary -> "UserDictionary"; is AutoCorrectionDestination.Edit -> "Edit:${destination.languageCode}" })
+        openSettingsChild(context, "autocorrection", when (destination) { AutoCorrectionDestination.Main -> "Main"; AutoCorrectionDestination.Settings -> "Settings"; AutoCorrectionDestination.UserDictionary -> "UserDictionary"; AutoCorrectionDestination.AppExactTyping -> "AppExactTyping"; is AutoCorrectionDestination.Edit -> "Edit:${destination.languageCode}" })
     }
     fun navigateBack() { context.settingsActivity().finish() }
 
@@ -354,6 +356,50 @@ fun AutoCorrectionCategoryScreen(
                                 }
 	                            }
 
+                        // Exact Typing page: choose the apps where smart typing is off
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .settingRow(SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING) {
+                                    navigateTo(AutoCorrectionDestination.AppExactTyping)
+                                }
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Apps,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.app_raw_mode_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Medium,
+                                        maxLines = 1
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.app_raw_mode_row_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 2
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
                         // Advanced suggestions master toggle
                         Surface(
                                 modifier = Modifier
@@ -568,6 +614,13 @@ fun AutoCorrectionCategoryScreen(
                     onBack = { navigateBack() }
                 )
             }
+
+            AutoCorrectionDestination.AppExactTyping -> {
+                AppRawModeScreen(
+                    modifier = modifier,
+                    onBack = { navigateBack() }
+                )
+            }
         }
 
 }
@@ -577,6 +630,7 @@ private sealed class AutoCorrectionDestination {
     object Settings : AutoCorrectionDestination()
     data class Edit(val languageCode: String) : AutoCorrectionDestination()
     object UserDictionary : AutoCorrectionDestination()
+    object AppExactTyping : AutoCorrectionDestination()
 }
 
 private enum class UserDictSource { DEFAULT, USER }

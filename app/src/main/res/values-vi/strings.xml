@@ -862,4 +862,8 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="settings_link_with_description">Kèm mô tả</string>
     <string name="settings_link_copied_toast">Đã sao chép liên kết</string>
     <string name="settings_link_unavailable_toast">Cài đặt này không khả dụng</string>
+    <string name="app_raw_mode_title">Gõ chính xác</string>
+    <string name="app_raw_mode_row_description">Cho terminal, SSH và mã nguồn: gõ gì vào nấy, không sửa hay viết hoa</string>
+    <string name="app_raw_mode_description">Trong các ứng dụng bạn chọn ở đây, Plektra gửi nguyên từng phím bấm: không gợi ý, không sửa tự động, không viết hoa đầu dòng, không dấu chấm khi nhấn đúp dấu cách. Dành cho terminal, ứng dụng SSH, trình soạn mã và bất cứ nơi nào một sửa lỗi “hữu ích” biến lệnh thành lỗi gõ — `ls -la` không bao giờ được thành `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Ứng dụng web — gõ bên trong %1$s, nên %1$s cũng được loại trừ</string>
 </resources>

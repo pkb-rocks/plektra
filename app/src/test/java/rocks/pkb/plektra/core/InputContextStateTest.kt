@@ -66,6 +66,34 @@ class InputContextStateTest {
         assertTrue(state.shouldDisableVariations)
     }
 
+    // Exact Typing: app-wide raw mode
+    @Test
+    fun testRawModeAppDisablesSmartFeatures() {
+        val info = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
+        }
+        val state = InputContextState.fromEditorInfo(info, isRawModeApp = true)
+
+        assertTrue(state.isAppRawMode)
+        assertEquals(InputContextState.RestrictedReason.APP_RAW_MODE, state.restrictedReason)
+        assertTrue(state.shouldDisableSuggestions)
+        assertTrue(state.shouldDisableAutoCorrect)
+        assertTrue(state.shouldDisableAutoCapitalize)
+        assertTrue(state.shouldDisableDoubleSpaceToPeriod)
+        assertFalse(state.shouldDisableVariations)
+    }
+
+    @Test
+    fun testFieldRestrictionWinsOverRawMode() {
+        val info = EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        val state = InputContextState.fromEditorInfo(info, isRawModeApp = true)
+
+        assertTrue(state.isPasswordField)
+        assertFalse(state.isAppRawMode)
+    }
+
     @Test
     fun testCapFlags() {
         val info = EditorInfo().apply {

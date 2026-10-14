@@ -91,6 +91,10 @@ data class InputContextState(
     val isPasswordField: Boolean
         get() = restrictedReason == RestrictedReason.PASSWORD
 
+    /** The whole app is in raw mode (explicit "no smart typing" choice), not a field-type restriction. */
+    val isAppRawMode: Boolean
+        get() = restrictedReason == RestrictedReason.APP_RAW_MODE
+
     val isUriField: Boolean
         get() = restrictedReason == RestrictedReason.URI
 
@@ -104,7 +108,10 @@ data class InputContextState(
         PASSWORD,
         URI,
         EMAIL,
-        FILTER
+        FILTER,
+
+        /** The user disabled smart typing features for this app ("raw mode"). */
+        APP_RAW_MODE
     }
 
     companion object {
@@ -182,7 +189,7 @@ data class InputContextState(
             }
         }
 
-        fun fromEditorInfo(info: EditorInfo?): InputContextState {
+        fun fromEditorInfo(info: EditorInfo?, isRawModeApp: Boolean = false): InputContextState {
             if (info == null) {
                 Log.d(TAG, "Input field: NULL (no EditorInfo)")
                 return EMPTY
@@ -226,6 +233,9 @@ data class InputContextState(
 
                 inputVariation == InputType.TYPE_TEXT_VARIATION_FILTER ->
                     RestrictedReason.FILTER
+
+                // Field-specific reasons take precedence; raw mode covers the rest of the app.
+                isRawModeApp -> RestrictedReason.APP_RAW_MODE
 
                 else -> null
             }

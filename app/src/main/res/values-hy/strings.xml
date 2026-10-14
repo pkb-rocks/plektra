@@ -862,4 +862,8 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="settings_link_with_description">Նկարագրությամբ</string>
     <string name="settings_link_copied_toast">Հղումը պատճենվեց</string>
     <string name="settings_link_unavailable_toast">Այս կարգավորումը հասանելի չէ</string>
+    <string name="app_raw_mode_title">Ճշգրիտ մուտքագրում</string>
+    <string name="app_raw_mode_row_description">Տերմինալների, SSH-ի և կոդի համար՝ ինչ մուտքագրում եք, այն էլ մտնում է, առանց ուղղումների ու մեծատառերի</string>
+    <string name="app_raw_mode_description">Այստեղ ընտրված հավելվածներում Plektra-ը ուղարկում է յուրաքանչյուր ստեղնի սեղմումն այնպես, ինչպես կա՝ առանց առաջարկների, առանց ավտոմատ ուղղման, առանց տողի սկզբի մեծատառի, առանց կրկնակի բացատից ստացվող կետի։ Նախատեսված է տերմինալների, SSH հաճախորդների, կոդի խմբագրիչների և այն ամենի համար, որտեղ «օգտակար» ուղղումը հրահանգը վերածում է սխալի՝ `ls -la`-ն երբեք չպետք է դառնա `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Վեբ հավելված՝ մուտքագրում է %1$s-ի ներսում, ուստի %1$s-ը նույնպես բացառված է</string>
 </resources>

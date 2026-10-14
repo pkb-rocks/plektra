@@ -862,4 +862,8 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
+    <string name="app_raw_mode_title">Точный ввод</string>
+    <string name="app_raw_mode_row_description">Для терминалов, SSH и кода: что набрали, то и вводится, без исправлений и заглавных</string>
+    <string name="app_raw_mode_description">В выбранных здесь приложениях Plektra отправляет каждое нажатие как есть: без подсказок, без автоисправления, без заглавной в начале строки, без точки от двойного пробела. Предназначено для терминалов, SSH-клиентов, редакторов кода и всего прочего, где полезное исправление превращает команду в опечатку — `ls -la` никогда не должно стать `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Веб-приложение — вводит внутри %1$s, поэтому %1$s тоже исключено</string>
 </resources>

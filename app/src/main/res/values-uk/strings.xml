@@ -862,4 +862,8 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
+    <string name="app_raw_mode_title">Точне введення</string>
+    <string name="app_raw_mode_row_description">Для терміналів, SSH і коду: що ввели, те й потрапляє в поле, без виправлень і великих літер</string>
+    <string name="app_raw_mode_description">У вибраних тут застосунках Plektra надсилає кожне натискання як є: без пропозицій, без автокорекції, без великої літери на початку рядка, без крапки від подвійного пробілу. Призначено для терміналів, SSH-клієнтів, редакторів коду й усього іншого, де корисне виправлення перетворює команду на помилку — `ls -la` ніколи не має ставати `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Вебзастосунок — вводить усередині %1$s, тож %1$s також виключено</string>
 </resources>

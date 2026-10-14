@@ -862,4 +862,8 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="settings_link_with_description">Z opisem</string>
     <string name="settings_link_copied_toast">Link skopiowano</string>
     <string name="settings_link_unavailable_toast">To ustawienie jest niedostępne</string>
+    <string name="app_raw_mode_title">Dokładne pisanie</string>
+    <string name="app_raw_mode_row_description">Dla terminali, SSH i kodu: to, co wpisujesz, trafia bez zmian, bez korekt i wielkich liter</string>
+    <string name="app_raw_mode_description">W wybranych tutaj aplikacjach Plektra wysyła każde naciśnięcie klawisza bez zmian: bez sugestii, bez autokorekty, bez wielkiej litery na początku wiersza, bez kropki z podwójnej spacji. Przeznaczone dla terminali, klientów SSH, edytorów kodu i wszystkiego, gdzie pomocna korekta zamienia polecenie w literówkę — `ls -la` nigdy nie powinno stać się `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Aplikacja webowa — pisze wewnątrz %1$s, więc %1$s też jest wykluczona</string>
 </resources>

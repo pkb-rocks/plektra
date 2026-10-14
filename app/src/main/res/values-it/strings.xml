@@ -1039,4 +1039,8 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_indicator_bottom_strip">LED, luci, striscia, in basso</string>
     <string name="kw_indicator_menu_bar">LED, luci, icona, barra di stato, indicatori</string>
     <string name="kw_indicator_status_bar">LED, luci, simboli, indicatori, plektra</string>
+    <string name="app_raw_mode_title">Digitazione esatta</string>
+    <string name="app_raw_mode_row_description">Per terminali, SSH e codice: ciò che digiti è ciò che entra, senza correzioni né maiuscole</string>
+    <string name="app_raw_mode_description">Nelle app che scegli qui, Plektra invia ogni tasto così com\'è: niente suggerimenti, niente correzione automatica, niente maiuscola a inizio riga, niente punto dal doppio spazio. Pensato per terminali, client SSH, editor di codice e tutto ciò in cui una correzione ben intenzionata trasforma un comando in un errore: `ls -la` non deve mai diventare `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Web app: scrive dentro %1$s, quindi anche %1$s è escluso</string>
 </resources>

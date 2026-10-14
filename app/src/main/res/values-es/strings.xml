@@ -862,4 +862,8 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="settings_link_with_description">Con descripción</string>
     <string name="settings_link_copied_toast">Enlace copiado</string>
     <string name="settings_link_unavailable_toast">Este ajuste no está disponible</string>
+    <string name="app_raw_mode_title">Escritura exacta</string>
+    <string name="app_raw_mode_row_description">Para terminales, SSH y código: lo que escribe es lo que entra, sin corregir ni poner mayúsculas</string>
+    <string name="app_raw_mode_description">En las aplicaciones que elija aquí, Plektra envía cada pulsación tal cual: sin sugerencias, sin corrección automática, sin mayúscula al inicio de línea, sin punto por doble espacio. Pensado para terminales, clientes SSH, editores de código y cualquier otro sitio donde una corrección bienintencionada convierte un comando en un error: `ls -la` nunca debería convertirse en `Ls -la.`</string>
+    <string name="app_raw_mode_webapk_note">Aplicación web: escribe dentro de %1$s, así que %1$s también queda excluida</string>
 </resources>

@@ -6338,6 +6338,29 @@ object SettingsManager {
         )
     }
 
+    // Exact Typing (raw mode): apps in which the smart-typing features are switched off.
+    private const val KEY_APP_RAW_MODE_PACKAGES = "app_raw_mode_packages"
+
+    fun getRawModePackages(context: Context): Set<String> {
+        return getPreferences(context).getStringSet(KEY_APP_RAW_MODE_PACKAGES, emptySet()) ?: emptySet()
+    }
+
+    fun isRawModeApp(context: Context, packageName: String?): Boolean {
+        if (packageName.isNullOrEmpty()) return false
+        val packages = getRawModePackages(context)
+        if (packageName in packages) return true
+        // A raw-mode PWA types inside its host browser, so the browser must match too.
+        return packageName in rocks.pkb.plektra.inputmethod.WebApkHost.expandWithHosts(context, packages)
+    }
+
+    fun setRawModeApp(context: Context, packageName: String, enabled: Boolean) {
+        val current = getRawModePackages(context).toMutableSet()
+        if (enabled) current.add(packageName) else current.remove(packageName)
+        getPreferences(context).edit()
+            .putStringSet(KEY_APP_RAW_MODE_PACKAGES, current)
+            .apply()
+    }
+
     private fun normalizeEnterBehaviorPreset(preset: String): String {
         return when (preset) {
             ENTER_BEHAVIOR_PRESET_APP_DEFAULT,

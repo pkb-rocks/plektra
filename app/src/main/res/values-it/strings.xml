@@ -319,6 +319,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Digita per cercare. Invio apre il primo risultato.</string>
     <string name="quick_launcher_close">Chiudi</string>
+    <string name="quick_launcher_no_entries_match">Nessuna voce corrisponde a \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Aggiungi ai preferiti</string>
+    <string name="quick_launcher_remove_favorite">Rimuovi dai preferiti</string>
+    <string name="quick_launcher_hide_entry">Nascondi voce</string>
+    <string name="quick_launcher_show_entry">Mostra voce</string>
+    <string name="quick_launcher_edit_entry">Modifica voce</string>
     <string name="quick_launcher_search_placeholder">Inizia a digitare...</string>
     <string name="quick_launcher_auto_start_single">Avvia automaticamente quando resta un solo risultato</string>
     <string name="quick_launcher_auto_start_single_title">Apri automaticamente la corrispondenza unica</string>

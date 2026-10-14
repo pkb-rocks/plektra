@@ -3765,9 +3765,17 @@ object SettingsManager {
         return getLauncherShortcutsRaw(context)
     }
 
+    // parsed shortcuts keyed on the JSON they came from; every writer goes
+    // through the preference, so a changed string is the only invalidation needed.
+    @Volatile
+    private var launcherShortcutsCache: Pair<String, Map<Int, LauncherShortcut>>? = null
+
     private fun getLauncherShortcutsRaw(context: Context): Map<Int, LauncherShortcut> {
         val prefs = getPreferences(context)
         val shortcutsJson = prefs.getString(KEY_LAUNCHER_SHORTCUTS, "{}") ?: "{}"
+        launcherShortcutsCache?.let { (json, parsed) ->
+            if (json == shortcutsJson) return parsed
+        }
         val shortcuts = mutableMapOf<Int, LauncherShortcut>()
         
         try {
@@ -3796,6 +3804,7 @@ object SettingsManager {
                     )
                 }
             }
+            launcherShortcutsCache = shortcutsJson to shortcuts
         } catch (e: Exception) {
             Log.e(TAG, "Errore nel caricamento delle scorciatoie", e)
         }

@@ -285,6 +285,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Tippen zum Suchen. Enter öffnet den obersten Treffer.</string>
     <string name="quick_launcher_close">Schließen</string>
+    <string name="quick_launcher_no_entries_match">Keine Einträge passen zu \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Zu Favoriten hinzufügen</string>
+    <string name="quick_launcher_remove_favorite">Aus Favoriten entfernen</string>
+    <string name="quick_launcher_hide_entry">Eintrag ausblenden</string>
+    <string name="quick_launcher_show_entry">Eintrag anzeigen</string>
+    <string name="quick_launcher_edit_entry">Eintrag bearbeiten</string>
     <string name="quick_launcher_search_placeholder">Tippen...</string>
     <string name="quick_launcher_auto_start_single">Automatisch starten, wenn nur noch ein Treffer übrig ist</string>
     <string name="quick_launcher_auto_start_single_title">Eindeutigen Treffer automatisch öffnen</string>

@@ -653,6 +653,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Pisz, aby szukać. Enter otwiera pierwszy wynik.</string>
     <string name="quick_launcher_close">Zamknij</string>
+    <string name="quick_launcher_no_entries_match">Brak pozycji pasujących do \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Dodaj do ulubionych</string>
+    <string name="quick_launcher_remove_favorite">Usuń z ulubionych</string>
+    <string name="quick_launcher_hide_entry">Ukryj pozycję</string>
+    <string name="quick_launcher_show_entry">Pokaż pozycję</string>
+    <string name="quick_launcher_edit_entry">Edytuj pozycję</string>
     <string name="quick_launcher_search_placeholder">Zacznij pisać...</string>
     <string name="quick_launcher_auto_start_single">Uruchamiaj automatycznie, gdy zostanie tylko jeden wynik</string>
     <string name="quick_launcher_auto_start_single_title">Automatycznie otwieraj jedyne dopasowanie</string>

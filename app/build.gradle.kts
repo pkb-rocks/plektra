@@ -350,6 +350,12 @@ android {
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            it.systemProperty(
+                "plektra.eval.realDictionary",
+                providers.gradleProperty("plektra.eval.realDictionary").getOrElse("false")
+            )
+        }
     }
 }
 

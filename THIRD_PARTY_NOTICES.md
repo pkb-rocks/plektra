@@ -86,3 +86,18 @@ and their manifests. Conversion and serialization scripts live under `scripts/`.
 Provenance note: the maintained dictionary pipeline and current maintainer-provided sources point
 mainly to Leipzig/Wortschatz frequency data. Some older bundled entries predate the current
 documentation trail, so their exact upstream corpus IDs are not fully reconstructed here.
+
+<!-- vendored wireless-ADB -->
+## Shizuku wireless-ADB implementation (vendored)
+
+- Project: Shizuku, by RikkaApps
+- Source repository: https://github.com/RikkaApps/Shizuku
+- License: Apache License, Version 2.0
+- License text: `third_party/licenses/Apache-2.0.txt`
+- Vendored source: `app/src/main/java/moe/shizuku/manager/adb/` (AdbClient, AdbKey, AdbMdns, AdbMessage, AdbPairingClient, AdbPairingService, AdbProtocol, AdbException; see the NOTICE file there)
+
+Plektra's embedded broker pairs with the device's own Wireless debugging using Shizuku's ADB pairing and connection classes, vendored with the original `moe.shizuku.manager.adb` package name. This is separate from the optional Shizuku integration.
+
+The bundled prebuilt native library `libadb.so` (`app/src/main/jniLibs/arm64-v8a/libadb.so`, arm64-v8a only) is built from the Shizuku project's native `adb` module, which incorporates BoringSSL for the SPAKE2 pairing handshake and TLS. BoringSSL is distributed under the OpenSSL License / ISC-style terms documented in its source (https://boringssl.googlesource.com/boringssl). The JNI entry class name `moe/shizuku/manager/adb/PairingContext` is hardcoded in the binary and is therefore preserved in the vendored Kotlin sources.
+
+Provenance (verified 2026-10-06): `libadb.so` is byte-identical to `lib/arm64-v8a/libadb.so` in the official Shizuku v13.6.0 release APK (https://github.com/RikkaApps/Shizuku/releases/tag/v13.6.0, `shizuku-v13.6.0.r1086.2650830c-release.apk`, signed CN=Rikka), unmodified: sha256 `a4257bc05ace812afa60a81e656724a07691edd08868dc90caab3bc6d0a49207`, BuildID `dfca36a85f1a4828b17a181e6ad4235dff758df2`.

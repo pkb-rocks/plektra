@@ -109,6 +109,9 @@
     <string name="experimental_suggestions_title">Suggestions expérimentales</string>
     <string name="experimental_suggestions_subtitle">Activer le nouveau moteur de dictionnaire/suggestions (bêta)</string>
     <string name="sym_customize_title">Personnaliser le Clavier SYM</string>
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
+    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A : copier, coller, couper, tout sélectionner</string>
+    <string name="sym_edit_shortcuts_description">Dans un champ de texte, Sym avec C, V, X ou A modifie le texte au lieu de taper un symbole ou de lancer une application. Désactivé, ces quatre combinaisons reviennent à la couche SYM.</string>
     <string name="sym_auto_close_title">Fermer Automatiquement le Layout SYM</string>
     <string name="sym_auto_close_description">Ferme automatiquement le layout SYM après avoir inséré un caractère, appuyé sur Alt ou appuyé sur Entrée. Ne se ferme pas avec Control ou Shift.</string>
     <string name="sym_enable_emoji_page_title">Activer la Page Emoji</string>

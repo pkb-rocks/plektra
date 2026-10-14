@@ -111,6 +111,9 @@
     <string name="experimental_suggestions_title">Sugestie eksperymentalne</string>
     <string name="experimental_suggestions_subtitle">Włącz nowy silnik słownika/sugestii (beta)</string>
     <string name="sym_customize_title">Dostosuj Klawiaturę SYM</string>
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
+    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: kopiuj, wklej, wytnij, zaznacz wszystko</string>
+    <string name="sym_edit_shortcuts_description">W polu tekstowym Sym z C, V, X lub A edytuje tekst zamiast wpisywać symbol lub uruchamiać aplikację. Po wyłączeniu te cztery kombinacje wracają do warstwy SYM.</string>
     <string name="sym_auto_close_title">Automatycznie Zamknij Layout SYM</string>
     <string name="sym_auto_close_description">Automatycznie zamyka layout SYM po wstawieniu znaku, naciśnięciu Alt lub naciśnięciu Enter. Nie zamyka się z Control lub Shift.</string>
     <string name="sym_enable_emoji_page_title">Włącz Stronę Emoji</string>

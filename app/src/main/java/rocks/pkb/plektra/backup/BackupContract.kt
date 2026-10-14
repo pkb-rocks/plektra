@@ -421,7 +421,9 @@ internal object BackupPreferenceContract {
             "alt_enter_layout_switch" to PreferenceValueType.BOOLEAN,
             "shift_backspace_delete" to PreferenceValueType.BOOLEAN,
             "alt_backspace_delete" to PreferenceValueType.BOOLEAN,
-            "backspace_at_start_delete" to PreferenceValueType.BOOLEAN
+            "backspace_at_start_delete" to PreferenceValueType.BOOLEAN,
+            // Sym+C/V/X/A edit shortcuts toggle
+            "sym_edit_shortcuts" to PreferenceValueType.BOOLEAN
         ),
         dynamicKeys = listOf(
             PreferenceFileSchema.DynamicKey(

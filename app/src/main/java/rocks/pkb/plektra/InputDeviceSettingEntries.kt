@@ -56,6 +56,8 @@ internal fun inputDeviceSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("clicks.buttons.microphone_button", R.string.clicks_microphone_button_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.PowerKeyboard)),
     SettingEntry("clicks.number_row_input_mode", R.string.clicks_number_row_input_mode_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.PowerKeyboard)),
     SettingEntry("clicks.release_order", R.string.clicks_release_order_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.PowerKeyboard)),
+    // Sym+C/V/X/A edit shortcuts toggle
+    SettingEntry("sym.edit_shortcuts", R.string.sym_edit_shortcuts_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.auto_close", R.string.sym_auto_close_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.auto_close_touch", R.string.sym_auto_close_touch_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_height", R.string.emoji_picker_expanded_height_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),

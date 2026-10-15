@@ -1710,4 +1710,12 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_indicator_bottom_strip">LED, LEDs, φώτα, λωρίδα, κάτω, strip, bottom</string>
     <string name="kw_indicator_menu_bar">LED, φώτα, εικονίδιο, γραμμή κατάστασης, ενδείξεις, icon, status bar, indicators</string>
     <string name="kw_indicator_status_bar">LED, φώτα, σύμβολα, ενδείξεις, plektra, lights, symbols, indicators</string>
+    <string name="long_press_cycle_next_title">Συνέχεια κρατήματος για</string>
+    <string name="long_press_cycle_next_description">Κρατήστε μετά το πρώτο παρατεταμένο πάτημα για να περάσετε σε δεύτερο χαρακτήρα (με Shift και Παραλλαγές ή SYM, έπειτα σε τρίτο που εφαρμόζει και τα δύο), ώστε κεφαλαία και σύμβολα να γίνονται με ένα χέρι.</string>
+    <string name="long_press_cycle_next_off">Τίποτα (ανενεργό)</string>
+    <string name="long_press_cycle_end_title">Μετά το τελευταίο βήμα</string>
+    <string name="long_press_cycle_end_stop">Διατήρηση του τελευταίου χαρακτήρα</string>
+    <string name="long_press_cycle_end_original">Επιστροφή στον πληκτρολογημένο χαρακτήρα</string>
+    <string name="long_press_cycle_end_loop">Συνεχής εναλλαγή όσο κρατιέται</string>
+    <string name="kw_modifiers_long_press_cycle">παρατεταμένο πάτημα, κράτημα, εναλλαγή, ένα χέρι, shift, σύμβολα</string>
 </resources>

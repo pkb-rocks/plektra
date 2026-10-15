@@ -97,6 +97,8 @@ object SettingsManager {
     private const val KEY_MAX_AUTO_REPLACE_DISTANCE = "max_auto_replace_distance"
     private const val KEY_AUTO_CAPITALIZE_AFTER_PERIOD = "auto_capitalize_after_period"
     private const val KEY_LONG_PRESS_MODIFIER = "long_press_modifier" // "alt", "shift", "variations", or "sym"
+    private const val KEY_LONG_PRESS_CYCLE_NEXT = "long_press_cycle_next" // "off" or a long-press action
+    private const val KEY_LONG_PRESS_CYCLE_END = "long_press_cycle_end" // "stop", "original", or "loop"
     private const val KEY_KEYBOARD_LAYOUT = "keyboard_layout" // "qwerty", "azerty", etc.
     private const val KEY_KEYBOARD_LAYOUT_AUTO_BY_LOCALE = "keyboard_layout_auto_by_locale" // If true, resolve layout from subtype/locale mapping
     const val KEY_KEYBOARD_LAYOUT_AUTO_MAPPING_UPDATED = "keyboard_layout_auto_mapping_updated"
@@ -356,6 +358,8 @@ object SettingsManager {
     private const val DEFAULT_MAX_AUTO_REPLACE_DISTANCE = 1
     private const val DEFAULT_AUTO_CAPITALIZE_AFTER_PERIOD = true
     private const val DEFAULT_LONG_PRESS_MODIFIER = "alt"
+    private const val DEFAULT_LONG_PRESS_CYCLE_NEXT = "off"
+    private const val DEFAULT_LONG_PRESS_CYCLE_END = "stop"
     private const val DEFAULT_KEYBOARD_LAYOUT = "qwerty"
     private const val DEFAULT_KEYBOARD_LAYOUT_AUTO_BY_LOCALE = true
     private const val DEFAULT_ALT_SHIFT_LAYOUT_SWITCH = false
@@ -3522,10 +3526,68 @@ object SettingsManager {
     }
 
     /** Returns 1 for Emoji and 2 for Symbols. */
-    fun resolveLongPressSymPage(context: Context): Int = when (getLongPressModifier(context)) {
+    fun resolveLongPressSymPage(context: Context): Int =
+        resolveLongPressSymPage(context, getLongPressModifier(context))
+
+    /** Returns 1 for Emoji and 2 for Symbols for the given long-press action. */
+    fun resolveLongPressSymPage(context: Context, mode: String): Int = when (mode) {
         "sym_emoji" -> 1
         "sym_symbols" -> 2
         else -> if (getSymPagesConfig(context).prefersEmojiLongPressLayer()) 1 else 2
+    }
+
+    /**
+     * Returns the stored second long-press step: "off" or one of the long-press actions.
+     */
+    fun getLongPressCycleNextSetting(context: Context): String {
+        val stored = getPreferences(context).getString(KEY_LONG_PRESS_CYCLE_NEXT, DEFAULT_LONG_PRESS_CYCLE_NEXT)
+            ?: DEFAULT_LONG_PRESS_CYCLE_NEXT
+        return when (stored) {
+            "alt", "shift", "variations", "sym", "sym_symbols", "sym_emoji" -> stored
+            else -> DEFAULT_LONG_PRESS_CYCLE_NEXT
+        }
+    }
+
+    fun setLongPressCycleNext(context: Context, mode: String) {
+        val validMode = when (mode) {
+            "alt", "shift", "variations", "sym", "sym_symbols", "sym_emoji" -> mode
+            else -> DEFAULT_LONG_PRESS_CYCLE_NEXT
+        }
+        getPreferences(context).edit()
+            .putString(KEY_LONG_PRESS_CYCLE_NEXT, validMode)
+            .apply()
+    }
+
+    /**
+     * Returns the action that follows the first long-press action while the key stays
+     * held, or null when cycling is off or would repeat the first action.
+     */
+    fun getLongPressCycleNext(context: Context): String? {
+        val next = getLongPressCycleNextSetting(context)
+        return next.takeIf { it != DEFAULT_LONG_PRESS_CYCLE_NEXT && it != getLongPressModifier(context) }
+    }
+
+    /**
+     * Returns what happens after the last long-press step: "stop" keeps it, "original"
+     * goes back to the typed character and stops, "loop" keeps cycling while held.
+     */
+    fun getLongPressCycleEnd(context: Context): String {
+        val stored = getPreferences(context).getString(KEY_LONG_PRESS_CYCLE_END, DEFAULT_LONG_PRESS_CYCLE_END)
+            ?: DEFAULT_LONG_PRESS_CYCLE_END
+        return when (stored) {
+            "stop", "original", "loop" -> stored
+            else -> DEFAULT_LONG_PRESS_CYCLE_END
+        }
+    }
+
+    fun setLongPressCycleEnd(context: Context, end: String) {
+        val validEnd = when (end) {
+            "original", "loop" -> end
+            else -> DEFAULT_LONG_PRESS_CYCLE_END
+        }
+        getPreferences(context).edit()
+            .putString(KEY_LONG_PRESS_CYCLE_END, validEnd)
+            .apply()
     }
     
     /**

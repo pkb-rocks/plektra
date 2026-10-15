@@ -862,4 +862,12 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="settings_link_with_description">Kèm mô tả</string>
     <string name="settings_link_copied_toast">Đã sao chép liên kết</string>
     <string name="settings_link_unavailable_toast">Cài đặt này không khả dụng</string>
+    <string name="long_press_cycle_next_title">Tiếp tục giữ để</string>
+    <string name="long_press_cycle_next_description">Giữ tiếp sau lần nhấn giữ đầu tiên để chuyển sang ký tự thứ hai (với Shift và Biến thể hoặc SYM, rồi sang ký tự thứ ba áp dụng cả hai), giúp gõ chữ hoa và ký hiệu chỉ bằng một tay.</string>
+    <string name="long_press_cycle_next_off">Không (tắt)</string>
+    <string name="long_press_cycle_end_title">Sau bước cuối</string>
+    <string name="long_press_cycle_end_stop">Giữ ký tự cuối</string>
+    <string name="long_press_cycle_end_original">Quay lại ký tự đã gõ</string>
+    <string name="long_press_cycle_end_loop">Tiếp tục xoay vòng khi còn giữ</string>
+    <string name="kw_modifiers_long_press_cycle">nhấn giữ, giữ, xoay vòng, một tay, shift, ký hiệu</string>
 </resources>

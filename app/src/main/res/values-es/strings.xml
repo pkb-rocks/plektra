@@ -862,4 +862,12 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="settings_link_with_description">Con descripción</string>
     <string name="settings_link_copied_toast">Enlace copiado</string>
     <string name="settings_link_unavailable_toast">Este ajuste no está disponible</string>
+    <string name="long_press_cycle_next_title">Seguir manteniendo para</string>
+    <string name="long_press_cycle_next_description">Mantén pulsado tras la primera pulsación larga para pasar a un segundo carácter (con Shift y Variaciones o SYM, después a un tercero que aplica ambos), así las mayúsculas y los símbolos necesitan una sola mano.</string>
+    <string name="long_press_cycle_next_off">Nada (desactivado)</string>
+    <string name="long_press_cycle_end_title">Tras el último paso</string>
+    <string name="long_press_cycle_end_stop">Mantener el último carácter</string>
+    <string name="long_press_cycle_end_original">Volver al carácter escrito</string>
+    <string name="long_press_cycle_end_loop">Seguir alternando mientras se mantiene</string>
+    <string name="kw_modifiers_long_press_cycle">pulsación larga, mantener, alternar, una mano, shift, símbolos</string>
 </resources>

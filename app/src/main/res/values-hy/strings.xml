@@ -862,4 +862,12 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="settings_link_with_description">Նկարագրությամբ</string>
     <string name="settings_link_copied_toast">Հղումը պատճենվեց</string>
     <string name="settings_link_unavailable_toast">Այս կարգավորումը հասանելի չէ</string>
+    <string name="long_press_cycle_next_title">Շարունակել պահել՝</string>
+    <string name="long_press_cycle_next_description">Առաջին երկար սեղմումից հետո շարունակեք պահել՝ երկրորդ նիշին անցնելու համար (Shift-ի և Տարբերակների կամ SYM-ի դեպքում՝ ապա երրորդին, որը կիրառում է երկուսը), որպեսզի մեծատառերն ու նշանները պահանջեն միայն մեկ ձեռք։</string>
+    <string name="long_press_cycle_next_off">Ոչինչ (անջատված)</string>
+    <string name="long_press_cycle_end_title">Վերջին քայլից հետո</string>
+    <string name="long_press_cycle_end_stop">Պահել վերջին նիշը</string>
+    <string name="long_press_cycle_end_original">Վերադառնալ մուտքագրված նիշին</string>
+    <string name="long_press_cycle_end_loop">Շարունակել փոխել, քանի դեռ պահվում է</string>
+    <string name="kw_modifiers_long_press_cycle">երկար սեղմում, պահել, փոխել, մեկ ձեռք, shift, նշաններ</string>
 </resources>

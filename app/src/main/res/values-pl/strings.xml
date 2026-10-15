@@ -862,4 +862,12 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="settings_link_with_description">Z opisem</string>
     <string name="settings_link_copied_toast">Link skopiowano</string>
     <string name="settings_link_unavailable_toast">To ustawienie jest niedostępne</string>
+    <string name="long_press_cycle_next_title">Przytrzymaj dłużej dla</string>
+    <string name="long_press_cycle_next_description">Przytrzymaj po pierwszym długim naciśnięciu, aby przejść do drugiego znaku (przy Shift i Wariantach lub SYM – potem do trzeciego, który stosuje oba) – wielkie litery i symbole jedną ręką.</string>
+    <string name="long_press_cycle_next_off">Nic (wyłączone)</string>
+    <string name="long_press_cycle_end_title">Po ostatnim kroku</string>
+    <string name="long_press_cycle_end_stop">Zachowaj ostatni znak</string>
+    <string name="long_press_cycle_end_original">Wróć do wpisanego znaku</string>
+    <string name="long_press_cycle_end_loop">Przełączaj dalej, dopóki trzymasz</string>
+    <string name="kw_modifiers_long_press_cycle">długie naciśnięcie, przytrzymaj, przełączaj, jedna ręka, shift, symbole</string>
 </resources>

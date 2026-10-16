@@ -351,13 +351,8 @@ class ClipboardHistoryView(
                     true
                 }
                 deleteText -> {
-                    val index = (0 until clipboardHistoryManager.getHistorySize()).firstOrNull { idx ->
-                        clipboardHistoryManager.getHistoryEntry(idx)?.id == entry.id
-                    }
-                    index?.let {
-                        clipboardHistoryManager.removeEntry(it, force = true)
-                        refresh()
-                    }
+                    clipboardHistoryManager.removeEntryById(entry.id, force = true)
+                    refresh()
                     true
                 }
                 else -> false

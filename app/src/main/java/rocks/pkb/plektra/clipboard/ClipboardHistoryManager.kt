@@ -23,12 +23,16 @@ class ClipboardHistoryManager internal constructor(
 
     private lateinit var clipboardManager: ClipboardManager
     private var clipboardDao: ClipboardDao? = null
+
+    // A DAO that failed to open at startup is retried on the next use instead of staying null.
+    private val dao: ClipboardDao?
+        get() = clipboardDao ?: ClipboardDao.getInstance(context).also { clipboardDao = it }
     private var isEnabled: Boolean = true // TODO: Add setting
     private var deviceStateReceiverRegistered = false
     private var screenOffReceived = false
     private var lastHistoryAccessible: Boolean? = null
-    private val historyChangeListeners = linkedSetOf<() -> Unit>()
-    private var externalHistoryListener: ClipboardDao.Listener? = null
+    private val historyChangeListeners = java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
+    @Volatile private var externalHistoryListener: ClipboardDao.Listener? = null
     private val daoListener = object : ClipboardDao.Listener {
         override fun onClipInserted(position: Int) {
             externalHistoryListener?.onClipInserted(position)
@@ -42,8 +46,12 @@ class ClipboardHistoryManager internal constructor(
             externalHistoryListener?.onClipMoved(oldPosition, newPosition)
             notifyHistoryChanged()
         }
+        override fun onHistoryLoaded() {
+            externalHistoryListener?.onHistoryLoaded()
+            notifyHistoryChanged()
+        }
     }
-    private fun notifyHistoryChanged() = historyChangeListeners.toList().forEach { it() }
+    private fun notifyHistoryChanged() = historyChangeListeners.forEach { it() }
 
     private val accessStateListeners = linkedSetOf<(Boolean) -> Unit>()
     private val deviceStateReceiver = object : BroadcastReceiver() {
@@ -57,7 +65,7 @@ class ClipboardHistoryManager internal constructor(
         clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.addPrimaryClipChangedListener(this)
         clipboardDao = ClipboardDao.getInstance(context)
-        clipboardDao?.listener = daoListener
+        dao?.listener = daoListener
         registerDeviceStateReceiver()
         lastHistoryAccessible = isHistoryAccessible()
 
@@ -101,19 +109,19 @@ class ClipboardHistoryManager internal constructor(
             if (!isHistoryAccessible()) return
 
             val retentionMinutes = getClipboardRetentionTime()
-            clipboardDao?.addClip(timeStamp, false, content.toString(), retentionMinutes, sensitive,
+            dao?.addClip(timeStamp, false, content.toString(), retentionMinutes, sensitive,
                 SettingsManager.getSensitiveClipboardRetentionTime(context))
         }
     }
 
     fun toggleClipPinned(id: Long) {
         if (getHistoryEntryContent(id) == null) return
-        clipboardDao?.togglePinned(id)
+        dao?.togglePinned(id)
     }
 
     fun clearHistory() {
         if (!isHistoryAccessible()) return
-        clipboardDao?.clearNonPinned()
+        dao?.clearNonPinned()
         try {
             // Clear system clipboard (API 28+)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -124,51 +132,46 @@ class ClipboardHistoryManager internal constructor(
         }
     }
 
-    fun canRemove(index: Int) = isHistoryAccessible() && clipboardDao?.isPinned(index) == false
+    fun canRemove(index: Int) = isHistoryAccessible() && dao?.isPinned(index) == false
 
     fun removeEntry(index: Int, force: Boolean = false) {
-        if (!isHistoryAccessible()) return
         val entry = getHistoryEntry(index) ?: return
+        removeEntryById(entry.id, force)
+    }
+
+    fun removeEntryById(id: Long, force: Boolean = false) {
+        val entry = getHistoryEntryContent(id) ?: return
 
         // For UX: allow deleting pinned entries when explicitly requested (force=true)
         if (entry.isPinned && !force) return
 
-        if (entry.isPinned && force) {
-            // Unpin first so DAO allows removal, then delete using the updated position
-            toggleClipPinned(entry.id)
-            val updatedIndex = (0 until getHistorySize()).firstOrNull { idx ->
-                getHistoryEntry(idx)?.id == entry.id
-            }
-            updatedIndex?.let { clipboardDao?.deleteClipAt(it) }
-        } else {
-            clipboardDao?.deleteClipAt(index)
-        }
+        dao?.deleteClip(entry.id)
     }
 
     fun sortHistoryEntries() {
         if (!isHistoryAccessible()) return
-        clipboardDao?.sort()
+        dao?.sort()
     }
 
     fun prepareClipboardHistory() {
         // Clear old clips before showing history
         val retentionMinutes = getClipboardRetentionTime()
-        clipboardDao?.clearOldClips(true, retentionMinutes, SettingsManager.getSensitiveClipboardRetentionTime(context))
+        dao?.clearOldClips(true, retentionMinutes, SettingsManager.getSensitiveClipboardRetentionTime(context))
     }
 
     fun getHistorySize(): Int {
         prepareClipboardHistory()
-        return if (isHistoryAccessible()) clipboardDao?.count() ?: 0 else 0
+        return if (isHistoryAccessible()) dao?.count() ?: 0 else 0
     }
 
     fun getHistoryEntry(position: Int): ClipboardHistoryEntry? {
         prepareClipboardHistory()
-        return if (isHistoryAccessible()) clipboardDao?.getAt(position) else null
+        return if (isHistoryAccessible()) dao?.getAt(position) else null
     }
 
     fun getHistoryEntryContent(id: Long): ClipboardHistoryEntry? {
         prepareClipboardHistory()
-        return if (isHistoryAccessible()) clipboardDao?.get(id) else null
+        return if (isHistoryAccessible()) dao?.get(id) else null
     }
 
     fun pasteEntry(id: Long, inputConnection: android.view.inputmethod.InputConnection?) {
@@ -231,12 +234,7 @@ class ClipboardHistoryManager internal constructor(
                 toggleClipPinned(entry.id)
             }
             setOnDeleteClickListener { entry ->
-                val index = getHistoryEntry(0)?.let {
-                    (0 until getHistorySize()).find { idx ->
-                        getHistoryEntry(idx)?.id == entry.id
-                    }
-                }
-                index?.let { removeEntry(it, force = true) }
+                removeEntryById(entry.id, force = true)
             }
             setOnClearAllClickListener {
                 clearHistory()

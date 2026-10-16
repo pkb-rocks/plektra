@@ -18,6 +18,16 @@ object Punctuation {
     const val FRENCH_SPACED_PUNCTUATION: String = "?!;:"
     const val COMMA_SPACE_PUNCTUATION: Char = ','
 
+    // Opening quotes and brackets that may come before a sentence's first letter, as
+    // TextUtils.getCapsMode skips them, plus the Spanish inverted marks.
+    fun isOpeningPunctuation(c: Char): Boolean = when (c) {
+        '"', '\'', '(', '[', '{', '¿', '¡' -> true
+        else -> Character.getType(c).let {
+            it == Character.START_PUNCTUATION.toInt() ||
+                it == Character.INITIAL_QUOTE_PUNCTUATION.toInt()
+        }
+    }
+
     // Normalize curly/variant apostrophes to straight.
     fun normalizeApostrophe(c: Char): Char = when (c) {
         '’', '‘', 'ʼ' -> '\''

@@ -862,4 +862,33 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="settings_link_with_description">Avec description</string>
     <string name="settings_link_copied_toast">Lien copié</string>
     <string name="settings_link_unavailable_toast">Ce paramètre n\'est pas disponible</string>
+    <!-- djb/screen-trackpad: screen trackpad strings -->
+    <string name="screen_trackpad_title">Trackpad d\'écran</string>
+    <string name="screen_trackpad_description">Maintenez une touche et balayez n\'importe où sur l\'écran pour déplacer le curseur</string>
+    <string name="screen_trackpad_enabled_title">Activer le trackpad d\'écran</string>
+    <string name="screen_trackpad_enabled_description">Transforme tout l\'écran en trackpad de curseur tant que la touche déclencheuse est active</string>
+    <string name="screen_trackpad_permission_title">Affichage par-dessus les autres applications</string>
+    <string name="screen_trackpad_permission_granted">Permission accordée</string>
+    <string name="screen_trackpad_permission_missing">Permission non accordée : touchez pour ouvrir les paramètres système</string>
+    <string name="screen_trackpad_permission_toast">Le trackpad d\'écran nécessite « Affichage par-dessus les autres applications ». Activez-le dans les paramètres de Plektra.</string>
+    <string name="screen_trackpad_trigger_key_title">Touche déclencheuse</string>
+    <string name="screen_trackpad_trigger_space">Espace</string>
+    <string name="screen_trackpad_trigger_shift_left">Shift gauche</string>
+    <string name="screen_trackpad_trigger_shift_right">Shift droit</string>
+    <string name="screen_trackpad_trigger_shift_either">L\'un ou l\'autre Shift</string>
+    <string name="screen_trackpad_trigger_sym">Sym</string>
+    <string name="screen_trackpad_activation_title">Activation par</string>
+    <string name="screen_trackpad_activation_hold">Maintien (actif tant que la touche est enfoncée)</string>
+    <string name="screen_trackpad_activation_double_tap">Double appui (reste actif jusqu\'au prochain appui)</string>
+    <string name="screen_trackpad_activation_single_tap">Appui simple (reste actif jusqu\'au prochain appui)</string>
+    <string name="screen_trackpad_activation_hold_note">Un appui rapide tape toujours la touche normalement. Maintenez Shift en balayant pour sélectionner du texte.</string>
+    <string name="screen_trackpad_activation_sticky_note">Touchez la touche déclencheuse, la touche Retour ou la pastille à l\'écran pour quitter. L\'appui simple s\'approprie complètement la touche : ne l\'utilisez qu\'avec une touche qui ne sert pas à taper.</string>
+    <string name="screen_trackpad_sensitivity_title">Sensibilité</string>
+    <string name="screen_trackpad_sensitivity_description">Pixels de balayage par pas de curseur : plus bas, plus rapide</string>
+    <string name="screen_trackpad_hint_enabled_title">Afficher l\'indication à l\'écran</string>
+    <string name="screen_trackpad_hint_enabled_description">Petite pastille en haut de l\'écran tant que le trackpad est actif</string>
+    <string name="screen_trackpad_hint_cursor">✥ Curseur</string>
+    <string name="screen_trackpad_hint_select">⇧ Sélection</string>
+    <string name="screen_trackpad_hint_sticky">✥ Curseur · toucher pour quitter</string>
+    <string name="kw_screen_trackpad">trackpad, curseur, glisser, écran tactile, barre d\'espace, maintenir, flèches, sélectionner, swipe</string>
 </resources>

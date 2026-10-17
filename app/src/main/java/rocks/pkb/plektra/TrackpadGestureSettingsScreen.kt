@@ -53,6 +53,8 @@ fun TrackpadGestureSettingsScreen(
     }
     var showTutorialDialog by remember { mutableStateOf(false) }
     var showSensitivitySettings by remember { mutableStateOf(settingsChild(context, "trackpad") == "sensitivity") }
+    // child page (hold a key, swipe anywhere on the screen to move the cursor)
+    var showScreenTrackpadSettings by remember { mutableStateOf(settingsChild(context, "trackpad") == "screen") }
     var shizukuStatus by remember { mutableStateOf(ShizukuStatus.NotConnected) }
     var trackpadProvider by remember { mutableStateOf(SettingsManager.getTrackpadProvider(context)) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
@@ -86,7 +88,18 @@ fun TrackpadGestureSettingsScreen(
             SettingLinkIds.TRACKPAD_PROVIDER,
             SettingLinkIds.TRACKPAD_SHIZUKU_DEVICE,
             SettingLinkIds.TRACKPAD_SENSITIVITY,
+            SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD,
             SettingLinkIds.TRACKPAD_DEBUG -> showSensitivitySettings = false
+        }
+    }
+    // deep links to the child page's rows open it in place
+    LaunchedEffect(highlightedSettingId) {
+        when (highlightedSettingId) {
+            SettingLinkIds.SCREEN_TRACKPAD_ENABLED,
+            SettingLinkIds.SCREEN_TRACKPAD_TRIGGER_KEY,
+            SettingLinkIds.SCREEN_TRACKPAD_ACTIVATION,
+            SettingLinkIds.SCREEN_TRACKPAD_SENSITIVITY,
+            SettingLinkIds.SCREEN_TRACKPAD_SHOW_HINT -> showScreenTrackpadSettings = true
         }
     }
     LaunchedEffect(Unit) {
@@ -110,6 +123,15 @@ fun TrackpadGestureSettingsScreen(
                     shizukuDeviceDiscoveryFailed = true
                 }
         }
+    }
+
+    // the child page brings its own top bar
+    if (showScreenTrackpadSettings) {
+        ScreenTrackpadSettingsScreen(
+            modifier = modifier,
+            onBack = { context.settingsActivity().finish() }
+        )
+        return
     }
 
     Scaffold(
@@ -624,6 +646,50 @@ fun TrackpadGestureSettingsScreen(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // row opening the screen trackpad child page
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .settingRow(SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD) {
+                        openSettingsChild(context, "trackpad", "screen")
+                    }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.OpenWith,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.screen_trackpad_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = stringResource(R.string.screen_trackpad_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2
+                        )
+                    }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,

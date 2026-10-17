@@ -862,4 +862,33 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="settings_link_with_description">Kèm mô tả</string>
     <string name="settings_link_copied_toast">Đã sao chép liên kết</string>
     <string name="settings_link_unavailable_toast">Cài đặt này không khả dụng</string>
+    <!-- djb/screen-trackpad: screen trackpad strings -->
+    <string name="screen_trackpad_title">Bàn di chuột màn hình</string>
+    <string name="screen_trackpad_description">Giữ một phím và vuốt bất cứ đâu trên màn hình để di chuyển con trỏ</string>
+    <string name="screen_trackpad_enabled_title">Bật bàn di chuột màn hình</string>
+    <string name="screen_trackpad_enabled_description">Biến toàn bộ màn hình thành bàn di chuột con trỏ khi phím kích hoạt đang hoạt động</string>
+    <string name="screen_trackpad_permission_title">Hiển thị trên ứng dụng khác</string>
+    <string name="screen_trackpad_permission_granted">Đã cấp quyền</string>
+    <string name="screen_trackpad_permission_missing">Chưa cấp quyền — chạm để mở cài đặt hệ thống</string>
+    <string name="screen_trackpad_permission_toast">Bàn di chuột màn hình cần quyền “Hiển thị trên ứng dụng khác”. Bật trong cài đặt Plektra.</string>
+    <string name="screen_trackpad_trigger_key_title">Phím kích hoạt</string>
+    <string name="screen_trackpad_trigger_space">Space</string>
+    <string name="screen_trackpad_trigger_shift_left">Shift trái</string>
+    <string name="screen_trackpad_trigger_shift_right">Shift phải</string>
+    <string name="screen_trackpad_trigger_shift_either">Shift bất kỳ</string>
+    <string name="screen_trackpad_trigger_sym">Sym</string>
+    <string name="screen_trackpad_activation_title">Kích hoạt bằng</string>
+    <string name="screen_trackpad_activation_hold">Giữ (hoạt động khi đang giữ)</string>
+    <string name="screen_trackpad_activation_double_tap">Nhấn đúp (bật cho tới khi nhấn lại)</string>
+    <string name="screen_trackpad_activation_single_tap">Nhấn một lần (bật cho tới khi nhấn lại)</string>
+    <string name="screen_trackpad_activation_hold_note">Nhấn nhanh vẫn gõ phím bình thường. Giữ Shift khi vuốt để chọn văn bản.</string>
+    <string name="screen_trackpad_activation_sticky_note">Nhấn phím kích hoạt, phím Quay lại hoặc viên thuốc trên màn hình để thoát. Nhấn một lần chiếm hoàn toàn phím đó — chỉ dùng với phím bạn không gõ.</string>
+    <string name="screen_trackpad_sensitivity_title">Độ nhạy</string>
+    <string name="screen_trackpad_sensitivity_description">Số pixel vuốt cho mỗi bước con trỏ — thấp hơn là nhanh hơn</string>
+    <string name="screen_trackpad_hint_enabled_title">Hiện gợi ý trên màn hình</string>
+    <string name="screen_trackpad_hint_enabled_description">Viên thuốc nhỏ ở đầu màn hình khi bàn di chuột đang hoạt động</string>
+    <string name="screen_trackpad_hint_cursor">✥ Con trỏ</string>
+    <string name="screen_trackpad_hint_select">⇧ Chọn</string>
+    <string name="screen_trackpad_hint_sticky">✥ Con trỏ · chạm để thoát</string>
+    <string name="kw_screen_trackpad">bàn di chuột, con trỏ, vuốt, màn hình cảm ứng, phím cách, giữ, phím mũi tên, chọn, trackpad, cursor, swipe</string>
 </resources>

@@ -107,6 +107,14 @@ object SettingLinkIds {
     const val TRACKPAD_DELETE_SWIPE_THRESHOLD = "trackpad.delete_swipe_threshold"
     const val TRACKPAD_DEBUG = "trackpad.debug"
 
+    // child page of the trackpad gesture screen
+    const val TRACKPAD_SCREEN_TRACKPAD = "trackpad.screen_trackpad"
+    const val SCREEN_TRACKPAD_ENABLED = "screen_trackpad.enabled"
+    const val SCREEN_TRACKPAD_TRIGGER_KEY = "screen_trackpad.trigger_key"
+    const val SCREEN_TRACKPAD_ACTIVATION = "screen_trackpad.activation"
+    const val SCREEN_TRACKPAD_SENSITIVITY = "screen_trackpad.sensitivity"
+    const val SCREEN_TRACKPAD_SHOW_HINT = "screen_trackpad.show_hint"
+
     // Modifiers screen
     const val MODIFIERS_LONG_PRESS_MODIFIER = "modifiers.long_press_modifier"
     const val MODIFIERS_LONG_PRESS_THRESHOLD = "modifiers.long_press_threshold"
@@ -725,6 +733,41 @@ object SettingLinkRegistry {
             R.string.trackpad_debug_description,
             destination = SettingsDestination.Advanced
         ),
+        // hold a key and swipe anywhere on the screen to move the cursor
+        entry(
+            SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD,
+            R.string.screen_trackpad_title,
+            R.string.screen_trackpad_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.SCREEN_TRACKPAD_ENABLED,
+            R.string.screen_trackpad_enabled_title,
+            R.string.screen_trackpad_enabled_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.SCREEN_TRACKPAD_TRIGGER_KEY,
+            R.string.screen_trackpad_trigger_key_title,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.SCREEN_TRACKPAD_ACTIVATION,
+            R.string.screen_trackpad_activation_title,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.SCREEN_TRACKPAD_SENSITIVITY,
+            R.string.screen_trackpad_sensitivity_title,
+            R.string.screen_trackpad_sensitivity_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.SCREEN_TRACKPAD_SHOW_HINT,
+            R.string.screen_trackpad_hint_enabled_title,
+            R.string.screen_trackpad_hint_enabled_description,
+            destination = SettingsDestination.Advanced
+        ),
 
         entry(
             SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER,
@@ -993,6 +1036,8 @@ object SettingLinkRegistry {
         SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING to R.string.kw_auto_correction_accent_matching,
         SettingLinkIds.ACCESSIBILITY_SUGGESTIONS_DELAY to R.string.kw_accessibility_suggestions_delay,
         SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD to R.string.kw_advanced_swipe_threshold,
+        // search synonyms
+        SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD to R.string.kw_screen_trackpad,
         SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER to R.string.kw_modifiers_long_press_modifier,
         SettingLinkIds.MODIFIERS_LONG_PRESS_THRESHOLD to R.string.kw_modifiers_long_press_threshold,
         SettingLinkIds.MODIFIERS_INDICATORS to R.string.kw_modifier_indicators,

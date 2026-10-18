@@ -56,6 +56,12 @@ class FullSuggestionsBar(
         private val DEFAULT_SUGGESTION_COLOR = Color.argb(100, 17, 17, 17)
         private const val FLASH_DURATION_MS = 160L
         private const val BASE_HEIGHT_DP = 36f
+        // Slim already carries its menu buttons in this row, so a shorter row keeps the whole bar compact.
+        private const val SLIM_BASE_HEIGHT_DP = 28f
+
+        /** Row height in dp for the active keyboard-bar profile and theme suggestions height. */
+        internal fun rowHeightDp(slim: Boolean, heightScale: Float): Float =
+            (if (slim) SLIM_BASE_HEIGHT_DP else BASE_HEIGHT_DP) * heightScale.coerceIn(0.65f, 1.6f)
     }
 
     private var container: LinearLayout? = null
@@ -120,7 +126,7 @@ class FullSuggestionsBar(
     }
 
     private val targetHeightPx: Int
-        get() = dpToPx(BASE_HEIGHT_DP * (themeOverride?.suggestionsHeightScale ?: 1f).coerceIn(0.65f, 1.6f))
+        get() = dpToPx(rowHeightDp(lastMinimalUiActive == true, themeOverride?.suggestionsHeightScale ?: 1f))
 
     /**
      * Sets the assets and IME service class needed for subtype cycling.
@@ -299,7 +305,13 @@ class FullSuggestionsBar(
     }
 
     fun setMinimalUiActive(isActive: Boolean) {
+        val heightChanged = (lastMinimalUiActive == true) != isActive
         lastMinimalUiActive = isActive
+        if (heightChanged) {
+            // Suggestion surfaces derive their corner radius from the row height.
+            if (lastSlots.isNotEmpty()) lastSlots = emptyList()
+            applyHeight()
+        }
         renderMinimalUiButtons()
         hamburgerMenuView?.setMinimalUiActive(isActive)
     }
@@ -506,8 +518,12 @@ class FullSuggestionsBar(
     private fun outerButtonExtraPx(): Int =
         if (rocks.pkb.plektra.SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) dpToPx(8f) else 0
 
+    // The 24dp floor never exceeds the row, which can be shorter than that in Slim.
+    private fun minimalButtonSizePx(): Int =
+        (targetHeightPx - dpToPx(4f)).coerceAtLeast(minOf(dpToPx(24f), targetHeightPx))
+
     private fun minimalButtonWidthPx(): Int {
-        val size = (targetHeightPx - dpToPx(4f)).coerceAtLeast(dpToPx(24f))
+        val size = minimalButtonSizePx()
         return if (rocks.pkb.plektra.SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) {
             maxOf(dpToPx(56f), (size * 1.6f).toInt())
         } else size
@@ -527,7 +543,7 @@ class FullSuggestionsBar(
             return
         }
 
-        val buttonSize = (targetHeightPx - dpToPx(4f)).coerceAtLeast(dpToPx(24f))
+        val buttonSize = minimalButtonSizePx()
         val buttonWidth = minimalButtonWidthPx()
         val buttonHeight = if (rocks.pkb.plektra.SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) {
             targetHeightPx

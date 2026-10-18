@@ -1039,4 +1039,12 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_indicator_bottom_strip">LED, luci, striscia, in basso</string>
     <string name="kw_indicator_menu_bar">LED, luci, icona, barra di stato, indicatori</string>
     <string name="kw_indicator_status_bar">LED, luci, simboli, indicatori, plektra</string>
+    <string name="long_press_cycle_next_title">Continua a tenere premuto per</string>
+    <string name="long_press_cycle_next_description">Tieni premuto oltre la prima pressione lunga per passare a un secondo carattere (con Maiusc e Varianti o SYM, poi a un terzo che applica entrambi), così maiuscole e simboli richiedono una sola mano.</string>
+    <string name="long_press_cycle_next_off">Niente (disattivato)</string>
+    <string name="long_press_cycle_end_title">Dopo l\'ultimo passo</string>
+    <string name="long_press_cycle_end_stop">Mantieni l\'ultimo carattere</string>
+    <string name="long_press_cycle_end_original">Torna al carattere digitato</string>
+    <string name="long_press_cycle_end_loop">Continua a ciclare finché tieni premuto</string>
+    <string name="kw_modifiers_long_press_cycle">pressione lunga, tieni premuto, ciclo, una mano, shift, simboli</string>
 </resources>

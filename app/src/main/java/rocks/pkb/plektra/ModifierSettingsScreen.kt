@@ -56,6 +56,8 @@ fun ModifierSettingsScreen(
     val context = LocalContext.current
     var longPressModifier by remember { mutableStateOf(SettingsManager.getLongPressModifier(context)) }
     var longPressThreshold by remember { mutableStateOf(SettingsManager.getLongPressThreshold(context)) }
+    var longPressCycleNext by remember { mutableStateOf(SettingsManager.getLongPressCycleNextSetting(context)) }
+    var longPressCycleEnd by remember { mutableStateOf(SettingsManager.getLongPressCycleEnd(context)) }
     var altBinding by remember { mutableStateOf(SettingsManager.getAltModifierBinding(context)) }
     var shiftTapLatches by remember { mutableStateOf(SettingsManager.getShiftTapLatches(context)) }
     var altTapLatches by remember { mutableStateOf(SettingsManager.getAltTapLatches(context)) }
@@ -65,6 +67,8 @@ fun ModifierSettingsScreen(
 
     var showSymShortcutCompatibilityInfo by remember { mutableStateOf(false) }
     var longPressExpanded by remember { mutableStateOf(false) }
+    var longPressCycleNextExpanded by remember { mutableStateOf(false) }
+    var longPressCycleEndExpanded by remember { mutableStateOf(false) }
     var altBindingExpanded by remember { mutableStateOf(false) }
 
     val longPressOptions = listOf(
@@ -75,6 +79,14 @@ fun ModifierSettingsScreen(
         "sym_symbols" to stringResource(R.string.long_press_modifier_sym_symbols),
         "sym_emoji" to stringResource(R.string.long_press_modifier_sym_emoji)
     )
+    val longPressCycleNextOptions = listOf("off" to stringResource(R.string.long_press_cycle_next_off)) +
+        longPressOptions.filter { it.first != longPressModifier }
+    val longPressCycleEndOptions = listOf(
+        "stop" to stringResource(R.string.long_press_cycle_end_stop),
+        "original" to stringResource(R.string.long_press_cycle_end_original),
+        "loop" to stringResource(R.string.long_press_cycle_end_loop)
+    )
+    val longPressCycleActive = longPressCycleNext != "off" && longPressCycleNext != longPressModifier
     val altBindingOptions = listOf(
         AltModifierBinding.DeviceSym to stringResource(R.string.alt_binding_current_device),
         AltModifierBinding.FirstEnabledSymKeyLayer to stringResource(R.string.alt_binding_first_key_layer),
@@ -142,6 +154,39 @@ fun ModifierSettingsScreen(
                     longPressExpanded = false
                 }
             )
+            ModifierDropdownRow(
+                title = stringResource(R.string.long_press_cycle_next_title),
+                description = stringResource(R.string.long_press_cycle_next_description),
+                value = longPressCycleNextOptions.firstOrNull { it.first == longPressCycleNext && longPressCycleActive }?.second
+                    ?: longPressCycleNextOptions.first().second,
+                linkId = SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_NEXT,
+                expanded = longPressCycleNextExpanded,
+                onExpand = { longPressCycleNextExpanded = true },
+                onDismiss = { longPressCycleNextExpanded = false },
+                options = longPressCycleNextOptions,
+                onSelected = { value ->
+                    longPressCycleNext = value
+                    SettingsManager.setLongPressCycleNext(context, value)
+                    longPressCycleNextExpanded = false
+                }
+            )
+            if (longPressCycleActive) {
+                ModifierDropdownRow(
+                    title = stringResource(R.string.long_press_cycle_end_title),
+                    value = longPressCycleEndOptions.firstOrNull { it.first == longPressCycleEnd }?.second
+                        ?: longPressCycleEndOptions.first().second,
+                    linkId = SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_END,
+                    expanded = longPressCycleEndExpanded,
+                    onExpand = { longPressCycleEndExpanded = true },
+                    onDismiss = { longPressCycleEndExpanded = false },
+                    options = longPressCycleEndOptions,
+                    onSelected = { value ->
+                        longPressCycleEnd = value
+                        SettingsManager.setLongPressCycleEnd(context, value)
+                        longPressCycleEndExpanded = false
+                    }
+                )
+            }
             ModifierLongPressThresholdRow(
                 threshold = longPressThreshold,
                 linkId = SettingLinkIds.MODIFIERS_LONG_PRESS_THRESHOLD,

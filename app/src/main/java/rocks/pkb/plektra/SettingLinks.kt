@@ -110,6 +110,8 @@ object SettingLinkIds {
     // Modifiers screen
     const val MODIFIERS_LONG_PRESS_MODIFIER = "modifiers.long_press_modifier"
     const val MODIFIERS_LONG_PRESS_THRESHOLD = "modifiers.long_press_threshold"
+    const val MODIFIERS_LONG_PRESS_CYCLE_NEXT = "modifiers.long_press_cycle_next"
+    const val MODIFIERS_LONG_PRESS_CYCLE_END = "modifiers.long_press_cycle_end"
     const val MODIFIERS_INDICATORS = "modifiers.indicators"
     const val MODIFIERS_SYM_LAYERS = "modifiers.sym_layers"
     const val MODIFIERS_SYM_SHORTCUTS = "modifiers.sym_shortcuts"
@@ -737,6 +739,17 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Modifiers
         ),
         entry(
+            SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_NEXT,
+            R.string.long_press_cycle_next_title,
+            R.string.long_press_cycle_next_description,
+            destination = SettingsDestination.Modifiers
+        ),
+        entry(
+            SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_END,
+            R.string.long_press_cycle_end_title,
+            destination = SettingsDestination.Modifiers
+        ),
+        entry(
             SettingLinkIds.MODIFIERS_INDICATORS,
             R.string.modifier_indicators_title,
             R.string.modifier_indicators_description,
@@ -995,6 +1008,8 @@ object SettingLinkRegistry {
         SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD to R.string.kw_advanced_swipe_threshold,
         SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER to R.string.kw_modifiers_long_press_modifier,
         SettingLinkIds.MODIFIERS_LONG_PRESS_THRESHOLD to R.string.kw_modifiers_long_press_threshold,
+        SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_NEXT to R.string.kw_modifiers_long_press_cycle,
+        SettingLinkIds.MODIFIERS_LONG_PRESS_CYCLE_END to R.string.kw_modifiers_long_press_cycle,
         SettingLinkIds.MODIFIERS_INDICATORS to R.string.kw_modifier_indicators,
         SettingLinkIds.CUSTOM_INPUT_STYLES_LAYOUT_MODE to R.string.kw_custom_input_styles_layout_mode,
         SettingLinkIds.ABOUT_SUPPORT_KO_FI to R.string.kw_about_support_ko_fi,

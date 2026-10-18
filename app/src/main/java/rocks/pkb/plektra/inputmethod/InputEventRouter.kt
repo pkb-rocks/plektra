@@ -554,15 +554,21 @@ class InputEventRouter(
         } else {
             callbacks.getCharacterFromLayout(keyCode, event, effectiveShiftForLongPress)
         }
-        val hasLongPressSupport = when (longPressMode) {
-            "shift" -> !longPressSuppressed && event != null && event.unicodeChar != 0 && event.unicodeChar.toChar().isLetter()
-            "variations" -> !longPressSuppressed && charForLongPress != null && controllers.variationStateController.hasVariationsFor(charForLongPress)
-            "sym", "sym_symbols", "sym_emoji" -> !longPressSuppressed && controllers.alternateCharacterManager.hasSymLongPressMapping(
+        fun supportsLongPress(mode: String): Boolean = when (mode) {
+            "shift" -> event != null && event.unicodeChar != 0 && event.unicodeChar.toChar().isLetter()
+            "variations" -> charForLongPress != null && controllers.variationStateController.hasVariationsFor(charForLongPress)
+            "sym", "sym_symbols", "sym_emoji" -> controllers.alternateCharacterManager.hasSymLongPressMapping(
                 keyCode = keyCode,
-                shiftPressed = effectiveShiftForLongPress
+                shiftPressed = effectiveShiftForLongPress,
+                mode = mode
             )
-            else -> !longPressSuppressed && controllers.alternateCharacterManager.hasAltMapping(keyCode)
+            else -> controllers.alternateCharacterManager.hasAltMapping(keyCode)
         }
+        val longPressCycleNext = SettingsManager.getLongPressCycleNext(context)
+        val hasLongPressSupport = !longPressSuppressed && (
+            supportsLongPress(longPressMode) ||
+                (longPressCycleNext != null && supportsLongPress(longPressCycleNext))
+            )
 
         if (
             controllers.textInputController.handleSpacedHyphenToEnDash(

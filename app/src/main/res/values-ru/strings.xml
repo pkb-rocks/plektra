@@ -862,4 +862,12 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
+    <string name="long_press_cycle_next_title">Удерживать дольше для</string>
+    <string name="long_press_cycle_next_description">Удерживайте после первого долгого нажатия, чтобы перейти ко второму символу (при Shift и Вариантах или SYM — затем к третьему, который применяет оба), — заглавные буквы и символы одной рукой.</string>
+    <string name="long_press_cycle_next_off">Ничего (выкл.)</string>
+    <string name="long_press_cycle_end_title">После последнего шага</string>
+    <string name="long_press_cycle_end_stop">Оставить последний символ</string>
+    <string name="long_press_cycle_end_original">Вернуться к набранному символу</string>
+    <string name="long_press_cycle_end_loop">Продолжать переключать, пока удерживается</string>
+    <string name="kw_modifiers_long_press_cycle">долгое нажатие, удержание, переключение, одной рукой, shift, символы</string>
 </resources>

@@ -301,6 +301,8 @@ internal object BackupPreferenceContract {
             "auto_replace_on_space_enter" to PreferenceValueType.BOOLEAN,
             "auto_capitalize_after_period" to PreferenceValueType.BOOLEAN,
             "long_press_modifier" to PreferenceValueType.STRING,
+            "long_press_cycle_next" to PreferenceValueType.STRING,
+            "long_press_cycle_end" to PreferenceValueType.STRING,
             "keyboard_layout" to PreferenceValueType.STRING,
             "keyboard_layout_auto_by_locale" to PreferenceValueType.BOOLEAN,
             "keyboard_layout_list" to PreferenceValueType.STRING,

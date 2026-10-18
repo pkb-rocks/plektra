@@ -345,6 +345,13 @@
     <string name="long_press_modifier_sym">First Emoji or Symbols Layer</string>
     <string name="long_press_modifier_sym_symbols">Symbols Layer</string>
     <string name="long_press_modifier_sym_emoji">Emoji Layer</string>
+    <string name="long_press_cycle_next_title">Keep Holding For</string>
+    <string name="long_press_cycle_next_description">Hold past the first long press to step to a second character (with Shift and Variations or SYM, then to a third that applies both), so capitals and symbols need only one hand.</string>
+    <string name="long_press_cycle_next_off">Nothing (off)</string>
+    <string name="long_press_cycle_end_title">After the Last Step</string>
+    <string name="long_press_cycle_end_stop">Keep the last character</string>
+    <string name="long_press_cycle_end_original">Go back to the typed character</string>
+    <string name="long_press_cycle_end_loop">Keep cycling while held</string>
     <string name="modifier_tap_behaviour_title">Advanced modifier tap behaviour</string>
     <string name="shift_tap_latches_title">Single-tap locks Shift</string>
     <string name="shift_tap_latches_description">Tap Shift once to lock caps instead of one-shot uppercase.</string>
@@ -1772,6 +1779,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_keyboard_timing_long_press">long press, delay, timing, threshold</string>
     <string name="kw_advanced_swipe_threshold">swipe, selection, threshold, cursor</string>
     <string name="kw_modifiers_long_press_modifier">long press, modifier, one-shot</string>
+    <string name="kw_modifiers_long_press_cycle">long press, hold, cycle, one-handed, shift, symbols</string>
     <string name="kw_modifiers_long_press_threshold">long press, delay, threshold, modifier</string>
     <string name="kw_modifier_indicators">LED, LEDs, lights, indicators, where modifier state shows</string>
     <string name="kw_custom_input_styles_layout_mode">layout mode, per-app, switch</string>

@@ -862,4 +862,12 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
+    <string name="long_press_cycle_next_title">Утримувати довше для</string>
+    <string name="long_press_cycle_next_description">Утримуйте після першого довгого натискання, щоб перейти до другого символу (за Shift і Варіантів або SYM — потім до третього, який застосовує обидва), — великі літери й символи однією рукою.</string>
+    <string name="long_press_cycle_next_off">Нічого (вимк.)</string>
+    <string name="long_press_cycle_end_title">Після останнього кроку</string>
+    <string name="long_press_cycle_end_stop">Залишити останній символ</string>
+    <string name="long_press_cycle_end_original">Повернутися до набраного символу</string>
+    <string name="long_press_cycle_end_loop">Перемикати далі, доки утримується</string>
+    <string name="kw_modifiers_long_press_cycle">довге натискання, утримання, перемикання, однією рукою, shift, символи</string>
 </resources>

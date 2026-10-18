@@ -862,4 +862,12 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="settings_link_with_description">Avec description</string>
     <string name="settings_link_copied_toast">Lien copié</string>
     <string name="settings_link_unavailable_toast">Ce paramètre n\'est pas disponible</string>
+    <string name="long_press_cycle_next_title">Continuer à maintenir pour</string>
+    <string name="long_press_cycle_next_description">Maintenez après le premier appui long pour passer à un second caractère (avec Maj et Variantes ou SYM, puis à un troisième qui applique les deux) : majuscules et symboles à une seule main.</string>
+    <string name="long_press_cycle_next_off">Rien (désactivé)</string>
+    <string name="long_press_cycle_end_title">Après la dernière étape</string>
+    <string name="long_press_cycle_end_stop">Garder le dernier caractère</string>
+    <string name="long_press_cycle_end_original">Revenir au caractère tapé</string>
+    <string name="long_press_cycle_end_loop">Continuer à alterner tant que la touche est maintenue</string>
+    <string name="kw_modifiers_long_press_cycle">appui long, maintenir, alterner, une main, shift, symboles</string>
 </resources>

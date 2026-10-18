@@ -862,4 +862,33 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
+    <!-- djb/screen-trackpad: screen trackpad strings -->
+    <string name="screen_trackpad_title">Экранный трекпад</string>
+    <string name="screen_trackpad_description">Удерживайте клавишу и проводите по экрану в любом месте, чтобы двигать курсор</string>
+    <string name="screen_trackpad_enabled_title">Включить экранный трекпад</string>
+    <string name="screen_trackpad_enabled_description">Превращает весь экран в трекпад для курсора, пока активна клавиша-триггер</string>
+    <string name="screen_trackpad_permission_title">Поверх других приложений</string>
+    <string name="screen_trackpad_permission_granted">Разрешение предоставлено</string>
+    <string name="screen_trackpad_permission_missing">Разрешение не предоставлено — нажмите, чтобы открыть системные настройки</string>
+    <string name="screen_trackpad_permission_toast">Экранному трекпаду нужно разрешение “Поверх других приложений”. Включите его в настройках Plektra.</string>
+    <string name="screen_trackpad_trigger_key_title">Клавиша-триггер</string>
+    <string name="screen_trackpad_trigger_space">Пробел</string>
+    <string name="screen_trackpad_trigger_shift_left">Левый Shift</string>
+    <string name="screen_trackpad_trigger_shift_right">Правый Shift</string>
+    <string name="screen_trackpad_trigger_shift_either">Любой Shift</string>
+    <string name="screen_trackpad_trigger_sym">Sym</string>
+    <string name="screen_trackpad_activation_title">Активация</string>
+    <string name="screen_trackpad_activation_hold">Удержание (активен, пока удерживается)</string>
+    <string name="screen_trackpad_activation_double_tap">Двойное нажатие (остаётся до повторного нажатия)</string>
+    <string name="screen_trackpad_activation_single_tap">Одно нажатие (остаётся до повторного нажатия)</string>
+    <string name="screen_trackpad_activation_hold_note">Короткое нажатие по-прежнему вводит клавишу. Удерживайте Shift во время свайпа, чтобы выделять текст.</string>
+    <string name="screen_trackpad_activation_sticky_note">Для выхода нажмите клавишу-триггер, клавишу «Назад» или экранную пилюлю. Одно нажатие полностью забирает клавишу — используйте только с клавишей, которой не печатаете.</string>
+    <string name="screen_trackpad_sensitivity_title">Чувствительность</string>
+    <string name="screen_trackpad_sensitivity_description">Пикселей свайпа на один шаг курсора — меньше значит быстрее</string>
+    <string name="screen_trackpad_hint_enabled_title">Показывать экранную подсказку</string>
+    <string name="screen_trackpad_hint_enabled_description">Небольшая пилюля вверху экрана, пока трекпад активен</string>
+    <string name="screen_trackpad_hint_cursor">✥ Курсор</string>
+    <string name="screen_trackpad_hint_select">⇧ Выделение</string>
+    <string name="screen_trackpad_hint_sticky">✥ Курсор · нажмите для выхода</string>
+    <string name="kw_screen_trackpad">трекпад, курсор, свайп, сенсорный экран, пробел, удерживать, стрелки, выделение, trackpad, cursor, swipe</string>
 </resources>

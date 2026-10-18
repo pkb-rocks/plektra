@@ -862,4 +862,33 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="settings_link_with_description">Նկարագրությամբ</string>
     <string name="settings_link_copied_toast">Հղումը պատճենվեց</string>
     <string name="settings_link_unavailable_toast">Այս կարգավորումը հասանելի չէ</string>
+    <!-- djb/screen-trackpad: screen trackpad strings -->
+    <string name="screen_trackpad_title">Էկրանային թաչփադ</string>
+    <string name="screen_trackpad_description">Պահեք ստեղնը և սահեցրեք էկրանի ցանկացած մասում՝ կուրսորը տեղափոխելու համար</string>
+    <string name="screen_trackpad_enabled_title">Միացնել էկրանային թաչփադը</string>
+    <string name="screen_trackpad_enabled_description">Ամբողջ էկրանը դարձնում է կուրսորի թաչփադ, քանի դեռ գործարկիչ ստեղնն ակտիվ է</string>
+    <string name="screen_trackpad_permission_title">Ցուցադրում այլ հավելվածների վրա</string>
+    <string name="screen_trackpad_permission_granted">Թույլտվությունը տրված է</string>
+    <string name="screen_trackpad_permission_missing">Թույլտվությունը տրված չէ. հպեք՝ համակարգի կարգավորումները բացելու համար</string>
+    <string name="screen_trackpad_permission_toast">Էկրանային թաչփադը պահանջում է «Ցուցադրում այլ հավելվածների վրա»։ Միացրեք այն Plektra-ի կարգավորումներում։</string>
+    <string name="screen_trackpad_trigger_key_title">Գործարկիչ ստեղն</string>
+    <string name="screen_trackpad_trigger_space">Space</string>
+    <string name="screen_trackpad_trigger_shift_left">Ձախ Shift</string>
+    <string name="screen_trackpad_trigger_shift_right">Աջ Shift</string>
+    <string name="screen_trackpad_trigger_shift_either">Ցանկացած Shift</string>
+    <string name="screen_trackpad_trigger_sym">Sym</string>
+    <string name="screen_trackpad_activation_title">Ակտիվացնել</string>
+    <string name="screen_trackpad_activation_hold">Պահելով (ակտիվ է պահելու ընթացքում)</string>
+    <string name="screen_trackpad_activation_double_tap">Կրկնակի հպումով (մնում է միացված մինչև կրկին հպում)</string>
+    <string name="screen_trackpad_activation_single_tap">Մեկ հպումով (մնում է միացված մինչև կրկին հպում)</string>
+    <string name="screen_trackpad_activation_hold_note">Արագ հպումը դեռ սովորական կերպով մուտքագրում է ստեղնը։ Սահեցնելիս պահեք Shift-ը՝ տեքստ ընտրելու համար։</string>
+    <string name="screen_trackpad_activation_sticky_note">Դուրս գալու համար հպեք գործարկիչ ստեղնին, Back ստեղնին կամ էկրանային հաբիկին։ Մեկ հպումն ամբողջությամբ գրավում է ստեղնը. օգտագործեք այն միայն այնպիսի ստեղնի հետ, որով չեք մուտքագրում։</string>
+    <string name="screen_trackpad_sensitivity_title">Զգայունություն</string>
+    <string name="screen_trackpad_sensitivity_description">Սահեցման պիքսելները մեկ կուրսորի քայլի համար. ավելի ցածրն ավելի արագ է</string>
+    <string name="screen_trackpad_hint_enabled_title">Ցուցադրել էկրանային հուշումը</string>
+    <string name="screen_trackpad_hint_enabled_description">Փոքր հաբիկ էկրանի վերևում, քանի դեռ թաչփադն ակտիվ է</string>
+    <string name="screen_trackpad_hint_cursor">✥ Կուրսոր</string>
+    <string name="screen_trackpad_hint_select">⇧ Ընտրել</string>
+    <string name="screen_trackpad_hint_sticky">✥ Կուրսոր · հպեք՝ դուրս գալու համար</string>
+    <string name="kw_screen_trackpad">թրեքփեդ, կուրսոր, սահեցնել, հպէկրան, բացատ, պահել, սլաքներ, ընտրել, trackpad, cursor, swipe</string>
 </resources>

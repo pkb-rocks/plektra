@@ -1646,7 +1646,7 @@ internal fun applyDevsChoiceSettings(context: Context) {
     SettingsManager.setSoftwareKeyboardMode(context, SettingsManager.SoftwareKeyboardMode.AUTO)
     SettingsManager.setLongPressModifier(context, "variations")
     SettingsManager.setLongPressThreshold(context, 200L)
-    SettingsManager.setTrackpadGesturesEnabled(context, true)
+    TrackpadFeatureExclusivity.setEnabled(context, TrackpadFeature.TRACKPAD_GESTURES, true)
     SettingsManager.setKeyboardLayoutAutoByLocale(context, false)
     SettingsManager.setKeyboardLayout(context, "qwertz")
     SettingsManager.setKeyboardLayoutList(context, listOf("qwertz"))

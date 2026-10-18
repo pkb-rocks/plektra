@@ -16,6 +16,19 @@ class ModifierStateControllerTest {
     private val doubleTapThreshold = 300L
 
     @Test
+    fun shiftHeldByUserIgnoresAutoCapOneShot() {
+        val controller = ModifierStateController(doubleTapThreshold)
+        controller.shiftOneShot = true
+        assertTrue(controller.shiftOneShot)
+        assertFalse(controller.shiftHeldByUser)
+
+        controller.handleShiftKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT)
+        assertTrue(controller.shiftHeldByUser)
+        controller.handleShiftKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT)
+        assertFalse(controller.shiftHeldByUser)
+    }
+
+    @Test
     fun testShiftTransitions() {
         val controller = ModifierStateController(doubleTapThreshold)
         

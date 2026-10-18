@@ -2,6 +2,7 @@ package rocks.pkb.plektra
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -52,7 +53,22 @@ fun TrackpadGestureSettingsScreen(
         mutableStateOf(SettingsManager.getTrackpadDeleteSwipeThreshold(context))
     }
     var showTutorialDialog by remember { mutableStateOf(false) }
-    var showSensitivitySettings by remember { mutableStateOf(settingsChild(context, "trackpad") == "sensitivity") }
+    // Turning on while Screen trackpad is on asks first (TrackpadFeatureExclusivity).
+    var confirmEnable by remember { mutableStateOf(false) }
+    // Follow the Screen trackpad page, a restore or the IME's reconcile while this page is up.
+    ObserveTrackpadFeaturePrefs { trackpadGesturesEnabled = SettingsManager.getTrackpadGesturesEnabled(context) }
+    // The page is decided once from the hosting activity's intent (see TrackpadSettingsNavigation.kt).
+    val initialPage = remember {
+        trackpadGesturePageFor(settingsChild(context, TRACKPAD_CHILD_SECTION), settingsLinkId(context))
+    }
+    var showSensitivitySettings by remember { mutableStateOf(initialPage == TrackpadGesturePage.Sensitivity) }
+    // child page (hold a key, swipe anywhere on the screen to move the cursor).
+    // Opened from its row it is its own activity (Back finishes it); opened by a setting link it
+    // replaces this screen in place (Back returns to the gesture settings).
+    val screenTrackpadIsOwnActivity = remember {
+        settingsChild(context, TRACKPAD_CHILD_SECTION) == TRACKPAD_CHILD_PAGE_SCREEN
+    }
+    var showScreenTrackpadSettings by remember { mutableStateOf(initialPage == TrackpadGesturePage.ScreenTrackpad) }
     var shizukuStatus by remember { mutableStateOf(ShizukuStatus.NotConnected) }
     var trackpadProvider by remember { mutableStateOf(SettingsManager.getTrackpadProvider(context)) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
@@ -86,6 +102,7 @@ fun TrackpadGestureSettingsScreen(
             SettingLinkIds.TRACKPAD_PROVIDER,
             SettingLinkIds.TRACKPAD_SHIZUKU_DEVICE,
             SettingLinkIds.TRACKPAD_SENSITIVITY,
+            SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD,
             SettingLinkIds.TRACKPAD_DEBUG -> showSensitivitySettings = false
         }
     }
@@ -110,6 +127,18 @@ fun TrackpadGestureSettingsScreen(
                     shizukuDeviceDiscoveryFailed = true
                 }
         }
+    }
+
+    // the child page brings its own top bar
+    if (showScreenTrackpadSettings) {
+        BackHandler(enabled = !screenTrackpadIsOwnActivity) { showScreenTrackpadSettings = false }
+        ScreenTrackpadSettingsScreen(
+            modifier = modifier,
+            onBack = {
+                if (screenTrackpadIsOwnActivity) context.settingsActivity().finish() else showScreenTrackpadSettings = false
+            }
+        )
+        return
     }
 
     Scaffold(
@@ -215,12 +244,28 @@ fun TrackpadGestureSettingsScreen(
                     FeatureStatusIcon(FeatureStatus.Experimental)
                     Switch(
                         checked = trackpadGesturesEnabled,
-                        onCheckedChange = { enabled ->
-                            trackpadGesturesEnabled = enabled
-                            SettingsManager.setTrackpadGesturesEnabled(context, enabled)
+                        onCheckedChange = { wanted ->
+                            val screenTrackpadOn = SettingsManager.isScreenTrackpadEnabled(context)
+                            if (wanted && TrackpadFeatureExclusivity.enablingNeedsConfirmation(TrackpadFeature.TRACKPAD_GESTURES, screenTrackpadOn)) {
+                                confirmEnable = true
+                            } else {
+                                TrackpadFeatureExclusivity.setEnabled(context, TrackpadFeature.TRACKPAD_GESTURES, wanted)
+                                trackpadGesturesEnabled = wanted
+                            }
                         }
                     )
                 }
+            }
+            if (confirmEnable) {
+                TrackpadExclusiveDialog(
+                    feature = TrackpadFeature.TRACKPAD_GESTURES,
+                    onContinue = {
+                        confirmEnable = false
+                        TrackpadFeatureExclusivity.setEnabled(context, TrackpadFeature.TRACKPAD_GESTURES, true)
+                        trackpadGesturesEnabled = true
+                    },
+                    onDismiss = { confirmEnable = false }
+                )
             }
 
             if (DeviceSpecific.isTitan2EliteDevice()) {
@@ -589,7 +634,7 @@ fun TrackpadGestureSettingsScreen(
                     .fillMaxWidth()
                     .height(72.dp)
                     .settingRow(SettingLinkIds.TRACKPAD_SENSITIVITY) {
-                        openSettingsChild(context, "trackpad", "sensitivity")
+                        openSettingsChild(context, TRACKPAD_CHILD_SECTION, TRACKPAD_CHILD_PAGE_SENSITIVITY)
                     }
             ) {
                 Row(
@@ -624,6 +669,50 @@ fun TrackpadGestureSettingsScreen(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // row opening the screen trackpad child page
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .settingRow(SettingLinkIds.TRACKPAD_SCREEN_TRACKPAD) {
+                        openSettingsChild(context, TRACKPAD_CHILD_SECTION, TRACKPAD_CHILD_PAGE_SCREEN)
+                    }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.OpenWith,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.screen_trackpad_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = stringResource(R.string.screen_trackpad_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2
+                        )
+                    }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,

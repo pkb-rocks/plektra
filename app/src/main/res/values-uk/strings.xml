@@ -862,4 +862,33 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
+    <!-- djb/screen-trackpad: screen trackpad strings -->
+    <string name="screen_trackpad_title">Екранний трекпад</string>
+    <string name="screen_trackpad_description">Утримуйте клавішу й проводьте будь-де по екрану, щоб переміщати курсор</string>
+    <string name="screen_trackpad_enabled_title">Увімкнути екранний трекпад</string>
+    <string name="screen_trackpad_enabled_description">Перетворює весь дисплей на трекпад для курсора, поки активна клавіша-тригер</string>
+    <string name="screen_trackpad_permission_title">Показ поверх інших застосунків</string>
+    <string name="screen_trackpad_permission_granted">Дозвіл надано</string>
+    <string name="screen_trackpad_permission_missing">Дозвіл не надано — торкніться, щоб відкрити системні налаштування</string>
+    <string name="screen_trackpad_permission_toast">Екранному трекпаду потрібен дозвіл “Показ поверх інших застосунків”. Увімкніть його в налаштуваннях Plektra.</string>
+    <string name="screen_trackpad_trigger_key_title">Клавіша-тригер</string>
+    <string name="screen_trackpad_trigger_space">Пробіл</string>
+    <string name="screen_trackpad_trigger_shift_left">Лівий Shift</string>
+    <string name="screen_trackpad_trigger_shift_right">Правий Shift</string>
+    <string name="screen_trackpad_trigger_shift_either">Будь-який Shift</string>
+    <string name="screen_trackpad_trigger_sym">Sym</string>
+    <string name="screen_trackpad_activation_title">Активація</string>
+    <string name="screen_trackpad_activation_hold">Утримання (активний, поки утримується)</string>
+    <string name="screen_trackpad_activation_double_tap">Подвійне натискання (активний до повторного натискання)</string>
+    <string name="screen_trackpad_activation_single_tap">Одне натискання (активний до повторного натискання)</string>
+    <string name="screen_trackpad_activation_hold_note">Швидке натискання все одно вводить клавішу як зазвичай. Утримуйте Shift під час свайпу, щоб виділяти текст.</string>
+    <string name="screen_trackpad_activation_sticky_note">Натисніть клавішу-тригер, клавішу Назад або екранну «пігулку», щоб вийти. Одне натискання повністю перехоплює клавішу — використовуйте лише з клавішею, якою не друкуєте.</string>
+    <string name="screen_trackpad_sensitivity_title">Чутливість</string>
+    <string name="screen_trackpad_sensitivity_description">Пікселів свайпу на крок курсора — менше означає швидше</string>
+    <string name="screen_trackpad_hint_enabled_title">Показувати екранну підказку</string>
+    <string name="screen_trackpad_hint_enabled_description">Маленька «пігулка» вгорі екрана, поки трекпад активний</string>
+    <string name="screen_trackpad_hint_cursor">✥ Курсор</string>
+    <string name="screen_trackpad_hint_select">⇧ Виділення</string>
+    <string name="screen_trackpad_hint_sticky">✥ Курсор · торкніться, щоб вийти</string>
+    <string name="kw_screen_trackpad">трекпад, курсор, свайп, сенсорний екран, пробіл, утримувати, стрілки, виділення, trackpad, cursor, swipe</string>
 </resources>

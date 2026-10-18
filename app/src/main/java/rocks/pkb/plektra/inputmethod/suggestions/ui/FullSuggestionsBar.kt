@@ -58,10 +58,13 @@ class FullSuggestionsBar(
         private const val BASE_HEIGHT_DP = 36f
         // Slim already carries its menu buttons in this row, so a shorter row keeps the whole bar compact.
         private const val SLIM_BASE_HEIGHT_DP = 28f
+        private const val SLIM_MIN_HEIGHT_DP = 24f
 
         /** Row height in dp for the active keyboard-bar profile and theme suggestions height. */
-        internal fun rowHeightDp(slim: Boolean, heightScale: Float): Float =
-            (if (slim) SLIM_BASE_HEIGHT_DP else BASE_HEIGHT_DP) * heightScale.coerceIn(0.65f, 1.6f)
+        internal fun rowHeightDp(slim: Boolean, heightScale: Float): Float {
+            val scale = heightScale.coerceIn(0.65f, 1.6f)
+            return if (slim) maxOf(SLIM_BASE_HEIGHT_DP * scale, SLIM_MIN_HEIGHT_DP) else BASE_HEIGHT_DP * scale
+        }
     }
 
     private var container: LinearLayout? = null
@@ -311,6 +314,9 @@ class FullSuggestionsBar(
             // Suggestion surfaces derive their corner radius from the row height.
             if (lastSlots.isNotEmpty()) lastSlots = emptyList()
             applyHeight()
+            container?.let { bar ->
+                for (index in 0 until bar.childCount) (bar.getChildAt(index) as? LinearLayout)?.let(::styleActionSlot)
+            }
         }
         renderMinimalUiButtons()
         hamburgerMenuView?.setMinimalUiActive(isActive)
@@ -518,7 +524,7 @@ class FullSuggestionsBar(
     private fun outerButtonExtraPx(): Int =
         if (rocks.pkb.plektra.SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) dpToPx(8f) else 0
 
-    // The 24dp floor never exceeds the row, which can be shorter than that in Slim.
+    // The 24dp floor never exceeds the row, which can be shorter than that in Normal at the smallest scale.
     private fun minimalButtonSizePx(): Int =
         (targetHeightPx - dpToPx(4f)).coerceAtLeast(minOf(dpToPx(24f), targetHeightPx))
 
@@ -844,8 +850,6 @@ class FullSuggestionsBar(
             gravity = Gravity.CENTER
             layoutParams = weightLayoutParams
             styleSuggestionSurface(this)
-            val padding = dpToPx(4f)
-            setPadding(padding, padding, padding, padding)
 
         actions.forEachIndexed { index, action ->
             val button = ImageView(context).apply {
@@ -853,7 +857,6 @@ class FullSuggestionsBar(
                     icon.setTint(action.iconColor)
                     setImageDrawable(icon)
                 }
-                scaleType = ImageView.ScaleType.CENTER
                 background = buildActionBackground(action.backgroundColor)
                 layoutParams = LinearLayout.LayoutParams(
                     0,
@@ -875,6 +878,18 @@ class FullSuggestionsBar(
             }
             addView(button)
         }
+            styleActionSlot(this)
+        }
+    }
+
+    // Framework action glyphs are 32dp bitmaps; the Slim row is too short to show them uncropped at full size.
+    private fun styleActionSlot(slot: LinearLayout) {
+        val slim = lastMinimalUiActive == true
+        val padding = dpToPx(if (slim) 2f else 4f)
+        slot.setPadding(padding, padding, padding, padding)
+        for (index in 0 until slot.childCount) {
+            (slot.getChildAt(index) as? ImageView)?.scaleType =
+                if (slim) ImageView.ScaleType.CENTER_INSIDE else ImageView.ScaleType.CENTER
         }
     }
 

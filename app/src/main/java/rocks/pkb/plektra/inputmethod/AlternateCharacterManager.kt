@@ -40,7 +40,7 @@ class AlternateCharacterManager(
     companion object {
         private const val TAG = "AlternateCharacterManager"
 
-        // The editor snapshot only needs the text around the cursor, not the whole document.
+        // The final-choice check only needs the text around the cursor, not the whole document.
         private const val SNAPSHOT_HINT_MAX_CHARS = 512
     }
 
@@ -505,6 +505,9 @@ class AlternateCharacterManager(
                                     replacement = firstVariation,
                                     commitAtCursor = null
                                 )
+                                if (outcome == ReplacementOutcome.REPLACED) {
+                                    DeferredPunctuationSpaceTracker.onTextReplaced(inputConnection)
+                                }
                                 finishLongPress(keyCode, outcome, firstVariation, "Variations")
                             }
                         }
@@ -772,6 +775,8 @@ class AlternateCharacterManager(
                 )
             } ?: captureInsertedTextAnchor(cycle.inputConnection, next)
             cycle.displayed = next
+            // The step may change the text length; the cursor moved with it.
+            DeferredPunctuationSpaceTracker.onTextReplaced(cycle.inputConnection)
         }
         cycle.index = nextIndex
         longPressActivated[keyCode] = true
@@ -787,7 +792,7 @@ class AlternateCharacterManager(
         }
         val inputConnection = cycle.inputConnection
         val isPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && !text[0].isWhitespace()
-        val shownBeforeCursor = isPunctuation && readEditorSnapshot(inputConnection)
+        val shownBeforeCursor = isPunctuation && readEditorSnapshot(inputConnection, SNAPSHOT_HINT_MAX_CHARS)
             ?.let { resolveImmediatelyPrecedingTarget(it, text) } != null
         if (shownBeforeCursor) {
             // Re-commit punctuation through the Alt path so boundary handling,
@@ -1134,8 +1139,8 @@ class AlternateCharacterManager(
         return targetStart to targetEnd
     }
 
-    private fun readEditorSnapshot(inputConnection: InputConnection): EditorSnapshot? {
-        val request = ExtractedTextRequest().apply { hintMaxChars = SNAPSHOT_HINT_MAX_CHARS }
+    private fun readEditorSnapshot(inputConnection: InputConnection, hintMaxChars: Int = 0): EditorSnapshot? {
+        val request = ExtractedTextRequest().apply { this.hintMaxChars = hintMaxChars }
         val extracted = inputConnection.getExtractedText(request, 0) ?: return null
         val text = extracted.text?.toString() ?: return null
         if (extracted.selectionStart < 0 || extracted.selectionEnd < 0) return null

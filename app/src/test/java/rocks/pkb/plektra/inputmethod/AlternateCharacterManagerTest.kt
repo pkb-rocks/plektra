@@ -246,6 +246,9 @@ class AlternateCharacterManagerTest {
         assertEquals(listOf(1 to 0), recorder.deleteCalls)
         assertEquals("delete and re-commit must share one batch edit", listOf(1), recorder.deleteBatchDepths)
         assertTrue(DeferredPunctuationSpaceTracker.isPending())
+        // Anchored reads keep the whole-document request; only the final-choice check is bounded.
+        assertTrue(0 in recorder.extractedHints)
+        assertTrue(512 in recorder.extractedHints)
 
         DeferredPunctuationSpaceTracker.prepareForTextCommit(context, inputConnection, "b")
         inputConnection.commitText("b", 1)
@@ -1040,7 +1043,7 @@ class AlternateCharacterManagerTest {
             private set
         /** Text edits made while no batch edit was open. */
         var editsOutsideBatch = 0
-
+        val extractedHints = mutableListOf<Int>()
         var text: String = ""
         var selectionStart: Int = 0
             private set
@@ -1139,6 +1142,8 @@ class AlternateCharacterManagerTest {
                         null
                     }
                     "getExtractedText" -> if (extractedTextAvailable) {
+                        (args?.getOrNull(0) as? android.view.inputmethod.ExtractedTextRequest)
+                            ?.let { extractedHints += it.hintMaxChars }
                         ExtractedText().apply {
                             this.text = this@RecordingInputConnection.text
                             selectionStart = this@RecordingInputConnection.selectionStart

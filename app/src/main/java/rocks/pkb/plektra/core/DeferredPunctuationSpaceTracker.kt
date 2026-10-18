@@ -60,10 +60,27 @@ object DeferredPunctuationSpaceTracker {
 
     /**
      * The editor reported plain forward typing that ended at [cursor]. While a space is
-     * pending, the first such report is the cursor right after the punctuation.
+     * pending, the first such report that matches the editor's current cursor is the cursor
+     * right after the punctuation; a report that lags behind the editor (an earlier key's)
+     * is ignored. Once that cursor is known, a forward step to anywhere else is a real move.
      */
-    fun onCursorAdvanced(cursor: Int) {
-        if (pending && settledCursor == NO_CURSOR) settledCursor = cursor
+    fun onCursorAdvanced(inputConnection: InputConnection?, cursor: Int) {
+        if (!pending) return
+        if (settledCursor == NO_CURSOR) {
+            val current = inputConnection?.let(::readCollapsedCursor)
+            if (current == cursor) settledCursor = cursor
+        } else if (cursor != settledCursor) {
+            clear()
+        }
+    }
+
+    /**
+     * Text just before the cursor was replaced in place (a long-press cycle step), so the
+     * cursor may have moved without a cursor move by the user. Learn it again.
+     */
+    fun onTextReplaced(inputConnection: InputConnection) {
+        if (!pending) return
+        settledCursor = readCollapsedCursor(inputConnection) ?: NO_CURSOR
     }
 
     /**

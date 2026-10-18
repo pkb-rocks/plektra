@@ -105,7 +105,7 @@ class DeferredPunctuationSpaceTrackerTest {
     fun staleReportAtSettledCursorKeepsPendingSpace() {
         commit("a")
         commit("!")
-        DeferredPunctuationSpaceTracker.onCursorAdvanced(2)
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
 
         DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 1)
 
@@ -116,7 +116,7 @@ class DeferredPunctuationSpaceTrackerTest {
     fun twoQuickCursorMovesDropPendingSpace() {
         commit("a")
         commit("!")
-        DeferredPunctuationSpaceTracker.onCursorAdvanced(2)
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
 
         // The cursor jumps to 0, then forward by one to 1 before the first report is handled.
         // The second move is plain forward steps, so only the first report reaches the tracker,
@@ -125,6 +125,107 @@ class DeferredPunctuationSpaceTrackerTest {
         DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 0)
 
         assertFalse(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun singleForwardMoveAwayFromSettledCursorDropsPendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        inputConnection.cursorOverride = 1
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 1)
+
+        assertFalse(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun forwardReportAtSettledCursorKeepsPendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun laggingForwardReportDoesNotSettleTheCursor() {
+        commit("a")
+        commit("!")
+
+        // The report for "a" (cursor 1) arrives after "!" was committed (cursor 2).
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 1)
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 1)
+
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun onlyTheFirstMatchingForwardReportSettlesTheCursor() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        // A later report elsewhere clears the space instead of replacing the settled cursor.
+        inputConnection.cursorOverride = 3
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 3)
+
+        assertFalse(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun newCommitForgetsTheSettledCursor() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        commit("?")
+        inputConnection.cursorOverride = 3
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 3)
+
+        // Settles on the new cursor rather than dropping the space against the old one.
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 2)
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun lengthChangingStepThenStaleDeleteReportKeepsPendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        // A long-press cycle step swaps the text before the cursor for something longer.
+        inputConnection.cursorOverride = 4
+        DeferredPunctuationSpaceTracker.onTextReplaced(inputConnection)
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 3)
+
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun lengthChangingStepWithoutRefreshWouldLoseThePendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(inputConnection, 2)
+
+        inputConnection.cursorOverride = 4
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 3)
+
+        assertFalse(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun cursorReadAsksForASmallWindow() {
+        commit("!")
+
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 0)
+
+        val hint = inputConnection.requests.single().hintMaxChars
+        assertTrue("hintMaxChars was $hint", hint in 1..256)
     }
 
     @Test
@@ -146,6 +247,7 @@ class DeferredPunctuationSpaceTrackerTest {
         private val buffer = StringBuilder()
         var cursorOverride: Int? = null
         var extractedTextAvailable = true
+        val requests = mutableListOf<ExtractedTextRequest>()
 
         val text: String
             get() = buffer.toString()
@@ -156,6 +258,7 @@ class DeferredPunctuationSpaceTrackerTest {
         }
 
         override fun getExtractedText(request: ExtractedTextRequest?, flags: Int): ExtractedText? {
+            request?.let { requests += it }
             if (!extractedTextAvailable) return null
             val cursor = cursorOverride ?: buffer.length
             return ExtractedText().apply {

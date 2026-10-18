@@ -4784,8 +4784,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             disableEmojiSearchInputCapture()
         }
         
+        // Before the skip-for-commit gate: the report of the punctuation's own commit is the
+        // skipped one, and it is what tells the tracker where the cursor settled.
         if (cursorPositionChanged && collapsedSelection && forwardByOne) {
-            DeferredPunctuationSpaceTracker.onCursorAdvanced(newSelStart)
+            DeferredPunctuationSpaceTracker.onCursorAdvanced(currentInputConnection, newSelStart)
         }
         if (cursorPositionChanged && collapsedSelection && !shouldSkipForCommit) {
             if (!forwardByOne) {

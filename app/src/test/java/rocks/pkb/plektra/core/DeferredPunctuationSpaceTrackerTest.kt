@@ -102,6 +102,32 @@ class DeferredPunctuationSpaceTrackerTest {
     }
 
     @Test
+    fun staleReportAtSettledCursorKeepsPendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(2)
+
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 1)
+
+        assertTrue(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
+    fun twoQuickCursorMovesDropPendingSpace() {
+        commit("a")
+        commit("!")
+        DeferredPunctuationSpaceTracker.onCursorAdvanced(2)
+
+        // The cursor jumps to 0, then forward by one to 1 before the first report is handled.
+        // The second move is plain forward steps, so only the first report reaches the tracker,
+        // and by then the editor no longer sits where the punctuation left it.
+        inputConnection.cursorOverride = 1
+        DeferredPunctuationSpaceTracker.onCursorMoved(inputConnection, 0)
+
+        assertFalse(DeferredPunctuationSpaceTracker.isPending())
+    }
+
+    @Test
     fun unreadableEditorTreatsCursorReportAsRealMove() {
         commit("!")
         inputConnection.extractedTextAvailable = false

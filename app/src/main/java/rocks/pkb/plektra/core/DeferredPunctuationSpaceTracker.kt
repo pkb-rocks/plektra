@@ -11,9 +11,15 @@ import rocks.pkb.plektra.SettingsManager
  */
 object DeferredPunctuationSpaceTracker {
     private const val NO_SPACE_BEFORE: String = ".,;:!?/\\)]}»›"
+    private const val NO_CURSOR: Int = -1
 
     @Volatile
     private var pending: Boolean = false
+
+    // Where the editor's cursor sat once the punctuation that made the space pending was
+    // typed; -1 until the editor has reported it.
+    @Volatile
+    private var settledCursor: Int = NO_CURSOR
 
     fun prepareForTextCommit(
         context: Context,
@@ -40,11 +46,21 @@ object DeferredPunctuationSpaceTracker {
             hadPending && first in NO_SPACE_BEFORE -> true
             else -> false
         }
+        settledCursor = NO_CURSOR
         return insertedSpace
     }
 
     fun clear() {
         pending = false
+        settledCursor = NO_CURSOR
+    }
+
+    /**
+     * The editor reported plain forward typing that ended at [cursor]. While a space is
+     * pending, the first such report is the cursor right after the punctuation.
+     */
+    fun onCursorAdvanced(cursor: Int) {
+        if (pending && settledCursor == NO_CURSOR) settledCursor = cursor
     }
 
     /**
@@ -53,13 +69,16 @@ object DeferredPunctuationSpaceTracker {
      * IME replaces text it just typed (delete, then re-commit), the editor may report the
      * delete on its own after the re-commit already happened. The editor's current cursor
      * then differs from the reported one and a later report brings it up to date, so the
-     * pending space is kept. If the editor cannot be read, the move counts as real.
+     * pending space is kept, but only when the editor sits where the punctuation left it. If
+     * the editor cannot be read, the move counts as real.
      */
     fun onCursorMoved(inputConnection: InputConnection?, reportedCursor: Int) {
         if (!pending) return
         val current = inputConnection?.let(::readCollapsedCursor)
-        if (current != null && current != reportedCursor) return
-        pending = false
+        if (current != null && current != reportedCursor &&
+            (settledCursor == NO_CURSOR || current == settledCursor)
+        ) return
+        clear()
     }
 
     private fun readCollapsedCursor(inputConnection: InputConnection): Int? {
@@ -76,6 +95,7 @@ object DeferredPunctuationSpaceTracker {
         val first = text.firstOrNull() ?: return
         if (first in SettingsManager.getSpaceAfterPunctuation(context)) {
             pending = true
+            settledCursor = NO_CURSOR
         }
     }
 

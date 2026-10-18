@@ -63,7 +63,9 @@ class FullSuggestionsBar(
         /** Row height in dp for the active keyboard-bar profile and theme suggestions height. */
         internal fun rowHeightDp(slim: Boolean, heightScale: Float): Float {
             val scale = heightScale.coerceIn(0.65f, 1.6f)
-            return if (slim) maxOf(SLIM_BASE_HEIGHT_DP * scale, SLIM_MIN_HEIGHT_DP) else BASE_HEIGHT_DP * scale
+            val normal = BASE_HEIGHT_DP * scale
+            // The floor never lifts Slim above Normal, which is below it at the smallest scales.
+            return if (slim) maxOf(SLIM_BASE_HEIGHT_DP * scale, minOf(SLIM_MIN_HEIGHT_DP, normal)) else normal
         }
     }
 

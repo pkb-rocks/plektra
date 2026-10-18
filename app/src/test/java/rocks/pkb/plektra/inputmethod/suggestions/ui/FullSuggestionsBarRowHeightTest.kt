@@ -39,8 +39,9 @@ class FullSuggestionsBarRowHeightTest {
         for (scale in listOf(0.5f, 0.65f, 0.9f, 1f, 1.3f, 1.6f, 2f)) {
             val clamped = scale.coerceIn(0.65f, 1.6f)
             assertEquals(36f * clamped, FullSuggestionsBar.rowHeightDp(slim = false, heightScale = scale), 0.0001f)
-            assertEquals(maxOf(28f * clamped, 24f), FullSuggestionsBar.rowHeightDp(slim = true, heightScale = scale), 0.0001f)
-            assertTrue(FullSuggestionsBar.rowHeightDp(true, scale) >= 24f)
+            assertEquals(maxOf(28f * clamped, minOf(24f, 36f * clamped)),
+                FullSuggestionsBar.rowHeightDp(slim = true, heightScale = scale), 0.0001f)
+            assertTrue(FullSuggestionsBar.rowHeightDp(true, scale) <= FullSuggestionsBar.rowHeightDp(false, scale))
             if (clamped >= 0.9f) {
                 assertTrue(FullSuggestionsBar.rowHeightDp(true, scale) < FullSuggestionsBar.rowHeightDp(false, scale))
             }
@@ -48,10 +49,23 @@ class FullSuggestionsBarRowHeightTest {
     }
 
     @Test fun slimRowNeverDropsBelowTheMenuButtonFloor() {
-        assertEquals(24f, FullSuggestionsBar.rowHeightDp(slim = true, heightScale = 0.65f), 0.0001f)
+        assertEquals(24f, FullSuggestionsBar.rowHeightDp(slim = true, heightScale = 0.7f), 0.0001f)
         assertEquals(24f, FullSuggestionsBar.rowHeightDp(slim = true, heightScale = 0.8f), 0.0001f)
         assertEquals(28f, FullSuggestionsBar.rowHeightDp(slim = true, heightScale = 1f), 0.0001f)
         assertEquals(36f * 0.65f, FullSuggestionsBar.rowHeightDp(slim = false, heightScale = 0.65f), 0.0001f)
+    }
+
+    @Test fun slimRowIsNeverTallerThanNormal() {
+        assertEquals(23.4f, FullSuggestionsBar.rowHeightDp(slim = true, heightScale = 0.65f), 0.0001f)
+        assertEquals(23.4f, FullSuggestionsBar.rowHeightDp(slim = false, heightScale = 0.65f), 0.0001f)
+        var scale = 0.5f
+        while (scale <= 2f) {
+            val slim = FullSuggestionsBar.rowHeightDp(slim = true, heightScale = scale)
+            val normal = FullSuggestionsBar.rowHeightDp(slim = false, heightScale = scale)
+            assertTrue("scale=$scale slim=$slim normal=$normal", slim <= normal)
+            if (normal >= 24f) assertTrue("scale=$scale slim=$slim", slim >= 24f)
+            scale += 0.01f
+        }
     }
 
     @Test fun everyHeightOwnerSharesTheProfileRowHeight() {

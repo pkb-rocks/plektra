@@ -49,6 +49,22 @@ internal fun openSettingsPage(context: Context, page: SettingsPage) {
     context.startActivity(Intent(context, SettingsActivity::class.java).putSettingsPage(page))
 }
 
+/**
+ * Child sections that live below a section's pages. Opening a page of the parent section
+ * anew starts from a fresh child state, so a page extra left behind by a deeper page
+ * (for example `settings.child.trackpad=screen` under Advanced > Trackpad Gestures) is
+ * dropped instead of being inherited by every later copy of the intent.
+ */
+private val NESTED_SETTINGS_CHILD_SECTIONS: Map<String, Set<String>> = mapOf(
+    "advanced" to setOf("trackpad")
+)
+
+/** The child sections whose page extras become stale when a page of [section] opens. */
+internal fun staleSettingsChildSections(section: String): Set<String> =
+    NESTED_SETTINGS_CHILD_SECTIONS[section].orEmpty()
+
+internal fun settingsChildExtraKey(section: String): String = "settings.child.$section"
+
 /** A child is a new platform Activity. Android alone owns the back stack and transitions. */
 internal fun openSettingsChild(context: Context, section: String, page: String) {
     val activity = context.settingsActivity()
@@ -56,9 +72,23 @@ internal fun openSettingsChild(context: Context, section: String, page: String) 
         data = null
         flags = 0
         removeExtra(SymCustomizationActivity.EXTRA_SETTING_ID)
-        putExtra("settings.child.$section", page)
+        staleSettingsChildSections(section).forEach { removeExtra(settingsChildExtraKey(it)) }
+        putExtra(settingsChildExtraKey(section), page)
     })
 }
 
 internal fun settingsChild(context: Context, section: String): String? =
-    context.settingsActivity().intent.getStringExtra("settings.child.$section")
+    context.settingsActivity().intent.getStringExtra(settingsChildExtraKey(section))
+
+/**
+ * Records the page a screen resolved for [section] on the hosting activity's intent, so a
+ * child opened from it inherits the page even when it was derived from the setting-link
+ * `data` (which [openSettingsChild] clears) rather than from a child extra.
+ */
+internal fun rememberSettingsChild(context: Context, section: String, page: String) {
+    context.settingsActivity().intent.putExtra(settingsChildExtraKey(section), page)
+}
+
+/** The setting-link id the hosting activity was opened with, if any. */
+internal fun settingsLinkId(context: Context): String? =
+    context.settingsActivity().intent.data?.let(SettingLinkRegistry::parseSettingLinkUri)

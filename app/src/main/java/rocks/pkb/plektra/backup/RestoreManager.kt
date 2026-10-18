@@ -114,6 +114,9 @@ object RestoreManager {
                         )
                     }
                 )
+                // A backup from a build that allowed both may carry Screen trackpad and
+                // Trackpad Gestures on together; keep exactly one (Screen trackpad wins).
+                rocks.pkb.plektra.TrackpadFeatureExclusivity.reconcile(context)
                 val postRestoreActions = collectTriggeredPostRestoreActions(prefsSummary, fileSummary)
                 notifyPostRestoreEffects(context, postRestoreActions)
                 if (fileSummary.restoredFiles.any { it.startsWith("dictionaries_serialized/") }) {

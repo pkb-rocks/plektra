@@ -107,11 +107,13 @@ fun AdvancedSettingsScreen(
     var pendingDeviceChangeRestore by remember {
         mutableStateOf<Pair<Uri, RestoreManager.DeviceChange>?>(null)
     }
-    val currentDestination = remember { when (settingsChild(context, "advanced")) {
-        "ImeTest" -> AdvancedDestination.ImeTest
-        "TrackpadGestures" -> AdvancedDestination.TrackpadGestures
-        else -> if (context.settingsActivity().intent.data?.let(SettingLinkRegistry::parseSettingLinkUri) in TRACKPAD_SETTING_LINK_IDS) AdvancedDestination.TrackpadGestures else AdvancedDestination.Main
-    } }
+    val currentDestination = remember {
+        val name = advancedDestinationNameFor(settingsChild(context, ADVANCED_CHILD_SECTION), settingsLinkId(context))
+        // Children copy the intent without its setting-link data, so a destination that
+        // came from the link is written back as the child extra they will inherit.
+        rememberSettingsChild(context, ADVANCED_CHILD_SECTION, name)
+        AdvancedDestination.fromName(name)
+    }
     val highlightedSettingId = LocalSettingHighlightId.current
     // Listen to SharedPreferences changes to update UI when values are restored
     DisposableEffect(prefs) {
@@ -149,7 +151,7 @@ fun AdvancedSettingsScreen(
     }
 
     fun navigateTo(destination: AdvancedDestination) {
-        openSettingsChild(context, "advanced", when (destination) { AdvancedDestination.Main -> "Main"; AdvancedDestination.ImeTest -> "ImeTest"; AdvancedDestination.TrackpadGestures -> "TrackpadGestures" })
+        openSettingsChild(context, ADVANCED_CHILD_SECTION, destination.name)
     }
     fun navigateBack() { context.settingsActivity().finish() }
 
@@ -778,27 +780,20 @@ fun AdvancedSettingsScreen(
 
 }
 
-private sealed class AdvancedDestination {
-    object Main : AdvancedDestination()
-    object ImeTest : AdvancedDestination()
-    object TrackpadGestures : AdvancedDestination()
+/** Pages of the Advanced screen; [name] is the `settings.child.advanced` extra value. */
+private sealed class AdvancedDestination(val name: String) {
+    object Main : AdvancedDestination(ADVANCED_DESTINATION_MAIN)
+    object ImeTest : AdvancedDestination(ADVANCED_DESTINATION_IME_TEST)
+    object TrackpadGestures : AdvancedDestination(ADVANCED_DESTINATION_TRACKPAD_GESTURES)
+
+    companion object {
+        fun fromName(name: String): AdvancedDestination = when (name) {
+            ADVANCED_DESTINATION_IME_TEST -> ImeTest
+            ADVANCED_DESTINATION_TRACKPAD_GESTURES -> TrackpadGestures
+            else -> Main
+        }
+    }
 }
-
-
-
-private val TRACKPAD_SETTING_LINK_IDS = setOf(
-    "trackpad.add_word",
-    "trackpad.add_word_full_width",
-    "trackpad.swipe_to_delete",
-    "trackpad.swipe_to_delete_provider",
-    SettingLinkIds.TRACKPAD_GESTURES_ENABLED,
-    SettingLinkIds.TRACKPAD_PROVIDER,
-    SettingLinkIds.TRACKPAD_SHIZUKU_DEVICE,
-    SettingLinkIds.TRACKPAD_SENSITIVITY,
-    SettingLinkIds.TRACKPAD_SUGGESTION_SWIPE_THRESHOLD,
-    SettingLinkIds.TRACKPAD_DELETE_SWIPE_THRESHOLD,
-    SettingLinkIds.TRACKPAD_DEBUG
-)
 
 @Composable
 private fun ClipboardRetentionSetting(

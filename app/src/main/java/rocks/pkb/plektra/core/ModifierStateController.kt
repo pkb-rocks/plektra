@@ -154,6 +154,10 @@ class ModifierStateController(
         get() = shiftPhysicallyPressedFlag
         set(value) { shiftPhysicallyPressedFlag = value }
 
+    /** Shift the user is holding; unlike [shiftOneShot], never armed by auto-capitalise. */
+    val shiftHeldByUser: Boolean
+        get() = shiftPressedFlag || shiftPhysicallyPressedFlag
+
     var shiftOneShot: Boolean
         get() = shiftStateMachine.state == ShiftState.ONE_SHOT
         set(value) {

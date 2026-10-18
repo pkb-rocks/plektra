@@ -16,6 +16,7 @@ import rocks.pkb.plektra.commands.PlektraCommandSource
 import rocks.pkb.plektra.core.Punctuation
 import rocks.pkb.plektra.data.layout.BundledLayoutAssets
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
+import rocks.pkb.plektra.inputmethod.ScreenTrackpadTerminalApps
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import rocks.pkb.plektra.inputmethod.ui.KeyboardThemeColors
@@ -5471,6 +5472,107 @@ object SettingsManager {
         getPreferences(context).edit()
             .putFloat(KEY_TRACKPAD_DELETE_SWIPE_THRESHOLD, clamped)
             .commit()
+    }
+
+    // hold a key, swipe anywhere on the screen to move the cursor
+    private const val KEY_SCREEN_TRACKPAD_ENABLED = "screen_trackpad_enabled"
+    private const val KEY_SCREEN_TRACKPAD_TRIGGER_KEY = "screen_trackpad_trigger_key"
+    private const val KEY_SCREEN_TRACKPAD_ACTIVATION = "screen_trackpad_activation"
+    private const val KEY_SCREEN_TRACKPAD_STEP_PX = "screen_trackpad_step_px"
+    private const val KEY_SCREEN_TRACKPAD_SHOW_HINT = "screen_trackpad_show_hint"
+    private const val KEY_SCREEN_TRACKPAD_TERMINAL_APPS = "screen_trackpad_terminal_apps"
+    const val SCREEN_TRACKPAD_TRIGGER_SPACE = "space"
+    const val SCREEN_TRACKPAD_TRIGGER_SHIFT_LEFT = "shift_left"
+    const val SCREEN_TRACKPAD_TRIGGER_SHIFT_RIGHT = "shift_right"
+    const val SCREEN_TRACKPAD_TRIGGER_SHIFT_EITHER = "shift_either"
+    const val SCREEN_TRACKPAD_TRIGGER_SYM = "sym"
+    private val SCREEN_TRACKPAD_TRIGGER_VALUES = setOf(
+        SCREEN_TRACKPAD_TRIGGER_SPACE,
+        SCREEN_TRACKPAD_TRIGGER_SHIFT_LEFT,
+        SCREEN_TRACKPAD_TRIGGER_SHIFT_RIGHT,
+        SCREEN_TRACKPAD_TRIGGER_SHIFT_EITHER,
+        SCREEN_TRACKPAD_TRIGGER_SYM
+    )
+    const val SCREEN_TRACKPAD_ACTIVATION_HOLD = "hold"
+    const val SCREEN_TRACKPAD_ACTIVATION_DOUBLE_TAP = "double_tap"
+    const val SCREEN_TRACKPAD_ACTIVATION_SINGLE_TAP = "single_tap"
+    private val SCREEN_TRACKPAD_ACTIVATION_VALUES = setOf(
+        SCREEN_TRACKPAD_ACTIVATION_HOLD,
+        SCREEN_TRACKPAD_ACTIVATION_DOUBLE_TAP,
+        SCREEN_TRACKPAD_ACTIVATION_SINGLE_TAP
+    )
+    const val MIN_SCREEN_TRACKPAD_STEP_PX = 8
+    const val MAX_SCREEN_TRACKPAD_STEP_PX = 64
+    // Tuned on the Titan 2 Elite; 24 px was too twitchy for the 4-inch screen.
+    private const val DEFAULT_SCREEN_TRACKPAD_STEP_PX = 32
+
+    fun isScreenTrackpadEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SCREEN_TRACKPAD_ENABLED, false)
+
+    fun setScreenTrackpadEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SCREEN_TRACKPAD_ENABLED, enabled).apply()
+    }
+
+    fun getScreenTrackpadTriggerKey(context: Context): String {
+        val value = getPreferences(context).getString(KEY_SCREEN_TRACKPAD_TRIGGER_KEY, SCREEN_TRACKPAD_TRIGGER_SPACE).orEmpty()
+        return if (SCREEN_TRACKPAD_TRIGGER_VALUES.contains(value)) value else SCREEN_TRACKPAD_TRIGGER_SPACE
+    }
+
+    fun setScreenTrackpadTriggerKey(context: Context, value: String) {
+        val normalized = if (SCREEN_TRACKPAD_TRIGGER_VALUES.contains(value)) value else SCREEN_TRACKPAD_TRIGGER_SPACE
+        getPreferences(context).edit().putString(KEY_SCREEN_TRACKPAD_TRIGGER_KEY, normalized).apply()
+    }
+
+    fun getScreenTrackpadActivation(context: Context): String {
+        val value = getPreferences(context).getString(KEY_SCREEN_TRACKPAD_ACTIVATION, SCREEN_TRACKPAD_ACTIVATION_HOLD).orEmpty()
+        return if (SCREEN_TRACKPAD_ACTIVATION_VALUES.contains(value)) value else SCREEN_TRACKPAD_ACTIVATION_HOLD
+    }
+
+    fun setScreenTrackpadActivation(context: Context, value: String) {
+        val normalized = if (SCREEN_TRACKPAD_ACTIVATION_VALUES.contains(value)) value else SCREEN_TRACKPAD_ACTIVATION_HOLD
+        getPreferences(context).edit().putString(KEY_SCREEN_TRACKPAD_ACTIVATION, normalized).apply()
+    }
+
+    fun getScreenTrackpadStepPx(context: Context): Int =
+        getPreferences(context).getInt(KEY_SCREEN_TRACKPAD_STEP_PX, DEFAULT_SCREEN_TRACKPAD_STEP_PX)
+            .coerceIn(MIN_SCREEN_TRACKPAD_STEP_PX, MAX_SCREEN_TRACKPAD_STEP_PX)
+
+    fun setScreenTrackpadStepPx(context: Context, stepPx: Int) {
+        getPreferences(context).edit()
+            .putInt(KEY_SCREEN_TRACKPAD_STEP_PX, stepPx.coerceIn(MIN_SCREEN_TRACKPAD_STEP_PX, MAX_SCREEN_TRACKPAD_STEP_PX))
+            .apply()
+    }
+
+    fun isScreenTrackpadHintEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SCREEN_TRACKPAD_SHOW_HINT, true)
+
+    fun setScreenTrackpadHintEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SCREEN_TRACKPAD_SHOW_HINT, enabled).apply()
+    }
+
+    /**
+     * Apps where the screen trackpad also works with no editable text field in focus (terminals,
+     * SSH clients). Pre-filled; once the user edits the list, the stored set (even an empty one)
+     * replaces the defaults. A restored backup can hold anything, so invalid names are dropped and
+     * the count is capped.
+     */
+    fun getScreenTrackpadTerminalApps(context: Context): Set<String> =
+        getPreferences(context).getStringSet(KEY_SCREEN_TRACKPAD_TERMINAL_APPS, null)
+            ?.let(ScreenTrackpadTerminalApps::sanitize)
+            ?: ScreenTrackpadTerminalApps.DEFAULT_PACKAGES
+
+    fun isScreenTrackpadTerminalApp(context: Context, packageName: String?): Boolean =
+        ScreenTrackpadTerminalApps.isListed(getScreenTrackpadTerminalApps(context), packageName)
+
+    fun setScreenTrackpadTerminalApp(context: Context, packageName: String, enabled: Boolean) {
+        if (packageName.isBlank()) return
+        val updated = getScreenTrackpadTerminalApps(context).toMutableSet()
+        if (enabled) updated.add(packageName) else updated.remove(packageName)
+        getPreferences(context).edit().putStringSet(KEY_SCREEN_TRACKPAD_TERMINAL_APPS, updated).apply()
+    }
+
+    fun resetScreenTrackpadTerminalApps(context: Context) {
+        getPreferences(context).edit().remove(KEY_SCREEN_TRACKPAD_TERMINAL_APPS).apply()
     }
 
     fun getTrackpadProvider(context: Context): String {

@@ -330,6 +330,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val clicksPowerButtonEventMapper = ClicksPowerButtonEventMapper()
     private var dispatchingClicksAccessibilityKeyEvent = false
     private var replayingProtectedNumberKey = false
+    // a replayed trigger key bypasses the key filters that already saw it
+    private var screenTrackpadReplaying = false
+    private lateinit var screenTrackpadController: ScreenTrackpadController
+    /**
+     * True between onStartInput and onFinishInput/onUnbindInput. InputMethodService keeps the
+     * previous EditorInfo after a finish, so the screen trackpad must not trust it outside a session.
+     */
+    private var inputStarted = false
     private val uiHandler = Handler(Looper.getMainLooper())
     private var inputManager: InputManager? = null
     private var lastObservedAutoSoftwareKeyboardMode: SettingsManager.SoftwareKeyboardMode? = null
@@ -1836,6 +1844,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         lastSystemLocalesSignature = resources.configuration.locales.toLanguageTags()
         lastImeConfiguration = Configuration(resources.configuration)
         prefs = getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
+        // Screen trackpad and Trackpad Gestures are never both on; repair prefs written by
+        // an older build or a restored backup before either controller reads them.
+        rocks.pkb.plektra.TrackpadFeatureExclusivity.reconcile(this)?.let { turnedOff ->
+            Log.i(TAG, "Trackpad features were both on; turned off $turnedOff")
+        }
         clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
         physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
 
@@ -1851,6 +1864,27 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         inputEventRouter = InputEventRouter(this, navModeController).apply {
             onCommitText = { markSelectionUpdateSkipAfterCommit() }
         }
+        // overlay trackpad controller
+        screenTrackpadController = ScreenTrackpadController(
+            service = this,
+            handler = uiHandler,
+            inputConnectionProvider = { currentInputConnection },
+            isShiftActive = { modifierStateController.shiftHeldByUser || shiftLayerLatched },
+            isEditableFieldFocused = {
+                inputStarted && currentInputConnection != null &&
+                    (currentInputEditorInfo?.inputType ?: EditorInfo.TYPE_NULL) != EditorInfo.TYPE_NULL
+            },
+            replayKey = { keyCode, downEvent, upEvent -> replayScreenTrackpadTriggerKey(keyCode, downEvent, upEvent) },
+            isTerminalApp = {
+                inputStarted &&
+                    SettingsManager.isScreenTrackpadTerminalApp(this, currentInputEditorInfo?.packageName)
+            },
+            hasStartedInputConnection = {
+                ScreenTrackpadTerminalApps.hasStartedInputConnection(
+                    inputStarted, currentInputConnection, currentInputBinding?.connection
+                )
+            }
+        )
         typingSoundPlayer = TypingSoundPlayer(this).apply { reload() }
         textInputController = TextInputController(
             context = this,
@@ -2910,6 +2944,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     override fun onDestroy() {
+        if (::screenTrackpadController.isInitialized) screenTrackpadController.deactivate()
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         ClicksAccessibilityKeyBridge.unregister(this)
@@ -3549,6 +3584,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         pendingKeyboardSurfaceTransition = null
         isInputViewActive = false
         if (::keyboardVisibilityController.isInitialized) keyboardVisibilityController.onInputUnbound()
+        inputStarted = false
+        if (::screenTrackpadController.isInitialized) screenTrackpadController.deactivate()
         traceImeVisibility("onUnbindInput")
         super.onUnbindInput()
     }
@@ -3566,6 +3603,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ++speechEditorSession
         }
         super.onStartInput(info, restarting)
+        inputStarted = true
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         if (
             !restarting ||
@@ -3742,6 +3780,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         super.onFinishInput()
+        // The text field session ended: a lost key-up must not leave the overlay up.
+        inputStarted = false
+        if (::screenTrackpadController.isInitialized) screenTrackpadController.deactivate()
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         keyboardVisibilityController.cancelPendingSurfaceTransition()
         accidentalKeyPressFilter.reset()
@@ -4264,6 +4305,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         super.onWindowHidden()
+        if (::screenTrackpadController.isInitialized) screenTrackpadController.deactivate()
         if (::candidatesBarController.isInitialized) {
             candidatesBarController.dismissEmojiPickerPopups()
         }
@@ -4527,6 +4569,29 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
     }
 
+    // re-dispatch a swallowed trigger key that turned out to be a tap or a chord
+    /**
+     * Re-dispatches a trigger key that the screen trackpad swallowed but that turned out to be a
+     * plain tap (or a chord), so it gets its normal behaviour. [upEvent] is null when only the
+     * down must be replayed (the real up will follow through the normal path).
+     */
+    private fun replayScreenTrackpadTriggerKey(keyCode: Int, downEvent: KeyEvent, upEvent: KeyEvent?) {
+        screenTrackpadReplaying = true
+        try {
+            val downHandled = onKeyDown(keyCode, downEvent)
+            if (downHandled) {
+                if (upEvent != null) onKeyUp(keyCode, upEvent)
+            } else {
+                currentInputConnection?.let { inputConnection ->
+                    inputConnection.sendKeyEvent(downEvent)
+                    if (upEvent != null) inputConnection.sendKeyEvent(upEvent)
+                }
+            }
+        } finally {
+            screenTrackpadReplaying = false
+        }
+    }
+
     private fun replayProtectedNumberKey(
         keyCode: Int,
         replay: AccidentalKeyPressFilter.KeyUpResult.ReplayTap
@@ -4592,7 +4657,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         val perfStart = ImePerfLogger.mark()
         try {
-        if (!replayingProtectedNumberKey) {
+        if (!replayingProtectedNumberKey && !screenTrackpadReplaying) {
             val accidentalInput = accidentalKeyInput(keyCode_, event_)
             accidentalKeyPressFilter.shouldConsumeKeyDown(
                 keyCode = keyCode_,
@@ -4617,7 +4682,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         val keyCode = remapped.keyCode
         val event = remapped.event
-        clicksPowerShiftTapFilter.shouldConsumeKeyDown(
+        if (!screenTrackpadReplaying) clicksPowerShiftTapFilter.shouldConsumeKeyDown(
             isClicksPowerKeyboard = DeviceSpecific.resolveInputProfile(
                 event,
                 physicalKeyboardProfileOverride
@@ -4634,7 +4699,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
             return true
         }
-        bounceKeyFilter.shouldConsumeKeyDown(this, keyCode, event)?.let { suppressed ->
+        if (!screenTrackpadReplaying) bounceKeyFilter.shouldConsumeKeyDown(this, keyCode, event)?.let { suppressed ->
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -4642,6 +4707,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 origin = "bounce_keys",
                 outputKeyCodeName = suppressed.debugOutput()
             )
+            return true
+        }
+        // trigger key handling (hold / tap activation)
+        if (!screenTrackpadReplaying && ::screenTrackpadController.isInitialized &&
+            screenTrackpadController.onKeyDown(keyCode, event, keyCode_, event_)
+        ) {
             return true
         }
 
@@ -5338,7 +5409,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
-        if (!replayingProtectedNumberKey) {
+        if (!replayingProtectedNumberKey && !screenTrackpadReplaying) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
                 is AccidentalKeyPressFilter.KeyUpResult.Suppressed -> {
                     notifyDebugKeyEvent(
@@ -5366,7 +5437,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             consumeAltEnterUntilKeyUp = false
             return true
         }
-        clicksPowerShiftTapFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
+        if (!screenTrackpadReplaying) clicksPowerShiftTapFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -5376,7 +5447,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
             return true
         }
-        bounceKeyFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
+        if (!screenTrackpadReplaying) bounceKeyFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -5384,6 +5455,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 origin = "bounce_keys",
                 outputKeyCodeName = suppressed.debugOutput()
             )
+            return true
+        }
+        // trigger key release (replays a plain tap)
+        if (!screenTrackpadReplaying && ::screenTrackpadController.isInitialized &&
+            screenTrackpadController.onKeyUp(keyCode, event, keyCode_, event_)
+        ) {
             return true
         }
 

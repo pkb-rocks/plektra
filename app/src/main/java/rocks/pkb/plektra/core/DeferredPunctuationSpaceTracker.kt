@@ -13,6 +13,9 @@ object DeferredPunctuationSpaceTracker {
     private const val NO_SPACE_BEFORE: String = ".,;:!?/\\)]}»›"
     private const val NO_CURSOR: Int = -1
 
+    // Only the cursor is read, so the editor need not send the document across.
+    private const val CURSOR_HINT_MAX_CHARS: Int = 64
+
     @Volatile
     private var pending: Boolean = false
 
@@ -83,7 +86,10 @@ object DeferredPunctuationSpaceTracker {
 
     private fun readCollapsedCursor(inputConnection: InputConnection): Int? {
         val extracted = try {
-            inputConnection.getExtractedText(ExtractedTextRequest(), 0)
+            inputConnection.getExtractedText(
+                ExtractedTextRequest().apply { hintMaxChars = CURSOR_HINT_MAX_CHARS },
+                0
+            )
         } catch (_: RuntimeException) {
             null
         } ?: return null

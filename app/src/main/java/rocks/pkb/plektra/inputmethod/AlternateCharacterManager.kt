@@ -39,6 +39,9 @@ class AlternateCharacterManager(
 
     companion object {
         private const val TAG = "AlternateCharacterManager"
+
+        // The editor snapshot only needs the text around the cursor, not the whole document.
+        private const val SNAPSHOT_HINT_MAX_CHARS = 512
     }
 
     private fun autoSpacePunctuation(): String {
@@ -1132,7 +1135,8 @@ class AlternateCharacterManager(
     }
 
     private fun readEditorSnapshot(inputConnection: InputConnection): EditorSnapshot? {
-        val extracted = inputConnection.getExtractedText(ExtractedTextRequest(), 0) ?: return null
+        val request = ExtractedTextRequest().apply { hintMaxChars = SNAPSHOT_HINT_MAX_CHARS }
+        val extracted = inputConnection.getExtractedText(request, 0) ?: return null
         val text = extracted.text?.toString() ?: return null
         if (extracted.selectionStart < 0 || extracted.selectionEnd < 0) return null
         return EditorSnapshot(

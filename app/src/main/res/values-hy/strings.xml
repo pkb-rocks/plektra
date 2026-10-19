@@ -653,6 +653,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Մուտքագրեք որոնելու համար։ Enter-ը բացում է առաջին արդյունքը։</string>
     <string name="quick_launcher_close">Փակել</string>
+    <string name="quick_launcher_no_entries_match">Ոչ մի տարր չի համապատասխանում \"%1$s\"-ին։</string>
+    <string name="quick_launcher_add_favorite">Ավելացնել ընտրանիում</string>
+    <string name="quick_launcher_remove_favorite">Հեռացնել ընտրանիից</string>
+    <string name="quick_launcher_hide_entry">Թաքցնել տարրը</string>
+    <string name="quick_launcher_show_entry">Ցուցադրել տարրը</string>
+    <string name="quick_launcher_edit_entry">Խմբագրել տարրը</string>
     <string name="quick_launcher_search_placeholder">Սկսեք մուտքագրել...</string>
     <string name="quick_launcher_auto_start_single">Ավտոմատ գործարկել, երբ մնա միայն մեկ արդյունք</string>
     <string name="quick_launcher_auto_start_single_title">Ավտոմատ բացել միակ համընկնումը</string>

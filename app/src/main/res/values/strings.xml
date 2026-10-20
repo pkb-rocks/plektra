@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="speech_external_enable">Enable FUTO Voice Input in Android keyboard settings</string>
     <string name="speech_external_installed">FUTO Voice Input is installed.</string>
     <string name="speech_external_missing">Install FUTO Voice Input to use this provider.</string>
@@ -1793,6 +1793,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="titan2_elite_top_corner_description">Round only the upper corner facing the display edge. Corners facing inward and inner buttons stay unchanged.</string>
     <string name="titan2_elite_max_icon_shrink_title">Maximum icon reduction: %1$d%%</string>
     <string name="titan2_elite_max_icon_shrink_description">Automatically shrink outer button icons only as much as needed, up to this limit. 0% disables shrinking; positioning stays active.</string>
+
     <string name="keyboard_bar_profile">Profile to configure</string>
     <string name="keyboard_bar_normal_profile">Normal</string>
     <string name="keyboard_bar_slim_profile">Slim</string>
@@ -1935,4 +1936,66 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="app_raw_mode_description">In the apps you pick here, Plektra sends every keystroke as-is: no suggestions, no auto-correction, no capital at the start of a line, no full stop from a double space. Meant for terminals, SSH clients, code editors and anything else where a helpful correction turns a command into a typo — `ls -la` should never become `Ls -la.`</string>
     <string name="app_raw_mode_webapk_note">Web app — types inside %1$s, so %1$s is excluded too</string>
     <string name="kw_auto_correction_exact_typing">exact typing, raw, per app, terminal, termux, ssh, disable autocorrect, auto-capitalization</string>
+    <!-- Embedded wireless-ADB broker, pairing service, and Titan 2 Elite tools. -->
+    <string name="notification_channel_adb_pairing">ADB pairing</string>
+    <string name="notification_adb_pairing_searching_for_service_title">Searching for pairing service…</string>
+    <string name="notification_adb_pairing_service_found_title">Pairing service found</string>
+    <string name="notification_adb_pairing_working_title">Pairing…</string>
+    <string name="notification_adb_pairing_succeed_title">Paired successfully</string>
+    <string name="notification_adb_pairing_succeed_text">This device can now connect to wireless debugging.</string>
+    <string name="notification_adb_pairing_failed_title">Pairing failed</string>
+    <string name="notification_adb_pairing_stop_searching">Stop</string>
+    <string name="notification_adb_pairing_retry">Retry</string>
+    <string name="notification_adb_pairing_input_paring_code">Enter pairing code</string>
+    <string name="dialog_adb_pairing_paring_code">Pairing code</string>
+    <string name="cannot_connect_port">Cannot connect to the pairing port.</string>
+    <string name="paring_code_is_wrong">The pairing code is wrong.</string>
+    <string name="adb_error_key_store">Failed to access the ADB key store.</string>
+    <string name="device_setup_needed_title">Setup needed</string>
+    <string name="device_setup_ready_title">Paired</string>
+    <string name="device_setup_ready_body">The tools below can reach the system. Survives reboots.</string>
+    <string name="device_setup_step_dev_1">Open Settings → About phone</string>
+    <string name="device_setup_step_dev_2">Tap Build number seven times</string>
+    <string name="device_setup_step_dev_3">Come back here</string>
+    <string name="device_setup_step_pair_1">Turn on Wireless debugging</string>
+    <string name="device_setup_step_pair_2">Tap Pair device with pairing code</string>
+    <string name="device_setup_step_pair_3">Type the code into the Plektra notification</string>
+    <string name="device_setup_open_about">Open About phone</string>
+    <string name="device_setup_open_wireless">Open Wireless debugging</string>
+    <string name="device_setup_open_pairing">Pair in Wireless debugging</string>
+    <string name="broker_forget_open_wireless">Remove %1$s in Wireless debugging</string>
+    <string name="device_setup_dnd_on">Do Not Disturb is on and may hide the pairing code. Turn it off until you are paired.</string>
+    <string name="device_setup_needs_notifications">Allow Plektra notifications first — the pairing code arrives as one.</string>
+    <string name="device_setup_forget_pairing">Forget pairing</string>
+    <string name="device_setup_checking_title">Checking…</string>
+    <string name="device_setup_checking_body">Testing whether the tools can reach the system.</string>
+    <string name="device_setup_unreachable_title">Cannot reach the system</string>
+    <string name="device_setup_rejected_body">Paired, but your phone is refusing the connection — the pairing code was probably mistyped, so the app is holding a key your phone never accepted. Re-pair to fix it.</string>
+    <string name="titan2_elite_tools_title">Titan 2 Elite tools</string>
+    <string name="titan2_elite_tools_description">Device setup for features that change the phone itself</string>
+    <string name="titan2_elite_tools_intro">Tools for the Titan 2 Elite that reach into the phone itself rather than the keyboard. They need the one-time wireless debugging pairing below.</string>
+    <string name="device_setup_link_title">Device setup</string>
+    <string name="device_setup_link_description">Pair wireless debugging so the app can run privileged commands itself</string>
+    <string name="broker_blocked_wireless_debugging">Wireless debugging is off. Android turns it off after a restart — turn it back on in Developer options.</string>
+    <string name="broker_blocked_no_service">Wireless debugging is on but the phone is not advertising it. Turn it off and on again in Developer options.</string>
+    <string name="broker_blocked_not_paired">Not paired. Follow the steps to set up wireless debugging.</string>
+    <string name="broker_repair">Re-pair</string>
+    <string name="broker_pin_mismatch_body">adbd\'s certificate changed. Forget the pairing and pair again.</string>
+    <string name="broker_forgetting">Forgetting the pairing…</string>
+    <string name="broker_forget_done">Unpaired. Plektra removed its key from Wireless debugging and deleted it here.</string>
+    <string name="broker_forget_manual">Plektra deleted its key here but could not remove it from your phone. Open Wireless debugging, tap %1$s under Paired devices, then tap Forget.</string>
+    <string name="broker_wireless_off_after_setup_title">Turn Wireless debugging off after setup</string>
+    <string name="broker_wireless_off_after_setup_description">When Plektra finishes a setup step, it turns Wireless debugging off again, so nothing on your network can reach it. Plektra can\'t reach the system again until you turn Wireless debugging back on in Developer options.</string>
+    <string name="broker_auth_timeout_help">Leave \"Disable adb authorization timeout\" in Developer options off. Android then forgets a paired key that has not been used for 7 days, so a pairing you no longer use stops working by itself. Plektra never changes this setting.</string>
+    <string name="broker_audit_title">Broker activity</string>
+    <string name="broker_audit_description">Every command Plektra ran through wireless debugging, and every permission it granted or took back. Kept on this phone only, last 200 entries.</string>
+    <string name="broker_audit_empty">Nothing yet.</string>
+    <string name="broker_audit_clear">Clear log</string>
+    <!-- A result word in the broker activity list, not a button label. -->
+    <string name="broker_audit_ok" tools:ignore="ButtonCase,Typos">ok</string>
+    <string name="broker_audit_failed">failed</string>
+    <string name="kw_main_titan2_elite_tools">titan, elite, t2e, toolbox, tools, device setup, broker, adb, wireless debugging, pairing, privileged</string>
+    <string name="kw_titan2_elite_tools_device_setup">adb, wireless debugging, pair, pairing, broker, shizuku, grant, secure settings</string>
+
+
 </resources>

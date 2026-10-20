@@ -5079,13 +5079,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             hasEditableField &&
             (symTogglePendingOnKeyUp || event?.isSymPressed == true) &&
             event?.repeatCount == 0 &&
-            !event.isAltPressed &&
             SettingsManager.getSymEditShortcutsEnabled(this)
         ) {
-            val action = SymEditShortcuts.actionFor(keyCode)
+            // The IME cannot see whether the app performed the action (the call is one-way), so an
+            // applicable Sym+C/V/X/A is always consumed. The key is left to the launcher and Sym
+            // chord blocks below only for a non-edit key, any Alt, or no connection.
+            val altActive = altActiveForDedicatedKeys || altPressed || altPhysicallyPressed
+            val action = SymEditShortcuts.perform(keyCode, altActive, currentInputConnection)
             if (action != null) {
                 symChordUsedSinceKeyDown = true
-                currentInputConnection?.performContextMenuAction(action)
                 KeyboardEventTracker.notifyKeyEvent(
                     keyCode = keyCode,
                     event = event,

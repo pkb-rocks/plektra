@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.inputmethod
 
+import android.os.SystemClock
 import android.util.Log
 
 /**
@@ -25,14 +26,15 @@ object NavModeHandler {
         ctrlPressed: Boolean,
         ctrlLatchActive: Boolean,
         lastCtrlReleaseTime: Long,
-        isConsecutiveTap: Boolean
+        isConsecutiveTap: Boolean,
+        now: Long = SystemClock.uptimeMillis()
     ): Pair<Boolean, NavModeResult> {
         if (ctrlPressed) {
             // Ctrl already pressed, ignore
             return Pair(false, NavModeResult())
         }
         
-        val currentTime = System.currentTimeMillis()
+        val currentTime = now
         val allowDoubleTap = isConsecutiveTap
         
         if (ctrlLatchActive) {
@@ -46,7 +48,7 @@ object NavModeHandler {
             ))
         } else {
             // Check for double tap
-            if (allowDoubleTap && currentTime - lastCtrlReleaseTime < DOUBLE_TAP_THRESHOLD && lastCtrlReleaseTime > 0) {
+            if (allowDoubleTap && ModifierKeyHandler.isWithinDoubleTap(currentTime, lastCtrlReleaseTime, DOUBLE_TAP_THRESHOLD)) {
                 // Double tap detected - activate Ctrl latch and show the keyboard
                 Log.d(TAG, "Nav mode: Ctrl latch activated with double tap")
                 return Pair(true, NavModeResult(
@@ -69,11 +71,11 @@ object NavModeHandler {
     /**
      * Handles Ctrl key up in nav mode.
      */
-    fun handleCtrlKeyUp(): NavModeResult {
+    fun handleCtrlKeyUp(now: Long = SystemClock.uptimeMillis()): NavModeResult {
         return NavModeResult(
             ctrlPressed = false,
             ctrlPhysicallyPressed = false,
-            lastCtrlReleaseTime = System.currentTimeMillis()
+            lastCtrlReleaseTime = now
         )
     }
     

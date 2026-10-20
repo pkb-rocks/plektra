@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.inputmethod
 
+import android.os.SystemClock
 import android.view.KeyEvent
 
 /**
@@ -32,6 +33,24 @@ class ModifierKeyHandler(
         val shouldRefreshStatusBar: Boolean = false
     )
 
+    private fun isDoubleTap(now: Long, lastReleaseTime: Long): Boolean =
+        isWithinDoubleTap(now, lastReleaseTime, doubleTapThreshold)
+
+    companion object {
+        /** The event's own time, or the current uptime when it has none (eventTime <= 0). */
+        fun eventTimeOrUptime(event: KeyEvent?): Long =
+            event?.eventTime?.takeIf { it > 0L } ?: SystemClock.uptimeMillis()
+
+        /**
+         * True when [now] falls within [threshold] after a recorded release. A negative delta
+         * (a release stamped on another clock, or from a later event) never counts, so a stale or
+         * foreign timestamp cannot latch a modifier. All times are in
+         * [android.os.SystemClock.uptimeMillis], the base of [KeyEvent.getEventTime].
+         */
+        fun isWithinDoubleTap(now: Long, lastReleaseTime: Long, threshold: Long): Boolean =
+            lastReleaseTime > 0 && now - lastReleaseTime in 0 until threshold
+    }
+
     // ========== Ctrl Handling ==========
 
     fun handleCtrlKeyDown(
@@ -40,6 +59,7 @@ class ModifierKeyHandler(
         isInputViewActive: Boolean,
         isConsecutiveTap: Boolean,
         singleTapLatches: Boolean = false,
+        now: Long = SystemClock.uptimeMillis(),
         onNavModeDeactivated: (() -> Unit)? = null
     ): ModifierKeyResult {
         if (keyCode != KeyEvent.KEYCODE_CTRL_LEFT && keyCode != KeyEvent.KEYCODE_CTRL_RIGHT) {
@@ -51,7 +71,6 @@ class ModifierKeyHandler(
         }
 
         state.physicallyPressed = true
-        val currentTime = System.currentTimeMillis()
         val allowDoubleTap = isConsecutiveTap
         if (!allowDoubleTap) {
             state.lastReleaseTime = 0
@@ -82,7 +101,7 @@ class ModifierKeyHandler(
             }
             state.oneShot -> {
                 // One-shot active: check for double-tap
-                if (allowDoubleTap && currentTime - state.lastReleaseTime < doubleTapThreshold && state.lastReleaseTime > 0) {
+                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
                     state.oneShot = false
                     state.latchActive = true
                     state.lastReleaseTime = 0
@@ -101,7 +120,7 @@ class ModifierKeyHandler(
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
                 // Check for double-tap to enable latch
-                if (allowDoubleTap && currentTime - state.lastReleaseTime < doubleTapThreshold && state.lastReleaseTime > 0) {
+                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
                     state.latchActive = true
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
@@ -114,13 +133,17 @@ class ModifierKeyHandler(
         }
     }
 
-    fun handleCtrlKeyUp(keyCode: Int, state: CtrlState): ModifierKeyResult {
+    fun handleCtrlKeyUp(
+        keyCode: Int,
+        state: CtrlState,
+        now: Long = SystemClock.uptimeMillis()
+    ): ModifierKeyResult {
         if (keyCode != KeyEvent.KEYCODE_CTRL_LEFT && keyCode != KeyEvent.KEYCODE_CTRL_RIGHT) {
             return ModifierKeyResult()
         }
 
         if (state.pressed) {
-            state.lastReleaseTime = System.currentTimeMillis()
+            state.lastReleaseTime = now
             state.pressed = false
             state.physicallyPressed = false
             return ModifierKeyResult(shouldUpdateStatusBar = true)
@@ -134,7 +157,8 @@ class ModifierKeyHandler(
         keyCode: Int,
         state: AltState,
         isConsecutiveTap: Boolean,
-        singleTapLatches: Boolean = false
+        singleTapLatches: Boolean = false,
+        now: Long = SystemClock.uptimeMillis()
     ): ModifierKeyResult {
         if (keyCode != KeyEvent.KEYCODE_ALT_LEFT && keyCode != KeyEvent.KEYCODE_ALT_RIGHT) {
             return ModifierKeyResult()
@@ -145,7 +169,6 @@ class ModifierKeyHandler(
         }
 
         state.physicallyPressed = true
-        val currentTime = System.currentTimeMillis()
         val allowDoubleTap = isConsecutiveTap
         if (!allowDoubleTap) {
             state.lastReleaseTime = 0
@@ -160,7 +183,7 @@ class ModifierKeyHandler(
             }
             state.oneShot -> {
                 // One-shot active: check for double-tap
-                if (allowDoubleTap && currentTime - state.lastReleaseTime < doubleTapThreshold && state.lastReleaseTime > 0) {
+                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
                     state.oneShot = false
                     state.latchActive = true
                     state.lastReleaseTime = 0
@@ -179,7 +202,7 @@ class ModifierKeyHandler(
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
                 // Check for double-tap to enable latch
-                if (allowDoubleTap && currentTime - state.lastReleaseTime < doubleTapThreshold && state.lastReleaseTime > 0) {
+                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
                     state.latchActive = true
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
@@ -192,13 +215,17 @@ class ModifierKeyHandler(
         }
     }
 
-    fun handleAltKeyUp(keyCode: Int, state: AltState): ModifierKeyResult {
+    fun handleAltKeyUp(
+        keyCode: Int,
+        state: AltState,
+        now: Long = SystemClock.uptimeMillis()
+    ): ModifierKeyResult {
         if (keyCode != KeyEvent.KEYCODE_ALT_LEFT && keyCode != KeyEvent.KEYCODE_ALT_RIGHT) {
             return ModifierKeyResult()
         }
 
         if (state.pressed) {
-            state.lastReleaseTime = System.currentTimeMillis()
+            state.lastReleaseTime = now
             state.pressed = false
             state.physicallyPressed = false
             return ModifierKeyResult(shouldUpdateStatusBar = true)

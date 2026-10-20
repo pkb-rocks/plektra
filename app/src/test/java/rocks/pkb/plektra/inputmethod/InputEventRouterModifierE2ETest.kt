@@ -134,7 +134,7 @@ class InputEventRouterModifierE2ETest {
         assertTrue(modifierStateController.altOneShot)
         assertTrue(modifierStateController.altPressed)
 
-        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT)
+        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT, now = EVENT_TIME + 30L)
         assertTrue(modifierStateController.altOneShot)
         assertFalse(modifierStateController.altPressed)
         assertFalse(modifierStateController.altPhysicallyPressed)
@@ -171,7 +171,7 @@ class InputEventRouterModifierE2ETest {
         assertTrue(aWhileHeldResult is InputEventRouter.EditableFieldRoutingResult.Consume)
         assertEquals(1, callbacks.clearAltOneShotCalls)
 
-        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT)
+        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT, now = EVENT_TIME + 30L)
         assertFalse(modifierStateController.altPressed)
         assertFalse(modifierStateController.altPhysicallyPressed)
         assertFalse(modifierStateController.altOneShot)
@@ -225,7 +225,7 @@ class InputEventRouterModifierE2ETest {
         assertTrue(modifierStateController.ctrlOneShot)
         assertTrue(modifierStateController.ctrlPressed)
 
-        modifierStateController.handleCtrlKeyUp(KeyEvent.KEYCODE_CTRL_LEFT)
+        modifierStateController.handleCtrlKeyUp(KeyEvent.KEYCODE_CTRL_LEFT, now = EVENT_TIME + 30L)
         assertTrue(modifierStateController.ctrlOneShot)
         assertFalse(modifierStateController.ctrlPressed)
         assertFalse(modifierStateController.ctrlPhysicallyPressed)
@@ -262,7 +262,7 @@ class InputEventRouterModifierE2ETest {
         assertEquals(0, callbacks.clearCtrlOneShotCalls)
         assertTrue(inputConnectionRecorder.sentKeyEvents.isNotEmpty())
 
-        modifierStateController.handleCtrlKeyUp(KeyEvent.KEYCODE_CTRL_LEFT)
+        modifierStateController.handleCtrlKeyUp(KeyEvent.KEYCODE_CTRL_LEFT, now = EVENT_TIME + 30L)
         assertFalse(modifierStateController.ctrlPressed)
         assertFalse(modifierStateController.ctrlPhysicallyPressed)
 
@@ -907,9 +907,10 @@ class InputEventRouterModifierE2ETest {
     }
 
     private fun keyDown(keyCode: Int, metaState: Int = 0): KeyEvent {
+        // Explicit uptime-base time: the modifier latch compares it with the release time.
         return KeyEvent(
             0L,
-            System.currentTimeMillis(),
+            EVENT_TIME,
             KeyEvent.ACTION_DOWN,
             keyCode,
             0,
@@ -944,7 +945,7 @@ class InputEventRouterModifierE2ETest {
             callbacks = callbacks
         )
         assertTrue(altDownResult is InputEventRouter.EditableFieldRoutingResult.Consume)
-        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT)
+        modifierStateController.handleAltKeyUp(KeyEvent.KEYCODE_ALT_LEFT, now = EVENT_TIME + 30L)
     }
 
     private class TestCallbacks(
@@ -1057,3 +1058,6 @@ class InputEventRouterModifierE2ETest {
         }
     }
 }
+
+// Explicit KeyEvent-time base (uptime-like) shared by the router tests.
+private const val EVENT_TIME = 5_000L

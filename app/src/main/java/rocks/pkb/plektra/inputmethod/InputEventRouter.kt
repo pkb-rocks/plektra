@@ -350,7 +350,8 @@ class InputEventRouter(
                     params.isInputViewActive,
                     onNavModeDeactivated = {
                         navModeController.cancelNotification()
-                    }
+                    },
+                    now = ModifierKeyHandler.eventTimeOrUptime(event)
                 )
                 if (result.shouldConsume) {
                     if (result.shouldUpdateStatusBar) {
@@ -380,7 +381,10 @@ class InputEventRouter(
                 }
             }
             if (!params.altPressed) {
-                val result = controllers.modifierStateController.handleAltKeyDown(keyCode)
+                val result = controllers.modifierStateController.handleAltKeyDown(
+                    keyCode,
+                    now = ModifierKeyHandler.eventTimeOrUptime(event)
+                )
                 if (result.shouldUpdateStatusBar) {
                     callbacks.updateStatusBar()
                 }

@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.core
 
+import android.os.SystemClock
 import android.view.KeyEvent
 import rocks.pkb.plektra.inputmethod.ModifierKeyHandler
 
@@ -260,6 +261,7 @@ class ModifierStateController(
     fun handleCtrlKeyDown(
         keyCode: Int,
         isInputViewActive: Boolean,
+        now: Long = SystemClock.uptimeMillis(),
         onNavModeDeactivated: (() -> Unit)? = null
     ): ModifierKeyHandler.ModifierKeyResult {
         if (ctrlPressed) {
@@ -272,19 +274,26 @@ class ModifierStateController(
             isInputViewActive,
             isConsecutiveTap = isConsecutiveTap,
             singleTapLatches = ctrlTapLatches,
-            onNavModeDeactivated
+            now = now,
+            onNavModeDeactivated = onNavModeDeactivated
         )
         ctrlPressed = true
         return result
     }
 
-    fun handleCtrlKeyUp(keyCode: Int): ModifierKeyHandler.ModifierKeyResult {
-        val result = modifierKeyHandler.handleCtrlKeyUp(keyCode, ctrlState)
+    fun handleCtrlKeyUp(
+        keyCode: Int,
+        now: Long = SystemClock.uptimeMillis()
+    ): ModifierKeyHandler.ModifierKeyResult {
+        val result = modifierKeyHandler.handleCtrlKeyUp(keyCode, ctrlState, now = now)
         ctrlPressed = false
         return result
     }
 
-    fun handleAltKeyDown(keyCode: Int): ModifierKeyHandler.ModifierKeyResult {
+    fun handleAltKeyDown(
+        keyCode: Int,
+        now: Long = SystemClock.uptimeMillis()
+    ): ModifierKeyHandler.ModifierKeyResult {
         if (altPressed) {
             return ModifierKeyHandler.ModifierKeyResult()
         }
@@ -293,14 +302,18 @@ class ModifierStateController(
             keyCode,
             altState,
             isConsecutiveTap = isConsecutiveTap,
-            singleTapLatches = altTapLatches
+            singleTapLatches = altTapLatches,
+            now = now
         )
         altPressed = true
         return result
     }
 
-    fun handleAltKeyUp(keyCode: Int): ModifierKeyHandler.ModifierKeyResult {
-        val result = modifierKeyHandler.handleAltKeyUp(keyCode, altState)
+    fun handleAltKeyUp(
+        keyCode: Int,
+        now: Long = SystemClock.uptimeMillis()
+    ): ModifierKeyHandler.ModifierKeyResult {
+        val result = modifierKeyHandler.handleAltKeyUp(keyCode, altState, now = now)
         altPressed = false
         return result
     }

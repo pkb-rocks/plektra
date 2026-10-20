@@ -517,9 +517,12 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
 
     @Test
     fun deviceSanity_ctrlLatch_canBeDisabledByAnotherCtrlTap() {
+        // Latch timing uses KeyEvent.eventTime (not wall-clock), so these gaps stay inside the
+        // 500ms double-tap window regardless of how slowly the test runner schedules the calls.
         val t0 = 3_000L
         tapCtrl(t0)
         tapCtrl(t0 + 120L) // latch
+        assertTrue(modifierController().ctrlLatchActive)
         tapCtrl(t0 + 260L) // toggle off
 
         val modifier = modifierController()

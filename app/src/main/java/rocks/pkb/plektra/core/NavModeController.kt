@@ -12,6 +12,7 @@ import rocks.pkb.plektra.commands.CommandExecutor
 import rocks.pkb.plektra.commands.CommandRegistry
 import rocks.pkb.plektra.commands.CommandSurface
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
+import rocks.pkb.plektra.inputmethod.ModifierKeyHandler
 import rocks.pkb.plektra.inputmethod.NavModeHandler
 import rocks.pkb.plektra.inputmethod.NotificationHelper
 
@@ -77,7 +78,8 @@ class NavModeController(
                     modifierStateController.ctrlPressed,
                     modifierStateController.ctrlLatchActive,
                     modifierStateController.ctrlLastReleaseTime,
-                    isConsecutiveTap
+                    isConsecutiveTap,
+                    now = ModifierKeyHandler.eventTimeOrUptime(event)
                 )
                 applyNavModeResult(result)
                 if (shouldConsume) {
@@ -85,7 +87,7 @@ class NavModeController(
                 }
                 shouldConsume
             } else {
-                val result = NavModeHandler.handleCtrlKeyUp()
+                val result = NavModeHandler.handleCtrlKeyUp(ModifierKeyHandler.eventTimeOrUptime(event))
                 applyNavModeResult(result)
                 modifierStateController.ctrlPressed = false
                 true

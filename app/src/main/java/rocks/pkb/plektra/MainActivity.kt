@@ -368,23 +368,15 @@ fun KeyboardSetupScreen(
     var isPlektraEnabled by remember { mutableStateOf(false) }
     var isPlektraSelected by remember { mutableStateOf(false) }
 
-    // Check IME status
-    LaunchedEffect(Unit) {
+    // Check IME status each time this screen becomes visible (open, multi-window, rotation, return
+    // from the system's keyboard settings), then on every change of the input method settings while
+    // it stays visible (the IME picker and a hardware switch shortcut write them too). Not on a
+    // timer: enabledInputMethodList makes system_server run AppsFilter against every other
+    // installed keyboard, which logged a BLOCKED interaction per package every 2 s.
+    CheckImeStatusWhileStarted {
         checkImeStatus(context) { enabled, selected ->
             isPlektraEnabled = enabled
             isPlektraSelected = selected
-        }
-    }
-
-    // Refresh IME status periodically and when activity resumes
-    LaunchedEffect(Unit) {
-        // Check status every 2 seconds when screen is visible
-        while (true) {
-            kotlinx.coroutines.delay(2000)
-            checkImeStatus(context) { enabled, selected ->
-                isPlektraEnabled = enabled
-                isPlektraSelected = selected
-            }
         }
     }
 

@@ -29,7 +29,7 @@ class ShowcaseNotesActivity : NotesActivity() {
         if (intent.getBooleanExtra("restoreClipboard", false) && clipboardSaved) {
             val dao = requireNotNull(rocks.pkb.plektra.clipboard.ClipboardDao.getInstance(this))
             (dao.count() - 1 downTo 0).forEach { index ->
-                if (dao.getAt(index)?.id !in originalClipboardIds) dao.deleteClipAt(index)
+                dao.getAt(index)?.takeIf { it.id !in originalClipboardIds }?.let { dao.deleteClip(it.id) }
             }
             val previous = originalClipboard
             if (previous != null) clipboard.setPrimaryClip(previous) else clipboard.clearPrimaryClip()

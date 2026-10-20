@@ -2,7 +2,8 @@ package rocks.pkb.plektra.clipboard
 
 /**
  * Represents a single clipboard history entry.
- * @param id Unique identifier for the entry
+ * @param id Stable handle for this entry: the row id for stored entries, or a unique negative
+ *   id from [ClipboardDao] for a new one (it never changes, so a handle held by the UI stays valid)
  * @param timeStamp When the entry was created/last updated (System.currentTimeMillis())
  * @param isPinned Whether the entry is pinned (won't be auto-deleted)
  * @param text The clipboard text content
@@ -14,6 +15,13 @@ data class ClipboardHistoryEntry(
     val text: String,
     var isSensitive: Boolean = false
 ) : Comparable<ClipboardHistoryEntry> {
+
+    /**
+     * SQLite row id, [ClipboardDao.PENDING_ID] until the background insert completes. Only read
+     * it on the DAO's database thread, which runs the insert before any later update or delete.
+     */
+    @Volatile
+    var rowId: Long = if (id >= 0) id else ClipboardDao.PENDING_ID
 
     /**
      * Comparator for sorting clipboard entries:

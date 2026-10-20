@@ -1003,6 +1003,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_main_text_input">digitazione, testo, punteggiatura, virgolette, spaziatura, maiuscole</string>
     <string name="kw_main_auto_correction">correzione, correttore automatico, ortografia, suggerimenti, sostituzioni, dizionari</string>
     <string name="kw_main_keyboard_theme">tema, temi, colori, scuro, chiaro, preset, tastiera fisica, tastiera a schermo, Plektra Dark, Plektra Light, Cloud Tap, Moon Tap, Classic Cloud, Classic Midnight</string>
+    <string name="kw_status_bar_presentation">Slim, normale, profilo, profili, minimale, compatto</string>
     <string name="kw_main_app_language">lingua, lingua app, locale, traduzione</string>
     <string name="kw_main_customization">personalizza, personalizzazione, aspetto</string>
     <string name="kw_main_advanced">avanzate, backup, ripristino, debug, esperto</string>

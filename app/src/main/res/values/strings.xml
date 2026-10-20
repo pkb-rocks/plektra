@@ -1750,6 +1750,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_main_text_input">typing, text, punctuation, quotes, spacing, capitalization</string>
     <string name="kw_main_auto_correction">correction, autocorrect, spelling, suggestions, replacements, dictionaries</string>
     <string name="kw_main_keyboard_theme">theme, themes, colors, dark, light, presets, hardware keyboard, on-screen keyboard, Plektra Dark, Plektra Light, Cloud Tap, Moon Tap, Classic Cloud, Classic Midnight</string>
+    <string name="kw_status_bar_presentation">slim, normal, profile, profiles, minimal, compact</string>
     <string name="kw_main_app_language">language, app language, locale, translation</string>
     <string name="kw_main_customization">customize, customization, appearance</string>
     <string name="kw_main_advanced">advanced, backup, restore, debug, expert</string>

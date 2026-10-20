@@ -44,6 +44,84 @@ class SettingLinkRegistryTest {
     }
 
     @Test
+    fun mainScreenCustomizationPagesAndTheirChildrenHaveReachableBreadcrumbs() {
+        val paths = mapOf(
+            "status_bar_buttons" to listOf(R.string.status_bar_buttons_title),
+            "keyboard_theme" to listOf(R.string.keyboard_theme_title),
+            "display_geometry" to listOf(R.string.keyboard_bar_geometry),
+            "launcher_shortcuts" to listOf(R.string.starter_launcher_shortcuts_title),
+            "app_enter_behavior" to listOf(R.string.app_enter_behaviour_title),
+            "keyboard_bar_buttons" to listOf(R.string.status_bar_buttons_title, R.string.status_bar_buttons_section),
+            "keyboard_bar_variations" to listOf(R.string.status_bar_buttons_title, R.string.keyboard_bar_variations_title),
+            "keyboard_theme_assignment" to listOf(R.string.keyboard_theme_title, R.string.setting_link_theme_assignment),
+            "launcher_shortcut_behavior" to listOf(R.string.starter_launcher_shortcuts_title, R.string.quick_launcher_behaviour_title),
+            "launcher_shortcut_cosmetic" to listOf(R.string.starter_launcher_shortcuts_title, R.string.quick_launcher_cosmetic_title),
+            "launcher_shortcut_assignments" to listOf(R.string.starter_launcher_shortcuts_title, R.string.launcher_shortcuts_screen_title)
+        )
+        paths.forEach { (page, path) ->
+            val entries = SettingLinkRegistry.entries.filter { it.route.customizationDestination == page }
+            assertTrue("No registry entries for $page", entries.isNotEmpty())
+            entries.forEach { entry ->
+                val breadcrumb = SettingLinkRegistry.breadcrumbTitles(entry.route)
+                assertTrue("${entry.id} incorrectly names More Customizations",
+                    R.string.settings_category_customization !in breadcrumb)
+                assertEquals(entry.id, listOf(R.string.settings_title) + path, breadcrumb)
+            }
+        }
+    }
+
+    @Test
+    fun moreCustomizationPagesKeepTheirParentInBreadcrumbs() {
+        for (page in listOf(null, "app_icon", "main_background", "sounds", "variations")) {
+            val entries = SettingLinkRegistry.entries.filter {
+                it.route.destination == SettingsDestination.Customization &&
+                    it.route.customizationDestination == page
+            }
+            assertTrue("No registry entries for $page", entries.isNotEmpty())
+            entries.forEach { entry ->
+                assertEquals(entry.id, listOfNotNull(
+                    R.string.settings_title,
+                    R.string.settings_category_customization,
+                    page?.let(SettingLinkRegistry.customizationSubtitles::get)
+                ), SettingLinkRegistry.breadcrumbTitles(entry.route))
+            }
+        }
+    }
+
+    @Test
+    fun everyCustomizationPageIsEitherReachableFromMainOrUnderMoreCustomizations() {
+        val moreCustomizationPages = setOf("variations", "sounds", "app_icon", "main_background")
+        SettingLinkRegistry.entries
+            .filter { it.route.destination == SettingsDestination.Customization }
+            .forEach { entry ->
+                val page = entry.route.customizationDestination ?: return@forEach
+                val underMoreCustomizations = R.string.settings_category_customization in
+                    SettingLinkRegistry.breadcrumbTitles(entry.route)
+                assertEquals(
+                    "Customization page '$page' of '${entry.id}' needs a breadcrumb parent or " +
+                        "an entry in the More Customizations set",
+                    page in moreCustomizationPages,
+                    underMoreCustomizations
+                )
+            }
+    }
+
+    @Test
+    fun breadcrumbParentsAreCustomizationPages() {
+        SettingLinkRegistry.customizationBreadcrumbParents.values.filterNotNull().forEach { parent ->
+            assertTrue("breadcrumb parent '$parent' is not a customization page",
+                SettingLinkRegistry.customizationSubtitles.containsKey(parent))
+        }
+    }
+
+    @Test
+    fun otherSettingsBreadcrumbsKeepTheirScreenAndSubscreen() {
+        val entry = requireNotNull(SettingLinkRegistry.byId("on_screen.number_row"))
+        assertEquals(listOf(R.string.settings_title, R.string.keyboards_devices_title,
+            R.string.on_screen_keyboard_title), SettingLinkRegistry.breadcrumbTitles(entry.route))
+    }
+
+    @Test
     fun buildLinkAndParseLinkRoundTrip() {
         SettingLinkRegistry.entries.forEach { entry ->
             assertEquals("https://pkb.rocks/settings/${entry.id}", SettingLinkRegistry.buildLink(entry.id))

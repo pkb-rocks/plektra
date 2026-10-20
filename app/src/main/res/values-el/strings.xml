@@ -1674,6 +1674,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_main_text_input">πληκτρολόγηση, κείμενο, στίξη, εισαγωγικά, διαστήματα, κεφαλαία, typing, text, punctuation, quotes, spacing, capitalization</string>
     <string name="kw_main_auto_correction">διόρθωση, αυτόματη διόρθωση, ορθογραφία, προτάσεις, αντικαταστάσεις, λεξικά, correction, autocorrect, spelling, suggestions, replacements, dictionaries</string>
     <string name="kw_main_keyboard_theme">θέμα, θέματα, χρώματα, σκοτεινό, φωτεινό, προρυθμίσεις, hardware πληκτρολόγιο, πληκτρολόγιο οθόνης, theme, colors, dark, light, presets, Plektra Dark, Plektra Light, Cloud Tap, Moon Tap, Classic Cloud, Classic Midnight</string>
+    <string name="kw_status_bar_presentation">Slim, κανονικό, προφίλ, μίνιμαλ, συμπαγές</string>
     <string name="kw_main_app_language">γλώσσα, γλώσσα εφαρμογής, locale, μετάφραση, language, app language, translation</string>
     <string name="kw_main_customization">προσαρμογή, εμφάνιση, customize, customization, appearance</string>
     <string name="kw_main_advanced">για προχωρημένους, αντίγραφο ασφαλείας, επαναφορά, debug, ειδικός, advanced, backup, restore, expert</string>

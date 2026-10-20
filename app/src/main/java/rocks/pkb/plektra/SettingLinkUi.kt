@@ -158,16 +158,8 @@ fun Modifier.settingRow(
 @Composable
 fun settingEntryBreadcrumb(entry: SettingEntry): String {
     val context = LocalContext.current
-    val root = stringResource(R.string.settings_title)
-    val screen = entry.route.destination.let { destination ->
-        SettingLinkRegistry.destinationTitles[destination]?.let { context.getString(it) }
-    }
-    val subtitle = entry.route.customizationDestination?.let { sub ->
-        SettingLinkRegistry.customizationSubtitles[sub]?.let { context.getString(it) }
-    }
-    val deviceSubtitle = SettingLinkRegistry.keyboardsDevicesSubtitles[entry.route.keyboardsDevicesDestination]
-        ?.let(context::getString)
-    return listOfNotNull(root, screen, subtitle, deviceSubtitle).joinToString(" › ")
+    return SettingLinkRegistry.breadcrumbTitles(entry.route)
+        .joinToString(" › ", transform = context::getString)
 }
 
 /**

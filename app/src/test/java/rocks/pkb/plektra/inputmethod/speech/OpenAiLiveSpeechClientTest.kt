@@ -140,9 +140,13 @@ class OpenAiLiveSpeechClientTest {
 
     @Test fun cancellationStopsCaptureAndDoesNotReconnect() = runBlocking {
         MockWebServer().use { server ->
+            val configured = CompletableDeferred<Unit>()
             server.enqueue(MockResponse().withWebSocketUpgrade(object : WebSocketListener() {
                 override fun onMessage(socket: WebSocket, text: String) {
-                    if (text.contains("session.update")) socket.send("""{"type":"session.updated"}""")
+                    if (text.contains("session.update")) {
+                        socket.send("""{"type":"session.updated"}""")
+                        configured.complete(Unit)
+                    }
                 }
             }))
             val recording = CompletableDeferred<Unit>()
@@ -161,7 +165,7 @@ class OpenAiLiveSpeechClientTest {
             }
             val task = launch { OpenAiLiveSpeechClient(url = server.url("/").toString())
                 .transcribe(request(), recorder, { _, _ -> }, { fail("Unexpected text") }, {}) }
-            withTimeout(3000) { recording.await() }
+            withTimeout(3000) { recording.await(); configured.await() }
             task.cancelAndJoin()
             assertTrue(stopped)
             assertEquals(1, server.requestCount)

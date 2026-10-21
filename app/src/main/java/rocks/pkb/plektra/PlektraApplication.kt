@@ -53,6 +53,8 @@ class PlektraApplication : Application() {
         }.also { preferences.registerOnSharedPreferenceChangeListener(it) }
         SettingsManager.initializeAltShiftLayoutSwitchDefault(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
+        // Restore the vendor keyboard switch if a ring process ended while it was darkened.
+        rocks.pkb.plektra.ring.RingBacklight.restoreLater(this)
         AppPackageChangeMonitor.register(this)
         ClicksPowerKeyboardController.initialize(this)
         publishSoftwareKeyboardModeShortcut()

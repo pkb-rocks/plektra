@@ -8,6 +8,7 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.edit
 import rocks.pkb.plektra.commands.CommandJson
 import rocks.pkb.plektra.commands.CommandLaunchSpec
 import rocks.pkb.plektra.commands.CommandSourceId
@@ -6397,5 +6398,50 @@ object SettingsManager {
             ENTER_ADDITIONAL_SEND_SHORTCUT_SYM_ENTER -> shortcut
             else -> ENTER_ADDITIONAL_SEND_SHORTCUT_NONE
         }
+    }
+
+    // smart keyboard backlight (Titan 2 Elite). The matching "written to the phone"
+    // state is device state, not a setting, so it lives in PrivilegedDiagnostics (backup-excluded).
+    private const val KEY_SMART_BACKLIGHT_ENABLED = "smart_backlight_enabled"
+    private const val DEFAULT_SMART_BACKLIGHT_ENABLED = false
+
+    /**
+     * Smart keyboard backlight: keep the keyboard lit past the vendor's 30 s limit. Needs the
+     * embedded ADB broker once, to write the vendor timeout.
+     */
+    fun getSmartBacklightEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_SMART_BACKLIGHT_ENABLED, DEFAULT_SMART_BACKLIGHT_ENABLED)
+    }
+
+    fun setSmartBacklightEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SMART_BACKLIGHT_ENABLED, enabled).apply()
+    }
+
+    // the keyboard-light Quick Settings tile's own WRITE_SECURE_SETTINGS holder
+    // ([rocks.pkb.plektra.inputmethod.WriteSecureSettingsHolders.BACKLIGHT_TILE]), a switch in the
+    // Smart backlight section.
+    private const val KEY_BACKLIGHT_TILE_ENABLED = "backlight_tile_enabled"
+
+    /**
+     * Keep WRITE_SECURE_SETTINGS for the keyboard-light tile even while Smart backlight is off.
+     *
+     * Never stored until first read: an install where the tile already worked (Smart backlight on,
+     * or the permission already held) starts with it on, so upgrading keeps a
+     * working tile; any other install starts with it off. The first answer is stored, so the
+     * default never shifts under the user afterwards.
+     */
+    fun getBacklightTileEnabled(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        if (prefs.contains(KEY_BACKLIGHT_TILE_ENABLED)) {
+            return prefs.getBoolean(KEY_BACKLIGHT_TILE_ENABLED, false)
+        }
+        val initial = getSmartBacklightEnabled(context) ||
+            rocks.pkb.plektra.inputmethod.PrivilegedSetup.hasWriteSecureSettings(context)
+        setBacklightTileEnabled(context, initial)
+        return initial
+    }
+
+    fun setBacklightTileEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit { putBoolean(KEY_BACKLIGHT_TILE_ENABLED, enabled) }
     }
 }

@@ -65,7 +65,7 @@ class CandidatesBarController(
             candidatesStatusBar.onSymTextCommitted = value
         }
 
-    var onSuggestionCommitted: (() -> Unit)? = null
+    var onSuggestionCommitted: ((String) -> Unit)? = null
         set(value) {
             field = value
             inputStatusBar.onSuggestionCommitted = value

@@ -33,6 +33,25 @@ class AlternateCharacterManager(
     var onAltCharInserted: ((Char) -> Unit)? = null
     // Callback invoked when a normal character is confirmed (short press in Alt mode)
     var onNormalCharCommitted: ((String) -> Unit)? = null
+    // Optional accounting observes successful editor mutations independently of suggestion tracking.
+    var onStatisticsTextCommitted: ((String) -> Unit)? = null
+    var onStatisticsCharactersDeleted: ((Int) -> Unit)? = null
+
+    private fun commitTextWithStatistics(
+        inputConnection: InputConnection,
+        text: String,
+        track: Boolean = true
+    ): Boolean {
+        val committed = inputConnection.commitText(text, 1)
+        if (committed && track) onStatisticsTextCommitted?.invoke(text)
+        return committed
+    }
+
+    private fun deletePreviousCharacterWithStatistics(inputConnection: InputConnection): Boolean {
+        val deleted = inputConnection.deleteSurroundingText(1, 0)
+        if (deleted) onStatisticsCharactersDeleted?.invoke(1)
+        return deleted
+    }
     // Callback invoked before mapped punctuation is committed.
     var onBoundaryTextRequested: ((String, InputConnection) -> Boolean)? = null
 
@@ -274,7 +293,9 @@ class AlternateCharacterManager(
                 normalChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
                 return true
             }
-            inputConnection.commitText(normalChar, 1)
+            val trackedImmediately = context?.let(SettingsManager::getLongPressModifier) == "shift" &&
+                normalChar.firstOrNull()?.isLetter() == true
+            commitTextWithStatistics(inputConnection, normalChar, track = !trackedImmediately)
             insertedNormalChars[keyCode] = normalChar
             insertedTextAnchors.remove(keyCode)
             captureInsertedTextAnchor(inputConnection, normalChar)?.let { anchor ->
@@ -351,7 +372,7 @@ class AlternateCharacterManager(
                 }
             }
             AutoSpaceTracker.clear()
-            inputConnection.commitText(altChar, 1)
+            commitTextWithStatistics(inputConnection, altChar)
             if (altChar.isNotEmpty()) {
                 onAltCharInserted?.invoke(altChar[0])
             }
@@ -510,7 +531,7 @@ class AlternateCharacterManager(
                             longPressActivated[keyCode] = true
 
                             if (!insertedChar.isNullOrEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
+                                deletePreviousCharacterWithStatistics(inputConnection)
                             }
 
                             if (handleBoundaryTextBeforeCommit(symChar, inputConnection)) {
@@ -547,7 +568,7 @@ class AlternateCharacterManager(
                             }
 
                             AutoSpaceTracker.clear()
-                            inputConnection.commitText(symChar, 1)
+                            commitTextWithStatistics(inputConnection, symChar)
                             insertedNormalChars.remove(keyCode)
                             keyPressWasShifted.remove(keyCode)
                             longPressRunnables.remove(keyCode)
@@ -565,9 +586,9 @@ class AlternateCharacterManager(
                             if (shiftChar != null) {
                                 longPressActivated[keyCode] = true
 
-                                inputConnection.deleteSurroundingText(1, 0)
+                                deletePreviousCharacterWithStatistics(inputConnection)
                                 if (!handleBoundaryTextBeforeCommit(shiftChar, inputConnection)) {
-                                    inputConnection.commitText(shiftChar, 1)
+                                    commitTextWithStatistics(inputConnection, shiftChar)
                                 }
 
                                 insertedNormalChars.remove(keyCode)
@@ -581,8 +602,8 @@ class AlternateCharacterManager(
                             longPressActivated[keyCode] = true
                             val shiftChar = resolveShiftLongPressText(keyCode, insertedChar) ?: insertedChar.uppercase()
 
-                            inputConnection.deleteSurroundingText(1, 0)
-                            inputConnection.commitText(shiftChar, 1)
+                            deletePreviousCharacterWithStatistics(inputConnection)
+                            commitTextWithStatistics(inputConnection, shiftChar)
 
                             insertedNormalChars.remove(keyCode)
                             keyPressWasShifted.remove(keyCode)
@@ -602,7 +623,7 @@ class AlternateCharacterManager(
                             longPressActivated[keyCode] = true
 
                             if (insertedChar != null && insertedChar.isNotEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
+                                deletePreviousCharacterWithStatistics(inputConnection)
                             }
 
                             if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
@@ -639,7 +660,7 @@ class AlternateCharacterManager(
                             }
 
                             AutoSpaceTracker.clear()
-                            inputConnection.commitText(altChar, 1)
+                            commitTextWithStatistics(inputConnection, altChar)
                             insertedNormalChars.remove(keyCode)
                             keyPressWasShifted.remove(keyCode)
                             longPressRunnables.remove(keyCode)
@@ -725,6 +746,8 @@ class AlternateCharacterManager(
         }
         val committed = inputConnection.commitText(variation, 1)
         if (committed) {
+            onStatisticsCharactersDeleted?.invoke(expectedText.length)
+            onStatisticsTextCommitted?.invoke(variation)
             inputConnection.finishComposingText()
             inputConnection.setSelection(
                 adjustSelectionAfterReplacement(selectionStart, target, lengthDelta, variation.length),

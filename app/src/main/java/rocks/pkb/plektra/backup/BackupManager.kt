@@ -138,6 +138,7 @@ object PreferencesBackupHelper {
         json.put("name", prefName)
         val entries = JSONObject()
         prefs.all.forEach { (key, value) ->
+            if ("$prefName:$key" in BackupPreferencePolicy.localOnlyKeys) return@forEach
             val requiresTypingSoundPack = prefName == "plektra_prefs" && (
                 key in typingSoundPackPreferenceKeys ||
                     key == SettingsManager.KEY_TYPING_SOUND_MODE &&
@@ -253,7 +254,7 @@ object PreferencesBackupHelper {
 
             entries.forEach { (key, value) ->
                 val qualifiedKey = "$prefName:$key"
-                if (excludedKeys.contains(qualifiedKey)) {
+                if (excludedKeys.contains(qualifiedKey) || qualifiedKey in BackupPreferencePolicy.localOnlyKeys) {
                     skipped.add(qualifiedKey)
                     return@forEach
                 }

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Статистика ввода</string>
+    <string name="typing_statistics_total_words">Общее количество введённых слов</string>
+    <string name="typing_statistics_manual_words">Слова, введённые вручную</string>
+    <string name="typing_statistics_suggested_words">Слова, введённые с помощью подсказок</string>
+    <string name="typing_statistics_since_installation">Использование с %1$s</string>
+</resources>

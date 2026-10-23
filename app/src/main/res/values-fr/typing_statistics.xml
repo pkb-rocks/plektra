@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Statistiques de frappe</string>
+    <string name="typing_statistics_total_words">Nombre total de mots saisis</string>
+    <string name="typing_statistics_manual_words">Mots saisis manuellement</string>
+    <string name="typing_statistics_suggested_words">Mots saisis par suggestions</string>
+    <string name="typing_statistics_since_installation">Utilisation depuis le %1$s</string>
+</resources>

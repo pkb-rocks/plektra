@@ -24,6 +24,7 @@ object SettingLinkIds {
     const val MAIN_APP_ENTER_BEHAVIOR = "main.app_enter_behavior"
     const val MAIN_ADVANCED = "main.advanced"
     const val MAIN_ACCESSIBILITY = "main.accessibility"
+    const val MAIN_TYPING_STATISTICS = "main.typing_statistics"
     const val MAIN_ABOUT = "main.about"
 
     // App appearance
@@ -331,6 +332,11 @@ object SettingLinkRegistry {
             SettingLinkIds.MAIN_ACCESSIBILITY,
             R.string.settings_category_accessibility,
             destination = SettingsDestination.Accessibility
+        ),
+        entry(
+            SettingLinkIds.MAIN_TYPING_STATISTICS,
+            R.string.typing_statistics_title,
+            destination = SettingsDestination.TypingStatistics
         ),
         entry(
             SettingLinkIds.MAIN_ABOUT,
@@ -1079,6 +1085,7 @@ object SettingLinkRegistry {
         SettingsDestination.TextInput to R.string.settings_category_text_input,
         SettingsDestination.SpeechRecognition to R.string.speech_settings_title,
         SettingsDestination.Accessibility to R.string.settings_category_accessibility,
+        SettingsDestination.TypingStatistics to R.string.typing_statistics_title,
         SettingsDestination.AutoCorrection to R.string.settings_category_auto_correction,
         SettingsDestination.Customization to R.string.settings_category_customization,
         SettingsDestination.NavMode to R.string.nav_mode_title,

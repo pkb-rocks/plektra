@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Στατιστικά πληκτρολόγησης</string>
+    <string name="typing_statistics_total_words">Συνολικός αριθμός λέξεων</string>
+    <string name="typing_statistics_manual_words">Λέξεις που πληκτρολογήθηκαν χειροκίνητα</string>
+    <string name="typing_statistics_suggested_words">Λέξεις που εισήχθησαν μέσω προτάσεων</string>
+    <string name="typing_statistics_since_installation">Χρήση από %1$s</string>
+</resources>

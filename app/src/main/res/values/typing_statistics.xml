@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Typing statistics</string>
+    <string name="typing_statistics_total_words">Total words entered</string>
+    <string name="typing_statistics_manual_words">Words entered manually</string>
+    <string name="typing_statistics_suggested_words">Words entered through suggestions</string>
+    <string name="typing_statistics_since_installation">Using the app since %1$s</string>
+</resources>

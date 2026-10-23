@@ -1158,6 +1158,36 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertEquals(listOf("£"), recorder.committedTexts)
     }
 
+    @Test
+    fun typingStatisticsCountsRealServiceInputWithSuggestionsDisabled() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setExperimentalSuggestionsEnabled(context, false)
+        service.onStartInput(editorInfo, false)
+        listOf(KeyEvent.KEYCODE_H, KeyEvent.KEYCODE_E, KeyEvent.KEYCODE_L,
+            KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_O, KeyEvent.KEYCODE_SPACE).forEach { key ->
+            service.onKeyDown(key, KeyEvent(KeyEvent.ACTION_DOWN, key))
+            service.onKeyUp(key, KeyEvent(KeyEvent.ACTION_UP, key))
+        }
+        service.onFinishInput()
+        assertEquals(rocks.pkb.plektra.statistics.TypingStatisticsSnapshot(1, 0),
+            rocks.pkb.plektra.statistics.TypingStatisticsStore.get(context).snapshot.value)
+    }
+
+    @Test
+    fun typingStatisticsDoesNotCountEditingAnExistingWordThroughServiceRouting() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setExperimentalSuggestionsEnabled(context, false)
+        recorder.textBeforeCursor = "example"
+        service.onStartInput(editorInfo, false)
+        listOf(KeyEvent.KEYCODE_S, KeyEvent.KEYCODE_SPACE).forEach { key ->
+            service.onKeyDown(key, KeyEvent(KeyEvent.ACTION_DOWN, key))
+            service.onKeyUp(key, KeyEvent(KeyEvent.ACTION_UP, key))
+        }
+        service.onFinishInput()
+        assertEquals(rocks.pkb.plektra.statistics.TypingStatisticsSnapshot(),
+            rocks.pkb.plektra.statistics.TypingStatisticsStore.get(context).snapshot.value)
+    }
+
     private class RecordingInputConnection {
         var textBeforeCursor: String = ""
         var sendKeyEventResult: Boolean = true

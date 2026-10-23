@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Μέγεθος κειμένου πληκτρολογίου</string>
+ <string name="keyboard_text_size_value">%1$d%%</string>
+ <string name="keyboard_text_size_hint">Προτάσεις, παραλλαγές και σημεία στίξης. Η υπάρχουσα προσαρμογή διατηρεί ολόκληρες λέξεις και ομάδες λέξεων όταν ο χώρος είναι περιορισμένος.</string>
+ <string name="keyboard_text_size_default">Προεπιλεγμένο μέγεθος</string>
+ <string name="keyboard_text_size_reference">100% — αναφορά</string>
+ <string name="keyboard_text_size_selected">Επιλεγμένο μέγεθος — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Ναι|Ευχαριστώ|Τα λέμε</string>
+</resources>

@@ -311,6 +311,7 @@ internal object BackupPreferenceContract {
             "alt_modifier_binding" to PreferenceValueType.STRING,
             "sym_auto_close" to PreferenceValueType.BOOLEAN,
             "emoji_picker_expanded_height" to PreferenceValueType.BOOLEAN,
+            "keyboard_bar_text_scale" to PreferenceValueType.FLOAT,
             "swipe_incremental_threshold" to PreferenceValueType.FLOAT,
             "static_variation_bar_mode" to PreferenceValueType.BOOLEAN,
             "static_variation_bar_preset" to PreferenceValueType.STRING,

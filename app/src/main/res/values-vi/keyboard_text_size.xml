@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Cỡ chữ bàn phím</string>
+ <string name="keyboard_text_size_value">%1$d%%</string>
+ <string name="keyboard_text_size_hint">Gợi ý, biến thể và dấu câu. Cách điều chỉnh hiện có giữ nguyên từ và cụm từ khi không đủ chỗ.</string>
+ <string name="keyboard_text_size_default">Cỡ mặc định</string>
+ <string name="keyboard_text_size_reference">100% — tham chiếu</string>
+ <string name="keyboard_text_size_selected">Cỡ đã chọn — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Có|Cảm ơn|Hẹn gặp lại</string>
+</resources>

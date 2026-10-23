@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Taille du texte du clavier</string>
+ <string name="keyboard_text_size_value">%1$d %%</string>
+ <string name="keyboard_text_size_hint">Suggestions, variantes et ponctuation. L’ajustement existant conserve les mots et groupes de mots entiers lorsque la place manque.</string>
+ <string name="keyboard_text_size_default">Taille par défaut</string>
+ <string name="keyboard_text_size_reference">100 % — référence</string>
+ <string name="keyboard_text_size_selected">Taille choisie — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Oui|Merci|À bientôt</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Dimensione del testo della tastiera</string>
+ <string name="keyboard_text_size_value">%1$d%%</string>
+ <string name="keyboard_text_size_hint">Suggerimenti, varianti e punteggiatura. Il ridimensionamento esistente conserva parole e gruppi di parole interi quando lo spazio è limitato.</string>
+ <string name="keyboard_text_size_default">Dimensione predefinita</string>
+ <string name="keyboard_text_size_reference">100% — riferimento</string>
+ <string name="keyboard_text_size_selected">Dimensione scelta — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Sì|Grazie|A presto</string>
+</resources>

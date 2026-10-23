@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.inputmethod.suggestions.ui
 
+import rocks.pkb.plektra.KeyboardBarTypography
 import android.content.Context
 import android.content.Intent
 import android.content.res.AssetManager
@@ -65,6 +66,7 @@ class FullSuggestionsBar(
     private var lastMinimalUiActive: Boolean? = null
     private var lastSlots: List<String?> = emptyList()
     private var lastSuggestionsBold: Boolean? = null
+    private var lastTextScale: Float? = null
     private var assets: AssetManager? = null
     private var imeServiceClass: Class<*>? = null
     private var showMinimalUiButtons: Boolean = false
@@ -375,6 +377,11 @@ class FullSuggestionsBar(
         val frame = frameContainer ?: return
         
         // Hide suggestions when unavailable, but keep Slim buttons visible.
+        val textScale = KeyboardBarTypography.scale(context)
+        if (lastTextScale != textScale) {
+            lastTextScale = textScale
+            lastSlots = emptyList()
+        }
         val suggestionsBold = SettingsManager.getSuggestionsBold(context)
         if (lastSuggestionsBold != suggestionsBold) {
             lastSuggestionsBold = suggestionsBold
@@ -703,17 +710,11 @@ class FullSuggestionsBar(
                 alpha = 1f
                 text = (suggestion ?: "")
                 gravity = if (continuousSpeechPreview) Gravity.CENTER_VERTICAL or Gravity.END else Gravity.CENTER
-                textSize = maxTextSp.toFloat()
-                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                    this,
-                    minTextSp,
-                    maxTextSp,
-                    1,
-                    TypedValue.COMPLEX_UNIT_SP
-                )
+                KeyboardBarTypography.applyAutoSize(this, minTextSp, maxTextSp)
                 if (continuousSpeechPreview) {
                     TextViewCompat.setAutoSizeTextTypeWithDefaults(this, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE)
-                    textSize = maxTextSp.toFloat()
+                    setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        KeyboardBarTypography.preferredMaxPx(context, minTextSp, maxTextSp).toFloat())
                 }
                 includeFontPadding = false
                 minHeight = 0

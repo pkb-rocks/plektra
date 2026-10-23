@@ -3,6 +3,7 @@ package rocks.pkb.plektra.inputmethod.ui
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import rocks.pkb.plektra.KeyboardBarTypography
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -507,7 +508,7 @@ class VariationBarView(
         val availableWidth = ((containerView.width.takeIf { it > 0 } ?: fallbackWidth) -
             containerView.paddingLeft - containerView.paddingRight).coerceAtLeast(1)
         val geometrySignature = listOf(
-            availableWidth, verticalPaddingPx(), roundedCorners,
+            availableWidth, verticalPaddingPx(), roundedCorners, KeyboardBarTypography.scale(context),
             SettingsManager.getDynamicVariationBarSlotCount(context),
             SettingsManager.getDynamicVariationBarResizeToContent(context),
             SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context)
@@ -1122,11 +1123,7 @@ class VariationBarView(
 
         // Calculate text width needed
         val paint = Paint().apply {
-            textSize = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_SP,
-                16f,
-                context.resources.displayMetrics
-            )
+            textSize = KeyboardBarTypography.preferredMaxPx(context, 6, 16).toFloat()
             typeface = android.graphics.Typeface.DEFAULT_BOLD
         }
         val textWidth = paint.measureText(variation).toInt()
@@ -1152,14 +1149,7 @@ class VariationBarView(
 
         return TextView(context).apply {
             text = variation
-            textSize = 16f
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                this,
-                6,
-                16,
-                1,
-                TypedValue.COMPLEX_UNIT_SP
-            )
+            KeyboardBarTypography.applyAutoSize(this, 6, 16)
             setTextColor(themeOverride?.textAndIcons ?: Color.WHITE)
             setTypeface(null, android.graphics.Typeface.BOLD)
             gravity = Gravity.CENTER

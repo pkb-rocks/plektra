@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Keyboard text size</string>
+ <string name="keyboard_text_size_value">%1$d%%</string>
+ <string name="keyboard_text_size_hint">Suggestions, variations and punctuation. The existing fitting keeps complete words and word groups when space is limited.</string>
+ <string name="keyboard_text_size_default">Default size</string>
+ <string name="keyboard_text_size_reference">100% — reference</string>
+ <string name="keyboard_text_size_selected">Selected size — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Yes|Thank you|See you soon</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Размер текста клавиатуры</string>
+ <string name="keyboard_text_size_value">%1$d %%</string>
+ <string name="keyboard_text_size_hint">Подсказки, варианты и пунктуация. Существующая подгонка сохраняет целые слова и группы слов при нехватке места.</string>
+ <string name="keyboard_text_size_default">Размер по умолчанию</string>
+ <string name="keyboard_text_size_reference">100% — образец</string>
+ <string name="keyboard_text_size_selected">Выбранный размер — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Да|Спасибо|До встречи</string>
+</resources>

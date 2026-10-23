@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="keyboard_text_size_title">Textgröße der Tastatur</string>
+ <string name="keyboard_text_size_value">%1$d %%</string>
+ <string name="keyboard_text_size_hint">Vorschläge, Varianten und Satzzeichen. Die vorhandene Anpassung erhält ganze Wörter und Wortgruppen bei wenig Platz.</string>
+ <string name="keyboard_text_size_default">Standardgröße</string>
+ <string name="keyboard_text_size_reference">100 % — Referenz</string>
+ <string name="keyboard_text_size_selected">Gewählte Größe — %1$d%%</string>
+ <string name="keyboard_text_size_preview_words">Ja|Danke|Bis bald</string>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Հավելվածի տեսքը</string>
+    <string name="app_appearance_hint">Ընտրեք հիմնական և ընտրված տարրերի գույները։ Տեքստի հակադրությունը կարգավորվում է ինքնաբերաբար։ Ստեղնաշարի թեմաներն ունեն առանձին կարգավորումներ։</string>
+    <string name="app_appearance_enabled">Անհատական գույներ</string>
+    <string name="app_appearance_palette">Գունապնակներ</string>
+    <string name="app_appearance_main">Հիմնական գույն</string>
+    <string name="app_appearance_selection">Ընտրված տարրերի գույն</string>
+    <string name="app_appearance_preview">Նախադիտում</string>
+    <string name="app_appearance_normal">Չընտրված կոճակ</string>
+    <string name="app_appearance_reset">Օգտագործել համակարգի գույները</string>
+    <string name="app_appearance_selected">Ընտրված կոճակ</string>
+</resources>

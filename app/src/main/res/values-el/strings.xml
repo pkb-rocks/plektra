@@ -1710,4 +1710,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_indicator_bottom_strip">LED, LEDs, φώτα, λωρίδα, κάτω, strip, bottom</string>
     <string name="kw_indicator_menu_bar">LED, φώτα, εικονίδιο, γραμμή κατάστασης, ενδείξεις, icon, status bar, indicators</string>
     <string name="kw_indicator_status_bar">LED, φώτα, σύμβολα, ενδείξεις, plektra, lights, symbols, indicators</string>
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
+    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: αντιγραφή, επικόλληση, αποκοπή, επιλογή όλων</string>
+    <string name="sym_edit_shortcuts_description">Σε πεδίο κειμένου, το Sym με C, V, X ή A επεξεργάζεται το κείμενο αντί να πληκτρολογεί σύμβολο ή να ανοίγει εφαρμογή. Όταν είναι ανενεργό, αυτοί οι τέσσερις συνδυασμοί επιστρέφουν στο επίπεδο SYM.</string>
 </resources>

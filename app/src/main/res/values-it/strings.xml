@@ -188,6 +188,9 @@
     
     <!-- SYM Customization Screen -->
     <string name="sym_customize_title">Personalizza Tastiera SYM</string>
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
+    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: copia, incolla, taglia, seleziona tutto</string>
+    <string name="sym_edit_shortcuts_description">In un campo di testo, Sym con C, V, X o A modifica il testo invece di digitare un simbolo o avviare un\'app. Disattivato, queste quattro combinazioni tornano al livello SYM.</string>
     <string name="sym_auto_close_title">Chiudi Automaticamente Layout SYM</string>
     <string name="sym_auto_close_description">Chiudi automaticamente il layout SYM dopo aver inserito un carattere, premuto Alt o premuto Invio. Non si chiude con Control o Shift.</string>
     <string name="sym_enable_emoji_page_title">Abilita Pagina Emoji</string>

@@ -152,6 +152,9 @@
     <string name="experimental_suggestions_title">Experimentelle Vorschläge</string>
     <string name="experimental_suggestions_subtitle">Neuen Wörterbuch/Vorschlags-Engine aktivieren (Beta)</string>
     <string name="sym_customize_title">SYM-Tastatur anpassen</string>
+    <!-- Sym+C/V/X/A edit shortcuts toggle -->
+    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: Kopieren, Einfügen, Ausschneiden, Alles auswählen</string>
+    <string name="sym_edit_shortcuts_description">In einem Textfeld bearbeitet Sym mit C, V, X oder A den Text, statt ein Symbol zu tippen oder eine App zu starten. Aus: Diese vier Kombinationen gehen zurück an den SYM-Layer.</string>
     <string name="sym_auto_close_title">SYM-Layout automatisch schließen</string>
     <string name="sym_auto_close_description">Schließt das SYM-Layout automatisch nach dem Einfügen eines Zeichens, Drücken von Alt oder Drücken von Enter. Schließt nicht mit Control oder Shift.</string>
     <string name="sym_enable_emoji_page_title">Emoji-Seite aktivieren</string>

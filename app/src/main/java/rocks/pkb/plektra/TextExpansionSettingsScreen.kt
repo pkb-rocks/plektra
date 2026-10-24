@@ -385,6 +385,7 @@ private fun SnippetsScreen(onBack: () -> Unit) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
                         value = shortcut,
+                        keyboardOptions = LiteralEntryKeyboardOptions,
                         onValueChange = { shortcut = it },
                         label = { Text(stringResource(R.string.snippets_shortcut_label)) },
                         isError = shortcut.isNotEmpty() && !shortcutValid,
@@ -393,6 +394,7 @@ private fun SnippetsScreen(onBack: () -> Unit) {
                     )
                     OutlinedTextField(
                         value = replacement,
+                        keyboardOptions = LiteralEntryKeyboardOptions,
                         onValueChange = { replacement = it },
                         label = { Text(stringResource(R.string.snippets_value_label)) },
                         minLines = 4,

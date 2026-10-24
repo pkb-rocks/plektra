@@ -29,28 +29,28 @@ data class InputContextState(
     
     /**
      * Disable word suggestions (dictionary-based suggestions).
-     * Disabled for: PASSWORD, URI, EMAIL, FILTER
+     * Disabled for: PASSWORD, URI, EMAIL, FILTER, LITERAL_ENTRY
      */
     val shouldDisableSuggestions: Boolean
         get() = isAppRawMode || restrictedReason != null
     
     /**
      * Disable auto-correction (automatic word replacement).
-     * Disabled for: PASSWORD, URI, EMAIL, FILTER
+     * Disabled for: PASSWORD, URI, EMAIL, FILTER, LITERAL_ENTRY
      */
     val shouldDisableAutoCorrect: Boolean
         get() = isAppRawMode || restrictedReason != null
     
     /**
      * Disable auto-capitalization (automatic capitalization after period/enter).
-     * Disabled for: PASSWORD, URI, EMAIL, FILTER
+     * Disabled for: PASSWORD, URI, EMAIL, FILTER, LITERAL_ENTRY
      */
     val shouldDisableAutoCapitalize: Boolean
         get() = isAppRawMode || restrictedReason != null
     
     /**
      * Disable double-space-to-period conversion.
-     * Disabled for: PASSWORD, URI, EMAIL, FILTER
+     * Disabled for: PASSWORD, URI, EMAIL, FILTER, LITERAL_ENTRY
      */
     val shouldDisableDoubleSpaceToPeriod: Boolean
         get() = isAppRawMode || restrictedReason != null
@@ -105,11 +105,15 @@ data class InputContextState(
         PASSWORD,
         URI,
         EMAIL,
-        FILTER
+        FILTER,
+        LITERAL_ENTRY
     }
 
     companion object {
         private const val TAG = "InputContextState"
+
+        // A field-scoped request; no application-wide preferences are changed.
+        const val LITERAL_ENTRY_IME_OPTION = "rocks.pkb.plektra.literal_entry"
 
         val EMPTY = InputContextState(
             isEditable = false,
@@ -227,6 +231,11 @@ data class InputContextState(
 
                 inputVariation == InputType.TYPE_TEXT_VARIATION_FILTER ->
                     RestrictedReason.FILTER
+
+                inputClass == InputType.TYPE_CLASS_TEXT &&
+                    info.privateImeOptions?.split(',')?.any {
+                        it.trim() == LITERAL_ENTRY_IME_OPTION
+                    } == true -> RestrictedReason.LITERAL_ENTRY
 
                 else -> null
             }

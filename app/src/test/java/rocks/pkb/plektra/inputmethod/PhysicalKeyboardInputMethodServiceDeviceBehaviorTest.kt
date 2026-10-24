@@ -474,6 +474,23 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun literalEditorOptOutSurvivesRestrictedCapitalizationAndAllowsManualShift() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setAutoCapitalizeRestrictedFields(context, true)
+        editorInfo.privateImeOptions = InputContextState.LITERAL_ENTRY_IME_OPTION
+        service.onStartInput(editorInfo, false)
+        assertFalse("Literal spelling must not inherit automatic Shift", modifierController().shiftOneShot)
+
+        tapShift(20_000L)
+        assertTrue("Deliberate capitalization remains available", modifierController().shiftOneShot)
+        tapShift(21_000L)
+        assertFalse(modifierController().shiftOneShot)
+
+        focusNewField(RecordingInputConnection(), inputType = InputType.TYPE_CLASS_TEXT)
+        assertTrue("Ordinary editors retain the user's capitalization preference", modifierController().shiftOneShot)
+    }
+
+    @Test
     fun autoCap_restrictedFieldsSetting_startsUriFieldWithShift() {
         val context = RuntimeEnvironment.getApplication()
         SettingsManager.setAutoCapitalizeFirstLetter(context, true)

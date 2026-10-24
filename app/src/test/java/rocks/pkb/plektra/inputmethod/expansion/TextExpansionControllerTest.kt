@@ -89,6 +89,24 @@ class TextExpansionControllerTest {
     }
 
     @Test
+    fun literalEditorDoesNotQueryOrExpandItsOwnSnippetDefinition() {
+        var editorQueries = 0
+        val info = android.view.inputmethod.EditorInfo().apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            privateImeOptions = InputContextState.LITERAL_ENTRY_IME_OPTION
+        }
+        val controller = controller(
+            state = InputContextState.fromEditorInfo(info),
+            configs = listOf(config(SnippetExpansionSource { mapOf("id" to "value") }, enabled = true)),
+            onEditorQuery = { editorQueries++ }
+        )
+        controller.refresh()
+        assertEquals(false, controller.handleKeyDown(KeyEvent.KEYCODE_SPACE))
+        assertEquals(false, controller.handleKeyDown(KeyEvent.KEYCODE_TAB))
+        assertEquals(0, editorQueries)
+    }
+
+    @Test
     fun rawModeAppsDoNotQueryOrExpandText() {
         var editorQueries = 0
         val controller = controller(

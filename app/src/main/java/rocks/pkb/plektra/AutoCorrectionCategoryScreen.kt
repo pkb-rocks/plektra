@@ -902,6 +902,7 @@ private fun UserDictWordDialog(
         text = {
             OutlinedTextField(
                 value = word,
+                keyboardOptions = LiteralEntryKeyboardOptions,
                 onValueChange = onWordChange,
                 label = { Text(title) },
                 singleLine = true,

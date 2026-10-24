@@ -381,6 +381,7 @@ private fun AddCorrectionDialog(
             ) {
                 OutlinedTextField(
                     value = originalText,
+                    keyboardOptions = LiteralEntryKeyboardOptions,
                     onValueChange = { originalText = it },
                     label = { Text(stringResource(R.string.auto_correct_original)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -388,6 +389,7 @@ private fun AddCorrectionDialog(
                 )
                 OutlinedTextField(
                     value = correctedText,
+                    keyboardOptions = LiteralEntryKeyboardOptions,
                     onValueChange = { correctedText = it },
                     label = { Text(stringResource(R.string.auto_correct_corrected)) },
                     modifier = Modifier.fillMaxWidth(),

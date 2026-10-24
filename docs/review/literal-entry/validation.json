@@ -1,0 +1,38 @@
+{
+  "officialBase": "5ff5615e42c1b3292a6737f5603e3cc9c7f60e7f",
+  "targetedTests": {
+    "tests": 77,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "testClasses": [
+    "InputContextStateTest",
+    "LiteralEntryInputContextTest",
+    "AutoCorrectEditScreenTest",
+    "AutoCorrectionSubstitutionStoreTest",
+    "TextExpansionControllerTest",
+    "SettingsManagerTextExpansionTest",
+    "PhysicalKeyboardInputMethodServiceDeviceBehaviorTest"
+  ],
+  "lintTask": "completed",
+  "lintClean": false,
+  "lintFindings": {
+    "Error": 1059,
+    "Warning": 930,
+    "Fatal": 2,
+    "Hint": 47
+  },
+  "lintComparison": "No additional canonical findings against independent PR160 branch; not a fresh pristine-baseline run",
+  "assembleStableDebug": "success",
+  "fullSuiteRun": false,
+  "newPermissions": false,
+  "newPreferences": false,
+  "backupSchemaChanged": false,
+  "deviceEvidence": "Titan 2 Android16: literal dictionary field, preserved two spaces and deliberate Shift, saved synthetic entry, automatic capitalization restored in ordinary search",
+  "deviceLimitations": "Not all six fields exercised on device; automatic replacement remained disabled in review app",
+  "originalDefaultAndEnabledImesRestored": true,
+  "mediaApproval": "User approved the capture with English explanatory captions; captioned version shown before publication",
+  "videoFramesInspected": 96,
+  "videoCaptions": "English; lowercase, double space and manual Shift; original capture unchanged"
+}

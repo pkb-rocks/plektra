@@ -7,6 +7,8 @@
         <include domain="sharedpref" path="."/>
         <exclude domain="sharedpref" path="recent_emojis_prefs.xml"/>
         <exclude domain="sharedpref" path="speech_credentials.xml"/>
+        <!-- The embedded ADB private key and broker state belong to this phone's pairing. -->
+        <exclude domain="sharedpref" path="embedded_adb.xml"/>
         
         <!-- Include custom keyboard layouts directory -->
         <include domain="file" path="keyboard_layouts/"/>
@@ -23,5 +25,6 @@
     <device-transfer>
         <exclude domain="device_sharedpref" path="direct_boot_keyboard_config.xml"/>
         <exclude domain="sharedpref" path="speech_credentials.xml"/>
+        <exclude domain="sharedpref" path="embedded_adb.xml"/>
     </device-transfer>
 </data-extraction-rules>

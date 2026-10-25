@@ -25,6 +25,8 @@ object SettingLinkIds {
     const val MAIN_ADVANCED = "main.advanced"
     const val MAIN_ACCESSIBILITY = "main.accessibility"
     const val MAIN_ABOUT = "main.about"
+    const val MAIN_TITAN2_ELITE_TOOLS = "main.titan2_elite_tools"
+    const val TITAN2_ELITE_TOOLS_DEVICE_SETUP = "titan2_elite_tools.device_setup"
 
     // App appearance
     const val CUSTOMIZATION_APP_ICON = "customization.app_icon"
@@ -961,7 +963,8 @@ object SettingLinkRegistry {
             R.string.modifier_indicators_status_bar_description,
             destination = SettingsDestination.ModifierIndicators
         )
-    ) + customizationSettingEntries() + inputDeviceSettingEntries() + systemSettingEntries()
+    ) + customizationSettingEntries() + inputDeviceSettingEntries() + systemSettingEntries() +
+        titan2EliteToolsSettingEntries()
 
     private val entriesById: Map<String, SettingEntry> =
         entries.associateBy { it.id }
@@ -985,6 +988,9 @@ object SettingLinkRegistry {
         SettingLinkIds.MAIN_ADVANCED to R.string.kw_main_advanced,
         SettingLinkIds.MAIN_ACCESSIBILITY to R.string.kw_main_accessibility,
         SettingLinkIds.MAIN_ABOUT to R.string.kw_main_about,
+        // Titan 2 Elite tools keywords
+        SettingLinkIds.MAIN_TITAN2_ELITE_TOOLS to R.string.kw_main_titan2_elite_tools,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_DEVICE_SETUP to R.string.kw_titan2_elite_tools_device_setup,
         SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION to R.string.kw_text_input_auto_space_punctuation,
         SettingLinkIds.TEXT_INPUT_SPACED_HYPHEN_TO_EN_DASH to R.string.kw_text_input_spaced_hyphen,
         SettingLinkIds.TEXT_INPUT_SMART_QUOTES to R.string.kw_text_input_smart_quotes,
@@ -1087,7 +1093,8 @@ object SettingLinkRegistry {
         SettingsDestination.CustomInputStyles to R.string.custom_input_styles_title,
         SettingsDestination.AppLanguage to R.string.app_language_title,
         SettingsDestination.Modifiers to R.string.modifiers_title,
-        SettingsDestination.ModifierIndicators to R.string.modifiers_section_indicators
+        SettingsDestination.ModifierIndicators to R.string.modifiers_section_indicators,
+        SettingsDestination.Titan2EliteTools to R.string.titan2_elite_tools_title
     )
 
     val keyboardsDevicesSubtitles: Map<KeyboardsDevicesDestination, Int> = mapOf(

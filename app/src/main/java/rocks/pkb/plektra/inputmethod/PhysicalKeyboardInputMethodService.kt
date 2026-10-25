@@ -2481,6 +2481,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 attachTrackpadDecorViewMotionHook("provider_changed")
             } else if (key == "slim_mode_override") {
                 keyboardVisibilityController.syncStatusBarPresentationModeFromSettings()
+            } else if (key == SettingsManager.KEY_SHOW_STATUS_BAR) {
+                // master status-bar toggle. Purely visual: invalidate the render cache
+                // so updateStatusBarText() is not skipped, then re-render on the main thread.
+                invalidateRenderedStatusSnapshot()
+                Handler(Looper.getMainLooper()).post {
+                    updateStatusBarText()
+                }
             } else if (key == SettingsManager.KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS ||
                 key == SettingsManager.KEY_TITAN2_ELITE_FILL_BOTTOM_CORNERS ||
                 key == rocks.pkb.plektra.T2eCornerCalibration.KEY ||

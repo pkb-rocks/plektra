@@ -25,6 +25,20 @@ object SettingLinkIds {
     const val MAIN_ADVANCED = "main.advanced"
     const val MAIN_ACCESSIBILITY = "main.accessibility"
     const val MAIN_ABOUT = "main.about"
+    const val MAIN_TITAN2_ELITE_TOOLS = "main.titan2_elite_tools"
+    const val TITAN2_ELITE_TOOLS_DEVICE_SETUP = "titan2_elite_tools.device_setup"
+    // smart keyboard backlight row on the Titan 2 Elite tools screen
+    const val TITAN2_ELITE_TOOLS_SMART_BACKLIGHT = "titan2_elite_tools.smart_backlight"
+    // the keyboard-light tile's own switch in the Smart backlight section
+    const val TITAN2_ELITE_TOOLS_BACKLIGHT_TILE = "titan2_elite_tools.backlight_tile"
+    // rows of the Titan 2 Elite toolbox (see Titan2EliteToolsSettingEntries.kt)
+    const val TITAN2_ELITE_TOOLS_BLOAT = "titan2_elite_tools.bloat_remover"
+    const val TITAN2_ELITE_TOOLS_DENSITY = "titan2_elite_tools.display_density"
+    const val TITAN2_ELITE_TOOLS_TWEAKS = "titan2_elite_tools.system_tweaks"
+    const val TITAN2_ELITE_TOOLS_KEY_MAPPING = "titan2_elite_tools.key_mapping"
+    const val TITAN2_ELITE_TOOLS_FN_CTRL = "titan2_elite_tools.fn_ctrl"
+    const val TITAN2_ELITE_TOOLS_SHOW_STATUS_BAR = "titan2_elite_tools.show_status_bar"
+    const val TITAN2_ELITE_TOOLS_RESET_TO_STOCK = "titan2_elite_tools.reset_to_stock"
 
     // App appearance
     const val CUSTOMIZATION_APP_ICON = "customization.app_icon"
@@ -961,7 +975,8 @@ object SettingLinkRegistry {
             R.string.modifier_indicators_status_bar_description,
             destination = SettingsDestination.ModifierIndicators
         )
-    ) + customizationSettingEntries() + inputDeviceSettingEntries() + systemSettingEntries()
+    ) + customizationSettingEntries() + inputDeviceSettingEntries() + systemSettingEntries() +
+        titan2EliteToolsSettingEntries()
 
     private val entriesById: Map<String, SettingEntry> =
         entries.associateBy { it.id }
@@ -985,6 +1000,20 @@ object SettingLinkRegistry {
         SettingLinkIds.MAIN_ADVANCED to R.string.kw_main_advanced,
         SettingLinkIds.MAIN_ACCESSIBILITY to R.string.kw_main_accessibility,
         SettingLinkIds.MAIN_ABOUT to R.string.kw_main_about,
+        // Titan 2 Elite tools keywords
+        SettingLinkIds.MAIN_TITAN2_ELITE_TOOLS to R.string.kw_main_titan2_elite_tools,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_DEVICE_SETUP to R.string.kw_titan2_elite_tools_device_setup,
+        // smart keyboard backlight keywords
+        SettingLinkIds.TITAN2_ELITE_TOOLS_SMART_BACKLIGHT to R.string.kw_titan2_elite_tools_smart_backlight,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_BACKLIGHT_TILE to R.string.kw_titan2_elite_tools_backlight_tile,
+        // toolbox keywords
+        SettingLinkIds.TITAN2_ELITE_TOOLS_BLOAT to R.string.kw_titan2_elite_tools_bloat,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_DENSITY to R.string.kw_titan2_elite_tools_density,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_TWEAKS to R.string.kw_titan2_elite_tools_tweaks,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_KEY_MAPPING to R.string.kw_titan2_elite_tools_key_mapping,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_FN_CTRL to R.string.kw_titan2_elite_tools_fn_ctrl,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_SHOW_STATUS_BAR to R.string.kw_titan2_elite_tools_show_status_bar,
+        SettingLinkIds.TITAN2_ELITE_TOOLS_RESET_TO_STOCK to R.string.kw_titan2_elite_tools_reset_to_stock,
         SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION to R.string.kw_text_input_auto_space_punctuation,
         SettingLinkIds.TEXT_INPUT_SPACED_HYPHEN_TO_EN_DASH to R.string.kw_text_input_spaced_hyphen,
         SettingLinkIds.TEXT_INPUT_SMART_QUOTES to R.string.kw_text_input_smart_quotes,
@@ -1087,7 +1116,8 @@ object SettingLinkRegistry {
         SettingsDestination.CustomInputStyles to R.string.custom_input_styles_title,
         SettingsDestination.AppLanguage to R.string.app_language_title,
         SettingsDestination.Modifiers to R.string.modifiers_title,
-        SettingsDestination.ModifierIndicators to R.string.modifiers_section_indicators
+        SettingsDestination.ModifierIndicators to R.string.modifiers_section_indicators,
+        SettingsDestination.Titan2EliteTools to R.string.titan2_elite_tools_title
     )
 
     val keyboardsDevicesSubtitles: Map<KeyboardsDevicesDestination, Int> = mapOf(

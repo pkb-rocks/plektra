@@ -1,7 +1,9 @@
 package rocks.pkb.plektra
 
 import android.content.Context
+import android.content.res.Configuration
 import java.io.File
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -136,6 +138,62 @@ class SettingLinkCoverageTest {
         ).firstOrNull { it.isDirectory }
         requireNotNull(sourceDirectory) { "Main sources not found relative to $workingDirectory" }
         return sourceDirectory.walkTopDown().filter { it.isFile && it.extension == "kt" }.toList()
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    fun keyboardBarProfilesAreSearchableAndTargetTheProfileTabs() {
+        for (mode in SettingsManager.StatusBarPresentationMode.values()) {
+            SettingsManager.setStatusBarPresentationMode(context, mode)
+            for (query in listOf("Slim", "normal", "profile", "minimal", "compact", "Slim profile")) {
+                val entry = SettingLinkRegistry.search(context, query)
+                    .single { it.id == "status_bar.presentation" }
+                assertEquals(entry, SettingLinkRegistry.visibleTarget(context, entry))
+                assertEquals(SettingsDestination.Customization, entry.route.destination)
+                assertEquals("status_bar_buttons", entry.route.customizationDestination)
+            }
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    fun searchingForSettingsDoesNotMatchEveryEntry() {
+        val available = SettingLinkRegistry.entries.filter { it.isAvailable(context) }
+        val matches = SettingLinkRegistry.search(context, "settings")
+        assertTrue("'settings' matched all ${available.size} entries", matches.size < available.size)
+
+        // The breadcrumb root is not a keyword, so a hit needs "settings" in the row's own words.
+        fun mentionsSettings(entry: SettingEntry): Boolean = listOfNotNull(
+            context.getString(entry.titleRes),
+            entry.summaryRes?.let(context::getString),
+            SettingLinkRegistry.keywordsById[entry.id]?.let(context::getString),
+            SettingLinkRegistry.breadcrumbTitles(entry.route).drop(1).joinToString(" ", transform = context::getString),
+            entry.id.replace('.', ' ').replace('_', ' ')
+        ).any { it.contains("settings", ignoreCase = true) }
+        matches.forEach { entry ->
+            assertTrue("'${entry.id}' matched 'settings' without mentioning it",
+                entry.route.destination == SettingsDestination.Main || mentionsSettings(entry))
+        }
+        val expected = available.filter {
+            listOfNotNull(context.getString(it.titleRes), it.summaryRes?.let(context::getString))
+                .any { text -> text.contains("settings", ignoreCase = true) }
+        }
+        assertTrue("no row mentions 'settings' in its title or summary", expected.isNotEmpty())
+        assertTrue("rows mentioning 'settings' went missing: ${expected.map { it.id } - matches.map { it.id }.toSet()}",
+            matches.map { it.id }.containsAll(expected.map { it.id }))
+    }
+
+    @Test
+    fun keyboardBarProfileKeywordsAreLocalized() {
+        val queries = mapOf("de" to "kompakt", "it" to "compatto", "el" to "συμπαγές")
+        queries.forEach { (language, query) ->
+            val configuration = Configuration(context.resources.configuration).apply {
+                setLocale(Locale(language))
+            }
+            val localizedContext = context.createConfigurationContext(configuration)
+            assertTrue("Profile keyword missing for $language",
+                SettingLinkRegistry.search(localizedContext, query).any { it.id == "status_bar.presentation" })
+        }
     }
 
     @Test

@@ -4818,6 +4818,32 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
 
+        // Sym+C/V/X/A edit the text before any app shortcut or symbol chord gets the key.
+        if (
+            hasEditableField &&
+            (symTogglePendingOnKeyUp || event?.isSymPressed == true) &&
+            event?.repeatCount == 0 &&
+            SettingsManager.getSymEditShortcutsEnabled(this)
+        ) {
+            // The IME cannot see whether the app performed the action (the call is one-way), so an
+            // applicable Sym+C/V/X/A is always consumed. The key is left to the launcher and Sym
+            // chord blocks below only for a non-edit key, any Alt, or no connection.
+            val altActive = altActiveForDedicatedKeys || altPressed || altPhysicallyPressed
+            val action = SymEditShortcuts.perform(keyCode, altActive, currentInputConnection)
+            if (action != null) {
+                symChordUsedSinceKeyDown = true
+                KeyboardEventTracker.notifyKeyEvent(
+                    keyCode = keyCode,
+                    event = event,
+                    action = "KEY_DOWN",
+                    origin = "ime_service",
+                    outputKeyCode = null,
+                    outputKeyCodeName = "sym_edit_${resources.getResourceEntryName(action)}"
+                )
+                return true
+            }
+        }
+
         if (
             hasEditableField &&
             (symTogglePendingOnKeyUp || event?.isSymPressed == true) &&

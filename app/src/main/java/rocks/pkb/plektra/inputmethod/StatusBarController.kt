@@ -3076,7 +3076,20 @@ class StatusBarController(
         val symSurfaceView = symSurfaceContainer ?: return
         val symSurfaceStackView = symSurfaceStack ?: return
         emojiView.visibility = View.GONE
-        
+
+        // master "Show status bar" toggle (Titan 2 Elite). Off collapses the strip to
+        // zero height; the IME stays active and hardware keys are still handled. Never collapse
+        // while the strip is hosting something the user has asked for: the on-screen keyboard, or
+        // a Sym, clipboard or emoji page.
+        if (SettingsManager.isStatusBarHidden(context) &&
+            !isFullSoftwareKeyboardMode &&
+            snapshot.symPage == 0 &&
+            !snapshot.clipboardOverlay
+        ) {
+            collapseLayout()
+            return
+        }
+
         if (snapshot.navModeActive) {
             layout.visibility = View.GONE
             return

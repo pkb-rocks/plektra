@@ -219,6 +219,65 @@ class AlternateCharacterManagerTest {
     }
 
     @Test
+    fun longPressCycle_releaseAtAnotherMatchingCharacterDoesNotRecommitIt() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("(x", 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(110)
+        assertEquals("(x(", recorder.text)
+        inputConnection.setSelection(1, 1)
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+
+        assertEquals("(x(", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        assertTrue(altInserted.isEmpty())
+    }
+
+    @Test
+    fun longPressCycle_changedAnchorDoesNotNotifyCommitOnRelease() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("a", 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(110)
+        recorder.replaceTextDirectly(0, 1, "b")
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+
+        assertEquals("b(", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        assertTrue(altInserted.isEmpty())
+    }
+
+    @Test
+    fun longPressCycle_boundedSnapshotStillFinalizesAtOriginalAnchor() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val prefix = "a".repeat(1000)
+        inputConnection.commitText(prefix, 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(110)
+        recorder.honorExtractedTextHint = true
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+
+        assertEquals(prefix + "(", recorder.text)
+        assertEquals(listOf(1 to 0), recorder.deleteCalls)
+        assertEquals(listOf('('), altInserted)
+    }
+
+    @Test
     fun longPressCycle_colonRecommitIsOneBatchEditAndKeepsDeferredSpace() {
         SettingsManager.setSpaceAfterPunctuation(context, ":")
         DeferredPunctuationSpaceTracker.clear()
@@ -1044,6 +1103,7 @@ class AlternateCharacterManagerTest {
         /** Text edits made while no batch edit was open. */
         var editsOutsideBatch = 0
         val extractedHints = mutableListOf<Int>()
+        var honorExtractedTextHint = false
         var text: String = ""
         var selectionStart: Int = 0
             private set
@@ -1142,12 +1202,17 @@ class AlternateCharacterManagerTest {
                         null
                     }
                     "getExtractedText" -> if (extractedTextAvailable) {
-                        (args?.getOrNull(0) as? android.view.inputmethod.ExtractedTextRequest)
-                            ?.let { extractedHints += it.hintMaxChars }
+                        val hint = (args?.getOrNull(0) as? android.view.inputmethod.ExtractedTextRequest)
+                            ?.hintMaxChars ?: 0
+                        extractedHints += hint
+                        val start = if (honorExtractedTextHint && hint > 0) {
+                            (selectionStart - hint).coerceAtLeast(0)
+                        } else 0
                         ExtractedText().apply {
-                            this.text = this@RecordingInputConnection.text
-                            selectionStart = this@RecordingInputConnection.selectionStart
-                            selectionEnd = this@RecordingInputConnection.selectionEnd
+                            this.text = this@RecordingInputConnection.text.substring(start)
+                            startOffset = start
+                            selectionStart = this@RecordingInputConnection.selectionStart - start
+                            selectionEnd = this@RecordingInputConnection.selectionEnd - start
                         }
                     } else {
                         null

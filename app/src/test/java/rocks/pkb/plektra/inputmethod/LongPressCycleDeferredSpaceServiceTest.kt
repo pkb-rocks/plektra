@@ -116,6 +116,26 @@ class LongPressCycleDeferredSpaceServiceTest {
         assertEquals("ba:", editor.text)
     }
 
+    @Test
+    fun longPressCycle_cursorMoveBeforeReleaseDoesNotArmSpaceAtNewCursor() {
+        configureShiftThenDeviceSymCycle()
+        startService(FakeEditor(honorBatchEdits = true))
+        tap(KeyEvent.KEYCODE_A)
+        settleKeyboardWindow()
+        val down = clock
+        service.onKeyDown(KeyEvent.KEYCODE_H, KeyEvent(down, down, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_H, 0, 0))
+        deliverSelectionUpdates()
+        idle(1500L)
+        deliverSelectionUpdates()
+        assertEquals("a:", editor.text)
+        editor.moveCursorByUser(0)
+        deliverSelectionUpdates()
+        service.onKeyUp(KeyEvent.KEYCODE_H, KeyEvent(down, clock, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_H, 0, 0))
+        deliverSelectionUpdates()
+        tap(KeyEvent.KEYCODE_B)
+        assertEquals("ba:", editor.text)
+    }
+
     private fun configureShiftThenDeviceSymCycle() {
         SettingsManager.setLongPressModifier(context, "shift")
         SettingsManager.setLongPressCycleNext(context, "alt")

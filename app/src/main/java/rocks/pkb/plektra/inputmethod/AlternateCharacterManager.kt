@@ -786,15 +786,27 @@ class AlternateCharacterManager(
 
     private fun finishLongPressCycle(keyCode: Int, cycle: LongPressCycle) {
         val text = cycle.displayed
+        val inputConnection = cycle.inputConnection
+        val snapshot = readEditorSnapshot(inputConnection, SNAPSHOT_HINT_MAX_CHARS) ?: return
+        val target = resolveImmediatelyPrecedingTarget(snapshot, text) ?: return
+        cycle.anchor?.let { anchor ->
+            if (anchor.inputConnection !== inputConnection ||
+                target.first != anchor.targetStart || target.second != anchor.targetEnd
+            ) return
+            // A bounded snapshot may start later than the original anchor's text window.
+            val sharedStart = maxOf(snapshot.textStart, anchor.textStart)
+            val currentPrefix = snapshot.text.substring(
+                sharedStart - snapshot.textStart,
+                target.second - snapshot.textStart
+            )
+            if (currentPrefix != anchor.prefixThroughTarget.substring(sharedStart - anchor.textStart)) return
+        }
         if (text == cycle.original) {
             onNormalCharCommitted?.invoke(text)
             return
         }
-        val inputConnection = cycle.inputConnection
         val isPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && !text[0].isWhitespace()
-        val shownBeforeCursor = isPunctuation && readEditorSnapshot(inputConnection, SNAPSHOT_HINT_MAX_CHARS)
-            ?.let { resolveImmediatelyPrecedingTarget(it, text) } != null
-        if (shownBeforeCursor) {
+        if (isPunctuation) {
             // Re-commit punctuation through the Alt path so boundary handling,
             // French spacing and auto-space replacement apply to the final choice.
             // One batch edit, so editors that honour it report a single selection

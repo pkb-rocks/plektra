@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Εκκινητής Plektra</string>
+    <string name="keyboard_launcher_hint">Κρατήστε πατημένο το επιλεγμένο πλήκτρο και πατήστε ένα γράμμα σύντομα ή παρατεταμένα. Αφήστε το για να γράψετε. Κρατήστε το Fn μέχρι τη δόνηση· δύο γρήγορα πατήματα εξακολουθούν να κλειδώνουν το Nav. Το εκχωρημένο Shift προορίζεται για συντομεύσεις· χρησιμοποιήστε το άλλο για κεφαλαία.</string>
+    <string name="keyboard_launcher_left_shift">Αριστερό Shift</string>
+    <string name="keyboard_launcher_right_shift">Δεξί Shift</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Αναζήτηση ενεργειών</string>
+    <string name="keyboard_launcher_remove">Κατάργηση αντιστοίχισης</string>
+    <string name="keyboard_launcher_selected">Επιλεγμένη συντόμευση</string>
+    <string name="keyboard_launcher_missing_command">Η συντόμευση δεν είναι διαθέσιμη</string>
+    <string name="keyboard_launcher_short">Σύντομο πάτημα</string>
+    <string name="keyboard_launcher_long">Παρατεταμένο πάτημα</string>
+    <string name="keyboard_launcher_delay">Διάρκεια πατήματος: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Συντομεύσεις σε όλες τις εφαρμογές</string>
+    <string name="keyboard_launcher_summary">Ανοίξτε εφαρμογές και ενέργειες κρατώντας ένα πλήκτρο και πατώντας σύντομα ή παρατεταμένα ένα γράμμα.</string>
+    <string name="keyboard_launcher_access_hint">Για συντομεύσεις εκτός πεδίων κειμένου, ενεργοποιήστε την υπηρεσία προσβασιμότητας Plektra Launcher / Clicks. Το Nav είναι ανεξάρτητο. Αν το Android εμποδίζει την ενεργοποίηση, επιτρέψτε πρώτα τις περιορισμένες ρυθμίσεις στις πληροφορίες της εφαρμογής.</string>
+    <string name="keyboard_launcher_service_description">Χειρίζεται ρητά ενεργοποιημένες συντομεύσεις και συμβατές αντιστοιχίσεις πλήκτρων Clicks. Δεν ανακτά περιεχόμενο οθόνης.</string>
+    <string name="keyboard_launcher_service_label">Εκκινητής Plektra / Clicks</string>
+</resources>

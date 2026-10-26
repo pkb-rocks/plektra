@@ -38,6 +38,7 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     fun setUp() {
         val context = RuntimeEnvironment.getApplication()
         DeviceSpecific.clearTestOverrides()
+        SettingsManager.getPreferences(context).edit().putBoolean(rocks.pkb.plektra.KeyboardLauncherStore.ENABLED,false).commit()
         SettingsManager.setSymPagesConfig(context, SymPagesConfig())
         SettingsManager.resetSymMappings(context)
         SettingsManager.resetSymMappingsPage2(context)
@@ -1138,6 +1139,36 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Suppress("UNCHECKED_CAST")
+    @Test fun launcherDoesNotReserveKeysOnLockedScreen() {
+        val context=RuntimeEnvironment.getApplication()
+        SettingsManager.getPreferences(context).edit().putBoolean(rocks.pkb.plektra.KeyboardLauncherStore.ENABLED,true).commit()
+        val keyguard=shadowOf(context.getSystemService(android.app.KeyguardManager::class.java))
+        keyguard.setKeyguardLocked(true)
+        try {assertFalse(service.dispatchKeyboardLauncher(KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_SHIFT_LEFT)))}
+        finally {keyguard.setKeyguardLocked(false)}
+    }
+
+    @Test fun launcherReservedShiftOpensHomeWithoutTypingAndOtherShiftStillTypes() {
+        val context=RuntimeEnvironment.getApplication()
+        SettingsManager.getPreferences(context).edit()
+            .putBoolean(rocks.pkb.plektra.KeyboardLauncherStore.ENABLED,true)
+            .putInt(rocks.pkb.plektra.KeyboardLauncherStore.TRIGGER,KeyEvent.KEYCODE_SHIFT_LEFT).commit()
+        rocks.pkb.plektra.KeyboardLauncherStore.save(context,mapOf(KeyEvent.KEYCODE_H to rocks.pkb.plektra.LauncherMapping("device.home")))
+        assertTrue(service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT,KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_SHIFT_LEFT)))
+        assertTrue(service.onKeyDown(KeyEvent.KEYCODE_H,KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_H)))
+        assertTrue(service.onKeyUp(KeyEvent.KEYCODE_H,KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_H)))
+        assertTrue(service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT,KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_SHIFT_LEFT)))
+        assertTrue(recorder.committedTexts.isEmpty())
+        val launched=shadowOf(context).nextStartedActivity
+        assertEquals(android.content.Intent.ACTION_MAIN,launched.action)
+        assertTrue(launched.hasCategory(android.content.Intent.CATEGORY_HOME))
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_RIGHT,KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_SHIFT_RIGHT))
+        service.onKeyDown(KeyEvent.KEYCODE_A,KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_A))
+        service.onKeyUp(KeyEvent.KEYCODE_A,KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_A))
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_RIGHT,KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_SHIFT_RIGHT))
+        assertTrue(recorder.textBeforeCursor.endsWith("A"))
+    }
+
     private fun <T> getField(target: Any, fieldName: String): T {
         var cls: Class<*>? = target.javaClass
         while (cls != null) {

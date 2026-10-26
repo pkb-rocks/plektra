@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Plektra Launcher</string>
+    <string name="keyboard_launcher_hint">Keep the chosen key held while pressing a shortcut letter briefly or for longer. Release the chosen key to return to typing. With Fn, hold until the vibration; two quick taps still lock Nav. An assigned Shift is reserved for shortcuts; use the other Shift for capitals.</string>
+    <string name="keyboard_launcher_left_shift">Left Shift</string>
+    <string name="keyboard_launcher_right_shift">Right Shift</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Search actions</string>
+    <string name="keyboard_launcher_remove">Remove assignment</string>
+    <string name="keyboard_launcher_selected">Selected shortcut</string>
+    <string name="keyboard_launcher_missing_command">Shortcut unavailable</string>
+    <string name="keyboard_launcher_short">Short press</string>
+    <string name="keyboard_launcher_long">Long press</string>
+    <string name="keyboard_launcher_delay">Hold duration: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Shortcuts in all apps</string>
+    <string name="keyboard_launcher_summary">Open apps and actions with a held key and short or long letter presses.</string>
+    <string name="keyboard_launcher_access_hint">For shortcuts outside text fields, enable the Plektra Launcher / Clicks accessibility service. Nav Mode is separate. If Android blocks activation, allow restricted settings in this app’s Android App info menu first.</string>
+    <string name="keyboard_launcher_service_description">Handles explicitly enabled launcher shortcuts and supported Clicks button remapping. Does not retrieve screen content.</string>
+    <string name="keyboard_launcher_service_label">Plektra Launcher / Clicks</string>
+</resources>

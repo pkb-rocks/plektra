@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Plektra գործարկիչ</string>
+    <string name="keyboard_launcher_hint">Պահեք ընտրված ստեղնը և կարճ կամ երկար սեղմեք տառը։ Բաց թողեք ստեղնը՝ գրելու համար։ Fn-ը պահեք մինչև թրթռումը. երկու արագ սեղմումը շարունակում է կողպել Nav-ը։ Նշանակված Shift-ը միայն դյուրանցումների համար է. մեծատառերի համար օգտագործեք մյուսը։</string>
+    <string name="keyboard_launcher_left_shift">Ձախ Shift</string>
+    <string name="keyboard_launcher_right_shift">Աջ Shift</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Որոնել գործողություններ</string>
+    <string name="keyboard_launcher_remove">Հեռացնել նշանակումը</string>
+    <string name="keyboard_launcher_selected">Ընտրված դյուրանցում</string>
+    <string name="keyboard_launcher_missing_command">Դյուրանցումն անհասանելի է</string>
+    <string name="keyboard_launcher_short">Կարճ սեղմում</string>
+    <string name="keyboard_launcher_long">Երկար սեղմում</string>
+    <string name="keyboard_launcher_delay">Սեղմման տևողություն՝ %1$d մվ</string>
+    <string name="keyboard_launcher_access_title">Դյուրանցումներ բոլոր հավելվածներում</string>
+    <string name="keyboard_launcher_summary">Բացեք ծրագրեր և գործողություններ՝ պահելով ստեղնը և տառը կարճ կամ երկար սեղմելով։</string>
+    <string name="keyboard_launcher_access_hint">Տեքստային դաշտերից դուրս դյուրանցումների համար միացրեք Plektra Launcher / Clicks մատչելիության ծառայությունը։ Nav ռեժիմն անկախ է։ Եթե Android-ն արգելափակում է միացումը, նախ թույլատրեք սահմանափակված կարգավորումները ծրագրի Android տեղեկություններում։</string>
+    <string name="keyboard_launcher_service_description">Մշակում է բացահայտ միացված դյուրանցումները և համատեղելի Clicks ստեղների վերագրումները։ Չի ստանում էկրանի բովանդակությունը։</string>
+    <string name="keyboard_launcher_service_label">Plektra գործարկիչ / Clicks</string>
+</resources>

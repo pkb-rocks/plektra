@@ -85,7 +85,51 @@ import rikka.shizuku.Shizuku
  * Input method service specialized for physical keyboards.
  * Handles advanced features such as long press that simulates Alt+key.
  */
-class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibilityKeyBridge.Target {
+class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibilityKeyBridge.Target, rocks.pkb.plektra.KeyboardLauncherBridge.Target {
+
+    private val keyboardLauncherPreferencesListener=SharedPreferences.OnSharedPreferenceChangeListener {_,key ->
+        if(key in setOf(rocks.pkb.plektra.KeyboardLauncherStore.ENABLED,rocks.pkb.plektra.KeyboardLauncherStore.TRIGGER,rocks.pkb.plektra.KeyboardLauncherStore.DELAY,rocks.pkb.plektra.KeyboardLauncherStore.ASSIGNMENTS)) keyboardLauncher.cancel()
+    }
+    private var replayingLauncherModifier=false
+    private val keyboardLauncher by lazy {
+        rocks.pkb.plektra.KeyboardLauncherController(
+            trigger={rocks.pkb.plektra.KeyboardLauncherStore.trigger(this)},
+            delay={rocks.pkb.plektra.KeyboardLauncherStore.delay(this)},
+            mappings={rocks.pkb.plektra.KeyboardLauncherStore.read(this)},
+            ordinary={event ->
+                replayingLauncherModifier=true
+                try {if(event.action==KeyEvent.ACTION_DOWN)onKeyDown(event.keyCode,event) else onKeyUp(event.keyCode,event)}
+                finally {replayingLauncherModifier=false}
+            },
+            execute=execute@{mapping ->
+                if(!isKeyboardLauncherEnabled()) return@execute
+                val command=rocks.pkb.plektra.commands.CommandRegistry(this).resolve(mapping.value)
+                if(command!=null) {
+                    if(::navModeController.isInitialized) navModeController.exitNavMode()
+                    rocks.pkb.plektra.commands.CommandExecutor(this,inputConnectionProvider={currentInputConnection}).execute(command)
+                } else android.widget.Toast.makeText(this,R.string.keyboard_launcher_missing_command,android.widget.Toast.LENGTH_SHORT).show()
+            },
+            activated={
+                try {
+                    val vibrator=getSystemService(android.os.Vibrator::class.java)
+                    if(vibrator?.hasVibrator()==true) vibrator.vibrate(android.os.VibrationEffect.createOneShot(45,android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                } catch(_:RuntimeException) { }
+            }
+        )
+    }
+    private fun isKeyboardLauncherEnabled():Boolean =
+        rocks.pkb.plektra.KeyboardLauncherStore.enabled(this) &&
+            (getSystemService(KEYGUARD_SERVICE) as? android.app.KeyguardManager)?.isKeyguardLocked!=true
+    override fun dispatchKeyboardLauncher(event:KeyEvent):Boolean {
+        if(replayingLauncherModifier || event.flags and KeyEvent.FLAG_SOFT_KEYBOARD!=0) return false
+        if(!isKeyboardLauncherEnabled()) {
+            keyboardLauncher.cancel()
+            return keyboardLauncher.consumeCanceled(event)
+        }
+        val remapped=DeviceSpecific.remapHardwareKeyEvent(event.keyCode,event,physicalKeyboardProfileOverride).event ?: event
+        return keyboardLauncher.handle(remapped)
+    }
+    override fun cancelKeyboardLauncher() {keyboardLauncher.cancel()}
 
     companion object {
         private const val TAG = "PlektraInputMethod"
@@ -1851,6 +1895,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         super.onCreate()
         smoothCaretOverlayController = SmoothCaretOverlayController(this)
         ClicksAccessibilityKeyBridge.register(this)
+        rocks.pkb.plektra.KeyboardLauncherBridge.register(this)
+        SettingsManager.getPreferences(this).registerOnSharedPreferenceChangeListener(keyboardLauncherPreferencesListener)
         lastSystemLocalesSignature = resources.configuration.locales.toLanguageTags()
         lastImeConfiguration = Configuration(resources.configuration)
         prefs = getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
@@ -2931,6 +2977,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         caretBadgeController.destroy()
+        SettingsManager.getPreferences(this).unregisterOnSharedPreferenceChangeListener(keyboardLauncherPreferencesListener)
+        rocks.pkb.plektra.KeyboardLauncherBridge.unregister(this)
+        keyboardLauncher.clear()
         ClicksAccessibilityKeyBridge.unregister(this)
         clicksPowerShiftTapFilter.reset()
         accidentalKeyPressFilter.reset()
@@ -3832,6 +3881,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onFinishInput() {
+        keyboardLauncher.cancel()
         cancelSpeechRecognition()
         ++speechEditorSession
         disableSmoothCaretExperiment()
@@ -4683,6 +4733,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyDown(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if(event_!=null && dispatchKeyboardLauncher(event_)) return true
         if (liveSpeechEditor != null && (event_?.unicodeChar?.let { it != 0 } == true ||
             keyCode_ in listOf(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_FORWARD_DEL, KeyEvent.KEYCODE_ENTER,
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN))) {
@@ -5436,6 +5487,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if(event_!=null && dispatchKeyboardLauncher(event_)) return true
         if (!replayingProtectedNumberKey) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
                 is AccidentalKeyPressFilter.KeyUpResult.Suppressed -> {

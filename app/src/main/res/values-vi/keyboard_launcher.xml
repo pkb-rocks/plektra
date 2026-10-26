@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Trình khởi chạy Plektra</string>
+    <string name="keyboard_launcher_hint">Giữ phím đã chọn khi nhấn nhanh hoặc nhấn giữ một chữ cái. Thả phím để tiếp tục gõ. Với Fn, giữ đến khi rung; hai lần nhấn nhanh vẫn khóa Nav. Phím Shift được gán chỉ dành cho phím tắt; dùng Shift còn lại để viết hoa.</string>
+    <string name="keyboard_launcher_left_shift">Shift trái</string>
+    <string name="keyboard_launcher_right_shift">Shift phải</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Tìm thao tác</string>
+    <string name="keyboard_launcher_remove">Xóa gán phím</string>
+    <string name="keyboard_launcher_selected">Phím tắt đã chọn</string>
+    <string name="keyboard_launcher_missing_command">Phím tắt không khả dụng</string>
+    <string name="keyboard_launcher_short">Nhấn ngắn</string>
+    <string name="keyboard_launcher_long">Nhấn giữ</string>
+    <string name="keyboard_launcher_delay">Thời gian giữ: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Phím tắt trong mọi ứng dụng</string>
+    <string name="keyboard_launcher_summary">Mở ứng dụng và thao tác bằng cách giữ một phím rồi nhấn ngắn hoặc giữ một chữ cái.</string>
+    <string name="keyboard_launcher_access_hint">Để dùng phím tắt ngoài ô nhập văn bản, bật dịch vụ hỗ trợ tiếp cận Plektra Launcher / Clicks. Chế độ Nav độc lập. Nếu Android chặn, trước tiên cho phép cài đặt bị hạn chế trong thông tin ứng dụng Android.</string>
+    <string name="keyboard_launcher_service_description">Xử lý phím tắt được bật rõ ràng và ánh xạ nút Clicks được hỗ trợ. Không truy xuất nội dung màn hình.</string>
+    <string name="keyboard_launcher_service_label">Trình khởi chạy Plektra / Clicks</string>
+</resources>

@@ -20,6 +20,7 @@ object SettingLinkIds {
     const val MAIN_STATUS_BAR_BUTTONS = "main.status_bar_buttons"
     const val MAIN_CUSTOMIZATION = "main.customization"
     const val MAIN_LAUNCHER_SHORTCUTS = "main.launcher_shortcuts"
+    const val MAIN_PERSONAL_LAUNCHER = "main.personal_launcher"
     const val MAIN_NAV_MODE = "main.nav_mode"
     const val MAIN_APP_ENTER_BEHAVIOR = "main.app_enter_behavior"
     const val MAIN_ADVANCED = "main.advanced"
@@ -314,6 +315,16 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_LAUNCHER_SHORTCUTS
         ),
+        entry(
+            SettingLinkIds.MAIN_PERSONAL_LAUNCHER,
+            R.string.keyboard_launcher_title,
+            R.string.keyboard_launcher_summary,
+            destination = SettingsDestination.PersonalLauncher
+        ),
+        entry("personal_launcher.enabled", R.string.keyboard_launcher_title, destination = SettingsDestination.PersonalLauncher),
+        entry("personal_launcher.trigger", R.string.keyboard_launcher_hint, destination = SettingsDestination.PersonalLauncher),
+        entry("personal_launcher.delay", R.string.keyboard_launcher_title, destination = SettingsDestination.PersonalLauncher),
+        entry("personal_launcher.assignments", R.string.keyboard_launcher_search, destination = SettingsDestination.PersonalLauncher),
         entry(
             SettingLinkIds.MAIN_NAV_MODE,
             R.string.nav_mode_title,
@@ -1111,6 +1122,7 @@ object SettingLinkRegistry {
         SettingsDestination.Accessibility to R.string.settings_category_accessibility,
         SettingsDestination.AutoCorrection to R.string.settings_category_auto_correction,
         SettingsDestination.Customization to R.string.settings_category_customization,
+        SettingsDestination.PersonalLauncher to R.string.keyboard_launcher_title,
         SettingsDestination.NavMode to R.string.nav_mode_title,
         SettingsDestination.Advanced to R.string.settings_category_advanced,
         SettingsDestination.About to R.string.about_title,

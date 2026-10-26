@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Launcher Plektra</string>
+    <string name="keyboard_launcher_hint">Tieni premuto il tasto scelto mentre premi brevemente o a lungo una lettera. Rilascialo per tornare a scrivere. Con Fn, attendi la vibrazione; due pressioni rapide bloccano ancora Nav. Maiusc assegnato è riservato alle scorciatoie; usa l’altro per le maiuscole.</string>
+    <string name="keyboard_launcher_left_shift">Maiusc sinistro</string>
+    <string name="keyboard_launcher_right_shift">Maiusc destro</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Cerca azioni</string>
+    <string name="keyboard_launcher_remove">Rimuovi assegnazione</string>
+    <string name="keyboard_launcher_selected">Scorciatoia selezionata</string>
+    <string name="keyboard_launcher_missing_command">Scorciatoia non disponibile</string>
+    <string name="keyboard_launcher_short">Pressione breve</string>
+    <string name="keyboard_launcher_long">Pressione lunga</string>
+    <string name="keyboard_launcher_delay">Durata della pressione: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Scorciatoie in tutte le app</string>
+    <string name="keyboard_launcher_summary">Apri app e azioni tenendo un tasto e premendo brevemente o a lungo una lettera.</string>
+    <string name="keyboard_launcher_access_hint">Per le scorciatoie fuori dai campi di testo, attiva il servizio di accessibilità Plektra Launcher / Clicks. La modalità Nav è indipendente. Se Android blocca l’attivazione, consenti prima le impostazioni limitate nelle informazioni Android dell’app.</string>
+    <string name="keyboard_launcher_service_description">Gestisce le scorciatoie attivate esplicitamente e i pulsanti Clicks compatibili. Non acquisisce il contenuto dello schermo.</string>
+    <string name="keyboard_launcher_service_label">Launcher Plektra / Clicks</string>
+</resources>

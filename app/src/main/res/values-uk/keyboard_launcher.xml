@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Лаунчер Plektra</string>
+    <string name="keyboard_launcher_hint">Утримуйте вибрану клавішу та натисніть літеру коротко або довго. Відпустіть клавішу для введення тексту. Fn утримуйте до вібрації; два швидкі натискання й далі фіксують Nav. Призначений Shift служить лише для ярликів; для великих літер використовуйте інший.</string>
+    <string name="keyboard_launcher_left_shift">Лівий Shift</string>
+    <string name="keyboard_launcher_right_shift">Правий Shift</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Пошук дій</string>
+    <string name="keyboard_launcher_remove">Видалити призначення</string>
+    <string name="keyboard_launcher_selected">Вибраний ярлик</string>
+    <string name="keyboard_launcher_missing_command">Ярлик недоступний</string>
+    <string name="keyboard_launcher_short">Коротке натискання</string>
+    <string name="keyboard_launcher_long">Довге натискання</string>
+    <string name="keyboard_launcher_delay">Тривалість утримання: %1$d мс</string>
+    <string name="keyboard_launcher_access_title">Ярлики в усіх застосунках</string>
+    <string name="keyboard_launcher_summary">Відкривайте програми й дії, утримуючи клавішу та натискаючи літеру коротко або довго.</string>
+    <string name="keyboard_launcher_access_hint">Для скорочень поза текстовими полями ввімкніть службу спеціальних можливостей Plektra Launcher / Clicks. Режим Nav незалежний. Якщо Android блокує ввімкнення, спочатку дозвольте обмежені налаштування у відомостях про цю програму.</string>
+    <string name="keyboard_launcher_service_description">Обробляє явно ввімкнені скорочення й сумісні призначення кнопок Clicks. Не отримує вміст екрана.</string>
+    <string name="keyboard_launcher_service_label">Лаунчер Plektra / Clicks</string>
+</resources>

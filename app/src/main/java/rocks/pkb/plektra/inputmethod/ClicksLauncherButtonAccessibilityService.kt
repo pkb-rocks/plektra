@@ -5,16 +5,17 @@ import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import rocks.pkb.plektra.SettingsManager
 
-/**
- * Filters only explicitly configured buttons of a supported Clicks Power Keyboard.
- *
- * Android handles Left Meta before an input method receives it. This service is therefore optional
- * and remains inert for other keyboards, other keys, and native button assignments.
+/** Shared optional key filter: configured launcher chords and existing Clicks remapping.
+ * No screen-content retrieval is requested. Unmatched events retain their previous route.
  */
 class ClicksLauncherButtonAccessibilityService : AccessibilityService() {
     private val mapper = ClicksLauncherAccessibilityKeyMapper()
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
+        val activeIme=android.provider.Settings.Secure.getString(contentResolver,android.provider.Settings.Secure.DEFAULT_INPUT_METHOD)?.substringBefore('/')
+        val unlocked=(getSystemService(KEYGUARD_SERVICE) as? android.app.KeyguardManager)?.isKeyguardLocked!=true
+        if(activeIme==packageName && unlocked && rocks.pkb.plektra.KeyboardLauncherBridge.dispatch(event)) return true
+
         val device = event.device
         val result = mapper.map(
             event = event,
@@ -37,9 +38,10 @@ class ClicksLauncherButtonAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
-    override fun onInterrupt() = Unit
+    override fun onInterrupt() {rocks.pkb.plektra.KeyboardLauncherBridge.cancel()}
 
     override fun onDestroy() {
+        rocks.pkb.plektra.KeyboardLauncherBridge.cancel()
         mapper.reset()
         super.onDestroy()
     }

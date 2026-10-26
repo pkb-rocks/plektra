@@ -890,6 +890,7 @@ class StatusBarController(
     private fun updateSlimModeState() {
         hamburgerMenuView?.setMinimalUiActive(slimModeActive)
         fullSuggestionsBar?.setMinimalUiActive(slimModeActive)
+        (statusBarLayout as? ImeChromeLayout)?.compactNestedRow = slimModeActive
     }
 
     private fun handleMinimalUiToggleFromMenu() {

@@ -22,7 +22,8 @@ enum class SuggestionKind {
 class SuggestionEngine(
     private val repository: DictionaryRepository,
     private val locale: Locale = Locale.ITALIAN,
-    private val debugLogging: Boolean = false
+    private val debugLogging: Boolean = false,
+    private val exactUsageCountProvider: (Locale, String) -> Int = { _, _ -> 0 }
 ) {
 
     private val accentCache: MutableMap<String, String> = mutableMapOf()
@@ -622,6 +623,10 @@ class SuggestionEngine(
                     }
                 }
 
+                // Personal usage is bounded and independent of corpus/user-dictionary weighting.
+                val personalCount = try { exactUsageCountProvider(locale, entry.word).coerceAtLeast(0) }
+                    catch (_: Exception) { 0 } // Optional personalization must not suppress ordinary suggestions.
+                val personalUsageBonus = minOf(1.0, kotlin.math.ln(1.0 + personalCount) * 0.25)
                 val score = (
                     distanceScore +
                         frequencyScore +
@@ -636,7 +641,7 @@ class SuggestionEngine(
                         numericMalus +
                         completionLengthPenalty +
                         sameRootBonus
-                    ) * sourceBoost
+                    ) * sourceBoost + personalUsageBonus
                 val key = entry.word.lowercase(locale)
                 if (!seen.add(key)) return@forEach
                 val suggestion = SuggestionResult(

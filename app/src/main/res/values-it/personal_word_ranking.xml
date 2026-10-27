@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Reimposta il ranking personale</string>
+    <string name="personal_ranking_reset_message">Cancellare i conteggi personali delle parole su questo telefono? Dizionario, sostituzioni del testo e previsioni della parola successiva restano invariati.</string>
+    <string name="personal_ranking_reset_failed">Impossibile reimpostare il ranking personale. Riprova.</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Đặt lại xếp hạng từ cá nhân</string>
+    <string name="personal_ranking_reset_message">Xóa bộ đếm từ cá nhân trên điện thoại này? Từ điển, thay thế văn bản và dự đoán từ tiếp theo được giữ nguyên.</string>
+    <string name="personal_ranking_reset_failed">Không thể đặt lại xếp hạng cá nhân. Vui lòng thử lại.</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Επαναφορά προσωπικής κατάταξης λέξεων</string>
+    <string name="personal_ranking_reset_message">Να διαγραφούν οι προσωπικοί μετρητές λέξεων σε αυτό το τηλέφωνο; Το λεξικό, οι αντικαταστάσεις κειμένου και οι προβλέψεις επόμενης λέξης διατηρούνται.</string>
+    <string name="personal_ranking_reset_failed">Δεν ήταν δυνατή η επαναφορά. Δοκιμάστε ξανά.</string>
+</resources>

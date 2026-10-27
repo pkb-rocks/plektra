@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Persönliche Wortsortierung zurücksetzen</string>
+    <string name="personal_ranking_reset_message">Persönliche Wortzähler auf diesem Telefon löschen? Wörterbuch, Textersetzungen und Vorhersagen für das nächste Wort bleiben erhalten.</string>
+    <string name="personal_ranking_reset_failed">Die persönliche Wortsortierung konnte nicht zurückgesetzt werden. Bitte erneut versuchen.</string>
+</resources>

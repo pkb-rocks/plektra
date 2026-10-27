@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Сбросить личный рейтинг слов</string>
+    <string name="personal_ranking_reset_message">Удалить личные счётчики слов на этом телефоне? Словарь, замены текста и прогноз следующего слова сохранятся.</string>
+    <string name="personal_ranking_reset_failed">Не удалось сбросить личный рейтинг. Попробуйте ещё раз.</string>
+</resources>

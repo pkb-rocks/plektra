@@ -37,17 +37,18 @@ class SuggestionController(
         Boolean
     ) -> DictionaryRepository)? = null,
     nextWordPredictorOverride: NextWordPredictor? = null,
-    private val activeSuggestionLocalesProvider: (() -> List<Locale>)? = null
+    private val activeSuggestionLocalesProvider: (() -> List<Locale>)? = null,
+    wordUsageRepositoryOverride: WordUsageRepository? = null
 ) {
 
     private val appContext = context.applicationContext
     private val debugLogging: Boolean = debugLogging
     private val userDictionaryStore = UserDictionaryStore()
+    // Disabled/unused smart suggestions must not allocate a persistent learning store.
+    private val wordUsage by lazy { wordUsageRepositoryOverride ?: PersonalWordLearning.store(appContext) }
     private val dictionaryRepositoryCache = mutableMapOf<String, DictionaryRepository>()
     private var dictionaryRepository: DictionaryRepository = createDictionaryRepository(currentLocale)
-    private var suggestionEngine = SuggestionEngine(dictionaryRepository, locale = currentLocale, debugLogging = debugLogging).apply {
-        setKeyboardLayout(keyboardLayoutProvider())
-    }
+    private var suggestionEngine = createSuggestionEngine(dictionaryRepository, currentLocale, keyboardLayoutProvider())
     private var tracker = CurrentWordTracker(
         onWordChanged = { word ->
             updateSuggestionsForWord(word)
@@ -69,6 +70,11 @@ class SuggestionController(
         val repository: DictionaryRepository,
         val engine: SuggestionEngine
     )
+
+    private fun createSuggestionEngine(repository: DictionaryRepository, locale: Locale, layout: String) =
+        SuggestionEngine(repository, locale=locale, debugLogging=debugLogging,
+            exactUsageCountProvider={ language, word -> wordUsage.getExactUsage(language,word)?.count ?: 0 })
+            .apply {setKeyboardLayout(layout)}
 
     private fun createDictionaryRepository(locale: Locale): DictionaryRepository {
         val cacheKey = dictionaryCacheKey(locale)
@@ -131,9 +137,7 @@ class SuggestionController(
         
         currentLocale = newLocale
         dictionaryRepository = createDictionaryRepository(currentLocale)
-        suggestionEngine = SuggestionEngine(dictionaryRepository, locale = currentLocale, debugLogging = debugLogging).apply {
-            setKeyboardLayout(keyboardLayoutProvider())
-        }
+        suggestionEngine = createSuggestionEngine(dictionaryRepository, currentLocale, keyboardLayoutProvider())
         autoReplaceController = createAutoReplaceController()
         extraSuggestionEngines.clear()
         
@@ -218,9 +222,7 @@ class SuggestionController(
             // Coalesce key repeat/backspace bursts before doing CPU-bound dictionary work.
             delay(40)
             val primary = if (primaryRepository.isReady) {
-                SuggestionEngine(primaryRepository, locale = localeSnapshot, debugLogging = debugLogging).apply {
-                    setKeyboardLayout(layoutSnapshot)
-                }.suggest(
+                createSuggestionEngine(primaryRepository, localeSnapshot, layoutSnapshot).suggest(
                     wordSnapshot,
                     settings.maxSuggestions,
                     settings.accentMatching,
@@ -234,9 +236,7 @@ class SuggestionController(
             coroutineContext.ensureActive()
             val extraSuggestions = extraRepositories.flatMap { (locale, repository) ->
                 coroutineContext.ensureActive()
-                SuggestionEngine(repository, locale = locale, debugLogging = debugLogging).apply {
-                    setKeyboardLayout(layoutSnapshot)
-                }.suggest(
+                createSuggestionEngine(repository, locale, layoutSnapshot).suggest(
                     wordSnapshot,
                     settings.maxSuggestions,
                     settings.accentMatching,
@@ -352,6 +352,26 @@ class SuggestionController(
      * Use this when entering a text field to show suggestions right away.
      * If dictionary is not ready yet, does nothing - normal typing/cursor flow will handle it.
      */
+    /** Successful acceptance replaces the tracked prefix; an inserted space completes the actual word. */
+    fun onSuggestionCommitted(inputConnection: InputConnection?) {
+        cancelPendingWordSuggestions()
+        tracker.reset()
+        if (!isEnabled() || !settingsProvider().suggestionsEnabled || inputConnection==null) return
+        val before=try {inputConnection.getTextBeforeCursor(128,0)?.toString()} catch(_:Exception) {null} ?: return
+        if (before.lastOrNull()?.isWhitespace()!=true) return
+        val completed=before.trimEnd()
+        val start=completed.indexOfLast {it.isWhitespace()}+1
+        if(start==0 && before.length==128) return // Do not learn a truncated tail of a long word.
+        learnPersonalWord(completed.substring(start))
+    }
+
+    private fun learnPersonalWord(word:String) {
+        if(!isEnabled() || !settingsProvider().suggestionsEnabled || word.isBlank() || word.length>48 || word.any {it.isWhitespace()}) return
+        try {
+            rocks.pkb.plektra.backup.LearningOperationGate.learnIfAllowed {wordUsage.learn(currentLocale,word)}
+        } catch(_:Exception) { /* Optional learning must not interrupt text entry. */ }
+    }
+
     fun readInitialContext(inputConnection: InputConnection?) {
         if (!isEnabled()) return
         if (inputConnection == null) return
@@ -481,6 +501,11 @@ class SuggestionController(
         val trimmed = candidate.trim()
         if (trimmed.isEmpty()) return
 
+        try {
+            rocks.pkb.plektra.backup.LearningOperationGate.learnIfAllowed {
+                wordUsage.delete(currentLocale, trimmed)
+            }
+        } catch (_: Exception) { /* Still hide the current suggestion if durable deletion is unavailable. */ }
         val current = latestSuggestions.get()
         val suggestion = current.firstOrNull { it.candidate.equals(trimmed, ignoreCase = true) }
         if (suggestion?.kind == SuggestionKind.NEXT_WORD) {
@@ -578,6 +603,8 @@ class SuggestionController(
 
         val cleanWord = completedWord?.trim()?.takeIf { it.any { ch -> ch.isLetterOrDigit() } }
         if (cleanWord != null) {
+            // Exact replacements remain independent; only personal learning uses the privacy guard.
+            learnPersonalWord(cleanWord)
             if (sentenceStartPending) {
                 nextWordPredictor.learnSentenceStart(currentLocale, cleanWord)
             }
@@ -758,9 +785,7 @@ class SuggestionController(
             val tag = locale.toLanguageTag()
             extraSuggestionEngines.getOrPut(tag) {
                 val repository = createDictionaryRepository(locale)
-                val engine = SuggestionEngine(repository, locale = locale, debugLogging = debugLogging).apply {
-                    setKeyboardLayout(keyboardLayoutProvider())
-                }
+                val engine = createSuggestionEngine(repository, locale, keyboardLayoutProvider())
                 SuggestionLanguageEngine(locale, repository, engine)
             }
         }

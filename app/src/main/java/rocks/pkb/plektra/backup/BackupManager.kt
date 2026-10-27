@@ -23,9 +23,11 @@ import java.time.ZoneOffset
 object BackupManager {
     private const val TAG = "BackupManager"
 
-    suspend fun createBackup(context: Context, targetUri: Uri): BackupResult = withContext(Dispatchers.IO) {
+    suspend fun createBackup(context: Context, targetUri: Uri): BackupResult = LearningOperationGate.withExclusiveOperation {
+        withContext(Dispatchers.IO) {
         val workingDir = File(context.cacheDir, "backup_${System.currentTimeMillis()}").apply { mkdirs() }
         try {
+            LearningOperationGate.awaitPendingLearning()
             val customTypingSoundActive =
                 SettingsManager.getTypingSoundMode(context) == SettingsManager.TYPING_SOUND_MODE_CUSTOM
             val hasTypingSoundPack = if (customTypingSoundActive) {
@@ -56,7 +58,8 @@ object BackupManager {
                 filesDir,
                 includeTypingSoundPack = hasTypingSoundPack
             )
-            val components = (prefComponents + fileComponents).sorted()
+            PersonalWordUsageBackup.write(context,workingDir)
+            val components = (prefComponents + fileComponents + listOf(PersonalWordUsageBackup.PATH,PersonalWordUsageBackup.EXACT_PATH)).sorted()
 
             val metadata = BackupMetadata(
                 versionCode = BuildConfig.VERSION_CODE,
@@ -77,6 +80,7 @@ object BackupManager {
             BackupResult.Failure(e.message ?: "Backup failed")
         } finally {
             workingDir.deleteRecursively()
+        }
         }
     }
 }

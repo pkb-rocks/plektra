@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Reset learned word ranking</string>
+    <string name="personal_ranking_reset_message">Erase personal word-use counts on this phone? Your dictionary, text replacements and next-word predictions stay unchanged.</string>
+    <string name="personal_ranking_reset_failed">Unable to reset personal ranking. Please try again.</string>
+</resources>

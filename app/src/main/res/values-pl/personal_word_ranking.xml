@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Zresetuj osobisty ranking słów</string>
+    <string name="personal_ranking_reset_message">Usunąć osobiste liczniki słów na tym telefonie? Słownik, zamiany tekstu i przewidywanie następnego słowa pozostaną bez zmian.</string>
+    <string name="personal_ranking_reset_failed">Nie udało się zresetować osobistego rankingu. Spróbuj ponownie.</string>
+</resources>

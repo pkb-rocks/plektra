@@ -451,6 +451,8 @@ fun AutoCorrectionCategoryScreen(
                                 }
                             }
 
+                        PersonalWordRankingReset()
+
                         TextButton(
                             modifier = Modifier.fillMaxWidth().settingRow(SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS),
                             onClick = {

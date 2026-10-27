@@ -2821,9 +2821,13 @@ private fun KeyboardThemeColorPickerDialog(
                     }
                 }
                 Column(
-                    modifier = Modifier.weight(1.35f),
+                    modifier = Modifier.weight(1.35f).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    ThemePhotoColorButton { sampled ->
+                        hexValue = sampled.toHexColorLabel()
+                        updateColorFromHex(sampled)
+                    }
                     KeyboardThemeColorWheel(
                         hue = hue,
                         saturation = saturation,

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_photo_pick">Ընտրել լուսանկարից</string>
+    <string name="theme_photo_loading">Լուսանկարի բեռնում…</string>
+    <string name="theme_photo_failed">Չհաջողվեց բացել լուսանկարը։ Ընտրեք 16 ՄԲ-ից փոքր այլ պատկեր։</string>
+    <string name="theme_photo_title">Ընտրել գույն</string>
+    <string name="theme_photo_hint">Հպեք լուսանկարին՝ գույն ընտրելու համար։ Պահվում է միայն ընտրված գույնը։</string>
+    <string name="theme_photo_change">Ընտրել այլ լուսանկար</string>
+    <string name="theme_photo_use">Օգտագործել գույնը</string>
+</resources>

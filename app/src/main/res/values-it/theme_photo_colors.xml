@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_photo_pick">Preleva da una foto</string>
+    <string name="theme_photo_loading">Caricamento della foto…</string>
+    <string name="theme_photo_failed">Impossibile aprire questa foto. Prova un’altra immagine inferiore a 16 MB.</string>
+    <string name="theme_photo_title">Preleva un colore</string>
+    <string name="theme_photo_hint">Tocca la foto per prelevare un colore. Viene salvato solo il colore scelto.</string>
+    <string name="theme_photo_change">Scegli un’altra foto</string>
+    <string name="theme_photo_use">Usa colore</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Una foto en todo el teclado</string>
+    <string name="theme_background_change">Cambiar foto</string>
+    <string name="theme_background_remove">Quitar foto</string>
+    <string name="theme_background_loading">Preparando foto…</string>
+    <string name="theme_background_failed">No se puede usar esta imagen. Prueba otra imagen de menos de 16 MB.</string>
+    <string name="theme_background_help">La foto llena el teclado. Los colores del texto y los bordes siguen siendo ajustables.</string>
+    <string name="theme_background_zip">Los temas con fotos se transfieren con la copia ZIP completa. El JSON para copiar solo contiene colores.</string>
+</resources>

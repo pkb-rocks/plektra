@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Use a photo across the keyboard</string>
+    <string name="theme_background_change">Change photo</string>
+    <string name="theme_background_remove">Remove photo</string>
+    <string name="theme_background_loading">Preparing photo…</string>
+    <string name="theme_background_failed">Cannot use this image. Try another image smaller than 16 MB.</string>
+    <string name="theme_background_help">The photo fills the keyboard. Text and border colours stay adjustable.</string>
+    <string name="theme_background_zip">Photo themes are transferred with the full ZIP backup. Clipboard JSON contains colours only.</string>
+</resources>

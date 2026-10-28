@@ -509,14 +509,15 @@ object SettingsManager {
         val keyPopupAttached: Boolean = true,
         val keyPopupTailEnabled: Boolean = true,
         val keyPreviewAfterLongPress: Boolean = false,
-        val keyAlternatesPopupEnabled: Boolean = true
+        val keyAlternatesPopupEnabled: Boolean = true,
+        val textures: Map<String, KeyboardThemeTexture> = emptyMap()
     ) {
         fun toKeyboardThemeColors(): KeyboardThemeColors =
             KeyboardThemeColors(
                 background = background,
                 divider = divider,
-                normalKey = normalKey,
-                specialKey = specialKey,
+                normalKey = textures.surfaceColour(normalKey),
+                specialKey = textures.surfaceColour(specialKey),
                 textAndIcons = textAndIcons,
                 ledInactive = ledInactive,
                 ledActive = ledActive,
@@ -525,12 +526,13 @@ object SettingsManager {
                 cursorSwipe = cursorSwipe,
                 keyPopup = keyPopup,
                 keyPopupSelected = keyPopupSelected,
-                suggestion = suggestion,
-                statusBarButton = statusBarButton,
+                suggestion = textures.surfaceColour(suggestion),
+                statusBarButton = textures.surfaceColour(statusBarButton),
                 keyCornerRadiusRatio = keyCornerRadiusRatio,
                 chromeCornerRadiusRatio = chromeCornerRadiusRatio,
                 suggestionsHeightScale = suggestionsHeightScale,
-                variationsHeightScale = variationsHeightScale
+                variationsHeightScale = variationsHeightScale,
+                textures = textures
             )
     }
 
@@ -988,7 +990,8 @@ object SettingsManager {
                 keyPopupAttached = json.optBoolean("key_popup_attached", defaults.keyPopupAttached),
                 keyPopupTailEnabled = json.optBoolean("key_popup_tail_enabled", defaults.keyPopupTailEnabled),
                 keyPreviewAfterLongPress = json.optBoolean("key_preview_after_long_press", defaults.keyPreviewAfterLongPress),
-                keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled)
+                keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled),
+                textures = ThemeTextureModel.decode(json.optJSONObject("textures"))
             )
         } catch (error: Exception) {
             Log.e(TAG, "Fehler beim Laden des Keyboard-Themes", error)
@@ -1456,7 +1459,8 @@ object SettingsManager {
             keyPopupAttached = json.optBoolean("key_popup_attached", defaults.keyPopupAttached),
             keyPopupTailEnabled = json.optBoolean("key_popup_tail_enabled", defaults.keyPopupTailEnabled),
             keyPreviewAfterLongPress = json.optBoolean("key_preview_after_long_press", defaults.keyPreviewAfterLongPress),
-            keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled)
+            keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled),
+                textures = ThemeTextureModel.decode(json.optJSONObject("textures"))
         )
 
     private fun keyboardThemeToJson(theme: KeyboardThemeSettings): JSONObject =
@@ -1491,6 +1495,7 @@ object SettingsManager {
             put("key_popup_tail_enabled", theme.keyPopupTailEnabled)
             put("key_preview_after_long_press", theme.keyPreviewAfterLongPress)
             put("key_alternates_popup_enabled", theme.keyAlternatesPopupEnabled)
+            if (theme.textures.isNotEmpty()) put("textures", ThemeTextureModel.encode(theme.textures))
         }
 
     private fun normalizeKeyboardThemePopupStyle(value: String): String =

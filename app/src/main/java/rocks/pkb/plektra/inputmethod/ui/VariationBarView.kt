@@ -181,8 +181,8 @@ class VariationBarView(
                     borderWidthPx = dpToPx(1f)
                 )
             }
-            wrapper?.setBackgroundColor(value?.background ?: Color.TRANSPARENT)
-            container?.setBackgroundColor(value?.background ?: Color.TRANSPARENT)
+            wrapper?.setBackgroundColor(value?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
+            container?.setBackgroundColor(value?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             emptyHintView?.setTextColor(colorWithAlpha(value?.textAndIcons ?: Color.WHITE, 120))
             swipeIndicator?.background = createSwipeIndicatorDrawable()
             applyHeight()
@@ -209,7 +209,7 @@ class VariationBarView(
                 variationsContainerHeight
             )
             visibility = View.GONE
-            setBackgroundColor(themeOverride?.background ?: Color.TRANSPARENT)
+            setBackgroundColor(themeOverride?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             addOnLayoutChangeListener { view, left, _, right, _, oldLeft, _, oldRight, _ ->
                 if (right - left != oldRight - oldLeft && view.visibility == View.VISIBLE) {
                     view.post {
@@ -250,7 +250,7 @@ class VariationBarView(
                 variationsContainerHeight
             )
             visibility = View.GONE
-            setBackgroundColor(themeOverride?.background ?: Color.TRANSPARENT)
+            setBackgroundColor(themeOverride?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             addView(container)
         }
 

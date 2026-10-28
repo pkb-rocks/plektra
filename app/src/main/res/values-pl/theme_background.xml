@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Jedno zdjęcie na całej klawiaturze</string>
+    <string name="theme_background_change">Zmień zdjęcie</string>
+    <string name="theme_background_remove">Usuń zdjęcie</string>
+    <string name="theme_background_loading">Przygotowywanie zdjęcia…</string>
+    <string name="theme_background_failed">Nie można użyć tego obrazu. Wybierz inny obraz mniejszy niż 16 MB.</string>
+    <string name="theme_background_help">Zdjęcie wypełnia klawiaturę. Kolory tekstu i obramowania pozostają regulowane.</string>
+    <string name="theme_background_zip">Motywy ze zdjęciami są przenoszone w pełnej kopii ZIP. JSON do skopiowania zawiera tylko kolory.</string>
+</resources>

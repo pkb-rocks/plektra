@@ -97,7 +97,8 @@ class AospKeyboardView @JvmOverloads constructor(
         val keyWidthScale: Float = 1f,
         val rowGapScale: Float = 1f,
         val distributeHorizontalSpacing: Boolean = true,
-        val ortholinear: Boolean = false
+        val ortholinear: Boolean = false,
+        val textures: Map<String, rocks.pkb.plektra.KeyboardThemeTexture> = emptyMap()
     )
 
     enum class SoftwareLayoutStyle {
@@ -400,10 +401,20 @@ class AospKeyboardView @JvmOverloads constructor(
     var longPressHintProvider: ((String) -> String?)? = null
     var longPressLayerAlternatesProvider: ((String) -> List<LongPressLayerAlternative>)? = null
     var longPressLayerPopupBelowKey: Boolean = true
+    private var backgroundBeforePhoto: Drawable? = null
     var themeOverride: ThemeOverride? = null
         set(value) {
             if (field == value) {
                 return
+            }
+            val image = value?.textures?.get("background")
+            val hadPhoto = field?.textures?.containsKey("background") == true
+            if (image != null) {
+                if (!hadPhoto) backgroundBeforePhoto = background
+                rocks.pkb.plektra.ThemeTextureBackground.set(this, value?.background ?: Color.BLACK, image)
+            } else if (hadPhoto) {
+                background = backgroundBeforePhoto
+                backgroundBeforePhoto = null
             }
             field = value
             rebuildKeys(width, height)
@@ -589,7 +600,9 @@ class AospKeyboardView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         themeOverride?.let {
-            canvas.drawColor(it.background)
+            // View.draw has already painted our backdrop (or the shared ancestor did).
+            // An opaque fill here would hide the photo behind the entire key grid.
+            if (!it.textures.containsKey("background")) canvas.drawColor(it.background)
         } ?: drawDrawable(canvas, keyboardBackground, RectF(0f, 0f, width.toFloat(), height.toFloat()))
         prepareKeySurfaces()
         keys.forEach { key ->

@@ -64,7 +64,7 @@ class HamburgerMenuView(
                     borderWidthPx = dpToPx(1f)
                 )
             }
-            root?.setBackgroundColor(value?.background ?: Color.BLACK)
+            rocks.pkb.plektra.ThemeTextureBackground.set(root, value?.background ?: Color.BLACK, value?.textures?.get("background"))
             closeButton?.let { applyCloseButtonTheme(it) }
         }
 
@@ -136,7 +136,7 @@ class HamburgerMenuView(
         }
         row = rowView
         root = FrameLayout(context).apply {
-            setBackgroundColor(themeOverride?.background ?: Color.BLACK)
+            rocks.pkb.plektra.ThemeTextureBackground.set(this, themeOverride?.background ?: Color.BLACK, themeOverride?.textures?.get("background"))
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Одне фото на всій клавіатурі</string>
+    <string name="theme_background_change">Змінити фото</string>
+    <string name="theme_background_remove">Прибрати фото</string>
+    <string name="theme_background_loading">Підготовка фото…</string>
+    <string name="theme_background_failed">Не вдалося використати зображення. Виберіть інше зображення розміром менше 16 МБ.</string>
+    <string name="theme_background_help">Фото заповнює клавіатуру. Кольори тексту та меж можна змінювати.</string>
+    <string name="theme_background_zip">Теми з фото переносяться з повною ZIP-копією. JSON для копіювання містить лише кольори.</string>
+</resources>

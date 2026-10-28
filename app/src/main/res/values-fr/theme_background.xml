@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Une photo sur tout le clavier</string>
+    <string name="theme_background_change">Changer la photo</string>
+    <string name="theme_background_remove">Retirer la photo</string>
+    <string name="theme_background_loading">Préparation de la photo…</string>
+    <string name="theme_background_failed">Impossible d’utiliser cette image. Essayez une autre image de moins de 16 Mo.</string>
+    <string name="theme_background_help">La photo remplit le clavier. Les couleurs du texte et des bordures restent réglables.</string>
+    <string name="theme_background_zip">Les thèmes photo se transfèrent avec la sauvegarde ZIP complète. Le JSON à copier contient uniquement les couleurs.</string>
+</resources>

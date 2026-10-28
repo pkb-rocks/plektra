@@ -18,7 +18,8 @@ data class KeyboardThemeColors(
     val keyCornerRadiusRatio: Float = 0.08f,
     val chromeCornerRadiusRatio: Float = 0.08f,
     val suggestionsHeightScale: Float = 1f,
-    val variationsHeightScale: Float = 1f
+    val variationsHeightScale: Float = 1f,
+    val textures: Map<String, rocks.pkb.plektra.KeyboardThemeTexture> = emptyMap()
 ) {
     // Themes are persisted as colors rather than preset names. Match the unchanged
     // Plektra Dark surfaces so custom palettes keep their configured divider.

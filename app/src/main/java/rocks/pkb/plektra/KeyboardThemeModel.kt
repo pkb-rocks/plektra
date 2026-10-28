@@ -35,7 +35,8 @@ internal data class KeyboardThemePreset(
     val keyPopupAttached: Boolean = true,
     val keyPopupTailEnabled: Boolean = true,
     val keyPreviewAfterLongPress: Boolean = false,
-    val keyAlternatesPopupEnabled: Boolean = true
+    val keyAlternatesPopupEnabled: Boolean = true,
+    val textures: Map<String, KeyboardThemeTexture> = emptyMap()
 )
 
 internal data class KeyboardThemeOption(
@@ -74,8 +75,8 @@ internal fun KeyboardThemePreset.toAospThemeOverride(): AospKeyboardView.ThemeOv
     AospKeyboardView.ThemeOverride(
         background = background,
         divider = divider,
-        normalKey = normalKey,
-        specialKey = specialKey,
+        normalKey = textures.surfaceColour(normalKey),
+        specialKey = textures.surfaceColour(specialKey),
         textAndIcons = textAndIcons,
         ledInactive = ledInactive,
         ledActive = ledActive,
@@ -94,15 +95,16 @@ internal fun KeyboardThemePreset.toAospThemeOverride(): AospKeyboardView.ThemeOv
         keyPopupAttached = keyPopupAttached,
         keyPopupTailEnabled = keyPopupTailEnabled,
         keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
+        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+        textures = textures
     )
 
 internal fun KeyboardThemePreset.toKeyboardThemeColors(): KeyboardThemeColors =
     KeyboardThemeColors(
         background = background,
         divider = divider,
-        normalKey = normalKey,
-        specialKey = specialKey,
+        normalKey = textures.surfaceColour(normalKey),
+        specialKey = textures.surfaceColour(specialKey),
         textAndIcons = textAndIcons,
         ledInactive = ledInactive,
         ledActive = ledActive,
@@ -111,12 +113,13 @@ internal fun KeyboardThemePreset.toKeyboardThemeColors(): KeyboardThemeColors =
         cursorSwipe = cursorSwipe,
         keyPopup = keyPopup,
         keyPopupSelected = keyPopupSelected,
-        suggestion = suggestion,
-        statusBarButton = statusBarButton,
+        suggestion = textures.surfaceColour(suggestion),
+        statusBarButton = textures.surfaceColour(statusBarButton),
         keyCornerRadiusRatio = keyCornerRadiusRatio,
         chromeCornerRadiusRatio = chromeCornerRadiusRatio,
         suggestionsHeightScale = suggestionsHeightScale,
-        variationsHeightScale = variationsHeightScale
+        variationsHeightScale = variationsHeightScale,
+        textures = textures
     )
 
 internal fun KeyboardThemePreset.toSettingsTheme(): SettingsManager.KeyboardThemeSettings =
@@ -150,7 +153,8 @@ internal fun KeyboardThemePreset.toSettingsTheme(): SettingsManager.KeyboardThem
         keyPopupAttached = keyPopupAttached,
         keyPopupTailEnabled = keyPopupTailEnabled,
         keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
+        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+        textures = textures
     )
 
 internal fun SettingsManager.KeyboardThemeSettings.toKeyboardThemePreset(name: String): KeyboardThemePreset =
@@ -185,7 +189,8 @@ internal fun SettingsManager.KeyboardThemeSettings.toKeyboardThemePreset(name: S
         keyPopupAttached = keyPopupAttached,
         keyPopupTailEnabled = keyPopupTailEnabled,
         keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
+        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+        textures = textures
     )
 
 internal fun SettingsManager.NamedKeyboardTheme.toKeyboardThemeOption(): KeyboardThemeOption {

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Một ảnh trên toàn bộ bàn phím</string>
+    <string name="theme_background_change">Đổi ảnh</string>
+    <string name="theme_background_remove">Xóa ảnh</string>
+    <string name="theme_background_loading">Đang chuẩn bị ảnh…</string>
+    <string name="theme_background_failed">Không thể dùng ảnh này. Hãy chọn ảnh khác nhỏ hơn 16 MB.</string>
+    <string name="theme_background_help">Ảnh phủ toàn bộ bàn phím. Vẫn có thể chỉnh màu chữ và đường viền.</string>
+    <string name="theme_background_zip">Chuyển chủ đề ảnh bằng bản sao lưu ZIP đầy đủ. JSON để sao chép chỉ chứa màu sắc.</string>
+</resources>

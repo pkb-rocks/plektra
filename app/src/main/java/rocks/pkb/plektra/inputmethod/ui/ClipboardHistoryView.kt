@@ -392,8 +392,9 @@ class ClipboardHistoryView(
 
     private fun applyTheme() {
         val theme = themeOverride
-        val background = theme?.background ?: Color.TRANSPARENT
-        setBackgroundColor(background)
+        val image = theme?.textures?.get("background")
+        val background = if (image != null) Color.TRANSPARENT else theme?.background ?: Color.TRANSPARENT
+        rocks.pkb.plektra.ThemeTextureBackground.set(this, theme?.background ?: Color.TRANSPARENT, image)
         recyclerView.setBackgroundColor(background)
         titleText.setTextColor(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 180))
         clearButton.setTextColor(theme?.accent ?: Color.parseColor("#FF6B6B"))

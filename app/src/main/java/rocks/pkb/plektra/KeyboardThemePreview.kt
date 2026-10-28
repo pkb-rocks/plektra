@@ -111,7 +111,7 @@ private fun createHardwareKeyboardThemePreviewView(
 ): LinearLayout {
     val root = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures["background"])
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -146,7 +146,7 @@ private fun createHardwareKeyboardThemePreviewView(
 }
 
 private fun updateHardwareKeyboardThemePreviewView(view: android.view.View, theme: KeyboardThemePreset) {
-    view.setBackgroundColor(theme.background)
+    ThemeTextureBackground.set(view, theme.background, theme.textures["background"])
     val colors = theme.toKeyboardThemeColors()
     (view.getTag(R.id.keyboard_theme_preview_suggestions_bar) as? FullSuggestionsBar)?.apply {
         themeOverride = colors
@@ -185,7 +185,7 @@ private fun createVirtualKeyboardThemePreviewView(
     }
     val root = AdditiveVerticalKeyboardPreviewLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures["background"])
         layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             previewHeightPx
@@ -234,7 +234,7 @@ private fun createVirtualKeyboardThemePreviewView(
             0,
             dpToPx(context, SOFTWARE_PREVIEW_KEYBOARD_BOTTOM_PADDING_DP)
         )
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures["background"])
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             virtualKeyboardSurfaceHeightPx(context, theme)
@@ -280,7 +280,8 @@ private fun updateVirtualKeyboardThemePreviewView(view: android.view.View, theme
     val previewHeightPx = virtualKeyboardPreviewHeightPx(root.context, theme)
     frame?.setBackgroundColor(theme.background)
     frame?.desiredPreviewHeightPx = previewHeightPx
-    root.setBackgroundColor(theme.background)
+    ThemeTextureBackground.set(root, theme.background, theme.textures["background"])
+    ThemeTextureBackground.set((root as? AdditiveVerticalKeyboardPreviewLayout)?.keyboardSurface, theme.background, theme.textures["background"])
     root.layoutParams = (root.layoutParams as? FrameLayout.LayoutParams)?.apply {
         width = ViewGroup.LayoutParams.MATCH_PARENT
         height = previewHeightPx

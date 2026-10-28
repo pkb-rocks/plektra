@@ -465,19 +465,20 @@ class StatusBarController(
                 imeWindow.isNavigationBarContrastEnforced = false
             }
         }
-        statusBarLayout?.setBackgroundColor(activeColors.background)
+        rocks.pkb.plektra.ThemeTextureBackground.set(statusBarLayout, activeColors.background, activeColors.textures["background"])
         val roundedCorners = SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)
-        val surfaceBackground = if (roundedCorners) Color.TRANSPARENT else activeColors.background
+        val surfaceBackground = if (roundedCorners || activeColors.textures.containsKey("background")) Color.TRANSPARENT else activeColors.background
         symSurfaceStack?.setBackgroundColor(surfaceBackground)
         symSurfaceContainer?.setBackgroundColor(surfaceBackground)
+        val chromeBackground = if (activeColors.textures.containsKey("background")) Color.TRANSPARENT else activeColors.background
         (statusBarLayout as? ImeChromeLayout)?.let { chrome ->
             // Keep the spacing around the individually rounded buttons in the chrome background.
-            chrome.regularCornerColors = activeColors.background to activeColors.background
-            chrome.compactCornerColors = activeColors.background to activeColors.background
-            chrome.bottomFillColors = activeColors.background to activeColors.background
+            chrome.regularCornerColors = chromeBackground to chromeBackground
+            chrome.compactCornerColors = chromeBackground to chromeBackground
+            chrome.bottomFillColors = chromeBackground to chromeBackground
             chrome.invalidate()
         }
-        emojiKeyboardContainer?.setBackgroundColor(activeColors.background)
+        rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardContainer, activeColors.background, activeColors.textures["background"])
         variationBarView?.themeOverride = activeColors
         ledStatusView.themeOverride = activeColors
         fullSuggestionsBar?.themeOverride = activeColors
@@ -555,8 +556,8 @@ class StatusBarController(
         AospKeyboardView.ThemeOverride(
             background = background,
             divider = divider,
-            normalKey = normalKey,
-            specialKey = specialKey,
+            normalKey = if (textures["background"]?.wholeKeyboard == true) Color.TRANSPARENT else normalKey,
+            specialKey = if (textures["background"]?.wholeKeyboard == true) Color.TRANSPARENT else specialKey,
             textAndIcons = textAndIcons,
             ledInactive = ledInactive,
             ledActive = ledActive,
@@ -575,7 +576,8 @@ class StatusBarController(
             keyWidthScale = keyWidthScale,
             rowGapScale = rowGapScale,
             distributeHorizontalSpacing = distributeHorizontalSpacing,
-            ortholinear = ortholinear
+            ortholinear = ortholinear,
+            textures = textures
         )
 
     fun setSlimModeActive(active: Boolean) {
@@ -1815,7 +1817,7 @@ class StatusBarController(
     private fun prepareSoftwareKeyboardForSymbolTransition() {
         val activeColors = softwareTheme()
         emojiKeyboardContainer?.apply {
-            setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(this, activeColors.background, activeColors.textures["background"])
         }
         // Also covers the stacked layout where the keyboard is not the first container child.
         (softwareKeyboardView ?: emojiKeyboardContainer?.getChildAt(0) as? AospKeyboardView)
@@ -2932,7 +2934,7 @@ class StatusBarController(
             view.alpha = 1f
             view.translationY = 0f
             view.visibility = View.VISIBLE
-            backgroundView?.setBackgroundColor(activeThemeColors().background)
+            activeThemeColors().let { rocks.pkb.plektra.ThemeTextureBackground.set(backgroundView, it.background, it.textures["background"]) }
             return
         }
         val height = view.height
@@ -2950,10 +2952,7 @@ class StatusBarController(
 
         // Restore the theme background, including its transparency, without animation.
         backgroundView?.let { bgView ->
-            if (bgView.background !is ColorDrawable) {
-                bgView.background = ColorDrawable(activeThemeColors().background)
-            }
-            (bgView.background as? ColorDrawable)?.color = activeThemeColors().background
+            activeThemeColors().let { rocks.pkb.plektra.ThemeTextureBackground.set(bgView, it.background, it.textures["background"]) }
         }
 
         val animator = ValueAnimator.ofFloat(measuredHeight.toFloat(), 0f).apply {
@@ -3089,11 +3088,7 @@ class StatusBarController(
         layout.visibility = View.VISIBLE
         applyAccessibilityLiveRegionPreference(layout)
         
-        if (layout.background !is ColorDrawable) {
-            layout.background = ColorDrawable(activeTheme.background)
-        } else if (snapshot.symPage == 0) {
-            (layout.background as ColorDrawable).color = activeThemeColors().background
-        }
+        rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeTheme.background, activeTheme.textures["background"])
         
         modifiersContainerView.visibility = View.GONE
         val showHardwareBottomIndicators = barPresentation.bottomIndicators
@@ -3209,10 +3204,7 @@ class StatusBarController(
             variationsBar?.resetVariationsState()
 
             // Pin background and hide variations while showing clipboard grid
-            if (layout.background !is ColorDrawable) {
-                layout.background = ColorDrawable(activeColors.background)
-            }
-            (layout.background as? ColorDrawable)?.color = activeThemeColors().background
+            rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
             variationsWrapperView?.apply {
                 visibility = View.GONE
                 isEnabled = false
@@ -3222,7 +3214,7 @@ class StatusBarController(
 
             val measured = ensureEmojiKeyboardMeasuredHeight(emojiKeyboardView, layout, forceReMeasure = true)
             val animationHeight = if (measured > 0) measured else defaultSymHeightPx
-            emojiKeyboardView.setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, activeColors.background, activeColors.textures["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             val surfaceHeight = resolveSurfaceHeightWithOptionalLed(animationHeight, showLedStrip)
             setSurfaceCloseVisible(true)
@@ -3270,7 +3262,7 @@ class StatusBarController(
             val measured = measureSoftwareKeyboardDesiredHeight(emojiKeyboardView, layout)
             val keyboardHeight = if (measured > 0) measured else defaultSymHeightPx
             lastSoftwareKeyboardHeight = keyboardHeight
-            emojiKeyboardView.setBackgroundColor(softwareThemeSettings.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, softwareThemeSettings.background, softwareThemeSettings.textures["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             applySymSurfaceLayout(
                 symSurfaceView,
@@ -3310,10 +3302,7 @@ class StatusBarController(
             variationsBar?.resetVariationsState()
 
             // Restore the theme background and hide variations while SYM animates.
-            if (layout.background !is ColorDrawable) {
-                layout.background = ColorDrawable(activeColors.background)
-            }
-            (layout.background as? ColorDrawable)?.color = activeThemeColors().background
+            rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
             if (isSoftwareKeyboardOverlayPage) {
                 variationsWrapperView?.apply {
                     visibility = View.VISIBLE
@@ -3341,7 +3330,7 @@ class StatusBarController(
             )
             val surfaceHeight = resolveSurfaceHeightWithOptionalLed(symHeight, showLedStrip)
             lastSymHeight = surfaceHeight
-            emojiKeyboardView.setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, activeColors.background, activeColors.textures["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             applySymSurfaceLayout(
                 symSurfaceView,

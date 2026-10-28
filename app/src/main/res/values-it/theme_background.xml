@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Una foto su tutta la tastiera</string>
+    <string name="theme_background_change">Cambia foto</string>
+    <string name="theme_background_remove">Rimuovi foto</string>
+    <string name="theme_background_loading">Preparazione della foto…</string>
+    <string name="theme_background_failed">Impossibile usare questa immagine. Prova un’altra immagine inferiore a 16 MB.</string>
+    <string name="theme_background_help">La foto riempie la tastiera. I colori del testo e dei bordi restano regolabili.</string>
+    <string name="theme_background_zip">I temi con foto si trasferiscono con il backup ZIP completo. Il JSON da copiare contiene solo i colori.</string>
+</resources>

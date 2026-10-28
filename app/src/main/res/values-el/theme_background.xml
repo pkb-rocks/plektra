@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Μία φωτογραφία σε όλο το πληκτρολόγιο</string>
+    <string name="theme_background_change">Αλλαγή φωτογραφίας</string>
+    <string name="theme_background_remove">Αφαίρεση φωτογραφίας</string>
+    <string name="theme_background_loading">Προετοιμασία φωτογραφίας…</string>
+    <string name="theme_background_failed">Δεν είναι δυνατή η χρήση αυτής της εικόνας. Επιλέξτε άλλη εικόνα μικρότερη από 16 MB.</string>
+    <string name="theme_background_help">Η φωτογραφία γεμίζει το πληκτρολόγιο. Τα χρώματα κειμένου και περιγράμματος παραμένουν ρυθμιζόμενα.</string>
+    <string name="theme_background_zip">Τα θέματα με φωτογραφίες μεταφέρονται με πλήρες αντίγραφο ZIP. Το JSON για αντιγραφή περιέχει μόνο χρώματα.</string>
+</resources>

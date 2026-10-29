@@ -1347,7 +1347,7 @@ private fun QuickLauncherCommandCustomizationDialog(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No entries match \"$query\".")
+                        Text(stringResource(R.string.quick_launcher_no_entries_match, query))
                     }
                 } else {
                     LazyVerticalGrid(
@@ -1521,7 +1521,9 @@ private fun CommandCustomizationRow(
                 IconButton(onClick = onToggleFavorite) {
                     Icon(
                         imageVector = if (customization.favorite) Icons.Filled.Star else Icons.Filled.StarBorder,
-                        contentDescription = null,
+                        contentDescription = stringResource(
+                            if (customization.favorite) R.string.quick_launcher_remove_favorite else R.string.quick_launcher_add_favorite
+                        ),
                         tint = if (customization.favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -1529,27 +1531,29 @@ private fun CommandCustomizationRow(
                     IconButton(onClick = { onMoveFavorite(-1) }) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowUp,
-                            contentDescription = null
+                            contentDescription = stringResource(R.string.sym_move_up)
                         )
                     }
                     IconButton(onClick = { onMoveFavorite(1) }) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowDown,
-                            contentDescription = null
+                            contentDescription = stringResource(R.string.sym_move_down)
                         )
                     }
                 }
                 IconButton(onClick = onToggleHidden) {
                     Icon(
                         imageVector = if (customization.hidden) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                        contentDescription = null,
+                        contentDescription = stringResource(
+                            if (customization.hidden) R.string.quick_launcher_show_entry else R.string.quick_launcher_hide_entry
+                        ),
                         tint = if (customization.hidden) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onToggleEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.quick_launcher_edit_entry),
                         tint = if (editing || customization.customSearch.isNotBlank()) {
                             MaterialTheme.colorScheme.primary
                         } else {

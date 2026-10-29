@@ -653,6 +653,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Gõ để tìm. Enter mở kết quả đầu tiên.</string>
     <string name="quick_launcher_close">Đóng</string>
+    <string name="quick_launcher_no_entries_match">Không có mục nào khớp với \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Thêm vào yêu thích</string>
+    <string name="quick_launcher_remove_favorite">Bỏ khỏi yêu thích</string>
+    <string name="quick_launcher_hide_entry">Ẩn mục</string>
+    <string name="quick_launcher_show_entry">Hiện mục</string>
+    <string name="quick_launcher_edit_entry">Sửa mục</string>
     <string name="quick_launcher_search_placeholder">Bắt đầu gõ...</string>
     <string name="quick_launcher_auto_start_single">Tự động mở khi chỉ còn một kết quả</string>
     <string name="quick_launcher_auto_start_single_title">Tự động mở kết quả duy nhất</string>

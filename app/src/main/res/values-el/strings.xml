@@ -699,6 +699,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Πληκτρολογήστε για αναζήτηση. Το Enter ανοίγει το πρώτο αποτέλεσμα.</string>
     <string name="quick_launcher_close">Κλείσιμο</string>
+    <string name="quick_launcher_no_entries_match">Καμία καταχώριση δεν ταιριάζει με “%1$s”.</string>
+    <string name="quick_launcher_add_favorite">Προσθήκη στα αγαπημένα</string>
+    <string name="quick_launcher_remove_favorite">Αφαίρεση από τα αγαπημένα</string>
+    <string name="quick_launcher_hide_entry">Απόκρυψη καταχώρισης</string>
+    <string name="quick_launcher_show_entry">Εμφάνιση καταχώρισης</string>
+    <string name="quick_launcher_edit_entry">Επεξεργασία καταχώρισης</string>
     <string name="quick_launcher_search_placeholder">Αρχίστε να πληκτρολογείτε...</string>
     <string name="quick_launcher_auto_start_single">Αυτόματη εκκίνηση όταν απομένει μόνο ένα αποτέλεσμα</string>
     <string name="quick_launcher_auto_start_single_title">Αυτόματο άνοιγμα μοναδικής αντιστοίχισης</string>

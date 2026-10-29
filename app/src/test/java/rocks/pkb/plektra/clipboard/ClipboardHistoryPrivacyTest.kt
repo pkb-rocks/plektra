@@ -179,6 +179,17 @@ class ClipboardHistoryPrivacyTest {
     }
 
     @Test
+    fun entriesNotYetStoredNeverShareAnId() {
+        val dao = requireNotNull(ClipboardDao.getInstance(context))
+        val now = System.currentTimeMillis()
+        dao.addClip(now, false, "first-secret", 0, true, 30)
+        dao.addClip(now + 1, false, "second-secret", 0, true, 30)
+        val entries = (0 until dao.count()).mapNotNull(dao::getAt)
+        assertEquals(entries.size, entries.map { it.id }.toSet().size)
+        entries.forEach { assertTrue(dao.get(it.id) === it) }
+    }
+
+    @Test
     fun databaseUpgradePreservesExistingClipsAndDefaultsThemToNormal() {
         android.database.sqlite.SQLiteDatabase.create(null).use { db ->
             db.execSQL("CREATE TABLE CLIPBOARD (ID INTEGER PRIMARY KEY, TIMESTAMP INTEGER NOT NULL, PINNED TINYINT NOT NULL, TEXT TEXT)")

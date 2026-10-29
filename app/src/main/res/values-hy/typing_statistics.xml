@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Մուտքագրման վիճակագրություն</string>
+    <string name="typing_statistics_total_words">Մուտքագրված բառերի ընդհանուր թիվը</string>
+    <string name="typing_statistics_manual_words">Ձեռքով մուտքագրված բառեր</string>
+    <string name="typing_statistics_suggested_words">Հուշումների միջոցով մուտքագրված բառեր</string>
+    <string name="typing_statistics_since_installation">Օգտագործվում է %1$s-ից</string>
+</resources>

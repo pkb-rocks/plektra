@@ -309,6 +309,52 @@ class AlternateCharacterManagerTest {
         }
     }
 
+    @Test
+    fun statisticsTrackSuccessfulNormalInsertAndVariationReplacementOnce() {
+        val recorder = RecordingInputConnection()
+        val manager = AlternateCharacterManager(context.assets, prefs, context)
+        var manual = 0
+        val tracker = rocks.pkb.plektra.statistics.TypingStatisticsTracker { count, _ -> manual += count }
+        manager.onStatisticsTextCommitted = { tracker.onTextCommitted(it) }
+        manager.onStatisticsCharactersDeleted = { count -> repeat(count) { tracker.onBackspace() } }
+        manager.handleKeyWithAltMapping(KeyEvent.KEYCODE_U,
+            KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_U), false, recorder.asProxy(), layoutChar = 'u')
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        tracker.finishWord()
+        assertEquals("ü", recorder.text)
+        assertEquals(1, manual)
+    }
+
+    @Test
+    fun statisticsDoNotRepeatAnAlreadyTrackedMultitapCharacter() {
+        val recorder = RecordingInputConnection()
+        val input = recorder.asProxy()
+        input.commitText("u", 1)
+        val manager = AlternateCharacterManager(context.assets, prefs, context)
+        var manual = 0
+        val tracker = rocks.pkb.plektra.statistics.TypingStatisticsTracker { count, _ -> manual += count }
+        tracker.onTextCommitted("u")
+        manager.onStatisticsTextCommitted = { tracker.onTextCommitted(it) }
+        manager.onStatisticsCharactersDeleted = { count -> repeat(count) { tracker.onBackspace() } }
+        manager.scheduleLongPressOnly(KeyEvent.KEYCODE_U, input, "u")
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        tracker.finishWord()
+        assertEquals("ü", recorder.text)
+        assertEquals(1, manual)
+    }
+
+    @Test
+    fun rejectedNormalInsertionDoesNotNotifyStatistics() {
+        val manager = AlternateCharacterManager(context.assets, prefs, context)
+        val input = org.mockito.Mockito.mock(InputConnection::class.java)
+        val inserted = mutableListOf<String>()
+        manager.onStatisticsTextCommitted = { inserted.add(it) }
+        manager.handleKeyWithAltMapping(KeyEvent.KEYCODE_U,
+            KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_U), false, input, layoutChar = 'u')
+        assertEquals(emptyList<String>(), inserted)
+        manager.handleKeyUp(KeyEvent.KEYCODE_U, symKeyActive = false)
+    }
+
     private class RecordingInputConnection(
         var extractedTextAvailable: Boolean = true
     ) {

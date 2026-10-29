@@ -17,6 +17,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import rocks.pkb.plektra.statistics.TypingStatisticsStore
+import rocks.pkb.plektra.statistics.TypingStatisticsTracker
 import rocks.pkb.plektra.inputmethod.AutoCorrector
 import rocks.pkb.plektra.inputmethod.NotificationHelper
 
@@ -41,6 +43,8 @@ class SuggestionController(
 ) {
 
     private val appContext = context.applicationContext
+    private val typingStatisticsStore = TypingStatisticsStore.get(appContext)
+    private val typingStatisticsTracker = TypingStatisticsTracker(typingStatisticsStore::record)
     private val debugLogging: Boolean = debugLogging
     private val userDictionaryStore = UserDictionaryStore()
     private val dictionaryRepositoryCache = mutableMapOf<String, DictionaryRepository>()
@@ -268,7 +272,16 @@ class SuggestionController(
     }
     var suggestionsListener: ((List<SuggestionResult>) -> Unit)? = onSuggestionsUpdated
 
-    fun onCharacterCommitted(text: CharSequence, inputConnection: InputConnection?) {
+    fun onCharacterCommitted(
+        text: CharSequence,
+        inputConnection: InputConnection?,
+        replacesPreviousCharacter: Boolean = false,
+        trackTypingStatistics: Boolean = true
+    ) {
+        // Count committed input even when dictionary suggestions are disabled, without editor reads.
+        if (trackTypingStatistics) {
+            onTypingStatisticsTextCommitted(if (replacesPreviousCharacter) "\b$text" else text)
+        }
         if (!isEnabled()) return
         if (debugLogging) {
             val caller = Throwable().stackTrace.getOrNull(1)?.let { "${it.className}#${it.methodName}:${it.lineNumber}" }
@@ -336,6 +349,7 @@ class SuggestionController(
             inputConnection,
             boundaryCharOverride = boundaryChar
         )
+        onTypingStatisticsBoundary()
         val completedWord = result.replacement ?: wordBeforeBoundary
         if (result.replaced) {
             pendingAddUserWord = addWordCandidateFor(result.replacement)
@@ -362,6 +376,7 @@ class SuggestionController(
         }
         
         val word = extractWordAtCursor(inputConnection)
+        typingStatisticsTracker.onEditorWordObserved(word)
         if (!word.isNullOrBlank()) {
             tracker.setWord(word)
         } else if (previousCompletedWord == null) {
@@ -389,6 +404,7 @@ class SuggestionController(
                 return@Runnable
             }
             val word = extractWordAtCursor(inputConnection)
+            typingStatisticsTracker.onEditorWordObserved(word)
             if (!word.isNullOrBlank()) {
                 tracker.setWord(word)
             } else {
@@ -405,6 +421,36 @@ class SuggestionController(
             }
         }
         cursorHandler.postDelayed(cursorRunnable!!, cursorDebounceMs)
+    }
+
+    fun onTypingStatisticsEditorStarted(inputConnection: InputConnection?) {
+        // Only at field entry; normal keystrokes add no InputConnection reads for statistics.
+        val before = inputConnection?.getTextBeforeCursor(1, 0)?.lastOrNull()
+        val after = inputConnection?.getTextAfterCursor(1, 0)?.firstOrNull()
+        fun isWordCharacter(character: Char?) = character != null &&
+            (character.isLetterOrDigit() || character in "'’‘ʼ-")
+        typingStatisticsTracker.onEditorStarted(isWordCharacter(before) || isWordCharacter(after))
+    }
+
+    fun onSuggestionCommitted(suggestion: String) {
+        typingStatisticsTracker.onSuggestionCommitted(suggestion)
+    }
+
+    fun onTypingStatisticsTextCommitted(text: CharSequence) {
+        typingStatisticsTracker.onTextCommitted(text)
+    }
+
+    fun onTypingStatisticsBoundary() {
+        typingStatisticsTracker.finishWord()
+    }
+
+    fun onTypingStatisticsBackspace() {
+        typingStatisticsTracker.onBackspace()
+    }
+
+    fun finishTypingStatistics() {
+        typingStatisticsTracker.finishWord()
+        typingStatisticsStore.flush()
     }
 
     fun onContextReset() {
@@ -561,6 +607,7 @@ class SuggestionController(
     }
 
     fun destroy() {
+        finishTypingStatistics()
         currentLoadJob?.cancel()
         suggestionJob?.cancel()
         cursorRunnable?.let { cursorHandler.removeCallbacks(it) }
@@ -933,6 +980,7 @@ class SuggestionController(
         pendingInitialContextConnection?.let { inputConnection ->
             pendingInitialContextConnection = null
             val word = extractWordAtCursor(inputConnection)
+            typingStatisticsTracker.onEditorWordObserved(word)
             if (!word.isNullOrBlank()) {
                 tracker.setWord(word)
                 return

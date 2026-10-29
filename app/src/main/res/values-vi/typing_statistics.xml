@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Thống kê nhập liệu</string>
+    <string name="typing_statistics_total_words">Tổng số từ đã nhập</string>
+    <string name="typing_statistics_manual_words">Số từ nhập thủ công</string>
+    <string name="typing_statistics_suggested_words">Số từ nhập bằng gợi ý</string>
+    <string name="typing_statistics_since_installation">Sử dụng từ %1$s</string>
+</resources>

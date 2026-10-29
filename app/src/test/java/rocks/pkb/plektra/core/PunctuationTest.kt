@@ -7,6 +7,16 @@ import org.junit.Test
 class PunctuationTest {
 
     @Test
+    fun testIsOpeningPunctuation() {
+        for (c in listOf('"', '\'', '(', '[', '{', '“', '‘', '„', '«', '‹', '¿', '¡')) {
+            assertTrue("$c opens", Punctuation.isOpeningPunctuation(c))
+        }
+        for (c in listOf('”', '’', '»', '›', ')', ']', '.', '!', ' ', 'a')) {
+            assertFalse("$c does not open", Punctuation.isOpeningPunctuation(c))
+        }
+    }
+
+    @Test
     fun testIsWordBoundary_Whitespace() {
         assertTrue(Punctuation.isWordBoundary(' '))
         assertTrue(Punctuation.isWordBoundary('\n'))

@@ -207,20 +207,12 @@ fun TutorialScreen(
     var isPlektraEnabled by remember { mutableStateOf(false) }
     var isPlektraSelected by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    // On every start and settings change, not a timer: see the note on MainActivity's IME status
+    // check.
+    CheckImeStatusWhileStarted {
         checkImeStatus(context) { enabled, selected ->
             isPlektraEnabled = enabled
             isPlektraSelected = selected
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(2000)
-            checkImeStatus(context) { enabled, selected ->
-                isPlektraEnabled = enabled
-                isPlektraSelected = selected
-            }
         }
     }
 

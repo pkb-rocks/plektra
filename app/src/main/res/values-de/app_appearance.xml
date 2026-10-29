@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">App-Darstellung</string>
+    <string name="app_appearance_hint">Hauptfarbe und Farbe ausgewählter Elemente wählen. Der Textkontrast passt sich automatisch an. Tastaturdesigns haben eigene Einstellungen.</string>
+    <string name="app_appearance_enabled">Eigene Farben</string>
+    <string name="app_appearance_palette">Paletten</string>
+    <string name="app_appearance_main">Hauptfarbe</string>
+    <string name="app_appearance_selection">Farbe ausgewählter Elemente</string>
+    <string name="app_appearance_preview">Vorschau</string>
+    <string name="app_appearance_normal">Nicht ausgewählte Schaltfläche</string>
+    <string name="app_appearance_reset">Systemfarben verwenden</string>
+    <string name="app_appearance_selected">Ausgewählte Schaltfläche</string>
+</resources>

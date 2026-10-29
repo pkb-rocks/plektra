@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Εμφάνιση εφαρμογής</string>
+    <string name="app_appearance_hint">Επιλέξτε κύριο χρώμα και χρώμα επιλεγμένων στοιχείων. Η αντίθεση κειμένου προσαρμόζεται αυτόματα. Τα θέματα πληκτρολογίου έχουν δικές τους ρυθμίσεις.</string>
+    <string name="app_appearance_enabled">Προσαρμοσμένα χρώματα</string>
+    <string name="app_appearance_palette">Παλέτες</string>
+    <string name="app_appearance_main">Κύριο χρώμα</string>
+    <string name="app_appearance_selection">Χρώμα επιλεγμένων στοιχείων</string>
+    <string name="app_appearance_preview">Προεπισκόπηση</string>
+    <string name="app_appearance_normal">Μη επιλεγμένο κουμπί</string>
+    <string name="app_appearance_reset">Χρήση χρωμάτων συστήματος</string>
+    <string name="app_appearance_selected">Επιλεγμένο κουμπί</string>
+</resources>

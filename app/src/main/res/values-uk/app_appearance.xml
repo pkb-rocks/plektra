@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Вигляд застосунку</string>
+    <string name="app_appearance_hint">Виберіть основний колір і колір вибраних елементів. Контраст тексту налаштовується автоматично. Теми клавіатури мають окремі налаштування.</string>
+    <string name="app_appearance_enabled">Власні кольори</string>
+    <string name="app_appearance_palette">Палітри</string>
+    <string name="app_appearance_main">Основний колір</string>
+    <string name="app_appearance_selection">Колір вибраних елементів</string>
+    <string name="app_appearance_preview">Перегляд</string>
+    <string name="app_appearance_normal">Невибрана кнопка</string>
+    <string name="app_appearance_reset">Використовувати системні кольори</string>
+    <string name="app_appearance_selected">Вибрана кнопка</string>
+</resources>

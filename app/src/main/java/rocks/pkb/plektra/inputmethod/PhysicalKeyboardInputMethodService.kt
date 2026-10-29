@@ -111,7 +111,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             "ch.threema.app",
             "ch.threema.app.libre",
             "com.instagram.android",
-            FACEBOOK_MESSENGER_PACKAGE_NAME
+            FACEBOOK_MESSENGER_PACKAGE_NAME,
+            "com.beeper.android"
         )
         private val ENTER_BEHAVIOR_SEND_ACTION_PACKAGES = MESSENGER_ENTER_BEHAVIOR_PACKAGES -
             DISCORD_PACKAGE_NAME

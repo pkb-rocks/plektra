@@ -51,7 +51,8 @@ private val testedEnterBehaviorPackages = setOf(
     "ch.threema.app",
     "ch.threema.app.libre",
     "com.instagram.android",
-    FACEBOOK_MESSENGER_PACKAGE_NAME
+    FACEBOOK_MESSENGER_PACKAGE_NAME,
+    "com.beeper.android"
 )
 
 private val favoriteEnterBehaviorApps = listOf(
@@ -64,7 +65,8 @@ private val favoriteEnterBehaviorApps = listOf(
     "ch.threema.app",
     "ch.threema.app.libre",
     "com.instagram.android",
-    FACEBOOK_MESSENGER_PACKAGE_NAME
+    FACEBOOK_MESSENGER_PACKAGE_NAME,
+    "com.beeper.android"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

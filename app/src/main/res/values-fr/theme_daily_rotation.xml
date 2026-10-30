@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Rotation quotidienne</string>
+  <string name="keyboard_theme_daily_rotation_description">Sélectionnez les thèmes enregistrés dans l’ordre de rotation. Un thème reste constant ; plusieurs alternent chaque jour. Modifier la sélection redémarre le cycle aujourd’hui.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Enregistrez d’abord un thème personnalisé.</string>
+  <string name="keyboard_theme_daily_rotation_none">Aucun thème sélectionné : le thème fixe est utilisé.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Tout désélectionner</string>
+  <string name="keyboard_theme_rotation_save">Enregistrer</string>
+  <string name="keyboard_theme_rotation_saved">Rotation enregistrée</string>
+</resources>

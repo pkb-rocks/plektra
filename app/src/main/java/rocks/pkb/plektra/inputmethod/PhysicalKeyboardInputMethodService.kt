@@ -130,6 +130,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     // SharedPreferences for settings
     private lateinit var prefs: SharedPreferences
+    private var themeRotationScheduler: rocks.pkb.plektra.DailyThemeRotationScheduler? = null
     private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private var lastSystemLocalesSignature: String = ""
     private var lastImeConfiguration: Configuration? = null
@@ -2527,7 +2528,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             } else if (SettingsManager.isKeyboardThemePreferenceKey(key)) {
                 Handler(Looper.getMainLooper()).post {
-                    updateStatusBarText()
+                    themeRotationScheduler?.refreshAndSchedule() ?: run {
+                        invalidateRenderedStatusSnapshot()
+                        updateStatusBarText()
+                    }
                 }
             } else if (SettingsManager.isModifierIndicatorPreferenceKey(key) ||
                 key == "suggestions_enabled" || key == "suggestions_bold" || key == "status_bar_variations_visible" ||
@@ -2928,6 +2932,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     override fun onDestroy() {
+        themeRotationScheduler?.close()
+        themeRotationScheduler=null
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         caretBadgeController.destroy()
@@ -3757,6 +3763,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
         }
 
+        if (themeRotationScheduler==null) {
+            themeRotationScheduler=rocks.pkb.plektra.DailyThemeRotationScheduler(this) {
+                invalidateRenderedStatusSnapshot()
+                updateStatusBarText()
+            }
+        }
+        themeRotationScheduler?.start()
         startClipboardCleanupTimer()
     }
 
@@ -3832,6 +3845,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onFinishInput() {
+        themeRotationScheduler?.stop()
         cancelSpeechRecognition()
         ++speechEditorSession
         disableSmoothCaretExperiment()

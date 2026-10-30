@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Codzienna rotacja</string>
+  <string name="keyboard_theme_daily_rotation_description">Wybierz zapisane motywy w kolejności rotacji. Jeden motyw pozostaje bez zmian; kilka zmienia się codziennie. Zmiana wyboru rozpoczyna cykl od nowa dzisiaj.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Najpierw zapisz własny motyw.</string>
+  <string name="keyboard_theme_daily_rotation_none">Nie wybrano motywu: używany jest stały motyw.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Odznacz wszystko</string>
+  <string name="keyboard_theme_rotation_save">Zapisz</string>
+  <string name="keyboard_theme_rotation_saved">Rotacja zapisana</string>
+</resources>

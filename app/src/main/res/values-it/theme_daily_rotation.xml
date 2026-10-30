@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Rotazione giornaliera</string>
+  <string name="keyboard_theme_daily_rotation_description">Seleziona i temi salvati nell’ordine di rotazione. Un tema rimane invariato; più temi si alternano ogni giorno. Modificare la selezione riavvia il ciclo oggi.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Salva prima un tema personalizzato.</string>
+  <string name="keyboard_theme_daily_rotation_none">Nessun tema selezionato: viene usato il tema fisso.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Deseleziona tutto</string>
+  <string name="keyboard_theme_rotation_save">Salva</string>
+  <string name="keyboard_theme_rotation_saved">Rotazione salvata</string>
+</resources>

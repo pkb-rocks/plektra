@@ -210,6 +210,7 @@ object SettingsManager {
     private const val KEY_KEYBOARD_THEME_DARK_SOFTWARE = "keyboard_theme_dark_software"
     private const val KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_HARDWARE = "keyboard_theme_layout_overrides_hardware"
     private const val KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_SOFTWARE = "keyboard_theme_layout_overrides_software"
+    const val KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY = "daily"
     const val KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED = "fixed"
     const val KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM = "follow_system"
     const val KEYBOARD_THEME_PREVIEW_VIEWPORT_SCALE_MIN = 1f
@@ -856,7 +857,16 @@ object SettingsManager {
         }
 
     fun isKeyboardThemePreferenceKey(key: String?): Boolean {
-        return key == KEY_KEYBOARD_THEME_HARDWARE || key == KEY_KEYBOARD_THEME_SOFTWARE
+        return key in setOf(
+            KEY_KEYBOARD_THEME_HARDWARE, KEY_KEYBOARD_THEME_SOFTWARE,
+            KEY_KEYBOARD_THEME_ASSIGNMENT_MODE_HARDWARE, KEY_KEYBOARD_THEME_ASSIGNMENT_MODE_SOFTWARE,
+            KEY_KEYBOARD_THEME_LIGHT_HARDWARE, KEY_KEYBOARD_THEME_LIGHT_SOFTWARE,
+            KEY_KEYBOARD_THEME_DARK_HARDWARE, KEY_KEYBOARD_THEME_DARK_SOFTWARE,
+            KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_HARDWARE, KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_SOFTWARE,
+            KEY_KEYBOARD_THEME_SAVED_THEMES,
+            DailyThemeRotation.namesKey(KeyboardThemeTarget.HARDWARE), DailyThemeRotation.namesKey(KeyboardThemeTarget.SOFTWARE),
+            DailyThemeRotation.anchorKey(KeyboardThemeTarget.HARDWARE), DailyThemeRotation.anchorKey(KeyboardThemeTarget.SOFTWARE)
+        )
     }
 
     fun isModifierIndicatorPreferenceKey(key: String?): Boolean {
@@ -933,18 +943,18 @@ object SettingsManager {
             keyboardThemeAssignmentModeKeyForTarget(target),
             fallback
         )
-        return if (stored == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
-            KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM
-        } else {
-            KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
+        return when(stored) {
+            KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM -> KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM
+            KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY -> KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY
+            else -> KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
         }
     }
 
     fun setKeyboardThemeAssignmentMode(context: Context, target: KeyboardThemeTarget, mode: String) {
-        val normalized = if (mode == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
-            KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM
-        } else {
-            KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
+        val normalized = when(mode) {
+            KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM -> KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM
+            KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY -> KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY
+            else -> KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
         }
         getPreferences(context).edit()
             .putString(keyboardThemeAssignmentModeKeyForTarget(target), normalized)
@@ -995,6 +1005,9 @@ object SettingsManager {
         layout: String?
     ): KeyboardThemeSettings {
         findKeyboardThemeLayoutOverride(context, target, locale, layout)?.let { return it.theme }
+        if (getKeyboardThemeAssignmentMode(context,target)==KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY) {
+            return DailyThemeRotation.theme(context,target) ?: getKeyboardTheme(context,target)
+        }
         return if (getKeyboardThemeAssignmentMode(context, target) == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
             getKeyboardThemeSystemSlot(context, target, dark = isSystemDarkTheme(context))
         } else {

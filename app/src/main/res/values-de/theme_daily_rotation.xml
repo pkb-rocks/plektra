@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Täglicher Wechsel</string>
+  <string name="keyboard_theme_daily_rotation_description">Wähle gespeicherte Designs in der Reihenfolge des Wechsels. Ein Design bleibt gleich; mehrere wechseln täglich. Eine geänderte Auswahl startet den Zyklus heute neu.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Speichere zuerst ein eigenes Design.</string>
+  <string name="keyboard_theme_daily_rotation_none">Kein Design ausgewählt: Das feste Design wird verwendet.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Alles abwählen</string>
+  <string name="keyboard_theme_rotation_save">Speichern</string>
+  <string name="keyboard_theme_rotation_saved">Wechsel gespeichert</string>
+</resources>

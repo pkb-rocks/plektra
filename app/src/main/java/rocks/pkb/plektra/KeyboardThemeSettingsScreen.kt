@@ -9,6 +9,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -40,6 +42,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -257,6 +260,8 @@ fun KeyboardThemeScreen(
         ?: "custom:${activeTarget.name.lowercase()}"
     val activeTheme = if (activeAssignmentMode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
         if (systemIsDark) activeDarkTheme else activeLightTheme
+    } else if (activeAssignmentMode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY) {
+        DailyThemeRotation.theme(context,activeTarget)?.toKeyboardThemePreset("Custom") ?: activeFixedTheme
     } else activeFixedTheme
     val activePreset = if (activeAssignmentMode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
         activeThemeOptions.firstOrNull { it.key == matchKeyboardThemeOption(activeThemeOptions, activeTheme) }
@@ -1213,6 +1218,18 @@ private fun KeyboardThemeAssignmentSection(
     onEditOverride: (SettingsManager.KeyboardThemeLayoutOverride) -> Unit,
     onRemoveOverride: (SettingsManager.KeyboardThemeLayoutOverride) -> Unit
 ) {
+    val rotationContext = LocalContext.current
+    val savedRotationThemes = SettingsManager.getSavedKeyboardThemes(rotationContext)
+    /** *Selection stays local until the user explicitly saves it.* */
+    var savedRotationNames by remember(target, savedRotationThemes.map { it.name }) {
+        mutableStateOf(DailyThemeRotation.selectedNames(rotationContext, target))
+    }
+    var rotationSaved by remember(target) { mutableStateOf(false) }
+    var rotationNames by remember(target, savedRotationThemes.map { it.name }) {
+        // *Clean the draft only; persist it and restart its calendar cycle after an explicit Save.*
+        mutableStateOf(DailyThemeRotation.availableNames(
+            DailyThemeRotation.selectedNames(rotationContext, target), savedRotationThemes.map { it.name }))
+    }
     Surface(
         modifier = modifier.fillMaxWidth(),
         tonalElevation = 1.dp,
@@ -1247,6 +1264,49 @@ private fun KeyboardThemeAssignmentSection(
                     modifier = Modifier.weight(1f),
                     onClick = { onModeChanged(SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) }
                 )
+            }
+            KeyboardThemeModeButton(
+                label = stringResource(R.string.keyboard_theme_daily_rotation),
+                selected = mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onModeChanged(SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY) }
+            )
+            if (mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY) {
+                Text(stringResource(R.string.keyboard_theme_daily_rotation_description), style = MaterialTheme.typography.bodySmall)
+                if (savedRotationThemes.isEmpty()) {
+                    Text(stringResource(R.string.keyboard_theme_daily_rotation_empty))
+                }
+                TextButton(onClick = {
+                    rotationNames = emptyList()
+                    rotationSaved = false
+                }, enabled = rotationNames.isNotEmpty()) {
+                    Text(stringResource(R.string.keyboard_theme_rotation_deselect_all))
+                }
+                savedRotationThemes.forEach { saved ->
+                    val checked = saved.name in rotationNames
+                    Row(
+                        modifier = Modifier.fillMaxWidth().toggleable(value = checked, role = Role.Checkbox,
+                            onValueChange = { enable ->
+                                rotationNames = if (enable) rotationNames + saved.name else rotationNames - saved.name
+                                rotationSaved = false
+                            }),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(checked = checked, onCheckedChange = null)
+                        Text(if (checked) "${rotationNames.indexOf(saved.name) + 1}. ${saved.name}" else saved.name)
+                    }
+                }
+                Button(onClick = {
+                    DailyThemeRotation.select(rotationContext, target, rotationNames)
+                    savedRotationNames = rotationNames
+                    rotationSaved = true
+                }, enabled = rotationNames != savedRotationNames) {
+                    Text(stringResource(R.string.keyboard_theme_rotation_save))
+                }
+                if (rotationSaved) Text(stringResource(R.string.keyboard_theme_rotation_saved))
+                if (rotationNames.none { name -> savedRotationThemes.any { it.name == name } }) {
+                    Text(stringResource(R.string.keyboard_theme_daily_rotation_none), style = MaterialTheme.typography.bodySmall)
+                }
             }
             if (mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
                 KeyboardThemePickerRow(
@@ -1334,7 +1394,9 @@ private fun KeyboardThemeAssignmentSummaryRow(
                     maxLines = 1
                 )
                 Text(
-                    text = if (mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
+                    text = if (mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_DAILY) {
+                        stringResource(R.string.keyboard_theme_daily_rotation)
+                    } else if (mode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
                         "${stringResource(R.string.keyboard_theme_assignment_follow_system)}: $lightThemeName / $darkThemeName"
                     } else {
                         stringResource(R.string.keyboard_theme_assignment_fixed)
@@ -1790,7 +1852,7 @@ internal fun keyboardThemeEditSourceKey(
     fixedSelectionKey: String,
     options: List<KeyboardThemeOption>,
     editorTheme: KeyboardThemePreset
-): String = if (assignmentMode == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
+): String = if (assignmentMode != SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED) {
     matchKeyboardThemeOption(options, editorTheme) ?: "custom"
 } else fixedSelectionKey
 

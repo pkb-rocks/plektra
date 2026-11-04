@@ -33,7 +33,7 @@ class DocumentsModelTest {
                             ),
                             true,
                         ),
-                        DocumentParagraph(listOf(DocumentRun("Ã©Ã \nnext\tðŸ™‚", true, true))),
+                        DocumentParagraph(listOf(DocumentRun("\u00e9\u00e0\nnext\t\uD83D\uDE42", true, true))),
                     ),
             )
 

@@ -47,6 +47,7 @@ import rocks.pkb.plektra.commands.CommandRegistry
 import rocks.pkb.plektra.commands.CommandSourceId
 import rocks.pkb.plektra.commands.CommandSurface
 import rocks.pkb.plektra.commands.CommandTarget
+import rocks.pkb.plektra.ui.theme.PlektraTheme
 
 /**
  * Activity per assegnare una scorciatoia del launcher a un tasto.
@@ -88,7 +89,7 @@ class LauncherShortcutAssignmentActivity : LocalizedComponentActivity() {
         
         // Usa un tema trasparente per mostrare il bottom sheet sopra il launcher
         setContent {
-            MaterialTheme {
+            PlektraTheme {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

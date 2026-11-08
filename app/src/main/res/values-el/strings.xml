@@ -1480,6 +1480,8 @@ QWERTZ σε φυσικό QWERTY
     <string name="clipboard_clear_all">Εκκαθάριση όλων</string>
     <string name="clipboard_empty_state">Δεν υπάρχει ιστορικό πρόχειρου</string>
     <string name="clipboard_locked_state">Το ιστορικό του πρόχειρου δεν είναι διαθέσιμο όσο η συσκευή είναι κλειδωμένη.</string>
+    <string name="clipboard_loading_state">Φόρτωση ιστορικού πρόχειρου…</string>
+    <string name="clipboard_error_state">Δεν ήταν δυνατή η φόρτωση του ιστορικού πρόχειρου. Ανοίξτε το ξανά για νέα προσπάθεια.</string>
     <string name="clipboard_pin">Καρφίτσωμα</string>
     <string name="clipboard_unpin">Ξεκαρφίτσωμα</string>
     <string name="clipboard_delete">Διαγραφή</string>

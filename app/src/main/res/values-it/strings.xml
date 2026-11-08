@@ -797,6 +797,8 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="clipboard_clear_all">Cancella tutto</string>
     <string name="clipboard_empty_state">Nessuna cronologia degli appunti</string>
     <string name="clipboard_locked_state">La cronologia degli appunti non è disponibile mentre il dispositivo è bloccato.</string>
+    <string name="clipboard_loading_state">Caricamento della cronologia degli appunti…</string>
+    <string name="clipboard_error_state">Impossibile caricare la cronologia degli appunti. Riaprila per riprovare.</string>
     <string name="clipboard_pin">Fissa</string>
     <string name="clipboard_unpin">Rimuovi pin</string>
     <string name="clipboard_delete">Elimina</string>

@@ -75,9 +75,10 @@ class ShowcaseNotesActivity : android.app.Activity() {
         applyBackground(intent)
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
         if (intent.getBooleanExtra("restoreClipboard", false) && clipboardSaved) {
-            val dao = requireNotNull(rocks.pkb.plektra.clipboard.ClipboardDao.getInstance(this))
-            (dao.count() - 1 downTo 0).forEach { index ->
-                if (dao.getAt(index)?.id !in originalClipboardIds) dao.deleteClipAt(index)
+            val history = rocks.pkb.plektra.clipboard.ClipboardHistory.getInstance(this)
+            val retention = rocks.pkb.plektra.clipboard.ClipboardRetention.fromSettings(this)
+            history.snapshot.entries.filter { it.id !in originalClipboardIds }.forEach { entry ->
+                history.delete(entry.id, force = true, retention = retention)
             }
             val previous = originalClipboard
             if (previous != null) clipboard.setPrimaryClip(previous) else clipboard.clearPrimaryClip()
@@ -86,8 +87,8 @@ class ShowcaseNotesActivity : android.app.Activity() {
         intent.getStringExtra("clipboard")?.let { text ->
             if (!clipboardSaved) {
                 originalClipboard = clipboard.primaryClip
-                val dao = requireNotNull(rocks.pkb.plektra.clipboard.ClipboardDao.getInstance(this))
-                originalClipboardIds = (0 until dao.count()).mapNotNull { dao.getAt(it)?.id }.toSet()
+                originalClipboardIds = rocks.pkb.plektra.clipboard.ClipboardHistory.getInstance(this)
+                    .snapshot.entries.map { it.id }.toSet()
                 clipboardSaved = true
             }
             clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Notes", text))

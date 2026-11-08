@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper
 /**
  * SQLite database helper for clipboard history.
  */
-class ClipboardDatabase private constructor(context: Context) :
-    SQLiteOpenHelper(context, NAME, null, VERSION) {
+class ClipboardDatabase internal constructor(context: Context, name: String? = NAME) :
+    SQLiteOpenHelper(context, name, null, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(ClipboardDao.CREATE_TABLE)
@@ -21,7 +21,6 @@ class ClipboardDatabase private constructor(context: Context) :
     }
 
     companion object {
-        private const val TAG = "ClipboardDatabase"
         private const val VERSION = 2
         private const val NAME = "plektra_clipboard.db"
 

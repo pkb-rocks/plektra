@@ -47,7 +47,9 @@ internal data class KeyboardThemeOption(
 
 internal const val SOFTWARE_THEME_DEFAULT_KEY_CORNER_RADIUS = 0.19f
 internal const val SOFTWARE_THEME_DEFAULT_CHROME_CORNER_RADIUS = 0.20f
-internal const val SOFTWARE_THEME_DEFAULT_KEY_HEIGHT = 1.5489256f
+// Compact rows, as in the Tap themes; replaced 1.5489256f (see SettingsManager.migrateCompactSoftwareKeyHeightOnce).
+internal const val SOFTWARE_THEME_DEFAULT_KEY_HEIGHT = 1.2588017f
+internal const val LEGACY_SOFTWARE_THEME_DEFAULT_KEY_HEIGHT = 1.5489256f
 internal const val SOFTWARE_THEME_DEFAULT_NUMBER_ROW_HEIGHT = 0.8f
 internal const val SOFTWARE_THEME_DEFAULT_ROW_GAP = 0.47933885f
 internal const val SOFTWARE_THEME_DEFAULT_SUGGESTIONS_HEIGHT = 0.8982954f

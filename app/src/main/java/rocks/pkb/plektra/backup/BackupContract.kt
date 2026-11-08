@@ -465,6 +465,7 @@ internal object BackupPreferenceContract {
         "keyboard_layout_auto_mapping_updated" to "mapping refresh marker",
         "legacy_german_qwertz_default_migrated" to "migration marker",
         "titan2_elite_rounded_corners_enforced_v1" to "migration marker",
+        "compact_software_key_height_migrated_v1" to "migration marker",
         "last_seen_whats_new_version" to "release UI state",
         "nav_mode_default_mappings_version" to "default-migration marker",
         "nav_mode_mappings_updated" to "runtime refresh marker",

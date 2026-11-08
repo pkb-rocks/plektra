@@ -53,6 +53,7 @@ class PlektraApplication : Application() {
         }.also { preferences.registerOnSharedPreferenceChangeListener(it) }
         SettingsManager.initializeAltShiftLayoutSwitchDefault(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
+        SettingsManager.migrateCompactSoftwareKeyHeightOnce(this)
         AppPackageChangeMonitor.register(this)
         ClicksPowerKeyboardController.initialize(this)
         publishSoftwareKeyboardModeShortcut()

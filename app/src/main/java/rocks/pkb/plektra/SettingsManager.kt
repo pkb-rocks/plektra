@@ -105,6 +105,7 @@ object SettingsManager {
     private const val KEY_ALT_SHIFT_DEFAULT_INITIALIZED = "alt_shift_default_initialized"
     private const val KEY_TITAN2_ELITE_ROUNDED_CORNERS_ENFORCED_V1 =
         "titan2_elite_rounded_corners_enforced_v1"
+    private const val KEY_COMPACT_SOFTWARE_KEY_HEIGHT_MIGRATED_V1 = "compact_software_key_height_migrated_v1"
     private const val KEY_ALT_ENTER_LAYOUT_SWITCH = "alt_enter_layout_switch" // Enable Alt+Enter shortcut for layout cycling
     private const val KEY_CTRL_SPACE_LAYOUT_SWITCH = "ctrl_space_layout_switch" // Enable Ctrl+Space shortcut for layout cycling
     private const val KEY_PHYSICAL_KEYBOARD_PROFILE_OVERRIDE = "physical_keyboard_profile_override" // auto | key2 | Q25 | titan | titan2 | titan2elite_qwerty | mp01 | clicks_razr | clicks_pixel | clicks_power
@@ -1503,6 +1504,46 @@ object SettingsManager {
             }
             putBoolean(KEY_TITAN2_ELITE_ROUNDED_CORNERS_ENFORCED_V1, true)
         }.apply()
+    }
+
+    /**
+     * Moves every stored theme that still has the former software key height to the compact
+     * default, once. Heights the user set themselves stay untouched.
+     */
+    fun migrateCompactSoftwareKeyHeightOnce(context: Context) {
+        val prefs = getPreferences(context)
+        if (prefs.getBoolean(KEY_COMPACT_SOFTWARE_KEY_HEIGHT_MIGRATED_V1, false)) return
+        val editor = prefs.edit()
+        listOf(
+            KEY_KEYBOARD_THEME_HARDWARE, KEY_KEYBOARD_THEME_SOFTWARE,
+            KEY_KEYBOARD_THEME_LIGHT_HARDWARE, KEY_KEYBOARD_THEME_LIGHT_SOFTWARE,
+            KEY_KEYBOARD_THEME_DARK_HARDWARE, KEY_KEYBOARD_THEME_DARK_SOFTWARE,
+            KEY_KEYBOARD_THEME_SAVED_THEMES, KEY_KEYBOARD_THEME_DRAFTS
+        ).forEach { key ->
+            prefs.getString(key, null)?.let(::withCompactSoftwareKeyHeight)?.let { editor.putString(key, it) }
+        }
+        editor.putBoolean(KEY_COMPACT_SOFTWARE_KEY_HEIGHT_MIGRATED_V1, true).apply()
+    }
+
+    /** The stored theme JSON with legacy default key heights replaced, or null when nothing changed. */
+    internal fun withCompactSoftwareKeyHeight(stored: String): String? {
+        val root = runCatching { org.json.JSONTokener(stored).nextValue() }.getOrNull() ?: return null
+        var changed = false
+        fun walk(value: Any?) {
+            when (value) {
+                is JSONObject -> {
+                    val height = value.optDouble("key_height_scale", Double.NaN)
+                    if (kotlin.math.abs(height - LEGACY_SOFTWARE_THEME_DEFAULT_KEY_HEIGHT) < 1e-4) {
+                        value.put("key_height_scale", SOFTWARE_THEME_DEFAULT_KEY_HEIGHT.toDouble())
+                        changed = true
+                    }
+                    value.keys().asSequence().toList().forEach { walk(value.opt(it)) }
+                }
+                is JSONArray -> for (index in 0 until value.length()) walk(value.opt(index))
+            }
+        }
+        walk(root)
+        return if (changed) root.toString() else null
     }
 
     /**

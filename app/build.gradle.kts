@@ -15,6 +15,18 @@ abstract class GenerateReleaseSbom : DefaultTask() {
     abstract val outputDirectory: DirectoryProperty
 }
 
+abstract class MockitoInstrumentationArguments : CommandLineArgumentProvider {
+    @get:Classpath
+    abstract val agent: ConfigurableFileCollection
+
+    override fun asArguments() = listOf("-javaagent:${agent.singleFile.absolutePath}")
+}
+
+val mockitoVersion = "5.11.0"
+val mockitoInstrumentation = configurations.create("mockitoInstrumentation") {
+    isCanBeConsumed = false
+}
+
 // Config di firma letta da release/keystore.properties (non tracciato) o da env vars
 val keystorePropertiesFileCandidates = listOf(
     rootProject.file("release/keystore.properties"),
@@ -366,6 +378,10 @@ android {
         unitTests.all {
             // Gradle's 512 MB default runs out on the full Robolectric suite (OutOfMemoryError mid-run).
             it.maxHeapSize = "2g"
+            // Load instrumentation at startup instead of relying on OS/JDK self-attach support.
+            it.jvmArgumentProviders.add(objects.newInstance<MockitoInstrumentationArguments>().apply {
+                agent.from(mockitoInstrumentation.filter { file -> file.name.startsWith("byte-buddy-agent-") })
+            })
         }
     }
 }
@@ -493,7 +509,9 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation(libs.robolectric)
-    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    // Resolve the agent from Mockito's own dependency graph to keep both versions aligned.
+    add(mockitoInstrumentation.name, "org.mockito:mockito-core:$mockitoVersion")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")

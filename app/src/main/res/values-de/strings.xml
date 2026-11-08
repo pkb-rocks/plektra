@@ -285,6 +285,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Tippen zum Suchen. Enter öffnet den obersten Treffer.</string>
     <string name="quick_launcher_close">Schließen</string>
+    <string name="quick_launcher_no_entries_match">Keine Einträge passen zu \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Zu Favoriten hinzufügen</string>
+    <string name="quick_launcher_remove_favorite">Aus Favoriten entfernen</string>
+    <string name="quick_launcher_hide_entry">Eintrag ausblenden</string>
+    <string name="quick_launcher_show_entry">Eintrag anzeigen</string>
+    <string name="quick_launcher_edit_entry">Eintrag bearbeiten</string>
     <string name="quick_launcher_search_placeholder">Tippen...</string>
     <string name="quick_launcher_auto_start_single">Automatisch starten, wenn nur noch ein Treffer übrig ist</string>
     <string name="quick_launcher_auto_start_single_title">Eindeutigen Treffer automatisch öffnen</string>
@@ -1434,6 +1440,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kw_main_text_input">Tippen, Text, Zeichensetzung, Anführungszeichen, Abstände, Großschreibung</string>
     <string name="kw_main_auto_correction">Korrektur, Autokorrektur, Rechtschreibung, Vorschläge, Ersetzungen, Wörterbücher</string>
     <string name="kw_main_keyboard_theme">Theme, Themen, Farben, dunkel, hell, Presets, Hardwaretastatur, Bildschirmtastatur, Plektra Dark, Plektra Light, Cloud Tap, Moon Tap, Classic Cloud, Classic Midnight</string>
+    <string name="kw_status_bar_presentation">Slim, normal, Profil, Profile, minimal, kompakt</string>
     <string name="kw_main_app_language">Sprache, App-Sprache, Locale, Übersetzung</string>
     <string name="kw_main_customization">Anpassen, Anpassung, Erscheinungsbild</string>
     <string name="kw_main_advanced">Erweitert, Backup, Wiederherstellung, Debug, Experte</string>

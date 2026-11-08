@@ -110,7 +110,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             "ch.threema.app",
             "ch.threema.app.libre",
             "com.instagram.android",
-            FACEBOOK_MESSENGER_PACKAGE_NAME
+            FACEBOOK_MESSENGER_PACKAGE_NAME,
+            "com.beeper.android"
         )
         private val ENTER_BEHAVIOR_SEND_ACTION_PACKAGES = MESSENGER_ENTER_BEHAVIOR_PACKAGES -
             DISCORD_PACKAGE_NAME
@@ -1024,8 +1025,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val override = SettingsManager.getAppEnterBehaviorOverrides(this)
             .firstOrNull { it.packageName == packageName }
             ?.behavior
-        if (override != null && override != SettingsManager.ENTER_BEHAVIOR_APP_DEFAULT) {
-            return override
+        if (override != null) {
+            return override.takeUnless { it == SettingsManager.ENTER_BEHAVIOR_APP_DEFAULT }
         }
         if (packageName !in MESSENGER_ENTER_BEHAVIOR_PACKAGES) return null
 

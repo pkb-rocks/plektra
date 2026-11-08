@@ -719,6 +719,12 @@
     <string name="quick_launcher_title">Plektra-QuickLauncher</string>
     <string name="quick_launcher_subtitle">Type to search. Enter opens the top result.</string>
     <string name="quick_launcher_close">Close</string>
+    <string name="quick_launcher_no_entries_match">No entries match \"%1$s\".</string>
+    <string name="quick_launcher_add_favorite">Add to favorites</string>
+    <string name="quick_launcher_remove_favorite">Remove from favorites</string>
+    <string name="quick_launcher_hide_entry">Hide entry</string>
+    <string name="quick_launcher_show_entry">Show entry</string>
+    <string name="quick_launcher_edit_entry">Edit entry</string>
     <string name="quick_launcher_search_placeholder">Start typing...</string>
     <string name="quick_launcher_auto_start_single">Launch automatically when only one result remains</string>
     <string name="quick_launcher_auto_start_single_title">Open unique match automatically</string>
@@ -1757,6 +1763,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_main_text_input">typing, text, punctuation, quotes, spacing, capitalization</string>
     <string name="kw_main_auto_correction">correction, autocorrect, spelling, suggestions, replacements, dictionaries</string>
     <string name="kw_main_keyboard_theme">theme, themes, colors, dark, light, presets, hardware keyboard, on-screen keyboard, Plektra Dark, Plektra Light, Cloud Tap, Moon Tap, Classic Cloud, Classic Midnight</string>
+    <string name="kw_status_bar_presentation">slim, normal, profile, profiles, minimal, compact</string>
     <string name="kw_main_app_language">language, app language, locale, translation</string>
     <string name="kw_main_customization">customize, customization, appearance</string>
     <string name="kw_main_advanced">advanced, backup, restore, debug, expert</string>

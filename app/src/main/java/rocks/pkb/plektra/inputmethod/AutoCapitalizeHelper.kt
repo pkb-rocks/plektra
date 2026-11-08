@@ -78,6 +78,24 @@ object AutoCapitalizeHelper {
     }
 
     /**
+     * Drops opening quotes and brackets typed right before the cursor, so `. "` and a
+     * field that starts with `(` still count as the start of a sentence.
+     */
+    private fun withoutOpeningPunctuation(before: CharSequence): CharSequence {
+        var end = before.length
+        while (end > 0) {
+            var opening = end
+            // French quotes include an inner space; preserve the sentence boundary before them.
+            while (opening > 0 && before[opening - 1].isWhitespace() &&
+                before[opening - 1] != '\n' && before[opening - 1] != '\r') opening--
+            if (opening == 0 ||
+                !rocks.pkb.plektra.core.Punctuation.isOpeningPunctuation(before[opening - 1])) break
+            end = opening - 1
+        }
+        return before.subSequence(0, end)
+    }
+
+    /**
      * Checks if the given text ends with sentence-ending punctuation (.!?)
      * followed by whitespace. Used for auto-capitalization and double-space-to-period.
      * 
@@ -132,9 +150,10 @@ object AutoCapitalizeHelper {
      */
     private fun shouldAutoCap(
         settings: AutoCapSettings,
-        before: CharSequence,
+        rawBefore: CharSequence,
         after: CharSequence
     ): Boolean {
+        val before = withoutOpeningPunctuation(rawBefore)
         val isCursorAtStart = before.isEmpty()
         val isAfterNewline = before.lastOrNull() == '\n'
 
@@ -224,7 +243,7 @@ object AutoCapitalizeHelper {
                     // User has at least one setting enabled, proceed with CAP_SENTENCES logic
                     val cursorContext = readContext(ic)
                     if (cursorContext != null) {
-                        val before = cursorContext.before
+                        val before = withoutOpeningPunctuation(cursorContext.before)
                         val isCursorAtStart = before.isEmpty()
                         val isAfterNewline = before.lastOrNull() == '\n'
                         val isAfterSentenceEnd = hasSentenceEndingPunctuation(before, requireWhitespaceAfter = true)
@@ -424,7 +443,7 @@ object AutoCapitalizeHelper {
         if (inputConnection == null) return false
         
         val cursorContext = readContext(inputConnection) ?: return false
-        val before = cursorContext.before
+        val before = withoutOpeningPunctuation(cursorContext.before)
         
         // At start of field
         if (before.isEmpty()) return true
@@ -480,7 +499,7 @@ object AutoCapitalizeHelper {
                 if (inputConnection != null) {
                     val cursorContext = readContext(inputConnection)
                     if (cursorContext != null) {
-                        val before = cursorContext.before
+                        val before = withoutOpeningPunctuation(cursorContext.before)
                         val isCursorAtStart = before.isEmpty()
                         val isAfterNewline = before.lastOrNull() == '\n'
                         val isAfterSentenceEnd = hasSentenceEndingPunctuation(before, requireWhitespaceAfter = true)

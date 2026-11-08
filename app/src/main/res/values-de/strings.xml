@@ -930,6 +930,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="clipboard_clear_all">Alle löschen</string>
     <string name="clipboard_empty_state">Kein Zwischenablageverlauf</string>
     <string name="clipboard_locked_state">Der Zwischenablageverlauf ist nicht verfügbar, solange das Gerät gesperrt ist.</string>
+    <string name="clipboard_loading_state">Zwischenablageverlauf wird geladen …</string>
+    <string name="clipboard_error_state">Der Zwischenablageverlauf konnte nicht geladen werden. Zum erneuten Versuch erneut öffnen.</string>
     <string name="clipboard_pin">Anheften</string>
     <string name="clipboard_unpin">Loslösen</string>
     <string name="clipboard_delete">Löschen</string>

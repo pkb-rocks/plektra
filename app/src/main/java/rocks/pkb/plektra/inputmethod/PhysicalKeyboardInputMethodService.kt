@@ -27,7 +27,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.CursorAnchorInfo
-import rocks.pkb.plektra.clipboard.ClipboardDao
 import rocks.pkb.plektra.inputmethod.KeyboardEventTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -409,29 +408,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var pendingStatusBarUpdate: Runnable? = null
     private var lastSystemStatusIconResId: Int? = null
     private var pendingSelectionAutoCapCheck: Runnable? = null
-    private val clipboardCleanupIntervalMs = 60_000L
-    private val clipboardCleanupRunnable = object : Runnable {
-        override fun run() {
-            clipboardHistoryManager.prepareClipboardHistory()
-            val count = clipboardHistoryManager.getHistorySize()
-            uiHandler.post {
-                if (::candidatesBarController.isInitialized) {
-                    candidatesBarController.updateClipboardCount(count)
-                }
-            }
-            uiHandler.postDelayed(this, clipboardCleanupIntervalMs)
-        }
-    }
-
-    private fun startClipboardCleanupTimer() {
-        uiHandler.removeCallbacks(clipboardCleanupRunnable)
-        uiHandler.postDelayed(clipboardCleanupRunnable, clipboardCleanupIntervalMs)
-    }
-
-    private fun stopClipboardCleanupTimer() {
-        uiHandler.removeCallbacks(clipboardCleanupRunnable)
-    }
-
     private val symPage: Int
         get() = if (::symLayoutController.isInitialized) symLayoutController.currentSymPage() else 0
 
@@ -1900,7 +1876,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Initialize clipboard history manager first (needed by candidatesBarController)
         clipboardHistoryManager = ClipboardHistoryManager(this)
         clipboardHistoryManager.onCreate()
-        startClipboardCleanupTimer()
 
         candidatesBarController = CandidatesBarController(this, clipboardHistoryManager, assets, PhysicalKeyboardInputMethodService::class.java)
         val snippetExpansionSource = SnippetExpansionSource {
@@ -2192,25 +2167,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         candidatesBarController.onSoftwareKeyboardModeToggleRequested = {
             toggleSoftwareKeyboardModeFromStatusBar()
         }
-        val postClipboardBadgeUpdate: () -> Unit = {
-            val count = clipboardHistoryManager.getHistorySize()
-            uiHandler.post {
-                candidatesBarController.updateClipboardCount(count)
-            }
+        clipboardHistoryManager.addHistoryChangeListener {
+            candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
         }
-        clipboardHistoryManager.setHistoryChangeListener(object : ClipboardDao.Listener {
-            override fun onClipInserted(position: Int) {
-                postClipboardBadgeUpdate()
-            }
-
-            override fun onClipsRemoved(position: Int, count: Int) {
-                postClipboardBadgeUpdate()
-            }
-
-            override fun onClipMoved(oldPosition: Int, newPosition: Int) {
-                postClipboardBadgeUpdate()
-            }
-        })
         clipboardHistoryManager.addAccessStateListener {
             uiHandler.post {
                 candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
@@ -2946,7 +2905,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         connectedClicksInputDeviceIds.clear()
         inputManager?.unregisterInputDeviceListener(inputDeviceListener)
         inputManager = null
-        stopClipboardCleanupTimer()
         // Remove listener when service is destroyed
         prefsListener?.let {
             prefs.unregisterOnSharedPreferenceChangeListener(it)
@@ -2962,7 +2920,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (::suggestionController.isInitialized) {
             suggestionController.destroy()
         }
-        clipboardHistoryManager.setHistoryChangeListener(null)
         clipboardHistoryManager.onDestroy()
         typingSoundPlayer.release()
 
@@ -3756,8 +3713,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 inputContextState = state
             )
         }
-
-        startClipboardCleanupTimer()
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {

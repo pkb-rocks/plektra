@@ -1187,7 +1187,6 @@ class StatusBarController(
         val count = manager.getHistorySize()
         val accessible = manager.isHistoryAccessible()
         if (count != lastClipboardCountRendered || accessible != lastClipboardAccessibleRendered) {
-            manager.prepareClipboardHistory()
             view.refresh()
             lastClipboardCountRendered = count
             lastClipboardAccessibleRendered = accessible

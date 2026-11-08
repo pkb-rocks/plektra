@@ -862,5 +862,4 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="settings_link_with_description">Նկարագրությամբ</string>
     <string name="settings_link_copied_toast">Հղումը պատճենվեց</string>
     <string name="settings_link_unavailable_toast">Այս կարգավորումը հասանելի չէ</string>
-    <string name="kw_status_bar_presentation">Slim Normal պրոֆիլ նվազագույն կոմպակտ վահանակ</string>
 </resources>

@@ -862,5 +862,4 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
-    <string name="kw_status_bar_presentation">Slim Normal профиль минимальный компактный панель</string>
 </resources>

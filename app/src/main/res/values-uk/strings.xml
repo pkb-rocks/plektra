@@ -862,5 +862,4 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
-    <string name="kw_status_bar_presentation">Slim Normal профіль мінімальний компактний панель</string>
 </resources>

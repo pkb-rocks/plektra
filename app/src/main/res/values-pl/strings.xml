@@ -862,5 +862,4 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="settings_link_with_description">Z opisem</string>
     <string name="settings_link_copied_toast">Link skopiowano</string>
     <string name="settings_link_unavailable_toast">To ustawienie jest niedostępne</string>
-    <string name="kw_status_bar_presentation">Slim Normal profil minimalny kompaktowy pasek</string>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Réinitialiser le classement personnel</string>
+    <string name="personal_ranking_reset_message">Effacer les compteurs personnels des mots sur ce téléphone ? Le dictionnaire, les remplacements de texte et les prédictions du mot suivant sont conservés.</string>
+    <string name="personal_ranking_reset_failed">Impossible de réinitialiser le classement personnel. Réessayez.</string>
+</resources>

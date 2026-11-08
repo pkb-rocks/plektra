@@ -1961,6 +1961,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 modifierStateController.consumeShiftOneShot()
             }
             variationInteractedDuringHold = true
+            suggestionController.onSuggestionCommitted(currentInputConnection)
             suggestionController.readInitialContext(currentInputConnection)
             updateStatusBarText()
         }

@@ -159,6 +159,7 @@ class SuggestionControllerNextWordTest {
         val controller = SuggestionController(
             context = context,
             assets = context.assets,
+            wordUsageRepositoryOverride = org.mockito.Mockito.mock(WordUsageRepository::class.java),
             settingsProvider = { SuggestionSettings(suggestionsEnabled = true, maxSuggestions = 3) },
             onSuggestionsUpdated = { snapshots.add(it) },
             currentLocale = Locale.GERMANY,
@@ -284,6 +285,7 @@ class SuggestionControllerNextWordTest {
         return SuggestionController(
             context = context,
             assets = context.assets,
+            wordUsageRepositoryOverride = org.mockito.Mockito.mock(WordUsageRepository::class.java),
             settingsProvider = { SuggestionSettings(suggestionsEnabled = true, maxSuggestions = 3) },
             onSuggestionsUpdated = { snapshots.add(it) },
             currentLocale = Locale.GERMANY,

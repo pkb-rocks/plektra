@@ -282,6 +282,7 @@ class SuggestionControllerReplacementReadinessTest {
         return SuggestionController(
             context = context,
             assets = context.assets,
+            wordUsageRepositoryOverride = org.mockito.Mockito.mock(WordUsageRepository::class.java),
             settingsProvider = {
                 SuggestionSettings(
                     textReplacementsEnabled = true,

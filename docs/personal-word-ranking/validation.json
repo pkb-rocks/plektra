@@ -1,0 +1,70 @@
+{
+  "officialBase": "3ead4703e335ac7e879074278068d16021020319",
+  "host": "Windows;JDK21;RobolectricAPI33",
+  "automated": {
+    "tests": 140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    "rocks.pkb.plektra.backup.BackupPreferenceContractIntegrationTest",
+    "rocks.pkb.plektra.backup.LearningOperationGateTest",
+    "rocks.pkb.plektra.backup.NotesAndDictionaryBackupTest",
+    "rocks.pkb.plektra.backup.PersonalWordUsageBackupTest",
+    "rocks.pkb.plektra.backup.RestoreManagerAndBackupContractTest",
+    "rocks.pkb.plektra.backup.RestoreManagerIntegrationTest",
+    "rocks.pkb.plektra.core.suggestions.LearnedWordRankingTest",
+    "rocks.pkb.plektra.core.suggestions.OrderedPersistenceQueueTest",
+    "rocks.pkb.plektra.core.suggestions.SuggestionControllerNextWordTest",
+    "rocks.pkb.plektra.core.suggestions.SuggestionControllerPersonalLearningTest",
+    "rocks.pkb.plektra.core.suggestions.SuggestionControllerReplacementReadinessTest",
+    "rocks.pkb.plektra.core.suggestions.SuggestionEngineTest",
+    "rocks.pkb.plektra.core.suggestions.WordUsageNegativeCacheTest",
+    "rocks.pkb.plektra.core.suggestions.WordUsageStoreTest"
+  ],
+  "build": "assembleStableDebug successful; external review suffix and label only",
+  "deviceVerified": true,
+  "videoApproved": true,
+  "device": {
+    "model": "Titan2",
+    "androidApi": 36,
+    "kind": "Isolated review app and fictional editor; ADB-generated keyboard events",
+    "rankingOrderChanged": true,
+    "dictionaryFrequenciesUnchanged": true,
+    "resetVerifiedThroughSettingsUI": true,
+    "originalKeyboardAndAccessibilitySettingsRestored": true
+  },
+  "media": {
+    "durationSeconds": 23.84,
+    "width": 808,
+    "height": 916,
+    "sha256": "8a4033c5b1863024c3f2b0d6684e0656341a17da8258f4688f96c4f9340415fb",
+    "audioStreams": 0,
+    "nativeFramesReviewed": 124,
+    "userApproved": true,
+    "uploaded": true,
+    "url": "https://github.com/user-attachments/assets/c3bce440-6e65-4dee-9f32-7da9e62ba12c"
+  },
+  "ciMemoryFollowup": {
+    "originalLinuxRun": "40467248715",
+    "originalResult": "1183 tests,5 OutOfMemoryError failures",
+    "changes": [
+      "Lazy persistent-store creation for unused controllers",
+      "One unit-test worker per class; existing2GB heap unchanged"
+    ],
+    "focusedAffectedClasses": {
+      "tests": 90,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "rankingControllerBackup": {
+      "tests": 141,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fullLinuxCIRerun": "pending"
+  }
+}

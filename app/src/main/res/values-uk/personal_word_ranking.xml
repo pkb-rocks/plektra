@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Скинути особистий рейтинг слів</string>
+    <string name="personal_ranking_reset_message">Видалити особисті лічильники слів на цьому телефоні? Словник, заміни тексту та прогноз наступного слова збережуться.</string>
+    <string name="personal_ranking_reset_failed">Не вдалося скинути особистий рейтинг. Спробуйте ще раз.</string>
+</resources>

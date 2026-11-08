@@ -7,6 +7,8 @@ import android.util.Log
 import rocks.pkb.plektra.DeviceIdentitySnapshot
 import rocks.pkb.plektra.AppBroadcastActions
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.core.suggestions.PersonalWordLearning
+import rocks.pkb.plektra.core.suggestions.WordUsageStore
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +83,7 @@ object RestoreManager {
         context: Context,
         sourceUri: Uri,
         importMode: ImportMode = ImportMode.UNCHANGED
-    ): RestoreResult = withContext(Dispatchers.IO) {
+    ): RestoreResult = LearningOperationGate.withExclusiveOperation { withContext(Dispatchers.IO) {
         val workingDir = File(context.cacheDir, "restore_${System.currentTimeMillis()}").apply { mkdirs() }
         val extractedDir = File(workingDir, "unzipped").apply { mkdirs() }
         var retainRecoveryData = false
@@ -91,12 +93,20 @@ object RestoreManager {
                 ZipHelper.unzip(input, extractedDir)
             } ?: return@withContext RestoreResult.Failure("Unable to open source backup")
 
-            val (metadata, prefsData) = readAndValidateBackup(extractedDir)
+            val (metadata, prefsData, personalWords) = readAndValidateBackup(extractedDir)
+            LearningOperationGate.awaitPendingLearning()
             val filesDir = File(extractedDir, "files")
 
-            val snapshot = RestoreSnapshot(context, File(workingDir, "rollback"))
+            val snapshot = RestoreSnapshot(context, File(workingDir, "rollback"),personalWords!=null)
             try {
-                val fileSummary = FileBackupHelper.restoreFiles(context, filesDir)
+                val restoredFiles = FileBackupHelper.restoreFiles(context, filesDir)
+                val unsupportedLearning=File(extractedDir,"learning").walkTopDown().filter {it.isFile}.map {
+                    it.relativeTo(extractedDir).invariantSeparatorsPath
+                }.filter {it!=PersonalWordUsageBackup.PATH && it!=PersonalWordUsageBackup.EXACT_PATH}.toList()
+                val fileSummary = restoredFiles.copy(
+                    restoredFiles=restoredFiles.restoredFiles + if(personalWords==null) emptyList() else
+                        listOf(PersonalWordUsageBackup.PATH,PersonalWordUsageBackup.EXACT_PATH),
+                    skippedFiles=restoredFiles.skippedFiles+unsupportedLearning)
                 val excludedKeys = BackupPreferencePolicy.runtimeDerivedKeys +
                     if (importMode == ImportMode.ADAPT_TO_CURRENT_DEVICE) {
                         BackupPreferencePolicy.targetDeviceDerivedKeys
@@ -114,6 +124,7 @@ object RestoreManager {
                         )
                     }
                 )
+                personalWords?.let { PersonalWordLearning.store(context).replaceUsage(it) }
                 val postRestoreActions = collectTriggeredPostRestoreActions(prefsSummary, fileSummary)
                 notifyPostRestoreEffects(context, postRestoreActions)
                 if (fileSummary.restoredFiles.any { it.startsWith("dictionaries_serialized/") }) {
@@ -144,23 +155,25 @@ object RestoreManager {
             extractedDir.deleteRecursively()
             if (!retainRecoveryData) workingDir.deleteRecursively()
         }
-    }
+    } }
 
     private fun readAndValidateBackup(
         extractedDir: File
-    ): Pair<BackupMetadata?, Map<String, Map<String, PreferenceValue>>> {
+    ): Triple<BackupMetadata?, Map<String, Map<String, PreferenceValue>>, WordUsageStore.Snapshot?> {
         val metadataFile = File(extractedDir, "backup_meta.json")
         val metadata = BackupMetadata.fromFile(metadataFile)
         require(!metadataFile.exists() || metadata != null) { "Invalid backup metadata" }
         val prefs = PreferencesBackupHelper.readPreferencesFromBackup(File(extractedDir, "prefs"))
         val fileCount = FileBackupHelper.validateRestoreFiles(File(extractedDir, "files"))
-        require(prefs.values.any { it.isNotEmpty() } || fileCount > 0) {
+        val personalWords=PersonalWordUsageBackup.read(extractedDir)
+        require(prefs.values.any { it.isNotEmpty() } || fileCount > 0 || personalWords!=null) {
             "Backup contains no supported settings or user files"
         }
-        return metadata to prefs
+        return Triple(metadata,prefs,personalWords)
     }
 
-    private class RestoreSnapshot(private val context: Context, private val directory: File) {
+    private class RestoreSnapshot(private val context: Context, private val directory: File,includePersonalWords:Boolean) {
+        private val personalWords=if(includePersonalWords) PersonalWordLearning.store(context).snapshotUsage() else null
         private val preferenceFiles = listOf("plektra_prefs", "notes").associateWith { name ->
             context.getSharedPreferences(name, Context.MODE_PRIVATE).all.mapValues { (_, value) -> PreferenceValue.fromAny(value)!! }
         }
@@ -168,6 +181,7 @@ object RestoreManager {
 
         init {
             directory.mkdirs()
+            if(personalWords!=null) PersonalWordUsageBackup.write(context,directory)
             val entries = org.json.JSONObject()
             preferenceFiles.forEach { (name, preferences) ->
                 val values = org.json.JSONObject()
@@ -182,6 +196,7 @@ object RestoreManager {
         }
 
         fun rollback() {
+            personalWords?.let { PersonalWordLearning.store(context).replaceUsage(it) }
             roots.forEach { name ->
                 val target = File(context.filesDir, name)
                 check(!target.exists() || target.deleteRecursively()) { "Unable to roll back $name" }

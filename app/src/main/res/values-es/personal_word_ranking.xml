@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_ranking_reset">Restablecer el orden personal de palabras</string>
+    <string name="personal_ranking_reset_message">¿Borrar los contadores personales de palabras de este teléfono? El diccionario, las sustituciones de texto y las predicciones de la siguiente palabra se conservarán.</string>
+    <string name="personal_ranking_reset_failed">No se pudo restablecer el orden personal. Inténtalo de nuevo.</string>
+</resources>

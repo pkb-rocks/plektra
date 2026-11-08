@@ -7,6 +7,7 @@ import android.media.MediaFormat
 import android.net.Uri
 import android.util.Log
 import rocks.pkb.plektra.BuildConfig
+import rocks.pkb.plektra.NotesAttachmentStore
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
@@ -343,7 +344,8 @@ object FileBackupHelper {
     )
     private val allowedDirectories = setOf(
         "keyboard_layouts",
-        DictionaryPackageBackup.DIRECTORY
+        DictionaryPackageBackup.DIRECTORY,
+        NotesAttachmentStore.DIRECTORY
     )
 
     internal fun validateRestoreFiles(filesDir: File): Int {
@@ -355,6 +357,12 @@ object FileBackupHelper {
             if (shouldBackupPath(relative, includeTypingSoundPack = true)) {
                 require(!file.extension.equals("json", ignoreCase = true) || isJsonValid(file)) {
                     "Invalid JSON file in backup: $relative"
+                }
+                if (relative.startsWith("${NotesAttachmentStore.DIRECTORY}/")) {
+                    require(file.parentFile == File(filesDir, NotesAttachmentStore.DIRECTORY) &&
+                        NotesAttachmentStore.isValidBackupFile(file)) {
+                        "Invalid note image in backup: $relative"
+                    }
                 }
                 if (relative.startsWith("keyboard_layouts/")) {
                     require(file.extension.equals("json", ignoreCase = true) &&

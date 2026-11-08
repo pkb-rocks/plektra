@@ -2,6 +2,7 @@ package rocks.pkb.plektra
 
 import android.app.Activity
 import android.app.AlertDialog
+import rocks.pkb.plektra.clipboard.ClipboardImageFormat
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
@@ -12,12 +13,18 @@ import android.graphics.drawable.RippleDrawable
 import android.graphics.drawable.StateListDrawable
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.InputType
+import android.text.Spanned
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.MotionEvent
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputConnectionWrapper
+import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.HorizontalScrollView
@@ -67,10 +74,34 @@ open class NotesActivity : Activity() {
     private enum class ViewMode { MARKDOWN, BOTH, PREVIEW }
     private var restoreHeadingFocus = false
     private var horizontalGutter = 24
+    private val attachments by lazy { NotesAttachmentStore.forContext(this) }
     private val markwon by lazy {
         Markwon.builder(this).usePlugin(TablePlugin.create(this))
             .usePlugin(TaskListPlugin.create(inkColor, dividerColor, Color.WHITE))
-            .usePlugin(StrikethroughPlugin.create()).build()
+            .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(NotesAttachments.previewPlugin(this, attachments)).build()
+    }
+    private val attachmentHost = object : NotesAttachments.Host {
+        override fun refersTo(reference: String) =
+            editor.text.contains(reference) || undo.any { reference in it } || redo.any { reference in it }
+
+        override fun removeReference(noteId: String, reference: String, replacedText: String): Boolean {
+            if (selectedNote.id != noteId) return false
+            NotesAttachments.referenceRange(editor.text, reference)?.let { editor.text.replace(it.first, it.last + 1, replacedText) }
+            // A failed import must not be resurrected by undo or redo.
+            for (history in listOf(undo, redo)) {
+                val cleaned = history.map { body ->
+                    NotesAttachments.referenceRange(body, reference)?.let { body.replaceRange(it, replacedText) } ?: body
+                }
+                history.clear()
+                history.addAll(cleaned)
+            }
+            return true
+        }
+
+        override fun onAttachmentStored() {
+            if (viewMode != ViewMode.MARKDOWN) markwon.setMarkdown(preview, editor.text.toString())
+        }
     }
 
     override fun onCreate(state: Bundle?) {
@@ -97,7 +128,16 @@ open class NotesActivity : Activity() {
         }
         val navigation = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
         navigation.addView(iconAction(R.drawable.ic_notes_back, R.string.settings_back_content_description) { finish() })
-        heading = EditText(this).apply {
+        heading = object : EditText(this) {
+            override fun onTextContextMenuItem(id: Int): Boolean {
+                if (isPaste(id) && imageClip() != null) {
+                    android.widget.Toast.makeText(this@NotesActivity, R.string.clipboard_image_unsupported_field,
+                        android.widget.Toast.LENGTH_SHORT).show()
+                    return true
+                }
+                return super.onTextContextMenuItem(id)
+            }
+        }.apply {
             id = R.id.notes_heading
             textSize = 22f
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
@@ -171,6 +211,27 @@ open class NotesActivity : Activity() {
         }
         editor = object : EditText(this) {
             override fun isSuggestionsEnabled() = false
+            override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+                val connection = super.onCreateInputConnection(outAttrs) ?: return null
+                outAttrs.contentMimeTypes = NotesAttachmentStore.MIME_TYPES
+                return object : InputConnectionWrapper(connection, false) {
+                    override fun commitContent(inputContentInfo: InputContentInfo, flags: Int, opts: Bundle?) =
+                        receiveImage(inputContentInfo, flags)
+                }
+            }
+            // Ctrl+V, the context menu and keyboard paste actions all end here; an image clip
+            // would otherwise be dropped by the plain text paste.
+            override fun onTextContextMenuItem(id: Int): Boolean {
+                if (isPaste(id)) {
+                    imageClip()?.let { clip ->
+                        val uri = (0 until clip.itemCount).firstNotNullOfOrNull { clip.getItemAt(it).uri }
+                        if (uri != null) receiveImage(uri, clip.description) {}
+                        else NotesAttachments.showFailure(this@NotesActivity, NotesAttachmentStore.Failure.UNSUPPORTED)
+                        return true
+                    }
+                }
+                return super.onTextContextMenuItem(id)
+            }
             private val gutterPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
                 color = if (dark) Color.LTGRAY else Color.GRAY
                 textSize = dp(11).toFloat()
@@ -198,6 +259,15 @@ open class NotesActivity : Activity() {
             background = null
             gravity = Gravity.TOP
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            // The body is stored as plain Markdown, so styled text from a keyboard or paste
+            // becomes Markdown source instead of spans that would vanish on saving.
+            filters = arrayOf(InputFilter { source, start, end, _, _, _ ->
+                val styled = source as? Spanned
+                val composing = styled?.getSpans(start, end, Any::class.java)
+                    ?.any { styled.getSpanFlags(it) and Spanned.SPAN_COMPOSING != 0 } == true
+                if (styled == null || composing) null
+                else (styled.subSequence(start, end) as? Spanned)?.let(MarkdownStyledText::toMarkdown)
+            })
             setText(selectedNote.body)
             setPadding(dp(44), dp(16), dp(16), dp(16))
             setLineSpacing(dp(4).toFloat(), 1f)
@@ -311,6 +381,12 @@ open class NotesActivity : Activity() {
         target.setSelection(editingSelectionStart, editingSelectionEnd)
         val mode = state?.getInt("view_mode") ?: notePrefs.getInt("view_mode", 0)
         setViewMode(ViewMode.entries.getOrElse(mode) { ViewMode.MARKDOWN }, showInput = false)
+        NotesAttachments.register(attachmentHost)
+    }
+
+    override fun onDestroy() {
+        NotesAttachments.unregister(attachmentHost)
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -338,6 +414,52 @@ open class NotesActivity : Activity() {
             target.setSelection((start ?: 0).coerceIn(0, target.length()), (end ?: 0).coerceIn(0, target.length()))
         }
         if (BuildConfig.DEBUG) android.util.Log.d("PlektraNotesFocus", "configuration keyboard=${newConfig.keyboard} hidden=${newConfig.hardKeyboardHidden} focus=${currentFocus?.id}")
+    }
+
+    private fun isPaste(id: Int) = id == android.R.id.paste || id == android.R.id.pasteAsPlainText
+
+    private fun imageClip(): android.content.ClipData? = try {
+        (getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager).primaryClip
+            ?.takeIf { ClipboardImageFormat.announcesImage(it.description) }
+    } catch (e: RuntimeException) {
+        null
+    }
+
+    /** Queues an image import while retaining its read grant until the worker finishes. */
+    private fun receiveImage(info: InputContentInfo, flags: Int): Boolean {
+        if (NotesAttachmentStore.MIME_TYPES.none(info.description::hasMimeType)) {
+            NotesAttachments.showFailure(this, NotesAttachmentStore.Failure.UNSUPPORTED)
+            return false
+        }
+        val granted = flags and InputConnection.INPUT_CONTENT_GRANT_READ_URI_PERMISSION != 0
+        if (granted) {
+            try {
+                info.requestPermission()
+            } catch (e: Exception) {
+                NotesAttachments.showFailure(this, NotesAttachmentStore.Failure.FAILED)
+                return false
+            }
+        }
+        return receiveImage(info.contentUri, info.description) { if (granted) info.releasePermission() }
+    }
+
+    /** Reserves a reference in this note; validation and all provider I/O run on the worker. */
+    private fun receiveImage(uri: android.net.Uri, description: android.content.ClipDescription, release: () -> Unit): Boolean {
+        val mimeType = NotesAttachmentStore.MIME_TYPES.firstOrNull(description::hasMimeType)
+        if (mimeType == null) {
+            release()
+            NotesAttachments.showFailure(this, NotesAttachmentStore.Failure.UNSUPPORTED)
+            return false
+        }
+        val name = attachments.newName(mimeType)
+        val start = minOf(editor.selectionStart, editor.selectionEnd).coerceAtLeast(0)
+        val end = maxOf(editor.selectionStart, editor.selectionEnd).coerceAtLeast(start)
+        val markdown = "![${getString(R.string.notes_image_alt)}](${NotesAttachmentStore.reference(name)})"
+        val replacedText = editor.text.substring(start, end)
+        editor.text.replace(start, end, markdown)
+        editor.setSelection(start + markdown.length)
+        NotesAttachments.start(this, attachments, notePrefs, selectedNote.id, name, uri, replacedText, release)
+        return true
     }
 
     private fun saveNote() {

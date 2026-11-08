@@ -31,4 +31,8 @@
     <string name="notes_table">Table</string>
     <string name="notes_strike">Strikethrough</string>
     <string name="notes_code_block">Code block</string>
+    <string name="notes_image_alt">Image</string>
+    <string name="notes_image_unsupported">This image format can\'t be added to a note.</string>
+    <string name="notes_image_too_large">The image is larger than %1$d MB and was not added.</string>
+    <string name="notes_image_import_failed">The image couldn\'t be saved to the note.</string>
 </resources>

@@ -55,6 +55,24 @@ class NotesAndDictionaryBackupTest {
         assertEquals("Private capture", context.getSharedPreferences("showcase_notes", Context.MODE_PRIVATE).getString("body", null))
     }
 
+    @Test fun noteImagesTravelWithBackupAndForeignFilesAreRejected() {
+        val store = rocks.pkb.plektra.NotesAttachmentStore.forContext(context)
+        val name = store.newName("image/png")
+        store.import(rocks.pkb.plektra.NotesTestImages.PNG.inputStream(), name)
+        val backup = File(context.cacheDir, "note-image-backup").apply { deleteRecursively(); mkdirs() }
+        val paths = FileBackupHelper.snapshotInternalFiles(context, backup)
+        assertTrue(paths.contains("files/${rocks.pkb.plektra.NotesAttachmentStore.DIRECTORY}/$name"))
+        store.directory.deleteRecursively()
+        assertEquals(1, FileBackupHelper.validateRestoreFiles(backup))
+        FileBackupHelper.restoreFiles(context, backup)
+        assertTrue(store.file(name)!!.readBytes().contentEquals(rocks.pkb.plektra.NotesTestImages.PNG))
+
+        File(backup, "${rocks.pkb.plektra.NotesAttachmentStore.DIRECTORY}/${store.newName("image/jpeg")}")
+            .writeBytes(rocks.pkb.plektra.NotesTestImages.PNG)
+        assertThrows(IllegalArgumentException::class.java) { FileBackupHelper.validateRestoreFiles(backup) }
+        store.directory.deleteRecursively()
+    }
+
     @Test fun ownImportedDictionaryTravelsWithBackup() {
         val source = File(context.filesDir, "${DictionaryPackageBackup.DIRECTORY}/zz_base.dict")
         source.parentFile!!.mkdirs()

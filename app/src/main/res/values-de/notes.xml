@@ -23,4 +23,8 @@
     <string name="notes_table">Tabelle</string>
     <string name="notes_strike">Durchgestrichen</string>
     <string name="notes_code_block">Codeblock</string>
+    <string name="notes_image_alt">Bild</string>
+    <string name="notes_image_unsupported">Dieses Bildformat kann nicht in eine Notiz übernommen werden.</string>
+    <string name="notes_image_too_large">Das Bild ist größer als %1$d MB und wurde nicht übernommen.</string>
+    <string name="notes_image_import_failed">Das Bild konnte nicht in der Notiz gespeichert werden.</string>
 </resources>

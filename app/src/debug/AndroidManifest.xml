@@ -7,10 +7,6 @@
             android:permission="android.permission.DUMP" />
         <receiver android:name=".ShowcaseReceiver" android:exported="true"
             android:permission="android.permission.DUMP" />
-        <activity android:name=".ShowcaseNotesActivity" android:exported="true"
-            android:configChanges="keyboard|keyboardHidden|navigation"
-            android:permission="android.permission.DUMP" android:launchMode="singleTop"
-            android:label="Notes" android:theme="@style/Theme.Plektra" />
         <receiver
             android:name=".KeyboardBarTestReceiver"
             android:exported="true"

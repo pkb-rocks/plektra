@@ -19,9 +19,9 @@ import androidx.test.uiautomator.Until
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import rocks.pkb.plektra.ImeContourTestActivity
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
-import rocks.pkb.plektra.ShowcaseNotesActivity
 import rocks.pkb.plektra.inputmethod.ui.ClipboardHistoryView
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -44,7 +44,8 @@ class ClipboardHistoryDeviceTest {
         val worker = Executors.newSingleThreadExecutor()
         val gate = CountDownLatch(1)
         val main = Handler(Looper.getMainLooper())
-        val history = ClipboardHistory(dao, worker, { main.post(it) })
+        val images = ClipboardImageStore(java.io.File(context.cacheDir, "$name-images"), java.io.File(context.cacheDir, "$name-staging"))
+        val history = ClipboardHistory(dao, worker, { main.post(it) }, images)
         val snapshots = LinkedBlockingQueue<ClipboardHistory.Snapshot>()
         val failures = LinkedBlockingQueue<ClipboardHistory.Operation>()
         history.addListener { snapshots.add(it) }
@@ -96,6 +97,7 @@ class ClipboardHistoryDeviceTest {
             instrumentation.waitForIdleSync()
             database.close()
             context.deleteDatabase(name)
+            images.directory.deleteRecursively()
         }
     }
 
@@ -116,7 +118,8 @@ class ClipboardHistoryDeviceTest {
         val database = ClipboardDatabase(isolated, name)
         val worker = Executors.newSingleThreadExecutor()
         val main = Handler(Looper.getMainLooper())
-        val history = ClipboardHistory(ClipboardDao(database), worker, { main.post(it) })
+        val images = ClipboardImageStore(java.io.File(isolated.cacheDir, "$name-images"), java.io.File(isolated.cacheDir, "$name-staging"))
+        val history = ClipboardHistory(ClipboardDao(database), worker, { main.post(it) }, images)
         val snapshots = LinkedBlockingQueue<ClipboardHistory.Snapshot>()
         history.addListener { snapshots.add(it) }
         val accessible = AtomicBoolean(true)
@@ -124,7 +127,8 @@ class ClipboardHistoryDeviceTest {
         val clipboard = context.getSystemService(ClipboardManager::class.java)
         var originalClip: ClipData? = null
         var managerStarted = false
-        val scenario = ActivityScenario.launch(ShowcaseNotesActivity::class.java)
+        // A host without persistence; the test replaces its content and never touches notes.
+        val scenario = ActivityScenario.launch(ImeContourTestActivity::class.java)
         try {
             lateinit var editor: EditText
             scenario.onActivity { activity ->
@@ -185,6 +189,8 @@ class ClipboardHistoryDeviceTest {
             instrumentation.waitForIdleSync()
             database.close()
             context.deleteDatabase(name)
+            images.directory.deleteRecursively()
+            images.stagingDirectory.deleteRecursively()
             preferenceNames.forEach(context::deleteSharedPreferences)
         }
     }

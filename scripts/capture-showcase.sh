@@ -9,12 +9,12 @@ Usage: $0 --serial <adb-serial> --device titan-2-elite|titan-2|pixel-7a [options
 Options:
   --serial <serial>       adb serial of an emulator or physical device (required)
   --device <name>         titan-2-elite, titan-2 or pixel-7a (required)
-  --host notes|showcase   force one host for every scene (default: per scene)
-                          notes    = Markdown notes editor (NotesActivity)
-                          showcase = ShowcaseNotesActivity (debug host, grid background)
   --only <state>[,<state>]  capture only these states (names as in sources/catalog.json)
   --out <dir>             output directory (default: build/showcase-capture/<device>/<timestamp>/)
   --help, -h              show this help
+
+Every scene is captured in the Markdown notes editor (NotesActivity). ShowcaseReceiver swaps in
+the scene note and puts the original notes back afterwards.
 
 The scene table is docs/showcase/capture/scenes.json. Captures go to build/ first.
 Copy reviewed files into docs/showcase/raw/<device>/ by hand.
@@ -26,13 +26,12 @@ USAGE
 
 SERIAL=""
 DEVICE=""
-HOST_OVERRIDE=""
 ONLY=""
 OUT_DIR=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --serial|--device|--host|--only|--out)
+    --serial|--device|--only|--out)
       if [ $# -lt 2 ]; then
         echo "Missing value for $1" >&2
         usage
@@ -41,7 +40,6 @@ while [ $# -gt 0 ]; do
       case "$1" in
         --serial) SERIAL="$2" ;;
         --device) DEVICE="$2" ;;
-        --host) HOST_OVERRIDE="$2" ;;
         --only) ONLY="$2" ;;
         --out) OUT_DIR="$2" ;;
       esac
@@ -77,10 +75,6 @@ case "$DEVICE" in
   "") usage; die "--device is required" ;;
   *) die "Unknown device: $DEVICE" ;;
 esac
-case "$HOST_OVERRIDE" in
-  ""|notes|showcase) ;;
-  *) die "--host must be notes or showcase" ;;
-esac
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCENES_FILE="$ROOT_DIR/docs/showcase/capture/scenes.json"
@@ -89,7 +83,6 @@ APP_CLASS_PREFIX="rocks.pkb.plektra"
 IME_COMPONENT="$PACKAGE/$APP_CLASS_PREFIX.inputmethod.PhysicalKeyboardInputMethodService"
 RECEIVER_COMPONENT="$PACKAGE/$APP_CLASS_PREFIX.ShowcaseReceiver"
 NOTES_COMPONENT="$PACKAGE/$APP_CLASS_PREFIX.ShowcaseNotesEditorAlias"
-SHOWCASE_COMPONENT="$PACKAGE/$APP_CLASS_PREFIX.ShowcaseNotesActivity"
 HOME_TASK_FLAGS="0x10008000"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
@@ -219,19 +212,17 @@ for index, scene in enumerate(scenes, 1):
     body = note.get("body", "")
     settings = dict(profile.get("baseline", {}))
     settings.update(scene.get("settings", {}))
-    note_json = json.dumps({"title": note.get("title", ""), "body": body, "cursor": len(body)},
-                           ensure_ascii=False)
     selection_start = note.get("selectionStart")
     selection_end = note.get("selectionEnd")
+    cursor = len(body) if selection_end is None else min(int(selection_end), len(body))
+    note_json = json.dumps({"title": note.get("title", ""), "body": body, "cursor": cursor},
+                           ensure_ascii=False)
     values = {
         "SCENE_ID": scene["id"],
         "SCENE_STATE": scene["state"],
-        "SCENE_HOST": scene.get("host", "notes"),
         "SCENE_BACKGROUND": scene.get("background", "default"),
         "SCENE_THEME": scene.get("theme") or "",
         "SCENE_SETTINGS_JSON": json.dumps(settings, ensure_ascii=False),
-        "SCENE_NOTE_TITLE": note.get("title", ""),
-        "SCENE_NOTE_BODY": body,
         "SCENE_NOTE_JSON": note_json,
         "SCENE_SEL_START": "" if selection_start is None else str(selection_start),
         "SCENE_SEL_END": "" if selection_end is None else str(selection_end),
@@ -302,12 +293,11 @@ dsh am broadcast -a com.android.systemui.demo -e command network -e wifi show -e
 dsh cmd uimode night no >/dev/null
 
 run_scene() {
-  local host="$SCENE_HOST"
-  if [ -n "$HOST_OVERRIDE" ]; then
-    host="$HOST_OVERRIDE"
+  if [ "$SCENE_BACKGROUND" = "grid" ]; then
+    warn "$SCENE_STATE asks for the grid background; the notes editor has none, so the capture will differ."
   fi
-  if [ "$SCENE_BACKGROUND" = "grid" ] && [ "$host" = "notes" ]; then
-    warn "$SCENE_STATE uses the grid background; the notes host has none, so the capture will differ."
+  if [ -n "$SCENE_SEL_START" ] && [ "$SCENE_SEL_START" != "$SCENE_SEL_END" ]; then
+    warn "$SCENE_STATE asks for a text selection; the notes editor restores only the cursor, placed at the selection end."
   fi
 
   local out
@@ -338,25 +328,14 @@ run_scene() {
     *) die "ShowcaseReceiver rejected settings for $SCENE_ID: $out" ;;
   esac
 
-  if [ "$host" = "notes" ]; then
-    out="$(dsh am broadcast -n "$RECEIVER_COMPONENT" --es note "$SCENE_NOTE_JSON" | tr -d '\r')"
-    case "$out" in
-      *"result=0"*) ;;
-      *) die "ShowcaseReceiver rejected the note for $SCENE_ID: $out" ;;
-    esac
-    out="$(dsh am start -W -f "$HOME_TASK_FLAGS" -n "$NOTES_COMPONENT" | tr -d '\r')"
-  else
-    local -a extras=(--es title "$SCENE_NOTE_TITLE" --es text "$SCENE_NOTE_BODY")
-    if [ "$SCENE_BACKGROUND" = "grid" ]; then
-      extras+=(--ez contrastBackground true)
-    fi
-    if [ -n "$SCENE_SEL_START" ] && [ -n "$SCENE_SEL_END" ]; then
-      extras+=(--ei selectionStart "$SCENE_SEL_START" --ei selectionEnd "$SCENE_SEL_END")
-    fi
-    out="$(dsh am start -W -f "$HOME_TASK_FLAGS" -n "$SHOWCASE_COMPONENT" "${extras[@]}" | tr -d '\r')"
-  fi
+  out="$(dsh am broadcast -n "$RECEIVER_COMPONENT" --es note "$SCENE_NOTE_JSON" | tr -d '\r')"
   case "$out" in
-    *Error*) die "Could not start the $host host for $SCENE_ID: $out" ;;
+    *"result=0"*) ;;
+    *) die "ShowcaseReceiver rejected the note for $SCENE_ID: $out" ;;
+  esac
+  out="$(dsh am start -W -f "$HOME_TASK_FLAGS" -n "$NOTES_COMPONENT" | tr -d '\r')"
+  case "$out" in
+    *Error*) die "Could not start the notes editor for $SCENE_ID: $out" ;;
   esac
 
   local has_back=0
@@ -427,7 +406,7 @@ run_scene() {
     "$ADB_BIN" -s "$SERIAL" exec-out run-as "$PACKAGE" cat cache/debug-reports/keyboard-transparent.png > "$OUT_DIR/$SCENE_STATE-ime.png"
     "$ADB_BIN" -s "$SERIAL" exec-out run-as "$PACKAGE" cat cache/debug-reports/keyboard-transparent.json > "$OUT_DIR/$SCENE_STATE-ime.json"
   fi
-  printf '%s\t%s\t%s\t%s\n' "$SCENE_STATE" "$SCENE_ID" "$host" "$(sha256_file "$target")" \
+  printf '%s\t%s\t%s\t%s\n' "$SCENE_STATE" "$SCENE_ID" "notes" "$(sha256_file "$target")" \
     >> "$WORK_DIR/captures.tsv"
   echo "Captured $SCENE_ID -> $target"
 }
@@ -446,7 +425,7 @@ for env_file in "$WORK_DIR"/scene-*.env; do
   captured=$((captured + 1))
 done
 
-python3 - "$OUT_DIR" "$WORK_DIR" "$DEVICE" "$SERIAL" "$PACKAGE" "$version_name" "$TIMESTAMP" "$screen_size" "$HOST_OVERRIDE" <<'PY'
+python3 - "$OUT_DIR" "$WORK_DIR" "$DEVICE" "$SERIAL" "$PACKAGE" "$version_name" "$TIMESTAMP" "$screen_size" <<'PY'
 import hashlib
 import json
 import os
@@ -454,7 +433,7 @@ import struct
 import sys
 from datetime import datetime, timezone
 
-out_dir, work, device, serial, package, version, stamp, screen, host_override = sys.argv[1:10]
+out_dir, work, device, serial, package, version, stamp, screen = sys.argv[1:9]
 
 
 def png_size(path):
@@ -507,7 +486,6 @@ manifest = {
     "version_name": version,
     "captured_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     "run_id": stamp,
-    "host_option": host_override or "per-scene",
     "screen_size": screen,
     "captures": captures,
     "skipped": skipped,

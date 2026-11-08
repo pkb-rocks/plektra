@@ -912,7 +912,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="slim_mode_title">Slim-Modus</string>
     <string name="slim_mode_description">Minimale UI umschalten</string>
     <string name="backup_now">Jetzt sichern</string>
-    <string name="backup_now_description">Alle Einstellungen und benutzerdefinierten Layouts in eine ZIP-Datei exportieren</string>
+    <string name="backup_now_description">Einstellungen, eigene Layouts und Notizen samt Bildern als ZIP exportieren. Das Android-Cloud-Backup enthält keine Notizbilder.</string>
     <string name="restore_from_file">Von Datei wiederherstellen</string>
     <string name="restore_from_file_description">Eine ZIP-Sicherung von Plektra oder Pastiera importieren</string>
     <string name="backup_completed">Sicherung abgeschlossen</string>

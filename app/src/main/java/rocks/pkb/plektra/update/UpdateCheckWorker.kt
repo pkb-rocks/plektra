@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import rocks.pkb.plektra.BuildConfig
+import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.inputmethod.NotificationHelper
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -56,14 +57,20 @@ class UpdateCheckWorker(
             return Result.retry()
         }
 
-        if (result.hasAnnouncement && result.displayName != null) {
-                NotificationHelper.showUpdateAvailableNotification(
+        if (result.hasAnnouncement && result.displayName != null && result.releaseTag != null) {
+            val (lastTag, lastAt) = SettingsManager.getUpdateReminderLastNotified(context)
+            val now = System.currentTimeMillis()
+            if (UpdateReminderPolicy.shouldNotify(SettingsManager.getUpdateReminderInterval(context), result.releaseTag, lastTag, lastAt, now)) {
+                val posted = NotificationHelper.showUpdateAvailableNotification(
                     context = context,
                     displayName = result.displayName,
                     releasePageUrl = result.releasePageUrl,
                     isNightlyUpdate = result.isNightlyUpdate,
                     isPlektraStableUpdate = result.isPlektraStableUpdate
                 )
+                // Without notification permission the release stays unannounced for the next check.
+                if (posted) SettingsManager.setUpdateReminderLastNotified(context, result.releaseTag, now)
+            }
         }
 
         if (!result.successful) {
@@ -77,8 +84,8 @@ class UpdateCheckWorker(
         private const val UNIQUE_WORK_NAME = "plektra_update_check"
 
         /**
-         * Schedules a periodic background update check every 24 hours.
-         * If already scheduled, the existing work is kept.
+         * Schedules a periodic background update check every 6 hours, so that a release is
+         * announced soon after it appears; [UpdateReminderPolicy] decides whether to notify.
          */
         fun schedule(context: Context) {
             if (!shouldUseGithubUpdateChecks(context)) {
@@ -91,14 +98,15 @@ class UpdateCheckWorker(
                 .build()
 
             val request = PeriodicWorkRequestBuilder<UpdateCheckWorker>(
-                24, TimeUnit.HOURS
+                6, TimeUnit.HOURS
             )
                 .setConstraints(constraints)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 UNIQUE_WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                // UPDATE replaces the former 24-hour period of existing installations.
+                ExistingPeriodicWorkPolicy.UPDATE,
                 request
             )
         }

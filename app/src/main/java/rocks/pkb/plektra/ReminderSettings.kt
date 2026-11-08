@@ -1,5 +1,6 @@
 package rocks.pkb.plektra
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,13 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +34,63 @@ import android.content.Intent
 import rocks.pkb.plektra.training.TypingTrainingActivity
 import rocks.pkb.plektra.training.TypingTrainingReminderPolicy
 import rocks.pkb.plektra.training.TypingTrainingReminderWorker
+import rocks.pkb.plektra.update.UpdateReminderInterval
+import rocks.pkb.plektra.update.shouldUseGithubUpdateChecks
+
+@Composable
+internal fun updateReminderLabel(interval: UpdateReminderInterval): String = stringResource(
+    when (interval) {
+        UpdateReminderInterval.ONCE -> R.string.update_reminder_once
+        UpdateReminderInterval.DAILY -> R.string.update_reminder_daily
+        UpdateReminderInterval.EVERY_THREE_DAYS -> R.string.update_reminder_every_3_days
+        UpdateReminderInterval.WEEKLY -> R.string.update_reminder_weekly
+        UpdateReminderInterval.OFF -> R.string.update_reminder_off
+    }
+)
+
+/** How often an available update is announced; only where Plektra checks GitHub itself. */
+@Composable
+internal fun UpdateReminderSetting() {
+    val context = LocalContext.current
+    if (!shouldUseGithubUpdateChecks(context)) return
+    var interval by remember { mutableStateOf(SettingsManager.getUpdateReminderInterval(context)) }
+    var choosing by remember { mutableStateOf(false) }
+    ReminderRow(
+        id = "advanced.update_reminders",
+        title = stringResource(R.string.update_reminder_title),
+        summary = updateReminderLabel(interval),
+        onClick = { choosing = true }
+    )
+    if (choosing) {
+        AlertDialog(
+            onDismissRequest = { choosing = false },
+            title = { Text(stringResource(R.string.update_reminder_title)) },
+            text = {
+                Column {
+                    Text(
+                        stringResource(R.string.update_reminder_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    UpdateReminderInterval.entries.forEach { option ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                interval = option
+                                SettingsManager.setUpdateReminderInterval(context, option)
+                                choosing = false
+                            },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = option == interval, onClick = null)
+                            Text(updateReminderLabel(option), modifier = Modifier.padding(start = 8.dp, top = 12.dp, bottom = 12.dp))
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { choosing = false }) { Text(stringResource(android.R.string.cancel)) } }
+        )
+    }
+}
 
 /** Weekly typing-training reminder on nightly builds, with an immediate off switch. */
 @Composable

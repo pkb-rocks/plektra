@@ -679,6 +679,7 @@ fun AdvancedSettingsScreen(
                         }
 
                         TypingTrainingReminderSetting()
+                        UpdateReminderSetting()
 
                         Surface(modifier = Modifier.fillMaxWidth().settingRow("advanced.notes") {
                             context.startActivity(Intent(context, NotesActivity::class.java))

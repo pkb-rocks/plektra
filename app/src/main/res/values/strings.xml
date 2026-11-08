@@ -1989,6 +1989,13 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="typing_training_share_failed">%1$d sessions could not be shared. Try again later.</string>
     <string name="typing_training_share_consent_title">Share typing sessions?</string>
     <string name="typing_training_share_consent_text">Your saved sessions are sent to the Plektra maintainer to improve key detection and correction. They contain the practice texts, what you typed, every touch on the screen keyboard and every hardware key press with timing and position, and diagnostic data about delays. They also include the technical context: device and Android build, app version, display and fold state, keyboard layout and geometry, connected input devices and your Plektra settings without credentials or personal content such as snippets, your dictionary or app shortcuts. No other text you type is included.\n\nEach session is encrypted on this device so that only the maintainer can read it. The server stores encrypted data only and does not keep your IP address; its source code is freely available (AGPL): github.com/pkb-rocks/plektra-datadrop. Sessions that were already shared are recognised and not sent again.</string>
+    <string name="update_reminder_title">Update reminders</string>
+    <string name="update_reminder_description">How often Plektra reminds you of a new version until it is installed.</string>
+    <string name="update_reminder_once">Once when released</string>
+    <string name="update_reminder_daily">Daily until installed</string>
+    <string name="update_reminder_every_3_days">Every 3 days until installed</string>
+    <string name="update_reminder_weekly">Weekly until installed</string>
+    <string name="update_reminder_off">Off</string>
     <string name="typing_training_reminder_setting_title">Remind me to practise typing</string>
     <string name="typing_training_reminder_setting_description">At most weekly, when sessions are unshared or you have not practised for a while</string>
     <string name="typing_training_reminder_channel_name">Typing training</string>

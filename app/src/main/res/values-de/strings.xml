@@ -1679,6 +1679,13 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="typing_training_share_failed">%1$d Sitzungen konnten nicht geteilt werden. Versuche es später erneut.</string>
     <string name="typing_training_share_consent_title">Tippsitzungen teilen?</string>
     <string name="typing_training_share_consent_text">Deine gespeicherten Sitzungen gehen an den Plektra-Maintainer, um Tastenerkennung und Korrektur zu verbessern. Sie enthalten die Übungstexte, deine Eingabe, jede Berührung der Bildschirmtastatur und jeden Tastendruck einer Hardware-Tastatur mit Zeitpunkt und Position sowie Diagnosedaten zu Verzögerungen. Dazu kommt der technische Kontext: Gerät und Android-Build, App-Version, Display und Faltzustand, Tastaturlayout und -geometrie, angeschlossene Eingabegeräte und deine Plektra-Einstellungen ohne Zugangsdaten und persönliche Inhalte wie Textbausteine, dein Wörterbuch oder App-Verknüpfungen. Anderer Text, den du tippst, ist nicht enthalten.\n\nJede Sitzung wird auf diesem Gerät so verschlüsselt, dass nur der Maintainer sie lesen kann. Der Server speichert nur verschlüsselte Daten und keine IP-Adressen; sein Quellcode ist frei verfügbar (AGPL): github.com/pkb-rocks/plektra-datadrop. Bereits geteilte Sitzungen werden erkannt und nicht erneut gesendet.</string>
+    <string name="update_reminder_title">Update-Erinnerungen</string>
+    <string name="update_reminder_description">Wie oft Plektra an eine neue Version erinnert, bis sie installiert ist.</string>
+    <string name="update_reminder_once">Einmal bei Erscheinen</string>
+    <string name="update_reminder_daily">Täglich, bis installiert</string>
+    <string name="update_reminder_every_3_days">Alle 3 Tage, bis installiert</string>
+    <string name="update_reminder_weekly">Wöchentlich, bis installiert</string>
+    <string name="update_reminder_off">Aus</string>
     <string name="typing_training_reminder_setting_title">An Tipptraining erinnern</string>
     <string name="typing_training_reminder_setting_description">Höchstens wöchentlich, wenn ungeteilte Sitzungen liegen oder länger nicht geübt wurde</string>
     <string name="typing_training_reminder_channel_name">Tipptraining</string>

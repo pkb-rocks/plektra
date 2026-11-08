@@ -209,7 +209,6 @@ class MainActivity : LocalizedComponentActivity() {
         }
 
         if (shouldUseGithubUpdateChecks(this)) {
-            // Schedule periodic background update checks (every 24 hours).
             UpdateCheckWorker.schedule(applicationContext)
         }
         rocks.pkb.plektra.training.TypingTrainingReminderWorker.schedule(applicationContext)

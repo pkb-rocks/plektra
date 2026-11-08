@@ -177,6 +177,9 @@ object SettingsManager {
     private const val KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED = "software_keyboard_nearest_key_touch_enabled"
     private const val KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_ENABLED = "software_keyboard_key_correction_enabled"
     private const val KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_PROFILES = "software_keyboard_key_correction_profiles"
+    private const val KEY_UPDATE_REMINDER_INTERVAL = "update_reminder_interval"
+    private const val KEY_UPDATE_REMINDER_LAST_TAG = "update_reminder_last_tag"
+    private const val KEY_UPDATE_REMINDER_LAST_AT = "update_reminder_last_at"
     private const val KEY_TYPING_TRAINING_REMINDER_ENABLED = "typing_training_reminder_enabled"
     private const val KEY_TYPING_TRAINING_REMINDER_LAST_AT = "typing_training_reminder_last_at"
     private const val KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY = "software_keyboard_left_modifier_key"
@@ -676,6 +679,28 @@ object SettingsManager {
     fun setSoftwareKeyboardNearestKeyTouchEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED, enabled)
+            .apply()
+    }
+
+    fun getUpdateReminderInterval(context: Context): rocks.pkb.plektra.update.UpdateReminderInterval =
+        rocks.pkb.plektra.update.UpdateReminderInterval.fromPersistedValue(
+            getPreferences(context).getString(KEY_UPDATE_REMINDER_INTERVAL, null)
+        ) ?: rocks.pkb.plektra.update.UpdateReminderInterval.defaultFor(BuildConfig.RELEASE_CHANNEL)
+
+    fun setUpdateReminderInterval(context: Context, interval: rocks.pkb.plektra.update.UpdateReminderInterval) {
+        getPreferences(context).edit().putString(KEY_UPDATE_REMINDER_INTERVAL, interval.persistedValue).apply()
+    }
+
+    /** Release tag and time of the last update notification, for the reminder interval. */
+    fun getUpdateReminderLastNotified(context: Context): Pair<String?, Long> {
+        val prefs = getPreferences(context)
+        return prefs.getString(KEY_UPDATE_REMINDER_LAST_TAG, null) to prefs.getLong(KEY_UPDATE_REMINDER_LAST_AT, 0L)
+    }
+
+    fun setUpdateReminderLastNotified(context: Context, releaseTag: String, atMs: Long) {
+        getPreferences(context).edit()
+            .putString(KEY_UPDATE_REMINDER_LAST_TAG, releaseTag)
+            .putLong(KEY_UPDATE_REMINDER_LAST_AT, atMs)
             .apply()
     }
 

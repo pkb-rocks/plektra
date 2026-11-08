@@ -257,6 +257,8 @@ object NotificationHelper {
     /**
      * Shows a notification when a new app update is available.
      * Respects notification permissions on Android 13+.
+     *
+     * @return whether the notification was posted.
      */
     fun showUpdateAvailableNotification(
         context: Context,
@@ -264,10 +266,10 @@ object NotificationHelper {
         releasePageUrl: String?,
         isNightlyUpdate: Boolean = false,
         isPlektraStableUpdate: Boolean = false
-    ) {
+    ): Boolean {
         if (!hasNotificationPermission(context)) {
             android.util.Log.w("NotificationHelper", "Notification permission not granted")
-            return
+            return false
         }
         
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -335,6 +337,7 @@ object NotificationHelper {
             else -> UPDATE_NOTIFICATION_ID
         }
         notificationManager.notify(notificationId, notification)
+        return true
     }
     
     /**

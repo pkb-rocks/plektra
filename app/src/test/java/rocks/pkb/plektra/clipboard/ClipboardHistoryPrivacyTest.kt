@@ -37,6 +37,7 @@ class ClipboardHistoryPrivacyTest {
     private lateinit var clipboardManager: ClipboardManager
     private lateinit var accessPolicy: MutableAccessPolicy
     private lateinit var historyManager: ClipboardHistoryManager
+    private lateinit var store: ClipboardTestStore
 
     @Before
     fun setUp() {
@@ -47,16 +48,17 @@ class ClipboardHistoryPrivacyTest {
         clipboardManager = context.getSystemService(ClipboardManager::class.java)
         clipboardManager.clearPrimaryClip()
         accessPolicy = MutableAccessPolicy(accessible = true)
-        historyManager = ClipboardHistoryManager(context, accessPolicy)
+        store = ClipboardTestStore(context, "clipboard-privacy-test.db")
+        historyManager = ClipboardHistoryManager(context, accessPolicy, store.history) { store.now }
         historyManager.onCreate()
-        historyManager.clearHistory()
+        store.settle()
     }
 
     @After
     fun tearDown() {
         accessPolicy.accessible = true
-        historyManager.clearHistory()
         historyManager.onDestroy()
+        store.close()
         clipboardManager.clearPrimaryClip()
         SettingsManager.setClipboardHistoryEnabled(context, true)
         SettingsManager.setClipboardRetentionTime(context, 0)
@@ -85,18 +87,20 @@ class ClipboardHistoryPrivacyTest {
     fun clipboardChangesWhileLockedAreNotCaptured() {
         copyToSystemClipboard("visible-secret")
         historyManager.onPrimaryClipChanged()
+        store.settle()
         assertEquals(1, historyManager.getHistorySize())
 
         setAccessible(false)
         copyToSystemClipboard("locked-secret")
         historyManager.onPrimaryClipChanged()
+        store.settle()
 
         assertEquals(0, historyManager.getHistorySize())
-        assertNull(historyManager.getHistoryEntry(0))
+        assertTrue(historyManager.getHistoryEntries().isEmpty())
 
         setAccessible(true)
-        assertEquals(1, historyManager.getHistorySize())
-        assertEquals("visible-secret", historyManager.getHistoryEntry(0)?.text)
+        assertEquals(listOf("visible-secret"), historyManager.getHistoryEntries().map { it.text })
+        assertEquals(listOf("visible-secret"), store.rows().map { it.text })
     }
 
     @Test
@@ -111,17 +115,18 @@ class ClipboardHistoryPrivacyTest {
         // uses wall-clock time. Match the real service before exercising retention.
         org.robolectric.util.ReflectionHelpers.callInstanceMethod<Unit>(
             clipboardManager.primaryClip!!.description, "setTimestamp",
-            org.robolectric.util.ReflectionHelpers.ClassParameter.from(Long::class.javaPrimitiveType, System.currentTimeMillis()))
+            org.robolectric.util.ReflectionHelpers.ClassParameter.from(Long::class.javaPrimitiveType, store.now))
         historyManager.onPrimaryClipChanged()
+        store.settle()
         assertTrue(clipboardManager.primaryClip!!.description.extras!!.getBoolean("android.content.extra.IS_SENSITIVE"))
         assertEquals(2, historyManager.getHistorySize())
-        val entry = requireNotNull((0 until historyManager.getHistorySize())
-            .mapNotNull(historyManager::getHistoryEntry).firstOrNull { it.isSensitive })
+        val entry = requireNotNull(historyManager.getHistoryEntries().firstOrNull { it.isSensitive })
         assertEquals("test-secret", entry.text)
         val connection = RecordingInputConnection(context)
         historyManager.pasteEntry(entry.id, connection)
         assertEquals(listOf("test-secret"), connection.committedTexts)
         historyManager.toggleClipPinned(entry.id)
+        store.settle()
         assertFalse(historyManager.getHistoryEntryContent(entry.id)!!.isPinned)
 
         val activity = Robolectric.buildActivity(Activity::class.java).setup().visible().get()
@@ -144,38 +149,46 @@ class ClipboardHistoryPrivacyTest {
     fun separateTimersExpireSensitiveEntriesEvenWithUnlimitedNormalHistory() {
         SettingsManager.setClipboardRetentionTime(context, 0)
         SettingsManager.setSensitiveClipboardRetentionTime(context, 120)
-        val dao = requireNotNull(ClipboardDao.getInstance(context))
-        val now = System.currentTimeMillis()
-        dao.addClip(now - 90 * 24 * 60 * 60_000L, false, "old-normal", 0)
-        dao.addClip(now - 31 * 60_000L, false, "expired-secret", 0, true, 120)
-        dao.addClip(now - 5 * 60_000L, false, "fresh-secret", 0, true, 120)
-        val expired = requireNotNull((0 until historyManager.getHistorySize())
-            .mapNotNull(historyManager::getHistoryEntry).firstOrNull { it.text == "expired-secret" })
+        val history = store.history
+        val retention = ClipboardRetention(0, 120)
+        val now = store.now
+        history.addClip("old-normal", now - 90 * 24 * 60 * 60_000L, false, retention)
+        history.addClip("expired-secret", now - 31 * 60_000L, true, retention)
+        history.addClip("fresh-secret", now - 5 * 60_000L, true, retention)
+        store.settle()
+        val expired = requireNotNull(historyManager.getHistoryEntries().firstOrNull { it.text == "expired-secret" })
         SettingsManager.setSensitiveClipboardRetentionTime(context, 30)
-        setAccessible(false)
-        // Cleanup must still run while the screen is locked.
-        historyManager.prepareClipboardHistory()
-        setAccessible(true)
-        assertEquals(setOf("old-normal", "fresh-secret"), (0 until historyManager.getHistorySize())
-            .mapNotNull(historyManager::getHistoryEntry).map { it.text }.toSet())
         val connection = RecordingInputConnection(context)
+        // The shorter retention applies to reads and paste before any cleanup ran.
         historyManager.pasteEntry(expired.id, connection)
         assertTrue(connection.committedTexts.isEmpty())
+        setAccessible(false)
+        // Cleanup must still run while the screen is locked.
+        historyManager.onHistoryOpened()
+        store.settle()
+        setAccessible(true)
+        assertEquals(setOf("old-normal", "fresh-secret"), historyManager.getHistoryEntries().map { it.text }.toSet())
+        assertEquals(setOf("old-normal", "fresh-secret"), store.rows().map { it.text }.toSet())
         SettingsManager.setClipboardRetentionTime(context, 24 * 60)
         assertEquals(1, historyManager.getHistorySize())
     }
 
     @Test
     fun duplicateCopiesCannotDowngradeSensitivity() {
-        val dao = requireNotNull(ClipboardDao.getInstance(context))
-        val now = System.currentTimeMillis()
-        dao.addClip(now, true, "duplicate-secret")
-        dao.addClip(now + 1, false, "duplicate-secret", sensitive = true)
-        dao.addClip(now + 2, false, "duplicate-secret")
-        val entry = requireNotNull(historyManager.getHistoryEntry(0))
+        val retention = ClipboardRetention(0, 30)
+        val now = store.now
+        store.history.addClip("duplicate-secret", now, false, retention)
+        store.settle()
+        historyManager.toggleClipPinned(historyManager.getHistoryEntries().single().id)
+        store.settle()
+        assertTrue(historyManager.getHistoryEntries().single().isPinned)
+        store.history.addClip("duplicate-secret", now + 1, true, retention)
+        store.history.addClip("duplicate-secret", now + 2, false, retention)
+        store.settle()
+        val entry = historyManager.getHistoryEntries().single()
         assertTrue(entry.isSensitive)
         assertFalse(entry.isPinned)
-        assertEquals(1, historyManager.getHistorySize())
+        assertEquals(listOf(ClipboardTestStore.Row(entry.id, "duplicate-secret", pinned = false, sensitive = true)), store.rows())
     }
 
     @Test
@@ -208,23 +221,23 @@ class ClipboardHistoryPrivacyTest {
     fun allHistoryActionsAreBlockedWhileLocked() {
         copyToSystemClipboard("protected-secret")
         historyManager.onPrimaryClipChanged()
-        val entry = requireNotNull(historyManager.getHistoryEntry(0))
+        store.settle()
+        val entry = historyManager.getHistoryEntries().single()
         val inputConnection = RecordingInputConnection(context)
 
         setAccessible(false)
         historyManager.toggleClipPinned(entry.id)
-        historyManager.removeEntry(0, force = true)
+        historyManager.removeEntry(entry.id, force = true)
         historyManager.clearHistory()
         historyManager.pasteText(entry.text, inputConnection)
+        historyManager.pasteEntry(entry.id, inputConnection)
+        store.settle()
 
-        assertFalse(historyManager.canRemove(0))
         assertNull(historyManager.getHistoryEntryContent(entry.id))
         assertTrue(inputConnection.committedTexts.isEmpty())
 
         setAccessible(true)
-        assertEquals(1, historyManager.getHistorySize())
-        assertFalse(historyManager.getHistoryEntry(0)?.isPinned == true)
-        assertEquals("protected-secret", historyManager.getHistoryEntry(0)?.text)
+        assertEquals(listOf(entry), historyManager.getHistoryEntries())
     }
 
     @Test
@@ -261,6 +274,7 @@ class ClipboardHistoryPrivacyTest {
     fun inlineHistoryReplacesSensitiveRowsWithLockedMessage() {
         copyToSystemClipboard("view-secret")
         historyManager.onPrimaryClipChanged()
+        store.settle()
         val activity = Robolectric.buildActivity(Activity::class.java).setup().visible().get()
         val view = ClipboardHistoryView(activity, historyManager)
         activity.setContentView(view)
@@ -286,6 +300,7 @@ class ClipboardHistoryPrivacyTest {
     fun popupHistoryReplacesSensitiveRowsImmediatelyWhenLocked() {
         copyToSystemClipboard("popup-secret")
         historyManager.onPrimaryClipChanged()
+        store.settle()
         val activity = Robolectric.buildActivity(Activity::class.java).setup().visible().get()
         activity.setContentView(FrameLayout(activity))
         val popup = ClipboardHistoryPopupView(activity, historyManager)

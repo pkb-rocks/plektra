@@ -43,8 +43,8 @@ class ClipboardHistoryView(
     private var activeContextMenu: PopupMenu? = null
     private var currentInputConnection: InputConnection? = null
     private val entryHeightPx: Int
-    private var scrollToTopPending: Boolean = false
-    private val historyChangeListener: () -> Unit = { post { if (isAttachedToWindow) refresh() } }
+    private var pendingPinChange: Pair<Long, Boolean>? = null
+    private val historyChangeListener: () -> Unit = { if (isAttachedToWindow) refresh() }
     private val accessStateListener: (Boolean) -> Unit = {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             refresh()
@@ -200,6 +200,7 @@ class ClipboardHistoryView(
         super.onAttachedToWindow()
         clipboardHistoryManager.addAccessStateListener(accessStateListener)
         clipboardHistoryManager.addHistoryChangeListener(historyChangeListener)
+        clipboardHistoryManager.onHistoryOpened()
         refresh()
     }
 
@@ -208,6 +209,7 @@ class ClipboardHistoryView(
         clipboardHistoryManager.removeHistoryChangeListener(historyChangeListener)
         activeContextMenu?.dismiss()
         activeContextMenu = null
+        pendingPinChange = null
         super.onDetachedFromWindow()
     }
 
@@ -228,8 +230,8 @@ class ClipboardHistoryView(
     }
 
     fun refresh() {
-        val historyAccessible = clipboardHistoryManager.isHistoryAccessible()
-        if (!historyAccessible) {
+        val state = clipboardHistoryManager.uiState()
+        if (state.status != ClipboardHistoryManager.Status.READY) {
             activeContextMenu?.dismiss()
             activeContextMenu = null
             adapter.submitList(emptyList())
@@ -237,13 +239,18 @@ class ClipboardHistoryView(
             recyclerView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
             clearButton.visibility = View.GONE
             clearButton.isEnabled = false
-            emptyStateView.text = context.getString(R.string.clipboard_locked_state)
+            emptyStateView.text = context.getString(
+                when (state.status) {
+                    ClipboardHistoryManager.Status.LOADING -> R.string.clipboard_loading_state
+                    ClipboardHistoryManager.Status.ERROR -> R.string.clipboard_error_state
+                    else -> R.string.clipboard_locked_state
+                }
+            )
             emptyStateView.visibility = View.VISIBLE
             return
         }
 
-        clipboardHistoryManager.prepareClipboardHistory()
-        val entries = loadEntries()
+        val entries = state.entries
         recyclerView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         clearButton.visibility = View.VISIBLE
         emptyStateView.text = context.getString(R.string.clipboard_empty_state)
@@ -259,10 +266,16 @@ class ClipboardHistoryView(
         adapter.submitList(entries) {
             // Recalculate item decorations so spacing is correct after insertions
             recyclerView.invalidateItemDecorations()
-            if (scrollToTopPending) {
+            val requestedPin = pendingPinChange
+            val pinApplied = requestedPin != null && entries.any {
+                it.id == requestedPin.first && it.isPinned == requestedPin.second
+            }
+            if (requestedPin != null && (pinApplied || entries.none { it.id == requestedPin.first && !it.isSensitive })) {
+                pendingPinChange = null
+            }
+            if (pinApplied) {
                 recyclerView.post {
                     recyclerView.scrollToPosition(0)
-                    scrollToTopPending = false
                 }
             } else if (firstVisiblePosition != RecyclerView.NO_POSITION && firstVisiblePosition < entries.size) {
                 // Restore scroll position after list update to prevent unwanted scrolling
@@ -275,16 +288,6 @@ class ClipboardHistoryView(
         emptyStateView.visibility = if (hasEntries) View.GONE else View.VISIBLE
         recyclerView.visibility = if (hasEntries) View.VISIBLE else View.GONE
         clearButton.isEnabled = hasEntries
-    }
-
-    private fun loadEntries(): List<ClipboardHistoryEntry> {
-        // Return immutable snapshots to let DiffUtil detect changes (isPinned, timeStamp, text)
-        val size = clipboardHistoryManager.getHistorySize()
-        val entries = mutableListOf<ClipboardHistoryEntry>()
-        for (index in 0 until size) {
-            clipboardHistoryManager.getHistoryEntry(index)?.let { entries.add(it.copy()) }
-        }
-        return entries
     }
 
     private fun createCloseButton(): View {
@@ -342,22 +345,13 @@ class ClipboardHistoryView(
             }
             when (item.title.toString()) {
                 pinText, unpinText -> {
+                    // The list refreshes when the change has been stored.
+                    pendingPinChange = entry.id to !entry.isPinned
                     clipboardHistoryManager.toggleClipPinned(entry.id)
-                    scrollToTopPending = true
-                    // Post refresh to ensure manager has updated the entry
-                    recyclerView.post {
-                        refresh()
-                    }
                     true
                 }
                 deleteText -> {
-                    val index = (0 until clipboardHistoryManager.getHistorySize()).firstOrNull { idx ->
-                        clipboardHistoryManager.getHistoryEntry(idx)?.id == entry.id
-                    }
-                    index?.let {
-                        clipboardHistoryManager.removeEntry(it, force = true)
-                        refresh()
-                    }
+                    clipboardHistoryManager.removeEntry(entry.id, force = true)
                     true
                 }
                 else -> false

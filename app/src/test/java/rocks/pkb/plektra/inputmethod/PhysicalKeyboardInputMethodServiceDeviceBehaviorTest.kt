@@ -14,6 +14,7 @@ import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.android.controller.ServiceController
 import java.lang.reflect.Field
 import java.lang.reflect.Proxy
 
@@ -30,6 +32,7 @@ import java.lang.reflect.Proxy
 class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
 
     private lateinit var service: PhysicalKeyboardInputMethodService
+    private lateinit var serviceController: ServiceController<PhysicalKeyboardInputMethodService>
     private lateinit var recorder: RecordingInputConnection
     private lateinit var inputConnection: InputConnection
     private lateinit var editorInfo: EditorInfo
@@ -55,9 +58,8 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         )
         SettingsManager.setAppEnterBehaviorOverrides(context, emptyList())
 
-        service = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java)
-            .create()
-            .get()
+        serviceController = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java).create()
+        service = serviceController.get()
 
         recorder = RecordingInputConnection()
         inputConnection = recorder.asProxy()
@@ -72,6 +74,15 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         setField(service, "mInputEditorInfo", editorInfo)
         setField(service, "isInputViewActive", true)
         setField(service, "inputContextState", InputContextState.fromEditorInfo(editorInfo))
+    }
+
+    @After
+    fun tearDown() {
+        try {
+            if (::serviceController.isInitialized) serviceController.destroy()
+        } finally {
+            DeviceSpecific.clearTestOverrides()
+        }
     }
 
     @Test

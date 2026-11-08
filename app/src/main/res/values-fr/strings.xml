@@ -359,6 +359,13 @@
     <string name="clipboard_clear_all">Tout effacer</string>
     <string name="clipboard_empty_state">Aucun historique du presse-papiers</string>
     <string name="clipboard_locked_state">L’historique du presse-papiers n’est pas disponible lorsque l’appareil est verrouillé.</string>
+    <string name="clipboard_loading_state">Chargement de l’historique du presse-papiers…</string>
+    <string name="clipboard_error_state">Impossible de charger l’historique du presse-papiers. Rouvrez-le pour réessayer.</string>
+    <string name="clipboard_save_failed">Impossible d’enregistrer le texte copié dans l’historique du presse-papiers.</string>
+    <string name="clipboard_pin_failed">Impossible d’épingler ou de désépingler l’entrée.</string>
+    <string name="clipboard_delete_failed">Impossible de supprimer l’entrée.</string>
+    <string name="clipboard_clear_failed">Impossible d’effacer l’historique du presse-papiers.</string>
+    <string name="clipboard_system_clear_failed">Impossible d’effacer le presse-papiers du système.</string>
     <string name="clipboard_pin">Épingler</string>
     <string name="clipboard_unpin">Retirer l\'épingle</string>
     <string name="clipboard_delete">Supprimer</string>

@@ -447,6 +447,13 @@
     <string name="clipboard_clear_all">Очистити все</string>
     <string name="clipboard_empty_state">Немає історії буфера обміну</string>
     <string name="clipboard_locked_state">Історія буфера обміну недоступна, поки пристрій заблоковано.</string>
+    <string name="clipboard_loading_state">Завантаження історії буфера обміну…</string>
+    <string name="clipboard_error_state">Не вдалося завантажити історію буфера обміну. Відкрийте її знову, щоб повторити спробу.</string>
+    <string name="clipboard_save_failed">Не вдалося зберегти скопійований текст в історії буфера обміну.</string>
+    <string name="clipboard_pin_failed">Не вдалося закріпити або відкріпити запис.</string>
+    <string name="clipboard_delete_failed">Не вдалося видалити запис.</string>
+    <string name="clipboard_clear_failed">Не вдалося очистити історію буфера обміну.</string>
+    <string name="clipboard_system_clear_failed">Не вдалося очистити системний буфер обміну.</string>
     <string name="clipboard_pin">Закріпити</string>
     <string name="clipboard_unpin">Відкріпити</string>
     <string name="clipboard_delete">Видалити</string>

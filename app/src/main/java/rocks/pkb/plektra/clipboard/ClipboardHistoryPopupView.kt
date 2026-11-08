@@ -30,7 +30,7 @@ class ClipboardHistoryPopupView(
     private val contentView: LinearLayout
     private val entriesContainer: LinearLayout
     private val clearButton: Button
-    private val historyChangeListener: () -> Unit = { contentView.post { if (popupWindow.isShowing) refreshEntries() } }
+    private val historyChangeListener: () -> Unit = { if (popupWindow.isShowing) refreshEntries() }
     private val accessStateListener: (Boolean) -> Unit = {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             refreshEntries()
@@ -145,24 +145,16 @@ class ClipboardHistoryPopupView(
     private fun refreshEntries() {
         entriesContainer.removeAllViews()
 
-        if (!clipboardHistoryManager.isHistoryAccessible()) {
-            clearButton.visibility = View.GONE
-            addStateText(R.string.clipboard_locked_state)
-            return
-        }
-
-        clearButton.visibility = View.VISIBLE
-
-        val count = clipboardHistoryManager.getHistorySize()
-        if (count == 0) {
-            addStateText(R.string.clipboard_empty_state)
-            return
-        }
-
-        for (i in 0 until count) {
-            val entry = clipboardHistoryManager.getHistoryEntry(i) ?: continue
-            val entryView = createEntryView(entry)
-            entriesContainer.addView(entryView)
+        val state = clipboardHistoryManager.uiState()
+        clearButton.visibility = if (state.status == ClipboardHistoryManager.Status.READY) View.VISIBLE else View.GONE
+        when (state.status) {
+            ClipboardHistoryManager.Status.LOCKED -> addStateText(R.string.clipboard_locked_state)
+            ClipboardHistoryManager.Status.LOADING -> addStateText(R.string.clipboard_loading_state)
+            ClipboardHistoryManager.Status.ERROR -> addStateText(R.string.clipboard_error_state)
+            ClipboardHistoryManager.Status.READY -> {
+                if (state.entries.isEmpty()) addStateText(R.string.clipboard_empty_state)
+                state.entries.forEach { entriesContainer.addView(createEntryView(it)) }
+            }
         }
     }
 
@@ -254,6 +246,7 @@ class ClipboardHistoryPopupView(
     fun show() {
         clipboardHistoryManager.addAccessStateListener(accessStateListener)
         clipboardHistoryManager.addHistoryChangeListener(historyChangeListener)
+        clipboardHistoryManager.onHistoryOpened()
         refreshEntries()
         // Show at top of screen or above keyboard
         popupWindow.showAtLocation(

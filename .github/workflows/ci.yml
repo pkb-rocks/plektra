@@ -2,84 +2,130 @@ name: Android CI
 
 on:
   pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  gradle-checks:
+  test-catalog:
     runs-on: ubuntu-latest
-
+    outputs:
+      topics: ${{ steps.topics.outputs.topics }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Check test classification and CI guards
+        run: |
+          python3 scripts/ci-tests.py check
+          python3 -m unittest discover -s scripts/tests
+      - id: topics
+        run: echo "topics=$(python3 scripts/ci-tests.py topics)" >> "$GITHUB_OUTPUT"
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+  topic-tests:
+    name: Tests / ${{ matrix.topic }}
+    needs: test-catalog
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        topic: ${{ fromJSON(needs.test-catalog.outputs.topics) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
           cache: gradle
-
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
-
-      - name: Run core modifier regression tests
-        run: |
-          ./gradlew :app:testStableDebugUnitTest --tests rocks.pkb.plektra.core.ModifierStateControllerTest
-
-      - name: Run input router modifier E2E tests
-        run: |
-          ./gradlew :app:testStableDebugUnitTest --tests rocks.pkb.plektra.inputmethod.InputEventRouterModifierE2ETest
-
-      - name: Run input router forward-delete tests
-        run: |
-          ./gradlew :app:testStableDebugUnitTest --tests rocks.pkb.plektra.inputmethod.InputEventRouterForwardDeleteAlternativesTest
-
-      - name: Run IME device behaviour tests
-        run: |
-          ./gradlew :app:testStableDebugUnitTest --tests rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodServiceDeviceBehaviorTest
-
-      - name: Run stable debug unit tests
-        run: |
-          ./gradlew :app:testStableDebugUnitTest
-
-      - name: Run stable release unit tests (F-Droid path)
-        run: |
-          ./gradlew :app:testStableReleaseUnitTest -PPLEKTRA_FDROID_BUILD=true
-
-      - name: Run nightly debug unit tests
-        run: |
-          ./gradlew :app:testNightlyDebugUnitTest
-
-      - name: Compile and test Google Play variants
-        run: |
-          ./gradlew :app:testPlayStableDebugUnitTest :app:testPlayNightlyDebugUnitTest
-
-      - name: Run nightly release unit tests
-        run: |
-          ./gradlew :app:testNightlyReleaseUnitTest
-
-      - name: Run stable debug lint
-        run: |
-          ./gradlew :app:lintStableDebug
-
-      - name: Run stable release lint
-        run: |
-          ./gradlew :app:lintStableRelease
-
-      - name: Run nightly debug lint
-        run: |
-          ./gradlew :app:lintNightlyDebug
-
-      - name: Run nightly release lint
-        run: |
-          ./gradlew :app:lintNightlyRelease
-
-      - name: Upload test and lint reports
+      - name: Run topic on Stable Debug
+        run: python3 scripts/ci-tests.py run --topic "${{ matrix.topic }}"
+      - name: Upload topic reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gradle-test-and-lint-reports
+          name: tests-${{ matrix.topic }}
+          path: app/build/ci-reports
+
+  variant-tests:
+    name: Variant / ${{ matrix.variant }}${{ matrix.fdroid && ' / F-Droid' || '' }}
+    needs: test-catalog
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: StableRelease
+            fdroid: true
+          - variant: NightlyDebug
+          - variant: NightlyRelease
+          - variant: PlayStableDebug
+          - variant: PlayNightlyDebug
+          - variant: StableNoAccessibilityDebug
+          - variant: NightlyNoAccessibilityDebug
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Run full variant suite
+        run: python3 scripts/ci-tests.py run --variant "${{ matrix.variant }}" ${{ matrix.fdroid && '--fdroid' || '' }}
+      - name: Upload variant reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ matrix.variant }}${{ matrix.fdroid && '-fdroid' || '' }}
+          path: app/build/ci-reports
+
+  lint:
+    name: Lint / ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [StableDebug, StableRelease, NightlyDebug, NightlyRelease]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Analyze lint
+        run: ./gradlew :app:lint${{ matrix.variant }} --console=plain
+      - name: Reject new lint errors
+        run: |
+          report=$(find app/build/reports -maxdepth 1 -name 'lint-results-*.xml' -print)
+          test -n "$report"
+          python3 scripts/check-lint.py "$report"
+      - name: Upload lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-${{ matrix.variant }}
           path: |
-            app/build/reports/tests
-            app/build/test-results
             app/build/reports/lint-results-*.html
             app/build/reports/lint-results-*.xml
+
+  gradle-checks:
+    if: always()
+    needs: [test-catalog, topic-tests, variant-tests, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check to pass
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          failed = [name for name, job in results.items() if job['result'] != 'success']
+          if failed:
+              raise SystemExit('Failed or incomplete checks: ' + ', '.join(failed))
+          PY

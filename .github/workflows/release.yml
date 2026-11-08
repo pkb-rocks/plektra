@@ -65,17 +65,16 @@ jobs:
 
       - name: Run stable unit tests
         run: |
-          ./gradlew :app:testStableDebugUnitTest \
-            -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
-            -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
+          python3 scripts/ci-tests.py run --variant StableDebug \
+            --gradle-arg=-PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
+            --gradle-arg=-PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
 
       - name: Run stable F-Droid-path unit tests
         if: ${{ inputs.build_fdroid_artifact }}
         run: |
-          ./gradlew :app:testStableDebugUnitTest \
-            -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
-            -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
-            -PPLEKTRA_FDROID_BUILD=true
+          python3 scripts/ci-tests.py run --variant StableDebug --fdroid \
+            --gradle-arg=-PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
+            --gradle-arg=-PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
 
       - name: Build release APK
         run: |

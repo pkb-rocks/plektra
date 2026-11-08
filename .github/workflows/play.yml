@@ -38,7 +38,9 @@ jobs:
           playUploadKeyPassword=$KEY_PASSWORD
           PROPS
       - name: Test Play variants
-        run: ./gradlew :app:testPlayStableDebugUnitTest :app:testPlayNightlyDebugUnitTest
+        run: |
+          python3 scripts/ci-tests.py run --variant PlayStableDebug
+          python3 scripts/ci-tests.py run --variant PlayNightlyDebug
       - name: Build Play bundles
         run: |
           ./gradlew :app:bundlePlayStableRelease :app:bundlePlayNightlyRelease \

@@ -868,4 +868,6 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="settings_link_with_description">Avec description</string>
     <string name="settings_link_copied_toast">Lien copié</string>
     <string name="settings_link_unavailable_toast">Ce paramètre n\'est pas disponible</string>
+    <string name="sym_move_up">Déplacer vers le haut</string>
+    <string name="sym_move_down">Déplacer vers le bas</string>
 </resources>

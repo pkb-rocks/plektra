@@ -868,4 +868,6 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="settings_link_with_description">Z opisem</string>
     <string name="settings_link_copied_toast">Link skopiowano</string>
     <string name="settings_link_unavailable_toast">To ustawienie jest niedostępne</string>
+    <string name="sym_move_up">Przenieś w górę</string>
+    <string name="sym_move_down">Przenieś w dół</string>
 </resources>

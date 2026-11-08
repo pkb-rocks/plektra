@@ -868,4 +868,6 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="settings_link_with_description">Con descripción</string>
     <string name="settings_link_copied_toast">Enlace copiado</string>
     <string name="settings_link_unavailable_toast">Este ajuste no está disponible</string>
+    <string name="sym_move_up">Subir</string>
+    <string name="sym_move_down">Bajar</string>
 </resources>

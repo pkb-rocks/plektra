@@ -3,17 +3,22 @@ set -euo pipefail
 
 usage() {
   cat <<USAGE
-Usage: $0 <base-version> [--install] [--device <adb-serial>]
+Usage: $0 <base-version> [--install] [--device <adb-serial>] [--backup | --reinstall] [--env <file>]
 
 Examples:
   $0 26.09
   $0 26.09 --install
+  $0 26.10 --install --backup
+  $0 26.10 --install --reinstall --env .env
   $0 26.09 --install --device 192.168.178.190:46293
 USAGE
 }
 
 BASE_VERSION="${1:-}"
 INSTALL=false
+BACKUP_INSTALL=false
+REINSTALL=false
+ENV_FILE=
 DEVICE_SERIAL="${ADB_SERIAL:-}"
 
 if [ -z "$BASE_VERSION" ] || [[ "$BASE_VERSION" == --* ]]; then
@@ -28,6 +33,20 @@ while [ $# -gt 0 ]; do
     --install)
       INSTALL=true
       shift
+      ;;
+    --backup)
+      BACKUP_INSTALL=true
+      shift
+      ;;
+    --reinstall)
+      BACKUP_INSTALL=true
+      REINSTALL=true
+      shift
+      ;;
+    --env)
+      [[ $# -ge 2 ]] || { echo "Missing value for --env" >&2; exit 1; }
+      ENV_FILE="$2"
+      shift 2
       ;;
     --device)
       if [ $# -lt 2 ]; then
@@ -49,6 +68,11 @@ while [ $# -gt 0 ]; do
       ;;
   esac
 done
+
+if [[ "$BACKUP_INSTALL" == true && "$INSTALL" != true ]]; then
+  echo "--backup and --reinstall require --install." >&2
+  exit 1
+fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION_INFO="$($ROOT_DIR/scripts/nightly-version.sh "$BASE_VERSION")"
@@ -133,7 +157,19 @@ if [ "$INSTALL" = true ]; then
       tr -d '\r'
   )"
 
-  "$ADB_BIN" "${ADB_DEVICE_ARGS[@]}" install -r "$APK_PATH"
+  if [[ "$BACKUP_INSTALL" == true ]]; then
+    HELPER_ARGS=(--device "$DEVICE_SERIAL" --package rocks.pkb.plektra.nightly)
+    if [[ -n "$ENV_FILE" ]]; then
+      HELPER_ARGS+=(--env "$ENV_FILE")
+    fi
+    HELPER_ARGS+=(install "$APK_PATH")
+    if [[ "$REINSTALL" == true ]]; then
+      HELPER_ARGS+=(--reinstall)
+    fi
+    python3 "$ROOT_DIR/scripts/debug_device.py" "${HELPER_ARGS[@]}"
+  else
+    "$ADB_BIN" "${ADB_DEVICE_ARGS[@]}" install -r "$APK_PATH"
+  fi
 
   # A package replacement stops the running IME. Some Android builds then keep the
   # fallback keyboard selected even though Plektra remains enabled. Restore Nightly

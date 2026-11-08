@@ -213,6 +213,24 @@ scripts/build-nightly-debug.sh 26.10
 
 To build and install on a connected device, add `--install --device <serial>`. Project structure and checks are in [Development](docs/development.md); maintainers use [Releasing](docs/releasing.md).
 
+For debug builds, copy `.env.example` to `.env`, run `chmod 600 .env`, and enter the speech API keys you use. Both `.env` and backups in `.local-work/device-backups/` are gitignored and contain private data. Build, back up the installed debug app, and install the update with:
+
+```sh
+scripts/build-nightly-debug.sh 26.10 --install --backup --device <serial> --env .env
+```
+
+For an explicit uninstall and reinstall, replace `--backup` with `--reinstall`. This includes a backup of the APK and app data, then restores app data, runtime permissions and keyboard selection. Android Keystore keys do not survive uninstalling: supply replacement keys in `.env` for every speech provider stored in the backup. Missing replacement keys prevent uninstallation. Use this path when replacing a debug build signed with a different key.
+
+To import keys without reinstalling, or back up and restore a debuggable app separately:
+
+```sh
+python3 scripts/setup-speech.py --device <serial> --env .env
+python3 scripts/debug_device.py --device <serial> backup
+python3 scripts/debug_device.py --device <serial> --env .env restore <backup-directory>
+```
+
+Restore requires the same package on the same device with a debuggable APK installed. Only supplied keys and optional speech settings are changed by the key import; omitted settings remain unchanged.
+
 Distributed forks must use their own name, application ID, update endpoints and branding, and must not present themselves as official Plektra releases.
 
 ## Project links

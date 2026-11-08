@@ -138,6 +138,8 @@ class ClipboardHistoryTest {
         store.settle()
         val published = mutableListOf<ClipboardHistory.Snapshot>()
         store.history.addListener { published += it }
+        val failures = mutableListOf<ClipboardHistory.Operation>()
+        store.history.addFailureListener { failures += it }
         val secret = "never-log-this-clipboard-value"
         store.database.writableDatabase.execSQL(
             "CREATE TRIGGER reject_clip BEFORE INSERT ON CLIPBOARD BEGIN SELECT RAISE(ABORT, '$secret'); END"
@@ -145,17 +147,19 @@ class ClipboardHistoryTest {
 
         copy(manager, secret, sensitive = true)
         store.worker.runAll()
-        // Nothing reaches the UI, not even a provisional entry.
+        // Publication stays on the main thread; a failure refresh never adds a provisional entry.
         assertTrue(published.isEmpty())
         shadowOf(Looper.getMainLooper()).idle()
-        assertTrue(published.isEmpty())
+        assertTrue(published.single().entries.isEmpty())
+        assertEquals(listOf(ClipboardHistory.Operation.SAVE), failures)
         assertEquals(0, manager.getHistorySize())
         assertTrue(store.rows().isEmpty())
         val logs = ShadowLog.getLogs()
-        assertTrue(logs.any { it.tag == "ClipboardHistory" && it.msg.startsWith("Clipboard insert failed") })
+        assertTrue(logs.any { it.tag == "ClipboardHistory" && it.msg.startsWith("Clipboard save failed") })
         assertFalse(logs.any { it.msg.contains(secret) || it.throwable?.toString()?.contains(secret) == true })
 
         store.database.writableDatabase.execSQL("DROP TRIGGER reject_clip")
+        published.clear()
         copy(manager, "accepted")
         store.worker.runAll()
         assertTrue(published.isEmpty())
@@ -187,6 +191,126 @@ class ClipboardHistoryTest {
 
         assertEquals(listOf(entry), manager.getHistoryEntries())
         assertEquals(listOf(ClipboardTestStore.Row(entry.id, "keep-me", pinned = false, sensitive = false)), store.rows())
+    }
+
+    @Test
+    fun sensitivityOnlyChangeIsPublishedEvenWithTheSameTimestamp() {
+        store.store("same-timestamp", store.now, pinned = true)
+        val manager = manager()
+        store.settle()
+        val published = mutableListOf<ClipboardHistory.Snapshot>()
+        store.history.addListener { published += it }
+
+        store.history.addClip("same-timestamp", store.now, true, retention)
+        store.settle()
+
+        val entry = published.single().entries.single()
+        assertTrue(entry.isSensitive)
+        assertFalse(entry.isPinned)
+        assertEquals(entry, manager.getHistoryEntries().single())
+        assertTrue(store.rows().single().sensitive)
+    }
+
+    @Test
+    fun failedSensitiveUpgradeStaysMaskedAndRecoveryPersistsProtectionWithoutReplayingPin() {
+        store.store("protect-me", store.now, pinned = true)
+        val manager = manager()
+        store.settle()
+        val id = manager.getHistoryEntries().single().id
+        val failures = mutableListOf<ClipboardHistory.Operation>()
+        store.history.addFailureListener { failures += it }
+        store.database.writableDatabase.execSQL(
+            "CREATE TRIGGER reject_protection BEFORE UPDATE ON CLIPBOARD BEGIN SELECT RAISE(ABORT, 'blocked'); END"
+        )
+
+        store.history.addClip("protect-me", store.now, true, retention)
+        store.settle()
+        val protected = manager.getHistoryEntries().single()
+        assertTrue(protected.isSensitive)
+        assertFalse(protected.isPinned)
+        assertFalse(store.rows().single().sensitive)
+        assertTrue(store.rows().single().pinned)
+        assertEquals(listOf(ClipboardHistory.Operation.SAVE), failures)
+
+        manager.toggleClipPinned(id)
+        store.settle()
+        assertFalse(manager.getHistoryEntries().single().isPinned)
+        store.database.writableDatabase.execSQL("DROP TRIGGER reject_protection")
+        manager.onHistoryOpened()
+        store.settle()
+        assertTrue(store.rows().single().sensitive)
+        assertFalse(store.rows().single().pinned)
+
+        val restarted = manager(store.restart())
+        store.settle()
+        assertEquals(protected, restarted.getHistoryEntries().single())
+    }
+
+    @Test
+    fun retentionChangesPurgeAndRefreshWithoutOpeningHistory() {
+        store.store("ten-minutes-old", store.now - 10 * 60_000L, sensitive = true)
+        val manager = manager()
+        store.settle()
+        assertEquals(1, manager.getHistorySize())
+        val snapshots = mutableListOf<ClipboardHistory.Snapshot>()
+        store.history.addListener { snapshots += it }
+
+        SettingsManager.setSensitiveClipboardRetentionTime(context, 5)
+        store.settle()
+
+        assertTrue(store.rows().isEmpty())
+        assertTrue(snapshots.last().entries.isEmpty())
+        assertEquals(0, manager.getHistorySize())
+    }
+
+    @Test
+    fun recreatedManagerRestoresExpiryTimerForAnAlreadyLoadedHistory() {
+        SettingsManager.setSensitiveClipboardRetentionTime(context, 1)
+        store.store("expires-after-recreation", store.now, sensitive = true)
+        val first = manager()
+        store.settle()
+        first.onDestroy()
+        val second = manager()
+        store.settle()
+        assertEquals(1, second.getHistorySize())
+
+        store.now += 61_000L
+        shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(61))
+        store.settle()
+
+        assertTrue(store.rows().isEmpty())
+        assertEquals(0, second.getHistorySize())
+    }
+
+    @Test
+    fun failedCleanupUsesBackoffAndNeverQueuesAnImmediateRetry() {
+        store.store("expires", store.now, sensitive = true)
+        val manager = manager()
+        store.settle()
+        store.database.writableDatabase.execSQL(
+            "CREATE TRIGGER reject_cleanup BEFORE DELETE ON CLIPBOARD BEGIN SELECT RAISE(ABORT, 'blocked'); END"
+        )
+        store.now += 31 * 60_000L
+        manager.onHistoryOpened()
+        store.settle()
+        assertEquals(0, manager.getHistorySize())
+        assertEquals(1, store.rows().size)
+        assertEquals(store.now + 60_000L, store.history.snapshot.nextExpiry)
+        assertEquals(0, store.worker.pending)
+
+        shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(59))
+        assertEquals(0, store.worker.pending)
+        store.now += 60_000L
+        shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1))
+        store.settle()
+        assertEquals(store.now + 120_000L, store.history.snapshot.nextExpiry)
+        assertEquals(0, store.worker.pending)
+
+        store.database.writableDatabase.execSQL("DROP TRIGGER reject_cleanup")
+        manager.onHistoryOpened()
+        store.settle()
+        assertTrue(store.rows().isEmpty())
+        assertEquals(Long.MAX_VALUE, store.history.snapshot.nextExpiry)
     }
 
     @Test

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Ամենօրյա հերթափոխ</string>
+  <string name="keyboard_theme_daily_rotation_description">Ընտրեք պահպանված թեմաները հերթափոխի կարգով։ Մեկ թեման մնում է անփոփոխ, մի քանիսը փոխվում են ամեն օր։ Ընտրությունը փոխելը վերսկսում է շրջանը այսօր։</string>
+  <string name="keyboard_theme_daily_rotation_empty">Նախ պահպանեք անհատական թեմա։</string>
+  <string name="keyboard_theme_daily_rotation_none">Թեմա ընտրված չէ․ օգտագործվում է հաստատուն թեման։</string>
+  <string name="keyboard_theme_rotation_deselect_all">Ապընտրել բոլորը</string>
+  <string name="keyboard_theme_rotation_save">Պահպանել</string>
+  <string name="keyboard_theme_rotation_saved">Հերթափոխը պահպանված է</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Καθημερινή εναλλαγή</string>
+  <string name="keyboard_theme_daily_rotation_description">Επιλέξτε αποθηκευμένα θέματα με τη σειρά εναλλαγής. Ένα θέμα παραμένει σταθερό· πολλά εναλλάσσονται καθημερινά. Η αλλαγή της επιλογής ξεκινά ξανά τον κύκλο σήμερα.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Αποθηκεύστε πρώτα ένα προσαρμοσμένο θέμα.</string>
+  <string name="keyboard_theme_daily_rotation_none">Δεν επιλέχθηκε θέμα: χρησιμοποιείται το σταθερό θέμα.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Αποεπιλογή όλων</string>
+  <string name="keyboard_theme_rotation_save">Αποθήκευση</string>
+  <string name="keyboard_theme_rotation_saved">Η εναλλαγή αποθηκεύτηκε</string>
+</resources>

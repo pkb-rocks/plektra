@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Luân phiên hằng ngày</string>
+  <string name="keyboard_theme_daily_rotation_description">Chọn các giao diện đã lưu theo thứ tự luân phiên. Một giao diện được giữ nguyên; nhiều giao diện thay đổi mỗi ngày. Thay đổi lựa chọn sẽ bắt đầu lại chu kỳ hôm nay.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Trước tiên hãy lưu một giao diện tùy chỉnh.</string>
+  <string name="keyboard_theme_daily_rotation_none">Chưa chọn giao diện: sử dụng giao diện cố định.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Bỏ chọn tất cả</string>
+  <string name="keyboard_theme_rotation_save">Lưu</string>
+  <string name="keyboard_theme_rotation_saved">Đã lưu luân phiên giao diện</string>
+</resources>

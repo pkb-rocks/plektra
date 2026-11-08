@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="keyboard_theme_daily_rotation">Ежедневная смена</string>
+  <string name="keyboard_theme_daily_rotation_description">Выберите сохранённые темы в порядке смены. Одна тема остаётся неизменной; несколько чередуются каждый день. Изменение выбора начинает цикл заново сегодня.</string>
+  <string name="keyboard_theme_daily_rotation_empty">Сначала сохраните свою тему.</string>
+  <string name="keyboard_theme_daily_rotation_none">Тема не выбрана: используется постоянная тема.</string>
+  <string name="keyboard_theme_rotation_deselect_all">Снять выделение со всех</string>
+  <string name="keyboard_theme_rotation_save">Сохранить</string>
+  <string name="keyboard_theme_rotation_saved">Смена тем сохранена</string>
+</resources>

@@ -318,6 +318,11 @@
     <string name="clipboard_locked_state">Պահոցի պատմությունը հասանելի չէ, քանի դեռ սարքը կողպված է։</string>
     <string name="clipboard_loading_state">Պահոցի պատմությունը բեռնվում է…</string>
     <string name="clipboard_error_state">Չհաջողվեց բեռնել պահոցի պատմությունը։ Կրկին փորձելու համար բացեք այն նորից։</string>
+    <string name="clipboard_save_failed">Չհաջողվեց պատճենված տեքստը պահել պահոցի պատմությունում։</string>
+    <string name="clipboard_pin_failed">Չհաջողվեց ամրացնել կամ ապամրացնել գրառումը։</string>
+    <string name="clipboard_delete_failed">Չհաջողվեց ջնջել գրառումը։</string>
+    <string name="clipboard_clear_failed">Չհաջողվեց մաքրել պահոցի պատմությունը։</string>
+    <string name="clipboard_system_clear_failed">Չհաջողվեց մաքրել համակարգի պահոցը։</string>
     <string name="clipboard_pin">Ամրացնել</string>
     <string name="clipboard_unpin">Ապամրացնել</string>
     <string name="clipboard_delete">Ջնջել</string>

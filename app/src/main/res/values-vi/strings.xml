@@ -512,6 +512,11 @@
     <string name="clipboard_locked_state">Lịch sử bộ nhớ tạm không khả dụng khi thiết bị bị khóa.</string>
     <string name="clipboard_loading_state">Đang tải lịch sử bộ nhớ tạm…</string>
     <string name="clipboard_error_state">Không thể tải lịch sử bộ nhớ tạm. Hãy mở lại để thử lại.</string>
+    <string name="clipboard_save_failed">Không thể lưu văn bản đã sao chép vào lịch sử bộ nhớ tạm.</string>
+    <string name="clipboard_pin_failed">Không thể ghim hoặc bỏ ghim mục này.</string>
+    <string name="clipboard_delete_failed">Không thể xóa mục này.</string>
+    <string name="clipboard_clear_failed">Không thể xóa lịch sử bộ nhớ tạm.</string>
+    <string name="clipboard_system_clear_failed">Không thể xóa bộ nhớ tạm của hệ thống.</string>
     <string name="clipboard_pin">Ghim</string>
     <string name="clipboard_unpin">Bỏ ghim</string>
     <string name="clipboard_delete">Xóa</string>

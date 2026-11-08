@@ -13,6 +13,7 @@ class AutoReplaceController(
     private val repository: DictionaryRepository,
     private val suggestionEngine: SuggestionEngine,
     private val settingsProvider: () -> SuggestionSettings,
+    private val languageProvider: () -> String = { "" },
     private val knownWordProvider: ((String) -> Boolean)? = null,
     private val exactReplacementProvider: ((String, Char?) -> String?)? = null
 ) {
@@ -133,12 +134,56 @@ class AutoReplaceController(
             return !input[inputIndex].equals(candidate[candidateIndex], ignoreCase = true)
         }
 
+        /**
+         * Picks the candidate auto-replace should judge.
+         *
+         * Normally that is the engine's top result. The exception is a typed word that is not a
+         * known word whose top result is a distance-0 prefix completion (`teh` -> `tehran`,
+         * `wich` -> `wichita`): that is a completion, not an edit, so the shape gate refuses it
+         * and the real typo fix ranked below it is never tried. In that case [fetch] is asked
+         * for a few more results and the best one that is an actual edit (distance 1 or more)
+         * is taken instead. When there is none, the completion is returned and refused as before.
+         *
+         * The fallback needs the completion to be at least [MIN_COMPLETION_EXTRA_LETTERS] longer
+         * than [typedLength]. A completion one or two letters longer is usually the typed word
+         * itself or an inflection of it (`untie` -> `untied`, `loathe` -> `loathed`), and
+         * rewriting that to a neighbour is a false correction. `teh` -> `tehran` and
+         * `wich` -> `wichita` are 3 and 4 letters longer.
+         *
+         * [fetch] takes the number of results wanted. The first call asks for one, exactly as
+         * before, so nothing changes unless this situation arises.
+         */
+        internal fun pickReplacementCandidate(
+            isKnownWord: Boolean,
+            typedLength: Int,
+            fetch: (limit: Int) -> List<SuggestionResult>
+        ): SuggestionResult? {
+            val top = fetch(1).firstOrNull() ?: return null
+            if (isKnownWord || top.distance > 0 || top.kind != SuggestionKind.CURRENT_WORD) return top
+            if (top.candidate.length - typedLength < MIN_COMPLETION_EXTRA_LETTERS) return top
+            return fetch(PREFIX_FALLBACK_LIMIT)
+                .firstOrNull { it.kind == SuggestionKind.CURRENT_WORD && it.distance >= 1 }
+                ?: top
+        }
+
+        private const val PREFIX_FALLBACK_LIMIT = 4
+
+        /** The completion must be this many letters longer than the typed word for the fallback. */
+        internal const val MIN_COMPLETION_EXTRA_LETTERS = 3
+
+        /**
+         * A dropped or added letter is only corrected towards a candidate of at least this many
+         * letters. Short words (`ios` -> `is`) are too easily another real word minus a letter.
+         */
+        internal const val MIN_LENGTH_CHANGE_CANDIDATE_LENGTH = 4
+
         internal fun isSafeAutoReplaceCandidate(
             input: String,
             lookupWord: String,
             candidate: SuggestionResult?,
             settings: SuggestionSettings,
-            isOrthographicVariant: Boolean
+            isOrthographicVariant: Boolean,
+            languageCode: String = ""
         ): Boolean {
             if (candidate == null) return false
             val isCaseVariant = isCaseOnlyVariant(input, candidate.candidate)
@@ -157,6 +202,20 @@ class AutoReplaceController(
                 return isOrthographicVariant || isCaseVariant || !changesFirstLetter(input, candidate.candidate)
             }
             if (lengthDelta == 1 && hasSingleRepeatedCharInsertion(input, candidate.candidate)) return true
+
+            // A dropped or added letter inside the word is the most common typo there is. How far
+            // a length change may go is a per-language decision (TypoShapeProfile); the distance
+            // check above still bounds it by the user's Maximum correction distance.
+            val profile = TypoShapeProfile.forLanguage(languageCode)
+            if (
+                profile.maxLengthDelta > 0 &&
+                candidate.candidate.length >= MIN_LENGTH_CHANGE_CANDIDATE_LENGTH &&
+                kotlin.math.abs(lengthDelta) <= profile.maxLengthDelta &&
+                !TypoShapeProfile.isPureAffixChange(input, candidate.candidate) &&
+                !changesFirstLetter(input, candidate.candidate)
+            ) {
+                return true
+            }
 
             // Pure suffix/prefix growth or shortening is usually morphology/completion, not a typo.
             return isOrthographicVariant && lookupWord.length == candidate.candidate.length
@@ -407,15 +466,21 @@ class AutoReplaceController(
                 entry.word.length == lookupWord.length && isAccentOnlyVariant(lookupWord, entry.word)
             }
         } else null
+
+        // Check if word exists in dictionary
+        val isKnownWord = knownWordProvider?.invoke(lookupWord) ?: repository.isKnownWord(lookupWord)
+
         val topRaw = orthographicEntry?.let { entry ->
             SuggestionResult(entry.word, 0, Double.MAX_VALUE, entry.source, SuggestionKind.CURRENT_WORD)
-        } ?: suggestionEngine.suggest(
-            lookupWord,
-            limit = 1,
-            includeAccentMatching = settings.accentMatching,
-            useKeyboardProximity = settings.useKeyboardProximity,
-            useEditTypeRanking = settings.useEditTypeRanking
-        ).firstOrNull()
+        } ?: pickReplacementCandidate(isKnownWord, lookupWord.length) { limit ->
+            suggestionEngine.suggest(
+                lookupWord,
+                limit = limit,
+                includeAccentMatching = settings.accentMatching,
+                useKeyboardProximity = settings.useKeyboardProximity,
+                useEditTypeRanking = settings.useEditTypeRanking
+            )
+        }
         // Suggestion ranking can assign zero distance to completions. Replacement safety
         // uses the actual distance of the dictionary root before restoring its prefix.
         val replacementCandidate = topRaw?.let {
@@ -441,8 +506,6 @@ class AutoReplaceController(
         // Check if word has been rejected by user
         val isRejected = rejectedWords.contains(wordLower)
         
-        // Check if word exists in dictionary
-        val isKnownWord = knownWordProvider?.invoke(lookupWord) ?: repository.isKnownWord(lookupWord)
         val isExactKnownWord = repository.getExactWordFrequency(lookupWord) > 0
         val hasExactPrimaryCase = primaryDictionaryHasExactCase(lookupWord)
 
@@ -453,7 +516,8 @@ class AutoReplaceController(
             lookupWord = lookupWord,
             candidate = top,
             settings = settings,
-            isOrthographicVariant = isOrthographicVariant
+            isOrthographicVariant = isOrthographicVariant,
+            languageCode = languageProvider()
         )
 
         val shouldReplace = top != null

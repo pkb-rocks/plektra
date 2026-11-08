@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.automirrored.filled.ManageSearch
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.SmartButton
@@ -72,6 +73,7 @@ enum class SettingsDestination {
     Customization,
     NavMode,
     Advanced,
+    Clipboard,
     About,
     CustomInputStyles,
     AppLanguage,
@@ -234,6 +236,7 @@ fun SettingsScreen(
                         openCustomization(SettingsActivity.CUSTOMIZATION_DESTINATION_APP_ENTER_BEHAVIOR)
                     },
                     onAdvancedClick = { navigateTo(SettingsDestination.Advanced) },
+                    onClipboardClick = { navigateTo(SettingsDestination.Clipboard) },
                     onAboutClick = { navigateTo(SettingsDestination.About) },
                     onBackClick = { navigateBack() },
                     onCustomInputStylesClick = { navigateTo(SettingsDestination.CustomInputStyles) },
@@ -305,6 +308,9 @@ fun SettingsScreen(
                     onBack = { navigateBack() }
                 )
             }
+            SettingsDestination.Clipboard -> {
+                ClipboardSettingsScreen(modifier = modifier, onBack = { navigateBack() })
+            }
             SettingsDestination.About -> {
                 AboutScreen(
                     modifier = modifier,
@@ -375,6 +381,7 @@ private fun SettingsMainScreen(
     onNavModeClick: () -> Unit,
     onEnterBehaviorClick: () -> Unit,
     onAdvancedClick: () -> Unit,
+    onClipboardClick: () -> Unit,
     onAboutClick: () -> Unit,
     onBackClick: () -> Unit,
     onCustomInputStylesClick: () -> Unit,
@@ -561,6 +568,13 @@ private fun SettingsMainScreen(
                 description = stringResource(R.string.app_enter_behaviour_description),
                 linkId = SettingLinkIds.MAIN_APP_ENTER_BEHAVIOR,
                 onClick = onEnterBehaviorClick
+            )
+            SettingsCategoryRow(
+                icon = Icons.Filled.ContentPaste,
+                title = stringResource(R.string.clipboard_settings_title),
+                description = stringResource(R.string.clipboard_settings_description),
+                linkId = SettingLinkIds.MAIN_CLIPBOARD,
+                onClick = onClipboardClick
             )
 
             SettingsGroupDivider(stringResource(R.string.settings_group_system))

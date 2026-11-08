@@ -22,6 +22,7 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
                 }
                 if (view.visibility != android.view.View.VISIBLE) return
                 if (view is rocks.pkb.plektra.inputmethod.aospkeyboard.AospKeyboardView && view.isShown) {
+                    lines += "SoftwareModifiers: shift=${view.shifted}, shiftLocked=${view.shiftLocked}, ctrlOneShot=${view.ctrlOneShot}, ctrlLocked=${view.ctrlLocked}, ctrlPressed=${view.ctrlPressed}"
                     val position = IntArray(2).also(view::getLocationOnScreen)
                     view.visibleAccessibilitySnapshots().forEach { key ->
                         lines += "SoftwareKey: id=${key.resourceName}, label=${key.label}, screen=${position[0] + key.bounds.centerX()},${position[1] + key.bounds.centerY()}"

@@ -23,43 +23,64 @@ internal class ClipboardDao(
     fun loadAll(): List<ClipboardHistoryEntry> {
         val db = db
         val charset = textCharset(db)
-        val entries = ArrayList<ClipboardHistoryEntry>()
-        val large = ArrayList<LargeRow>()
+        val rows = ArrayList<Row>()
         // Text is read as bytes: length() and substr() on BLOBs count bytes and keep NUL characters.
         db.rawQuery(
             """
             SELECT $COLUMN_ID, $COLUMN_TIMESTAMP, $COLUMN_PINNED, $COLUMN_SENSITIVE,
                 length(CAST($COLUMN_TEXT AS BLOB)),
                 CASE WHEN length(CAST($COLUMN_TEXT AS BLOB)) <= $textChunkBytes
-                    THEN CAST($COLUMN_TEXT AS BLOB) END
+                    THEN CAST($COLUMN_TEXT AS BLOB) END,
+                length(CAST($COLUMN_HTML AS BLOB)),
+                CASE WHEN length(CAST($COLUMN_HTML AS BLOB)) <= $textChunkBytes
+                    THEN CAST($COLUMN_HTML AS BLOB) END,
+                $COLUMN_IMAGE_ASSET, $COLUMN_IMAGE_MIME, $COLUMN_IMAGE_BYTES,
+                $COLUMN_IMAGE_WIDTH, $COLUMN_IMAGE_HEIGHT, $COLUMN_IMAGE_DIGEST
             FROM $TABLE WHERE $COLUMN_TEXT IS NOT NULL
             """.trimIndent(),
             null
         ).use {
             while (it.moveToNext()) {
-                val id = it.getLong(0)
-                val timestamp = it.getLong(1)
-                val pinned = it.getInt(2) != 0
-                val sensitive = it.getInt(3) != 0
-                if (it.isNull(5)) {
-                    large += LargeRow(id, timestamp, pinned, sensitive, it.getLong(4))
-                } else {
-                    entries += ClipboardHistoryEntry(id, timestamp, pinned, String(it.getBlob(5), charset), sensitive)
-                }
+                val image = if (it.isNull(8)) null else ClipboardImage(
+                    asset = it.getString(8),
+                    mimeType = it.getString(9),
+                    byteSize = it.getLong(10),
+                    width = it.getInt(11),
+                    height = it.getInt(12),
+                    digest = it.getString(13)
+                )
+                rows += Row(
+                    id = it.getLong(0),
+                    timestamp = it.getLong(1),
+                    pinned = it.getInt(2) != 0,
+                    sensitive = it.getInt(3) != 0,
+                    textBytes = it.getLong(4),
+                    text = if (it.isNull(5)) null else String(it.getBlob(5), charset),
+                    htmlBytes = if (it.isNull(6)) null else it.getLong(6),
+                    html = if (it.isNull(7)) null else String(it.getBlob(7), charset),
+                    image = image
+                )
             }
         }
-        large.forEach { row ->
-            entries += ClipboardHistoryEntry(row.id, row.timestamp, row.pinned, readLargeText(db, row, charset), row.sensitive)
+        return rows.map { row ->
+            ClipboardHistoryEntry(
+                row.id,
+                row.timestamp,
+                row.pinned,
+                row.text ?: readLarge(db, row.id, COLUMN_TEXT, row.textBytes, charset),
+                row.sensitive,
+                html = row.html ?: row.htmlBytes?.let { readLarge(db, row.id, COLUMN_HTML, it, charset) },
+                image = row.image
+            )
         }
-        return entries
     }
 
-    private fun readLargeText(db: SQLiteDatabase, row: LargeRow, charset: Charset): String {
-        val bytes = ByteArrayOutputStream(row.byteLength.toInt())
+    private fun readLarge(db: SQLiteDatabase, id: Long, column: String, byteLength: Long, charset: Charset): String {
+        val bytes = ByteArrayOutputStream(byteLength.toInt())
         var offset = 1L // substr() is 1-based
-        while (offset <= row.byteLength) {
+        while (offset <= byteLength) {
             db.rawQuery(
-                "SELECT substr(CAST($COLUMN_TEXT AS BLOB), $offset, $textChunkBytes) FROM $TABLE WHERE $COLUMN_ID = ${row.id}",
+                "SELECT substr(CAST($column AS BLOB), $offset, $textChunkBytes) FROM $TABLE WHERE $COLUMN_ID = $id",
                 null
             ).use {
                 check(it.moveToFirst()) { "Clipboard row disappeared during load" }
@@ -83,14 +104,35 @@ internal class ClipboardDao(
         }
     }
 
-    fun insert(timestamp: Long, pinned: Boolean, text: String, sensitive: Boolean): Long {
+    fun insert(
+        timestamp: Long,
+        pinned: Boolean,
+        text: String,
+        sensitive: Boolean,
+        html: String? = null,
+        image: ClipboardImage? = null
+    ): Long {
         val cv = ContentValues().apply {
             put(COLUMN_TIMESTAMP, timestamp)
             put(COLUMN_PINNED, pinned)
             put(COLUMN_TEXT, text)
             put(COLUMN_SENSITIVE, sensitive)
+            put(COLUMN_HTML, html)
+            if (image != null) {
+                put(COLUMN_IMAGE_ASSET, image.asset)
+                put(COLUMN_IMAGE_MIME, image.mimeType)
+                put(COLUMN_IMAGE_BYTES, image.byteSize)
+                put(COLUMN_IMAGE_WIDTH, image.width)
+                put(COLUMN_IMAGE_HEIGHT, image.height)
+                put(COLUMN_IMAGE_DIGEST, image.digest)
+            }
         }
         return db.insertOrThrow(TABLE, null, cv)
+    }
+
+    fun updateHtml(id: Long, html: String?) {
+        val cv = ContentValues().apply { put(COLUMN_HTML, html) }
+        db.update(TABLE, cv, "$COLUMN_ID = ?", arrayOf(id.toString()))
     }
 
     fun updateFlags(entry: ClipboardHistoryEntry) {
@@ -128,7 +170,17 @@ internal class ClipboardDao(
         }
     }
 
-    private class LargeRow(val id: Long, val timestamp: Long, val pinned: Boolean, val sensitive: Boolean, val byteLength: Long)
+    private class Row(
+        val id: Long,
+        val timestamp: Long,
+        val pinned: Boolean,
+        val sensitive: Boolean,
+        val textBytes: Long,
+        val text: String?,
+        val htmlBytes: Long?,
+        val html: String?,
+        val image: ClipboardImage?
+    )
 
     companion object {
         const val TABLE = "CLIPBOARD"
@@ -137,6 +189,13 @@ internal class ClipboardDao(
         private const val COLUMN_PINNED = "PINNED"
         private const val COLUMN_TEXT = "TEXT"
         private const val COLUMN_SENSITIVE = "SENSITIVE"
+        private const val COLUMN_HTML = "HTML"
+        private const val COLUMN_IMAGE_ASSET = "IMAGE_ASSET"
+        private const val COLUMN_IMAGE_MIME = "IMAGE_MIME"
+        private const val COLUMN_IMAGE_BYTES = "IMAGE_BYTES"
+        private const val COLUMN_IMAGE_WIDTH = "IMAGE_WIDTH"
+        private const val COLUMN_IMAGE_HEIGHT = "IMAGE_HEIGHT"
+        private const val COLUMN_IMAGE_DIGEST = "IMAGE_DIGEST"
 
         // Well below the default 2 MB CursorWindow, also when several rows share a window.
         const val TEXT_CHUNK_BYTES = 256 * 1024
@@ -147,8 +206,26 @@ internal class ClipboardDao(
                 $COLUMN_TIMESTAMP INTEGER NOT NULL,
                 $COLUMN_PINNED TINYINT NOT NULL,
                 $COLUMN_TEXT TEXT,
-                $COLUMN_SENSITIVE TINYINT NOT NULL DEFAULT 0
+                $COLUMN_SENSITIVE TINYINT NOT NULL DEFAULT 0,
+                $COLUMN_HTML TEXT,
+                $COLUMN_IMAGE_ASSET TEXT,
+                $COLUMN_IMAGE_MIME TEXT,
+                $COLUMN_IMAGE_BYTES INTEGER,
+                $COLUMN_IMAGE_WIDTH INTEGER,
+                $COLUMN_IMAGE_HEIGHT INTEGER,
+                $COLUMN_IMAGE_DIGEST TEXT
             )
         """
+
+        /** Columns added in schema version 3: formatted text and image metadata. */
+        val VERSION_3_COLUMNS = listOf(
+            "$COLUMN_HTML TEXT",
+            "$COLUMN_IMAGE_ASSET TEXT",
+            "$COLUMN_IMAGE_MIME TEXT",
+            "$COLUMN_IMAGE_BYTES INTEGER",
+            "$COLUMN_IMAGE_WIDTH INTEGER",
+            "$COLUMN_IMAGE_HEIGHT INTEGER",
+            "$COLUMN_IMAGE_DIGEST TEXT"
+        )
     }
 }

@@ -15,6 +15,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.Switch
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.clipboard.ClipboardHistoryEntry
 import rocks.pkb.plektra.clipboard.ClipboardHistoryManager
+import rocks.pkb.plektra.clipboard.ClipboardImageFormat
+import rocks.pkb.plektra.clipboard.ClipboardPanelControls
 
 /**
  * Lightweight clipboard history UI that runs inside the SYM layout page.
@@ -39,11 +42,14 @@ class ClipboardHistoryView(
     private val emptyStateView: TextView
     private val clearButton: TextView
     private val titleText: TextView
+    private val plainTextSwitch: Switch
+    private val settingsButton: ImageView
     private var closeButton: ImageView? = null
     private var activeContextMenu: PopupMenu? = null
     private var currentInputConnection: InputConnection? = null
     private val entryHeightPx: Int
     private var pendingPinChange: Pair<Long, Boolean>? = null
+    private var renderedEditorGeneration = clipboardHistoryManager.editorGeneration
     private val historyChangeListener: () -> Unit = { if (isAttachedToWindow) refresh() }
     private val accessStateListener: (Boolean) -> Unit = {
         if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -110,8 +116,22 @@ class ClipboardHistoryView(
             }
         }
 
+        plainTextSwitch = Switch(context).apply {
+            text = context.getString(R.string.clipboard_paste_unformatted)
+            textSize = 12f
+            showText = false
+            isChecked = clipboardHistoryManager.pastesPlainText()
+            setOnCheckedChangeListener { _, checked -> clipboardHistoryManager.setPastesPlainText(checked) }
+            val padding = dpToPx(8f)
+            setPadding(padding, 0, padding, 0)
+        }
+
+        settingsButton = ClipboardPanelControls.settingsButton(context, dpToPx(32f), dpToPx(6f))
+
         header.addView(titleText)
+        header.addView(plainTextSwitch)
         header.addView(clearButton)
+        header.addView(settingsButton)
         addView(header)
 
         // Scrollable content container below the header (margin set after header is measured)
@@ -231,6 +251,9 @@ class ClipboardHistoryView(
 
     fun refresh() {
         val state = clipboardHistoryManager.uiState()
+        val plainText = clipboardHistoryManager.pastesPlainText()
+        if (plainTextSwitch.isChecked != plainText) plainTextSwitch.isChecked = plainText
+        plainTextSwitch.visibility = if (state.status == ClipboardHistoryManager.Status.READY) View.VISIBLE else View.GONE
         if (state.status != ClipboardHistoryManager.Status.READY) {
             activeContextMenu?.dismiss()
             activeContextMenu = null
@@ -251,6 +274,11 @@ class ClipboardHistoryView(
         }
 
         val entries = state.entries
+        // Paste availability of images depends on the editor, which the entries do not show.
+        if (renderedEditorGeneration != clipboardHistoryManager.editorGeneration) {
+            renderedEditorGeneration = clipboardHistoryManager.editorGeneration
+            adapter.notifyDataSetChanged()
+        }
         recyclerView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         clearButton.visibility = View.VISIBLE
         emptyStateView.text = context.getString(R.string.clipboard_empty_state)
@@ -332,7 +360,15 @@ class ClipboardHistoryView(
         val pinText = context.getString(R.string.clipboard_pin)
         val unpinText = context.getString(R.string.clipboard_unpin)
         val deleteText = context.getString(R.string.clipboard_delete)
+        // Offers the formatting the switch does not apply.
+        val pastesPlainText = clipboardHistoryManager.pastesPlainText()
+        val otherFormatting = context.getString(
+            if (pastesPlainText) R.string.clipboard_paste_with_formatting else R.string.clipboard_paste_plain_text
+        )
 
+        if (entry.html != null) {
+            menu.menu.add(otherFormatting)
+        }
         if (!entry.isSensitive) {
             menu.menu.add(if (entry.isPinned) unpinText else pinText)
         }
@@ -354,6 +390,15 @@ class ClipboardHistoryView(
                     clipboardHistoryManager.removeEntry(entry.id, force = true)
                     true
                 }
+                otherFormatting -> {
+                    clipboardHistoryManager.pasteEntryIntoCurrentEditor(
+                        entry.id,
+                        if (pastesPlainText) ClipboardHistoryManager.Formatting.STYLED
+                            else ClipboardHistoryManager.Formatting.PLAIN,
+                        fallbackConnection = currentInputConnection
+                    )
+                    true
+                }
                 else -> false
             }
         }
@@ -362,7 +407,7 @@ class ClipboardHistoryView(
     }
 
     private fun onEntryClicked(entry: ClipboardHistoryEntry) {
-        clipboardHistoryManager.pasteEntry(entry.id, currentInputConnection)
+        clipboardHistoryManager.pasteEntryIntoCurrentEditor(entry.id, fallbackConnection = currentInputConnection)
     }
 
     private fun createRoundedBackground(isPinned: Boolean = false): GradientDrawable {
@@ -391,6 +436,9 @@ class ClipboardHistoryView(
         recyclerView.setBackgroundColor(background)
         titleText.setTextColor(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 180))
         clearButton.setTextColor(theme?.accent ?: Color.parseColor("#FF6B6B"))
+        plainTextSwitch.setTextColor(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 180))
+        ClipboardPanelControls.tint(plainTextSwitch, theme?.accent ?: Color.parseColor("#FF6B6B"), theme?.textAndIcons ?: Color.WHITE)
+        settingsButton.setColorFilter(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 220))
         emptyStateView.setTextColor(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 128))
         closeButton?.let { applyCloseButtonTheme(it) }
         adapter.notifyDataSetChanged()
@@ -415,13 +463,20 @@ class ClipboardHistoryView(
 
     private inner class ClipboardHistoryViewHolder(
         itemView: View,
-        val textView: TextView
-    ) : RecyclerView.ViewHolder(itemView)
+        val textView: TextView,
+        val imageView: ImageView? = null
+    ) : RecyclerView.ViewHolder(itemView) {
+        /** Asset whose preview this holder waits for; a late preview of another entry is ignored. */
+        var boundAsset: String? = null
+    }
 
     private inner class ClipboardHistoryAdapter :
         ListAdapter<ClipboardHistoryEntry, ClipboardHistoryViewHolder>(DiffCallback) {
 
+        override fun getItemViewType(position: Int): Int = if (getItem(position).isImage) VIEW_TYPE_IMAGE else VIEW_TYPE_TEXT
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClipboardHistoryViewHolder {
+            if (viewType == VIEW_TYPE_IMAGE) return createImageHolder()
             val container = FrameLayout(context).apply {
                 // Default background, will be updated in onBindViewHolder based on isPinned
                 background = createRoundedBackground(false)
@@ -452,9 +507,74 @@ class ClipboardHistoryView(
             return ClipboardHistoryViewHolder(container, textView)
         }
 
+        private fun createImageHolder(): ClipboardHistoryViewHolder {
+            val padding = dpToPx(4f)
+            val container = FrameLayout(context).apply {
+                background = createRoundedBackground(false)
+                layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, entryHeightPx)
+                setPadding(padding, padding, padding, padding)
+                isClickable = true
+                isFocusable = true
+                isLongClickable = true
+            }
+            val imageView = ImageView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            }
+            val label = TextView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.BOTTOM
+                )
+                textSize = 11f
+                maxLines = 2
+                ellipsize = TextUtils.TruncateAt.END
+                setPadding(padding, padding / 2, padding, padding / 2)
+                setBackgroundColor(Color.argb(150, 0, 0, 0))
+                setTextColor(Color.WHITE)
+            }
+            container.addView(imageView)
+            container.addView(label)
+            return ClipboardHistoryViewHolder(container, label, imageView)
+        }
+
+        private fun bindImage(holder: ClipboardHistoryViewHolder, entry: ClipboardHistoryEntry): String {
+            val image = requireNotNull(entry.image)
+            val imageView = requireNotNull(holder.imageView)
+            val pasteable = clipboardHistoryManager.canPasteIntoCurrentEditor(entry)
+            val description = if (entry.isSensitive) {
+                context.getString(R.string.clipboard_sensitive_image_preview)
+            } else {
+                context.getString(
+                    R.string.clipboard_image_preview,
+                    ClipboardImageFormat.label(image.mimeType),
+                    image.width,
+                    image.height
+                )
+            }
+            holder.textView.text = if (pasteable) description
+                else "$description\n${context.getString(R.string.clipboard_image_not_accepted_here)}"
+            holder.itemView.alpha = if (pasteable) 1f else 0.5f
+            imageView.setImageDrawable(null)
+            holder.boundAsset = if (entry.isSensitive) null else image.asset
+            if (!entry.isSensitive) {
+                clipboardHistoryManager.loadThumbnail(entry, entryHeightPx) { bitmap ->
+                    if (holder.boundAsset == image.asset) imageView.setImageBitmap(bitmap)
+                }
+            }
+            return holder.textView.text.toString()
+        }
+
         override fun onBindViewHolder(holder: ClipboardHistoryViewHolder, position: Int) {
             val entry = getItem(position)
             if (!clipboardHistoryManager.isHistoryAccessible()) {
+                holder.boundAsset = null
+                holder.imageView?.setImageDrawable(null)
                 holder.textView.text = ""
                 holder.itemView.contentDescription = null
                 holder.itemView.isClickable = false
@@ -464,9 +584,18 @@ class ClipboardHistoryView(
                 holder.itemView.setOnLongClickListener(null)
                 return
             }
-            val preview = if (entry.isSensitive) context.getString(R.string.clipboard_sensitive_preview) else entry.text
-            holder.textView.text = preview
-            holder.itemView.contentDescription = preview
+            holder.boundAsset = null
+            val preview = when {
+                entry.isImage -> bindImage(holder, entry)
+                entry.isSensitive -> context.getString(R.string.clipboard_sensitive_preview)
+                else -> entry.text
+            }
+            if (!entry.isImage) holder.textView.text = preview
+            holder.itemView.contentDescription = if (entry.html != null && !entry.isSensitive) {
+                context.getString(R.string.clipboard_formatted_description, preview)
+            } else {
+                preview
+            }
             holder.itemView.isClickable = true
             holder.itemView.isLongClickable = true
             holder.itemView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
@@ -491,9 +620,12 @@ class ClipboardHistoryView(
         }
 
         override fun areContentsTheSame(oldItem: ClipboardHistoryEntry, newItem: ClipboardHistoryEntry): Boolean {
-            return oldItem.timeStamp == newItem.timeStamp &&
-                oldItem.isPinned == newItem.isPinned &&
-                oldItem.text == newItem.text && oldItem.isSensitive == newItem.isSensitive
+            return oldItem == newItem
         }
+    }
+
+    private companion object {
+        const val VIEW_TYPE_TEXT = 0
+        const val VIEW_TYPE_IMAGE = 1
     }
 }

@@ -1876,6 +1876,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Initialize clipboard history manager first (needed by candidatesBarController)
         clipboardHistoryManager = ClipboardHistoryManager(this)
         clipboardHistoryManager.onCreate()
+        // Pastes resolve the editor when they happen, so they never reach a replaced editor.
+        clipboardHistoryManager.pasteTargetProvider = ClipboardHistoryManager.PasteTargetProvider {
+            val connection = currentInputConnection
+            if (connection != null && inputContextState.isEditable) {
+                ClipboardHistoryManager.PasteTarget(connection, currentInputEditorInfo)
+            } else {
+                null
+            }
+        }
 
         candidatesBarController = CandidatesBarController(this, clipboardHistoryManager, assets, PhysicalKeyboardInputMethodService::class.java)
         val snippetExpansionSource = SnippetExpansionSource {
@@ -3640,6 +3649,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Reset clipboard overlay when starting new input
 
         updateInputContextState(info)
+        clipboardHistoryManager.onEditorChanged()
         beginCursorAnchorMonitoring()
         uiHandler.post { refreshSmoothCaretExperiment() }
         val state = inputContextState
@@ -3802,6 +3812,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             candidatesBarController.resetSuggestionActionMode()
         }
         inputContextState = InputContextState.EMPTY
+        if (::clipboardHistoryManager.isInitialized) clipboardHistoryManager.onEditorChanged()
         multiTapController.cancelAll()
         disableEmojiSearchInputCapture()
         resetModifierStates(preserveNavMode = true)

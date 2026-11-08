@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import java.io.File
 import java.util.concurrent.Executor
 import org.robolectric.Shadows.shadowOf
 
@@ -22,17 +23,23 @@ internal class QueueExecutor : Executor {
 }
 
 /** A clipboard history on its own database file, with a queued worker and main-thread publication. */
-internal class ClipboardTestStore(private val context: Context, private val name: String) {
+internal class ClipboardTestStore(
+    private val context: Context,
+    private val name: String,
+    imageDirectory: File = File(context.filesDir, "$name-images")
+) {
     var now = System.currentTimeMillis()
     val worker = QueueExecutor()
     var database = ClipboardDatabase(context, name)
         private set
+    val images = ClipboardImageStore(imageDirectory, File(context.noBackupFilesDir, "$name-staging"))
+    var imageLimits = ClipboardImageLimits.DEFAULT
     var history = newHistory()
         private set
 
     private fun newHistory(chunkBytes: Int = ClipboardDao.TEXT_CHUNK_BYTES): ClipboardHistory {
         val mainHandler = Handler(Looper.getMainLooper())
-        return ClipboardHistory(ClipboardDao(database, chunkBytes), worker, Executor { mainHandler.post(it) }) { now }
+        return ClipboardHistory(ClipboardDao(database, chunkBytes), worker, Executor { mainHandler.post(it) }, images, imageLimits) { now }
     }
 
     /** Simulates a process restart: a new database helper and history on the same file. */
@@ -43,6 +50,9 @@ internal class ClipboardTestStore(private val context: Context, private val name
         history = newHistory(chunkBytes)
         return history
     }
+
+    /** Stored image files, by name. */
+    fun imageFiles(): Set<String> = images.directory.list()?.toSet().orEmpty()
 
     fun settle() {
         do {
@@ -72,5 +82,7 @@ internal class ClipboardTestStore(private val context: Context, private val name
     fun close() {
         database.close()
         context.deleteDatabase(name)
+        images.directory.deleteRecursively()
+        images.stagingDirectory.deleteRecursively()
     }
 }

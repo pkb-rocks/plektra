@@ -41,13 +41,16 @@ class InputEventRouterSoftwareCtrlTest {
         mappings = KeyMappingLoader.loadCtrlKeyMappings(context.assets, context)
     }
 
-    private fun press(key: Int, oneShot: Boolean = true): Boolean = router.handleCtrlModifiedKey(
+    private fun press(key: Int, oneShot: Boolean = true, shift: Boolean = false, physical: Boolean = false): Boolean = router.handleCtrlModifiedKey(
         keyCode = key,
         event = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, key, 0,
-            KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON,
-            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_SOFT_KEYBOARD, InputDevice.SOURCE_KEYBOARD),
+            KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON or
+                (if (shift) KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON else 0),
+            if (physical) 1 else KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+            if (physical) 0 else KeyEvent.FLAG_SOFT_KEYBOARD, InputDevice.SOURCE_KEYBOARD),
         inputConnection = connection, ctrlKeyMap = mappings,
         ctrlLatchFromNavMode = false, ctrlOneShot = oneShot, ctrlPhysicallyPressed = true,
+        selectionShiftActive = shift,
         clearCtrlOneShot = { cleared++ }, updateStatusBar = {}, callSuper = { false },
         toggleMinimalUi = { slimToggles++ }
     )
@@ -81,6 +84,25 @@ class InputEventRouterSoftwareCtrlTest {
             verify(connection).performContextMenuAction(action)
         }
         verify(connection, never()).sendKeyEvent(any(KeyEvent::class.java))
+    }
+
+    @Test fun softwareCtrlShiftVPastesPlainTextUnlessSwitchedOff() {
+        assertTrue(press(KeyEvent.KEYCODE_V, shift = true))
+        verify(connection).performContextMenuAction(android.R.id.pasteAsPlainText)
+        SettingsManager.setClipboardCtrlShiftVPlainText(context, false)
+        assertTrue(press(KeyEvent.KEYCODE_V, shift = true))
+        verify(connection).performContextMenuAction(android.R.id.paste)
+    }
+
+    @Test fun physicalCtrlShiftVReachesTheEditorWithShiftOnlyWhilePlainPasteIsOn() {
+        val events = ArgumentCaptor.forClass(KeyEvent::class.java)
+        assertTrue(press(KeyEvent.KEYCODE_V, shift = true, physical = true))
+        SettingsManager.setClipboardCtrlShiftVPlainText(context, false)
+        assertTrue(press(KeyEvent.KEYCODE_V, shift = true, physical = true))
+        verify(connection, times(2)).sendKeyEvent(events.capture())
+        assertEquals(listOf(true, false), events.allValues.map { it.isShiftPressed })
+        assertTrue(events.allValues.all { it.isCtrlPressed && it.keyCode == KeyEvent.KEYCODE_V })
+        verify(connection, never()).performContextMenuAction(anyInt())
     }
 
     @Test fun softwareCtrlNavigationUsesMappedArrowWithoutCtrlMetaState() {

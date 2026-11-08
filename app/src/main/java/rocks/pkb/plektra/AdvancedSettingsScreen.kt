@@ -93,12 +93,6 @@ fun AdvancedSettingsScreen(
     var swipeIncrementalThreshold by remember {
         mutableStateOf(SettingsManager.getSwipeIncrementalThreshold(context))
     }
-    var clipboardRetentionTime by remember {
-        mutableStateOf(SettingsManager.getClipboardRetentionTime(context))
-    }
-    var sensitiveClipboardRetentionTime by remember {
-        mutableStateOf(SettingsManager.getSensitiveClipboardRetentionTime(context))
-    }
     var shizukuStatus by remember { mutableStateOf(ShizukuStatus.NotConnected) }
     var trackpadProvider by remember { mutableStateOf(SettingsManager.getTrackpadProvider(context)) }
     var experimentalCandidatesViewEnabled by remember {
@@ -119,12 +113,6 @@ fun AdvancedSettingsScreen(
             when (key) {
                 "swipe_incremental_threshold" -> {
                     swipeIncrementalThreshold = SettingsManager.getSwipeIncrementalThreshold(context)
-                }
-                "clipboard_retention_time" -> {
-                    clipboardRetentionTime = SettingsManager.getClipboardRetentionTime(context)
-                }
-                "sensitive_clipboard_retention_time" -> {
-                    sensitiveClipboardRetentionTime = SettingsManager.getSensitiveClipboardRetentionTime(context)
                 }
                 "trackpad_provider" -> {
                     trackpadProvider = SettingsManager.getTrackpadProvider(context)
@@ -194,8 +182,6 @@ fun AdvancedSettingsScreen(
 
             // Explicitly reload values after restore to ensure UI is updated
             swipeIncrementalThreshold = SettingsManager.getSwipeIncrementalThreshold(context)
-            clipboardRetentionTime = SettingsManager.getClipboardRetentionTime(context)
-            sensitiveClipboardRetentionTime = SettingsManager.getSensitiveClipboardRetentionTime(context)
         }
     }
 
@@ -532,31 +518,6 @@ fun AdvancedSettingsScreen(
                             }
                         }
 
-                        ClipboardRetentionSetting(
-                            title = stringResource(R.string.clipboard_retention_time_title),
-                            description = stringResource(R.string.clipboard_retention_time_description),
-                            value = clipboardRetentionTime,
-                            options = listOf(
-                                0L to stringResource(R.string.clipboard_retention_forever),
-                                1440L to stringResource(R.string.clipboard_retention_24_hours),
-                                10080L to stringResource(R.string.clipboard_retention_days, 7),
-                                43200L to stringResource(R.string.clipboard_retention_days, 30),
-                                129600L to stringResource(R.string.clipboard_retention_days, 90)
-                            ),
-                            onSelected = { SettingsManager.setClipboardRetentionTime(context, it) },
-                            modifier = Modifier.settingRow(SettingLinkIds.ADVANCED_CLIPBOARD_RETENTION_TIME)
-                        )
-                        ClipboardRetentionSetting(
-                            title = stringResource(R.string.clipboard_sensitive_retention_title),
-                            description = stringResource(R.string.clipboard_sensitive_retention_description),
-                            value = sensitiveClipboardRetentionTime,
-                            options = listOf(5L, 15L, 30L, 60L, 120L).map {
-                                it to stringResource(R.string.clipboard_retention_time_minutes, it)
-                            },
-                            onSelected = { SettingsManager.setSensitiveClipboardRetentionTime(context, it) },
-                            modifier = Modifier.settingRow(SettingLinkIds.ADVANCED_SENSITIVE_CLIPBOARD_RETENTION_TIME)
-                        )
-
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -799,36 +760,3 @@ private val TRACKPAD_SETTING_LINK_IDS = setOf(
     SettingLinkIds.TRACKPAD_DELETE_SWIPE_THRESHOLD,
     SettingLinkIds.TRACKPAD_DEBUG
 )
-
-@Composable
-private fun ClipboardRetentionSetting(
-    title: String,
-    description: String,
-    value: Long,
-    options: List<Pair<Long, String>>,
-    onSelected: (Long) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selectedLabel = options.firstOrNull { it.first == value }?.second
-        ?: stringResource(R.string.clipboard_retention_time_minutes, value)
-    Surface(modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-            Text(description, style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            androidx.compose.foundation.layout.Box {
-                OutlinedButton(onClick = { expanded = true }) { Text(selectedLabel) }
-                androidx.compose.material3.DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    options.forEach { (minutes, label) ->
-                        androidx.compose.material3.DropdownMenuItem(text = { Text(label) }, onClick = {
-                            onSelected(minutes)
-                            expanded = false
-                        })
-                    }
-                }
-            }
-        }
-    }
-}

@@ -24,6 +24,7 @@ object SettingLinkIds {
     const val MAIN_APP_ENTER_BEHAVIOR = "main.app_enter_behavior"
     const val MAIN_ADVANCED = "main.advanced"
     const val MAIN_ACCESSIBILITY = "main.accessibility"
+    const val MAIN_CLIPBOARD = "main.clipboard"
     const val MAIN_ABOUT = "main.about"
 
     // App appearance
@@ -93,8 +94,12 @@ object SettingLinkIds {
     const val ADVANCED_BACKUP = "advanced.backup"
     const val ADVANCED_RESTORE = "advanced.restore"
     const val ADVANCED_SWIPE_INCREMENTAL_THRESHOLD = "advanced.swipe_incremental_threshold"
-    const val ADVANCED_SENSITIVE_CLIPBOARD_RETENTION_TIME = "advanced.sensitive_clipboard_retention_time"
-    const val ADVANCED_CLIPBOARD_RETENTION_TIME = "advanced.clipboard_retention_time"
+    const val CLIPBOARD_HISTORY_ENABLED = "clipboard.history_enabled"
+    const val CLIPBOARD_IMAGE_HISTORY = "clipboard.image_history"
+    const val CLIPBOARD_RETENTION_TIME = "clipboard.retention_time"
+    const val CLIPBOARD_SENSITIVE_RETENTION_TIME = "clipboard.sensitive_retention_time"
+    const val CLIPBOARD_PASTE_PLAIN_TEXT = "clipboard.paste_plain_text"
+    const val CLIPBOARD_CTRL_SHIFT_V_PLAIN_TEXT = "clipboard.ctrl_shift_v_plain_text"
     const val ADVANCED_EXPERIMENTAL_CANDIDATES_VIEW = "advanced.experimental_candidates_view"
     const val ADVANCED_SHOW_TUTORIAL = "advanced.show_tutorial"
     const val ADVANCED_SHOW_RELEASE_NOTES_TUTORIAL = "advanced.show_release_notes_tutorial"
@@ -336,6 +341,12 @@ object SettingLinkRegistry {
             SettingLinkIds.MAIN_ACCESSIBILITY,
             R.string.settings_category_accessibility,
             destination = SettingsDestination.Accessibility
+        ),
+        entry(
+            SettingLinkIds.MAIN_CLIPBOARD,
+            R.string.clipboard_settings_title,
+            R.string.clipboard_settings_description,
+            destination = SettingsDestination.Clipboard
         ),
         entry(
             SettingLinkIds.MAIN_ABOUT,
@@ -665,16 +676,39 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Advanced
         ),
         entry(
-            SettingLinkIds.ADVANCED_CLIPBOARD_RETENTION_TIME,
-            R.string.clipboard_retention_time_title,
-            R.string.clipboard_retention_time_description,
-            destination = SettingsDestination.Advanced
+            SettingLinkIds.CLIPBOARD_HISTORY_ENABLED,
+            R.string.clipboard_history_enabled_title,
+            R.string.clipboard_history_enabled_description,
+            destination = SettingsDestination.Clipboard
         ),
         entry(
-            SettingLinkIds.ADVANCED_SENSITIVE_CLIPBOARD_RETENTION_TIME,
+            SettingLinkIds.CLIPBOARD_IMAGE_HISTORY,
+            R.string.clipboard_image_history_title,
+            destination = SettingsDestination.Clipboard
+        ),
+        entry(
+            SettingLinkIds.CLIPBOARD_RETENTION_TIME,
+            R.string.clipboard_retention_time_title,
+            R.string.clipboard_retention_time_description,
+            destination = SettingsDestination.Clipboard
+        ),
+        entry(
+            SettingLinkIds.CLIPBOARD_SENSITIVE_RETENTION_TIME,
             R.string.clipboard_sensitive_retention_title,
             R.string.clipboard_sensitive_retention_description,
-            destination = SettingsDestination.Advanced
+            destination = SettingsDestination.Clipboard
+        ),
+        entry(
+            SettingLinkIds.CLIPBOARD_PASTE_PLAIN_TEXT,
+            R.string.clipboard_paste_plain_text_setting_title,
+            R.string.clipboard_paste_plain_text_setting_description,
+            destination = SettingsDestination.Clipboard
+        ),
+        entry(
+            SettingLinkIds.CLIPBOARD_CTRL_SHIFT_V_PLAIN_TEXT,
+            R.string.clipboard_ctrl_shift_v_title,
+            R.string.clipboard_ctrl_shift_v_description,
+            destination = SettingsDestination.Clipboard
         ),
         entry(
             SettingLinkIds.ADVANCED_EXPERIMENTAL_CANDIDATES_VIEW,
@@ -1013,6 +1047,7 @@ object SettingLinkRegistry {
         SettingLinkIds.MAIN_CUSTOMIZATION to R.string.kw_main_customization,
         SettingLinkIds.MAIN_ADVANCED to R.string.kw_main_advanced,
         SettingLinkIds.MAIN_ACCESSIBILITY to R.string.kw_main_accessibility,
+        SettingLinkIds.MAIN_CLIPBOARD to R.string.kw_main_clipboard,
         SettingLinkIds.MAIN_ABOUT to R.string.kw_main_about,
         SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION to R.string.kw_text_input_auto_space_punctuation,
         SettingLinkIds.TEXT_INPUT_SPACED_HYPHEN_TO_EN_DASH to R.string.kw_text_input_spaced_hyphen,
@@ -1054,6 +1089,10 @@ object SettingLinkRegistry {
     fun byId(id: String): SettingEntry? = entriesById[
         when (id) {
             "status_bar.slim_left", "status_bar.slim_right" -> "status_bar.presentation"
+            // Clipboard settings lived under Advanced before they got their own page.
+            "advanced.clipboard_retention_time" -> SettingLinkIds.CLIPBOARD_RETENTION_TIME
+            "advanced.sensitive_clipboard_retention_time" -> SettingLinkIds.CLIPBOARD_SENSITIVE_RETENTION_TIME
+            "advanced.clipboard_image_history" -> SettingLinkIds.CLIPBOARD_IMAGE_HISTORY
             else -> id
         }
     ]
@@ -1113,6 +1152,7 @@ object SettingLinkRegistry {
         SettingsDestination.Customization to R.string.settings_category_customization,
         SettingsDestination.NavMode to R.string.nav_mode_title,
         SettingsDestination.Advanced to R.string.settings_category_advanced,
+        SettingsDestination.Clipboard to R.string.clipboard_settings_title,
         SettingsDestination.About to R.string.about_title,
         SettingsDestination.CustomInputStyles to R.string.custom_input_styles_title,
         SettingsDestination.AppLanguage to R.string.app_language_title,

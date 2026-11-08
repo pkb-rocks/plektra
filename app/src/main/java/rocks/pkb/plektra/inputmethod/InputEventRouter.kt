@@ -519,6 +519,9 @@ class InputEventRouter(
                     ctrlOneShot = params.ctrlOneShot,
                     ctrlPhysicallyPressed = params.ctrlPressed || params.ctrlPhysicallyPressed,
                     selectionShiftActive = params.shiftPressed || event?.isShiftPressed == true,
+                    pasteShiftActive = params.shiftPressed || params.shiftOneShot || params.shiftLayerLatched ||
+                        event?.isShiftPressed == true,
+                    clearShiftOneShot = { if (params.shiftOneShot) callbacks.disableShiftOneShot() },
                     forceBasicContextMenuActions = params.isNumericField,
                     clearCtrlOneShot = {
                         callbacks.clearCtrlOneShot()
@@ -1301,6 +1304,8 @@ class InputEventRouter(
         ctrlOneShot: Boolean,
         ctrlPhysicallyPressed: Boolean,
         selectionShiftActive: Boolean = false,
+        pasteShiftActive: Boolean = selectionShiftActive,
+        clearShiftOneShot: () -> Unit = {},
         forceBasicContextMenuActions: Boolean = false,
         clearCtrlOneShot: () -> Unit,
         updateStatusBar: () -> Unit,
@@ -1330,7 +1335,10 @@ class InputEventRouter(
         fun passThroughCtrlCombo(): Boolean {
             val ic = inputConnection ?: return false
             if (event != null) {
-                ic.sendKeyEvent(event.withKeyCodeAndCtrl(shortcutKeyCode))
+                // Editors paste Ctrl+Shift+V as plain text; without Shift they paste like Ctrl+V.
+                val dropShift = shortcutKeyCode == KeyEvent.KEYCODE_V && event.isShiftPressed &&
+                    !SettingsManager.getClipboardCtrlShiftVPlainText(context)
+                ic.sendKeyEvent(event.withKeyCodeAndCtrl(shortcutKeyCode, dropShift))
             } else {
                 val meta = KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON or KeyEvent.META_CTRL_RIGHT_ON
                 val down = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, shortcutKeyCode, 0, meta)
@@ -1522,7 +1530,8 @@ class InputEventRouter(
                         else -> {
                             val actionId = when (ctrlMapping.value) {
                                 "copy" -> android.R.id.copy
-                                "paste" -> android.R.id.paste
+                                "paste" -> rocks.pkb.plektra.clipboard.ClipboardNativePaste.actionId(context, pasteShiftActive)
+                                    .also { if (pasteShiftActive) clearShiftOneShot() }
                                 "cut" -> android.R.id.cut
                                 "undo" -> android.R.id.undo
                                 "select_all" -> android.R.id.selectAll
@@ -1726,8 +1735,9 @@ class InputEventRouter(
         )
     }
 
-    private fun KeyEvent.withKeyCodeAndCtrl(newKeyCode: Int): KeyEvent {
-        val ctrlMetaState = metaState or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+    private fun KeyEvent.withKeyCodeAndCtrl(newKeyCode: Int, dropShift: Boolean = false): KeyEvent {
+        val shiftMeta = if (dropShift) KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON or KeyEvent.META_SHIFT_RIGHT_ON else 0
+        val ctrlMetaState = (metaState and shiftMeta.inv()) or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
         if (keyCode == newKeyCode && metaState == ctrlMetaState) return this
         return KeyEvent(
             downTime,

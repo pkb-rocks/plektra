@@ -156,6 +156,9 @@ object SettingsManager {
     private const val KEY_VARIATIONS_UPDATED = "variations_updated" // Trigger for reloading variations in input method service
     private const val KEY_ADDITIONAL_IME_SUBTYPES = "additional_ime_subtypes" // Comma-separated list of language codes for additional IME subtypes
     private const val KEY_CLIPBOARD_HISTORY_ENABLED = "clipboard_history_enabled" // Whether clipboard history is enabled
+    private const val KEY_CLIPBOARD_IMAGE_HISTORY_ENABLED = "clipboard_image_history_enabled"
+    private const val KEY_CLIPBOARD_PASTE_PLAIN_TEXT = "clipboard_paste_plain_text"
+    private const val KEY_CLIPBOARD_CTRL_SHIFT_V_PLAIN_TEXT = "clipboard_ctrl_shift_v_plain_text"
     private const val KEY_SENSITIVE_CLIPBOARD_RETENTION_TIME = "sensitive_clipboard_retention_time"
     private const val KEY_CLIPBOARD_RETENTION_TIME = "clipboard_retention_time" // How long to keep clipboard entries (in minutes)
     private const val KEY_TRACKPAD_GESTURES_ENABLED = "trackpad_gestures_enabled" // Whether trackpad gesture suggestions are enabled
@@ -5403,6 +5406,39 @@ object SettingsManager {
     fun setClipboardRetentionTime(context: Context, minutes: Long) {
         getPreferences(context).edit()
             .putLong(KEY_CLIPBOARD_RETENTION_TIME, minutes)
+            .apply()
+    }
+
+    /** Whether copied images are stored in the clipboard history. */
+    fun getClipboardImageHistoryEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_CLIPBOARD_IMAGE_HISTORY_ENABLED, true)
+
+    fun setClipboardImageHistoryEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CLIPBOARD_IMAGE_HISTORY_ENABLED, enabled)
+            .apply()
+    }
+
+    /** Whether Ctrl+Shift+V pastes without formatting; otherwise it pastes like Ctrl+V. */
+    fun getClipboardCtrlShiftVPlainText(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_CLIPBOARD_CTRL_SHIFT_V_PLAIN_TEXT, true)
+
+    fun setClipboardCtrlShiftVPlainText(context: Context, plainText: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CLIPBOARD_CTRL_SHIFT_V_PLAIN_TEXT, plainText)
+            .apply()
+    }
+
+    /** Whether a preference change with [key] can switch the clipboard history on or off. */
+    fun isClipboardHistoryEnabledKey(key: String?): Boolean = key == null || key == KEY_CLIPBOARD_HISTORY_ENABLED
+
+    /** Whether entries tapped in the clipboard history drop their formatting; stored formatting is kept either way. */
+    fun getClipboardPastePlainText(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_CLIPBOARD_PASTE_PLAIN_TEXT, true)
+
+    fun setClipboardPastePlainText(context: Context, plainText: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CLIPBOARD_PASTE_PLAIN_TEXT, plainText)
             .apply()
     }
 

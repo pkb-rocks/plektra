@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import rocks.pkb.plektra.R
 import rocks.pkb.plektra.clipboard.ClipboardHistoryManager
 import rocks.pkb.plektra.inputmethod.ui.ClipboardHistoryView
 import org.junit.Assert.assertEquals
@@ -27,7 +28,7 @@ class ClipboardRoundedLayoutTest {
         }
         val children = descendants(view)
         val recycler = children.filterIsInstance<RecyclerView>().single()
-        val close = children.filterIsInstance<ImageView>().single()
+        val close = children.filterIsInstance<ImageView>().single { it.contentDescription == context.getString(R.string.close) }
         val originalPadding = recycler.paddingBottom
         val originalSidePadding = recycler.paddingLeft
         view.useHostCloseControl()

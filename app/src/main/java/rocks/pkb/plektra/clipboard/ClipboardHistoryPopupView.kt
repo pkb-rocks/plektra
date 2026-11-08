@@ -13,13 +13,13 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
+import android.widget.Switch
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import rocks.pkb.plektra.R
 
 /**
  * Popup window that displays clipboard history.
- * Triggered by SHIFT+CTRL+V keyboard shortcut.
  */
 class ClipboardHistoryPopupView(
     private val context: Context,
@@ -30,6 +30,7 @@ class ClipboardHistoryPopupView(
     private val contentView: LinearLayout
     private val entriesContainer: LinearLayout
     private val clearButton: Button
+    private val plainTextSwitch: Switch
     private val historyChangeListener: () -> Unit = { if (popupWindow.isShowing) refreshEntries() }
     private val accessStateListener: (Boolean) -> Unit = {
         if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -88,8 +89,25 @@ class ClipboardHistoryPopupView(
             }
         }
 
+        plainTextSwitch = Switch(context).apply {
+            text = context.getString(R.string.clipboard_paste_unformatted)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = clipboardHistoryManager.pastesPlainText()
+            setOnCheckedChangeListener { _, checked -> clipboardHistoryManager.setPastesPlainText(checked) }
+            val padding = dpToPx(8f)
+            setPadding(padding, 0, padding, 0)
+        }
+
+        ClipboardPanelControls.tint(plainTextSwitch, Color.parseColor("#4FC3F7"), Color.WHITE)
+        val settingsButton = ClipboardPanelControls.settingsButton(context, dpToPx(40f), dpToPx(8f)).apply {
+            setColorFilter(Color.WHITE)
+        }
+
         header.addView(titleText)
+        header.addView(plainTextSwitch)
         header.addView(clearButton)
+        header.addView(settingsButton)
         contentView.addView(header)
 
         // Entries container (scrollable)
@@ -147,6 +165,9 @@ class ClipboardHistoryPopupView(
 
         val state = clipboardHistoryManager.uiState()
         clearButton.visibility = if (state.status == ClipboardHistoryManager.Status.READY) View.VISIBLE else View.GONE
+        plainTextSwitch.visibility = clearButton.visibility
+        val plainText = clipboardHistoryManager.pastesPlainText()
+        if (plainTextSwitch.isChecked != plainText) plainTextSwitch.isChecked = plainText
         when (state.status) {
             ClipboardHistoryManager.Status.LOCKED -> addStateText(R.string.clipboard_locked_state)
             ClipboardHistoryManager.Status.LOADING -> addStateText(R.string.clipboard_loading_state)
@@ -185,7 +206,8 @@ class ClipboardHistoryPopupView(
             }
             isClickable = true
             isFocusable = true
-            contentDescription = if (entry.isSensitive) context.getString(R.string.clipboard_sensitive_preview) else entry.text
+            contentDescription = preview(entry)
+            if (!clipboardHistoryManager.canPasteIntoCurrentEditor(entry)) alpha = 0.5f
             setOnClickListener {
                 onItemClickListener?.invoke(entry)
             }
@@ -193,8 +215,7 @@ class ClipboardHistoryPopupView(
 
         // Text content (truncated)
         val textView = TextView(context).apply {
-            text = if (entry.isSensitive) context.getString(R.string.clipboard_sensitive_preview)
-                else entry.text.take(100) + if (entry.text.length > 100) "..." else ""
+            text = preview(entry)
             textSize = 14f
             setTextColor(Color.WHITE)
             maxLines = 2
@@ -241,6 +262,23 @@ class ClipboardHistoryPopupView(
         }
 
         return container
+    }
+
+    private fun preview(entry: ClipboardHistoryEntry): String {
+        val image = entry.image
+        val base = when {
+            image != null && entry.isSensitive -> context.getString(R.string.clipboard_sensitive_image_preview)
+            image != null -> context.getString(
+                R.string.clipboard_image_preview,
+                ClipboardImageFormat.label(image.mimeType),
+                image.width,
+                image.height
+            )
+            entry.isSensitive -> context.getString(R.string.clipboard_sensitive_preview)
+            else -> entry.text.take(100) + if (entry.text.length > 100) "..." else ""
+        }
+        return if (clipboardHistoryManager.canPasteIntoCurrentEditor(entry)) base
+            else "$base\n${context.getString(R.string.clipboard_image_not_accepted_here)}"
     }
 
     fun show() {

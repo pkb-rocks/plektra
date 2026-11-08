@@ -151,7 +151,7 @@ class NavModeController(
                 } ?: return false
                 sendMappedKey(mappedKeyCode, event, inputConnection)
             }
-            "action" -> performMappedAction(mappingValue, inputConnection)
+            "action" -> performMappedAction(mappingValue, inputConnection, event?.isShiftPressed == true)
             "native_ctrl" -> false
             else -> false
         }
@@ -300,7 +300,8 @@ class NavModeController(
 
     private fun performMappedAction(
         action: String,
-        inputConnection: InputConnection
+        inputConnection: InputConnection,
+        shiftActive: Boolean
     ): Boolean {
         val mediaKeyCode = when (action) {
             "media_play_pause" -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
@@ -314,7 +315,7 @@ class NavModeController(
 
         val actionId = when (action) {
             "copy" -> android.R.id.copy
-            "paste" -> android.R.id.paste
+            "paste" -> rocks.pkb.plektra.clipboard.ClipboardNativePaste.actionId(context, shiftActive)
             "cut" -> android.R.id.cut
             "undo" -> android.R.id.undo
             "select_all" -> android.R.id.selectAll

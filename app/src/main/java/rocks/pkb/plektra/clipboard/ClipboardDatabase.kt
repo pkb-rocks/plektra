@@ -18,10 +18,13 @@ class ClipboardDatabase internal constructor(context: Context, name: String? = N
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE ${ClipboardDao.TABLE} ADD COLUMN SENSITIVE TINYINT NOT NULL DEFAULT 0")
         }
+        if (oldVersion < 3) {
+            ClipboardDao.VERSION_3_COLUMNS.forEach { db.execSQL("ALTER TABLE ${ClipboardDao.TABLE} ADD COLUMN $it") }
+        }
     }
 
     companion object {
-        private const val VERSION = 2
+        private const val VERSION = 3
         private const val NAME = "plektra_clipboard.db"
 
         @Volatile

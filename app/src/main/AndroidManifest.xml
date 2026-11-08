@@ -300,6 +300,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+
+        <provider
+            android:name=".clipboard.ClipboardImageProvider"
+            android:authorities="${applicationId}.clipboardimages"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/clipboard_image_paths" />
+        </provider>
     </application>
 
 </manifest>

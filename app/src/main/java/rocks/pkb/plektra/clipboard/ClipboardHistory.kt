@@ -17,19 +17,31 @@ import java.util.concurrent.TimeUnit
  * request runs to completion before the next one starts, so copies that arrive while the
  * history is still loading simply wait behind the load. A change is published only after
  * its database transaction committed, as an immutable [Snapshot] delivered through
- * [publisher] (the main thread in production). The one exception is protection: a text
+ * [publisher] (the main thread in production). The one exception is protection: a clip
  * recognised as sensitive is hidden at once, even when storing that fact fails.
+ *
+ * Image files belong to the worker as well: it adopts staged files into [images], deletes
+ * the files of removed rows after their deletion committed, and removes files without rows
+ * and rows without files when it loads.
  */
 class ClipboardHistory internal constructor(
     private val dao: ClipboardDao,
     private val worker: Executor,
     private val publisher: Executor,
+    private val images: ClipboardImageStore,
+    private val imageLimits: ClipboardImageLimits = ClipboardImageLimits.DEFAULT,
     private val clock: () -> Long = System::currentTimeMillis
 ) {
     enum class LoadState { LOADING, READY, ERROR }
 
     /** Change whose transaction failed; reported through [addFailureListener]. */
     enum class Operation { SAVE, PIN, DELETE, CLEAR, CLEANUP }
+
+    /** A copy that was stored without a failure but not as requested; see [addNoticeListener]. */
+    enum class Notice {
+        /** Pinned images alone fill the image limits, so a new image was not stored. */
+        IMAGE_LIMIT_REACHED
+    }
 
     /**
      * Complete, immutable view of the history.
@@ -67,6 +79,7 @@ class ClipboardHistory internal constructor(
 
     private val listeners = CopyOnWriteArraySet<(Snapshot) -> Unit>()
     private val failureListeners = CopyOnWriteArraySet<(Operation) -> Unit>()
+    private val noticeListeners = CopyOnWriteArraySet<(Notice) -> Unit>()
 
     fun addListener(listener: (Snapshot) -> Unit) { listeners += listener }
 
@@ -80,6 +93,14 @@ class ClipboardHistory internal constructor(
     fun addFailureListener(listener: (Operation) -> Unit) { failureListeners += listener }
 
     fun removeFailureListener(listener: (Operation) -> Unit) { failureListeners -= listener }
+
+    /** Notices, delivered on the publisher thread. */
+    fun addNoticeListener(listener: (Notice) -> Unit) { noticeListeners += listener }
+
+    fun removeNoticeListener(listener: (Notice) -> Unit) { noticeListeners -= listener }
+
+    /** The private file of a stored image; files of published entries never change. */
+    internal fun imageFile(asset: String): java.io.File = images.file(asset)
 
     /**
      * Opens and loads the history unless it is already loaded. After a failed load this is
@@ -95,7 +116,13 @@ class ClipboardHistory internal constructor(
         try {
             val now = clock()
             dao.transaction { dao.deleteExpired(retention.normalCutoff(now), retention.sensitiveCutoff(now)) }
-            entries = dao.loadAll().filterNot { retention.isExpired(it, now) }.sorted()
+            val loaded = dao.loadAll()
+            // A row whose image file is gone cannot be pasted; a file without a row is never shown.
+            val missing = loaded.filter { entry -> entry.image?.let { !images.exists(it.asset) } == true }
+            if (missing.isNotEmpty()) dao.transaction { missing.forEach { dao.delete(it.id) } }
+            val stored = loaded - missing.toSet()
+            images.deleteUnreferenced(stored.mapNotNullTo(HashSet()) { it.image?.asset })
+            entries = stored.filterNot { retention.isExpired(it, now) }.sorted()
             loadState = LoadState.READY
         } catch (e: Exception) {
             entries = emptyList()
@@ -105,39 +132,112 @@ class ClipboardHistory internal constructor(
         publish()
     }
 
-    /** Adds a copied text, or refreshes the entry with the same text without weakening its protection. */
-    internal fun addClip(text: String, timestamp: Long, sensitive: Boolean, retention: ClipboardRetention) =
+    /**
+     * Adds a copied text, or refreshes the entry with the same text without weakening its
+     * protection. The formatting of the latest copy replaces the stored one; null stores the
+     * text as plain.
+     */
+    internal fun addClip(text: String, timestamp: Long, sensitive: Boolean, retention: ClipboardRetention, html: String? = null) =
         worker.execute {
             if (!isReady()) return@execute
-            if (sensitive) protectStored(text)
+            val matches: (ClipboardHistoryEntry) -> Boolean = { !it.isImage && it.text == text }
+            if (sensitive) protectStored(matches)
             applyChange(Operation.SAVE, retention) { current, now ->
                 if (sensitive && timestamp <= retention.sensitiveCutoff(now)) return@applyChange current
-                val existing = current.firstOrNull { it.text == text }
+                val existing = current.firstOrNull(matches)
                 if (existing != null) {
-                    // Copying the same secret without metadata must not downgrade its protection.
-                    val isSensitive = existing.isSensitive || sensitive
-                    val updated = existing.copy(
-                        timeStamp = timestamp,
-                        isSensitive = isSensitive,
-                        isPinned = existing.isPinned && !isSensitive
-                    )
+                    val updated = refreshed(existing, timestamp, sensitive).copy(html = html)
                     dao.updateFlags(updated)
+                    if (existing.html != html) dao.updateHtml(updated.id, html)
                     current.map { if (it.id == updated.id) updated else it }
                 } else {
-                    val id = dao.insert(timestamp, false, text, sensitive)
-                    current + ClipboardHistoryEntry(id, timestamp, false, text, sensitive)
+                    val id = dao.insert(timestamp, false, text, sensitive, html)
+                    current + ClipboardHistoryEntry(id, timestamp, false, text, sensitive, html)
                 }
             }
         }
 
     /**
-     * Marks a stored, so far normal entry with [text] as sensitive before anything is written,
-     * so a failed transaction cannot leave it visible or pinnable. The entry keeps its own age:
-     * sensitive retention decides whether it stays, and a sensitive copy that is itself already
-     * expired never extends it.
+     * Stores a captured image, or refreshes the entry with the same image. The staged file is
+     * adopted into [images] only for a new entry and is deleted in every other case. Making
+     * room removes the oldest unpinned images; when pinned images alone fill the limits, the
+     * image is not stored and [Notice.IMAGE_LIMIT_REACHED] is reported.
      */
-    private fun protectStored(text: String) {
-        val existing = withProtection(entries).firstOrNull { it.text == text && !it.isSensitive } ?: return
+    internal fun addImage(
+        staged: ClipboardImageCapture.Staged,
+        timestamp: Long,
+        sensitive: Boolean,
+        retention: ClipboardRetention
+    ) = worker.execute {
+        var adopted: String? = null
+        var limitReached = false
+        try {
+            if (!isReady()) return@execute
+            val matches: (ClipboardHistoryEntry) -> Boolean = { it.image?.digest == staged.digest }
+            if (sensitive) protectStored(matches)
+            val committed = applyChange(Operation.SAVE, retention) { current, now ->
+                if (sensitive && timestamp <= retention.sensitiveCutoff(now)) return@applyChange current
+                val existing = current.firstOrNull(matches)
+                if (existing != null) {
+                    val updated = refreshed(existing, timestamp, sensitive)
+                    dao.updateFlags(updated)
+                    return@applyChange current.map { if (it.id == updated.id) updated else it }
+                }
+                val evicted = imagesToEvict(current, staged.byteSize)
+                if (evicted == null) {
+                    limitReached = true
+                    return@applyChange current
+                }
+                val asset = images.adopt(staged.file, staged.mimeType).also { adopted = it }
+                val image = ClipboardImage(asset, staged.mimeType, staged.byteSize, staged.width, staged.height, staged.digest)
+                evicted.forEach { dao.delete(it.id) }
+                val id = dao.insert(timestamp, false, "", sensitive, image = image)
+                current - evicted.toSet() + ClipboardHistoryEntry(id, timestamp, false, "", sensitive, image = image)
+            }
+            if (committed) adopted = null
+            if (limitReached) publisher.execute { noticeListeners.forEach { it(Notice.IMAGE_LIMIT_REACHED) } }
+        } finally {
+            adopted?.let(images::delete)
+            staged.file.delete()
+        }
+    }
+
+    /**
+     * Unpinned images, oldest first, whose removal makes room for another image of [byteSize];
+     * null when not even removing all of them is enough.
+     */
+    private fun imagesToEvict(current: List<ClipboardHistoryEntry>, byteSize: Long): List<ClipboardHistoryEntry>? {
+        val stored = current.filter { it.isImage }
+        var count = stored.size + 1
+        var bytes = stored.sumOf { it.image!!.byteSize } + byteSize
+        val evicted = ArrayList<ClipboardHistoryEntry>()
+        for (candidate in stored.filterNot { it.isPinned }.sortedBy { it.timeStamp }) {
+            if (count <= imageLimits.maxImages && bytes <= imageLimits.maxTotalBytes) break
+            evicted += candidate
+            count--
+            bytes -= candidate.image!!.byteSize
+        }
+        return if (count <= imageLimits.maxImages && bytes <= imageLimits.maxTotalBytes) evicted else null
+    }
+
+    /** A repeated copy: newer time, and the same secret copied without metadata stays protected. */
+    private fun refreshed(existing: ClipboardHistoryEntry, timestamp: Long, sensitive: Boolean): ClipboardHistoryEntry {
+        val isSensitive = existing.isSensitive || sensitive
+        return existing.copy(
+            timeStamp = timestamp,
+            isSensitive = isSensitive,
+            isPinned = existing.isPinned && !isSensitive
+        )
+    }
+
+    /**
+     * Marks a stored, so far normal entry that [matches] the copy as sensitive before anything
+     * is written, so a failed transaction cannot leave it visible or pinnable. The entry keeps
+     * its own age: sensitive retention decides whether it stays, and a sensitive copy that is
+     * itself already expired never extends it.
+     */
+    private fun protectStored(matches: (ClipboardHistoryEntry) -> Boolean) {
+        val existing = withProtection(entries).firstOrNull { matches(it) && !it.isSensitive } ?: return
         unsavedProtection[existing.id] = existing.copy(isSensitive = true, isPinned = false)
     }
 
@@ -193,14 +293,15 @@ class ClipboardHistory internal constructor(
      * Applies [change] to the protected, purged history inside one transaction. The stored
      * state changes only after the commit. A failure keeps the previous state apart from
      * [unsavedProtection], publishes it with a postponed cleanup time and reports [operation];
-     * the failed change itself is never repeated.
+     * the failed change itself is never repeated. Image files of removed rows are deleted
+     * after the commit. Returns whether the transaction committed.
      */
     private fun applyChange(
         operation: Operation,
         retention: ClipboardRetention,
         publishUnchanged: Boolean = false,
         change: (List<ClipboardHistoryEntry>, Long) -> List<ClipboardHistoryEntry>
-    ) {
+    ): Boolean {
         val previousRetention = this.retention
         val previous = withProtection(entries)
         val updated = try {
@@ -222,7 +323,7 @@ class ClipboardHistory internal constructor(
             this.retention = retention
             publish()
             publisher.execute { failureListeners.forEach { it(operation) } }
-            return
+            return false
         }
         val recovered = failedWrites > 0
         unsavedProtection.clear()
@@ -233,6 +334,9 @@ class ClipboardHistory internal constructor(
         val changed = sorted != entries
         entries = sorted
         if (publishUnchanged || recovered || changed || retention != previousRetention) publish()
+        val kept = sorted.mapNotNullTo(HashSet()) { it.image?.asset }
+        previous.forEach { entry -> entry.image?.asset?.takeIf { it !in kept }?.let(images::delete) }
+        return true
     }
 
     private fun withProtection(list: List<ClipboardHistoryEntry>): List<ClipboardHistoryEntry> =
@@ -282,7 +386,8 @@ class ClipboardHistory internal constructor(
                 ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, LinkedBlockingQueue()) { runnable ->
                     Thread(runnable, "ClipboardHistory").apply { isDaemon = true }
                 }.apply { allowCoreThreadTimeOut(true) },
-                Executor { mainHandler.post(it) }
+                Executor { mainHandler.post(it) },
+                ClipboardImageStore.create(context)
             )
         }
     }

@@ -86,6 +86,39 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun softwareCtrlThenShiftVPastesPlainTextAndConsumesBothOneShots() {
+        softwareCtrlShiftPaste(shiftFirst = false)
+    }
+
+    @Test
+    fun softwareShiftThenCtrlVPastesPlainTextAndConsumesBothOneShots() {
+        softwareCtrlShiftPaste(shiftFirst = true)
+    }
+
+    private fun softwareCtrlShiftPaste(shiftFirst: Boolean) {
+        modifierController().resetModifiers(preserveNavMode = false, onNavModeCancelled = {})
+        SettingsManager.setClipboardCtrlShiftVPlainText(service, true)
+        val bar = getField<CandidatesBarController>(service, "candidatesBarController")
+        fun tapCtrl() {
+            bar.onSoftwareKeyboardModifierKeyDown!!.invoke(KeyEvent.KEYCODE_CTRL_LEFT)
+            bar.onSoftwareKeyboardModifierKeyUp!!.invoke(KeyEvent.KEYCODE_CTRL_LEFT)
+        }
+        if (shiftFirst) {
+            bar.onSoftwareKeyboardShiftTapped!!.invoke()
+            tapCtrl()
+        } else {
+            tapCtrl()
+            bar.onSoftwareKeyboardShiftTapped!!.invoke()
+        }
+        assertTrue("Ctrl must survive the Shift tap", modifierController().ctrlOneShot)
+        assertTrue("Shift must survive the Ctrl tap", modifierController().shiftOneShot)
+        assertTrue(bar.onSoftwareKeyboardKeyStroke!!.invoke(KeyEvent.KEYCODE_V, "V"))
+        assertEquals(listOf(android.R.id.pasteAsPlainText), recorder.contextMenuActions)
+        assertFalse(modifierController().ctrlOneShot)
+        assertFalse(modifierController().shiftOneShot)
+    }
+
+    @Test
     fun mp01DedicatedEmojiKey_isIgnoredWhenMp01IsNotActive() {
         DeviceSpecific.setBuildFingerprintForTests(
             brand = "unihertz",

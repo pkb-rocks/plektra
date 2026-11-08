@@ -1049,8 +1049,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val override = SettingsManager.getAppEnterBehaviorOverrides(this)
             .firstOrNull { it.packageName == packageName }
             ?.behavior
-        if (override != null && override != SettingsManager.ENTER_BEHAVIOR_APP_DEFAULT) {
-            return override
+        if (override != null) {
+            return override.takeUnless { it == SettingsManager.ENTER_BEHAVIOR_APP_DEFAULT }
         }
         if (packageName !in MESSENGER_ENTER_BEHAVIOR_PACKAGES) return null
 

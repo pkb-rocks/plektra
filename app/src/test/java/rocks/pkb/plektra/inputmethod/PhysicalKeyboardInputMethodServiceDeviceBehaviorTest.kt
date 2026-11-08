@@ -301,6 +301,61 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun appEnter_beeperWithoutOverride_usesEditorAction() {
+        focusNewField(RecordingInputConnection(),
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, "com.beeper.android")
+        service.onKeyDown(KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_750L, 2_750L))
+        assertEquals(listOf(EditorInfo.IME_ACTION_SEND), recorder.editorActions)
+        assertFalse(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
+    fun appEnter_beeperShiftEnter_insertsNewlineInsteadOfSending() {
+        focusNewField(RecordingInputConnection(),
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, "com.beeper.android")
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 2_740L, 2_740L))
+        service.onKeyDown(KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_750L, 2_750L, KeyEvent.META_SHIFT_ON))
+        assertTrue(recorder.editorActions.isEmpty())
+        assertTrue(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
+    fun appEnter_beeperNativeOverride_preservesNativeEnterAfterUpdate() {
+        SettingsManager.setAppEnterBehaviorOverride(RuntimeEnvironment.getApplication(),
+            "com.beeper.android", SettingsManager.ENTER_BEHAVIOR_APP_DEFAULT)
+        focusNewField(RecordingInputConnection(),
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, "com.beeper.android")
+        service.onKeyDown(KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_750L, 2_750L))
+        assertTrue(recorder.editorActions.isEmpty())
+    }
+
+    @Test
+    fun appEnter_beeperExplicitNewline_winsOverSendPreset() {
+        SettingsManager.setAppEnterBehaviorOverride(RuntimeEnvironment.getApplication(),
+            "com.beeper.android", SettingsManager.ENTER_BEHAVIOR_ENTER_NEWLINE)
+        focusNewField(RecordingInputConnection(),
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, "com.beeper.android")
+        service.onKeyDown(KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_750L, 2_750L))
+        assertTrue(recorder.editorActions.isEmpty())
+        assertTrue(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
+    fun appEnter_beeperDisabled_doesNotSend() {
+        SettingsManager.setAppEnterBehaviorEnabled(RuntimeEnvironment.getApplication(), false)
+        focusNewField(RecordingInputConnection(),
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE, "com.beeper.android")
+        service.onKeyDown(KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_750L, 2_750L))
+        assertTrue(recorder.editorActions.isEmpty())
+    }
+
+    @Test
     fun appEnter_facebookMessengerManualEditorStrategy_usesEditorAction() {
         configureAppEnterOverride(
             packageName = "com.facebook.orca",

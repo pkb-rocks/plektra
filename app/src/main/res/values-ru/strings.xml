@@ -868,6 +868,4 @@ Nav Mode использует физическое положение клави
     <string name="settings_link_with_description">С описанием</string>
     <string name="settings_link_copied_toast">Ссылка скопирована</string>
     <string name="settings_link_unavailable_toast">Этот параметр недоступен</string>
-    <string name="sym_move_up">Переместить вверх</string>
-    <string name="sym_move_down">Переместить вниз</string>
 </resources>

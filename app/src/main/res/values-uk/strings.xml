@@ -868,6 +868,4 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="settings_link_with_description">З описом</string>
     <string name="settings_link_copied_toast">Посилання скопійовано</string>
     <string name="settings_link_unavailable_toast">Цей параметр недоступний</string>
-    <string name="sym_move_up">Перемістити вгору</string>
-    <string name="sym_move_down">Перемістити вниз</string>
 </resources>

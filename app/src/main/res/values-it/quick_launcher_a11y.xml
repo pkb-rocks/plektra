@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sym_move_up">Sposta su</string>
+    <string name="sym_move_down">Sposta giù</string>
+</resources>

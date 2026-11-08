@@ -1045,6 +1045,4 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_indicator_bottom_strip">LED, luci, striscia, in basso</string>
     <string name="kw_indicator_menu_bar">LED, luci, icona, barra di stato, indicatori</string>
     <string name="kw_indicator_status_bar">LED, luci, simboli, indicatori, plektra</string>
-    <string name="sym_move_up">Sposta su</string>
-    <string name="sym_move_down">Sposta giù</string>
 </resources>

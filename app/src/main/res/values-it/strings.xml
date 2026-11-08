@@ -799,6 +799,11 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="clipboard_locked_state">La cronologia degli appunti non è disponibile mentre il dispositivo è bloccato.</string>
     <string name="clipboard_loading_state">Caricamento della cronologia degli appunti…</string>
     <string name="clipboard_error_state">Impossibile caricare la cronologia degli appunti. Riaprila per riprovare.</string>
+    <string name="clipboard_save_failed">Impossibile salvare il testo copiato nella cronologia degli appunti.</string>
+    <string name="clipboard_pin_failed">Impossibile fissare o sbloccare la voce.</string>
+    <string name="clipboard_delete_failed">Impossibile eliminare la voce.</string>
+    <string name="clipboard_clear_failed">Impossibile cancellare la cronologia degli appunti.</string>
+    <string name="clipboard_system_clear_failed">Impossibile cancellare gli appunti di sistema.</string>
     <string name="clipboard_pin">Fissa</string>
     <string name="clipboard_unpin">Rimuovi pin</string>
     <string name="clipboard_delete">Elimina</string>

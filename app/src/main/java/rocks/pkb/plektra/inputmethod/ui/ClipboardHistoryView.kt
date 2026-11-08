@@ -43,7 +43,7 @@ class ClipboardHistoryView(
     private var activeContextMenu: PopupMenu? = null
     private var currentInputConnection: InputConnection? = null
     private val entryHeightPx: Int
-    private var scrollToTopPending: Boolean = false
+    private var pendingPinChange: Pair<Long, Boolean>? = null
     private val historyChangeListener: () -> Unit = { if (isAttachedToWindow) refresh() }
     private val accessStateListener: (Boolean) -> Unit = {
         if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -209,6 +209,7 @@ class ClipboardHistoryView(
         clipboardHistoryManager.removeHistoryChangeListener(historyChangeListener)
         activeContextMenu?.dismiss()
         activeContextMenu = null
+        pendingPinChange = null
         super.onDetachedFromWindow()
     }
 
@@ -265,10 +266,16 @@ class ClipboardHistoryView(
         adapter.submitList(entries) {
             // Recalculate item decorations so spacing is correct after insertions
             recyclerView.invalidateItemDecorations()
-            if (scrollToTopPending) {
+            val requestedPin = pendingPinChange
+            val pinApplied = requestedPin != null && entries.any {
+                it.id == requestedPin.first && it.isPinned == requestedPin.second
+            }
+            if (requestedPin != null && (pinApplied || entries.none { it.id == requestedPin.first && !it.isSensitive })) {
+                pendingPinChange = null
+            }
+            if (pinApplied) {
                 recyclerView.post {
                     recyclerView.scrollToPosition(0)
-                    scrollToTopPending = false
                 }
             } else if (firstVisiblePosition != RecyclerView.NO_POSITION && firstVisiblePosition < entries.size) {
                 // Restore scroll position after list update to prevent unwanted scrolling
@@ -339,8 +346,8 @@ class ClipboardHistoryView(
             when (item.title.toString()) {
                 pinText, unpinText -> {
                     // The list refreshes when the change has been stored.
+                    pendingPinChange = entry.id to !entry.isPinned
                     clipboardHistoryManager.toggleClipPinned(entry.id)
-                    scrollToTopPending = true
                     true
                 }
                 deleteText -> {

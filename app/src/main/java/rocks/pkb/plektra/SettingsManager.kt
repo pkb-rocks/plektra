@@ -5406,6 +5406,10 @@ object SettingsManager {
             .apply()
     }
 
+    /** Whether a preference change with [key] can change clipboard retention; null means the preferences were cleared. */
+    fun isClipboardRetentionKey(key: String?): Boolean =
+        key == null || key == KEY_CLIPBOARD_RETENTION_TIME || key == KEY_SENSITIVE_CLIPBOARD_RETENTION_TIME
+
     fun getSensitiveClipboardRetentionTime(context: Context): Long =
         getPreferences(context).getLong(KEY_SENSITIVE_CLIPBOARD_RETENTION_TIME, 30L).coerceIn(1L, 120L)
 

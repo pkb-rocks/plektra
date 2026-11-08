@@ -5,11 +5,15 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
 
 /**
@@ -49,9 +53,31 @@ class ClipboardHistoryManager internal constructor(
         historyChangeListeners.toList().forEach { it() }
     }
 
+    private val failureListener: (ClipboardHistory.Operation) -> Unit = { operation ->
+        when (operation) {
+            ClipboardHistory.Operation.SAVE -> showError(R.string.clipboard_save_failed)
+            ClipboardHistory.Operation.PIN -> showError(R.string.clipboard_pin_failed)
+            ClipboardHistory.Operation.DELETE -> showError(R.string.clipboard_delete_failed)
+            ClipboardHistory.Operation.CLEAR -> showError(R.string.clipboard_clear_failed)
+            // Background cleanup is retried by the expiry timer; a toast would only repeat.
+            ClipboardHistory.Operation.CLEANUP -> Unit
+        }
+    }
+    private var errorToast: Toast? = null
+
+    // SharedPreferences holds listeners weakly, so this one stays a field.
+    private val retentionListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (SettingsManager.isClipboardRetentionKey(key)) reapplyRetention()
+    }
+
     private val accessStateListeners = linkedSetOf<(Boolean) -> Unit>()
     private val deviceStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_TIME_CHANGED) {
+                // The expiry timer counts uptime; a wall-clock jump moves the actual expiry times.
+                reapplyRetention()
+                return
+            }
             screenOffReceived = intent?.action == Intent.ACTION_SCREEN_OFF
             refreshAccessState()
         }
@@ -61,6 +87,8 @@ class ClipboardHistoryManager internal constructor(
         clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.addPrimaryClipChangedListener(this)
         history.addListener(snapshotListener)
+        history.addFailureListener(failureListener)
+        SettingsManager.getPreferences(context).registerOnSharedPreferenceChangeListener(retentionListener)
         registerDeviceStateReceiver()
         lastHistoryAccessible = isHistoryAccessible()
 
@@ -69,6 +97,8 @@ class ClipboardHistoryManager internal constructor(
 
         // Queued first, so copies captured below wait for the load.
         history.start(retention())
+        // An already loaded history publishes nothing on start; this schedules expiry for this manager.
+        reapplyRetention()
         if (isEnabled) {
             fetchPrimaryClip()
         }
@@ -81,7 +111,11 @@ class ClipboardHistoryManager internal constructor(
             deviceStateReceiverRegistered = false
         }
         history.removeListener(snapshotListener)
+        history.removeFailureListener(failureListener)
+        SettingsManager.getPreferences(context).unregisterOnSharedPreferenceChangeListener(retentionListener)
         mainHandler.removeCallbacks(expiryCleanup)
+        errorToast?.cancel()
+        errorToast = null
         accessStateListeners.clear()
         historyChangeListeners.clear()
     }
@@ -152,8 +186,12 @@ class ClipboardHistoryManager internal constructor(
         history.delete(id, force, retention())
     }
 
+    /**
+     * Clears unpinned history and the system clipboard. Both succeed or fail independently,
+     * and each failure is reported on its own.
+     */
     fun clearHistory() {
-        if (!isHistoryAccessible()) return
+        if (uiState().status != Status.READY) return
         history.clearNonPinned(retention())
         try {
             // Clear system clipboard (API 28+)
@@ -161,7 +199,8 @@ class ClipboardHistoryManager internal constructor(
                 clipboardManager.clearPrimaryClip()
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to clear system clipboard", e)
+            Log.w(TAG, "Failed to clear system clipboard (${e.javaClass.simpleName})")
+            showError(R.string.clipboard_system_clear_failed)
         }
     }
 
@@ -228,6 +267,17 @@ class ClipboardHistoryManager internal constructor(
         }
     }
 
+    /** Purges with the current retention and republishes, which reschedules the expiry timer. */
+    private fun reapplyRetention() {
+        history.purgeExpired(retention(), republish = true)
+    }
+
+    /** Replaces the visible error, so failures do not queue up. */
+    private fun showError(@StringRes message: Int) {
+        errorToast?.cancel()
+        errorToast = Toast.makeText(context, message, Toast.LENGTH_SHORT).also { it.show() }
+    }
+
     private fun scheduleExpiryCleanup(nextExpiry: Long) {
         mainHandler.removeCallbacks(expiryCleanup)
         if (nextExpiry == Long.MAX_VALUE) return
@@ -247,6 +297,7 @@ class ClipboardHistoryManager internal constructor(
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_USER_PRESENT)
             addAction(Intent.ACTION_USER_UNLOCKED)
+            addAction(Intent.ACTION_TIME_CHANGED)
         }
         ContextCompat.registerReceiver(
             context,

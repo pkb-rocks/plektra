@@ -1482,6 +1482,11 @@ QWERTZ σε φυσικό QWERTY
     <string name="clipboard_locked_state">Το ιστορικό του πρόχειρου δεν είναι διαθέσιμο όσο η συσκευή είναι κλειδωμένη.</string>
     <string name="clipboard_loading_state">Φόρτωση ιστορικού πρόχειρου…</string>
     <string name="clipboard_error_state">Δεν ήταν δυνατή η φόρτωση του ιστορικού πρόχειρου. Ανοίξτε το ξανά για νέα προσπάθεια.</string>
+    <string name="clipboard_save_failed">Δεν ήταν δυνατή η αποθήκευση του αντιγραμμένου κειμένου στο ιστορικό πρόχειρου.</string>
+    <string name="clipboard_pin_failed">Δεν ήταν δυνατό το καρφίτσωμα ή ξεκαρφίτσωμα της καταχώρισης.</string>
+    <string name="clipboard_delete_failed">Δεν ήταν δυνατή η διαγραφή της καταχώρισης.</string>
+    <string name="clipboard_clear_failed">Δεν ήταν δυνατή η εκκαθάριση του ιστορικού πρόχειρου.</string>
+    <string name="clipboard_system_clear_failed">Δεν ήταν δυνατή η εκκαθάριση του πρόχειρου συστήματος.</string>
     <string name="clipboard_pin">Καρφίτσωμα</string>
     <string name="clipboard_unpin">Ξεκαρφίτσωμα</string>
     <string name="clipboard_delete">Διαγραφή</string>

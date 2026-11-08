@@ -364,6 +364,11 @@
     <string name="clipboard_locked_state">Historia schowka jest niedostępna, gdy urządzenie jest zablokowane.</string>
     <string name="clipboard_loading_state">Wczytywanie historii schowka…</string>
     <string name="clipboard_error_state">Nie udało się wczytać historii schowka. Otwórz ją ponownie, aby spróbować jeszcze raz.</string>
+    <string name="clipboard_save_failed">Nie udało się zapisać skopiowanego tekstu w historii schowka.</string>
+    <string name="clipboard_pin_failed">Nie udało się przypiąć ani odpiąć wpisu.</string>
+    <string name="clipboard_delete_failed">Nie udało się usunąć wpisu.</string>
+    <string name="clipboard_clear_failed">Nie udało się wyczyścić historii schowka.</string>
+    <string name="clipboard_system_clear_failed">Nie udało się wyczyścić schowka systemowego.</string>
     <string name="clipboard_pin">Przypnij</string>
     <string name="clipboard_unpin">Odepnij</string>
     <string name="clipboard_delete">Usuń</string>

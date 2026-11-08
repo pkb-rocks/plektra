@@ -21,7 +21,7 @@ object Punctuation {
     // Opening quotes and brackets that may come before a sentence's first letter, as
     // TextUtils.getCapsMode skips them, plus the Spanish inverted marks.
     fun isOpeningPunctuation(c: Char): Boolean = when (c) {
-        '"', '\'', '(', '[', '{', '¿', '¡' -> true
+        '"', '\'', '(', '[', '{', '¿', '¡', '»', '›' -> true
         else -> Character.getType(c).let {
             it == Character.START_PUNCTUATION.toInt() ||
                 it == Character.INITIAL_QUOTE_PUNCTUATION.toInt()

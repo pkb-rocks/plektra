@@ -53,7 +53,20 @@ class AutoCapitalizeHelperOpeningPunctuationTest {
         assertFalse(armsShift("The end.\""))
         assertFalse(armsShift("The end.)"))
         assertFalse(armsShift("He said. \"hello"))
-        assertFalse(armsShift("He said. »"))
+        assertFalse(armsShift("He said. »hello"))
+    }
+
+    @Test
+    fun germanAndSpacedFrenchQuotes_preserveSentenceAndLineStarts() {
+        for (opening in listOf("»", "›", "« ", "«\u202F", "\" ", "(\" ")) {
+            assertTrue(opening, armsShift("Er sagte. $opening"))
+            assertTrue(opening, armsShift(opening))
+            assertTrue(opening, armsShift("First line\n$opening"))
+            assertTrue(opening, AutoCapitalizeHelper.isAtStartOfSentence(connection("Er sagte. $opening")))
+            assertFalse(opening, armsShift("A word $opening"))
+            assertFalse(opening, armsShift("The end.$opening"))
+        }
+        assertFalse(armsShift("A word "))
     }
 
     @Test

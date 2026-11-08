@@ -8,10 +8,10 @@ class PunctuationTest {
 
     @Test
     fun testIsOpeningPunctuation() {
-        for (c in listOf('"', '\'', '(', '[', '{', '“', '‘', '„', '«', '‹', '¿', '¡')) {
+        for (c in listOf('"', '\'', '(', '[', '{', '“', '‘', '„', '«', '‹', '»', '›', '¿', '¡')) {
             assertTrue("$c opens", Punctuation.isOpeningPunctuation(c))
         }
-        for (c in listOf('”', '’', '»', '›', ')', ']', '.', '!', ' ', 'a')) {
+        for (c in listOf('”', '’', ')', ']', '.', '!', ' ', 'a')) {
             assertFalse("$c does not open", Punctuation.isOpeningPunctuation(c))
         }
     }

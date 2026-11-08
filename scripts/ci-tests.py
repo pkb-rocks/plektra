@@ -53,18 +53,25 @@ def validate(catalog, found):
             raise ValueError(f'{kind}: empty topic')
 
 
+def validate_workflow(catalog, workflow):
+    topics = re.findall(r'^\s*run: python3 scripts/ci-tests\.py run --topic ([a-z-]+)\s*$', workflow, re.M)
+    if Counter(topics) != Counter(catalog['unit'].keys()):
+        raise ValueError(f'CI topic steps differ from catalog: workflow={topics}, catalog={sorted(catalog["unit"])}')
+
+
 def verify_results(directory, expected):
     suites = [ET.parse(path).getroot() for path in directory.glob('TEST-*.xml')]
     actual = {suite.get('name') for suite in suites}
+    duplicate = sorted(name for name, count in Counter(s.get('name') for s in suites).items() if count != 1)
     missing = set(expected) - actual
     unexpected = actual - set(expected)
     empty = [suite.get('name') for suite in suites if int(suite.get('tests', 0)) <= int(suite.get('skipped', 0))]
     failures = sum(int(s.get('failures', 0)) + int(s.get('errors', 0)) for s in suites)
     skipped = sum(int(s.get('skipped', 0)) for s in suites)
     tests = sum(int(s.get('tests', 0)) for s in suites)
-    if missing or unexpected or empty or failures or not tests:
+    if missing or unexpected or duplicate or empty or failures or not tests:
         raise ValueError(f'Invalid results: missing={sorted(missing)}, unexpected={sorted(unexpected)}, '
-                         f'empty={empty}, failures={failures}')
+                         f'duplicate={duplicate}, empty={empty}, failures={failures}')
     return f'{len(actual)} classes, {tests} tests, {skipped} skipped'
 
 
@@ -80,6 +87,7 @@ def main():
     found = discover()
     validate(catalog, found)
     if args.command == 'check':
+        validate_workflow(catalog, (ROOT / '.github/workflows/ci.yml').read_text())
         print('Every unit and instrumented test class belongs to exactly one topic.')
         return 0
     if args.command == 'topics':

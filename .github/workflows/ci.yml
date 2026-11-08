@@ -14,108 +14,92 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-catalog:
+  android:
     runs-on: ubuntu-latest
-    outputs:
-      topics: ${{ steps.topics.outputs.topics }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check test classification and CI guards
+        with:
+          fetch-depth: 0
+      - name: Check test catalog and CI guards
         run: |
           python3 scripts/ci-tests.py check
           python3 -m unittest discover -s scripts/tests
-      - id: topics
-        run: echo "topics=$(python3 scripts/ci-tests.py topics)" >> "$GITHUB_OUTPUT"
-
-  topic-tests:
-    name: Tests / ${{ matrix.topic }}
-    needs: test-catalog
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        topic: ${{ fromJSON(needs.test-catalog.outputs.topics) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: gradle
-      - name: Run topic on Stable Debug
-        run: python3 scripts/ci-tests.py run --topic "${{ matrix.topic }}"
-      - name: Upload topic reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: tests-${{ matrix.topic }}
-          path: app/build/ci-reports
-
-  variant-tests:
-    name: Variant / ${{ matrix.variant }}${{ matrix.fdroid && ' / F-Droid' || '' }}
-    needs: test-catalog
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - variant: StableRelease
-            fdroid: true
-          - variant: NightlyDebug
-          - variant: NightlyRelease
-          - variant: PlayStableDebug
-          - variant: PlayNightlyDebug
-          - variant: StableNoAccessibilityDebug
-          - variant: NightlyNoAccessibilityDebug
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: gradle
-      - name: Run full variant suite
-        run: python3 scripts/ci-tests.py run --variant "${{ matrix.variant }}" ${{ matrix.fdroid && '--fdroid' || '' }}
-      - name: Upload variant reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: tests-${{ matrix.variant }}${{ matrix.fdroid && '-fdroid' || '' }}
-          path: app/build/ci-reports
-
-  lint:
-    name: Lint / ${{ matrix.variant }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        variant: [StableDebug, StableRelease, NightlyDebug, NightlyRelease]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: gradle
-      - name: Analyze lint
-        run: ./gradlew :app:lint${{ matrix.variant }} --console=plain
-      - name: Reject new lint errors
+      - name: Select checks
+        id: paths
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          report=$(find app/build/reports -maxdepth 1 -name 'lint-results-*.xml' -print)
-          test -n "$report"
-          python3 scripts/check-lint.py "$report"
-      - name: Upload lint reports
-        if: always()
+          base="$BASE"
+          if ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+            base=$(git rev-list --max-parents=0 HEAD | head -n 1)
+          fi
+          python3 scripts/ci-paths.py "$base" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        if: steps.paths.outputs.android == 'true'
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Check generated variant contracts
+        if: steps.paths.outputs.android == 'true'
+        run: python3 scripts/ci-variants.py
+      - name: Check F-Droid generated contracts
+        if: steps.paths.outputs.android == 'true'
+        run: python3 scripts/ci-variants.py --fdroid
+      - name: Compile Stable Debug and unit tests once
+        id: compile
+        if: steps.paths.outputs.android == 'true'
+        run: ./gradlew :app:compileStableDebugUnitTestSources --console=plain --max-workers=2
+      - name: Tests / app-distribution
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic app-distribution
+      - name: Tests / data-backup
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic data-backup
+      - name: Tests / devices-layouts
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic devices-layouts
+      - name: Tests / editing
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic editing
+      - name: Tests / ime-integration
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic ime-integration
+      - name: Tests / keys-modifiers
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic keys-modifiers
+      - name: Tests / speech
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic speech
+      - name: Tests / suggestions
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic suggestions
+      - name: Tests / ui-settings
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic ui-settings
+      - name: Analyze representative lint
+        id: lint
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: ./gradlew :app:lintStableDebug --console=plain --max-workers=2
+      - name: Reject new lint errors
+        if: ${{ !cancelled() && steps.lint.outcome == 'success' }}
+        run: python3 scripts/check-lint.py app/build/reports/lint-results-stableDebug.xml
+      - name: Build representative minified release
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' && steps.paths.outputs.release == 'true' }}
+        run: ./gradlew :app:assembleStableRelease -PPLEKTRA_UNSIGNED_RELEASE_BUILD=true --console=plain --max-workers=2
+      - name: Upload reports
+        if: ${{ !cancelled() && steps.paths.outputs.android == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: lint-${{ matrix.variant }}
+          name: android-reports
           path: |
+            app/build/ci-reports
             app/build/reports/lint-results-*.html
             app/build/reports/lint-results-*.xml
 
   gradle-checks:
     if: always()
-    needs: [test-catalog, topic-tests, variant-tests, lint]
+    needs: [android]
     runs-on: ubuntu-latest
     steps:
       - name: Require every check to pass

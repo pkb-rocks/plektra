@@ -862,4 +862,5 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="settings_link_with_description">Kèm mô tả</string>
     <string name="settings_link_copied_toast">Đã sao chép liên kết</string>
     <string name="settings_link_unavailable_toast">Cài đặt này không khả dụng</string>
+    <string name="kw_status_bar_presentation">Slim Normal cấu hình tối giản nhỏ gọn thanh</string>
 </resources>

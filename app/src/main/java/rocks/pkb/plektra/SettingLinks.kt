@@ -967,6 +967,7 @@ object SettingLinkRegistry {
      * assert that every assignment targets a registered entry.
      */
     internal val keywordsById: Map<String, Int> = mapOf(
+        "status_bar.presentation" to R.string.kw_status_bar_presentation,
         SettingLinkIds.MAIN_KEYBOARDS_DEVICES to R.string.kw_main_keyboards_devices,
         SettingLinkIds.MAIN_MODIFIERS to R.string.kw_main_modifiers,
         SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES to R.string.kw_main_custom_input_styles,
@@ -1010,8 +1011,7 @@ object SettingLinkRegistry {
         SettingLinkIds.KEYBOARD_THEME_LED_COLORS to R.string.kw_theme_led_colors,
         SettingLinkIds.MODIFIERS_INDICATOR_BOTTOM_STRIP to R.string.kw_indicator_bottom_strip,
         SettingLinkIds.MODIFIERS_INDICATOR_MENU_BAR to R.string.kw_indicator_menu_bar,
-        SettingLinkIds.MODIFIERS_INDICATOR_STATUS_BAR to R.string.kw_indicator_status_bar,
-        "status_bar.presentation" to R.string.kw_status_bar_presentation
+        SettingLinkIds.MODIFIERS_INDICATOR_STATUS_BAR to R.string.kw_indicator_status_bar
     )
 
     fun byId(id: String): SettingEntry? = entriesById[

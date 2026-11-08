@@ -862,4 +862,5 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="settings_link_with_description">Avec description</string>
     <string name="settings_link_copied_toast">Lien copié</string>
     <string name="settings_link_unavailable_toast">Ce paramètre n\'est pas disponible</string>
+    <string name="kw_status_bar_presentation">Slim Normal profil minimal compact barre</string>
 </resources>

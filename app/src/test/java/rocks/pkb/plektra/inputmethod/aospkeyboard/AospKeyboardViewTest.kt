@@ -353,6 +353,72 @@ class AospKeyboardViewTest {
     }
 
     @Test
+    fun touchTrace_recordsGeometryTouchesAndCommitOnlyWhenEditorAllows() {
+        val recorder = object : TouchTraceSink {
+            val geometries = mutableListOf<KeyboardGeometrySnapshot>()
+            val touches = mutableListOf<TouchSample>()
+            val commits = mutableListOf<KeyCommit>()
+            override fun onGeometry(snapshot: KeyboardGeometrySnapshot) { geometries += snapshot }
+            override fun onTouch(sample: TouchSample) { touches += sample }
+            override fun onKeyCommitted(commit: KeyCommit) { commits += commit }
+        }
+        val view = measuredKeyboard().apply { listener = RecordingListener() }
+        val (x, y) = centerOfLabel(view, "a")
+        try {
+            TouchTraceHub.sink = recorder
+            TouchTraceHub.editorAllowsTrace = false
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 20L))
+            assertTrue(recorder.touches.isEmpty())
+
+            TouchTraceHub.editorAllowsTrace = true
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 40L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 60L))
+        } finally {
+            TouchTraceHub.sink = null
+            TouchTraceHub.editorAllowsTrace = false
+        }
+
+        assertEquals(1, recorder.geometries.size)
+        assertEquals(listOf("down", "up"), recorder.touches.map { it.phase })
+        val aIndex = recorder.geometries.single().keys.first { it.label == "a" }.index
+        assertEquals(aIndex, recorder.touches.first().uiKeyIndex)
+        assertEquals(aIndex, recorder.touches.first().nearby.first().index)
+        assertEquals(listOf("a"), recorder.commits.map { it.output })
+    }
+
+    @Test
+    fun backspaceInTypingTrainingMarksInsteadOfDeleting() {
+        val listener = RecordingListener()
+        val deletes = mutableListOf<Long>()
+        val sink = object : TouchTraceSink {
+            override fun onGeometry(snapshot: KeyboardGeometrySnapshot) = Unit
+            override fun onTouch(sample: TouchSample) = Unit
+            override fun onKeyCommitted(commit: KeyCommit) = Unit
+            override fun onUserDelete(uptimeMs: Long) { deletes += uptimeMs }
+        }
+        val view = measuredKeyboard().apply { this.listener = listener }
+        val (x, y) = centerOfLabel(view, "⌫")
+        try {
+            TouchTraceHub.sink = sink
+            TouchTraceHub.editorAllowsTrace = true
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 20L))
+            assertEquals(1, deletes.size)
+            assertEquals(0, listener.backspaceCount)
+
+            TouchTraceHub.editorAllowsTrace = false
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 40L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 60L))
+        } finally {
+            TouchTraceHub.sink = null
+            TouchTraceHub.editorAllowsTrace = false
+        }
+        assertEquals(1, deletes.size)
+        assertEquals(1, listener.backspaceCount)
+    }
+
+    @Test
     fun shiftKeyTap_notifiesListener() {
         val listener = RecordingListener()
         val view = measuredKeyboard().apply {

@@ -68,6 +68,7 @@ class AlternateCharacterManager(
 
     private val pressedKeys = ConcurrentHashMap<Int, Long>()
     private val longPressRunnables = ConcurrentHashMap<Int, Runnable>()
+    private val longPressTrace = LongPressTimerTrace()
     private val longPressActivated = ConcurrentHashMap<Int, Boolean>()
     private val insertedNormalChars = ConcurrentHashMap<Int, String>()
     private val insertedTextAnchors = ConcurrentHashMap<Int, InsertedTextAnchor>()
@@ -187,6 +188,7 @@ class AlternateCharacterManager(
 
     fun resetTransientState() {
         longPressRunnables.values.forEach { handler.removeCallbacks(it) }
+        longPressTrace.cancelAll("reset")
         longPressRunnables.clear()
         pressedKeys.clear()
         longPressActivated.clear()
@@ -368,7 +370,10 @@ class AlternateCharacterManager(
         insertedTextAnchors.remove(keyCode)
         keyPressWasShifted.remove(keyCode)
         
-        longPressRunnables.remove(keyCode)?.let { handler.removeCallbacks(it) }
+        longPressRunnables.remove(keyCode)?.let {
+            handler.removeCallbacks(it)
+            longPressTrace.cancelled(keyCode, "key_up")
+        }
 
         // If the long press did NOT trigger and we had inserted a normal char, notify tracking
         if (!wasLongPressActivated && insertedChar != null) {
@@ -379,7 +384,10 @@ class AlternateCharacterManager(
     }
 
     fun cancelPendingLongPress(keyCode: Int) {
-        longPressRunnables.remove(keyCode)?.let { handler.removeCallbacks(it) }
+        longPressRunnables.remove(keyCode)?.let {
+            handler.removeCallbacks(it)
+            longPressTrace.cancelled(keyCode, "alt_active")
+        }
     }
 
     /**
@@ -442,7 +450,9 @@ class AlternateCharacterManager(
             SettingsManager.getLongPressModifier(it)
         } ?: "alt"
 
+        val traceGeneration = longPressTrace.scheduled(keyCode, longPressThreshold, longPressMode)
         val runnable = Runnable {
+            longPressTrace.fired(traceGeneration, pressedKeys.containsKey(keyCode))
             if (pressedKeys.containsKey(keyCode)) {
                 val insertedChar = insertedNormalChars[keyCode]
 

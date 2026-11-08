@@ -59,6 +59,9 @@ import rocks.pkb.plektra.data.mappings.AltModifierMappingResolver
 import rocks.pkb.plektra.data.variation.VariationRepository
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.aospkeyboard.AospKeyboardView
+import rocks.pkb.plektra.inputmethod.aospkeyboard.HardwareKeyDecision
+import rocks.pkb.plektra.inputmethod.aospkeyboard.HardwareKeySample
+import rocks.pkb.plektra.inputmethod.aospkeyboard.TouchTraceHub
 import rocks.pkb.plektra.inputmethod.aospkeyboard.SoftwareKeyboardLayoutTemplates
 import rocks.pkb.plektra.inputmethod.aospkeyboard.SoftwareKeyboardSymLabels
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
@@ -338,6 +341,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val clicksPowerButtonEventMapper = ClicksPowerButtonEventMapper()
     private var dispatchingClicksAccessibilityKeyEvent = false
     private var replayingProtectedNumberKey = false
+    /** Trace seq of the raw hardware key being handled; 0 outside typing training. */
+    private var tracedKeySeq = 0L
+    private var replayCauseSeq = 0L
     private val uiHandler = Handler(Looper.getMainLooper())
     // Modifier badge beside the text cursor, and the state of its cursor-update request
     private val caretBadgeController by lazy {
@@ -3653,6 +3659,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        // Tied to the editor, not to the on-screen keyboard: hardware-only typing is traced too.
+        TouchTraceHub.editorAllowsTrace = info?.packageName == packageName &&
+            TouchTraceHub.editorRequestsTrace(info?.privateImeOptions)
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         if (!restarting) {
@@ -3832,6 +3841,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onFinishInput() {
+        TouchTraceHub.editorAllowsTrace = false
         cancelSpeechRecognition()
         ++speechEditorSession
         disableSmoothCaretExperiment()
@@ -4645,6 +4655,79 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
     }
 
+    /**
+     * Records raw hardware keys while a typing-training field is focused (no-op otherwise).
+     * Returns true when the key is consumed: in training, Delete marks a mistake instead of
+     * deleting, so that the IME and the editor never disagree about the text.
+     */
+    private fun traceHardwareKey(keyCode: Int, event: KeyEvent?): Boolean {
+        tracedKeySeq = 0L
+        val sink = TouchTraceHub.activeSink ?: return false
+        if (event == null) return false
+        val seq = TouchTraceHub.nextSeq()
+        val origin = when {
+            replayingProtectedNumberKey -> "replay"
+            dispatchingClicksAccessibilityKeyEvent -> "accessibility"
+            else -> "device"
+        }
+        sink.onHardwareKey(
+            HardwareKeySample.from(event, seq, origin, if (replayingProtectedNumberKey) replayCauseSeq else 0L)
+        )
+        tracedKeySeq = seq
+        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            TouchTraceHub.noteRawDown(keyCode, TouchTraceHub.RawKeyDown(seq, event.eventTime, event.downTime))
+        }
+        if (keyCode != KeyEvent.KEYCODE_DEL && keyCode != KeyEvent.KEYCODE_FORWARD_DEL) return false
+        if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) sink.onUserDelete(event.eventTime)
+        return true
+    }
+
+    /** Records why a filter or remapping step dropped, replayed or rewrote the traced raw key. */
+    private fun traceKeyDecision(
+        action: String,
+        stage: String,
+        decision: String,
+        keyCode: Int,
+        reason: String = "",
+        outKeyCode: Int = keyCode,
+        deltaMs: Long = -1,
+        thresholdMs: Long = -1
+    ) {
+        val sink = TouchTraceHub.activeSink ?: return
+        sink.onKeyDecision(
+            HardwareKeyDecision(
+                seq = TouchTraceHub.nextSeq(),
+                causeSeq = tracedKeySeq,
+                uptimeMs = SystemClock.uptimeMillis(),
+                action = action,
+                stage = stage,
+                decision = decision,
+                reason = reason,
+                keyCode = keyCode,
+                outKeyCode = outKeyCode,
+                deltaMs = deltaMs,
+                thresholdMs = thresholdMs
+            )
+        )
+    }
+
+    private fun traceRemap(
+        action: String,
+        keyCode: Int,
+        event: KeyEvent?,
+        remapped: ClicksPowerButtonEventMapper.Result
+    ) {
+        if (TouchTraceHub.activeSink == null) return
+        when {
+            remapped.consume -> traceKeyDecision(
+                action, "remap", "consumed", keyCode,
+                reason = remapped.directAction?.toString() ?: "", outKeyCode = remapped.keyCode
+            )
+            remapped.keyCode != keyCode -> traceKeyDecision(action, "remap", "remapped", keyCode, outKeyCode = remapped.keyCode)
+            remapped.event !== event -> traceKeyDecision(action, "remap", "remapped", keyCode, reason = "event_rewritten")
+        }
+    }
+
     override fun onKeyLongPress(keyCode_: Int, event_: KeyEvent?): Boolean {
         if (!replayingProtectedNumberKey) {
             val accidentalInput = accidentalKeyInput(keyCode_, event_)
@@ -4653,9 +4736,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 event = event_,
                 resolution = accidentalInput.resolution,
                 configuration = accidentalInput.configuration
-            )?.let { return true }
+            )?.let { suppressed ->
+                traceKeyDecision("long_press", "accidental_keys", "suppressed", keyCode_, suppressed.reason.debugName)
+                return true
+            }
         }
         val remapped = remapHardwareEvent(keyCode_, event_)
+        traceRemap("long_press", keyCode_, event_, remapped)
         if (remapped.consume) return true
         val keyCode = remapped.keyCode
         val event = remapped.event
@@ -4683,6 +4770,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyDown(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if (traceHardwareKey(keyCode_, event_)) return true
         if (liveSpeechEditor != null && (event_?.unicodeChar?.let { it != 0 } == true ||
             keyCode_ in listOf(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_FORWARD_DEL, KeyEvent.KEYCODE_ENTER,
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN))) {
@@ -4698,6 +4786,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 resolution = accidentalInput.resolution,
                 configuration = accidentalInput.configuration
             )?.let { suppressed ->
+                traceKeyDecision("down", "accidental_keys", "suppressed", keyCode_, suppressed.reason.debugName)
                 notifyDebugKeyEvent(
                     keyCode = keyCode_,
                     event = event_,
@@ -4709,6 +4798,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
         }
         val remapped = remapHardwareEvent(keyCode_, event_)
+        traceRemap("down", keyCode_, event_, remapped)
         if (remapped.consume) {
             remapped.directAction?.let { ClicksButtonDirectActionExecutor.execute(this, it) }
             return true
@@ -4723,6 +4813,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             keyCode = keyCode,
             event = event
         )?.let { suppressed ->
+            traceKeyDecision("down", "clicks_shift_bounce", "suppressed", keyCode, deltaMs = suppressed.deltaMs)
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -4733,6 +4824,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         bounceKeyFilter.shouldConsumeKeyDown(this, keyCode, event)?.let { suppressed ->
+            traceKeyDecision(
+                "down", "bounce_keys", "suppressed", keyCode, suppressed.category.debugName,
+                deltaMs = suppressed.deltaMs, thresholdMs = suppressed.thresholdMs
+            )
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -5436,9 +5531,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if (traceHardwareKey(keyCode_, event_)) return true
         if (!replayingProtectedNumberKey) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
                 is AccidentalKeyPressFilter.KeyUpResult.Suppressed -> {
+                    traceKeyDecision("up", "accidental_keys", "suppressed", keyCode_, result.event.reason.debugName)
                     notifyDebugKeyEvent(
                         keyCode = keyCode_,
                         event = event_,
@@ -5449,6 +5546,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     return true
                 }
                 is AccidentalKeyPressFilter.KeyUpResult.ReplayTap -> {
+                    traceKeyDecision("up", "accidental_keys", "replay", keyCode_)
+                    replayCauseSeq = tracedKeySeq
                     replayProtectedNumberKey(keyCode_, result)
                     return true
                 }
@@ -5457,6 +5556,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         if (consumedLanguageSwitchKeys.remove(keyCode_)) return true
         val remapped = remapHardwareEvent(keyCode_, event_)
+        traceRemap("up", keyCode_, event_, remapped)
         if (remapped.consume) return true
         val keyCode = remapped.keyCode
         val event = remapped.event
@@ -5465,6 +5565,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         clicksPowerShiftTapFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
+            traceKeyDecision("up", "clicks_shift_bounce", "suppressed", keyCode, deltaMs = suppressed.deltaMs)
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,
@@ -5475,6 +5576,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         bounceKeyFilter.shouldConsumeKeyUp(keyCode, event)?.let { suppressed ->
+            traceKeyDecision(
+                "up", "bounce_keys", "suppressed", keyCode, suppressed.category.debugName,
+                deltaMs = suppressed.deltaMs, thresholdMs = suppressed.thresholdMs
+            )
             notifyDebugKeyEvent(
                 keyCode = keyCode,
                 event = event,

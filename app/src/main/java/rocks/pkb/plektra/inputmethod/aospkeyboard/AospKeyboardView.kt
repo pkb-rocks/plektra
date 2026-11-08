@@ -412,6 +412,10 @@ class AospKeyboardView @JvmOverloads constructor(
         }
 
     private val keys = mutableListOf<Key>()
+    private var geometryRevision = 0
+    private var tracedGeometryRevision = -1
+    private var tracedGeometrySink: TouchTraceSink? = null
+    private val keyNeighborScorer = KeyNeighborScorer()
     private val accessibilityVirtualIds = linkedMapOf<String, Int>()
     private var nextAccessibilityVirtualId = 1
     private var pressedKey: Key? = null
@@ -751,6 +755,12 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        val handled = handleTouchEvent(event)
+        TouchTraceHub.activeSink?.let { traceTouch(it, event) }
+        return handled
+    }
+
+    private fun handleTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 val pointerIndex = event.actionIndex
@@ -894,6 +904,7 @@ class AospKeyboardView @JvmOverloads constructor(
                         activePointerId = -1
                         invalidateKeyboard()
                         if (selected != null) {
+                            traceMoreKeysCommit(panel.baseKey, selected)
                             listener?.onText(selected)
                         }
                         return true
@@ -925,6 +936,7 @@ class AospKeyboardView @JvmOverloads constructor(
                     pressedKey = null
                     invalidateKeyboard()
                     if (selected != null) {
+                        traceMoreKeysCommit(panel.baseKey, selected)
                         listener?.onText(selected)
                     }
                     return true
@@ -973,6 +985,7 @@ class AospKeyboardView @JvmOverloads constructor(
 
     private fun rebuildKeys(viewWidth: Int, viewHeight: Int) {
         keys.clear()
+        geometryRevision++
         if (viewWidth <= 0 || viewHeight <= 0) {
             return
         }
@@ -1014,6 +1027,104 @@ class AospKeyboardView @JvmOverloads constructor(
                 theme?.let(::keyCornerRadius) ?: dp(6f).toFloat(),
                 bottomKeys.minBy { it.visualRect.left }.visualRect,
                 bottomKeys.maxBy { it.visualRect.right }.visualRect)
+        }
+    }
+
+    private fun traceMoreKeysCommit(baseKey: Key, output: String) {
+        val sink = TouchTraceHub.activeSink ?: return
+        ensureGeometryTraced(sink)
+        sink.onKeyCommitted(
+            KeyCommit(geometryRevision, android.os.SystemClock.uptimeMillis(), keys.indexOf(baseKey), output, via = "more_keys")
+        )
+    }
+
+    private fun ensureGeometryTraced(sink: TouchTraceSink) {
+        if (tracedGeometrySink === sink && tracedGeometryRevision == geometryRevision) return
+        tracedGeometrySink = sink
+        tracedGeometryRevision = geometryRevision
+        val location = IntArray(2)
+        getLocationOnScreen(location)
+        val metrics = resources.displayMetrics
+        sink.onGeometry(
+            KeyboardGeometrySnapshot(
+                revision = geometryRevision,
+                uptimeMs = android.os.SystemClock.uptimeMillis(),
+                layoutName = layoutName,
+                layoutStyle = layoutStyle.name,
+                shifted = shifted,
+                numberRow = includeNumberRow,
+                nearestKeyTouch = nearestKeyTouchEnabled,
+                viewWidthPx = width,
+                viewHeightPx = height,
+                viewLeftOnScreenPx = location[0],
+                viewTopOnScreenPx = location[1],
+                xdpi = metrics.xdpi,
+                ydpi = metrics.ydpi,
+                keys = keys.mapIndexed { index, key ->
+                    TraceKey(
+                        index = index,
+                        type = key.spec.type.name,
+                        label = key.spec.label,
+                        output = characterOutput(key.spec),
+                        hit = with(key.hitRect) { listOf(left, top, right, bottom) },
+                        visual = with(key.visualRect) { listOf(left, top, right, bottom) }
+                    )
+                }
+            )
+        )
+    }
+
+    private fun traceTouch(sink: TouchTraceSink, event: MotionEvent) {
+        ensureGeometryTraced(sink)
+        val uiKeyIndex = pressedKey?.let(keys::indexOf) ?: -1
+        val action = event.actionMasked
+        val phase = when (action) {
+            MotionEvent.ACTION_DOWN -> "down"
+            MotionEvent.ACTION_POINTER_DOWN -> "pointer_down"
+            MotionEvent.ACTION_MOVE -> "move"
+            MotionEvent.ACTION_UP -> "up"
+            MotionEvent.ACTION_POINTER_UP -> "pointer_up"
+            MotionEvent.ACTION_CANCEL -> "cancel"
+            else -> return
+        }
+        val metrics = resources.displayMetrics
+        val processedAt = android.os.SystemClock.uptimeMillis()
+        val scoringKeys by lazy(LazyThreadSafetyMode.NONE) {
+            keys.mapIndexed { index, key ->
+                KeyNeighborScorer.KeyRect(index, key.hitRect.left, key.hitRect.top, key.hitRect.right, key.hitRect.bottom)
+            }
+        }
+        fun sample(pointerIndex: Int, historyIndex: Int?): TouchSample {
+            val historical = historyIndex != null
+            val x = if (historical) event.getHistoricalX(pointerIndex, historyIndex!!) else event.getX(pointerIndex)
+            val y = if (historical) event.getHistoricalY(pointerIndex, historyIndex!!) else event.getY(pointerIndex)
+            val scored = action != MotionEvent.ACTION_MOVE && action != MotionEvent.ACTION_CANCEL
+            return TouchSample(
+                geometryRevision = geometryRevision,
+                phase = phase,
+                pointerId = event.getPointerId(pointerIndex),
+                eventTimeMs = if (historical) event.getHistoricalEventTime(historyIndex!!) else event.eventTime,
+                downTimeMs = event.downTime,
+                historical = historical,
+                x = x,
+                y = y,
+                pressure = if (historical) event.getHistoricalPressure(pointerIndex, historyIndex!!) else event.getPressure(pointerIndex),
+                touchMajor = if (historical) event.getHistoricalTouchMajor(pointerIndex, historyIndex!!) else event.getTouchMajor(pointerIndex),
+                touchMinor = if (historical) event.getHistoricalTouchMinor(pointerIndex, historyIndex!!) else event.getTouchMinor(pointerIndex),
+                uiKeyIndex = uiKeyIndex,
+                nearby = if (scored) keyNeighborScorer.score(x, y, scoringKeys, metrics.xdpi, metrics.ydpi) else emptyList(),
+                processedUptimeMs = processedAt
+            )
+        }
+        if (action == MotionEvent.ACTION_MOVE) {
+            for (h in 0 until event.historySize) {
+                for (p in 0 until event.pointerCount) sink.onTouch(sample(p, h))
+            }
+            for (p in 0 until event.pointerCount) sink.onTouch(sample(p, null))
+        } else if (action == MotionEvent.ACTION_CANCEL) {
+            for (p in 0 until event.pointerCount) sink.onTouch(sample(p, null))
+        } else {
+            sink.onTouch(sample(event.actionIndex, null))
         }
     }
 
@@ -1484,6 +1595,12 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun dispatchKey(key: Key) {
+        TouchTraceHub.activeSink?.let { sink ->
+            ensureGeometryTraced(sink)
+            sink.onKeyCommitted(
+                KeyCommit(geometryRevision, android.os.SystemClock.uptimeMillis(), keys.indexOf(key), characterOutput(key.spec))
+            )
+        }
         if (dispatchSymLayerTextIfNeeded(key)) {
             return
         }
@@ -1499,7 +1616,10 @@ class AospKeyboardView @JvmOverloads constructor(
                     listener?.onText(key.spec.output)
                 }
             }
-            KeyType.BACKSPACE -> listener?.onBackspace()
+            KeyType.BACKSPACE -> {
+                val sink = TouchTraceHub.activeSink
+                if (sink != null) sink.onUserDelete(android.os.SystemClock.uptimeMillis()) else listener?.onBackspace()
+            }
             KeyType.ENTER -> listener?.onEnter()
             KeyType.SHIFT -> listener?.onShift()
             KeyType.SYMBOLS -> listener?.onSymbols()
@@ -1562,8 +1682,14 @@ class AospKeyboardView @JvmOverloads constructor(
         if (key.spec.type == KeyType.BACKSPACE) {
             longPressTriggered = true
             listener?.onKeyPressSound(KeyEvent.KEYCODE_DEL)
-            listener?.onBackspace()
-            handler.postDelayed(longPressRunnable, 55L)
+            // In typing training a held Backspace marks once and never deletes.
+            val sink = TouchTraceHub.activeSink
+            if (sink != null) {
+                sink.onUserDelete(android.os.SystemClock.uptimeMillis())
+            } else {
+                listener?.onBackspace()
+                handler.postDelayed(longPressRunnable, 55L)
+            }
             return
         }
         if (key.spec.type == KeyType.SPACE) {

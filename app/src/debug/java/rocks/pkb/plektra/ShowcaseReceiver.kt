@@ -50,9 +50,6 @@ class ShowcaseReceiver : BroadcastReceiver() {
             val theme = intent.getStringExtra("theme")?.let { name ->
                 keyboardThemePresets().firstOrNull { it.name == name } ?: error("Unknown theme $name")
             }
-            val currentThemes = if (theme != null) SettingsManager.KeyboardThemeTarget.entries.associateWith {
-                SettingsManager.getKeyboardTheme(context, it)
-            } else emptyMap()
             if (theme != null) listOf("keyboard_theme_hardware", "keyboard_theme_software",
                 "keyboard_theme_assignment_mode_hardware", "keyboard_theme_assignment_mode_software").forEach { key ->
                 if (!values.has(key)) values.put(key, JSONObject.NULL)
@@ -105,24 +102,12 @@ class ShowcaseReceiver : BroadcastReceiver() {
             }
             backup.writeText(saved.toString())
             require(editor.commit()) { "Settings could not be saved" }
+            // Applied exactly as choosing the preset in settings does, geometry included.
             theme?.let {
-                for (target in SettingsManager.KeyboardThemeTarget.entries) {
-                    val current = currentThemes.getValue(target)
-                    val palette = theme.toSettingsTheme().copy(
-                        keyCornerRadiusRatio = current.keyCornerRadiusRatio,
-                        chromeCornerRadiusRatio = current.chromeCornerRadiusRatio,
-                        keyHeightScale = current.keyHeightScale,
-                        numberRowHeightScale = current.numberRowHeightScale,
-                        keyWidthScale = current.keyWidthScale,
-                        rowGapScale = current.rowGapScale,
-                        distributeHorizontalSpacing = current.distributeHorizontalSpacing,
-                        ortholinear = current.ortholinear,
-                        showLeds = current.showLeds,
-                        suggestionsHeightScale = current.suggestionsHeightScale,
-                        variationsHeightScale = current.variationsHeightScale
-                    )
-                    SettingsManager.setKeyboardTheme(context, target, palette)
-                }
+                SettingsManager.setKeyboardTheme(context, SettingsManager.KeyboardThemeTarget.HARDWARE, theme.toSettingsTheme())
+                SettingsManager.setKeyboardTheme(
+                    context, SettingsManager.KeyboardThemeTarget.SOFTWARE, theme.withSoftwareKeyboardDefaults().toSettingsTheme()
+                )
             }
             resultData = "Showcase settings applied"
         } catch (error: Exception) {

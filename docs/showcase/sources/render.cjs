@@ -27,7 +27,27 @@ async function wrapText(lines,size,maxWidth,bold=false){
 async function dimensions(p){return metas[p]||(metas[p]=await sharp(p).metadata());}
 async function fit(p,x,y,w,h){let m=await dimensions(p),scale=Math.min(w/m.width,h/m.height);let rw=m.width*scale,rh=m.height*scale;return image(p,x+(w-rw)/2,y+(h-rh)/2,rw,rh);}
 function raw(item){return path.join(root,'raw',item[0],item[1]+'.png');}
-async function frame(item){const stamp=digest(raw(item),path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-frame.png'),path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-screen-mask.png'),path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-geometry.json'));const out=path.join(root,'composed',item[0]+'-'+item[1]+'-'+stamp+'.png');assets.add(out);if(!fs.existsSync(out))execFileSync(process.execPath,[path.join(__dirname,'compose-screen.cjs'),item[0],raw(item),out]);return out;}
+async function presentedScreen(item){
+ const nativeState=item[3]?.nativeKeyboard;
+ if(!nativeState)return raw(item);
+ const native=path.join(root,'raw',item[0],nativeState+'-ime.png');
+ const reference=path.join(root,'raw',item[0],nativeState+'.png');
+ const source=raw(item),stamp=digest(source,native,reference,__filename);
+ const out=path.join(root,'composed',item[0]+'-'+item[1]+'-screen-'+stamp+'.png');
+ if(!fs.existsSync(out)){
+  const shot=await sharp(source).ensureAlpha().raw().toBuffer({resolveWithObject:true});
+  const {width,height}=shot.info,m=await dimensions(native);
+  const paperOffset=(Math.floor(height*.5)*width+Math.floor(width*.5))*4;
+  const paper={r:shot.data[paperOffset],g:shot.data[paperOffset+1],b:shot.data[paperOffset+2],alpha:1};
+  // Preserve the native editor above its blank lower half, then place the recorded device IME.
+  const backdrop=await sharp(source).extract({left:0,top:0,width,height:Math.floor(height*.5)})
+   .extend({top:0,bottom:height-Math.floor(height*.5),left:0,right:0,background:paper}).png().toBuffer();
+  const status=await sharp(reference).extract({left:0,top:0,width,height:104}).png().toBuffer();
+  await sharp(backdrop).composite([{input:status,left:0,top:0},{input:native,left:0,top:height-m.height}]).png().toFile(out);
+ }
+ return out;
+}
+async function frame(item){const source=await presentedScreen(item);const stamp=digest(source,path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-frame.png'),path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-screen-mask.png'),path.join(process.env.PLEKTRA_FRAMES_DIR,item[0]+'-geometry.json'));const out=path.join(root,'composed',item[0]+'-'+item[1]+'-'+stamp+'.png');assets.add(out);if(!fs.existsSync(out))execFileSync(process.execPath,[path.join(__dirname,'compose-screen.cjs'),item[0],source,out]);return out;}
 // Titan 2 Elite bar crops. The IME top is measured per capture (bar, contour and LED strokes), not fixed.
 // Background is removed by one rule: pixels that match the app background, and that are connected to the
 // crop border, become transparent. Matching pixels enclosed by the bar (keys, panel gaps behind keys) stay.
@@ -98,11 +118,11 @@ async function deviceComparison(items,box,portrait){
   const id=item[0],p=await frame(item),m=await dimensions(p),geometry=JSON.parse(fs.readFileSync(path.join(root,'frames',id+'-geometry.json')));
   const trimmed=await sharp(path.join(root,'frames',id+'-frame.png')).trim({background:'#00000000'}).toBuffer({resolveWithObject:true});
   const bounds={x:-trimmed.info.trimOffsetLeft,y:-trimmed.info.trimOffsetTop,width:trimmed.info.width,height:trimmed.info.height};
-  const capture=await rgba(raw(item)),W=capture.width,H=capture.height,d=capture.data,center=(Math.floor(H*.5)*W+Math.floor(W*.5))*4;
+  const capture=await rgba(await presentedScreen(item)),W=capture.width,H=capture.height,d=capture.data,center=(Math.floor(H*.5)*W+Math.floor(W*.5))*4;
   const bg=[d[center],d[center+1],d[center+2]];
   let barTop=-1;
   if(id==='titan-2-elite'){
-   const bar=await dimensions(await crop(item));
+   const bar=await dimensions(await crop(item[3]?.nativeKeyboard?[item[0],item[3].nativeKeyboard,item[2]]:item));
    barTop=H-bar.height+BAR_MARGIN;
   }
   for(let row=Math.floor(H*.5);barTop<0&&row<H;row++){
@@ -134,12 +154,17 @@ async function contents(card,box,portrait){
  let [x,y,w,h]=box, out='';
  if(card.layout==='devices'){
    out+=await deviceComparison(card.items,box,portrait);
- }else if(card.layout==='stacked-devices'){
-   const gap=30,cell=(h-gap*(card.items.length-1))/card.items.length;
-   for(let i=0;i<card.items.length;i++){
-     const p=await frame(card.items[i]),yy=y+i*(cell+gap);
-     out+=await fit(p,x,yy,w,cell-45);
-     out+=text(card.items[i][2],x+w/2,yy+cell-8,26,'#565B60',400,'middle');
+ }else if(card.layout==='theme-gallery'){
+   const gap=24,cell=(w-gap*(card.items.length-1))/card.items.length;
+   const frames=await Promise.all(card.items.map(frame));
+   const sizes=await Promise.all(frames.map(dimensions));
+   const scale=Math.min(...sizes.map(m=>cell/m.width),...sizes.map(m=>(h-48)/m.height));
+   const height=Math.max(...sizes.map(m=>m.height*scale));
+   const top=y+(h-height-48)/2;
+   for(let i=0;i<frames.length;i++){
+     const m=sizes[i],xx=x+i*(cell+gap)+(cell-m.width*scale)/2;
+     out+=image(frames[i],xx,top,m.width*scale,m.height*scale);
+     out+=text(card.items[i][2],x+i*(cell+gap)+cell/2,top+height+34,23,'#565B60',400,'middle');
    }
  }else if(card.layout==='pair'){
    const n=card.items.length,gap=portrait?28:32,cell=(w-gap*(n-1))/n;
@@ -190,7 +215,8 @@ async function contents(card,box,portrait){
        const box=portrait?[72,bodyEnd+65,936,H-(bodyEnd+65)-175]:[794,148,1048,790];const artwork=await contents(card,box,portrait);body+=artwork;
        if(!portrait){
          const visualDir=path.join(root,'exports',channel,'visuals');fs.mkdirSync(visualDir,{recursive:true});
-         const visual=`<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="830" viewBox="770 130 1100 830"><rect x="770" y="130" width="1100" height="830" fill="${channel==='nightly'?'#CFDDE7':'#F4F1E9'}"/>${artwork}</svg>`;
+         const visualY=card.layout==='theme-gallery'?250:130,visualHeight=card.layout==='theme-gallery'?600:830;
+         const visual=`<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="${visualHeight}" viewBox="770 ${visualY} 1100 ${visualHeight}"><rect x="770" y="${visualY}" width="1100" height="${visualHeight}" fill="${channel==='nightly'?'#CFDDE7':'#F4F1E9'}"/>${artwork}</svg>`;
          const visualPath=path.join(visualDir,card.id+'.svg');fs.writeFileSync(visualPath,visual);
          execFileSync('rsvg-convert',['-o',path.join(visualDir,card.id+'.png'),visualPath]);
        }

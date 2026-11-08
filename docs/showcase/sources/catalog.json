@@ -19,12 +19,15 @@
       ],
       [
         "titan-2-elite",
-        "r6-full",
-        "Titan 2 Elite"
+        "hero-full",
+        "Titan 2 Elite",
+        {
+          "nativeKeyboard": "r6-full"
+        }
       ],
       [
         "pixel-7a",
-        "r6-full",
+        "gallery-cloud-tap",
         "Pixel 7a"
       ]
     ]
@@ -389,17 +392,27 @@
       "physical keys, with suggestions, symbols and",
       "snippets."
     ],
-    "layout": "stacked-devices",
+    "layout": "theme-gallery",
     "items": [
       [
         "pixel-7a",
-        "r6-full",
+        "gallery-cloud-tap",
         "Cloud Tap"
       ],
       [
         "pixel-7a",
-        "r5-theme-volcanic-dusk",
-        "Volcanic Dusk"
+        "gallery-moon-tap",
+        "Moon Tap"
+      ],
+      [
+        "pixel-7a",
+        "gallery-classic-cloud",
+        "Classic Cloud"
+      ],
+      [
+        "pixel-7a",
+        "gallery-classic-midnight",
+        "Classic Midnight"
       ]
     ]
   },

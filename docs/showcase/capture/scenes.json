@@ -828,6 +828,152 @@
       ],
       "confidence": "approximate",
       "comment": "Preset theme on the software keyboard."
+    },
+    {
+      "id": "pixel-7a/gallery-cloud-tap",
+      "device": "pixel-7a",
+      "state": "gallery-cloud-tap",
+      "host": "showcase",
+      "background": "default",
+      "theme": "Cloud Tap",
+      "settings": {
+        "software_keyboard_mode": "force_virtual",
+        "software_keyboard_mode_runtime_override": null,
+        "suggestions_enabled": true,
+        "status_bar_variations_visible": true,
+        "static_variation_bar_preset": "symbols",
+        "keyboard_layout": null,
+        "keyboard_layout_list": null,
+        "software_keyboard_layout_style": null
+      },
+      "note": {
+        "title": "Weekend plans",
+        "body": "Let's meet at the station "
+      },
+      "steps": [
+        "KEYCODE_T",
+        "KEYCODE_O",
+        "KEYCODE_M",
+        "KEYCODE_O",
+        "KEYCODE_R"
+      ],
+      "confidence": "verified",
+      "comment": "Consistent four-theme software keyboard gallery; capture on the Pixel 7a Android profile."
+    },
+    {
+      "id": "pixel-7a/gallery-moon-tap",
+      "device": "pixel-7a",
+      "state": "gallery-moon-tap",
+      "host": "showcase",
+      "background": "default",
+      "theme": "Moon Tap",
+      "settings": {
+        "software_keyboard_mode": "force_virtual",
+        "software_keyboard_mode_runtime_override": null,
+        "suggestions_enabled": true,
+        "status_bar_variations_visible": true,
+        "static_variation_bar_preset": "symbols",
+        "keyboard_layout": null,
+        "keyboard_layout_list": null,
+        "software_keyboard_layout_style": null
+      },
+      "note": {
+        "title": "Weekend plans",
+        "body": "Let's meet at the station "
+      },
+      "steps": [
+        "KEYCODE_T",
+        "KEYCODE_O",
+        "KEYCODE_M",
+        "KEYCODE_O",
+        "KEYCODE_R"
+      ],
+      "confidence": "verified",
+      "comment": "Consistent four-theme software keyboard gallery; capture on the Pixel 7a Android profile."
+    },
+    {
+      "id": "pixel-7a/gallery-classic-cloud",
+      "device": "pixel-7a",
+      "state": "gallery-classic-cloud",
+      "host": "showcase",
+      "background": "default",
+      "theme": "Classic Cloud",
+      "settings": {
+        "software_keyboard_mode": "force_virtual",
+        "software_keyboard_mode_runtime_override": null,
+        "suggestions_enabled": true,
+        "status_bar_variations_visible": true,
+        "static_variation_bar_preset": "symbols",
+        "keyboard_layout": null,
+        "keyboard_layout_list": null,
+        "software_keyboard_layout_style": null
+      },
+      "note": {
+        "title": "Weekend plans",
+        "body": "Let's meet at the station "
+      },
+      "steps": [
+        "KEYCODE_T",
+        "KEYCODE_O",
+        "KEYCODE_M",
+        "KEYCODE_O",
+        "KEYCODE_R"
+      ],
+      "confidence": "verified",
+      "comment": "Consistent four-theme software keyboard gallery; capture on the Pixel 7a Android profile."
+    },
+    {
+      "id": "pixel-7a/gallery-classic-midnight",
+      "device": "pixel-7a",
+      "state": "gallery-classic-midnight",
+      "host": "showcase",
+      "background": "default",
+      "theme": "Classic Midnight",
+      "settings": {
+        "software_keyboard_mode": "force_virtual",
+        "software_keyboard_mode_runtime_override": null,
+        "suggestions_enabled": true,
+        "status_bar_variations_visible": true,
+        "static_variation_bar_preset": "symbols",
+        "keyboard_layout": null,
+        "keyboard_layout_list": null,
+        "software_keyboard_layout_style": null
+      },
+      "note": {
+        "title": "Weekend plans",
+        "body": "Let's meet at the station "
+      },
+      "steps": [
+        "KEYCODE_T",
+        "KEYCODE_O",
+        "KEYCODE_M",
+        "KEYCODE_O",
+        "KEYCODE_R"
+      ],
+      "confidence": "verified",
+      "comment": "Consistent four-theme software keyboard gallery; capture on the Pixel 7a Android profile."
+    },
+    {
+      "id": "titan-2-elite/hero-full",
+      "device": "titan-2-elite",
+      "state": "hero-full",
+      "host": "showcase",
+      "background": "default",
+      "theme": "Plektra Dark",
+      "settings": {},
+      "note": {
+        "title": "Weekend plans",
+        "body": "Let's meet at the station "
+      },
+      "steps": [
+        "KEYCODE_T",
+        "KEYCODE_O",
+        "KEYCODE_M",
+        "KEYCODE_O",
+        "KEYCODE_R"
+      ],
+      "confidence": "backdrop-only",
+      "comment": "Plain native editor backdrop on the Titan 2 Elite emulator profile. The hero composition preserves the physical-device status bar and r6-full-ime.png keyboard instead of using the emulator keyboard."
     }
   ]
 }

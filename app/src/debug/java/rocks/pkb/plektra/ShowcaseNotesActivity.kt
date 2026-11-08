@@ -7,12 +7,57 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 
 /** A native text editor with synthetic content; the keyboard remains the real IME. */
-class ShowcaseNotesActivity : NotesActivity() {
-    override val notesPreferencesName: String = "showcase_notes"
+class ShowcaseNotesActivity : android.app.Activity() {
+    private lateinit var editor: android.widget.EditText
+    private lateinit var heading: android.widget.EditText
+    private lateinit var root: android.widget.LinearLayout
+    private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        root = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setBackgroundColor(Color.rgb(248, 247, 243))
+        }
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+            view.setPadding(dp(24) + bars.left, dp(24) + bars.top,
+                dp(24) + bars.right, maxOf(bars.bottom, ime.bottom))
+            insets
+        }
+        root.addView(android.widget.TextView(this).apply {
+            text = "NOTES"
+            textSize = 11f
+            letterSpacing = .15f
+            setTextColor(Color.rgb(100, 100, 96))
+        })
+        // Ids let Android restore edits after recreation (rotation, fold, process death).
+        heading = android.widget.EditText(this).apply {
+            id = R.id.notes_heading
+            background = null
+            textSize = 24f
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            setTextColor(Color.rgb(30, 34, 36))
+            setPadding(0, dp(20), 0, dp(12))
+        }
+        root.addView(heading)
+        editor = android.widget.EditText(this).apply {
+            id = R.id.notes_body
+            textSize = 16f
+            setTextColor(Color.rgb(30, 34, 36))
+            gravity = android.view.Gravity.TOP
+            background = null
+            setPadding(0, dp(8), 0, 0)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+        root.addView(editor, android.widget.LinearLayout.LayoutParams(-1, 0, 1f))
+        setContentView(root)
+        androidx.core.view.WindowCompat.getInsetsController(window, root).isAppearanceLightStatusBars = true
+        applyBackground(intent)
+        // A recreated activity keeps the restored edits instead of replaying the capture text.
         if (state == null) update(intent)
     }
     override fun onNewIntent(intent: Intent) {
@@ -20,11 +65,14 @@ class ShowcaseNotesActivity : NotesActivity() {
         setIntent(intent)
         update(intent)
     }
-    private fun update(intent: Intent) {
+    private fun applyBackground(intent: Intent) {
         val contrast = intent.getBooleanExtra("contrastBackground", false)
         val background = if (contrast) CaptureBackground() else android.graphics.drawable.ColorDrawable(Color.rgb(248, 247, 243))
         window.setBackgroundDrawable(background)
         if (contrast) root.background = null
+    }
+    private fun update(intent: Intent) {
+        applyBackground(intent)
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
         if (intent.getBooleanExtra("restoreClipboard", false) && clipboardSaved) {
             val dao = requireNotNull(rocks.pkb.plektra.clipboard.ClipboardDao.getInstance(this))
@@ -44,7 +92,6 @@ class ShowcaseNotesActivity : NotesActivity() {
             }
             clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Notes", text))
         }
-        findViewById<android.view.View>(R.id.notes_markdown_toggle).performClick()
         intent.getStringExtra("title")?.let { heading.setText(it) }
         if (intent.hasExtra("text")) editor.setText(intent.getStringExtra("text"))
         val start = intent.getIntExtra("selectionStart", editor.length()).coerceIn(0, editor.length())

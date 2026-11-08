@@ -15,7 +15,7 @@ const {createHash}=require('node:crypto');
  }
  for(const channel of ['stable','nightly']){
   const files=fs.readdirSync(path.join(root,'exports',channel,'visuals')).filter(f=>f.endsWith('.png'));assert.equal(files.length,21);
-  for(const file of files){const m=await sharp(path.join(root,'exports',channel,'visuals',file)).metadata();assert.equal(m.width,1100);assert.equal(m.height,830);}
+  for(const file of files){const m=await sharp(path.join(root,'exports',channel,'visuals',file)).metadata();assert.equal(m.width,1100);assert.equal(m.height,file==='16-software-keyboard.png'?600:830);}
  }
  for(const name of ['r6-config-full','r5-config-suggestions','r5-config-leds','r5-slim']){
   const cropFile=assets.find(p=>p.includes('/titan-2-elite-'+name+'-bar-')),
@@ -47,6 +47,15 @@ const {createHash}=require('node:crypto');
   assert(Math.abs(titan.width/elite.width-88.7/75)<1e-8);
   assert(Math.abs(pixel.width/elite.width-72.9/75)<1e-8);
   assert(devices.every(d=>Math.abs(d.bar-titan.bar)<1e-8&&Math.abs(d.label-titan.label)<1e-8));
+ }
+ for(const channel of ['stable','nightly']){
+  const svg=fs.readFileSync(path.join(root,'exports',channel,'landscape','16-software-keyboard.svg'),'utf8');
+  const phones=[...svg.matchAll(/<image [^>]* x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/g)]
+   .map(m=>({x:+m[1],y:+m[2],width:+m[3],height:+m[4]})).filter(m=>m.x>=794&&m.width>100);
+  assert.equal(phones.length,4,'Four theme devices must be present');
+  assert(phones.every(p=>Math.abs(p.y-phones[0].y)<.01),'Theme devices must share one row');
+  assert(phones.every((p,i)=>!i||p.x>=phones[i-1].x+phones[i-1].width),'Theme devices overlap');
+  assert(phones.every(p=>p.x+p.width<=1842&&p.y+p.height<=938),'Theme devices exceed their visual area');
  }
  const mask=await sharp(path.join(root,'frames/titan-2-elite-screen-mask.png')).ensureAlpha().raw().toBuffer();
  for(const [name,colors] of [['r6-full',[[48,48,48]]],['r5-config-leds',[[48,48,48],[100,150,255]]]]){

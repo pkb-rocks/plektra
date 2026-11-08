@@ -146,7 +146,7 @@ Choose from nine built-in keyboard bar themes.
 
 Use the software keyboard on phones without physical keys, with suggestions, symbols and snippets.
 
-![Cloud Tap and Volcanic Dusk software keyboards shown separately on Pixel 7a](docs/showcase/exports/stable/visuals/16-software-keyboard.png)
+![Four Pixel 7a software keyboards in Cloud Tap, Moon Tap, Classic Cloud and Classic Midnight](docs/showcase/exports/stable/visuals/16-software-keyboard.png)
 
 ### Native QWERTY, AZERTY, and QWERTZ support
 

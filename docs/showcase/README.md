@@ -280,6 +280,8 @@ Use Ctrl shortcuts to move the cursor, select text, copy and paste.
 
 ![Terminal-style Ctrl navigation and selection](exports/nightly/visuals/21-ctrl-navigation.png)
 
+The software keyboard gallery uses four Pixel 7a captures in one row: Cloud Tap, Moon Tap, Classic Cloud and Classic Midnight, each with its own preset geometry and the default QWERTY layout. All four use the same native plain Notes host; only the ADB notification icon was painted over in the status bar. The device comparison keeps the physical Titan 2 Elite keyboard from its native alpha export, preserves its original status bar, and places these over the plain Notes backdrop; its LED geometry and pixels are preserved. Capture sources and this composition are recorded in [provenance.json](provenance.json).
+
 ## Capture new screenshots
 
 `scripts/capture-showcase.sh` captures screenshots and native transparent keyboard exports on an emulator or a physical device. It uses the Nightly debug build, which must be installed on the device first.
@@ -296,7 +298,7 @@ Use Ctrl shortcuts to move the cursor, select text, copy and paste.
    scripts/capture-showcase.sh --serial <serial> --device titan-2-elite
    ```
 
-   To capture only some states, add `--only r6-full,r5-slim`. To force one host for every scene, add `--host notes` or `--host showcase`. The default is the host each scene asks for.
+   To capture only some states, add `--only r6-full,r5-slim`. To force one host for every scene, add `--host notes` or `--host showcase`. The default is the host each scene asks for. `showcase` uses a plain native editor with synthetic text and an optional contrast grid; `notes` uses the Markdown editor. The plain host is independent of the Notes screen layout.
 
 **Emulator.** Start the Android Virtual Device and wait until it has finished booting. The serial is usually `emulator-5554`. The display must have no size override, so run `adb shell wm size reset` first if the script reports a mismatch. The Titan 2 Elite profile expects a 1080 by 1200 display.
 
@@ -306,7 +308,7 @@ The script changes some device settings while it runs. It turns on the system de
 
 Each run writes to `build/showcase-capture/<device>/<timestamp>/`. The folder holds a screenshot per state, `*-ime.png` native alpha exports and `*-ime.json` dimensions/position metadata for visible keyboards, plus a `manifest.json` with the device, serial, app version, time and SHA-256 hash of every file. Captures are never written to `raw/` automatically. Review screenshots and transparent exports against the existing references, then copy the approved files into `raw/<device>/` by hand. The renderer uses native alpha exports when available; screenshots supply the device frames.
 
-The scene table is [capture/scenes.json](capture/scenes.json). Each entry lists the device, the keyboard settings, the theme, the typed text and key events, and the crop. States with `"manual": true` are skipped by the script; the `instruction` field says how to capture them by hand. Expect small differences from the references: the Markdown notes editor is a different screen from the older notes host, and the emulator is not detected as a Titan 2 Elite, so its keyboard layout differs.
+The scene table is [capture/scenes.json](capture/scenes.json). Each entry lists the device, the keyboard settings, the theme, the typed text and key events, and the crop. States with `"manual": true` are skipped by the script; the `instruction` field says how to capture them by hand. New gallery scenes explicitly select software keyboard mode. The Titan 2 Elite baseline selects its physical keyboard profile even on an emulator. Record the emulator profile or physical device in provenance when promoting captures.
 
 ## Transparent export in Debug builds
 

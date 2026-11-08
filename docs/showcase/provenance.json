@@ -10,7 +10,7 @@
       "package": "rocks.pkb.plektra.nightly"
     },
     "pixel-7a": {
-      "version": "26.10-nightly.08.155029Z",
+      "version": "26.11-nightly.08.182051Z",
       "package": "rocks.pkb.plektra.nightly"
     }
   },
@@ -692,6 +692,123 @@
       "capture_run": "20261011T192646Z",
       "physical_profile": "titan2elite_qwerty",
       "rendering": "native-view-alpha"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-cloud-tap.png",
+      "sha256": "e7c7c2b5f8156e9383e8f740f23a986cd32a0902feac0596e2019e8adc8b7c38",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI; ADB notification icon painted over in the status bar",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-cloud-tap-ime.png",
+      "sha256": "ad924aee8a7b8c3530e1a831414afadaf97f6879f43bbd794a7167010cf078ef",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-cloud-tap-ime.json",
+      "sha256": "67cb29ad21d2d57a686cac592d0358bdf5b60270bac38c7513c78f2454195b38",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-moon-tap.png",
+      "sha256": "730e1c375942a0b7051e286e620a06206e7a1d15e59ab448fb16ab6fbd98d96d",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI; ADB notification icon painted over in the status bar",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-moon-tap-ime.png",
+      "sha256": "5bee593b40b103e97276181f1fab193e0eaf76d141b6c257ac4d3d8c346c1244",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-moon-tap-ime.json",
+      "sha256": "67cb29ad21d2d57a686cac592d0358bdf5b60270bac38c7513c78f2454195b38",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-cloud.png",
+      "sha256": "8aded6edfcc16d6b7abb089a812f35b274b85f51e343dcc9bd8062626b248e83",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI; ADB notification icon painted over in the status bar",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-cloud-ime.png",
+      "sha256": "ec339f121f47a3c6a50c4e7b35d6c71e2508e484e59605e6f5b59b9feb2ee7c4",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-cloud-ime.json",
+      "sha256": "67cb29ad21d2d57a686cac592d0358bdf5b60270bac38c7513c78f2454195b38",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-midnight.png",
+      "sha256": "50820eb2a2605e4ca1171713a23c8236b8cc54a56b7d49d0d955d7f7e61afd61",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI; ADB notification icon painted over in the status bar",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-midnight-ime.png",
+      "sha256": "a4876b3d1f3f49098f989e1f3267212994f7be4ce9c09ab9f9426b56268a718f",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/pixel-7a/gallery-classic-midnight-ime.json",
+      "sha256": "67cb29ad21d2d57a686cac592d0358bdf5b60270bac38c7513c78f2454195b38",
+      "device": "pixel-7a",
+      "source": "Pixel 7a (physical device); native Plektra UI",
+      "version": "26.11-nightly.08.182051Z",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "host": "ShowcaseNotesActivity, synthetic example text"
+    },
+    {
+      "file": "raw/titan-2-elite/hero-full.png",
+      "sha256": "2211f82fe6d1f9146b10e675166742025cae4b7061055b2188bb89d8abc701ed",
+      "device": "titan-2-elite",
+      "source": "Android emulator display 1080x1200 at 400 dpi, cropped 2 pixels from each side to 1076x1200; native plain Notes backdrop",
+      "version": "26.10-nightly.14.215557Z",
+      "captured_at": "2026-10-14T21:56:26Z",
+      "presentation": "Hero uses this plain editor backdrop with the existing physical-device r6-full-ime.png native alpha export and the original physical-device status bar (first 104 pixels of r6-full.png). The emulator keyboard and navigation area are replaced with the sampled flat editor paper and that unmodified export."
     }
   ],
   "github_icon_source": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/github.svg",
@@ -804,6 +921,26 @@
         "r5-theme-cobalt-ime.json"
       ],
       "rendering": "screenshots and native-view-alpha"
+    },
+    {
+      "device": "pixel-7a",
+      "captured_at": "2026-11-08T18:33:35Z",
+      "version": "26.11-nightly.08.182051Z",
+      "run_id": "20261108T183259Z",
+      "files": [
+        "gallery-cloud-tap.png",
+        "gallery-cloud-tap-ime.png",
+        "gallery-cloud-tap-ime.json",
+        "gallery-moon-tap.png",
+        "gallery-moon-tap-ime.png",
+        "gallery-moon-tap-ime.json",
+        "gallery-classic-cloud.png",
+        "gallery-classic-cloud-ime.png",
+        "gallery-classic-cloud-ime.json",
+        "gallery-classic-midnight.png",
+        "gallery-classic-midnight-ime.png",
+        "gallery-classic-midnight-ime.json"
+      ]
     }
   ]
 }

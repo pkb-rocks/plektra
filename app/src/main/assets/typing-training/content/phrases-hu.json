@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-hu-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A villamos ma reggel tíz percet késett, így lekéstem a megbeszélés elejét."
+  },
+  {
+   "id": "opus-hu-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nem tudom, hová tettem a kulcsomat; tegnap még a kabátzsebemben volt."
+  },
+  {
+   "id": "opus-hu-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ha holnap is esik, inkább itthon maradunk és társasozunk."
+  },
+  {
+   "id": "opus-hu-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A szomszéd néni minden vasárnap friss kalácsot hoz nekünk."
+  },
+  {
+   "id": "opus-hu-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Három dolgot kérek: pontosságot, türelmet és egy jó erős kávét."
+  },
+  {
+   "id": "opus-hu-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Szerinted megéri ennyit fizetni egy új telefonért?"
+  },
+  {
+   "id": "opus-hu-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A bolt hétköznap 7:00-tól 20:00-ig, szombaton csak délig van nyitva."
+  },
+  {
+   "id": "opus-hu-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Végre leadtam a szakdolgozatot! Most egy hétig csak aludni fogok."
+  },
+  {
+   "id": "opus-hu-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Az apró betűs részt (mint mindig) senki sem olvasta el."
+  },
+  {
+   "id": "opus-hu-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kinyitottam az ablakot, és a szobát betöltötte a frissen nyírt fű illata."
+  },
+  {
+   "id": "opus-hu-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nagymamám szerint a jó pörkölthöz sok hagyma és még több türelem kell."
+  },
+  {
+   "id": "opus-hu-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ki hagyta nyitva a hűtőt egész éjszakára?"
+  },
+  {
+   "id": "opus-hu-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Az e-mailt elküldtem, de a melléklet sajnos lemaradt róla."
+  },
+  {
+   "id": "opus-hu-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Jövő pénteken 18:30-kor kezdődik az évzáró a tornateremben."
+  },
+  {
+   "id": "opus-hu-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A kutya megint ellopta a papucsomat, és a kert végébe vitte."
+  },
+  {
+   "id": "opus-hu-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hány percig kell főzni a tojást, hogy lágy maradjon?"
+  },
+  {
+   "id": "opus-hu-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Elfelejtettem a jelszavamat, pedig csak tegnap állítottam be."
+  },
+  {
+   "id": "opus-hu-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A tóparton ültünk, és néztük, ahogy lemegy a nap."
+  },
+  {
+   "id": "opus-hu-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A számla végösszege 12 450 Ft, a borravalót nem tartalmazza."
+  },
+  {
+   "id": "opus-hu-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kétszer is elolvastam a levelet, mégsem értem, mit akar tőlem."
+  },
+  {
+   "id": "opus-hu-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Gyere korábban, ha tudsz; errefelé elég nehéz parkolni."
+  },
+  {
+   "id": "opus-hu-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Az unokaöcsém hétéves, és már jobban sakkozik, mint én."
+  },
+  {
+   "id": "opus-hu-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tavasszal szeretnénk kifesteni a nappalit - talán világoszöldre."
+  },
+  {
+   "id": "opus-hu-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A vonat 14:05-kor indul a Keleti pályaudvarról, a 9-es vágányról."
+  },
+  {
+   "id": "opus-hu-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mindenki tapsolt, amikor a kislány elszavalta a versét."
+  },
+  {
+   "id": "opus-hu-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Esküszöm, csak egy szelet tortát akartam enni!"
+  },
+  {
+   "id": "opus-hu-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A könyvtárban halkan kell beszélni, telefonálni pedig egyáltalán nem szabad."
+  },
+  {
+   "id": "opus-hu-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ha eltévedsz, kérdezz a sarki pékségben; ott mindenkit ismernek."
+  },
+  {
+   "id": "opus-hu-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A kávégép megint villog: vízkőtelenítés kell neki, vagy új szűrő?"
+  },
+  {
+   "id": "opus-hu-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Idén először a Balatonnál töltjük a szilvesztert."
+  },
+  {
+   "id": "opus-hu-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Szerdán a csapat 3:1-re nyert, pedig senki sem hitt bennük."
+  },
+  {
+   "id": "opus-hu-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A fiókban találtam egy régi képeslapot 1987-ből."
+  },
+  {
+   "id": "opus-hu-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nem szeretek korán kelni, de a hajnali csendet imádom."
+  },
+  {
+   "id": "opus-hu-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A \"gyors\" javítás végül három órán át tartott."
+  },
+  {
+   "id": "opus-hu-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kérlek, szólj, ha megérkeztél; addig úgysem tudok elaludni."
+  },
+  {
+   "id": "opus-hu-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A piacon most nagyon jó a paradicsom, ráadásul olcsó is."
+  },
+  {
+   "id": "opus-hu-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ez a dal mindig az első nyári táborra emlékeztet."
+  },
+  {
+   "id": "opus-hu-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A macska az ablakpárkányon ül, és a galambokat lesi."
+  },
+  {
+   "id": "opus-hu-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mennyi idő gyalog a várig? Fél óra?"
+  },
+  {
+   "id": "opus-hu-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A régi bicikli rozsdás, de a lánca még mindig hibátlanul fut."
+  },
+  {
+   "id": "opus-hu-p041",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Holnap reggel 8-kor ott leszek - ha a busz is így gondolja."
+  },
+  {
+   "id": "opus-hu-p042",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A szomszédok kertjében már virágzik a cseresznyefa."
+  },
+  {
+   "id": "opus-hu-p043",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ugye nem felejtetted el, hogy ma van anya születésnapja?"
+  },
+  {
+   "id": "opus-hu-p044",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A pénztárnál derült ki, hogy otthon hagytam a pénztárcámat."
+  },
+  {
+   "id": "opus-hu-p045",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ma este palacsinta lesz: túrós, lekváros és kakaós."
+  },
+  {
+   "id": "opus-hu-p046",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Az irodában mindenki náthás, és már az én torkom is kapar."
+  },
+  {
+   "id": "opus-hu-p047",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A cikk szerint 20%-kal nőtt a kerékpárosok száma a városban."
+  },
+  {
+   "id": "opus-hu-p048",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tiszta időben a kilátóból egészen a Mátráig ellátni."
+  },
+  {
+   "id": "opus-hu-p049",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nem az a kérdés, hogy sikerül-e, hanem az, hogy mikor."
+  },
+  {
+   "id": "opus-hu-p050",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A gyerekek hóembert építettek, és nagypapa sálját tekerték a nyakába."
+  },
+  {
+   "id": "opus-hu-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Aki a kávén spórol, az az egész reggelt elveszíti.\""
+  },
+  {
+   "id": "opus-hu-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "A türelmes kertész a második évben arat igazán."
+  },
+  {
+   "id": "opus-hu-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Csak az nem téved, aki soha semmit nem kérdez.\""
+  },
+  {
+   "id": "opus-hu-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Ami ma bosszant, holnap már jó történet lesz a vacsoraasztalnál."
+  },
+  {
+   "id": "opus-hu-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Lassan járj, de előtte nézd meg a menetrendet!\""
+  },
+  {
+   "id": "opus-hu-p056",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Egy jó szomszéd többet ér egy tele kamránál."
+  },
+  {
+   "id": "opus-hu-p057",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"A legrövidebb út sokszor az a kitérő, amit senki sem ajánlott.\""
+  },
+  {
+   "id": "opus-hu-p058",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Aki tud nevetni magán, sosem unatkozik."
+  },
+  {
+   "id": "opus-hu-p059",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"A csendes emberek gondolatai hangosabbak, mint hinnéd.\""
+  },
+  {
+   "id": "opus-hu-p060",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Egy jó könyv mellett egyetlen vonat sem késik."
+  },
+  {
+   "id": "opus-hu-p061",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Az esernyőt mindig azon a napon hagyod otthon, amikor tényleg kellene.\""
+  },
+  {
+   "id": "opus-hu-p062",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Minden nagy utazás egy otthon felejtett töltővel kezdődik."
+  },
+  {
+   "id": "opus-hu-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Kapcsold ki a sütőt, és hagyd benne a süteményt még öt percig."
+  },
+  {
+   "id": "opus-hu-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Töltse ki az űrlapot nyomtatott betűkkel, majd írja alá a lap alján."
+  },
+  {
+   "id": "opus-hu-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Nyomd meg háromszor a gombot, amíg a jelzőfény zölden nem villog."
+  },
+  {
+   "id": "opus-hu-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "A jelszó legalább 8 karakter legyen: kisbetű, nagybetű és szám is kell bele."
+  },
+  {
+   "id": "opus-hu-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Szállj le a harmadik megállónál, majd a postánál fordulj jobbra."
+  },
+  {
+   "id": "opus-hu-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "30 fokon, kifordítva mosandó; centrifugálni tilos!"
+  },
+  {
+   "id": "opus-hu-p069",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Keverd simára a lisztet a tejjel, és adj hozzá egy csipet sót."
+  },
+  {
+   "id": "opus-hu-p070",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Indítsd újra a telefont, aztán próbáld meg még egyszer a frissítést."
+  },
+  {
+   "id": "opus-hu-p071",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Kérjük, jegyét az utazás végéig őrizze meg!"
+  },
+  {
+   "id": "opus-hu-p072",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Zárd be az ajtót, és tedd a kulcsot a lábtörlő alá."
+  },
+  {
+   "id": "opus-hu-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Hétvégén lehűlés várható, a hegyekben az első hó is leeshet"
+  },
+  {
+   "id": "opus-hu-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Új kerékpárút épül a Duna-parton, tavaszra készülhet el"
+  },
+  {
+   "id": "opus-hu-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Megnyílt a város első csomagolásmentes boltja a belvárosban"
+  },
+  {
+   "id": "opus-hu-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Rekordot döntött a nyári fesztivál: 120 ezer látogató érkezett"
+  },
+  {
+   "id": "opus-hu-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Drágul a tömegközlekedés? A közgyűlés kedden dönt"
+  },
+  {
+   "id": "opus-hu-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Helyi diákok nyerték az országos robotépítő versenyt"
+  },
+  {
+   "id": "opus-hu-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Pályafelújítás a szobi vonalon: hétvégén pótlóbuszok járnak"
+  },
+  {
+   "id": "opus-hu-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Felújítják a régi vásárcsarnokot (az árusok ideiglenesen elköltöznek)"
+  }
+ ]
+}

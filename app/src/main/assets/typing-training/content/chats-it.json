@@ -1,0 +1,1634 @@
+{
+ "chats": [
+  {
+   "id": "haiku-it-01",
+   "source": "claude-haiku",
+   "topic": "Aperitivo con gli amici",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ci vediamo domani sera per un aperitivo sui Navigli? Alle 19?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì dai! Io arrivo un po' dopo, finisco il lavoro alle 19:30"
+    },
+    {
+     "speaker": "A",
+     "text": "Va bene, ci sediamo fuori se c'è posto. Ci sono anche Marta e Luca?"
+    },
+    {
+     "speaker": "B",
+     "text": "Marta sì, Luca ha detto che forse arriva tardi"
+    },
+    {
+     "speaker": "A",
+     "text": "Peccato, lui è sempre il più divertente. Quanto costa lo spritz lì?"
+    },
+    {
+     "speaker": "B",
+     "text": "Circa 9 euro, ma con il buffet è abbondante"
+    },
+    {
+     "speaker": "A",
+     "text": "Allora va benissimo. Prenoto un tavolo per 4?"
+    },
+    {
+     "speaker": "B",
+     "text": "Meglio per 5, vuole venire anche Giulia"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto, scrivo io al locale. Ci vediamo lì!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Grande! Non fare tardi come l'ultima volta ;)"
+    },
+    {
+     "speaker": "A",
+     "text": "Ma no, stavolta sono puntualissimo. Promesso!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-02",
+   "source": "claude-haiku",
+   "topic": "Trasloco",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Abbiamo finalmente le chiavi del nuovo appartamento! Quando possiamo iniziare a portare le scatole?"
+    },
+    {
+     "speaker": "B",
+     "text": "Evviva! Sabato mattina va bene per me, alle 9"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto. Ho circa 25 scatole e il divano non passa dalle scale"
+    },
+    {
+     "speaker": "B",
+     "text": "Dobbiamo smontarlo allora. Il furgone l'hai già prenotato?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, per sabato dalle 8 alle 14. Costa 80 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo. Chi porta il trapano per il letto?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mio padre viene con la cassetta degli attrezzi, sa tutto lui"
+    },
+    {
+     "speaker": "B",
+     "text": "Meglio così, io con il trapano combino sempre dei disastri ahah"
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, ok. Tu porti il caffè e qualche dolce?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, e una pizza per pranzo. Quale preferisci?"
+    },
+    {
+     "speaker": "A",
+     "text": "Margherita e una con i funghi, grazie mille. Sei un tesoro!"
+    },
+    {
+     "speaker": "B",
+     "text": "Figurati, per queste cose ci sono gli amici ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-03",
+   "source": "claude-haiku",
+   "topic": "Partita di calcio",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hai visto la partita ieri sera? L'arbitro ha rovinato tutto"
+    },
+    {
+     "speaker": "B",
+     "text": "Il rigore era dubbio, ma l'espulsione è stata giusta"
+    },
+    {
+     "speaker": "A",
+     "text": "Ma quale espulsione, quel difensore ha solo sfiorato il pallone!"
+    },
+    {
+     "speaker": "B",
+     "text": "Tu difendi sempre quella squadra, ormai è un vizio"
+    },
+    {
+     "speaker": "A",
+     "text": "Perché giocano bene, mica come le solite squadre che si buttano a terra"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, domenica giochiamo noi contro il team dell'ufficio. Ci sei?"
+    },
+    {
+     "speaker": "A",
+     "text": "Certo, a che ora?"
+    },
+    {
+     "speaker": "B",
+     "text": "Alle 10:30 al campetto vicino alla scuola. Dobbiamo essere in 11"
+    },
+    {
+     "speaker": "A",
+     "text": "Va bene, avviso gli altri nel gruppo. Chi fa il portiere?"
+    },
+    {
+     "speaker": "B",
+     "text": "Marco, ma ha mal di schiena, quindi tocca a Luca"
+    },
+    {
+     "speaker": "A",
+     "text": "Luca si lamenterà per tutto il tempo ahah"
+    },
+    {
+     "speaker": "B",
+     "text": "Lo so, ma ormai è una tradizione. Porti tu i palloni?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ne ho due nuovi. A domenica!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-04",
+   "source": "claude-haiku",
+   "topic": "Ragù della nonna",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "La nonna vuole fare il ragù per il pranzo di domenica. Ti va di aiutarla?"
+    },
+    {
+     "speaker": "B",
+     "text": "Certo! Lo fa con la carne mista, vero?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, manzo e maiale, e poi il sugo di pomodoro lo fa lei"
+    },
+    {
+     "speaker": "B",
+     "text": "Quanto tempo ci mette? Ho sempre paura di farlo attaccare"
+    },
+    {
+     "speaker": "A",
+     "text": "Almeno tre ore a fuoco basso. Non deve mai bollire forte"
+    },
+    {
+     "speaker": "B",
+     "text": "E il vino? Bianco o rosso?"
+    },
+    {
+     "speaker": "A",
+     "text": "Rosso, un bicchiere, poi lei dice che si cuoce tutto da solo"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, porto io la carne dal macellaio, la prendo alle 9"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto. Ricordati di prendere anche la pasta fresca, tagliatelle"
+    },
+    {
+     "speaker": "B",
+     "text": "Quelle le facciamo in casa con la nonna, lei non si fida di quelle pronte"
+    },
+    {
+     "speaker": "A",
+     "text": "Eh lo so, è un'artista. Allora ci vediamo alle 10 da lei"
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene, ma mi raccomando, niente cipolla!"
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, promesso, la nonna la mette solo se non lo vede nessuno"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-05",
+   "source": "claude-haiku",
+   "topic": "Spesa per la festa",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Per sabato ci servono bibite, patatine e qualcosa da mangiare. Che prendiamo?"
+    },
+    {
+     "speaker": "B",
+     "text": "Io porto le birre e due bottiglie di prosecco"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok. Quanti siamo? Una quindicina?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, forse qualcuno in più se Sara porta il fidanzato"
+    },
+    {
+     "speaker": "A",
+     "text": "Allora meglio prendere anche due litri di succo per chi non beve alcol"
+    },
+    {
+     "speaker": "B",
+     "text": "Giusto. Tu porti i dolci?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tiramisù da fare a casa, costa meno che comprarlo in pasticceria"
+    },
+    {
+     "speaker": "B",
+     "text": "Ottima idea, ma non l'ho mai fatto. Mi insegni?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dai, ci provo. Mi servono anche bicchieri e tovaglioli, non ne abbiamo abbastanza"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne compro io 50 al supermercato, costano pochissimo"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto, così non dobbiamo lavare nulla. Paghi tu e ti rimborso"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, ma non farmi spendere 40 euro di roba come l'ultima volta"
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, promesso. A sabato!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-06",
+   "source": "claude-haiku",
+   "topic": "Esame di analisi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hai già studiato per l'esame di analisi? Io sono ancora al capitolo sulle serie"
+    },
+    {
+     "speaker": "B",
+     "text": "Un po', ma le derivate parziali mi fanno impazzire"
+    },
+    {
+     "speaker": "A",
+     "text": "Anche a me. Me le spieghi tu domani?"
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene, ci vediamo in biblioteca alle 14:00?"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto. Porto gli appunti, ho saltato un pezzo a lezione"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, anch'io. Hai il testo del prof?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ce l'ho in PDF. Ti mando il link stasera"
+    },
+    {
+     "speaker": "B",
+     "text": "Grazie. Secondo te esce la dimostrazione?"
+    },
+    {
+     "speaker": "A",
+     "text": "Probabilmente sì, lui le ha sempre chieste"
+    },
+    {
+     "speaker": "B",
+     "text": "Che noia, ma almeno è un argomento bello"
+    },
+    {
+     "speaker": "A",
+     "text": "Sarà, ma io preferisco i calcoli. Porto anche la calcolatrice"
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo, a domani! Non dimenticare il badge della biblioteca"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-07",
+   "source": "claude-haiku",
+   "topic": "Visita dall'oculista",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Domani ho la visita dall'oculista alle 9, sono agitato"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma è una visita di controllo, no? Cosa ti senti?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ogni tanto vedo le lettere sfocate quando leggo sul telefono"
+    },
+    {
+     "speaker": "B",
+     "text": "Probabilmente ti serve una nuova gradazione. Hai già gli occhiali?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ma sono vecchi di tre anni. Però li ho pagati 250 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "Non è poco! Chiedi se la mutua copre la visita"
+    },
+    {
+     "speaker": "A",
+     "text": "Penso di sì, ma metà la paghi tu"
+    },
+    {
+     "speaker": "B",
+     "text": "Vabbè, meglio non risparmiare sulla vista. Vai da solo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, tanto sono solo 40 minuti. Ti scrivo dopo"
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene. Mi raccomando, non farti spaventare dalle goccine che ti mettono"
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, spero che siano veloci. Grazie per la pazienza"
+    },
+    {
+     "speaker": "B",
+     "text": "Figurati, poi fammi sapere cosa ti dice!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-08",
+   "source": "claude-haiku",
+   "topic": "Computer lento",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Il mio computer è diventato lentissimo, ci mette un'eternità ad aprire i programmi"
+    },
+    {
+     "speaker": "B",
+     "text": "Hai provato a riavviarlo? A volte basta questo"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ma dopo cinque minuti è di nuovo lento. Controllo il disco e sembra pieno"
+    },
+    {
+     "speaker": "B",
+     "text": "Quanto spazio hai libero?"
+    },
+    {
+     "speaker": "A",
+     "text": "Pochissimo, tipo 4 giga su 256. Ci sono un sacco di foto e video vecchi"
+    },
+    {
+     "speaker": "B",
+     "text": "Spostali su una chiavetta o sul cloud, così respiri un po'"
+    },
+    {
+     "speaker": "A",
+     "text": "Ottima idea. Poi forse devo anche disattivare qualche programma all'avvio"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, ma fai attenzione a non togliere quelli importanti per il sistema"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, mi dai una mano stasera per farlo bene?"
+    },
+    {
+     "speaker": "B",
+     "text": "Certo, portalo da me alle 20:00. Porta anche il caricatore"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, lo porto sicuramente. Non voglio perdere le foto del viaggio"
+    },
+    {
+     "speaker": "B",
+     "text": "Tranquillo, faccio prima un backup e poi lavoriamo"
+    },
+    {
+     "speaker": "A",
+     "text": "Grazie mille, sei un salvatore!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-09",
+   "source": "claude-haiku",
+   "topic": "Frecciarossa in ritardo",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Il Frecciarossa per Roma è in ritardo di 40 minuti, ci hanno chiesto di aspettare"
+    },
+    {
+     "speaker": "B",
+     "text": "Che noia! C'è un guasto alla linea o cosa?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hanno detto un problema tecnico vicino a Firenze"
+    },
+    {
+     "speaker": "B",
+     "text": "Perderai la coincidenza a Roma?"
+    },
+    {
+     "speaker": "A",
+     "text": "Probabilmente sì, la prossima è tra un'ora"
+    },
+    {
+     "speaker": "B",
+     "text": "Chiedi il rimborso o il cambio del biglietto dall'app"
+    },
+    {
+     "speaker": "A",
+     "text": "Ho già fatto la richiesta, mi hanno dato un buono di 15 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "Non è molto. Ti spettano almeno i soldi del ritardo"
+    },
+    {
+     "speaker": "A",
+     "text": "Vedrò, ci sono le regole per i rimborsi sul sito"
+    },
+    {
+     "speaker": "B",
+     "text": "Tieni duro, se arrivi in tempo ci vediamo per cena!"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ti scrivo quando arrivo alla stazione. Ci sentiamo!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, e prendi un caffè per me, mi raccomando ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-10",
+   "source": "claude-haiku",
+   "topic": "Regalo per la mamma",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Il compleanno della mamma è tra due settimane. Hai già un'idea?"
+    },
+    {
+     "speaker": "B",
+     "text": "Pensavo a un profumo o a una borsa, cosa ne dici?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha già due borse e il profumo lo cambia sempre. Ma mi piacerebbe un regalo speciale"
+    },
+    {
+     "speaker": "B",
+     "text": "Un viaggio a Ravenna? Lei adora i mosaici"
+    },
+    {
+     "speaker": "A",
+     "text": "Ottima idea, il treno costa circa 60 euro a persona. Non è male"
+    },
+    {
+     "speaker": "B",
+     "text": "Allora facciamo una gita di una giornata, la portiamo a pranzo"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto. Quanto possiamo spendere in totale?"
+    },
+    {
+     "speaker": "B",
+     "text": "Io metto 50 euro, poi vediamo il resto con Chiara"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, io pago il pranzo, circa 80 euro in due"
+    },
+    {
+     "speaker": "B",
+     "text": "Più le spese per il treno. Chiediamo anche a papà?"
+    },
+    {
+     "speaker": "A",
+     "text": "Papà sicuramente vorrà venire, è sempre il primo che si offre!"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, e lui pagherà i caffè ahah. Ci organizziamo nel gruppo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ti mando lo schema dei costi stasera"
+    },
+    {
+     "speaker": "B",
+     "text": "Grazie, sei una vera forza!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-11",
+   "source": "claude-haiku",
+   "topic": "Colloquio di lavoro a Milano",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho un colloquio di lavoro a Milano giovedì alle 15, sono nervosissimo"
+    },
+    {
+     "speaker": "B",
+     "text": "Dai, andrà benissimo! Di cosa si occupa l'azienda?"
+    },
+    {
+     "speaker": "A",
+     "text": "Logistica internazionale, cercano un responsabile di magazzino"
+    },
+    {
+     "speaker": "B",
+     "text": "Hai già preparato le risposte alle domande classiche?"
+    },
+    {
+     "speaker": "A",
+     "text": "Più o meno. Non so mai cosa dire sul mio punto debole"
+    },
+    {
+     "speaker": "B",
+     "text": "Dì che tendi a fare tutto da solo, ma che ora delego di più"
+    },
+    {
+     "speaker": "A",
+     "text": "Buona idea. E lo stipendio? Devo dire una cifra?"
+    },
+    {
+     "speaker": "B",
+     "text": "Dai un range, tipo 2000 euro netti al mese, poi vedi tu"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok. Il treno da Bologna ci mette un'ora e mezza, meglio prendere quello delle 12"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, con un po' di margine. Metti la giacca anche se fa caldo"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ho già preparato il vestito. Ti scrivo appena esco!!"
+    },
+    {
+     "speaker": "B",
+     "text": "In bocca al lupo, ti aspetto!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-12",
+   "source": "claude-haiku",
+   "topic": "Mercatino dell'usato",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Sabato andiamo al mercatino dell'usato in piazza? Cerco un vecchio lampadario"
+    },
+    {
+     "speaker": "B",
+     "text": "Volentieri! Io cerco libri e qualche disco in vinile"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, portiamo contanti, che molti non accettano carta"
+    },
+    {
+     "speaker": "B",
+     "text": "Hai ragione, porto 30 euro in monete"
+    },
+    {
+     "speaker": "A",
+     "text": "Io ne ho 40, così magari compro anche la sedia di legno"
+    },
+    {
+     "speaker": "B",
+     "text": "Sei sempre pieno di idee. A che ora apre?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dalle 8:00, ma meglio arrivare alle 9, quando c'è più roba"
+    },
+    {
+     "speaker": "B",
+     "text": "Uffa, presto. Va bene, ma tu offri il caffè dopo"
+    },
+    {
+     "speaker": "A",
+     "text": "Affare fatto! Se troviamo il lampadario ti invito anche a pranzo"
+    },
+    {
+     "speaker": "B",
+     "text": "Dai, ci sto. Ci vediamo davanti alla fontana"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto, a sabato! Prendi una borsa grande"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-13",
+   "source": "claude-haiku",
+   "topic": "Tagliando dell'auto",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Devo portare la macchina al tagliando, quanto costa più o meno?"
+    },
+    {
+     "speaker": "B",
+     "text": "Dipende dal meccanico. Dalle 250 euro in su, se cambiano anche l'olio"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha 40000 km, quindi dovrebbe essere quello grosso"
+    },
+    {
+     "speaker": "B",
+     "text": "Allora chiedi un preventivo scritto prima di dire sì"
+    },
+    {
+     "speaker": "A",
+     "text": "Hanno detto che servono anche le pastiglie dei freni, chiedono 120 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "Fai controllare anche la batteria, se è vecchia ti lascia a piedi"
+    },
+    {
+     "speaker": "A",
+     "text": "Ah, questo non lo sapevo. Quanto dura di solito?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tre o quattro anni, a seconda dell'uso. La mia è da cinque anni"
+    },
+    {
+     "speaker": "A",
+     "text": "Allora la cambio anch'io, non voglio rischiare in autostrada"
+    },
+    {
+     "speaker": "B",
+     "text": "Ottima scelta. E non dimenticare di portare il libretto"
+    },
+    {
+     "speaker": "A",
+     "text": "Certo, mi sono già segnato tutto. Grazie del consiglio!"
+    },
+    {
+     "speaker": "B",
+     "text": "Di niente, ci sentiamo dopo il tagliando ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-14",
+   "source": "claude-haiku",
+   "topic": "Vacanza in montagna sotto la pioggia",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Il weekend in montagna rischia di essere tutto sotto la pioggia, guarda le previsioni"
+    },
+    {
+     "speaker": "B",
+     "text": "Uffa! Abbiamo già prenotato il rifugio, non si può cancellare"
+    },
+    {
+     "speaker": "A",
+     "text": "Possiamo fare comunque il sentiero breve, i rifugi hanno sempre il camino"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, prendiamo gli stivali e i k-way. Quanti km facciamo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Circa 8, con 500 metri di dislivello, niente di che"
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene. Ci sono i treni per Bolzano o andiamo in macchina?"
+    },
+    {
+     "speaker": "A",
+     "text": "In macchina, ci fermiamo a Trento per un caffè"
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo, parto alle 7 così evitiamo il traffico in autostrada"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfetto. Porta anche le coperte per la notte, il rifugio è freddo"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, e il vino per la cena lo porto io, ahah"
+    },
+    {
+     "speaker": "A",
+     "text": "Non metterlo nel bagagliaio con i panini, grazie"
+    },
+    {
+     "speaker": "B",
+     "text": "Non ti preoccupare, il vino sta in alto. Ci vediamo domani!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-15",
+   "source": "claude-haiku",
+   "topic": "Gatto malato",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Il mio gatto non mangia da ieri e sta sempre nascosto sotto il letto"
+    },
+    {
+     "speaker": "B",
+     "text": "Uh, è preoccupante. Ha vomitato o fatto la cacca?"
+    },
+    {
+     "speaker": "A",
+     "text": "Non ha vomitato, però beve pochissima acqua"
+    },
+    {
+     "speaker": "B",
+     "text": "Chiama il veterinario, meglio non aspettare troppo"
+    },
+    {
+     "speaker": "A",
+     "text": "La clinica chiude alle 13, è sabato. Sto chiamando adesso"
+    },
+    {
+     "speaker": "B",
+     "text": "Se non rispondono, c'è il pronto soccorso veterinario in centro"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, provo a chiamare. Ha 12 anni, mi preoccupo subito"
+    },
+    {
+     "speaker": "B",
+     "text": "Lo capisco. Prova a dargli un po' di pollo tiepido, a volte aiuta"
+    },
+    {
+     "speaker": "A",
+     "text": "Ci ho già provato, ma niente. Non vuole nemmeno le crocchette"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, aspetta le indicazioni del vet e fammi sapere"
+    },
+    {
+     "speaker": "A",
+     "text": "Va bene. Ti scrivo dopo la visita, grazie per essere in ascolto"
+    },
+    {
+     "speaker": "B",
+     "text": "Sempre. Speriamo che sia solo un po' di stress!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-16",
+   "source": "claude-haiku",
+   "topic": "Pranzo con i suoceri",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Domenica pranziamo dai tuoi, ti ricordi? Tua madre ha detto ore 13:00 in punto."
+    },
+    {
+     "speaker": "B",
+     "text": "Me lo ricordo, ma papà vuole sempre fare il giro del quartiere prima di mangiare."
+    },
+    {
+     "speaker": "A",
+     "text": "Allora arriviamo alle 12:30, così ci prendiamo un caffè."
+    },
+    {
+     "speaker": "B",
+     "text": "Non ti preoccupare, mamma apre la porta anche se siamo in ritardo!"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, ma il dolce lo porto io. Va bene la torta di mele?"
+    },
+    {
+     "speaker": "B",
+     "text": "Certo, a patto che non la fai tu da zero come l'ultima volta."
+    },
+    {
+     "speaker": "A",
+     "text": "Ehi, quella torta era buonissima! Solo un po' bassa."
+    },
+    {
+     "speaker": "B",
+     "text": "Un po' bassa? Sembrava una frittella."
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, va bene, questa volta la compro in pasticceria, contento?"
+    },
+    {
+     "speaker": "B",
+     "text": "Contentissimo. Porta anche il vino, che papà ha già finito quello buono."
+    },
+    {
+     "speaker": "A",
+     "text": "Ci penso io. Ma niente discorsi di politica a tavola, mi raccomando!"
+    },
+    {
+     "speaker": "B",
+     "text": "Promesso. Anche se lo zio Sergio ci casca sempre."
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-17",
+   "source": "claude-haiku",
+   "topic": "Casa al mare in Liguria",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho trovato una casa in affitto a Levanto per agosto, due camere e terrazza!"
+    },
+    {
+     "speaker": "B",
+     "text": "Quanto costa a settimana?"
+    },
+    {
+     "speaker": "A",
+     "text": "900 euro, con il posto auto incluso. Non è male per quella zona."
+    },
+    {
+     "speaker": "B",
+     "text": "È vicina al mare o bisogna prendere la macchina?"
+    },
+    {
+     "speaker": "A",
+     "text": "A cinque minuti a piedi dalla spiaggia, c'è anche una piccola focaccieria."
+    },
+    {
+     "speaker": "B",
+     "text": "Mi sembra perfetta. Ci sono le zanzare? Quelle di sera sono un incubo."
+    },
+    {
+     "speaker": "A",
+     "text": "Il proprietario dice di no, ma ha la zanzariera in tutte le finestre."
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, prenota prima che la trovi qualcun altro!"
+    },
+    {
+     "speaker": "A",
+     "text": "Ho già mandato la caparra, 200 euro, e ho chiesto la fattura."
+    },
+    {
+     "speaker": "B",
+     "text": "Bravo, sei sempre il più organizzato di tutti."
+    },
+    {
+     "speaker": "A",
+     "text": "Solo perché tu fai sempre tutto all'ultimo minuto!"
+    },
+    {
+     "speaker": "B",
+     "text": "Eh, così ho sempre un motivo per chiederti aiuto."
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-18",
+   "source": "claude-haiku",
+   "topic": "Corso di nuoto",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho iscritto Matteo al corso di nuoto del sabato mattina, alle 9:30."
+    },
+    {
+     "speaker": "B",
+     "text": "Bene! Ha già paura dell'acqua o è tranquillo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tranquillo, ma non vuole mettere la testa sott'acqua."
+    },
+    {
+     "speaker": "B",
+     "text": "Capita, ci vuole tempo. Il mio ha iniziato a sei anni e ci metteva un'ora."
+    },
+    {
+     "speaker": "A",
+     "text": "Quanto costa il corso?"
+    },
+    {
+     "speaker": "B",
+     "text": "70 euro al mese, con tre lezioni, mi pare."
+    },
+    {
+     "speaker": "A",
+     "text": "Un po' tanto, ma se impara a nuotare va bene."
+    },
+    {
+     "speaker": "B",
+     "text": "Ti conviene chiedere se fanno lezioni private, costano di più ma sono più veloci."
+    },
+    {
+     "speaker": "A",
+     "text": "Vedrò. Ho anche sentito che la piscina comunale ha il pomeriggio libero per famiglie."
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, il martedì e il giovedì dalle 15:00 alle 17:00, è molto frequentata."
+    },
+    {
+     "speaker": "A",
+     "text": "Allora ci andiamo il martedì, così Matteo si diverte senza pressione."
+    },
+    {
+     "speaker": "B",
+     "text": "Ottima idea. Porta la cuffia di ricambio, che si dimentica sempre!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-19",
+   "source": "claude-haiku",
+   "topic": "Caldaia rotta",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "La caldaia non si accende più, e fuori ci sono due gradi!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma davvero? Hai provato a riavviarla dal pannello?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, c'è scritto E01 sul display, qualunque cosa voglia dire."
+    },
+    {
+     "speaker": "B",
+     "text": "Di solito è la pressione bassa. Guarda il manometro, deve stare tra 1 e 1,5."
+    },
+    {
+     "speaker": "A",
+     "text": "È a 0,6, quindi la devo ricaricare? Come si fa?"
+    },
+    {
+     "speaker": "B",
+     "text": "C'è un rubinetto sotto la caldaia, lo apri finché la lancetta sale."
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, ci provo. Se non va, chiamo il tecnico di fiducia."
+    },
+    {
+     "speaker": "B",
+     "text": "Quello che ha fatto il lavoro a tuo cugino? Quello è bravo."
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, però costa 90 euro solo per venire a vedere."
+    },
+    {
+     "speaker": "B",
+     "text": "Eh, la caldaia non perdona. Fammi sapere com'è andata."
+    },
+    {
+     "speaker": "A",
+     "text": "Ti scrivo subito, incrocio le dita, sto congelando!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-20",
+   "source": "claude-haiku",
+   "topic": "Concerto in piazza",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Stasera c'è il concerto in piazza del Duomo, gratuito, alle 21:00. Vieni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chi suona?"
+    },
+    {
+     "speaker": "A",
+     "text": "Una band di Bologna, fanno cover degli anni Ottanta, dicono sia divertente."
+    },
+    {
+     "speaker": "B",
+     "text": "Mah, non sono un grande fan delle cover, però dai, andiamo."
+    },
+    {
+     "speaker": "A",
+     "text": "Ci spostiamo prima delle 20:30, altrimenti non troviamo posto."
+    },
+    {
+     "speaker": "B",
+     "text": "Porta una giacca, la sera si fa freddo ad aprile."
+    },
+    {
+     "speaker": "A",
+     "text": "Già pensato. E una bottiglia d'acqua, che costano un occhio."
+    },
+    {
+     "speaker": "B",
+     "text": "Vuoi una birra? Ne ho una nel frigo, la prendiamo lì."
+    },
+    {
+     "speaker": "A",
+     "text": "No, grazie, poi devo guidare."
+    },
+    {
+     "speaker": "B",
+     "text": "Ma la metro è aperta fino a tardi, non serve la macchina."
+    },
+    {
+     "speaker": "A",
+     "text": "Giusto, allora ci sto. Ci vediamo alla fermata alle 20:15?"
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene, ma se piove non esco, lo sai che odio il bagnato!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-21",
+   "source": "claude-haiku",
+   "topic": "Sagra del paese",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Sabato c'è la sagra del paese, quella con i porcini e le castagne."
+    },
+    {
+     "speaker": "B",
+     "text": "La sagra del fungo? Ci andiamo sempre, è la più bella della zona."
+    },
+    {
+     "speaker": "A",
+     "text": "Dicono che quest'anno ci sia anche il gruppo folk con la fisarmonica."
+    },
+    {
+     "speaker": "B",
+     "text": "Speriamo che suonino meglio dell'anno scorso, sembravano stonati."
+    },
+    {
+     "speaker": "A",
+     "text": "Ahah, erano fuori tempo dall'inizio alla fine!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma i tortelli erano buonissimi. Li ho mangiati tre volte."
+    },
+    {
+     "speaker": "A",
+     "text": "Tre? Non ti sembra un po' esagerato?"
+    },
+    {
+     "speaker": "B",
+     "text": "Non dire niente ai miei zii, ne hanno fatti solo due a testa."
+    },
+    {
+     "speaker": "A",
+     "text": "Ti porto a casa almeno un sacchetto di castagne, promesso."
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo. E ricordati il portafoglio, lì si paga solo in contanti."
+    },
+    {
+     "speaker": "A",
+     "text": "Eh, tanto anche il bancomat era rotto l'anno scorso!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-22",
+   "source": "claude-haiku",
+   "topic": "Bolletta troppo alta",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho ricevuto la bolletta della luce: 310 euro, non è possibile!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma non eri in vacanza per due settimane?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ero via, il contatore doveva essere quasi fermo."
+    },
+    {
+     "speaker": "B",
+     "text": "Hai controllato la lettura del contatore? Potrebbe essere stimata male."
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, c'è scritto stima, non lettura reale. Ho chiamato il numero verde."
+    },
+    {
+     "speaker": "B",
+     "text": "Quanto ci hanno messo a risponderti?"
+    },
+    {
+     "speaker": "A",
+     "text": "Quaranta minuti di musichetta, poi è caduta la linea."
+    },
+    {
+     "speaker": "B",
+     "text": "Che rabbia! Fai reclamo scritto, così resta traccia."
+    },
+    {
+     "speaker": "A",
+     "text": "Lo faccio domani. Intanto ho già mandato la foto del contatore."
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo. Le bollette stimate si correggono con il conguaglio."
+    },
+    {
+     "speaker": "A",
+     "text": "Speriamo, altrimenti pago questa cifra e non me la dimentico più."
+    },
+    {
+     "speaker": "B",
+     "text": "Dai, è già un passo avanti, in bocca al lupo!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-23",
+   "source": "claude-haiku",
+   "topic": "Quiz per la patente",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Oggi ho fatto il quiz della patente, 28 errori su 30, pessimo."
+    },
+    {
+     "speaker": "B",
+     "text": "Ma dai, hai studiato o no?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ho fatto tutti i test sull'app, ma le domande cambiano sempre."
+    },
+    {
+     "speaker": "B",
+     "text": "Quali sono quelle difficili? I segnali o i sorpassi?"
+    },
+    {
+     "speaker": "A",
+     "text": "I segnali stradali sono una tortura, ci sono troppi cartelli simili."
+    },
+    {
+     "speaker": "B",
+     "text": "Il trucco è capire la forma e il colore, poi il resto viene da sé."
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, ti credo. Ma le domande sulle precedenze mi confondono ancora."
+    },
+    {
+     "speaker": "B",
+     "text": "Ricorda: a destra sempre, salvo segnali contrari. È la regola base."
+    },
+    {
+     "speaker": "A",
+     "text": "Me lo ripeto ogni notte, come una filastrocca."
+    },
+    {
+     "speaker": "B",
+     "text": "Bene, poi rifai il quiz domani, con calma."
+    },
+    {
+     "speaker": "A",
+     "text": "Tu mi prendi in giro, ma ti prometto che lo passo al secondo tentativo!"
+    },
+    {
+     "speaker": "B",
+     "text": "Lo spero, perché la macchina di mio padre non te la presto più."
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-24",
+   "source": "claude-haiku",
+   "topic": "Pizza che non lievita",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "La pizza non lievita, sono le sette di sera e l'impasto è ancora piatto!"
+    },
+    {
+     "speaker": "B",
+     "text": "Hai messo il lievito di birra o quello in polvere?"
+    },
+    {
+     "speaker": "A",
+     "text": "Quello fresco, del supermercato, dieci grammi."
+    },
+    {
+     "speaker": "B",
+     "text": "Dove l'hai tenuto? Se era in cucina vicino al forno, troppo caldo, ammazza il lievito."
+    },
+    {
+     "speaker": "A",
+     "text": "L'ho lasciato sul tavolo, a 20 gradi, ma non so se bastano."
+    },
+    {
+     "speaker": "B",
+     "text": "Potrebbe essere l'acqua troppo calda, sopra i 40 gradi lo uccide."
+    },
+    {
+     "speaker": "A",
+     "text": "Ho messo acqua del rubinetto, non l'ho misurata col termometro."
+    },
+    {
+     "speaker": "B",
+     "text": "Allora aggiungi un pizzico di lievito e lascia riposare un'altra ora."
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, nel frattempo preparo il sugo. Ci sarà tempo?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, ma non aprire il forno di continuo, altrimenti non sale."
+    },
+    {
+     "speaker": "A",
+     "text": "Mi raccomando, mi dai il voto dopo!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ti dirò il voto solo se la finisco tutta!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-25",
+   "source": "claude-haiku",
+   "topic": "Festa di compleanno della nipote",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Sabato facciamo la festa per i sei anni di Giulia, ti aspettiamo!"
+    },
+    {
+     "speaker": "B",
+     "text": "Che bello! Vuoi che porti qualcosa?"
+    },
+    {
+     "speaker": "A",
+     "text": "Qualche bibita e i bicchierini, il resto l'ho già organizzato."
+    },
+    {
+     "speaker": "B",
+     "text": "Hai già preso la torta? Quella al cioccolato con gli unicorni?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, l'ha ordinata la mamma, la ritira alle 10:00 in pasticceria."
+    },
+    {
+     "speaker": "B",
+     "text": "Ottimo. E i regali? Giulia vuole solo i pastelli, mi ha detto."
+    },
+    {
+     "speaker": "A",
+     "text": "Eh, i pastelli li hanno già regalati almeno tre compagni."
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, allora le compro un libro illustrato, che non si ripete."
+    },
+    {
+     "speaker": "A",
+     "text": "Bella idea. Ma attento, perché ne ha già due dalla zia."
+    },
+    {
+     "speaker": "B",
+     "text": "Ahah, almeno la famiglia è una garanzia! Ci vediamo alle 15:30?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ma arriva puntuale, che i bambini hanno già fame!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-26",
+   "source": "claude-haiku",
+   "topic": "Pacco alle Poste",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho ricevuto l'avviso di giacenza delle Poste, ma il pacco dov'è?"
+    },
+    {
+     "speaker": "B",
+     "text": "Di solito è all'ufficio di zona. Hai il codice?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ma l'ufficio chiude alle 13:30 e io esco dal lavoro alle 14:00."
+    },
+    {
+     "speaker": "B",
+     "text": "Eh, la sfortuna. Puoi delegare qualcuno con il documento."
+    },
+    {
+     "speaker": "A",
+     "text": "Ci sarebbe mia sorella, ma non ha la delega firmata."
+    },
+    {
+     "speaker": "B",
+     "text": "Allora chiedi la consegna a domicilio, la fanno su richiesta."
+    },
+    {
+     "speaker": "A",
+     "text": "Ho già provato, mi hanno detto di passare di persona."
+    },
+    {
+     "speaker": "B",
+     "text": "Dai, prova con il punto di ritiro della stazione, che apre più tardi."
+    },
+    {
+     "speaker": "A",
+     "text": "Buona idea, ci passo giovedì, così il pacco non torna indietro."
+    },
+    {
+     "speaker": "B",
+     "text": "Ricordati la carta d'identità, ti chiedono sempre quella."
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, grazie, sei un salvavita!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-27",
+   "source": "claude-haiku",
+   "topic": "Sciopero dei treni",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Domani c'è sciopero dei treni, dalle 21:00 alle 24:00, lo sapevi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma dai! Io devo andare a Torino per la riunione alle 9:00."
+    },
+    {
+     "speaker": "A",
+     "text": "Hai il treno delle 7:00? Lo sciopero inizia dopo."
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, ma l'ultimo treno di ritorno è a rischio, per fortuna sono a Torino."
+    },
+    {
+     "speaker": "A",
+     "text": "Ti conviene prendere il pullman, ne passa uno ogni ora."
+    },
+    {
+     "speaker": "B",
+     "text": "Vero, controllo l'app. Ma costa più del doppio!"
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, però se resti bloccato lì è peggio."
+    },
+    {
+     "speaker": "B",
+     "text": "Hai ragione. Preparo lo zaino stasera, così non ho scuse."
+    },
+    {
+     "speaker": "A",
+     "text": "Ottimo. E porta il caricabatterie, non si sa mai quanto dura l'attesa."
+    },
+    {
+     "speaker": "B",
+     "text": "Lo porto sempre, è l'unica cosa che non dimentico mai!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-28",
+   "source": "claude-haiku",
+   "topic": "Torneo di scopa",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Domenica al circolo c'è il torneo di scopa, mi iscrivo con te?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sono molto arrugginito, l'ultima volta ho perso con tuo nonno."
+    },
+    {
+     "speaker": "A",
+     "text": "Il nonno? Ha più di ottant'anni e fa ancora la scopa a memoria!"
+    },
+    {
+     "speaker": "B",
+     "text": "Per questo ho perso. Non ti preoccupare, mi rifarò."
+    },
+    {
+     "speaker": "A",
+     "text": "Quanto costa l'iscrizione?"
+    },
+    {
+     "speaker": "B",
+     "text": "Dieci euro a coppia, poi c'è il rinfresco con panini e vino."
+    },
+    {
+     "speaker": "A",
+     "text": "Allora è un affare. Si gioca a coppie?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sì, e le coppie si fanno a sorteggio, quindi chissà."
+    },
+    {
+     "speaker": "A",
+     "text": "Speriamo di no, non voglio trovarmi con il signor Pietro."
+    },
+    {
+     "speaker": "B",
+     "text": "È l'unico che bara? Si dice che usi le carte segnate."
+    },
+    {
+     "speaker": "A",
+     "text": "Non dire queste cose, poi lo sa tutto il circolo!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, ok, vediamo come va. Ci vediamo alle 15:00?"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-29",
+   "source": "claude-haiku",
+   "topic": "Serie TV da maratonare",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ti ho passato la serie nuova, quella ambientata a Napoli? Devi vederla!"
+    },
+    {
+     "speaker": "B",
+     "text": "Quella con i clan? Ho già visto la prima stagione, ma non mi ha preso."
+    },
+    {
+     "speaker": "A",
+     "text": "Dai, la seconda è molto più bella, cambia tutto."
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, ma quanti episodi ci sono in totale?"
+    },
+    {
+     "speaker": "A",
+     "text": "Otto per stagione, circa cinquanta minuti l'uno."
+    },
+    {
+     "speaker": "B",
+     "text": "Quindi sono quasi otto ore, ce la faccio in un weekend."
+    },
+    {
+     "speaker": "A",
+     "text": "Ce la fai di sicuro, se non esci di casa e non rispondi al telefono."
+    },
+    {
+     "speaker": "B",
+     "text": "Va bene, ma il terzo episodio della seconda stagione è pesantissimo."
+    },
+    {
+     "speaker": "A",
+     "text": "Lo so, non voglio spoilerarti niente. Solo: preparati i fazzoletti!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ahah, ho già comprato le patatine. Ci sentiamo lunedì."
+    },
+    {
+     "speaker": "A",
+     "text": "Non osare dirmi com'è finita senza di me!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-it-30",
+   "source": "claude-haiku",
+   "topic": "Divano in vendita online",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ho messo in vendita il divano su un annuncio online, 150 euro, come nuovo."
+    },
+    {
+     "speaker": "B",
+     "text": "Come nuovo? Non ha ancora qualche macchia sul bracciolo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Quella macchia si lava via con il sapone di Marsiglia, non si vede più."
+    },
+    {
+     "speaker": "B",
+     "text": "Hai fatto le foto con la luce del giorno? Di sera sembra sempre sporco."
+    },
+    {
+     "speaker": "A",
+     "text": "Sì, ho fatto cinque foto, una anche del retro."
+    },
+    {
+     "speaker": "B",
+     "text": "Bene. Attento ai perditempo che chiedono di pagare in anticipo."
+    },
+    {
+     "speaker": "A",
+     "text": "Ci ho già parlato con uno, voleva ritirarlo con il furgone del cugino."
+    },
+    {
+     "speaker": "B",
+     "text": "Quindi meglio se lo ritira lui, con i suoi soldi in mano."
+    },
+    {
+     "speaker": "A",
+     "text": "Esatto, niente bonifici prima della consegna, ci mancherebbe!"
+    },
+    {
+     "speaker": "B",
+     "text": "Sei troppo gentile con questa gente. Se ti chiedono di più, rifiuta subito."
+    }
+   ]
+  }
+ ]
+}

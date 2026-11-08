@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-es-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El tren de las ocho llega siempre con diez minutos de retraso."
+  },
+  {
+   "id": "haiku-es-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mi abuela cocina el mejor arroz con leche del barrio."
+  },
+  {
+   "id": "haiku-es-p003",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¿Dónde dejaste las llaves esta vez, otra vez?"
+  },
+  {
+   "id": "haiku-es-p004",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hoy hace un frío que pela, así que sácate la bufanda."
+  },
+  {
+   "id": "haiku-es-p005",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Nos mudamos a Valencia en primavera y todavía no encontramos sofá."
+  },
+  {
+   "id": "haiku-es-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "La reunión se pasó a las 16:30 porque el jefe llega tarde."
+  },
+  {
+   "id": "haiku-es-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¡Qué ganas tengo de unas vacaciones en la playa!"
+  },
+  {
+   "id": "haiku-es-p008",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Compré entradas para el concierto del sábado, pero no sé si podré ir."
+  },
+  {
+   "id": "haiku-es-p009",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El perro del vecino ladra cada noche a las tres de la mañana."
+  },
+  {
+   "id": "haiku-es-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Tengo que pagar 45 euros de multa por aparcar en doble fila."
+  },
+  {
+   "id": "haiku-es-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mañana empiezo el curso de fotografía en la biblioteca municipal."
+  },
+  {
+   "id": "haiku-es-p012",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Nadie sabe por qué el wifi se corta siempre después de las diez."
+  },
+  {
+   "id": "haiku-es-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "La panadería de la esquina cierra los lunes, así que compra hoy."
+  },
+  {
+   "id": "haiku-es-p014",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Llovió toda la tarde, pero al final salimos a pasear por el parque."
+  },
+  {
+   "id": "haiku-es-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mi hermano aprendió a tocar la guitarra viendo vídeos en internet."
+  },
+  {
+   "id": "haiku-es-p016",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¿Quieres que te acompañe al médico o prefieres ir solo?"
+  },
+  {
+   "id": "haiku-es-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hemos reservado una mesa para cuatro en el restaurante del puerto."
+  },
+  {
+   "id": "haiku-es-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El examen de matemáticas fue difícil, pero creo que aprobé."
+  },
+  {
+   "id": "haiku-es-p019",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "La tienda de la calle Mayor vende pan artesanal de masa madre."
+  },
+  {
+   "id": "haiku-es-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Me encanta leer en el balcón cuando el sol de la tarde calienta."
+  },
+  {
+   "id": "haiku-es-p021",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Han cortado la calle por obras, así que tomaremos el camino largo."
+  },
+  {
+   "id": "haiku-es-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¿Cuánto cuesta el billete de ida y vuelta a Sevilla en tren?"
+  },
+  {
+   "id": "haiku-es-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mi tía tiene once gatos y todos tienen nombres de cantantes."
+  },
+  {
+   "id": "haiku-es-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Después del trabajo solo quiero tumbarme en el sofá y ver una serie."
+  },
+  {
+   "id": "haiku-es-p025",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Esta semana el supermercado tiene la leche con un 20 por ciento de descuento."
+  },
+  {
+   "id": "haiku-es-p026",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Aunque no tenga mucha experiencia, me gustaría presentarme a la vacante."
+  },
+  {
+   "id": "haiku-es-p027",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El ayuntamiento anunció que el parque reabrirá en mayo tras las obras."
+  },
+  {
+   "id": "haiku-es-p028",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¡Ojo con el escalón, que está un poco roto y te puedes caer!"
+  },
+  {
+   "id": "haiku-es-p029",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ana y Luis se casan en septiembre en una finca cerca de Toledo."
+  },
+  {
+   "id": "haiku-es-p030",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hace años que no visito a mis primos en Argentina, y los echo de menos."
+  },
+  {
+   "id": "haiku-es-p031",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El café de la oficina sabe a agua sucia, pero es gratis, así que no me quejo."
+  },
+  {
+   "id": "haiku-es-p032",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Se nos olvidó el aceite, así que hay que volver al supermercado otra vez."
+  },
+  {
+   "id": "haiku-es-p033",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "El precio del alquiler subió un ocho por ciento en los últimos doce meses."
+  },
+  {
+   "id": "haiku-es-p034",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "¿Viste el partido de anoche? El árbitro se equivocó tres veces seguidas."
+  },
+  {
+   "id": "haiku-es-p035",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Tomamos el autobús número 27, que tarda unos veinte minutos hasta el centro."
+  },
+  {
+   "id": "haiku-es-p036",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mi padre plancha las camisas los domingos mientras escucha la radio en la cocina."
+  },
+  {
+   "id": "haiku-es-p037",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "La paciencia es amarga, pero su fruto es dulce, dicen los abuelos."
+  },
+  {
+   "id": "haiku-es-p038",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "No todo lo que brilla es oro, pero a veces el oro brilla igual."
+  },
+  {
+   "id": "haiku-es-p039",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Quien madruga no siempre encuentra el café listo, pero siempre llega antes."
+  },
+  {
+   "id": "haiku-es-p040",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Vivir sin pedir permiso es la forma más honesta de empezar el día."
+  },
+  {
+   "id": "haiku-es-p041",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Nadie nace sabiendo, todos aprendemos tropezando\", escribió mi profesor."
+  },
+  {
+   "id": "haiku-es-p042",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Cada error es un paso más cerca de la respuesta correcta (y de un buen café)."
+  },
+  {
+   "id": "haiku-es-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "El tiempo cura las heridas, pero antes hay que atreverse a sentirlas."
+  },
+  {
+   "id": "haiku-es-p044",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Sonríe, que el mundo no se da cuenta de lo serio que te estás tomando todo."
+  },
+  {
+   "id": "haiku-es-p045",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "La prisa es mala consejera: pregúntate siempre si realmente la necesitas."
+  },
+  {
+   "id": "haiku-es-p046",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Sin mapa no hay viaje, y sin viaje no hay historia que contar."
+  },
+  {
+   "id": "haiku-es-p047",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Escuchar es un arte: el silencio también dice mucho de una persona."
+  },
+  {
+   "id": "haiku-es-p048",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Hoy es un buen día para empezar lo que siempre dejas para mañana."
+  },
+  {
+   "id": "haiku-es-p049",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Las grandes ideas empiezan en servilletas de bar y terminan en garajes."
+  },
+  {
+   "id": "haiku-es-p050",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "¡Atrévete a equivocarte, que de los fallos también se aprende!"
+  },
+  {
+   "id": "haiku-es-p051",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "La amistad verdadera no se mide en mensajes, sino en los días difíciles."
+  },
+  {
+   "id": "haiku-es-p052",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "El que espera desespera, pero el que actúa a tiempo recoge el premio."
+  },
+  {
+   "id": "haiku-es-p053",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Apaga las luces al salir de la habitación para ahorrar energía."
+  },
+  {
+   "id": "haiku-es-p054",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Lava las verduras antes de cortarlas y sécalas con un paño limpio."
+  },
+  {
+   "id": "haiku-es-p055",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Revisa la presión de los neumáticos cada mes, sobre todo en verano."
+  },
+  {
+   "id": "haiku-es-p056",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "No dejes la sartén sin vigilar mientras el aceite se calienta."
+  },
+  {
+   "id": "haiku-es-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Guarda el contrato original en una carpeta y haz una copia digital."
+  },
+  {
+   "id": "haiku-es-p058",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Mezcla la harina con la levadura y deja reposar la masa una hora."
+  },
+  {
+   "id": "haiku-es-p059",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Activa la verificación en dos pasos en tu cuenta de correo electrónico."
+  },
+  {
+   "id": "haiku-es-p060",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Cierra la puerta con llave al salir y comprueba que la ventana esté bien."
+  },
+  {
+   "id": "haiku-es-p061",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Escribe tu nombre y tu número de socio en el formulario de la derecha."
+  },
+  {
+   "id": "haiku-es-p062",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Pon el móvil en modo avión antes de entrar en la sala de cine."
+  },
+  {
+   "id": "haiku-es-p063",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Desenchufa el cargador cuando no lo uses, aunque no esté conectado al móvil."
+  },
+  {
+   "id": "haiku-es-p064",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Reserva con antelación si vienes en fin de semana, porque se llena rápido."
+  },
+  {
+   "id": "haiku-es-p065",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nuevo carril bici conecta el centro con el barrio de Triana este verano."
+  },
+  {
+   "id": "haiku-es-p066",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "La selección vence por dos a uno en un partido lleno de polémica arbitral."
+  },
+  {
+   "id": "haiku-es-p067",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Abre en la plaza mayor una librería con café y música en directo."
+  },
+  {
+   "id": "haiku-es-p068",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Tormenta de granizo deja daños en cientos de coches en la costa levantina."
+  },
+  {
+   "id": "haiku-es-p069",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "El ayuntamiento amplía el horario del metro durante las fiestas de octubre."
+  },
+  {
+   "id": "haiku-es-p070",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Científicos descubren una nueva especie de rana en la selva amazónica peruana."
+  },
+  {
+   "id": "haiku-es-p071",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "La cosecha de aceitunas será la más pequeña de la última década, según expertos."
+  },
+  {
+   "id": "haiku-es-p072",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Vecinos de Lavapiés protestan por el cierre de la biblioteca del barrio."
+  },
+  {
+   "id": "haiku-es-p073",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Un perro salvado del río recibe una medalla en el parque municipal de Cádiz."
+  },
+  {
+   "id": "haiku-es-p074",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Récord de visitantes en el museo tras la reforma de la sala de arte moderno."
+  },
+  {
+   "id": "haiku-es-p075",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Las tarifas de la luz bajan un 12 por ciento en el segundo trimestre del año."
+  },
+  {
+   "id": "haiku-es-p076",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "¿Qué pasa con el tranvía? Tres preguntas que el ayuntamiento aún no responde."
+  },
+  {
+   "id": "haiku-es-p077",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Los estudiantes de Salamanca organizan una cadena solidaria contra el hambre."
+  },
+  {
+   "id": "haiku-es-p078",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Cierran temporalmente el paso de la sierra por nevadas inesperadas esta noche."
+  },
+  {
+   "id": "haiku-es-p079",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "El festival de cine independiente llega a Bilbao con 60 películas y debates."
+  },
+  {
+   "id": "haiku-es-p080",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Un nuevo tren de alta velocidad unirá Madrid y Galicia en menos de tres horas."
+  }
+ ]
+}

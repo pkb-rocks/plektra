@@ -1,0 +1,724 @@
+{
+ "items": [
+  {
+   "id": "terra-de-p001",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Der kleine Vogel sitzt auf dem warmen Dach."
+  },
+  {
+   "id": "terra-de-p002",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Der kleine Vogel sitzt auf dem warmen Dach."
+  },
+  {
+   "id": "terra-de-p003",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Morgen besuchen wir den Markt am alten Platz."
+  },
+  {
+   "id": "terra-de-p004",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Morgen besuchen wir den Markt am alten Platz."
+  },
+  {
+   "id": "terra-de-p005",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Kannst du bitte das Fenster ein Stück öffnen?"
+  },
+  {
+   "id": "terra-de-p006",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Kannst du bitte das Fenster ein Stück öffnen?"
+  },
+  {
+   "id": "terra-de-p007",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Nach dem Regen riecht die Erde besonders frisch."
+  },
+  {
+   "id": "terra-de-p008",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Nach dem Regen riecht die Erde besonders frisch."
+  },
+  {
+   "id": "terra-de-p009",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Im Regal stehen Bücher, Tassen und eine kleine Pflanze."
+  },
+  {
+   "id": "terra-de-p010",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Im Regal stehen Bücher, Tassen und eine kleine Pflanze."
+  },
+  {
+   "id": "terra-de-p011",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute beginnt der Kurs erst um neun Uhr."
+  },
+  {
+   "id": "terra-de-p012",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Heute beginnt der Kurs erst um neun Uhr."
+  },
+  {
+   "id": "terra-de-p013",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Die Suppe schmeckt mit frischen Kräutern noch besser."
+  },
+  {
+   "id": "terra-de-p014",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Die Suppe schmeckt mit frischen Kräutern noch besser."
+  },
+  {
+   "id": "terra-de-p015",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Warum liegt der Schlüssel neben der leeren Schale?"
+  },
+  {
+   "id": "terra-de-p016",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Warum liegt der Schlüssel neben der leeren Schale?"
+  },
+  {
+   "id": "terra-de-p017",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Am Samstag fahren wir gemeinsam an den See."
+  },
+  {
+   "id": "terra-de-p018",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Am Samstag fahren wir gemeinsam an den See."
+  },
+  {
+   "id": "terra-de-p019",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Bitte schalte das Licht im Flur später aus."
+  },
+  {
+   "id": "terra-de-p020",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Bitte schalte das Licht im Flur später aus."
+  },
+  {
+   "id": "terra-de-p021",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Die Wolken ziehen langsam über die dunklen Hügel."
+  },
+  {
+   "id": "terra-de-p022",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Die Wolken ziehen langsam über die dunklen Hügel."
+  },
+  {
+   "id": "terra-de-p023",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Ein roter Faden führt durch die ganze Geschichte."
+  },
+  {
+   "id": "terra-de-p024",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Ein roter Faden führt durch die ganze Geschichte."
+  },
+  {
+   "id": "terra-de-p025",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Wir brauchen Mehl, Wasser und eine Prise Salz."
+  },
+  {
+   "id": "terra-de-p026",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Wir brauchen Mehl, Wasser und eine Prise Salz."
+  },
+  {
+   "id": "terra-de-p027",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Der Bus kommt heute vermutlich zehn Minuten später."
+  },
+  {
+   "id": "terra-de-p028",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Der Bus kommt heute vermutlich zehn Minuten später."
+  },
+  {
+   "id": "terra-de-p029",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Sie öffnet die Tür und lächelt ganz kurz."
+  },
+  {
+   "id": "terra-de-p030",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Sie öffnet die Tür und lächelt ganz kurz."
+  },
+  {
+   "id": "terra-de-p031",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "In der Pause trinken alle zusammen einen Tee."
+  },
+  {
+   "id": "terra-de-p032",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: In der Pause trinken alle zusammen einen Tee."
+  },
+  {
+   "id": "terra-de-p033",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Wer hat die bunten Stifte aufgeräumt?"
+  },
+  {
+   "id": "terra-de-p034",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Wer hat die bunten Stifte aufgeräumt?"
+  },
+  {
+   "id": "terra-de-p035",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Das neue Rezept braucht etwas mehr Geduld."
+  },
+  {
+   "id": "terra-de-p036",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Das neue Rezept braucht etwas mehr Geduld."
+  },
+  {
+   "id": "terra-de-p037",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Auf dem Tisch liegt eine handgeschriebene Notiz."
+  },
+  {
+   "id": "terra-de-p038",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Auf dem Tisch liegt eine handgeschriebene Notiz."
+  },
+  {
+   "id": "terra-de-p039",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Bei gutem Wetter essen wir draußen im Garten."
+  },
+  {
+   "id": "terra-de-p040",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Bei gutem Wetter essen wir draußen im Garten."
+  },
+  {
+   "id": "terra-de-p041",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Ein kleiner Schritt bringt dich manchmal weit."
+  },
+  {
+   "id": "terra-de-p042",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Heute: Ein kleiner Schritt bringt dich manchmal weit."
+  },
+  {
+   "id": "terra-de-p043",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Auch ein Umweg kann eine schöne Aussicht bieten."
+  },
+  {
+   "id": "terra-de-p044",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Vielleicht: Auch ein Umweg kann eine schöne Aussicht bieten."
+  },
+  {
+   "id": "terra-de-p045",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Geduld wächst, wenn man ihr Zeit lässt."
+  },
+  {
+   "id": "terra-de-p046",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Heute: Geduld wächst, wenn man ihr Zeit lässt."
+  },
+  {
+   "id": "terra-de-p047",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Wer aufmerksam zuhört, entdeckt oft neue Fragen."
+  },
+  {
+   "id": "terra-de-p048",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Vielleicht: Wer aufmerksam zuhört, entdeckt oft neue Fragen."
+  },
+  {
+   "id": "terra-de-p049",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Ein guter Anfang darf ganz leise sein."
+  },
+  {
+   "id": "terra-de-p050",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Heute: Ein guter Anfang darf ganz leise sein."
+  },
+  {
+   "id": "terra-de-p051",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Manchmal ist eine Pause der beste nächste Schritt."
+  },
+  {
+   "id": "terra-de-p052",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Vielleicht: Manchmal ist eine Pause der beste nächste Schritt."
+  },
+  {
+   "id": "terra-de-p053",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Mut beginnt dort, wo Neugier stärker wird."
+  },
+  {
+   "id": "terra-de-p054",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Heute: Mut beginnt dort, wo Neugier stärker wird."
+  },
+  {
+   "id": "terra-de-p055",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Eine offene Frage kann viele Türen öffnen."
+  },
+  {
+   "id": "terra-de-p056",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Vielleicht: Eine offene Frage kann viele Türen öffnen."
+  },
+  {
+   "id": "terra-de-p057",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Leichte Gedanken finden auch an schweren Tagen Platz."
+  },
+  {
+   "id": "terra-de-p058",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Heute: Leichte Gedanken finden auch an schweren Tagen Platz."
+  },
+  {
+   "id": "terra-de-p059",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Jeder Versuch zeigt einen neuen kleinen Weg."
+  },
+  {
+   "id": "terra-de-p060",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Vielleicht: Jeder Versuch zeigt einen neuen kleinen Weg."
+  },
+  {
+   "id": "terra-de-p061",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Ordne die Karten nach Farbe und Größe."
+  },
+  {
+   "id": "terra-de-p062",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Heute: Ordne die Karten nach Farbe und Größe."
+  },
+  {
+   "id": "terra-de-p063",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Stelle den Wecker bitte auf halb sieben."
+  },
+  {
+   "id": "terra-de-p064",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Vielleicht: Stelle den Wecker bitte auf halb sieben."
+  },
+  {
+   "id": "terra-de-p065",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Lies zuerst die Frage und markiere wichtige Wörter."
+  },
+  {
+   "id": "terra-de-p066",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Heute: Lies zuerst die Frage und markiere wichtige Wörter."
+  },
+  {
+   "id": "terra-de-p067",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Mische alle Zutaten langsam in einer großen Schüssel."
+  },
+  {
+   "id": "terra-de-p068",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Vielleicht: Mische alle Zutaten langsam in einer großen Schüssel."
+  },
+  {
+   "id": "terra-de-p069",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Prüfe vor der Fahrt den Druck der Reifen."
+  },
+  {
+   "id": "terra-de-p070",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Heute: Prüfe vor der Fahrt den Druck der Reifen."
+  },
+  {
+   "id": "terra-de-p071",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Lege das grüne Blatt auf den oberen Stapel."
+  },
+  {
+   "id": "terra-de-p072",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Vielleicht: Lege das grüne Blatt auf den oberen Stapel."
+  },
+  {
+   "id": "terra-de-p073",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Speichere die Datei und schließe das Fenster."
+  },
+  {
+   "id": "terra-de-p074",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Heute: Speichere die Datei und schließe das Fenster."
+  },
+  {
+   "id": "terra-de-p075",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Drehe die Temperatur nach fünf Minuten etwas herunter."
+  },
+  {
+   "id": "terra-de-p076",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Vielleicht: Drehe die Temperatur nach fünf Minuten etwas herunter."
+  },
+  {
+   "id": "terra-de-p077",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Nimm eine Jacke mit, falls es später regnet."
+  },
+  {
+   "id": "terra-de-p078",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Heute: Nimm eine Jacke mit, falls es später regnet."
+  },
+  {
+   "id": "terra-de-p079",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Schreibe die Antwort in das freie Feld."
+  },
+  {
+   "id": "terra-de-p080",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Vielleicht: Schreibe die Antwort in das freie Feld."
+  },
+  {
+   "id": "terra-de-p081",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Neuer Radweg verbindet zwei ruhige Stadtteile."
+  },
+  {
+   "id": "terra-de-p082",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Heute: Neuer Radweg verbindet zwei ruhige Stadtteile."
+  },
+  {
+   "id": "terra-de-p083",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Kleines Museum öffnet am Wochenende seine Türen."
+  },
+  {
+   "id": "terra-de-p084",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Vielleicht: Kleines Museum öffnet am Wochenende seine Türen."
+  },
+  {
+   "id": "terra-de-p085",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Frischer Wind bringt Abkühlung nach heißen Tagen."
+  },
+  {
+   "id": "terra-de-p086",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Heute: Frischer Wind bringt Abkühlung nach heißen Tagen."
+  },
+  {
+   "id": "terra-de-p087",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Gemeinsames Projekt stärkt den Austausch im Viertel."
+  },
+  {
+   "id": "terra-de-p088",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Vielleicht: Gemeinsames Projekt stärkt den Austausch im Viertel."
+  },
+  {
+   "id": "terra-de-p089",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Neue Ausstellung zeigt Bilder aus fernen Landschaften."
+  },
+  {
+   "id": "terra-de-p090",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Heute: Neue Ausstellung zeigt Bilder aus fernen Landschaften."
+  },
+  {
+   "id": "terra-de-p091",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Freiwillige sammeln Müll entlang des kleinen Flusses."
+  },
+  {
+   "id": "terra-de-p092",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Vielleicht: Freiwillige sammeln Müll entlang des kleinen Flusses."
+  },
+  {
+   "id": "terra-de-p093",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Bibliothek erweitert ihr Angebot für junge Leser."
+  },
+  {
+   "id": "terra-de-p094",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Heute: Bibliothek erweitert ihr Angebot für junge Leser."
+  },
+  {
+   "id": "terra-de-p095",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Lokales Team gewinnt spannendes Spiel in letzter Minute."
+  },
+  {
+   "id": "terra-de-p096",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Vielleicht: Lokales Team gewinnt spannendes Spiel in letzter Minute."
+  },
+  {
+   "id": "terra-de-p097",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Bunte Blumen verwandeln den Platz im Frühling."
+  },
+  {
+   "id": "terra-de-p098",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Heute: Bunte Blumen verwandeln den Platz im Frühling."
+  },
+  {
+   "id": "terra-de-p099",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Eine alte Brücke bekommt einen neuen Anstrich."
+  },
+  {
+   "id": "terra-de-p100",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Vielleicht: Eine alte Brücke bekommt einen neuen Anstrich."
+  },
+  {
+   "id": "terra-de-p101",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Sie fragt: \"Kommst du später noch vorbei?\""
+  },
+  {
+   "id": "terra-de-p102",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Sie fragt: \"Kommst du später noch vorbei?\""
+  },
+  {
+   "id": "terra-de-p103",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Der Plan steht; nur die Uhrzeit fehlt noch."
+  },
+  {
+   "id": "terra-de-p104",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Der Plan steht; nur die Uhrzeit fehlt noch."
+  },
+  {
+   "id": "terra-de-p105",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Mein Tipp: Lass die Soße kurz abkühlen."
+  },
+  {
+   "id": "terra-de-p106",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Mein Tipp: Lass die Soße kurz abkühlen."
+  },
+  {
+   "id": "terra-de-p107",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Das Paket (noch ungeöffnet) liegt im Flur."
+  },
+  {
+   "id": "terra-de-p108",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Das Paket (noch ungeöffnet) liegt im Flur."
+  },
+  {
+   "id": "terra-de-p109",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Ein Kaffee-Pausen-Gespräch löste das kleine Rätsel."
+  },
+  {
+   "id": "terra-de-p110",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Ein Kaffee-Pausen-Gespräch löste das kleine Rätsel."
+  },
+  {
+   "id": "terra-de-p111",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Wie spät ist es jetzt genau?"
+  },
+  {
+   "id": "terra-de-p112",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Wie spät ist es jetzt genau?"
+  },
+  {
+   "id": "terra-de-p113",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Achtung, die Farbe ist noch frisch!"
+  },
+  {
+   "id": "terra-de-p114",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Achtung, die Farbe ist noch frisch!"
+  },
+  {
+   "id": "terra-de-p115",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Er sagte: \"Das probieren wir morgen erneut.\""
+  },
+  {
+   "id": "terra-de-p116",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Er sagte: \"Das probieren wir morgen erneut.\""
+  },
+  {
+   "id": "terra-de-p117",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Die Liste ist lang; wir beginnen trotzdem heute."
+  },
+  {
+   "id": "terra-de-p118",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Heute: Die Liste ist lang; wir beginnen trotzdem heute."
+  },
+  {
+   "id": "terra-de-p119",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Das Sommer-Fest findet bei jedem Wetter statt."
+  },
+  {
+   "id": "terra-de-p120",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Vielleicht: Das Sommer-Fest findet bei jedem Wetter statt."
+  }
+ ]
+}

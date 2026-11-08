@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-sv-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jag tar tåget till jobbet på måndag morgon eftersom bilen står på verkstad."
+  },
+  {
+   "id": "haiku-sv-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi åt middag ute på torget och pratade om sommarens resor."
+  },
+  {
+   "id": "haiku-sv-p003",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Små steg varje dag bygger ofta de största bergen, om man bara fortsätter gå."
+  },
+  {
+   "id": "haiku-sv-p004",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Fyll i formuläret med ditt namn, din adress och ett giltigt personnummer."
+  },
+  {
+   "id": "haiku-sv-p005",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Regeringen presenterar ny plan för kollektivtrafiken i Skåne"
+  },
+  {
+   "id": "haiku-sv-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mormor bakar kanelbullar varje lördag, och hela familjen brukar komma förbi."
+  },
+  {
+   "id": "haiku-sv-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det regnade hela eftermiddagen, så vi stannade inne och spelade kort."
+  },
+  {
+   "id": "haiku-sv-p008",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Den som seglar utan mål får aldrig medvind, sa farfar alltid till oss barn."
+  },
+  {
+   "id": "haiku-sv-p009",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Stäng av flygplansläget innan du startar kartappen, annars fungerar inte navigeringen."
+  },
+  {
+   "id": "haiku-sv-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hur många gånger ska jag säga åt dig att städa rummet?"
+  },
+  {
+   "id": "haiku-sv-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kaffet kostar 45 kronor i kiosken vid stationen, men bullen är gratis idag!"
+  },
+  {
+   "id": "haiku-sv-p012",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Ny forskning visar att sömn påverkar inlärning mer än tidigare väntat"
+  },
+  {
+   "id": "haiku-sv-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hon sprang tio kilometer på under en timme, vilket var hennes nya personliga rekord."
+  },
+  {
+   "id": "haiku-sv-p014",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Ingen blir mästare över en natt; varje träningspass räknas ändå."
+  },
+  {
+   "id": "haiku-sv-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Bussen var försenad med tjugo minuter, så vi hann precis med tåget."
+  },
+  {
+   "id": "haiku-sv-p016",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Ladda ner appen från den officiella butiken och logga in med ditt konto."
+  },
+  {
+   "id": "haiku-sv-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Har du sett den nya säsongen av serien, eller ska jag inte spoila något?"
+  },
+  {
+   "id": "haiku-sv-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi behöver köpa mjölk, ägg, bröd och några äpplen till helgen."
+  },
+  {
+   "id": "haiku-sv-p019",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Det är inte tiden du har, utan vad du gör med den."
+  },
+  {
+   "id": "haiku-sv-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Veterinären sa att katten mår bra, men den ska få mindre torrfoder nu."
+  },
+  {
+   "id": "haiku-sv-p021",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Stockholmarna får betala mer för parkering från nästa månad"
+  },
+  {
+   "id": "haiku-sv-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi möttes vid fontänen klockan halv åtta, men du kom först tjugo minuter senare!"
+  },
+  {
+   "id": "haiku-sv-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan du skicka mig vägbeskrivningen till festen, jag hittar inte längre?"
+  },
+  {
+   "id": "haiku-sv-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Efter flytten tog det tre veckor innan vi hittade nycklarna i en flyttkartong."
+  },
+  {
+   "id": "haiku-sv-p025",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Sortera tvätten i mörka och ljusa färger och välj 40 grader för ullen."
+  },
+  {
+   "id": "haiku-sv-p026",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Projektet blev klart i tid, trots att två kollegor var sjuka hela veckan."
+  },
+  {
+   "id": "haiku-sv-p027",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Den bästa planen är den man faktiskt genomför, även när den är lite ofullständig."
+  },
+  {
+   "id": "haiku-sv-p028",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi tog den gamla vägen genom skogen och stannade vid sjön för en fika."
+  },
+  {
+   "id": "haiku-sv-p029",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Barnen älskar att leka i sandlådan, men de glömmer alltid att borsta tänderna."
+  },
+  {
+   "id": "haiku-sv-p030",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Tåget mot Göteborg är inställt på grund av signalfel, ersättningsbuss går från perrong fyra."
+  },
+  {
+   "id": "haiku-sv-p031",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Fotbollslaget vann med 3-1 efter ett sent mål i andra halvlek"
+  },
+  {
+   "id": "haiku-sv-p032",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det kostar 129 kronor per månad, plus en engångsavgift på 350 kronor."
+  },
+  {
+   "id": "haiku-sv-p033",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Oj, vad fort tiden går! Det var ju precis nyår igår, eller hur?"
+  },
+  {
+   "id": "haiku-sv-p034",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Värm ugnen till 200 grader och grädda kakan i ungefär 35 minuter."
+  },
+  {
+   "id": "haiku-sv-p035",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Min syster jobbar nattskift på sjukhuset tre gånger i veckan, så hon sover mycket på dagen."
+  },
+  {
+   "id": "haiku-sv-p036",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Vem är modigast, den som faller eller den som aldrig försöker alls?"
+  },
+  {
+   "id": "haiku-sv-p037",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hon köpte begagnade skidor på loppisen för 200 kronor och var jätteglad."
+  },
+  {
+   "id": "haiku-sv-p038",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Kom ihåg att ta med pass, biljett och laddare när du åker till flygplatsen."
+  },
+  {
+   "id": "haiku-sv-p039",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det kan bli en lång kväll, men pizzan är på väg och vinet står redan i kylen."
+  },
+  {
+   "id": "haiku-sv-p040",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Bostadspriserna sjunker för första gången på tre år enligt ny rapport"
+  },
+  {
+   "id": "haiku-sv-p041",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jag har glömt koden till låset på cykelstället igen, typiskt mig!"
+  },
+  {
+   "id": "haiku-sv-p042",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi ska resa till Gotland i juli och hyra en liten stuga nära havet."
+  },
+  {
+   "id": "haiku-sv-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Ett leende kostar ingenting, men det kan ge väldigt mycket tillbaka."
+  },
+  {
+   "id": "haiku-sv-p044",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Tryck på knappen med kameraikonen och håll den nedtryckt i två sekunder."
+  },
+  {
+   "id": "haiku-sv-p045",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Han jobbar deltid på biblioteket och studerar historia på kvällarna."
+  },
+  {
+   "id": "haiku-sv-p046",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Har du hört att de stänger vägen mellan Uppsala och Enköping i helgen?"
+  },
+  {
+   "id": "haiku-sv-p047",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det blev en riktigt mysig fredagskväll med lasagne, film och hemmagjord glass."
+  },
+  {
+   "id": "haiku-sv-p048",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mamma ringde två gånger idag, så jag tror att hon vill prata om julen."
+  },
+  {
+   "id": "haiku-sv-p049",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Vägen till framgång är kantad av små beslut som ingen egentligen lägger märke till."
+  },
+  {
+   "id": "haiku-sv-p050",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jag tycker att vi ska boka bordet redan nu, annars blir det fullt på lördag."
+  },
+  {
+   "id": "haiku-sv-p051",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Termometern visade minus fyra grader i morse, så isen på sjön var tjock."
+  },
+  {
+   "id": "haiku-sv-p052",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Läs igenom villkoren noggrant innan du godkänner och skickar in din ansökan."
+  },
+  {
+   "id": "haiku-sv-p053",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det var en gång en liten räv som bodde i skogen bakom det gamla sågverket."
+  },
+  {
+   "id": "haiku-sv-p054",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Tusentals besökte festivalen i Västerås trots ihållande regn under helgen"
+  },
+  {
+   "id": "haiku-sv-p055",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hon är mycket noggrann och kollar alltid tre gånger att dörren verkligen är låst."
+  },
+  {
+   "id": "haiku-sv-p056",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi hann med två museer, en lång promenad och en glass innan det började regna."
+  },
+  {
+   "id": "haiku-sv-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Lägg frysta bär i en skål och låt dem tina över natten i kylskåpet."
+  },
+  {
+   "id": "haiku-sv-p058",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Lyssna mer än du talar, så lär du dig mer än alla andra i rummet."
+  },
+  {
+   "id": "haiku-sv-p059",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan vi flytta mötet till torsdag? Jag har tandläkarbesök på tisdag förmiddag."
+  },
+  {
+   "id": "haiku-sv-p060",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jag laddade ner tre nya spel men hann bara testa det första innan jobbet."
+  },
+  {
+   "id": "haiku-sv-p061",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Älgen stod mitt på vägen och vi fick bromsa in ordentligt."
+  },
+  {
+   "id": "haiku-sv-p062",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Skriv ett kort meddelande till läraren och bifoga bilden i samma e-post."
+  },
+  {
+   "id": "haiku-sv-p063",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det här är den bästa pizzan jag ätit på länge, säg inte till Anna!"
+  },
+  {
+   "id": "haiku-sv-p064",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi behöver fler stolar, bord och ljus till fredagens fest i lokalen."
+  },
+  {
+   "id": "haiku-sv-p065",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nya regler för elsparkcyklar träder i kraft den första januari nästa år"
+  },
+  {
+   "id": "haiku-sv-p066",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hon började studera till sjuksköterska på hösten och trivs jättebra med kurserna."
+  },
+  {
+   "id": "haiku-sv-p067",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Du behöver inte vara perfekt för att börja, men du måste börja för att bli bra."
+  },
+  {
+   "id": "haiku-sv-p068",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Solen gick upp över skärgården och allt såg ut som ett vykort från 1950-talet."
+  },
+  {
+   "id": "haiku-sv-p069",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan du hämta barnen från fotbollen klockan fyra? Jag kommer sent från jobbet."
+  },
+  {
+   "id": "haiku-sv-p070",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Använd endast det lösenord som du har skapat själv och byt det regelbundet."
+  },
+  {
+   "id": "haiku-sv-p071",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Efter tre timmar i kö fick vi slutligen se den berömda utställningen på Moderna."
+  },
+  {
+   "id": "haiku-sv-p072",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Han gillar att laga mat från grunden, även när det tar hela söndagen i anspråk."
+  },
+  {
+   "id": "haiku-sv-p073",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det blir pannkakor till frukost, med lingonsylt och grädde för den som vill."
+  },
+  {
+   "id": "haiku-sv-p074",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Varför är det alltid så långa köer på måndagar? Jag förstår verkligen inte."
+  },
+  {
+   "id": "haiku-sv-p075",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Skolorna i Malmö inför nytt system för digital närvaro från höstterminen"
+  },
+  {
+   "id": "haiku-sv-p076",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi tog tåget från Malmö till Köpenhamn och åt lunch vid kanalen."
+  },
+  {
+   "id": "haiku-sv-p077",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mina grannar har en hund som skäller varje morgon klockan sex, tyvärr."
+  },
+  {
+   "id": "haiku-sv-p078",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Att våga misslyckas är ett sätt att visa att man menar allvar med det man gör."
+  },
+  {
+   "id": "haiku-sv-p079",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Glöm inte att spara filen innan du stänger programmet, annars är allt borta."
+  },
+  {
+   "id": "haiku-sv-p080",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jag hoppas att vädret håller i sig hela veckan, då kan vi grilla varje kväll!"
+  }
+ ]
+}

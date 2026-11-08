@@ -1,0 +1,1546 @@
+{
+ "chats": [
+  {
+   "id": "haiku-da-01",
+   "source": "claude-haiku",
+   "topic": "Date på fredag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hej, skal vi tage i biffen fredag? eller spise noget?"
+    },
+    {
+     "speaker": "B",
+     "text": "hej! fedt, jeg er med. hvad har du i tankerne?"
+    },
+    {
+     "speaker": "A",
+     "text": "den nye restaurant på Nørrebro, de har god vin og lækker mad"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg har hørt om den! er den ikke dyr?"
+    },
+    {
+     "speaker": "A",
+     "text": "jo, en hovedret koster omkring 180 kr, men det er det værd"
+    },
+    {
+     "speaker": "B",
+     "text": "okay, bare vi ikke ender med at spise for meget"
+    },
+    {
+     "speaker": "A",
+     "text": "haha jeg lover ikke noget. klokken 19 er vel fint?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, jeg kommer med cyklen, så er jeg der på 20 minutter"
+    },
+    {
+     "speaker": "A",
+     "text": "pas nu på trafikken ved Nørrebro Runddel, den er kaotisk"
+    },
+    {
+     "speaker": "B",
+     "text": "klart, jeg kender vejen godt, jeg bor jo i kvarteret"
+    },
+    {
+     "speaker": "A",
+     "text": "nå ja, så ses vi!"
+    },
+    {
+     "speaker": "B",
+     "text": "ses! og tak for indbydelsen, det glæder jeg mig til"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-02",
+   "source": "claude-haiku",
+   "topic": "Deadline på rapporten",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du nået at skrive din del af rapporten?"
+    },
+    {
+     "speaker": "B",
+     "text": "næsten, jeg mangler konklusionen og et par tabeller"
+    },
+    {
+     "speaker": "A",
+     "text": "hvornår skal den ind? i morgen kl 12?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, og chefen vil have en kort præsentation også"
+    },
+    {
+     "speaker": "A",
+     "text": "ej, det er så meget på én dag"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg har siddet med kaffe hele formiddagen, det går nok"
+    },
+    {
+     "speaker": "A",
+     "text": "hvis du vil kan jeg sende dig de data jeg har samlet"
+    },
+    {
+     "speaker": "B",
+     "text": "tak, det vil være super. send dem til min private mail"
+    },
+    {
+     "speaker": "A",
+     "text": "okay, sender dem om lidt, de er i et excel-ark"
+    },
+    {
+     "speaker": "B",
+     "text": "og tjek lige side 7, jeg tror der er en fejl i procenterne"
+    },
+    {
+     "speaker": "A",
+     "text": "godt fanget, det har jeg ikke set, tak"
+    },
+    {
+     "speaker": "B",
+     "text": "vi kan mødes i frokostpausen og gennemgå det hele"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-03",
+   "source": "claude-haiku",
+   "topic": "Flytning til Aarhus",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hvordan går det med pakningen? er du kommet i gang?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, men jeg har alt for mange bøger og en stor reol"
+    },
+    {
+     "speaker": "A",
+     "text": "tag dem med, så kan jeg hjælpe med at bære dem"
+    },
+    {
+     "speaker": "B",
+     "text": "det er ti kasser med bøger alene, det er alt for tungt"
+    },
+    {
+     "speaker": "A",
+     "text": "bær ikke dem selv, bed Mikkel om hjælp"
+    },
+    {
+     "speaker": "B",
+     "text": "han kommer lørdag med sin lille varevogn"
+    },
+    {
+     "speaker": "A",
+     "text": "det er jo fedt, koster det noget at leje den?"
+    },
+    {
+     "speaker": "B",
+     "text": "nej, han låner den af sin far, så det er gratis"
+    },
+    {
+     "speaker": "A",
+     "text": "perfekt, så sparer du mindst 700 kr"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, og jeg har allerede købt pizzaer til dem, de hjælper jo"
+    },
+    {
+     "speaker": "A",
+     "text": "du er bedst, og husk at få nøglerne fra udlejeren"
+    },
+    {
+     "speaker": "B",
+     "text": "nøglerne får jeg fredag kl 10, jeg skriver lige til ham"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-04",
+   "source": "claude-haiku",
+   "topic": "Løbetur i Fælledparken",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "skal vi løbe i Fælledparken i morgen tidlig?"
+    },
+    {
+     "speaker": "B",
+     "text": "hvad er klokken?"
+    },
+    {
+     "speaker": "A",
+     "text": "halv otte, så er der ikke så mange folk"
+    },
+    {
+     "speaker": "B",
+     "text": "ej, det er tidligt for mig, kan vi ikke tage ti?"
+    },
+    {
+     "speaker": "A",
+     "text": "jo, men så bliver det lidt varmt, vejret bliver 18 grader"
+    },
+    {
+     "speaker": "B",
+     "text": "okay, så tager vi bare en rolig tur på fem kilometer"
+    },
+    {
+     "speaker": "A",
+     "text": "det lyder fint. jeg kender en god rute langs søen"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, og en kaffe bagefter på bageriet på hjørnet"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, altid, og så spiser vi en rugbrødsmad"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, du er faktisk sjov, når du er træt"
+    },
+    {
+     "speaker": "A",
+     "text": "vi får se om jeg er det, vi ses ved fontænen"
+    },
+    {
+     "speaker": "B",
+     "text": "tjek, tag en flaske vand med dig"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-05",
+   "source": "claude-haiku",
+   "topic": "Frikadeller til aftensmad",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hvad skal vi have til aftensmad? jeg tænker frikadeller"
+    },
+    {
+     "speaker": "B",
+     "text": "mums! med kartofler og rødkål?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, og brun sovs, det er min yndlings"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg køber svinekød og løg, mangler vi noget andet?"
+    },
+    {
+     "speaker": "A",
+     "text": "havregryn og æg, vi har ikke nok derhjemme"
+    },
+    {
+     "speaker": "B",
+     "text": "og mælk til sovsen, den er tom"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, skriv det på listen, så tager jeg resten senere"
+    },
+    {
+     "speaker": "B",
+     "text": "kan du huske om vi har persille?"
+    },
+    {
+     "speaker": "A",
+     "text": "tror der er lidt i køleskabet, men den er måske gammel"
+    },
+    {
+     "speaker": "B",
+     "text": "så køber jeg en ny, den koster bare 10 kr"
+    },
+    {
+     "speaker": "A",
+     "text": "og det bliver nok en rigtig hyggelig aften, vi kan se en film bagefter"
+    },
+    {
+     "speaker": "B",
+     "text": "fedt, vælg en god film, jeg er træt af action"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-06",
+   "source": "claude-haiku",
+   "topic": "Ny telefon",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jeg har købt en ny telefon, men skærmen er allerede ridset!"
+    },
+    {
+     "speaker": "B",
+     "text": "hvad? havde du et skærmbeskyttelse på?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, det tænkte jeg ikke på, dumt af mig"
+    },
+    {
+     "speaker": "B",
+     "text": "du bør spørge forhandleren om garantien, den er jo ny"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, men jeg er bange for at de siger at det er min skyld"
+    },
+    {
+     "speaker": "B",
+     "text": "prøv i hvert fald, det er ikke værd at ærgre sig over"
+    },
+    {
+     "speaker": "A",
+     "text": "og batteriet holder også kun et par timer nu"
+    },
+    {
+     "speaker": "B",
+     "text": "opdater styresystemet, det plejer at hjælpe"
+    },
+    {
+     "speaker": "A",
+     "text": "gjorde det i nat, men det føles ikke bedre"
+    },
+    {
+     "speaker": "B",
+     "text": "så er det måske batteriet selv, det har også en garanti"
+    },
+    {
+     "speaker": "A",
+     "text": "så må jeg ringe til butikken i morgen"
+    },
+    {
+     "speaker": "B",
+     "text": "held og lykke, skriv bare hvordan det går"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-07",
+   "source": "claude-haiku",
+   "topic": "Tur til Bornholm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hvornår tager vi til Bornholm? juni eller juli?"
+    },
+    {
+     "speaker": "B",
+     "text": "juni, der er mindre trafik og færgen er billigere"
+    },
+    {
+     "speaker": "A",
+     "text": "vi kan tage færgen fra Ystad, eller flyve?"
+    },
+    {
+     "speaker": "B",
+     "text": "flyve er dyrt, færgen fra Ystad er fint"
+    },
+    {
+     "speaker": "A",
+     "text": "hvor skal vi bo? sommerhus eller hotel?"
+    },
+    {
+     "speaker": "B",
+     "text": "sommerhus, det er billigt hvis vi er fire personer"
+    },
+    {
+     "speaker": "A",
+     "text": "det koster omkring 1400 kr om natten, plus rengøring"
+    },
+    {
+     "speaker": "B",
+     "text": "lidt meget, men vi deler jo regningen med Lina og Anders"
+    },
+    {
+     "speaker": "A",
+     "text": "det bliver fedt, de har lovet at tage cyklerne med"
+    },
+    {
+     "speaker": "B",
+     "text": "og så skal vi spise røget sild, det må ikke glemmes"
+    },
+    {
+     "speaker": "A",
+     "text": "ahah, du og din sild, det må vi se"
+    },
+    {
+     "speaker": "B",
+     "text": "vi tager også en tur til Hammershus, den er smuk"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-08",
+   "source": "claude-haiku",
+   "topic": "Farmors fødselsdag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "farmor fylder 80 på lørdag, hvad giver vi hende?"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg tænker på en fotobog med gamle billeder fra hendes barndom"
+    },
+    {
+     "speaker": "A",
+     "text": "det er en god idé, men det tager lang tid at lave"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg har allerede scannet en masse, det er bare at sætte dem op"
+    },
+    {
+     "speaker": "A",
+     "text": "skal vi også bestille kage hos bageren i byen?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, en sandkage med jordbær, det elsker hun"
+    },
+    {
+     "speaker": "A",
+     "text": "hvem kommer? onkel Bent også?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, han kommer med sin nye kæreste fra Odense"
+    },
+    {
+     "speaker": "A",
+     "text": "fedt, så bliver det en lang middag"
+    },
+    {
+     "speaker": "B",
+     "text": "vi kan jo spille kort bagefter, det plejer at være hyggeligt"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg tager gerne spillet med, sidste gang vandt jeg tre gange"
+    },
+    {
+     "speaker": "B",
+     "text": "haha okay, så må jeg træne op til næste gang"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-09",
+   "source": "claude-haiku",
+   "topic": "Serie om aftenen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du set den nye danske serie om politiet på Vesterbro?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja i går! slutningen var så spændende, jeg kunne ikke sove"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg ser kun afsnit tre, så spoil ikke noget"
+    },
+    {
+     "speaker": "B",
+     "text": "nej nej, jeg siger ingenting. men du skal se det hele"
+    },
+    {
+     "speaker": "A",
+     "text": "tror du det er kommissæren der er skurken?"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det vil jeg ikke sige, men han er ikke den man tror"
+    },
+    {
+     "speaker": "A",
+     "text": "det har de jo gjort i alle de sidste serier også"
+    },
+    {
+     "speaker": "B",
+     "text": "præcis, de vil bare lure os hele tiden"
+    },
+    {
+     "speaker": "A",
+     "text": "skal vi se næste afsnit sammen på torsdag hos mig?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, jeg tager popcorn med karamel og salt"
+    },
+    {
+     "speaker": "A",
+     "text": "lyder godt, jeg har cola i køleskabet"
+    },
+    {
+     "speaker": "B",
+     "text": "fedt, så ses vi kl 20 på sofaen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-10",
+   "source": "claude-haiku",
+   "topic": "Indkøb i Netto",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "skal du have noget med fra Netto? jeg skal lige forbi"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, mælk, æg og et brød, og hvis de har rabat på kylling"
+    },
+    {
+     "speaker": "A",
+     "text": "hvor mange æg vil du have? der er en tolvpak til 25 kr"
+    },
+    {
+     "speaker": "B",
+     "text": "tag den, vi bruger jo mange til bagning"
+    },
+    {
+     "speaker": "A",
+     "text": "og brød? de har rugbrød i tilbud"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, tag et fuldkornsbrød også"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, og jeg køber lidt jordbær, de er billige nu"
+    },
+    {
+     "speaker": "B",
+     "text": "super, lad os lave en kage i weekenden"
+    },
+    {
+     "speaker": "A",
+     "text": "det lyder godt! jeg tager pengene med, du skal ikke betale"
+    },
+    {
+     "speaker": "B",
+     "text": "det er fint, jeg betaler senere, når du kommer hjem"
+    },
+    {
+     "speaker": "A",
+     "text": "okay, så ses vi om lidt"
+    },
+    {
+     "speaker": "B",
+     "text": "tak! og tag gerne en pose til, de koster jo penge nu"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-11",
+   "source": "claude-haiku",
+   "topic": "Tid hos lægen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hej, skal du til lægen i morgen? jeg kan køre dig"
+    },
+    {
+     "speaker": "B",
+     "text": "nej tak, det er bare et blodtryks-tjek"
+    },
+    {
+     "speaker": "A",
+     "text": "okay, men skal du være fastende?"
+    },
+    {
+     "speaker": "B",
+     "text": "det har jeg ikke set i indkaldelsen, jeg ringer lige"
+    },
+    {
+     "speaker": "A",
+     "text": "godt, for så slipper du for at sidde og vente"
+    },
+    {
+     "speaker": "B",
+     "text": "de siger, at jeg ikke skal spise noget før, kun vand"
+    },
+    {
+     "speaker": "A",
+     "text": "så tager jeg en sandwich med til dig bagefter"
+    },
+    {
+     "speaker": "B",
+     "text": "du er sød, men jeg spiser nok bare hjemme"
+    },
+    {
+     "speaker": "A",
+     "text": "fair nok, skriv bare og fortæl hvordan det gik"
+    },
+    {
+     "speaker": "B",
+     "text": "selvfølgelig, jeg ringer dig efter frokost"
+    },
+    {
+     "speaker": "A",
+     "text": "perfekt, vi ses i morgen aften"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, og tak for din hjælp!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-12",
+   "source": "claude-haiku",
+   "topic": "Spilaften online og offline",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vi skal spille spil fredag? jeg har et nyt brætspil"
+    },
+    {
+     "speaker": "B",
+     "text": "hvilket spil er det?"
+    },
+    {
+     "speaker": "A",
+     "text": "Catan, med udvidelsen om søfart"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg kan ikke finde ud af det, men jeg vil lære det"
+    },
+    {
+     "speaker": "A",
+     "text": "det er fint, jeg forklarer det før vi starter"
+    },
+    {
+     "speaker": "B",
+     "text": "Sofus kommer også, han vinder altid med sine bygninger"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, så skal vi sætte ham i et hjørne"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg tager chips med, og en pose lakrids"
+    },
+    {
+     "speaker": "A",
+     "text": "den kombi er perfekt, tak"
+    },
+    {
+     "speaker": "B",
+     "text": "hvornår starter vi egentlig?"
+    },
+    {
+     "speaker": "A",
+     "text": "kl 20, så vi har tid til at spise først"
+    },
+    {
+     "speaker": "B",
+     "text": "okay, jeg er der kl 8, det lover jeg"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-13",
+   "source": "claude-haiku",
+   "topic": "Eksamen i økonomi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du læst kapitel 7 i økonomi? det er vist det der kommer til eksamen"
+    },
+    {
+     "speaker": "B",
+     "text": "næsten, jeg forstår ikke helt regressionsanalysen"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg har lavet et godt resume, sender jeg til dig senere"
+    },
+    {
+     "speaker": "B",
+     "text": "tak! hvordan er eksamen egentlig? er den svær?"
+    },
+    {
+     "speaker": "A",
+     "text": "sidste år dumpede mange på de multiple regressioner"
+    },
+    {
+     "speaker": "B",
+     "text": "åh nej, det er præcis det jeg er dårligst til"
+    },
+    {
+     "speaker": "A",
+     "text": "øv de gamle opgaver, så går det nok"
+    },
+    {
+     "speaker": "B",
+     "text": "okay, i morgen på biblioteket? så øver vi sammen"
+    },
+    {
+     "speaker": "A",
+     "text": "fint, men først kl 14, jeg har en øvelsesgruppe om formiddagen"
+    },
+    {
+     "speaker": "B",
+     "text": "det er fint, jeg tager de gamle eksamenssæt med"
+    },
+    {
+     "speaker": "A",
+     "text": "tag også kaffe med, den på biblioteket er forfærdelig"
+    },
+    {
+     "speaker": "B",
+     "text": "haha aftalt, min termokande er klar"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-14",
+   "source": "claude-haiku",
+   "topic": "Regn og blæst",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "sikke en storm i nat, fik du sovet?"
+    },
+    {
+     "speaker": "B",
+     "text": "ikke særlig godt, vinden smækkede med vinduerne hele natten"
+    },
+    {
+     "speaker": "A",
+     "text": "hos mig væltede havemøblerne ned ad gaden"
+    },
+    {
+     "speaker": "B",
+     "text": "heldigvis gik det godt, og nu er det tørt"
+    },
+    {
+     "speaker": "A",
+     "text": "toget kører ikke, så jeg må tage cyklen til arbejde"
+    },
+    {
+     "speaker": "B",
+     "text": "i det vejr? held og lykke, du bliver helt våd"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg har en regnjakke, så det går nok"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg sidder hjemme, kontoret er lukket i dag"
+    },
+    {
+     "speaker": "A",
+     "text": "heldige dig, jeg skal til en kunde i Roskilde"
+    },
+    {
+     "speaker": "B",
+     "text": "tag så en varm kakao med på vejen"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, altid en plan, og du bliver bare inde"
+    },
+    {
+     "speaker": "B",
+     "text": "helt sikkert, jeg har en film klar"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-15",
+   "source": "claude-haiku",
+   "topic": "Toget er forsinket",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "toget kl 17:12 er 20 minutter forsinket, ved du mere?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, der er en fejl ved Ringsted, det står på appen"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg står på perronen i 15 minutter, og det er koldt"
+    },
+    {
+     "speaker": "B",
+     "text": "du kan tage bussen, den kører via centrum"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, men den er fuld og kører kun en gang i timen"
+    },
+    {
+     "speaker": "B",
+     "text": "så venter vi bare her, undskyld"
+    },
+    {
+     "speaker": "A",
+     "text": "det er okay, jeg fik lige en besked om at DSB dækker en del"
+    },
+    {
+     "speaker": "B",
+     "text": "virkelig? måske skal jeg også tjekke det"
+    },
+    {
+     "speaker": "A",
+     "text": "du kan søge via appen, hvis forsinkelsen er over 20 minutter"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg gjorde det i går, men det tog en uge"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, men det er jo bare 1,80 kr ekstra? ikke et stort tab"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg snakker ikke om pengene, det handler om princippet"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-16",
+   "source": "claude-haiku",
+   "topic": "Jobsamtale",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hvordan gik samtalen hos banken? du var jo nervøs"
+    },
+    {
+     "speaker": "B",
+     "text": "ret godt, de spurgte hvorfor jeg vil skifte efter fem år"
+    },
+    {
+     "speaker": "A",
+     "text": "og hvad svarede du?"
+    },
+    {
+     "speaker": "B",
+     "text": "at jeg vil have mere ansvar og gerne arbejde tættere på kunderne"
+    },
+    {
+     "speaker": "A",
+     "text": "godt svar! sagde de noget om lønnen?"
+    },
+    {
+     "speaker": "B",
+     "text": "nej, de ringer næste uge torsdag mellem 10 og 12"
+    },
+    {
+     "speaker": "A",
+     "text": "spændende, jeg krydser fingrene for dig"
+    },
+    {
+     "speaker": "B",
+     "text": "tak! jeg fik også en praktisk opgave, noget på to timer"
+    },
+    {
+     "speaker": "A",
+     "text": "ih, det lyder hårdt. kan du nå at øve i aften?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, lidt i hvert fald, ellers går det jo ikke haha"
+    },
+    {
+     "speaker": "A",
+     "text": "held og lykke, du klarer den"
+    },
+    {
+     "speaker": "B",
+     "text": "håber det, jeg er allerede bange for at vente på opkaldet"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-17",
+   "source": "claude-haiku",
+   "topic": "Brugt cykel",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jeg har set en brugt cykel på DBA, 1200 kroner"
+    },
+    {
+     "speaker": "B",
+     "text": "hvilket mærke? pas på bremserne og stellet"
+    },
+    {
+     "speaker": "A",
+     "text": "en Bianchi fra 2015, ser ret pæn ud, bare klokken er i stykker"
+    },
+    {
+     "speaker": "B",
+     "text": "spørg om den har lås og nøgler med"
+    },
+    {
+     "speaker": "A",
+     "text": "det gør jeg, og om den er registreret hos ejeren"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det må du selv tjekke, men låsen er vigtig"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, jeg kigger i morgen kl. 17:30 ved stationen i Odense"
+    },
+    {
+     "speaker": "B",
+     "text": "tag nogen med, så står du stærkere"
+    },
+    {
+     "speaker": "A",
+     "text": "god ide, min bror kommer med"
+    },
+    {
+     "speaker": "B",
+     "text": "og betal ikke på forhånd, først når du henter den"
+    },
+    {
+     "speaker": "A",
+     "text": "aftalt, jeg siger til hvordan det gik"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-18",
+   "source": "claude-haiku",
+   "topic": "Bil der ikke vil starte",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "bilen driller ved start, den klikker bare"
+    },
+    {
+     "speaker": "B",
+     "text": "lyder som batteriet, har du fået det tjekket?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, første tid på værkstedet er i morgen kl. 8"
+    },
+    {
+     "speaker": "B",
+     "text": "koster et nyt batteri ikke hurtigt 1500 kroner?"
+    },
+    {
+     "speaker": "A",
+     "text": "jo, det er en Golf fra 2011 så den er jo gammel"
+    },
+    {
+     "speaker": "B",
+     "text": "tjek om polerne sidder løst, det sker tit"
+    },
+    {
+     "speaker": "A",
+     "text": "god idé, jeg tager en lommelygte med og kigger"
+    },
+    {
+     "speaker": "B",
+     "text": "ellers kan jeg komme med startkabler"
+    },
+    {
+     "speaker": "A",
+     "text": "super, kan du være hos mig kl. 17:30?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja da, vi ses"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-19",
+   "source": "claude-haiku",
+   "topic": "Lejlighedssøgning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vi har fremvisning på lejligheden på Nørrebro torsdag"
+    },
+    {
+     "speaker": "B",
+     "text": "hvor stor er den, og hvad koster den?"
+    },
+    {
+     "speaker": "A",
+     "text": "tre værelser, 74 kvadratmeter, husleje 13.800 kroner"
+    },
+    {
+     "speaker": "B",
+     "text": "det er dyrt, men altanen lyder jo fedt"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, og den vender mod syd med sol hele eftermiddagen"
+    },
+    {
+     "speaker": "B",
+     "text": "spørg til vaskeriet og om der er en kælder"
+    },
+    {
+     "speaker": "A",
+     "text": "det gør jeg, og hvor mange kommer til visningen?"
+    },
+    {
+     "speaker": "B",
+     "text": "måske 20 stykker, så du skal have papirerne klar"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg har lønsedler og referencer liggende i en mappe"
+    },
+    {
+     "speaker": "B",
+     "text": "smart, så er du først i køen med det"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-20",
+   "source": "claude-haiku",
+   "topic": "Koncertbilletter",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "billetterne til Nattfuglene-koncerten bliver sat til salg kl. 10!"
+    },
+    {
+     "speaker": "B",
+     "text": "nej, jeg havde helt glemt det, er du inde på siden?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, køen er allerede på over 3000 og vokser hele tiden"
+    },
+    {
+     "speaker": "B",
+     "text": "hvad koster en billet, og er der noget tilbage?"
+    },
+    {
+     "speaker": "A",
+     "text": "695 kroner, men der er kun få på sektion C"
+    },
+    {
+     "speaker": "B",
+     "text": "tag to, så kan vi tage afsted sammen!"
+    },
+    {
+     "speaker": "A",
+     "text": "siden hænger, jeg kommer ikke til kassen"
+    },
+    {
+     "speaker": "B",
+     "text": "genindlæs siden, ellers mister du din plads i køen"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg har dem!! sektion C, række 7, to pladser ved siden af hinanden"
+    },
+    {
+     "speaker": "B",
+     "text": "endelig! mobilepay mig beløbet, så betaler jeg med det samme"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-21",
+   "source": "claude-haiku",
+   "topic": "Tandlægen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jeg skal til tandlægen i morgen, jeg har et hul"
+    },
+    {
+     "speaker": "B",
+     "text": "av, hvornår er din tid?"
+    },
+    {
+     "speaker": "A",
+     "text": "kvart over to, men jeg er så bange for boret"
+    },
+    {
+     "speaker": "B",
+     "text": "spørg om de giver bedøvelse, det hjælper virkelig"
+    },
+    {
+     "speaker": "A",
+     "text": "de tilbød lattergas, så det tager jeg gerne"
+    },
+    {
+     "speaker": "B",
+     "text": "lattergas er ret rart, jeg har prøvet det én gang"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, jeg håber ikke det bliver værre end det"
+    },
+    {
+     "speaker": "B",
+     "text": "og så en is bagefter som belønning?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, det er planen, der er en isbod lige om hjørnet"
+    },
+    {
+     "speaker": "B",
+     "text": "men ingen søde sager bagefter, ellers får du hul igen!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-22",
+   "source": "claude-haiku",
+   "topic": "Haven og tomaterne",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mine tomater vokser vildt, men bladene bliver gule"
+    },
+    {
+     "speaker": "B",
+     "text": "får de for meget vand? det giver tit råd"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg vander hver dag, måske for meget"
+    },
+    {
+     "speaker": "B",
+     "text": "prøv hver anden dag, og kun ved foden af planten"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, og peberfrugterne har jeg stillet i solen"
+    },
+    {
+     "speaker": "B",
+     "text": "de elsker varme, det er godt"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg køber ny jord i havecentret på lørdag"
+    },
+    {
+     "speaker": "B",
+     "text": "tag også en kompostblanding med, det hjælper virkelig"
+    },
+    {
+     "speaker": "A",
+     "text": "så kan jeg lave tomatsovs efter høsten"
+    },
+    {
+     "speaker": "B",
+     "text": "du og din tomatsovs, jeg vil smage mine rødbeder først!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-23",
+   "source": "claude-haiku",
+   "topic": "Forældremøde i vuggestuen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du set indkaldelsen til forældremødet i vuggestuen?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, tirsdag kl. 18:30, men jeg kan ikke blive længere end til 19"
+    },
+    {
+     "speaker": "A",
+     "text": "vi går begge to, det handler om sommerferien og udeliv"
+    },
+    {
+     "speaker": "B",
+     "text": "hvad skal de egentlig snakke om?"
+    },
+    {
+     "speaker": "A",
+     "text": "nye rutiner for bleskift og hvilket tøj børnene skal have på"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, så kan vi købe regnkedeldragt til Ella også"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, og hun skal have nye støvler, de gamle er for små"
+    },
+    {
+     "speaker": "B",
+     "text": "tager du papiret med alle spørgsmålene? jeg glemmer altid noget"
+    },
+    {
+     "speaker": "A",
+     "text": "det ligger allerede på køleskabet, jeg har skrevet alt op"
+    },
+    {
+     "speaker": "B",
+     "text": "tak, du er bedst!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-24",
+   "source": "claude-haiku",
+   "topic": "Pakken forsvandt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "min pakke fra Zalando er stadig ikke kommet"
+    },
+    {
+     "speaker": "B",
+     "text": "hvornår skulle den komme? det er vel flere dage siden?"
+    },
+    {
+     "speaker": "A",
+     "text": "sporingen siger leveret, men jeg kan ikke finde den"
+    },
+    {
+     "speaker": "B",
+     "text": "har du spurgt naboerne eller ved portneren?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, ingen har set noget, jeg har spurgt alle"
+    },
+    {
+     "speaker": "B",
+     "text": "ring til transportfirmaet, det går tit hurtigere"
+    },
+    {
+     "speaker": "A",
+     "text": "vent, nu ser jeg den ligger på en pakkeshop i Ålborg"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, så den er stadig på vej, jeg er nysgerrig på jakken"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, jeg var selv ikke helt med på det"
+    },
+    {
+     "speaker": "B",
+     "text": "sig til når den er kommet, jeg vil se den!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-25",
+   "source": "claude-haiku",
+   "topic": "Bryllupsplanlægning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vi har fundet datoen til brylluppet: 14. juni"
+    },
+    {
+     "speaker": "B",
+     "text": "hvor sjovt!! hvor skal I gifte jer?"
+    },
+    {
+     "speaker": "A",
+     "text": "på et slot på Fyn, stedet er virkelig smukt"
+    },
+    {
+     "speaker": "B",
+     "text": "hvor mange gæster regner I med?"
+    },
+    {
+     "speaker": "A",
+     "text": "omkring 80, så det bliver en stor opgave"
+    },
+    {
+     "speaker": "B",
+     "text": "hvem laver maden? vi var glade for den italienske restaurant"
+    },
+    {
+     "speaker": "A",
+     "text": "det første tilbud lyder på 650 kroner per person"
+    },
+    {
+     "speaker": "B",
+     "text": "det er ret meget, men måske det værd"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, vi snakker lige med familien først"
+    },
+    {
+     "speaker": "B",
+     "text": "send bare, jeg hjælper gerne med invitationerne"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-26",
+   "source": "claude-haiku",
+   "topic": "Ferie-billeder",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "nu er jeg endelig gået i gang med ferie-billederne"
+    },
+    {
+     "speaker": "B",
+     "text": "hvor mange er der?"
+    },
+    {
+     "speaker": "A",
+     "text": "over 4000, det er et rod på harddisken"
+    },
+    {
+     "speaker": "B",
+     "text": "jeg har set et program der finder dubletter"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, det er smart, ellers sidder man med det i evigheder"
+    },
+    {
+     "speaker": "B",
+     "text": "har du lavet mapper for hvert år?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, og nu lægger jeg dem også i skyen som backup"
+    },
+    {
+     "speaker": "B",
+     "text": "god idé, så mister du dem ikke ved et nedbrud"
+    },
+    {
+     "speaker": "A",
+     "text": "og billedet af os i Skagen var virkelig flot!"
+    },
+    {
+     "speaker": "B",
+     "text": "send det lige, det vil jeg også have"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-27",
+   "source": "claude-haiku",
+   "topic": "Støjende nabo",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "naboerne borer igen i weekenden kl. 9, det er så irriterende"
+    },
+    {
+     "speaker": "B",
+     "text": "av, har du snakket med dem?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej endnu, jeg venter på et roligt øjeblik"
+    },
+    {
+     "speaker": "B",
+     "text": "skriv bare en seddel, det virker tit"
+    },
+    {
+     "speaker": "A",
+     "text": "god idé, men jeg vil ikke gøre det for voldsomt"
+    },
+    {
+     "speaker": "B",
+     "text": "et venligt brev er altid bedre end at blive vred"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, jeg skriver det i morgen, nu går jeg i seng"
+    },
+    {
+     "speaker": "B",
+     "text": "held og lykke, og hvis det ikke hjælper, ved jeg ikke hvad jeg skal sige"
+    },
+    {
+     "speaker": "A",
+     "text": "haha tak, måske får jeg lige en ørepropp med"
+    },
+    {
+     "speaker": "B",
+     "text": "held med det, og sig til hvordan det gik"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-28",
+   "source": "claude-haiku",
+   "topic": "Hundepasning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "kan du passe Bamse i ferien, vi kører fra fredag"
+    },
+    {
+     "speaker": "B",
+     "text": "klart! hvor længe er I væk?"
+    },
+    {
+     "speaker": "A",
+     "text": "ni dage, men han skal lufte tre gange om dagen"
+    },
+    {
+     "speaker": "B",
+     "text": "han spiser vel stadig det samme foder?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, der står en seddel i køkkenskuffen med alt det vigtige"
+    },
+    {
+     "speaker": "B",
+     "text": "og må han sove i sengen?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, han må gerne ligge i kurven i stuen"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, han er jo en lille rakker men søde ham"
+    },
+    {
+     "speaker": "A",
+     "text": "husk at lukke døren til spisestuen, han stjæler gerne sokker"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det har jeg hørt! tag det som en aftale"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-29",
+   "source": "claude-haiku",
+   "topic": "Fodboldtræning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "min søn vil gerne starte til fodbold, hvad synes du?"
+    },
+    {
+     "speaker": "B",
+     "text": "fedt! hvor gammel er han nu?"
+    },
+    {
+     "speaker": "A",
+     "text": "otte, så han er lige til U9"
+    },
+    {
+     "speaker": "B",
+     "text": "er der prøvetræning? så kan han selv mærke det"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, onsdag kl. 17 til 18 på klubbens anlæg"
+    },
+    {
+     "speaker": "B",
+     "text": "tag skinnebensbeskyttere og en taske med"
+    },
+    {
+     "speaker": "A",
+     "text": "klart, han har sko fra sidste år endnu"
+    },
+    {
+     "speaker": "B",
+     "text": "husk transporten, banen ligger langt væk"
+    },
+    {
+     "speaker": "A",
+     "text": "jeg kører ham, eller også cykler han hvis det er tørt"
+    },
+    {
+     "speaker": "B",
+     "text": "super, så ses vi til den første træning!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-da-30",
+   "source": "claude-haiku",
+   "topic": "Flyttekasser fra IKEA",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du styr på flytningen? jeg har bestilt 20 kasser"
+    },
+    {
+     "speaker": "B",
+     "text": "20? er det ikke lidt meget?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, jeg har en masse bøger og en hel kommode fyldt op"
+    },
+    {
+     "speaker": "B",
+     "text": "smart at købe dem hos IKEA, de kan holde længe"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, de skal bare afhentes næste fredag kl. 9"
+    },
+    {
+     "speaker": "B",
+     "text": "har du en bil, eller skal vi leje en varebil?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sofie låner sin varebil, så vi klarer det med den"
+    },
+    {
+     "speaker": "B",
+     "text": "fedt, så skal jeg nok komme med en tur med kasserne"
+    },
+    {
+     "speaker": "A",
+     "text": "og glem ikke at mærke dem med rum og indhold"
+    },
+    {
+     "speaker": "B",
+     "text": "ja ja, det tager jeg mig af!"
+    }
+   ]
+  }
+ ]
+}

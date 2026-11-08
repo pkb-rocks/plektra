@@ -37,6 +37,9 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
     var nearestKeyTouchEnabled by remember {
         mutableStateOf(SettingsManager.getSoftwareKeyboardNearestKeyTouchEnabled(context))
     }
+    var keyCorrectionEnabled by remember {
+        mutableStateOf(SettingsManager.getSoftwareKeyboardKeyCorrectionEnabled(context))
+    }
     var longPressLayerPopupEnabled by remember {
         mutableStateOf(SettingsManager.getSoftwareKeyboardLongPressLayerPopupEnabled(context))
     }
@@ -301,6 +304,23 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
                     SettingsManager.setSoftwareKeyboardNearestKeyTouchEnabled(context, enabled)
                 }
             )
+
+            ModifierTapLatchRow(
+                title = stringResource(R.string.software_keyboard_key_correction_title),
+                linkId = "on_screen.key_correction",
+                description = stringResource(R.string.software_keyboard_key_correction_description),
+                checked = keyCorrectionEnabled,
+                onCheckedChange = { enabled ->
+                    keyCorrectionEnabled = enabled
+                    SettingsManager.setSoftwareKeyboardKeyCorrectionEnabled(context, enabled)
+                }
+            )
+            androidx.compose.material3.TextButton(
+                onClick = {
+                    context.startActivity(android.content.Intent(context, rocks.pkb.plektra.training.KeyCorrectionActivity::class.java))
+                },
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) { Text(stringResource(R.string.key_correction_open_calibration)) }
 
             ModifierTapLatchRow(
                 title = stringResource(R.string.software_keyboard_long_press_layer_popup_title),

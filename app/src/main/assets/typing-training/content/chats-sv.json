@@ -1,0 +1,1550 @@
+{
+ "chats": [
+  {
+   "id": "haiku-sv-01",
+   "source": "claude-haiku",
+   "topic": "Dejt på fredag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hej! vill du gå ut på fredag?"
+    },
+    {
+     "speaker": "B",
+     "text": "hej! ja gärna, vart tänkte du?"
+    },
+    {
+     "speaker": "A",
+     "text": "det nya fiket vid kanalen, de har riktigt bra fika"
+    },
+    {
+     "speaker": "B",
+     "text": "fika på fredag kväll? lite tidigt för dig va"
+    },
+    {
+     "speaker": "A",
+     "text": "haha jo men vi kan äta middag efteråt också"
+    },
+    {
+     "speaker": "B",
+     "text": "okej, säg klockan sjutton så kommer jag"
+    },
+    {
+     "speaker": "A",
+     "text": "kl 18 så fixar vi bord, det brukar bli fullt sent"
+    },
+    {
+     "speaker": "B",
+     "text": "bra! ska jag ta bilen eller cykeln?"
+    },
+    {
+     "speaker": "A",
+     "text": "cykeln, parkeringen är helt förstörd där"
+    },
+    {
+     "speaker": "B",
+     "text": "sant, jag kommer med cykeln då, vädret ska bli fint"
+    },
+    {
+     "speaker": "A",
+     "text": "vad roligt, vi ses då!"
+    },
+    {
+     "speaker": "B",
+     "text": "vi ses! kul att vi hittar på något"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-02",
+   "source": "claude-haiku",
+   "topic": "Jobbprojekt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hur går det med presentationen till måndag?"
+    },
+    {
+     "speaker": "B",
+     "text": "halvdant, jag har bara första tre sidorna klara"
+    },
+    {
+     "speaker": "A",
+     "text": "jag kan ta slidesen med siffror om du vill"
+    },
+    {
+     "speaker": "B",
+     "text": "snälla, det vore toppen. skicka över när du är klar"
+    },
+    {
+     "speaker": "A",
+     "text": "det blir nog ikväll, jag har en lång dag imorgon"
+    },
+    {
+     "speaker": "B",
+     "text": "förstår, jag fixar layouten under tiden"
+    },
+    {
+     "speaker": "A",
+     "text": "vilken mall använder ni i teamet nu?"
+    },
+    {
+     "speaker": "B",
+     "text": "den nya från marknadsavdelningen, den är lite tråkig men ren"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, jag håller mig till den"
+    },
+    {
+     "speaker": "A",
+     "text": "förresten, vet du vem som ska leda mötet?"
+    },
+    {
+     "speaker": "B",
+     "text": "Johan tror jag, men kolla med Lisa först"
+    },
+    {
+     "speaker": "A",
+     "text": "tack, då skriver jag till henne nu"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-03",
+   "source": "claude-haiku",
+   "topic": "Flytt till Göteborg",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hur går packningen? har du börjat?"
+    },
+    {
+     "speaker": "B",
+     "text": "jag har packat ett par kartonger men det tar tid"
+    },
+    {
+     "speaker": "A",
+     "text": "tar du med soffan eller säljer du den?"
+    },
+    {
+     "speaker": "B",
+     "text": "säljer den, den är för stor för lägenheten i Göteborg"
+    },
+    {
+     "speaker": "A",
+     "text": "bra, då slipper du flytta den med hyrbil"
+    },
+    {
+     "speaker": "B",
+     "text": "hyrbilen kostar typ 800 kr för helgen"
+    },
+    {
+     "speaker": "A",
+     "text": "dyrt! fråga kompisen Erik, han har släp"
+    },
+    {
+     "speaker": "B",
+     "text": "ja det skulle vara perfekt, jag ringer honom i kväll"
+    },
+    {
+     "speaker": "A",
+     "text": "och när kommer flyttbilen? tidigt på lördag?"
+    },
+    {
+     "speaker": "B",
+     "text": "kl 8, så vi får hinna innan trafiken"
+    },
+    {
+     "speaker": "A",
+     "text": "jag kommer och hjälper till, kl 8 är lite tidigt men okej"
+    },
+    {
+     "speaker": "B",
+     "text": "tack, du är bäst! jag bjuder på lunch"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-04",
+   "source": "claude-haiku",
+   "topic": "Träning på gymmet",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ska vi träna på gymmet imorgon? kl 7?"
+    },
+    {
+     "speaker": "B",
+     "text": "7 är för tidigt för mig, typ kl 9?"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, men då blir det mest folk som kör överlappande pass"
+    },
+    {
+     "speaker": "B",
+     "text": "nja, det är lugnt på förmiddagarna, jag har kört det länge"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, kör på! jag tar benpasset, du tar överkropp?"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, så slipper vi vänta på maskinerna"
+    },
+    {
+     "speaker": "A",
+     "text": "vad körde du förra gången? jag minns inte längre"
+    },
+    {
+     "speaker": "B",
+     "text": "bänkpress 60 kg, men jag vill upp till 70 snart"
+    },
+    {
+     "speaker": "A",
+     "text": "nice, då måste du äta mer protein"
+    },
+    {
+     "speaker": "B",
+     "text": "jag tar kycklingen och ägg varje dag, funkar bra"
+    },
+    {
+     "speaker": "A",
+     "text": "bra, vi ses kl 9 då"
+    },
+    {
+     "speaker": "B",
+     "text": "ses! ta med vatten, det är varmt i salen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-05",
+   "source": "claude-haiku",
+   "topic": "Köttbullar med potatismos",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vad blir det till middag? jag tänkte köttbullar"
+    },
+    {
+     "speaker": "B",
+     "text": "gärna! med potatismos och lingonsylt?"
+    },
+    {
+     "speaker": "A",
+     "text": "självklart, men jag tar färdiga köttbullar från affären"
+    },
+    {
+     "speaker": "B",
+     "text": "blir inte lika gott som hemgjorda, men tiden är knapp"
+    },
+    {
+     "speaker": "A",
+     "text": "jag vet, men jag orkar inte stå och rulla bollar"
+    },
+    {
+     "speaker": "B",
+     "text": "okej, då köper jag grädde och gräddfil också"
+    },
+    {
+     "speaker": "A",
+     "text": "bra, och ta gärna lite gurka"
+    },
+    {
+     "speaker": "B",
+     "text": "gurka och sallad, jag kollar vad det kostar"
+    },
+    {
+     "speaker": "A",
+     "text": "vi brukar slänga ett par hundralappar på mat varje vecka, typ 1200 kr"
+    },
+    {
+     "speaker": "B",
+     "text": "jämfört med restaurang är det billigt ändå"
+    },
+    {
+     "speaker": "A",
+     "text": "sant, dessutom blir det mindre spill"
+    },
+    {
+     "speaker": "B",
+     "text": "okej, middag kl 18 då?"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-06",
+   "source": "claude-haiku",
+   "topic": "Ny mobil",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jag har köpt ny mobil, men skärmen är redan repad"
+    },
+    {
+     "speaker": "B",
+     "text": "va? hade du skärmskydd?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, jag tänkte inte på det. dumt av mig"
+    },
+    {
+     "speaker": "B",
+     "text": "du borde fråga butiken om garantin, den är inte så gammal"
+    },
+    {
+     "speaker": "A",
+     "text": "bra tips, men jag är lite rädd att de säger att det är mitt fel"
+    },
+    {
+     "speaker": "B",
+     "text": "försök i alla fall, det är värt ett försök"
+    },
+    {
+     "speaker": "A",
+     "text": "batteriet håller också bara ett par timmar sen"
+    },
+    {
+     "speaker": "B",
+     "text": "uppdatera operativsystemet, det brukar fixa det"
+    },
+    {
+     "speaker": "A",
+     "text": "gjorde det i natt, men det verkar inte hjälpa så mycket"
+    },
+    {
+     "speaker": "B",
+     "text": "då kan det vara batteriet själv som börjat tappa kapacitet"
+    },
+    {
+     "speaker": "A",
+     "text": "då får jag väl ringa supporten på måndag"
+    },
+    {
+     "speaker": "B",
+     "text": "lycka till, hör av dig hur det går!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-07",
+   "source": "claude-haiku",
+   "topic": "Resa till Gotland",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "när åker vi till Gotland? helgen i juni eller juli?"
+    },
+    {
+     "speaker": "B",
+     "text": "juni är bättre, då är det inte så mycket folk på Fårö"
+    },
+    {
+     "speaker": "A",
+     "text": "tåg och färja eller bil?"
+    },
+    {
+     "speaker": "B",
+     "text": "bilen, då kan vi åka runt själva på ön"
+    },
+    {
+     "speaker": "A",
+     "text": "vi får ta färjan från Nynäshamn, den går runt 06:30"
+    },
+    {
+     "speaker": "B",
+     "text": "tidigt men okej, då kan vi ta en frukost på färjan"
+    },
+    {
+     "speaker": "A",
+     "text": "boende? stugan vi kollade kostar 1400 kr per natt"
+    },
+    {
+     "speaker": "B",
+     "text": "lite mycket, men om vi är fyra blir det okej"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, vi delar på kostnaden, Sara och Linn kommer ju med"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, glöm inte badkläderna, vädret ska bli fint"
+    },
+    {
+     "speaker": "A",
+     "text": "och kakor på fiket i Visby, vi måste testa dem"
+    },
+    {
+     "speaker": "B",
+     "text": "självklart! jag har redan köpt biljetterna till färjan"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-08",
+   "source": "claude-haiku",
+   "topic": "Mormor fyller år",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mormor fyller 80 på lördag, vad ska vi köpa?"
+    },
+    {
+     "speaker": "B",
+     "text": "jag tänkte på en bok med gamla bilder från Dalarna"
+    },
+    {
+     "speaker": "A",
+     "text": "bra idé! hon älskar ju att prata om barndomen"
+    },
+    {
+     "speaker": "B",
+     "text": "vi kan också beställa tårta från konditoriet nere i byn"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, med vaniljkräm och jordgubbar, det är hennes favorit"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, och kanske en blomsterbukett från torget"
+    },
+    {
+     "speaker": "A",
+     "text": "vilka kommer? pappa och moster Anna också?"
+    },
+    {
+     "speaker": "B",
+     "text": "pappa kommer, Anna är i USA men hon ringer"
+    },
+    {
+     "speaker": "A",
+     "text": "då blir det ett kul samtal, mormor blir glad"
+    },
+    {
+     "speaker": "B",
+     "text": "hon har sagt att hon vill höra lite piano, så vi får se"
+    },
+    {
+     "speaker": "A",
+     "text": "haha ja, det vore en sjukt bra present"
+    },
+    {
+     "speaker": "B",
+     "text": "vi tar det på plats, hon brukar bli rörd av barnbarnen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-09",
+   "source": "claude-haiku",
+   "topic": "Deckarserien",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du sett nya säsongen av den svenska deckarserien?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja igår! slutet var helt sjukt, jag fattade inget"
+    },
+    {
+     "speaker": "A",
+     "text": "jag ser bara avsnitt tre, undvik spoilers tack"
+    },
+    {
+     "speaker": "B",
+     "text": "okej, säger inget. men titta vidare, det lönar sig"
+    },
+    {
+     "speaker": "A",
+     "text": "vem tror du är mördaren då?"
+    },
+    {
+     "speaker": "B",
+     "text": "haha jag säger inte, men det är inte den man tror"
+    },
+    {
+     "speaker": "A",
+     "text": "det är alltid så i såna serier"
+    },
+    {
+     "speaker": "B",
+     "text": "precis, de gör det för att lura oss"
+    },
+    {
+     "speaker": "A",
+     "text": "ska vi se nästa avsnitt tillsammans på torsdag?"
+    },
+    {
+     "speaker": "B",
+     "text": "okej, jag bjuder på popcorn med salt och karamell"
+    },
+    {
+     "speaker": "A",
+     "text": "låter bra, jag tar med läsk"
+    },
+    {
+     "speaker": "B",
+     "text": "super, då ses vi kl 20 i soffan"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-10",
+   "source": "claude-haiku",
+   "topic": "Handla på ICA",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "behöver du något från ICA? jag ska precis gå dit"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, mjölk, ägg och ett bröd gärna"
+    },
+    {
+     "speaker": "A",
+     "text": "havregryn? de är slut hemma"
+    },
+    {
+     "speaker": "B",
+     "text": "tack, ja ta ett paket. och lite bananer"
+    },
+    {
+     "speaker": "A",
+     "text": "bananerna är på rea idag, 12 kr kilot"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, då tar vi två kilo"
+    },
+    {
+     "speaker": "A",
+     "text": "vad ska vi ha till fredagsmyset?"
+    },
+    {
+     "speaker": "B",
+     "text": "tacos! köp med köttfärs och tortillabröd"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, och salsa och ost också"
+    },
+    {
+     "speaker": "B",
+     "text": "lägg även till en påse nachos, de tar slut snabbt"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, jag tar kassan vid 17 och kommer hem sen"
+    },
+    {
+     "speaker": "B",
+     "text": "tack, jag dukar fram tallrikarna då"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-11",
+   "source": "claude-haiku",
+   "topic": "Tid hos vårdcentralen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du fått tid hos vårdcentralen än?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, på tisdag kl 10, men bara för en blodprovtagning"
+    },
+    {
+     "speaker": "A",
+     "text": "då slipper du vänta, det brukar vara långa köer annars"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, jag ringde för att de ville kolla mina järnvärden"
+    },
+    {
+     "speaker": "A",
+     "text": "ska jag följa med? jag kan ta lunch efter"
+    },
+    {
+     "speaker": "B",
+     "text": "nej tack, det är bara en kort stund"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, men kom ihåg att fasta om de säger det"
+    },
+    {
+     "speaker": "B",
+     "text": "jag tittade i mailet, det står bara att man ska dricka vatten"
+    },
+    {
+     "speaker": "A",
+     "text": "bra, då är det lätt"
+    },
+    {
+     "speaker": "B",
+     "text": "tack för påminnelsen, jag skriver det i kalendern"
+    },
+    {
+     "speaker": "A",
+     "text": "hör av dig efteråt så vi vet hur det gick"
+    },
+    {
+     "speaker": "B",
+     "text": "absolut, jag ringer dig efter lunch"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-12",
+   "source": "claude-haiku",
+   "topic": "Speltävling online",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "spelar du med i turneringen i Counter Strike på lördag?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, vi är ett lag på fyra personer, men vi behöver en till"
+    },
+    {
+     "speaker": "A",
+     "text": "jag kan hoppa in, vad är din rank?"
+    },
+    {
+     "speaker": "B",
+     "text": "vi kör guld-divisionen, lite tufft men vi har tränat"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, jag är inte så bra men jag kan ta support-rollen"
+    },
+    {
+     "speaker": "B",
+     "text": "perfekt, hellre någon som kan kommunicera än en sniper"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, jag ska sluta skrika i micken då"
+    },
+    {
+     "speaker": "B",
+     "text": "nej nej, skrik gärna, det hjälper att höra läget"
+    },
+    {
+     "speaker": "A",
+     "text": "okej, hur börjar vi? kl 16?"
+    },
+    {
+     "speaker": "B",
+     "text": "kl 15 så vi hinner testa servern innan"
+    },
+    {
+     "speaker": "A",
+     "text": "lovar, jag är där! ta med bra headset"
+    },
+    {
+     "speaker": "B",
+     "text": "självklart, och ett par energidrycker till"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-13",
+   "source": "claude-haiku",
+   "topic": "Tentaplugg i nationalekonomi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du börjat plugga inför tentan i nationalekonomi?"
+    },
+    {
+     "speaker": "B",
+     "text": "knappt, jag har gått igenom föreläsningarna men inte övningarna"
+    },
+    {
+     "speaker": "A",
+     "text": "då ska vi göra några tal tillsammans, typ i biblioteket?"
+    },
+    {
+     "speaker": "B",
+     "text": "bra, när passar det dig?"
+    },
+    {
+     "speaker": "A",
+     "text": "tisdag eftermiddag funkar, då har jag inga föreläsningar"
+    },
+    {
+     "speaker": "B",
+     "text": "kul, då kan jag ta med gamla tentor från förra året"
+    },
+    {
+     "speaker": "A",
+     "text": "tänk om vi båda klarar oss på treorna i alla fall"
+    },
+    {
+     "speaker": "B",
+     "text": "tre är bara godkänt, jag siktar på fyra men det känns avlägset"
+    },
+    {
+     "speaker": "A",
+     "text": "vi får kämpa, kaffe på caféet sen då"
+    },
+    {
+     "speaker": "B",
+     "text": "tack, jag ska prata med dig om kursmaterialet också"
+    },
+    {
+     "speaker": "A",
+     "text": "fint, skicka över de anteckningar du har"
+    },
+    {
+     "speaker": "B",
+     "text": "gör jag redan nu, kolla din mail om en stund"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-14",
+   "source": "claude-haiku",
+   "topic": "Snöstorm i Stockholm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vilket väder! det har snöat hela natten"
+    },
+    {
+     "speaker": "B",
+     "text": "jag vaknade och kunde knappt öppna dörren för snön"
+    },
+    {
+     "speaker": "A",
+     "text": "tåget till jobbet är inställt, så jag sitter fast hemma"
+    },
+    {
+     "speaker": "B",
+     "text": "jag tog bussen och det tog nästan en timme extra"
+    },
+    {
+     "speaker": "A",
+     "text": "skolan är stängd idag, så barnen är hemma och bråkar"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, vi har också en tråkig dag med snöskottning"
+    },
+    {
+     "speaker": "A",
+     "text": "kan du hjälpa till med att skotta uppfarten senare?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, jag kommer över när jag fått på mig varma kläder"
+    },
+    {
+     "speaker": "A",
+     "text": "tack, det är verkligen jobbigt med såna stormar"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, men snön är fin, lite som ett vykort"
+    },
+    {
+     "speaker": "A",
+     "text": "du är för positiv, jag är trött på vintern redan"
+    },
+    {
+     "speaker": "B",
+     "text": "ha, nu är det ju bara november, det blir värre sen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-15",
+   "source": "claude-haiku",
+   "topic": "Tåget är försenat",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "tåget är försenat 25 minuter, vet du vad som hänt?"
+    },
+    {
+     "speaker": "B",
+     "text": "tror det är ett signalfel vid Jönköping"
+    },
+    {
+     "speaker": "A",
+     "text": "jag står på perrongen sen tjugo minuter, det är iskallt"
+    },
+    {
+     "speaker": "B",
+     "text": "gå in i väntsalen då, där är det varmt"
+    },
+    {
+     "speaker": "A",
+     "text": "där är det fullt av folk, men jag kan försöka"
+    },
+    {
+     "speaker": "B",
+     "text": "har du sett att SJ skriver att man kan få ersättning?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, men man måste ha minst 20 minuters försening"
+    },
+    {
+     "speaker": "B",
+     "text": "då har du rätt, appen säger det också"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, jag tar en selfie med tidtabellen som bevis haha"
+    },
+    {
+     "speaker": "B",
+     "text": "bra, så du kan skicka in kvittot senare"
+    },
+    {
+     "speaker": "A",
+     "text": "tåget kommer! jag hör den rulla in"
+    },
+    {
+     "speaker": "B",
+     "text": "ha en bra resa, skriv när du kommit hem"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-16",
+   "source": "claude-haiku",
+   "topic": "Jobbintervju",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hur gick det på intervjun? du var ju nervös innan"
+    },
+    {
+     "speaker": "B",
+     "text": "ganska bra, de frågade varför jag vill byta efter fem år"
+    },
+    {
+     "speaker": "A",
+     "text": "och vad svarade du?"
+    },
+    {
+     "speaker": "B",
+     "text": "att jag vill ta mer ansvar och jobba närmare kunderna"
+    },
+    {
+     "speaker": "A",
+     "text": "bra svar! sa de något om lönen?"
+    },
+    {
+     "speaker": "B",
+     "text": "nej, de ringer nästa vecka på torsdag mellan 10 och 12"
+    },
+    {
+     "speaker": "A",
+     "text": "spännande, jag håller tummarna för dig"
+    },
+    {
+     "speaker": "B",
+     "text": "tack! jag fick också en praktisk uppgift, typ två timmars jobb"
+    },
+    {
+     "speaker": "A",
+     "text": "oj, det låter tufft. hinner du öva i kväll?"
+    },
+    {
+     "speaker": "B",
+     "text": "typ ikväll, annars blir det inget haha"
+    },
+    {
+     "speaker": "A",
+     "text": "lycka till, du fixar det"
+    },
+    {
+     "speaker": "B",
+     "text": "hoppas det, jag är redan orolig för att vänta på samtalet"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-17",
+   "source": "claude-haiku",
+   "topic": "Loppis på lördag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ska vi ha loppis i trädgården på lördag?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja! vilken tid tänker du dig?"
+    },
+    {
+     "speaker": "A",
+     "text": "typ 10 till 14, då är folk ute och handlar"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, vad ska vi sälja då?"
+    },
+    {
+     "speaker": "A",
+     "text": "gamla böcker, barnkläder och en massa grejer från garaget"
+    },
+    {
+     "speaker": "B",
+     "text": "jag har en gammal stereo och två stolar som kan gå"
+    },
+    {
+     "speaker": "A",
+     "text": "perfekt, och kaffe och kanelbullar kan vi ju sälja också"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det är ju en bra idé, jag fixar bullarna"
+    },
+    {
+     "speaker": "A",
+     "text": "prislappar behöver vi, har du tejp?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, i lådan i hallen, jag tar med den imorgon"
+    },
+    {
+     "speaker": "A",
+     "text": "vad kul, vi tjänar säkert några hundralappar"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-18",
+   "source": "claude-haiku",
+   "topic": "Körkortsuppkörning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jag har uppkörning på måndag klockan 13:20"
+    },
+    {
+     "speaker": "B",
+     "text": "nervös?? jag var helt skakig första gången"
+    },
+    {
+     "speaker": "A",
+     "text": "lite, framför allt backa in i rutan"
+    },
+    {
+     "speaker": "B",
+     "text": "öva på det på parkeringen vid ICA, det är lugnt där"
+    },
+    {
+     "speaker": "A",
+     "text": "gjorde det igår, men det blev fel två gånger"
+    },
+    {
+     "speaker": "B",
+     "text": "det är helt normalt, du klarar det!"
+    },
+    {
+     "speaker": "A",
+     "text": "vad var det som du fick underkänt för?"
+    },
+    {
+     "speaker": "B",
+     "text": "jag stannade för sent vid övergångsstället, typiskt"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, då kollar jag extra på övergångarna"
+    },
+    {
+     "speaker": "B",
+     "text": "och glöm inte att blinka i god tid!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-19",
+   "source": "claude-haiku",
+   "topic": "Bilen startar inte",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "bilen vill inte starta, den bara klickar"
+    },
+    {
+     "speaker": "B",
+     "text": "låter som batteriet, har du kollat det?"
+    },
+    {
+     "speaker": "A",
+     "text": "nej, tidigast imorgon kan jag få tid på verkstaden"
+    },
+    {
+     "speaker": "B",
+     "text": "vad kostar ett nytt batteri nu då?"
+    },
+    {
+     "speaker": "A",
+     "text": "runt 1 700 kronor med montering, bilen är ju från 2012"
+    },
+    {
+     "speaker": "B",
+     "text": "kolla att polerna inte sitter löst, det händer ofta"
+    },
+    {
+     "speaker": "A",
+     "text": "bra idé, jag tar en ficklampa och kikar"
+    },
+    {
+     "speaker": "B",
+     "text": "annars kan jag komma med startkablar"
+    },
+    {
+     "speaker": "A",
+     "text": "toppen, kan du komma runt kvart i sex?"
+    },
+    {
+     "speaker": "B",
+     "text": "javisst, jag ses då!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-20",
+   "source": "claude-haiku",
+   "topic": "Lägenhetsvisning",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vi har visning på lägenheten i Hammarby Sjöstad på torsdag"
+    },
+    {
+     "speaker": "B",
+     "text": "ooh, hur stor är den? och vad kostar den?"
+    },
+    {
+     "speaker": "A",
+     "text": "två rum och kök, 58 kvadrat, hyran är 11 200 kronor"
+    },
+    {
+     "speaker": "B",
+     "text": "det är ju dyrt men med utsikt över vattnet kanske värt det"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, och det finns balkong åt söder"
+    },
+    {
+     "speaker": "B",
+     "text": "fråga om tvättstugan och om det finns förråd"
+    },
+    {
+     "speaker": "A",
+     "text": "ska göra det, och hur många andra kommer på visningen?"
+    },
+    {
+     "speaker": "B",
+     "text": "säkert tjugo personer, man måste ha bra papper med sig"
+    },
+    {
+     "speaker": "A",
+     "text": "jag har lönespecar och referens redan i en mapp"
+    },
+    {
+     "speaker": "B",
+     "text": "smart, då är du först i kön med papperna"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-21",
+   "source": "claude-haiku",
+   "topic": "Badrumsrenovering",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hantverkaren sa att badrumsrenoveringen tar tre veckor"
+    },
+    {
+     "speaker": "B",
+     "text": "tre veckor? var ska ni duscha under tiden?"
+    },
+    {
+     "speaker": "A",
+     "text": "hos mamma, hon bor ju bara en kvart bort"
+    },
+    {
+     "speaker": "B",
+     "text": "bra lösning! vilket kakel har ni valt?"
+    },
+    {
+     "speaker": "A",
+     "text": "ljusgrått med mönster, det känns lugnt och fräscht"
+    },
+    {
+     "speaker": "B",
+     "text": "och handfatet, blir det ett stort?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, 80 centimeter, vi har inte tillräckligt med plats annars"
+    },
+    {
+     "speaker": "B",
+     "text": "hoppas att rörmokaren inte hittar några överraskningar i väggen"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, det var det jag var rädd för också"
+    },
+    {
+     "speaker": "B",
+     "text": "skicka bilder när det är klart, jag är nyfiken!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-22",
+   "source": "claude-haiku",
+   "topic": "Midsommarfirande",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ska vi fira midsommar hos oss på lördag?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja! vi kommer med sill och jordgubbstårta"
+    },
+    {
+     "speaker": "A",
+     "text": "perfekt, och vi har en stång som vi kan resa på gräsmattan"
+    },
+    {
+     "speaker": "B",
+     "text": "typ det där med dans kring stången, det är ju det roligaste"
+    },
+    {
+     "speaker": "A",
+     "text": "sa Elin att hon tar med sin gitarr också"
+    },
+    {
+     "speaker": "B",
+     "text": "fint, då kan vi sjunga Små grodorna, det brukar gå bra"
+    },
+    {
+     "speaker": "A",
+     "text": "om det regnar blir det inne i vardagsrummet"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, men kolla vädret, det ska vara 19 grader och sol!"
+    },
+    {
+     "speaker": "A",
+     "text": "jag har kollat, men man vet ju aldrig i Sverige"
+    },
+    {
+     "speaker": "B",
+     "text": "ha, då tar vi med oss täcken och myggmedel"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-23",
+   "source": "claude-haiku",
+   "topic": "Hunden åt sockorna",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bamse har ätit upp två par sockor igen!!"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, han är verkligen en sockmonster"
+    },
+    {
+     "speaker": "A",
+     "text": "och igår åt han en sudd också, det var sjukt"
+    },
+    {
+     "speaker": "B",
+     "text": "oj, mår han bra? ska du ringa veterinären?"
+    },
+    {
+     "speaker": "A",
+     "text": "han verkar okej, men jag håller ögonen på honom"
+    },
+    {
+     "speaker": "B",
+     "text": "om han kräks eller slutar äta ska du ringa direkt"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, jag ska dessutom låsa in skorna i garderoben"
+    },
+    {
+     "speaker": "B",
+     "text": "smart, men han kan nog öppna dörrar också"
+    },
+    {
+     "speaker": "A",
+     "text": "sluta, han är faktiskt ganska smart"
+    },
+    {
+     "speaker": "B",
+     "text": "han är en riktig rackare, men så söt"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-24",
+   "source": "claude-haiku",
+   "topic": "Sommarjobb på restaurang",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jag fick jobb på restaurangen i Vasastan över sommaren!"
+    },
+    {
+     "speaker": "B",
+     "text": "grattis! vilka tider jobbar du?"
+    },
+    {
+     "speaker": "A",
+     "text": "mest kvällar, från 16 till midnatt, fredag och lördag också"
+    },
+    {
+     "speaker": "B",
+     "text": "tungt men bra betalt säkert, typ 150 kronor i timmen?"
+    },
+    {
+     "speaker": "A",
+     "text": "lite mindre, men dricksen är ganska bra"
+    },
+    {
+     "speaker": "B",
+     "text": "har du fått någon uniform eller ska du köpa egna svarta kläder?"
+    },
+    {
+     "speaker": "A",
+     "text": "de ger en förkläde, sen ska jag ha svarta byxor själv"
+    },
+    {
+     "speaker": "B",
+     "text": "det har jag i garderoben, kan jag låna dem?"
+    },
+    {
+     "speaker": "A",
+     "text": "klart, vi kan kolla på kvällen"
+    },
+    {
+     "speaker": "B",
+     "text": "och när börjar du?"
+    },
+    {
+     "speaker": "A",
+     "text": "nästa vecka på tisdag, då har jag introduktion"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-25",
+   "source": "claude-haiku",
+   "topic": "Konsertbiljetter",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "biljetterna till Silverbandets konsert släpps idag klockan 10!"
+    },
+    {
+     "speaker": "B",
+     "text": "oj, jag hade glömt det helt, är du redan inne på sidan?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, kön är redan 3000 personer och växer hela tiden"
+    },
+    {
+     "speaker": "B",
+     "text": "vad kostar en biljett? och finns det något kvar?"
+    },
+    {
+     "speaker": "A",
+     "text": "695 kronor, men det är bara några få på sektion C"
+    },
+    {
+     "speaker": "B",
+     "text": "ta två, då kan vi åka tillsammans!"
+    },
+    {
+     "speaker": "A",
+     "text": "sidan hänger sig, jag får inte fram kassan"
+    },
+    {
+     "speaker": "B",
+     "text": "ladda om sidan, annars förlorar du din plats i kön"
+    },
+    {
+     "speaker": "A",
+     "text": "jag har dem!! sektion C, rad 7, två platser bredvid varandra"
+    },
+    {
+     "speaker": "B",
+     "text": "äntligen! swisha mig pengarna så betalar jag direkt"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-26",
+   "source": "claude-haiku",
+   "topic": "Tandläkare",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "jag måste till tandläkaren imorgon, jag har ett hål"
+    },
+    {
+     "speaker": "B",
+     "text": "oj, vad är det för tid?"
+    },
+    {
+     "speaker": "A",
+     "text": "kvart över två, men jag är så rädd för borren"
+    },
+    {
+     "speaker": "B",
+     "text": "be dem ge bedövning direkt, det hjälper verkligen"
+    },
+    {
+     "speaker": "A",
+     "text": "de erbjöd lustgas, så det tar jag gärna"
+    },
+    {
+     "speaker": "B",
+     "text": "lustgas är ganska skönt, jag har provat en gång"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, jag hoppas att det inte blir värre än så"
+    },
+    {
+     "speaker": "B",
+     "text": "sen kan du ta en glass som belöning?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, det är min plan, glasskiosken ligger precis bredvid"
+    },
+    {
+     "speaker": "B",
+     "text": "men inga söta saker efteråt, annars får du hål igen!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-27",
+   "source": "claude-haiku",
+   "topic": "Julklappar",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vad ska vi ge mormor i julklapp i år?"
+    },
+    {
+     "speaker": "B",
+     "text": "hon vill ha något praktiskt, typ en ny vattenkokare?"
+    },
+    {
+     "speaker": "A",
+     "text": "hon sa att hennes gamla gick sönder förra veckan"
+    },
+    {
+     "speaker": "B",
+     "text": "bra, då köper vi en snygg en i rostfritt"
+    },
+    {
+     "speaker": "A",
+     "text": "och till pappa? han gillar ju bara kaffe"
+    },
+    {
+     "speaker": "B",
+     "text": "en påse från rosteriet i Kungsholmen, han blir glad"
+    },
+    {
+     "speaker": "A",
+     "text": "bra idé! och vad ska vi ge barnen?"
+    },
+    {
+     "speaker": "B",
+     "text": "lego, de har önskat det sedan september"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, budget 800 kronor totalt? det får räcka"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, vi tar en lista så vi inte glömmer något"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-28",
+   "source": "claude-haiku",
+   "topic": "Paketet försvann",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mitt paket från Zalando har inte kommit fram än"
+    },
+    {
+     "speaker": "B",
+     "text": "när skulle det komma? det är väl några dagar sen?"
+    },
+    {
+     "speaker": "A",
+     "text": "spårningen säger levererat, men jag hittar det inte"
+    },
+    {
+     "speaker": "B",
+     "text": "har du kollat hos grannarna eller i portkoden?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, ingen har sett något, jag har frågat överallt"
+    },
+    {
+     "speaker": "B",
+     "text": "ring transportföretaget, det brukar gå snabbare"
+    },
+    {
+     "speaker": "A",
+     "text": "vänta, nu ser jag att det ligger på ombud i Solna"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det är alltså på väg, jag är nyfiken på jackan"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, jag var själv inte riktigt med på det"
+    },
+    {
+     "speaker": "B",
+     "text": "säg till när den kommit, jag vill se den!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-29",
+   "source": "claude-haiku",
+   "topic": "Föräldramöte på förskolan",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "har du sett kallelsen till föräldramötet på förskolan?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, på tisdag 18:30, men jag hinner nog inte vara kvar längre än till 19"
+    },
+    {
+     "speaker": "A",
+     "text": "vi går båda, det är ju inför sommaren och uteförskolan"
+    },
+    {
+     "speaker": "B",
+     "text": "vad ska de prata om egentligen?"
+    },
+    {
+     "speaker": "A",
+     "text": "nya rutiner för blöjbyte och vilka kläder barnen ska ha"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, då kan vi köpa regnoverall till Ella också"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, hon behöver nya stövlar också, de hon har är för små"
+    },
+    {
+     "speaker": "B",
+     "text": "tar du med papperet med alla frågor? jag glömmer ju alltid"
+    },
+    {
+     "speaker": "A",
+     "text": "ligger redan på kylskåpet, jag har skrivit upp allt"
+    },
+    {
+     "speaker": "B",
+     "text": "tack, du är bäst!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-sv-30",
+   "source": "claude-haiku",
+   "topic": "Barnkalas",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hugo fyller fem på lördag och vill ha dinosauriekalas"
+    },
+    {
+     "speaker": "B",
+     "text": "wow, hur många barn blir det?"
+    },
+    {
+     "speaker": "A",
+     "text": "ungefär tolv, vi har bjudit alla från förskoleklassen"
+    },
+    {
+     "speaker": "B",
+     "text": "oj, ska ni ha det hemma eller på lekland?"
+    },
+    {
+     "speaker": "A",
+     "text": "hemma, vi har en stor trädgård och det blir billigare"
+    },
+    {
+     "speaker": "B",
+     "text": "vad har du tänkt med mat och tårta?"
+    },
+    {
+     "speaker": "A",
+     "text": "korv och pastasallad, och tårtan blir en vulkan med dinosaurier"
+    },
+    {
+     "speaker": "B",
+     "text": "haha, det låter som något Hugo vill ha! kan jag hjälpa till?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, kom gärna en timme tidigare, så fixar vi dekorationerna"
+    },
+    {
+     "speaker": "B",
+     "text": "klart, jag tar med lite ballonger också"
+    }
+   ]
+  }
+ ]
+}

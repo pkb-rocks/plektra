@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-da-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jeg tager toget på arbejde i morgen, fordi bilen står til service."
+  },
+  {
+   "id": "haiku-da-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi spiste frokost ude på torvet og snakkede om ferien i sommer."
+  },
+  {
+   "id": "haiku-da-p003",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Den, der venter på noget godt, skal også selv gøre en indsats for det."
+  },
+  {
+   "id": "haiku-da-p004",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Udfyld formularen med dit fulde navn, din adresse og dit cpr-nummer."
+  },
+  {
+   "id": "haiku-da-p005",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Regeringen præsenterer ny plan for kollektiv trafik i Jylland"
+  },
+  {
+   "id": "haiku-da-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mormor bager boller hver lørdag, og hele familien plejer at kigge forbi."
+  },
+  {
+   "id": "haiku-da-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det regnede hele eftermiddagen, så vi blev inde og spillede kort."
+  },
+  {
+   "id": "haiku-da-p008",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Den, der sejler uden mål, får aldrig medvind, sagde min farfar altid."
+  },
+  {
+   "id": "haiku-da-p009",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Slå flytilstand fra, før du åbner kortappen, ellers virker navigationen ikke."
+  },
+  {
+   "id": "haiku-da-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hvor mange gange skal jeg sige, at du skal rydde op på værelset?"
+  },
+  {
+   "id": "haiku-da-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kaffen koster 35 kr. i kiosken ved stationen, men boller er gratis i dag!"
+  },
+  {
+   "id": "haiku-da-p012",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Ny undersøgelse viser, at søvn betyder mere for indlæring end ventet"
+  },
+  {
+   "id": "haiku-da-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hun løb ti kilometer på under en time, og det var hendes nye personlige rekord."
+  },
+  {
+   "id": "haiku-da-p014",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Ingen bliver mester på en dag, men hver træning tæller alligevel."
+  },
+  {
+   "id": "haiku-da-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Bussen var forsinket med tyve minutter, så vi nåede lige toget."
+  },
+  {
+   "id": "haiku-da-p016",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Download appen fra den officielle butik og log ind med din konto."
+  },
+  {
+   "id": "haiku-da-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Har du set den nye sæson af serien, eller må jeg ikke spoile noget?"
+  },
+  {
+   "id": "haiku-da-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi skal købe mælk, æg, rugbrød og nogle æbler til weekenden."
+  },
+  {
+   "id": "haiku-da-p019",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Det er ikke den tid, du har, men det du gør med den, der tæller."
+  },
+  {
+   "id": "haiku-da-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Dyrlægen sagde, at katten har det godt, men den skal have mindre tørfoder nu."
+  },
+  {
+   "id": "haiku-da-p021",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Københavnerne skal betale mere for parkering fra næste måned"
+  },
+  {
+   "id": "haiku-da-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi mødtes ved springvandet klokken halv otte, men du kom først tyve minutter senere!"
+  },
+  {
+   "id": "haiku-da-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan du sende mig vejbeskrivelsen til festen, jeg kan ikke finde vej længere?"
+  },
+  {
+   "id": "haiku-da-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Efter flytningen tog det tre uger, før vi fandt nøglerne i en flyttekasse."
+  },
+  {
+   "id": "haiku-da-p025",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Sorter tøjet i mørke og lyse farver og vælg 40 grader til uld."
+  },
+  {
+   "id": "haiku-da-p026",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Projektet blev færdigt til tiden, selvom to kollegaer var syge hele ugen."
+  },
+  {
+   "id": "haiku-da-p027",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Den bedste plan er den, du faktisk gennemfører, selv når den er lidt ufuldkommen."
+  },
+  {
+   "id": "haiku-da-p028",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi tog den gamle sti gennem skoven og holdt en pause ved søen."
+  },
+  {
+   "id": "haiku-da-p029",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Børnene elsker at lege i sandkassen, men de glemmer altid at pusse tænder."
+  },
+  {
+   "id": "haiku-da-p030",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Toget mod Aarhus er aflyst på grund af en signalfejl; bussen kører fra perron fire."
+  },
+  {
+   "id": "haiku-da-p031",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Fodboldholdet vandt 3-1 efter et sent mål i anden halvleg"
+  },
+  {
+   "id": "haiku-da-p032",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det koster 129 kr. om måneden, plus et engangsgebyr på 350 kr."
+  },
+  {
+   "id": "haiku-da-p033",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hold da op, hvor tiden flyver! Det var lige nytår i går, ikke?"
+  },
+  {
+   "id": "haiku-da-p034",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Forvarm ovnen til 200 grader og bag kagen i cirka 35 minutter."
+  },
+  {
+   "id": "haiku-da-p035",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Min søster arbejder nattevagt på hospitalet tre gange om ugen, så hun sover om dagen."
+  },
+  {
+   "id": "haiku-da-p036",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Hvem er mest modig, den der falder, eller den der aldrig prøver overhovedet?"
+  },
+  {
+   "id": "haiku-da-p037",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hun købte brugte skiløbersko på loppemarkedet for 200 kr. og var meget glad."
+  },
+  {
+   "id": "haiku-da-p038",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Husk at tage pas, billet og oplader med, når du skal til lufthavnen."
+  },
+  {
+   "id": "haiku-da-p039",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det kan blive en lang aften, men pizzaen er på vej, og vinen står i køleskabet."
+  },
+  {
+   "id": "haiku-da-p040",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Boligpriserne falder for første gang i tre år ifølge ny rapport"
+  },
+  {
+   "id": "haiku-da-p041",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jeg har glemt koden til cykellåsen igen, typisk mig!"
+  },
+  {
+   "id": "haiku-da-p042",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi skal til Bornholm i juli og leje et lille sommerhus tæt på havet."
+  },
+  {
+   "id": "haiku-da-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Et smil koster ingenting, men det kan give rigtig meget tilbage."
+  },
+  {
+   "id": "haiku-da-p044",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Tryk på kameraikonet og hold knappen nede i to sekunder."
+  },
+  {
+   "id": "haiku-da-p045",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Han arbejder deltid på biblioteket og læser historie om aftenen."
+  },
+  {
+   "id": "haiku-da-p046",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Har du hørt, at vejen mellem Odense og Svendborg lukkes i weekenden?"
+  },
+  {
+   "id": "haiku-da-p047",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det blev en rigtig hyggelig fredag med lasagne, film og hjemmelavet is."
+  },
+  {
+   "id": "haiku-da-p048",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mor ringede to gange i dag, så jeg tror, hun vil snakke om juleferien."
+  },
+  {
+   "id": "haiku-da-p049",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Vejen til succes er brolagt med små valg, som ingen rigtig lægger mærke til."
+  },
+  {
+   "id": "haiku-da-p050",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jeg synes, vi skal bestille bord med det samme, ellers er den fuldt på lørdag."
+  },
+  {
+   "id": "haiku-da-p051",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Termometeret viste minus fire grader i morges, så søen var dækket af is."
+  },
+  {
+   "id": "haiku-da-p052",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Læs vilkårene grundigt igennem, før du accepterer og sender din ansøgning."
+  },
+  {
+   "id": "haiku-da-p053",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Der var engang en lille ræv, der boede i skoven bag det gamle savværk."
+  },
+  {
+   "id": "haiku-da-p054",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Tusindvis af gæster besøgte festivalen i Roskilde trods vedvarende regn"
+  },
+  {
+   "id": "haiku-da-p055",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hun er meget omhyggelig og tjekker altid tre gange, at døren er låst."
+  },
+  {
+   "id": "haiku-da-p056",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi nåede to museer, en lang gåtur og en is, før det begyndte at regne."
+  },
+  {
+   "id": "haiku-da-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Læg frosne bær i en skål og lad dem tø op natten over i køleskabet."
+  },
+  {
+   "id": "haiku-da-p058",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Lyt mere, end du taler, så lærer du mere end alle andre i rummet."
+  },
+  {
+   "id": "haiku-da-p059",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan vi flytte mødet til torsdag? Jeg har tandlæge om tirsdagen."
+  },
+  {
+   "id": "haiku-da-p060",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jeg hentede tre nye spil, men nåede kun at prøve det første, før arbejdet."
+  },
+  {
+   "id": "haiku-da-p061",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "En hjort stod midt på vejen, og vi måtte bremse hårdt op."
+  },
+  {
+   "id": "haiku-da-p062",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Skriv en kort besked til læreren og vedhæft billedet i samme mail."
+  },
+  {
+   "id": "haiku-da-p063",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Det er den bedste pizza, jeg har spist i lang tid, sig ikke til Anna!"
+  },
+  {
+   "id": "haiku-da-p064",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi mangler flere stole, borde og lys til fredagens fest i lokalet."
+  },
+  {
+   "id": "haiku-da-p065",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nye regler for elløbehjul træder i kraft den første januar næste år"
+  },
+  {
+   "id": "haiku-da-p066",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hun begyndte på sygeplejerskeuddannelsen i efteråret og trives rigtig godt."
+  },
+  {
+   "id": "haiku-da-p067",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Du behøver ikke være perfekt for at begynde, men du skal begynde for at blive god."
+  },
+  {
+   "id": "haiku-da-p068",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Solen stod op over øhavet, og alt så ud som et postkort fra 1950'erne."
+  },
+  {
+   "id": "haiku-da-p069",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kan du hente børnene fra fodbold klokken fire? Jeg kommer sent fra arbejde."
+  },
+  {
+   "id": "haiku-da-p070",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Brug kun den adgangskode, du selv har valgt, og skift den jævnligt."
+  },
+  {
+   "id": "haiku-da-p071",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Efter tre timers kø fik vi endelig set den berømte udstilling på Louisiana."
+  },
+  {
+   "id": "haiku-da-p072",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Han kan lide at lave mad fra bunden, også når det tager hele søndagen."
+  },
+  {
+   "id": "haiku-da-p073",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Der bliver pandekager til morgenmad med syltetøj og flødeskum til dem, der vil."
+  },
+  {
+   "id": "haiku-da-p074",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hvorfor er der altid så lange køer om mandagen? Jeg forstår det virkelig ikke."
+  },
+  {
+   "id": "haiku-da-p075",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Skolerne i Aalborg indfører nyt system for digital fremmøde fra efteråret"
+  },
+  {
+   "id": "haiku-da-p076",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Vi tog toget til København og spiste frokost ved kanalen."
+  },
+  {
+   "id": "haiku-da-p077",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Naboens hund gøer hver morgen klokken seks, og det er ikke sjovt."
+  },
+  {
+   "id": "haiku-da-p078",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "At turde fejle er en måde at vise, at man mener det alvorligt med det, man gør."
+  },
+  {
+   "id": "haiku-da-p079",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Glem ikke at gemme filen, før du lukker programmet, ellers er alt væk."
+  },
+  {
+   "id": "haiku-da-p080",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jeg håber, vejret holder hele ugen, så kan vi grille hver aften!"
+  }
+ ]
+}

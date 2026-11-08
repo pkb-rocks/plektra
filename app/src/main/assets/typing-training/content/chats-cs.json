@@ -1,0 +1,1782 @@
+{
+ "chats": [
+  {
+   "id": "opus-cs-01",
+   "source": "claude-opus",
+   "topic": "Verabredung",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, máš v sobotu čas?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ahoj! Večer jo, přes den pracuju"
+    },
+    {
+     "speaker": "A",
+     "text": "Co takhle večeře a pak kino?"
+    },
+    {
+     "speaker": "B",
+     "text": "To zní dobře. Na co bys šel?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dávají novou detektivku, prý je fakt napínavá"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak jo. V kolik?"
+    },
+    {
+     "speaker": "A",
+     "text": "Film začíná ve 20:15, večeře třeba v 18:30?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, a kde?"
+    },
+    {
+     "speaker": "A",
+     "text": "Znáš tu malou italskou restauraci na Vinohradech?"
+    },
+    {
+     "speaker": "B",
+     "text": "U náměstí Míru? Tam jsem ještě nebyla"
+    },
+    {
+     "speaker": "A",
+     "text": "Mají výbornou pizzu, zarezervuju stůl"
+    },
+    {
+     "speaker": "B",
+     "text": "Super, těším se!"
+    },
+    {
+     "speaker": "A",
+     "text": "Já taky :) Tak v sobotu"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-02",
+   "source": "claude-opus",
+   "topic": "Arbeit",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hele, ta porada zítra je v 9 nebo v 10?"
+    },
+    {
+     "speaker": "B",
+     "text": "V 9:30, šéf to včera přesunul"
+    },
+    {
+     "speaker": "A",
+     "text": "Aha, to mi nikdo neřekl. Mám si připravit prezentaci?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, čísla za třetí kvartál, max 10 slajdů"
+    },
+    {
+     "speaker": "A",
+     "text": "Do zítřka?! To nestihnu"
+    },
+    {
+     "speaker": "B",
+     "text": "Pošli mi, co máš, pomůžu ti s grafy"
+    },
+    {
+     "speaker": "A",
+     "text": "Díky moc, máš to u mě"
+    },
+    {
+     "speaker": "B",
+     "text": "V pohodě. Tabulky máš v excelu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jj, posílám mailem"
+    },
+    {
+     "speaker": "B",
+     "text": "Dorazilo. Do 8 večer ti to vrátím"
+    },
+    {
+     "speaker": "A",
+     "text": "Jsi poklad. Zítra kafe ode mě"
+    },
+    {
+     "speaker": "B",
+     "text": "Beru, s mlékem a bez cukru"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-03",
+   "source": "claude-opus",
+   "topic": "Zahnarzt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bolí mě zub už třetí den"
+    },
+    {
+     "speaker": "B",
+     "text": "Na nic nečekej a objednej se k zubaři"
+    },
+    {
+     "speaker": "A",
+     "text": "Moje zubařka má volno až za tři týdny"
+    },
+    {
+     "speaker": "B",
+     "text": "Zkus pohotovost, nebo tě objednám ke svýmu"
+    },
+    {
+     "speaker": "A",
+     "text": "Ty bys to zvládl? Bere nové pacienty?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nevím jistě, ale akutní případy bere vždycky. Zavolám tam"
+    },
+    {
+     "speaker": "A",
+     "text": "Moc díky"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak zítra v 7:45, před začátkem ordinace"
+    },
+    {
+     "speaker": "A",
+     "text": "Brzo, ale beru! Kolik to stojí?"
+    },
+    {
+     "speaker": "B",
+     "text": "Prohlídka je na pojišťovnu, plomba asi 1500 Kč"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, jdu si koupit ibalgin"
+    },
+    {
+     "speaker": "B",
+     "text": "Drž se!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-04",
+   "source": "claude-opus",
+   "topic": "Gaming",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dneska večer hrajem?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně, v kolik?"
+    },
+    {
+     "speaker": "A",
+     "text": "Po devátý, předtím ještě vařím"
+    },
+    {
+     "speaker": "B",
+     "text": "Já už jsem doma. Stáhnul jsi ten novej update?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, 35 GB, stahovalo se to celou noc"
+    },
+    {
+     "speaker": "B",
+     "text": "Prý přidali novou mapu a opravili bugy"
+    },
+    {
+     "speaker": "A",
+     "text": "Konečně, ten pád hry v posledním levelu mě štval"
+    },
+    {
+     "speaker": "B",
+     "text": "Vezmem ještě Ondru? Říkal, že má čas"
+    },
+    {
+     "speaker": "A",
+     "text": "Jasně, ve třech je to lepší"
+    },
+    {
+     "speaker": "B",
+     "text": "Discord ve 21:00?"
+    },
+    {
+     "speaker": "A",
+     "text": "Platí. A nezapomeň headset, minule tě nebylo slyšet xd"
+    },
+    {
+     "speaker": "B",
+     "text": "Mám novej mikrofon, už to bude ok"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-05",
+   "source": "claude-opus",
+   "topic": "Zugverspätung",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Vlak z Brna má zpoždění 40 minut :("
+    },
+    {
+     "speaker": "B",
+     "text": "Ne! Takže v Praze budeš kdy?"
+    },
+    {
+     "speaker": "A",
+     "text": "Místo 17:20 asi v 18:00"
+    },
+    {
+     "speaker": "B",
+     "text": "To nevadí, počkám na hlavním nádraží"
+    },
+    {
+     "speaker": "A",
+     "text": "Prý nějaká porucha na trati u Pardubic"
+    },
+    {
+     "speaker": "B",
+     "text": "Klasika. Máš aspoň místo k sezení?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, naštěstí mám místenku"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak si čti, já si zatím dám kafe"
+    },
+    {
+     "speaker": "A",
+     "text": "Napíšu, až budeme v Kolíně"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok. Pak tě vezmu na večeři, ať to není tak hrozný"
+    },
+    {
+     "speaker": "A",
+     "text": "To je nejlepší zpráva dne!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-06",
+   "source": "claude-opus",
+   "topic": "Konzert",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Jdeš v pátek do Lucerny na koncert?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jaký koncert?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hraje tam ta brněnská kapela, co jsme loni slyšeli na festivalu"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo ta! Lístky ještě jsou?"
+    },
+    {
+     "speaker": "A",
+     "text": "Zbývá posledních pár, 650 Kč na stání"
+    },
+    {
+     "speaker": "B",
+     "text": "Kup mi jeden, prosím, peníze ti hned pošlu"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, číslo účtu ti napíšu do zprávy"
+    },
+    {
+     "speaker": "B",
+     "text": "Super. Kde se sejdeme?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ve 20:00 v pasáži Lucerna pod tím visícím koněm? Začíná se ve 21"
+    },
+    {
+     "speaker": "B",
+     "text": "Platí. Předtím si dáme pivo"
+    },
+    {
+     "speaker": "A",
+     "text": "Jasně, v Lucerně je bar"
+    },
+    {
+     "speaker": "B",
+     "text": "Těším se, už dlouho jsem nebyl na koncertě"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-07",
+   "source": "claude-opus",
+   "topic": "Friseur",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kláro, kam chodíš ke kadeřnici? Vypadáš skvěle"
+    },
+    {
+     "speaker": "B",
+     "text": "Díky! Do malýho salonu na Smíchově"
+    },
+    {
+     "speaker": "A",
+     "text": "Kolik tam zaplatíš?"
+    },
+    {
+     "speaker": "B",
+     "text": "Střih a foukaná 750 Kč, barva zvlášť"
+    },
+    {
+     "speaker": "A",
+     "text": "To je dobrá cena. Musím se objednat dlouho dopředu?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak týden, dva. Objednávám se přes aplikaci"
+    },
+    {
+     "speaker": "A",
+     "text": "Pošli mi pak odkaz pls"
+    },
+    {
+     "speaker": "B",
+     "text": "Posílám. Chceš jen zkrátit?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, trochu zastřihnout konečky a ofinu"
+    },
+    {
+     "speaker": "B",
+     "text": "Je hrozně šikovná, určitě ti to udělá hezky"
+    },
+    {
+     "speaker": "A",
+     "text": "Uvidíme, jestli mi to bude slušet xd"
+    },
+    {
+     "speaker": "B",
+     "text": "Bude, neboj"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-08",
+   "source": "claude-opus",
+   "topic": "Fahrrad",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Píchnul jsem kolo cestou do práce"
+    },
+    {
+     "speaker": "B",
+     "text": "Ty jo. Máš s sebou lepení?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ne, nic, musím ho dotlačit"
+    },
+    {
+     "speaker": "B",
+     "text": "Nech ho v práci, večer tam přijedu s pumpou"
+    },
+    {
+     "speaker": "A",
+     "text": "Fakt? To by bylo super"
+    },
+    {
+     "speaker": "B",
+     "text": "V kolik končíš?"
+    },
+    {
+     "speaker": "A",
+     "text": "V 17:00, budu dole před budovou"
+    },
+    {
+     "speaker": "B",
+     "text": "Dobře, vezmu i novou duši, kdyby to nešlo zalepit"
+    },
+    {
+     "speaker": "A",
+     "text": "Jakou máš velikost? Já mám 28 palců"
+    },
+    {
+     "speaker": "B",
+     "text": "Náhodou mám přesně takovou"
+    },
+    {
+     "speaker": "A",
+     "text": "Jsi zachránce. Platím pivo"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak domluveno"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-09",
+   "source": "claude-opus",
+   "topic": "Chata",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Jedeme o víkendu na chatu?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo! Kdy vyrážíme?"
+    },
+    {
+     "speaker": "A",
+     "text": "V pátek po práci, kolem 16:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Kdo všechno jede?"
+    },
+    {
+     "speaker": "A",
+     "text": "My dva, Petra s Jakubem a možná Tomáš"
+    },
+    {
+     "speaker": "B",
+     "text": "Nakoupíme cestou? Na chatě nic není"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, stavíme se v Benešově v supermarketu"
+    },
+    {
+     "speaker": "B",
+     "text": "Vezmu buřty a pivo, ty pečivo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dobře. A dřevo tam ještě je?"
+    },
+    {
+     "speaker": "B",
+     "text": "Myslím, že jo, minule jsme ho nasekali hodně"
+    },
+    {
+     "speaker": "A",
+     "text": "Super. Hlavně ať neprší"
+    },
+    {
+     "speaker": "B",
+     "text": "Podle předpovědi bude 15 stupňů a slunečno"
+    },
+    {
+     "speaker": "A",
+     "text": "Paráda, tak v pátek!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-10",
+   "source": "claude-opus",
+   "topic": "Pilze sammeln",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Šel bys v neděli na houby?"
+    },
+    {
+     "speaker": "B",
+     "text": "Rád! Prý je jich teď v lesích plno"
+    },
+    {
+     "speaker": "A",
+     "text": "Babička včera našla plný košík hřibů u Křivoklátu"
+    },
+    {
+     "speaker": "B",
+     "text": "Wow! Kdy vyrazíme?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ráno v 6, ať jsme tam první"
+    },
+    {
+     "speaker": "B",
+     "text": "To je brzo, ale jo, chápu"
+    },
+    {
+     "speaker": "A",
+     "text": "Vezmi si nůž a košík, žádný igelitky"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně. Poznáš všechny houby?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bezpečně jen hřiby a bedly, ostatní nechávám"
+    },
+    {
+     "speaker": "B",
+     "text": "Rozumné. Pak uděláme smaženici?"
+    },
+    {
+     "speaker": "A",
+     "text": "Samozřejmě! S chlebem a cibulkou"
+    },
+    {
+     "speaker": "B",
+     "text": "Už teď mám hlad"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-11",
+   "source": "claude-opus",
+   "topic": "Nachbarn",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Slyšíš to? Soused zase vrtá"
+    },
+    {
+     "speaker": "B",
+     "text": "Už od 8 ráno, a to je neděle!"
+    },
+    {
+     "speaker": "A",
+     "text": "Mám mu jít něco říct?"
+    },
+    {
+     "speaker": "B",
+     "text": "Počkej, možná jen něco opravuje a hned skončí"
+    },
+    {
+     "speaker": "A",
+     "text": "Je to už třetí víkend po sobě"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to jo. Zazvoníme spolu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dobře, ale slušně. Nechci se hádat"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně. Podle domovního řádu má být v neděli klid, ne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Nevím přesně, ale aspoň do 10 určitě"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak mu řekneme, ať začíná aspoň později"
+    },
+    {
+     "speaker": "A",
+     "text": "Dobře, jdu se obléknout"
+    },
+    {
+     "speaker": "B",
+     "text": "Za 5 min jsem na chodbě"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-12",
+   "source": "claude-opus",
+   "topic": "Babysitting",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj Veroniko, mohla bys v pátek pohlídat Aničku?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ahoj, jasně! Od kolika?"
+    },
+    {
+     "speaker": "A",
+     "text": "Od 18 do 23, jdeme na firemní večírek"
+    },
+    {
+     "speaker": "B",
+     "text": "V pohodě. Mám jí dát večeři?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, v lednici jsou těstoviny, stačí ohřát"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok. V kolik chodí spát?"
+    },
+    {
+     "speaker": "A",
+     "text": "V 19:30, po koupání. Bude chtít pohádku"
+    },
+    {
+     "speaker": "B",
+     "text": "Ráda přečtu. Je na něco alergická?"
+    },
+    {
+     "speaker": "A",
+     "text": "Na ořechy, ale doma žádné nemáme"
+    },
+    {
+     "speaker": "B",
+     "text": "Rozumím. Jako minule, 200 na hodinu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ano, a taxík domů platíme my"
+    },
+    {
+     "speaker": "B",
+     "text": "To je moc milé, díky!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-13",
+   "source": "claude-opus",
+   "topic": "Kneipenquiz",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ve středu je kvíz v naší hospodě, jdeš?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně! Kolik nás je v týmu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Zatím 4, maximum je 6"
+    },
+    {
+     "speaker": "B",
+     "text": "Vezmu Martina, ten ví všechno o sportu"
+    },
+    {
+     "speaker": "A",
+     "text": "Super, sportovní znalec nám chyběl"
+    },
+    {
+     "speaker": "B",
+     "text": "Jak se letos jmenujeme?"
+    },
+    {
+     "speaker": "A",
+     "text": "Pořád Ztracený ponožky, ne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha, jo. V kolik to začíná?"
+    },
+    {
+     "speaker": "A",
+     "text": "V 19:00, ale přijď v 18:30, ať máme stůl"
+    },
+    {
+     "speaker": "B",
+     "text": "A vstupné?"
+    },
+    {
+     "speaker": "A",
+     "text": "50 Kč na osobu, vítěz dostane sud piva"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to musíme vyhrát!!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-14",
+   "source": "claude-opus",
+   "topic": "Handwerker",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kape nám kohoutek v koupelně, neznáš nějakýho instalatéra?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, pan Hrubý, opravoval nám bojler"
+    },
+    {
+     "speaker": "A",
+     "text": "Byl drahý?"
+    },
+    {
+     "speaker": "B",
+     "text": "Výjezd 500 Kč a práce podle času"
+    },
+    {
+     "speaker": "A",
+     "text": "Dobrý. Kdy by mohl přijít?"
+    },
+    {
+     "speaker": "B",
+     "text": "Napíšu mu, většinou má volno odpoledne"
+    },
+    {
+     "speaker": "A",
+     "text": "Ideální by byl čtvrtek po 15:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Odepsal, že ve čtvrtek v 16:00 může"
+    },
+    {
+     "speaker": "A",
+     "text": "Super, díky moc!"
+    },
+    {
+     "speaker": "B",
+     "text": "Řekni mu, že jsi ode mě, třeba ti dá slevu"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, to zkusím"
+    },
+    {
+     "speaker": "B",
+     "text": "A uvař mu kafe, to má rád"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-15",
+   "source": "claude-opus",
+   "topic": "Hochzeit",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Přišla ti pozvánka na Lucčinu svatbu?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo! 12. června, ne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Přesně. Co jim dáme za dárek?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mají seznam přání, ale většina už je zabraná"
+    },
+    {
+     "speaker": "A",
+     "text": "Tak dáme peníze do obálky?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, to je nejjednodušší. Kolik?"
+    },
+    {
+     "speaker": "A",
+     "text": "Myslím, že 3000 Kč od každého je ok"
+    },
+    {
+     "speaker": "B",
+     "text": "Souhlasím. Kde se svatba koná?"
+    },
+    {
+     "speaker": "A",
+     "text": "Na zámku Hluboká, obřad je v 11:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Pojedeme spolu autem?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, ale zpátky řídíš ty, já chci tancovat xd"
+    },
+    {
+     "speaker": "B",
+     "text": "Dobře, tak já budu pít jen vodu"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-16",
+   "source": "claude-opus",
+   "topic": "Výměna občanky na úřadě",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, víš, co potřebuju k výměně občanky? Ta moje končí v prosinci"
+    },
+    {
+     "speaker": "B",
+     "text": "Jen starou občanku, fotku ti udělají přímo na úřadě"
+    },
+    {
+     "speaker": "A",
+     "text": "Fakt? Žádnou fotku nemusím nosit?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne, vyfotí tě na místě. A když jdeš kvůli konci platnosti, je to zadarmo"
+    },
+    {
+     "speaker": "A",
+     "text": "Super. Kam mám jít, na magistrát?"
+    },
+    {
+     "speaker": "B",
+     "text": "Klidně na úřad městské části, třeba na Prahu 3"
+    },
+    {
+     "speaker": "A",
+     "text": "Tam mají v pondělí a ve středu do 18:00, ne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, ale objednej se přes rezervační systém, jinak tam budeš čekat hodinu"
+    },
+    {
+     "speaker": "A",
+     "text": "Díky za tip! Je volno ve středu v 8:30"
+    },
+    {
+     "speaker": "B",
+     "text": "To ber, ráno tam bývá klid"
+    },
+    {
+     "speaker": "A",
+     "text": "Za jak dlouho bude nová hotová?"
+    },
+    {
+     "speaker": "B",
+     "text": "Do 30 dnů, ale mně přišla SMS už po dvou týdnech"
+    },
+    {
+     "speaker": "A",
+     "text": "Paráda, tak to stihnu před Vánocema"
+    },
+    {
+     "speaker": "B",
+     "text": "jj, hlavne si vezmi tu starou s sebou"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-17",
+   "source": "claude-opus",
+   "topic": "Technická kontrola auta",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hele, nevíš, kdy mi končí STK? Nemůžu najít ten papír"
+    },
+    {
+     "speaker": "B",
+     "text": "Mělo by to být v technickým průkazu, ne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, máš pravdu. Končí 20. listopadu, to je za tři týdny"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak se objednej hned, před zimou je všude plno"
+    },
+    {
+     "speaker": "A",
+     "text": "Na stanici u nás mají první volno až 25."
+    },
+    {
+     "speaker": "B",
+     "text": "Zkus tu v Modřicích, tam jsem byl loni za dva dny"
+    },
+    {
+     "speaker": "A",
+     "text": "Super, volno mají ve čtvrtek v 9:40"
+    },
+    {
+     "speaker": "B",
+     "text": "Ber to. A nezapomeň na emise, ty se dělají zvlášť"
+    },
+    {
+     "speaker": "A",
+     "text": "Kolik to vyjde dohromady?"
+    },
+    {
+     "speaker": "B",
+     "text": "Kolem 1 900 Kč, záleží na stanici"
+    },
+    {
+     "speaker": "A",
+     "text": "Doufám, že projde, pravý světlo občas zlobí"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak kup radši novou žárovku, stojí pár korun"
+    },
+    {
+     "speaker": "A",
+     "text": "jj, zajedu odpoledne do obchodu s autodíly"
+    },
+    {
+     "speaker": "B",
+     "text": "Drž se, ať to máš na dva roky z krku"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-18",
+   "source": "claude-opus",
+   "topic": "Začátky s kytarou",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tak jsem si konečně koupil tu kytaru z bazaru"
+    },
+    {
+     "speaker": "B",
+     "text": "No konečně! Kolik jsi dal?"
+    },
+    {
+     "speaker": "A",
+     "text": "2 800 Kč i s pouzdrem, je to Yamaha"
+    },
+    {
+     "speaker": "B",
+     "text": "To je dobrá cena. Umíš už nějaký akordy?"
+    },
+    {
+     "speaker": "A",
+     "text": "G, C a D. Prsty mě bolí jak blázen"
+    },
+    {
+     "speaker": "B",
+     "text": "To je normální, za dva týdny ti naskočí mozoly"
+    },
+    {
+     "speaker": "A",
+     "text": "Doufám. Učím se z videí, ale nevím, jestli to dělám dobře"
+    },
+    {
+     "speaker": "B",
+     "text": "Přijď ve čtvrtek ke mně, ukážu ti, jak správně držet ruku"
+    },
+    {
+     "speaker": "A",
+     "text": "Fakt? To by bylo super. V kolik?"
+    },
+    {
+     "speaker": "B",
+     "text": "Po sedmé, dřív nejsem doma"
+    },
+    {
+     "speaker": "A",
+     "text": "plati, prinesu pivo"
+    },
+    {
+     "speaker": "B",
+     "text": "A ladičku, ta tvoje bude určitě rozladěná"
+    },
+    {
+     "speaker": "A",
+     "text": "Mám ji v mobilu, appka zadarmo"
+    },
+    {
+     "speaker": "B",
+     "text": "Taky dobrý. Tak ve čtvrtek!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-19",
+   "source": "claude-opus",
+   "topic": "Bolest zad",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Čau, dneska nepřijdu na oběd, zase mě chytla záda"
+    },
+    {
+     "speaker": "B",
+     "text": "Ty jo, zase? Co se stalo"
+    },
+    {
+     "speaker": "A",
+     "text": "Nosil jsem krabice do sklepa a najednou lup"
+    },
+    {
+     "speaker": "B",
+     "text": "Byl jsi u doktora?"
+    },
+    {
+     "speaker": "A",
+     "text": "Zítra v 10:20 u praktika, snad mi dá žádanku na rehabku"
+    },
+    {
+     "speaker": "B",
+     "text": "Určitě o ni řekni, mně fyzioterapie strašně pomohla"
+    },
+    {
+     "speaker": "A",
+     "text": "Kam jsi chodil ty? Všude jsou šílený čekačky"
+    },
+    {
+     "speaker": "B",
+     "text": "Na rehabilitaci u nemocnice, termín jsem měl do týdne"
+    },
+    {
+     "speaker": "A",
+     "text": "To zní dobře. Zatím ležím a beru ibalgin"
+    },
+    {
+     "speaker": "B",
+     "text": "A zkus teplo, třeba nahřívací polštářek"
+    },
+    {
+     "speaker": "A",
+     "text": "Mám jen termofor po babičce haha"
+    },
+    {
+     "speaker": "B",
+     "text": "To úplně stačí! Hlavně nic nezvedej"
+    },
+    {
+     "speaker": "A",
+     "text": "Neboj, ani tašku s nákupem"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak ať se brzo uzdravíš, dej vědět, co říkal doktor"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-20",
+   "source": "claude-opus",
+   "topic": "Třídní schůzky",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, jdeš zítra na třídní schůzky?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, v 17:00, ne? Nebo až v půl šestý?"
+    },
+    {
+     "speaker": "A",
+     "text": "V 17:00 je společná část, pak individuální konzultace"
+    },
+    {
+     "speaker": "B",
+     "text": "Super, musím se zeptat paní učitelky na tu matiku"
+    },
+    {
+     "speaker": "A",
+     "text": "Proč, co se děje?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tobiáš dostal z písemky čtyřku a vůbec nechápe zlomky"
+    },
+    {
+     "speaker": "A",
+     "text": "Matyáš taky. Myslím, že jedou strašně rychle"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak se zeptáme spolu, třeba jich je víc"
+    },
+    {
+     "speaker": "A",
+     "text": "jj. A ještě se má řešit škola v přírodě, prý za 4 500 Kč"
+    },
+    {
+     "speaker": "B",
+     "text": "Cože?! Loni to bylo 3 200"
+    },
+    {
+     "speaker": "A",
+     "text": "Prý zdražil autobus i ubytování"
+    },
+    {
+     "speaker": "B",
+     "text": "To je teda pálka. Snad něco přispěje SRPŠ"
+    },
+    {
+     "speaker": "A",
+     "text": "Uvidíme. Sejdeme se v 16:50 před školou?"
+    },
+    {
+     "speaker": "B",
+     "text": "Platí, budu u vchodu"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-21",
+   "source": "claude-opus",
+   "topic": "Dobrovolníci na potravinové sbírce",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, v sobotu je potravinová sbírka, nechceš jít jako dobrovolník?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jo, proč ne. Co se tam dělá?"
+    },
+    {
+     "speaker": "A",
+     "text": "Stojíš u vchodu do supermarketu, rozdáváš letáčky a přebíráš nákupy"
+    },
+    {
+     "speaker": "B",
+     "text": "Jak dlouho to trvá?"
+    },
+    {
+     "speaker": "A",
+     "text": "Směny jsou po čtyřech hodinách, já mám 8:00 až 12:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak se přidám k tobě. Musím se někde registrovat?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, přes formulář, pošlu ti odkaz"
+    },
+    {
+     "speaker": "B",
+     "text": "Díky. Mám si něco vzít?"
+    },
+    {
+     "speaker": "A",
+     "text": "Teplý oblečení! U dveří táhne jak blázen"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha jasně, vezmu termosku s čajem"
+    },
+    {
+     "speaker": "A",
+     "text": "Výborně. Loni jsme na naší prodejně vybrali přes 700 kilo jídla"
+    },
+    {
+     "speaker": "B",
+     "text": "Wow, to je hodně"
+    },
+    {
+     "speaker": "A",
+     "text": "Lidi nejvíc dávaj těstoviny a konzervy"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to se těším, jsem zapsaná!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-22",
+   "source": "claude-opus",
+   "topic": "Sázení tulipánů",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Čau, máš ještě ty cibulky tulipánů navíc?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mám, asi tak 30 kusů. Chceš?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo! Chtěla bych je zasadit k plotu, než přijdou mrazy"
+    },
+    {
+     "speaker": "B",
+     "text": "Ještě je čas, do konce listopadu v pohodě"
+    },
+    {
+     "speaker": "A",
+     "text": "Jak hluboko je dáváš?"
+    },
+    {
+     "speaker": "B",
+     "text": "Zhruba 10 až 15 cm, špičkou nahoru"
+    },
+    {
+     "speaker": "A",
+     "text": "Jasně. A hnojíš je nějak?"
+    },
+    {
+     "speaker": "B",
+     "text": "Trochu kompostu do jamky, víc nic"
+    },
+    {
+     "speaker": "A",
+     "text": "Super. Jo a moje rajčata letos vůbec nedozrála"
+    },
+    {
+     "speaker": "B",
+     "text": "To bylo počasím, v srpnu pršelo snad každý den"
+    },
+    {
+     "speaker": "A",
+     "text": "Příští rok je dám do skleníku"
+    },
+    {
+     "speaker": "B",
+     "text": "Dobrý nápad. Cibulky ti přinesu v neděli, jo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, a já ti dám sklenici meruňkový marmelády"
+    },
+    {
+     "speaker": "B",
+     "text": "Beru, díky!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-23",
+   "source": "claude-opus",
+   "topic": "Knihovna a rezervace knih",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, nevíš, do kdy má dneska otevřeno knihovna na Smíchově?"
+    },
+    {
+     "speaker": "B",
+     "text": "Myslím do 19:00, ve středu mají dýl"
+    },
+    {
+     "speaker": "A",
+     "text": "Super. Mám tam zarezervovanou tu novou detektivku"
+    },
+    {
+     "speaker": "B",
+     "text": "Tu, co se o ní všichni bavěj? Jak dlouho jsi na ni čekala?"
+    },
+    {
+     "speaker": "A",
+     "text": "Skoro dva měsíce, byla jsem 14. v pořadí"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, to je jako fronta na banány"
+    },
+    {
+     "speaker": "A",
+     "text": "No jo, a mám ji jen na 21 dní, nejde prodloužit"
+    },
+    {
+     "speaker": "B",
+     "text": "Pak mi ji půjč, než ji vrátíš?"
+    },
+    {
+     "speaker": "A",
+     "text": "To nesmím, ale můžeš si ji hned zarezervovat po mně"
+    },
+    {
+     "speaker": "B",
+     "text": "Pravda. Mimochodem, mně propadla průkazka, kolik stojí obnovení?"
+    },
+    {
+     "speaker": "A",
+     "text": "Pro dospělý 120 Kč na rok"
+    },
+    {
+     "speaker": "B",
+     "text": "To je fakt levný. Tak tam zajdu s tebou"
+    },
+    {
+     "speaker": "A",
+     "text": "Sraz v 17:30 u vchodu?"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, budu tam"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-24",
+   "source": "claude-opus",
+   "topic": "Nová karta na pobočce",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Jsem na pobočce a čekám už 40 minut, to nechápu"
+    },
+    {
+     "speaker": "B",
+     "text": "Co tam řešíš?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ztratil jsem kartu a chci novou"
+    },
+    {
+     "speaker": "B",
+     "text": "To nejde přes aplikaci? Já si tam kartu blokovala sama"
+    },
+    {
+     "speaker": "A",
+     "text": "Zablokovat jo, ale novou musím vyřídit tady kvůli adrese"
+    },
+    {
+     "speaker": "B",
+     "text": "Aha, ty ses stěhoval"
+    },
+    {
+     "speaker": "A",
+     "text": "Přesně. Musím ukázat občanku s novou adresou"
+    },
+    {
+     "speaker": "B",
+     "text": "A kolik stojí nová karta?"
+    },
+    {
+     "speaker": "A",
+     "text": "Prý 150 Kč za vydání"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to jde. Kdy ti přijde?"
+    },
+    {
+     "speaker": "A",
+     "text": "Do 7 pracovních dnů poštou"
+    },
+    {
+     "speaker": "B",
+     "text": "Potřebuješ do tý doby hotovost? Můžu ti něco půjčit"
+    },
+    {
+     "speaker": "A",
+     "text": "Díky, vybral jsem si u přepážky 3 000 Kč"
+    },
+    {
+     "speaker": "B",
+     "text": "Výborně. Tak ať to odsýpá"
+    },
+    {
+     "speaker": "A",
+     "text": "Konečně jsem na řadě!"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-25",
+   "source": "claude-opus",
+   "topic": "Do kina",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Nechceš dneska do kina? Dávaj tu novou českou komedii"
+    },
+    {
+     "speaker": "B",
+     "text": "Tu z hor? Slyšela jsem, že je fakt vtipná"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo tu. Hraje se v 18:15 a ve 20:45"
+    },
+    {
+     "speaker": "B",
+     "text": "Dala bych ten pozdější, ještě musím na nákup"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok. Lístek je za 210 Kč, mám to koupit online?"
+    },
+    {
+     "speaker": "B",
+     "text": "Já mám slevu přes kartičku, kup jen sobě"
+    },
+    {
+     "speaker": "A",
+     "text": "Hmm, na 20:45 zbyla jen 3. řada"
+    },
+    {
+     "speaker": "B",
+     "text": "Fuj, bude mě bolet krk"
+    },
+    {
+     "speaker": "A",
+     "text": "Nebo zítra v 19:00, tam je volno všude"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak radši zítra, jo?"
+    },
+    {
+     "speaker": "A",
+     "text": "Platí, beru si místo v 9. řadě, vedle je volno"
+    },
+    {
+     "speaker": "B",
+     "text": "Super, já si to vedlejší koupím na pokladně"
+    },
+    {
+     "speaker": "A",
+     "text": "Sraz v 18:40 u pokladny?"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně, popcorn platím já"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-26",
+   "source": "claude-opus",
+   "topic": "Hledání bytu v Praze",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tak jsem byla na prohlídce toho bytu v Libni"
+    },
+    {
+     "speaker": "B",
+     "text": "A? Jaký byl?"
+    },
+    {
+     "speaker": "A",
+     "text": "2+kk, 48 metrů, nájem 19 500 plus poplatky"
+    },
+    {
+     "speaker": "B",
+     "text": "To je na Prahu ještě slušný"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, ale koupelna je strašná, v rohu plíseň"
+    },
+    {
+     "speaker": "B",
+     "text": "Fuj. Ptala ses majitele, jestli to opraví?"
+    },
+    {
+     "speaker": "A",
+     "text": "Prý jo, ale moc mu nevěřím"
+    },
+    {
+     "speaker": "B",
+     "text": "A kauce?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dva nájmy, plus provize pro realitku ve výši jednoho nájmu"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to je skoro 60 tisíc najednou. Šílený"
+    },
+    {
+     "speaker": "A",
+     "text": "Zítra v 17:00 jdu ještě na jeden na Palmovce"
+    },
+    {
+     "speaker": "B",
+     "text": "Mám jít s tebou? Mám dobrý oko na vlhkost"
+    },
+    {
+     "speaker": "A",
+     "text": "Prosím jo! Sejdeme se u metra"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, budu tam v 16:50"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-27",
+   "source": "claude-opus",
+   "topic": "Kurz němčiny",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tak jsem se přihlásila na ten večerní kurz němčiny"
+    },
+    {
+     "speaker": "B",
+     "text": "Fakt? Kvůli práci?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, šéf chce, abych komunikovala s pobočkou ve Vídni"
+    },
+    {
+     "speaker": "B",
+     "text": "Jakou úroveň máš?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ze školy tak A2, ale všechno jsem zapomněla"
+    },
+    {
+     "speaker": "B",
+     "text": "To se rychle vrátí. Kolikrát týdně tam chodíš?"
+    },
+    {
+     "speaker": "A",
+     "text": "Úterý a čtvrtek od 18:00 do 19:30"
+    },
+    {
+     "speaker": "B",
+     "text": "A kolik to stojí?"
+    },
+    {
+     "speaker": "A",
+     "text": "5 400 Kč za semestr, firma mi to proplatí"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak to je paráda. Já bych se taky ráda naučila trochu německy"
+    },
+    {
+     "speaker": "A",
+     "text": "Pojď se mnou! Ve skupině je ještě jedno místo"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm, úterky mám volno... zkusím to"
+    },
+    {
+     "speaker": "A",
+     "text": "Super, pošlu ti kontakt na lektorku"
+    },
+    {
+     "speaker": "B",
+     "text": "Díky, už teď se bojím těch členů der, die, das"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-28",
+   "source": "claude-opus",
+   "topic": "Posilovna",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tak jsem si koupil permanentku do posilovny"
+    },
+    {
+     "speaker": "B",
+     "text": "Konečně! Kolik tě to stálo?"
+    },
+    {
+     "speaker": "A",
+     "text": "6 990 Kč na půl roku"
+    },
+    {
+     "speaker": "B",
+     "text": "Ujde to. Máš i úvodní trénink s trenérem?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, dva zdarma. Dneska jsem měl první, nohy mám jak z gumy"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha dřepy?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dřepy, výpady a nějaký mrtvý tahy"
+    },
+    {
+     "speaker": "B",
+     "text": "Zítra si nebudeš moct ani sednout"
+    },
+    {
+     "speaker": "A",
+     "text": "Díky za povzbuzení :D"
+    },
+    {
+     "speaker": "B",
+     "text": "Chodím tam ráno v 6:30, nechceš se přidat?"
+    },
+    {
+     "speaker": "A",
+     "text": "v pul sedmy? to si delas srandu"
+    },
+    {
+     "speaker": "B",
+     "text": "Ráno je tam prázdno, odpoledne čekáš na každej stroj"
+    },
+    {
+     "speaker": "A",
+     "text": "Tak to zkusím ve čtvrtek. Ale nic neslibuju"
+    },
+    {
+     "speaker": "B",
+     "text": "Vyzvednu tě v 6:15, budu troubit"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-29",
+   "source": "claude-opus",
+   "topic": "Ztracený balík",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Nevíš, jak se reklamuje ztracenej balík?"
+    },
+    {
+     "speaker": "B",
+     "text": "Záleží, kdo ho vezl. Co se stalo?"
+    },
+    {
+     "speaker": "A",
+     "text": "V aplikaci je od pondělí doručeno, ale nic jsem nedostala"
+    },
+    {
+     "speaker": "B",
+     "text": "Nenechal ho u sousedů nebo ve schránce?"
+    },
+    {
+     "speaker": "A",
+     "text": "Obešla jsem celej dům, nikde nic"
+    },
+    {
+     "speaker": "B",
+     "text": "Napiš hned dopravci, mají na to formulář"
+    },
+    {
+     "speaker": "A",
+     "text": "Napsala jsem, odpověď prý do 5 pracovních dnů"
+    },
+    {
+     "speaker": "B",
+     "text": "Napiš i e-shopu, oni to s dopravcem vyřeší rychlejc"
+    },
+    {
+     "speaker": "A",
+     "text": "Dobrej nápad. Byly tam zimní boty za 2 490 Kč"
+    },
+    {
+     "speaker": "B",
+     "text": "Au. Platila jsi kartou?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo, předem"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak se neboj, dostaneš buď boty, nebo peníze zpátky"
+    },
+    {
+     "speaker": "A",
+     "text": "Doufám. Kdyby ne, zkusím reklamaci přes banku"
+    },
+    {
+     "speaker": "B",
+     "text": "Přesně tak. Dej vědět, jak to dopadlo"
+    }
+   ]
+  },
+  {
+   "id": "opus-cs-30",
+   "source": "claude-opus",
+   "topic": "Babiččiny narozeniny",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ahoj, potvrzuješ sobotu u babičky? Bude jí 75!"
+    },
+    {
+     "speaker": "B",
+     "text": "Jasně, v kolik?"
+    },
+    {
+     "speaker": "A",
+     "text": "Oběd ve 12:00, pak dort a kafe"
+    },
+    {
+     "speaker": "B",
+     "text": "Co mám přinést?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mamka dělá svíčkovou, ty bys mohla udělat nějaký salát"
+    },
+    {
+     "speaker": "B",
+     "text": "Udělám ten těstovinový, ten má babička ráda"
+    },
+    {
+     "speaker": "A",
+     "text": "Super. A dárek? Skládáme se na nový rádio"
+    },
+    {
+     "speaker": "B",
+     "text": "Kolik dáváme na osobu?"
+    },
+    {
+     "speaker": "A",
+     "text": "500 Kč, je nás pět"
+    },
+    {
+     "speaker": "B",
+     "text": "V pohodě, pošlu ti to na účet"
+    },
+    {
+     "speaker": "A",
+     "text": "Strejda Pavel přiveze harmoniku, tak se připrav"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha zase budeme zpívat do půlnoci"
+    },
+    {
+     "speaker": "A",
+     "text": "To je tradice! Babička se na to těší nejvíc"
+    },
+    {
+     "speaker": "B",
+     "text": "Tak v sobotu, pusu všem"
+    }
+   ]
+  }
+ ]
+}

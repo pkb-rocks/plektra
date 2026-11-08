@@ -1,0 +1,1782 @@
+{
+ "chats": [
+  {
+   "id": "opus-hu-01",
+   "source": "claude-opus",
+   "topic": "Fahrrad",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szia! Nem tudsz egy jó bicikliszervizt a közelben?"
+    },
+    {
+     "speaker": "B",
+     "text": "A Bartók Béla úton van egy, a srác korrekt és nem drága"
+    },
+    {
+     "speaker": "A",
+     "text": "Mennyit kért legutóbb?"
+    },
+    {
+     "speaker": "B",
+     "text": "Fékbetétcsere meg láncolajozás kb 6500 Ft volt"
+    },
+    {
+     "speaker": "A",
+     "text": "Az még belefér. Nekem a hátsó kerék ütött, meg nyikorog valami"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor centrírozni kell, az nem nagy ügy"
+    },
+    {
+     "speaker": "B",
+     "text": "Vidd be reggel, délutánra általában kész"
+    },
+    {
+     "speaker": "A",
+     "text": "Szombaton is nyitva vannak?"
+    },
+    {
+     "speaker": "B",
+     "text": "Asszem 9-től 13-ig, de inkább hívd fel előtte"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, köszi! Addig marad a BKV :("
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, sok sikert a 4-6-oson reggel nyolckor"
+    },
+    {
+     "speaker": "A",
+     "text": "Ne is mondd, tegnap is ott álltam, mint a szardínia"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-02",
+   "source": "claude-opus",
+   "topic": "Konzert",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hallottad, hogy a Szürke Varjak novemberben az A38-on játszik?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nemár! Mikor pontosan?"
+    },
+    {
+     "speaker": "A",
+     "text": "Nov. 21., péntek, kapunyitás 19:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Jegy mennyi?"
+    },
+    {
+     "speaker": "A",
+     "text": "Elővételben 7900, a helyszínen 9500 Ft"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor vegyük meg most, mielőtt elfogy"
+    },
+    {
+     "speaker": "A",
+     "text": "Megveszem kettőt, utald át a felét, jó?"
+    },
+    {
+     "speaker": "B",
+     "text": "Persze, küldöm. Revolutra vagy számlára?"
+    },
+    {
+     "speaker": "A",
+     "text": "Revolut jó, köszi"
+    },
+    {
+     "speaker": "B",
+     "text": "Elküldtem! Előtte együnk valamit a Bartókon?"
+    },
+    {
+     "speaker": "A",
+     "text": "Benne vagyok, 18-kor a Gellértnél?"
+    },
+    {
+     "speaker": "B",
+     "text": "Áll! Úgyis rég voltunk együtt bulizni"
+    },
+    {
+     "speaker": "A",
+     "text": "Remélem, eljátsszák a régi számokat is"
+    },
+    {
+     "speaker": "B",
+     "text": "Ha nem, addig kiabálunk, amíg el nem játsszák xd"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-03",
+   "source": "claude-opus",
+   "topic": "Nachbarn",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Te is hallod a felettünk lakókat? Hajnali egykor fúrnak?!"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, már én is felébredtem. Ez komoly?"
+    },
+    {
+     "speaker": "A",
+     "text": "Harmadik éjszaka egymás után"
+    },
+    {
+     "speaker": "B",
+     "text": "Írjunk a közös képviselőnek, vagy előbb csöngessünk be?"
+    },
+    {
+     "speaker": "A",
+     "text": "Előbb szóljunk nekik normálisan, hátha nem tudják, hogy áthallatszik"
+    },
+    {
+     "speaker": "B",
+     "text": "Jogos. Holnap este 7 körül felmegyek"
+    },
+    {
+     "speaker": "A",
+     "text": "Megyek veled, ketten talán komolyabban vesznek"
+    },
+    {
+     "speaker": "B",
+     "text": "Oké. Ha nem változik semmi, megírjuk a levelet"
+    },
+    {
+     "speaker": "A",
+     "text": "A házirend szerint 22 és 6 között csend van, nem?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, ki is van téve a lépcsőházban"
+    },
+    {
+     "speaker": "A",
+     "text": "Akkor azt is megemlítjük, finoman"
+    },
+    {
+     "speaker": "B",
+     "text": "Jó éjt, már ha lehet ilyenkor..."
+    },
+    {
+     "speaker": "A",
+     "text": "Van füldugó a fiókban, ha kell, vegyél ki egyet"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-04",
+   "source": "claude-opus",
+   "topic": "Friseur",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szia Kata! Ki a fodrászod? Imádom a hajad"
+    },
+    {
+     "speaker": "B",
+     "text": "Köszi! Egy Lili nevű csaj a Nagymező utcában"
+    },
+    {
+     "speaker": "A",
+     "text": "És drága?"
+    },
+    {
+     "speaker": "B",
+     "text": "Vágás, mosás, szárítás 9000 körül. Festés külön"
+    },
+    {
+     "speaker": "A",
+     "text": "Az belefér. Van szabad időpontja mostanában?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nála két héttel előre kell foglalni, de néha van lemondás"
+    },
+    {
+     "speaker": "A",
+     "text": "Megadnád az elérhetőségét? Vagy online lehet foglalni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Van foglalási oldala, átküldöm a linket"
+    },
+    {
+     "speaker": "A",
+     "text": "Szuper! Csak egy kicsit rövidebbet szeretnék, semmi drasztikusat"
+    },
+    {
+     "speaker": "B",
+     "text": "Mutass neki képet, abból mindig jól dolgozik"
+    },
+    {
+     "speaker": "A",
+     "text": "Jó ötlet. Te mikor mész legközelebb?"
+    },
+    {
+     "speaker": "B",
+     "text": "Dec. 3-án, a céges karácsonyi buli előtt"
+    },
+    {
+     "speaker": "A",
+     "text": "Akkor utána mesélj!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-05",
+   "source": "claude-opus",
+   "topic": "Waschmaschine",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Gáz van, a mosógép nem pumpálja ki a vizet"
+    },
+    {
+     "speaker": "B",
+     "text": "Ajjaj. Megnézted a szűrőt alul?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hol van az??"
+    },
+    {
+     "speaker": "B",
+     "text": "Elöl, a jobb alsó sarokban egy kis fedél mögött. Tegyél alá törölközőt, mert ömlik a víz"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, megvan... fúj, egy zokni meg két hajcsat volt benne"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, klasszikus. Próbáld újra"
+    },
+    {
+     "speaker": "A",
+     "text": "Működik!!! Imádlak"
+    },
+    {
+     "speaker": "B",
+     "text": "Szívesen. Most spóroltál 20 ezret a szerelőn"
+    },
+    {
+     "speaker": "A",
+     "text": "Meghívlak egy sörre, megérdemled"
+    },
+    {
+     "speaker": "B",
+     "text": "Elfogadom, csütörtökön ráérek"
+    },
+    {
+     "speaker": "A",
+     "text": "Csütörtök 8, a szokásos helyen?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ott leszek"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-06",
+   "source": "claude-opus",
+   "topic": "Spieleabend",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Péntek este társasozás nálunk, jössz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Persze! Mit játszunk?"
+    },
+    {
+     "speaker": "A",
+     "text": "Gondoltam Catanra, de öten leszünk, úgyhogy lehet, hogy Dixit"
+    },
+    {
+     "speaker": "B",
+     "text": "Nagy társaságnak a Dixit jobb. Vigyek valamit?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chipset vagy sört, ami jólesik"
+    },
+    {
+     "speaker": "B",
+     "text": "Hozok egy karton sört meg nachost"
+    },
+    {
+     "speaker": "A",
+     "text": "Szuper. Zsófi pogácsát süt"
+    },
+    {
+     "speaker": "B",
+     "text": "Na az biztos jó lesz, tavaly is imádtam"
+    },
+    {
+     "speaker": "A",
+     "text": "7-re gyertek, kb éjfélig maradhatunk, utána a szomszéd ideges lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "Rendben. Gergő is jön?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, de azt mondta, késik egy kicsit"
+    },
+    {
+     "speaker": "B",
+     "text": "Mint mindig xd"
+    },
+    {
+     "speaker": "A",
+     "text": "Pontosan így"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-07",
+   "source": "claude-opus",
+   "topic": "Wandern",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Vasárnap Bükk? Elvileg jó idő lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "Mennyi a táv?"
+    },
+    {
+     "speaker": "A",
+     "text": "Szilvásváradról a Szalajka-völgyön át kb 14 km, 600 m szint"
+    },
+    {
+     "speaker": "B",
+     "text": "Az bőven oké. Mikor indulnánk?"
+    },
+    {
+     "speaker": "A",
+     "text": "6:30-kor Pestről, kocsival megyünk"
+    },
+    {
+     "speaker": "B",
+     "text": "Hú, korán. De legalább nem lesz tömeg"
+    },
+    {
+     "speaker": "A",
+     "text": "Hozz réteges ruhát, fent hidegebb lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "És túrabakancsot, ugye?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, főleg a csúszós avar miatt"
+    },
+    {
+     "speaker": "B",
+     "text": "Csinálok szendvicset mindkettőnknek"
+    },
+    {
+     "speaker": "A",
+     "text": "Én hozom a termoszt teával"
+    },
+    {
+     "speaker": "B",
+     "text": "Tökéletes. A benzinpénzt felezzük"
+    },
+    {
+     "speaker": "A",
+     "text": "Akkor megbeszéltük!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-08",
+   "source": "claude-opus",
+   "topic": "Paket verloren",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Jött egy SMS, hogy kézbesítették a csomagot, de nincs itt semmi"
+    },
+    {
+     "speaker": "B",
+     "text": "Megnézted a szomszédoknál?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, senki nem vett át semmit"
+    },
+    {
+     "speaker": "B",
+     "text": "Lehet, hogy rossz automatába tették"
+    },
+    {
+     "speaker": "A",
+     "text": "Az appban a Móricz Zsigmond körtéri automata szerepel, pedig én a Fehérvári útit választottam"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor írj az ügyfélszolgálatnak, ott elég gyorsan reagálnak"
+    },
+    {
+     "speaker": "A",
+     "text": "Megírtam, állítólag 48 órán belül válaszolnak"
+    },
+    {
+     "speaker": "B",
+     "text": "Mi volt benne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Egy téli kabát, 32 990 Ft volt"
+    },
+    {
+     "speaker": "B",
+     "text": "Huh, azért az nem semmi"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha nem kerül elő, visszakérem a pénzt a bolttól"
+    },
+    {
+     "speaker": "B",
+     "text": "Szólj, ha kiderült valami"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-09",
+   "source": "claude-opus",
+   "topic": "Steuererklärung",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Te ellenőrizted már az szja-bevallási tervezetet?"
+    },
+    {
+     "speaker": "B",
+     "text": "Még nem, meddig kell?"
+    },
+    {
+     "speaker": "A",
+     "text": "Május 20-ig, de ha nem nyúlsz hozzá, automatikusan érvényes lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "Ja tényleg. És te hozzányúltál?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, mert a fizetésem mellett volt egy kis vállalkozói bevételem is"
+    },
+    {
+     "speaker": "B",
+     "text": "Az bonyolultabb. Könyvelőhöz mész?"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem, de az ügyfélkapus belépés mindig kikészít"
+    },
+    {
+     "speaker": "B",
+     "text": "Most már Ügyfélkapu+ kell, nem?"
+    },
+    {
+     "speaker": "A",
+     "text": "De, kétlépcsős azonosítással, napokig szenvedtem vele"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, velem ugyanez volt. De legalább utána egyszerű"
+    },
+    {
+     "speaker": "A",
+     "text": "Az 1+1%-ot is beállítottam, egy állatmenhelynek adom"
+    },
+    {
+     "speaker": "B",
+     "text": "Jó ötlet, én is megcsinálom ma este"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-10",
+   "source": "claude-opus",
+   "topic": "Babysitting",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szia Eszter! Szombat este ráérnél vigyázni Bencére?"
+    },
+    {
+     "speaker": "B",
+     "text": "Szia! Hánytól meddig?"
+    },
+    {
+     "speaker": "A",
+     "text": "18:00-tól kb 23:00-ig, egy esküvői vacsorára megyünk"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, jó. Ugyanannyi, mint múltkor, óránként 2500?"
+    },
+    {
+     "speaker": "A",
+     "text": "Persze. Vacsorát hagyok neki, 8-kor fürdés, fél 9-kor ágy"
+    },
+    {
+     "speaker": "B",
+     "text": "Rendben. Mesét olvashatok neki?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, most a vakondos könyv a kedvence"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, azt már kívülről tudom"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha bármi gond van, Ági néni a szomszédban lakik"
+    },
+    {
+     "speaker": "B",
+     "text": "Oké. Allergiás valamire?"
+    },
+    {
+     "speaker": "A",
+     "text": "Csak a mogyoróra, de itthon nincs semmi ilyesmi"
+    },
+    {
+     "speaker": "B",
+     "text": "Értem, vigyázok. Szombaton 5 perccel előbb ott leszek"
+    },
+    {
+     "speaker": "A",
+     "text": "Köszi szépen, nagyon rendes vagy!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-11",
+   "source": "claude-opus",
+   "topic": "Zimmerpflanzen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Segíts, sárgulnak a monsterám levelei"
+    },
+    {
+     "speaker": "B",
+     "text": "Milyen gyakran locsolod?"
+    },
+    {
+     "speaker": "A",
+     "text": "Minden második nap"
+    },
+    {
+     "speaker": "B",
+     "text": "Az túl sok! Hetente egyszer elég, főleg most ősszel"
+    },
+    {
+     "speaker": "A",
+     "text": "Komolyan? Azt hittem, szomjas"
+    },
+    {
+     "speaker": "B",
+     "text": "A sárga levél többnyire túllocsolás. Nézd meg, nem rohad-e a gyökere"
+    },
+    {
+     "speaker": "A",
+     "text": "Vegyem ki a cserépből?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, és ha barna, puha részeket látsz, vágd le őket"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, hétvégén megnézem. Kell új föld?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, laza, jó vízáteresztő keverék, perlittel"
+    },
+    {
+     "speaker": "A",
+     "text": "A barkácsáruházban lesz ilyen?"
+    },
+    {
+     "speaker": "B",
+     "text": "Biztos. Kb 2000 Ft egy zsák"
+    },
+    {
+     "speaker": "A",
+     "text": "Köszi, te vagy a kertészkirálynő!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-12",
+   "source": "claude-opus",
+   "topic": "Sprachkurs",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Végül beiratkoztál a spanyolra?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen! Kedden és csütörtökön, 18:30-tól"
+    },
+    {
+     "speaker": "A",
+     "text": "És hol?"
+    },
+    {
+     "speaker": "B",
+     "text": "Egy kis nyelviskolában a Deák térnél, 8 fős a csoport"
+    },
+    {
+     "speaker": "A",
+     "text": "Az jó, nem túl nagy. Mennyibe kerül?"
+    },
+    {
+     "speaker": "B",
+     "text": "3 hónap 89 000 Ft, de a könyv benne van"
+    },
+    {
+     "speaker": "A",
+     "text": "Elmegy. Én is gondolkozom rajta"
+    },
+    {
+     "speaker": "B",
+     "text": "Gyere! Jövő héten indul az új kezdő csoport"
+    },
+    {
+     "speaker": "A",
+     "text": "Nincs szintfelmérő?"
+    },
+    {
+     "speaker": "B",
+     "text": "Kezdőknek nincs, egyszerűen beülsz az első órára"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, akkor még ma írok nekik"
+    },
+    {
+     "speaker": "B",
+     "text": "Szuper, akkor együtt gyakorolhatunk!"
+    },
+    {
+     "speaker": "A",
+     "text": "Hasta luego! Ennyit már tudok xd"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-13",
+   "source": "claude-opus",
+   "topic": "Handyvertrag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Lejárt a hűségidőm, szerinted váltsak szolgáltatót?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mennyit fizetsz most?"
+    },
+    {
+     "speaker": "A",
+     "text": "Havi 8990-et 20 GB-ért"
+    },
+    {
+     "speaker": "B",
+     "text": "Az sok. Nézz körül, máshol ennyiért korlátlan netet kapsz"
+    },
+    {
+     "speaker": "A",
+     "text": "A számomat át tudom vinni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Persze, a számhordozás ingyenes, 1-2 nap az egész"
+    },
+    {
+     "speaker": "A",
+     "text": "És közben megy a net?"
+    },
+    {
+     "speaker": "B",
+     "text": "Pár órára kieshet, de semmi vészes"
+    },
+    {
+     "speaker": "A",
+     "text": "Előbb felhívom a mostanit, hátha adnak kedvezményt"
+    },
+    {
+     "speaker": "B",
+     "text": "Okos. Mondd, hogy váltani akarsz, olyankor általában engednek"
+    },
+    {
+     "speaker": "A",
+     "text": "Jó tipp, megpróbálom!"
+    },
+    {
+     "speaker": "B",
+     "text": "Szólj, mennyit sikerült lealkudni"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-14",
+   "source": "claude-opus",
+   "topic": "Kesselgulasch",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szombaton bográcsozunk a telken, jöttök?"
+    },
+    {
+     "speaker": "B",
+     "text": "Naná! Mit főzöl?"
+    },
+    {
+     "speaker": "A",
+     "text": "Babgulyást, úgy, ahogy a nagyapám csinálta"
+    },
+    {
+     "speaker": "B",
+     "text": "Hozzunk valamit?"
+    },
+    {
+     "speaker": "A",
+     "text": "Kenyeret és savanyúságot, ha megoldható"
+    },
+    {
+     "speaker": "B",
+     "text": "Megoldjuk. Fát is vigyünk?"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem kell, van bőven, tavaly vágtunk"
+    },
+    {
+     "speaker": "B",
+     "text": "Mikor kezdtek?"
+    },
+    {
+     "speaker": "A",
+     "text": "Délben gyújtunk be, 3 körül lesz kész"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor 1-re ott vagyunk"
+    },
+    {
+     "speaker": "A",
+     "text": "Hozd a gitárt is, este jólesne egy kis zene"
+    },
+    {
+     "speaker": "B",
+     "text": "Hozom, de csak ha nem kell énekelnem"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, semmit sem ígérhetek"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-15",
+   "source": "claude-opus",
+   "topic": "Fitnessstudio",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tegnap végre elmentem az edzőterembe"
+    },
+    {
+     "speaker": "B",
+     "text": "Na végre! Milyen volt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ma minden izmom fáj, a lépcsőn alig jöttem le"
+    },
+    {
+     "speaker": "B",
+     "text": "Ez normális, 2-3 nap múlva elmúlik"
+    },
+    {
+     "speaker": "A",
+     "text": "Kezdőként hetente hányszor menjek?"
+    },
+    {
+     "speaker": "B",
+     "text": "Heti 3 alkalom bőven elég, közte pihenőnappal"
+    },
+    {
+     "speaker": "A",
+     "text": "Bérletet vegyek vagy napijegyet?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ha komolyan gondolod, a havi bérlet jobb, nálunk 14 500"
+    },
+    {
+     "speaker": "A",
+     "text": "Na jó, akkor bérlet. Edzünk együtt?"
+    },
+    {
+     "speaker": "B",
+     "text": "Persze, hétfő és szerda este 7?"
+    },
+    {
+     "speaker": "A",
+     "text": "Áll az alku. De ne kínozz túl!"
+    },
+    {
+     "speaker": "B",
+     "text": "Csak egy kicsit ;)"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-16",
+   "source": "claude-opus",
+   "topic": "Okmányiroda",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szia! Te mikor csináltattad az új személyit?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tavaly tavasszal. Miért, lejárt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Jövő hónapban jár le, és decemberben megyünk Bécsbe"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor gyorsan foglalj időpontot a kormányablakba, mert hetekre előre be vannak táblázva"
+    },
+    {
+     "speaker": "A",
+     "text": "Most néztem, a legkorábbi nov. 19., 8:40"
+    },
+    {
+     "speaker": "B",
+     "text": "Vedd ki, az még bőven jó"
+    },
+    {
+     "speaker": "A",
+     "text": "Mit kell vinni? Csak a régit meg a lakcímkártyát?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, meg az útleveled, ha van. Fotót ott csinálnak"
+    },
+    {
+     "speaker": "A",
+     "text": "És fizetni kell?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ha lejár, ingyenes, nálam legalábbis az volt"
+    },
+    {
+     "speaker": "A",
+     "text": "Szuper. És mennyi idő, mire elkészül?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nekem kb. két hét volt, postán küldték ki"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, köszi, akkor most lefoglalom"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-17",
+   "source": "claude-opus",
+   "topic": "Beázás a szomszéd miatt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Otthon vagy? Csöpög a víz a fürdő plafonjáról!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Mi?? Megint?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, már akkora a folt, mint egy tálca. Biztos a 3. emeleti szomszéd"
+    },
+    {
+     "speaker": "B",
+     "text": "Menj fel és csengess be, kb. 20 perc múlva otthon vagyok"
+    },
+    {
+     "speaker": "A",
+     "text": "Becsengettem, senki nem nyit ajtót"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor hívd a közös képviselőt, neki van kulcsa a pincéhez, ott el lehet zárni a vizet"
+    },
+    {
+     "speaker": "A",
+     "text": "Hívtam, azt mondta, 10 percen belül itt van"
+    },
+    {
+     "speaker": "B",
+     "text": "Szuper. Fotózz le mindent, kelleni fog a biztosítónak"
+    },
+    {
+     "speaker": "A",
+     "text": "Már lefotóztam, és alátettem egy lavórt"
+    },
+    {
+     "speaker": "B",
+     "text": "Ügyes vagy. Hozok szemeteszsákot, letakarjuk a mosógépet"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, csak siess pls"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-18",
+   "source": "claude-opus",
+   "topic": "Horgászat",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Na, milyen volt a horgászat hétvégén?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hajnali 5-kor kint voltunk a Tisza-tónál, kegyetlen hideg volt"
+    },
+    {
+     "speaker": "A",
+     "text": "És fogtatok valamit?"
+    },
+    {
+     "speaker": "B",
+     "text": "Két pontyot meg egy kárászt. A nagyobbik ponty 4 kiló volt!"
+    },
+    {
+     "speaker": "A",
+     "text": "Komoly! Visszaengedtétek?"
+    },
+    {
+     "speaker": "B",
+     "text": "A pontyokat igen, a kárász ment a serpenyőbe"
+    },
+    {
+     "speaker": "A",
+     "text": "Én is ki akarom próbálni egyszer"
+    },
+    {
+     "speaker": "B",
+     "text": "Kell hozzá horgászjegy, de nem drága"
+    },
+    {
+     "speaker": "A",
+     "text": "Mennyi kb.?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nemtom pontosan, pár ezer forint, utánanézek"
+    },
+    {
+     "speaker": "A",
+     "text": "És botot honnan szerzek?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nekem van egy régi pótbotom, kölcsönadom"
+    },
+    {
+     "speaker": "A",
+     "text": "Akkor tavasszal megyünk együtt?"
+    },
+    {
+     "speaker": "B",
+     "text": "Megbeszéltük. De hajnalban indulunk, nem délben!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-19",
+   "source": "claude-opus",
+   "topic": "Fogfájás",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Még mindig fáj a fogad?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, egész éjjel nem aludtam tőle"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem kéne inkább ma elmenned fogorvoshoz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Felhívtam a rendelőt, csak csütörtökre adtak időpontot"
+    },
+    {
+     "speaker": "A",
+     "text": "Az még három nap! Van ügyelet is, nem?"
+    },
+    {
+     "speaker": "B",
+     "text": "Van, a kerületi rendelőintézetben, este 8-ig"
+    },
+    {
+     "speaker": "A",
+     "text": "Akkor menj oda, ne szenvedj"
+    },
+    {
+     "speaker": "B",
+     "text": "Félek, hogy húzni fogják"
+    },
+    {
+     "speaker": "A",
+     "text": "Inkább húzzák ki, mint hogy begyulladjon"
+    },
+    {
+     "speaker": "B",
+     "text": "Igazad van. Tudsz jönni velem? Nem szeretnék egyedül menni"
+    },
+    {
+     "speaker": "A",
+     "text": "Persze, 5-kor végzek, fél 6-ra ott vagyok érted"
+    },
+    {
+     "speaker": "B",
+     "text": "Köszi, szuper vagy"
+    },
+    {
+     "speaker": "A",
+     "text": "Addig vegyél be egy fájdalomcsillapítót, és ne egyél semmi hideget"
+    },
+    {
+     "speaker": "B",
+     "text": "Rendben, doktornő"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-20",
+   "source": "claude-opus",
+   "topic": "Szülői értekezlet",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Mész ma a szülőire?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma van? Azt hittem, csütörtökön"
+    },
+    {
+     "speaker": "A",
+     "text": "Áttették mára, 17:30, a 6.b-ben"
+    },
+    {
+     "speaker": "B",
+     "text": "Jaj, nem érek oda a munkából. Utána elmondod, mi volt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Persze. Az erdei iskoláról lesz szó"
+    },
+    {
+     "speaker": "B",
+     "text": "Mennyibe fog kerülni?"
+    },
+    {
+     "speaker": "A",
+     "text": "Az osztályfőnök azt mondta, kb. 45 ezer forint, busszal együtt"
+    },
+    {
+     "speaker": "B",
+     "text": "Hűha. És hova mennek?"
+    },
+    {
+     "speaker": "A",
+     "text": "A Bükkbe, három napra"
+    },
+    {
+     "speaker": "B",
+     "text": "A fiam biztos menni akar. Csak előbb javítsa ki a matekjegyét"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, az enyém is. Rákérdezek az új angoltanárra is"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, mert a gyerek szerint az órán csak filmeket néznek"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, írok, ha vége"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-21",
+   "source": "claude-opus",
+   "topic": "Önkéntes adománygyűjtés",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Szia! Idén is szervezitek a karácsonyi tartósélelmiszer-gyűjtést?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, december 6. és 14. között lesz, a közösségi házban"
+    },
+    {
+     "speaker": "A",
+     "text": "Szívesen segítenék. Mit kell csinálni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Átvenni az adományokat, válogatni, aztán csomagokat összerakni"
+    },
+    {
+     "speaker": "A",
+     "text": "Melyik nap kellene ember?"
+    },
+    {
+     "speaker": "B",
+     "text": "Leginkább hétvégén, szombaton 9-től 13-ig"
+    },
+    {
+     "speaker": "A",
+     "text": "Az nekem jó. Kell valahol regisztrálni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Csak írd be magad a táblázatba, küldöm a linket"
+    },
+    {
+     "speaker": "A",
+     "text": "Megkaptam, beírtam magam 13-ára"
+    },
+    {
+     "speaker": "B",
+     "text": "Szuper! Ha van autód, a szállításnál is jól jönne a segítség"
+    },
+    {
+     "speaker": "A",
+     "text": "Van, egy kis Suzuki, de sok minden belefér"
+    },
+    {
+     "speaker": "B",
+     "text": "Tökéletes, akkor szólok, ha kell fuvar"
+    },
+    {
+     "speaker": "A",
+     "text": "Rendben, várom!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-22",
+   "source": "claude-opus",
+   "topic": "Kerti munka",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Anya, kiszedtétek már a krumplit?"
+    },
+    {
+     "speaker": "B",
+     "text": "Még szeptemberben, mit gondolsz. Most a fokhagymát kell elültetni"
+    },
+    {
+     "speaker": "A",
+     "text": "Mikor pontosan?"
+    },
+    {
+     "speaker": "B",
+     "text": "November közepéig, amíg meg nem fagy a föld"
+    },
+    {
+     "speaker": "A",
+     "text": "Vasárnap le tudok menni segíteni"
+    },
+    {
+     "speaker": "B",
+     "text": "Az jó lenne. Apád meghúzta a hátát diószedés közben"
+    },
+    {
+     "speaker": "A",
+     "text": "Jaj! És hogy van? Volt orvosnál?"
+    },
+    {
+     "speaker": "B",
+     "text": "Vettünk kenőcsöt, már jobb. De ásni nem engedem"
+    },
+    {
+     "speaker": "A",
+     "text": "Helyes. Mit vigyek?"
+    },
+    {
+     "speaker": "B",
+     "text": "Kesztyűt meg egy régi kabátot. Az ebédet én főzöm"
+    },
+    {
+     "speaker": "A",
+     "text": "Lesz töltött káposzta?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hát persze! Meg lekváros bukta"
+    },
+    {
+     "speaker": "A",
+     "text": "Na, ezzel meggyőztél. 10-re ott vagyok"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-23",
+   "source": "claude-opus",
+   "topic": "Vízszerelő",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Jó napot! Vízszerelő? A szomszédtól kaptam a számát"
+    },
+    {
+     "speaker": "B",
+     "text": "Jó napot, igen. Miben segíthetek?"
+    },
+    {
+     "speaker": "A",
+     "text": "Csöpög a konyhai csaptelep, és a mosogató alatt is mindig vizes"
+    },
+    {
+     "speaker": "B",
+     "text": "Régi a csaptelep? Lehet, hogy egyszerűbb kicserélni"
+    },
+    {
+     "speaker": "A",
+     "text": "Kb. tízéves. Mennyibe kerülne a csere?"
+    },
+    {
+     "speaker": "B",
+     "text": "A munkadíj 15 ezer, a csaptelepet megveheti maga, vagy hozok én"
+    },
+    {
+     "speaker": "A",
+     "text": "Inkább hozza ön, nem értek hozzá"
+    },
+    {
+     "speaker": "B",
+     "text": "Rendben, egy rendes darab 20-25 ezer körül van"
+    },
+    {
+     "speaker": "A",
+     "text": "Az belefér. Mikor tudna jönni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Holnap 4 után megfelel?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, fél 4-től itthon vagyok"
+    },
+    {
+     "speaker": "B",
+     "text": "Küldje el SMS-ben a címet, és kérem, zárja el a vizet a mosogató alatt"
+    },
+    {
+     "speaker": "A",
+     "text": "Rendben, köszönöm!"
+    },
+    {
+     "speaker": "B",
+     "text": "Rendben, viszonthallásra"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-24",
+   "source": "claude-opus",
+   "topic": "Bankfiók",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tudod, meddig van nyitva a bankfiók a piacnál?"
+    },
+    {
+     "speaker": "B",
+     "text": "Asszem 5-ig, csütörtökön 6-ig. Mi történt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Letiltották a kártyámat, mert háromszor rossz PIN-t ütöttem be"
+    },
+    {
+     "speaker": "B",
+     "text": "Jaj. Az appban nem lehet feloldani?"
+    },
+    {
+     "speaker": "A",
+     "text": "Azt írja, hogy személyesen kell bemenni, igazolvánnyal"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor csütörtökön menj munka után"
+    },
+    {
+     "speaker": "A",
+     "text": "Jó ötlet. De addig gyakorlatilag pénz nélkül vagyok"
+    },
+    {
+     "speaker": "B",
+     "text": "Átutalok 20 ezret a másik számládra, majd visszaadod"
+    },
+    {
+     "speaker": "A",
+     "text": "Megmented az életem"
+    },
+    {
+     "speaker": "B",
+     "text": "Küldd el a számlaszámot"
+    },
+    {
+     "speaker": "A",
+     "text": "Elküldtem privátban. Nagyon köszi!"
+    },
+    {
+     "speaker": "B",
+     "text": "Semmi gond"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-25",
+   "source": "claude-opus",
+   "topic": "Mozi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Megyünk ma moziba?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mi megy most?"
+    },
+    {
+     "speaker": "A",
+     "text": "Az az új magyar thriller, mindenki dicséri"
+    },
+    {
+     "speaker": "B",
+     "text": "Tudod, hogy nem bírom a parás filmeket"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem paras, csak izgalmas. Esküszöm"
+    },
+    {
+     "speaker": "B",
+     "text": "Jó, legyen. Hánykor?"
+    },
+    {
+     "speaker": "A",
+     "text": "Van 19:15-ös és 21:40-es előadás"
+    },
+    {
+     "speaker": "B",
+     "text": "Inkább a 19:15-öst, holnap korán kelek"
+    },
+    {
+     "speaker": "A",
+     "text": "Veszem a jegyeket. Középre vagy közelebb?"
+    },
+    {
+     "speaker": "B",
+     "text": "Középre, 7. vagy 8. sor"
+    },
+    {
+     "speaker": "A",
+     "text": "Megvan: 8. sor, 11-12. hely, 2900 Ft darabja"
+    },
+    {
+     "speaker": "B",
+     "text": "Oké. A popcorn az enyém"
+    },
+    {
+     "speaker": "A",
+     "text": "Sósat kérek, ne édeset!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Tudom, tudom"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-26",
+   "source": "claude-opus",
+   "topic": "Albérletkeresés",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Na, találtál valamit?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma három lakást néztem meg, borzalom"
+    },
+    {
+     "speaker": "A",
+     "text": "De miért?"
+    },
+    {
+     "speaker": "B",
+     "text": "Az első a vasút mellett van, 10 percenként jön a vonat. A másodikban 80-as évekbeli a konyha"
+    },
+    {
+     "speaker": "A",
+     "text": "És a harmadik?"
+    },
+    {
+     "speaker": "B",
+     "text": "Az rendben van, másfél szobás a XI. kerületben, 220 ezer plusz rezsi"
+    },
+    {
+     "speaker": "A",
+     "text": "Ennyiért ez még egész jó"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, de két havi kauciót kér, meg az első havi bérleti díjat előre"
+    },
+    {
+     "speaker": "A",
+     "text": "Az 660 ezer egyben!"
+    },
+    {
+     "speaker": "B",
+     "text": "Hát ez az. Meg az ingatlanosnak is fél havi díj"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem keresel inkább tulajtól? Vannak erre csoportok fb-n"
+    },
+    {
+     "speaker": "B",
+     "text": "Ott a hirdetések fele kamu"
+    },
+    {
+     "speaker": "A",
+     "text": "Nem mind. Én is így találtam a mostanit. Küldök pár csoportot"
+    },
+    {
+     "speaker": "B",
+     "text": "Köszi! Hónap végéig ki kell költöznöm"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-27",
+   "source": "claude-opus",
+   "topic": "Esküvő",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Megkaptad Eszter esküvői meghívóját?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen! Június 6., egy birtokon a Balaton-felvidéken"
+    },
+    {
+     "speaker": "A",
+     "text": "Mit adunk? Azt írták, ajándék helyett boríték"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor boríték. Mennyit szokás most beletenni?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sztem fejenként 20-25 ezret, elvégre közeli barátok vagyunk"
+    },
+    {
+     "speaker": "B",
+     "text": "Egyetértek. Bencével jössz?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, már most öltönyt keres, pedig még fél év van hátra"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, ügyes. Én még azt sem tudom, mit vegyek fel"
+    },
+    {
+     "speaker": "A",
+     "text": "Csak fehéret ne, mert Eszter megöl"
+    },
+    {
+     "speaker": "B",
+     "text": "Ennyit azért tudok. Egy zöld ruhán gondolkodom"
+    },
+    {
+     "speaker": "A",
+     "text": "Jól áll neked a zöld. Van dresszkód?"
+    },
+    {
+     "speaker": "B",
+     "text": "A meghívón az áll, hogy pasztellszínek"
+    },
+    {
+     "speaker": "A",
+     "text": "A halványzöld pasztell, szóval jó lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor el van döntve!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-28",
+   "source": "claude-opus",
+   "topic": "Edzőterem",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tesó, még jársz abba a konditerembe a sarkon?"
+    },
+    {
+     "speaker": "B",
+     "text": "Igen, heti háromszor. Végre rászántad magad?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aha, a nyár után kéne valamit kezdeni a pocakkal"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha. A havi bérlet 14 ezer, éves bérlettel olcsóbb jön ki"
+    },
+    {
+     "speaker": "A",
+     "text": "Éveset még nem merek venni, mi van, ha abbahagyom"
+    },
+    {
+     "speaker": "B",
+     "text": "Logikus. Sztem vegyél egy havit, aztán meglátod"
+    },
+    {
+     "speaker": "A",
+     "text": "Edző kell?"
+    },
+    {
+     "speaker": "B",
+     "text": "Az első pár alkalomra érdemes, hogy megtanuld a helyes technikát. Bemutatlak az enyémnek"
+    },
+    {
+     "speaker": "A",
+     "text": "Benne vagyok. Te mikor szoktál menni?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hétfő, szerda, péntek, reggel 7-kor"
+    },
+    {
+     "speaker": "A",
+     "text": "Reggel 7-kor?? Komolyan?"
+    },
+    {
+     "speaker": "B",
+     "text": "Reggel üres a terem, minden gép szabad"
+    },
+    {
+     "speaker": "A",
+     "text": "Jó, szerdán megpróbálom. Ha nem kelek fel, ne haragudj"
+    },
+    {
+     "speaker": "B",
+     "text": "6:15-kor felhívlak, nem úszod meg"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-29",
+   "source": "claude-opus",
+   "topic": "Elveszett csomag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Nem jött meg a csomagom, pedig már 3 napja kézbesítettnek mutatja"
+    },
+    {
+     "speaker": "B",
+     "text": "Hű. A futárcégnél rákérdeztél?"
+    },
+    {
+     "speaker": "A",
+     "text": "Igen, azt mondják, a futár szerint átadta"
+    },
+    {
+     "speaker": "B",
+     "text": "Kinek? Nem a szomszédnál hagyta?"
+    },
+    {
+     "speaker": "A",
+     "text": "Végigkérdeztem az egész emeletet, senki nem látta"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor írj az ügyfélszolgálatnak a csomagszámmal"
+    },
+    {
+     "speaker": "A",
+     "text": "Tegnap írtam, még semmi válasz"
+    },
+    {
+     "speaker": "B",
+     "text": "Mi volt benne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Egy fülhallgató 24 990 Ft-ért, az öcsém szülinapjára"
+    },
+    {
+     "speaker": "B",
+     "text": "Jaj, és mikor lesz a szülinapja?"
+    },
+    {
+     "speaker": "A",
+     "text": "Szombaton! Ha péntekig nem kerül elő, veszek valami mást"
+    },
+    {
+     "speaker": "B",
+     "text": "Telefonálj inkább, az gyorsabb, mint a chat"
+    },
+    {
+     "speaker": "A",
+     "text": "Oké, megpróbálom"
+    },
+    {
+     "speaker": "A",
+     "text": "Sikerült! Rossz címre vitték, holnap délig kihozzák"
+    },
+    {
+     "speaker": "B",
+     "text": "Na végre!"
+    }
+   ]
+  },
+  {
+   "id": "opus-hu-30",
+   "source": "claude-opus",
+   "topic": "Mama 80. születésnapja",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Emlékeztető mindenkinek: vasárnap mama 80 éves lesz!"
+    },
+    {
+     "speaker": "B",
+     "text": "Tudom. Hánykor találkozunk?"
+    },
+    {
+     "speaker": "A",
+     "text": "13 órakor a mamánál. Anya azt mondta, ne vigyünk kaját, minden lesz"
+    },
+    {
+     "speaker": "B",
+     "text": "Mint mindig, egy hétre előre jóllakatnak"
+    },
+    {
+     "speaker": "A",
+     "text": "Az biztos. Összedobjuk az ajándékot, fejenként 10 ezer"
+    },
+    {
+     "speaker": "B",
+     "text": "Oké, átutalom. Mit veszünk?"
+    },
+    {
+     "speaker": "A",
+     "text": "Új tévét, mert a régi már alig mutat valamit"
+    },
+    {
+     "speaker": "B",
+     "text": "Szuper ötlet. De vajon kiigazodik majd a távirányítón?"
+    },
+    {
+     "speaker": "A",
+     "text": "Csak a fontos csatornákat állítom be neki, az elejére"
+    },
+    {
+     "speaker": "B",
+     "text": "Akkor írj mellé egy kézzel írt leírást is"
+    },
+    {
+     "speaker": "A",
+     "text": "Már gondoltam rá"
+    },
+    {
+     "speaker": "B",
+     "text": "És a tortát ki rendeli?"
+    },
+    {
+     "speaker": "A",
+     "text": "Zsuzsa néni, dobostortát, a mama kedvencét"
+    },
+    {
+     "speaker": "B",
+     "text": "Tökéletes. Vasárnap találkozunk!"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1830 @@
+{
+ "chats": [
+  {
+   "id": "opus-gd-01",
+   "source": "claude-opus",
+   "topic": "An càr air briseadh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tha an càr air briseadh sìos a-rithist, aig taobh an rathaid faisg air a' bhaile"
+    },
+    {
+     "speaker": "B",
+     "text": "O mo chreach! A bheil thu ceart gu leòr?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha mi fhìn ceart, ach tha ceò a' tighinn às an einnsean"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir fòn gu Calum aig a' gharaids, bidh e fosgailte gu 17:30"
+    },
+    {
+     "speaker": "A",
+     "text": "Rinn mi sin mu thràth. Thuirt e gun tig e le làraidh an ceann uair a thìde"
+    },
+    {
+     "speaker": "B",
+     "text": "Uill, chan eil sin cho dona. A bheil thu airson gun tig mi gad iarraidh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bhiodh sin sgoinneil, tapadh leat!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Gun dragh. Càit dìreach a bheil thu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Seachad air an drochaid, ri taobh an locha bhig"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, bidh mi ann ann an 20 mionaid"
+    },
+    {
+     "speaker": "A",
+     "text": "Dè chosgas e an turas seo, saoil? Phàigh mi 340 not sa Mhàrt..."
+    },
+    {
+     "speaker": "B",
+     "text": "Na bi a' smaoineachadh air sin an-dràsta. Gabh balgam tì às an fhlasg"
+    },
+    {
+     "speaker": "A",
+     "text": "haha chan eil flasg agam. Chì mi a dh'aithghearr thu"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-02",
+   "source": "claude-opus",
+   "topic": "An cù tinn",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chan eil Bran air dad ithe bho dhè"
+    },
+    {
+     "speaker": "B",
+     "text": "Ò, an truaghan. A bheil e ag òl uisge co-dhiù?"
+    },
+    {
+     "speaker": "A",
+     "text": "Beagan. Tha e dìreach na laighe air a' bhrat fad an latha"
+    },
+    {
+     "speaker": "B",
+     "text": "Feumaidh tu a thoirt chun an lighiche-sprèidh"
+    },
+    {
+     "speaker": "A",
+     "text": "Chuir mi fòn, tha àite aca aig 14:15 a-màireach"
+    },
+    {
+     "speaker": "B",
+     "text": "A-màireach?! Nach eil sin ro fhadalach?"
+    },
+    {
+     "speaker": "A",
+     "text": "Thuirt iad fòn a chur a-rithist ma dh'fhàsas e nas miosa"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart. An do dh'ith e rud sam bith neònach air a' chuairt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hmm... bha e a' cnàmh rudeigin air a' chladach Disathairne"
+    },
+    {
+     "speaker": "B",
+     "text": "Sin e 's dòcha. Cùm sùil air"
+    },
+    {
+     "speaker": "A",
+     "text": "Nì mi sin. Tha e dìreach a' coimhead orm leis na sùilean brònach aige"
+    },
+    {
+     "speaker": "B",
+     "text": "lol tha fios aige mar a gheibh e a rathad fhèin"
+    },
+    {
+     "speaker": "A",
+     "text": "Ach seall seo: thug mi dha pìos cearc agus dh'ith e e!"
+    },
+    {
+     "speaker": "B",
+     "text": "Uill, sin deagh chomharra!! Innis dhomh dè thuirt an lighiche"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-03",
+   "source": "claude-opus",
+   "topic": "Iarrtas airson obrach",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chuir mi a-steach an t-iarrtas airson na h-obrach aig a' chomhairle!"
+    },
+    {
+     "speaker": "B",
+     "text": "Math fhèin! An tè ann an oifis na Gàidhlig?"
+    },
+    {
+     "speaker": "A",
+     "text": "'S i. Oifigear leasachaidh, 29,500 not sa bhliadhna"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil sin dona idir. Cuin a chluinneas tu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha iad ag ràdh ro dheireadh an ath mhìos"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma gheibh thu agallamh, nì sinn beagan cleachdaidh còmhla"
+    },
+    {
+     "speaker": "A",
+     "text": "Bhiodh sin math. Tha mi uabhasach dona aig agallamhan"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil! Bha thu math san agallamh mu dheireadh agad"
+    },
+    {
+     "speaker": "A",
+     "text": "Uill... cha d' fhuair mi an obair ge-tà"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha robh sin mu do dheidhinn-sa, bha cuideigin aca a-staigh mu thràth"
+    },
+    {
+     "speaker": "A",
+     "text": "'s dòcha. An toir thu sùil air an litir agam?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir thugam i. Coimheadaidh mi oirre a-nochd"
+    },
+    {
+     "speaker": "A",
+     "text": "Mìle taing! 'S math gu bheil thu ann"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-04",
+   "source": "claude-opus",
+   "topic": "Fèill san talla",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "A bheil thu a' tighinn chun na fèille san talla Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bidh, ach dìreach airson uair a thìde. Dè an uair a tha i a' tòiseachadh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aig 10:00. Tha mi a' cuideachadh air bòrd nan cèicean"
+    },
+    {
+     "speaker": "B",
+     "text": "Ò, cùm sgona dhomh!!"
+    },
+    {
+     "speaker": "A",
+     "text": "haha chan urrainn dhomh gealltainn, bidh na sgonaichean air falbh ro 10:15"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha bogsa leabhraichean agam dhuibh cuideachd, an gabh sibh iad?"
+    },
+    {
+     "speaker": "A",
+     "text": "Gabhaidh gu dearbh. Dè seòrsa leabhraichean?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nobhailean sa mhòr-chuid, agus seann leabhraichean còcaireachd aig mo mhàthair"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh iad sin a' reic gu math. Iarraidh sinn 50p air gach fear"
+    },
+    {
+     "speaker": "B",
+     "text": "Càit a bheil an t-airgead a' dol am-bliadhna?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mullach ùr airson an talla. Tha e a' leigeil a-steach uisge a-rithist"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart, bheir mi a-null na leabhraichean Dihaoine feasgar"
+    },
+    {
+     "speaker": "A",
+     "text": "Sgoinneil, bidh mi ann bho 18:00 a' cur nam bòrd air dòigh"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-05",
+   "source": "claude-opus",
+   "topic": "An t-aiseag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tha an t-aiseag air a chur dheth a-rithist!!"
+    },
+    {
+     "speaker": "B",
+     "text": "A chan e! A' ghaoth?"
+    },
+    {
+     "speaker": "A",
+     "text": "'S e. Tha iad ag ràdh gur dòcha gun seòl e aig 15:30, ach chan eil cinnt ann"
+    },
+    {
+     "speaker": "B",
+     "text": "Agus tha agad ri bhith ann an Glaschu a-nochd?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha. Tha a' choinneamh agam aig 9:00 sa mhadainn"
+    },
+    {
+     "speaker": "B",
+     "text": "Am b' urrainn dhut am plèana fheuchainn?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chan eil àite air fhàgail. Sheall mi mu thràth"
+    },
+    {
+     "speaker": "B",
+     "text": "Uill, sin e ma-thà. Dè nì thu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Fuirichidh mi sa chafaidh aig a' chidhe agus chì mi"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir teacs thugam nuair a bhios fios agad"
+    },
+    {
+     "speaker": "A",
+     "text": "Nì mi sin. Tha leth a' bhaile an seo, tha e coltach ri cèilidh"
+    },
+    {
+     "speaker": "B",
+     "text": "lol co-dhiù tha cuideachd agad"
+    },
+    {
+     "speaker": "A",
+     "text": "Ùrachadh: tha iad a' seòladh aig 16:00!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Iongantach! Turas math dhut, agus na bi tinn air an t-slighe"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-06",
+   "source": "claude-opus",
+   "topic": "Seisean ciùil",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Am bi thu aig an t-seisean a-nochd san taigh-òsta?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bidh, tha mi an dùil. Tha mi air port ùr ionnsachadh air an fhidhill"
+    },
+    {
+     "speaker": "A",
+     "text": "Ooh, dè am port?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ruidhle. Chan eil fios agam dè an t-ainm a th' air, dh'ionnsaich mi e bho sheann chlàr"
+    },
+    {
+     "speaker": "A",
+     "text": "Cluich dhomh e a-nochd agus innsidh mi dhut"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart gu leòr, ma tha thu a' gealltainn nach dèan thu gàire"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha Iain a' toirt a' bhogsa leis cuideachd"
+    },
+    {
+     "speaker": "B",
+     "text": "Math dha-rìribh. Bidh e fuaimneach ma-thà"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh! Dè an uair a bhios tu ann?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mu leth-uair an dèidh ochd. Feumaidh mi a' chlann a chur dhan leabaidh an toiseach"
+    },
+    {
+     "speaker": "A",
+     "text": "Gleidhidh mi cathair dhut faisg air an teine"
+    },
+    {
+     "speaker": "B",
+     "text": "Tapadh leat! Agus deoch dhomh ma tha thu fialaidh :)"
+    },
+    {
+     "speaker": "A",
+     "text": "Pinnt? No sùgh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sùgh, tha mi a' dràibheadh. Chì mi a dh'aithghearr thu"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-07",
+   "source": "claude-opus",
+   "topic": "An gàrradh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dh'ith na seilcheagan a h-uile càl a chuir mi!"
+    },
+    {
+     "speaker": "B",
+     "text": "Ò, tha iad uabhasach am-bliadhna. Leis an uisge uile"
+    },
+    {
+     "speaker": "A",
+     "text": "Dh'fheuch mi lionn, ach cha do rinn e diofar sam bith"
+    },
+    {
+     "speaker": "B",
+     "text": "Feuch sligean uighean briste timcheall air na lusan"
+    },
+    {
+     "speaker": "A",
+     "text": "An obraich sin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha mo sheanmhair ag ràdh nach eil dad nas fheàrr"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceart, nì mi sin. Ciamar a tha am buntàta agadsa?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sgoinneil! Thog mi 6 kg an-dè"
+    },
+    {
+     "speaker": "A",
+     "text": "6 kg?! Seadh, tha thu a' sealltainn dheth a-nis"
+    },
+    {
+     "speaker": "B",
+     "text": "hehe bheir mi poca dhut Diciadain"
+    },
+    {
+     "speaker": "A",
+     "text": "Bhiodh sin àlainn. Bheir mi ugh no dhà dhut bho na cearcan"
+    },
+    {
+     "speaker": "B",
+     "text": "Malairt chothromach!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-08",
+   "source": "claude-opus",
+   "topic": "Am Mòd",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "A bheil thu deiseil airson a' Mhòid?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil idir! Chan eil faclan an dàrna òrain agam fhathast"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha cleachdadh eile againn Dimàirt aig 19:30"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha fios agam. Bidh mi ag èisteachd ris a' chlàradh sa chàr"
+    },
+    {
+     "speaker": "A",
+     "text": "Sin an dòigh as fheàrr. Rinn mi fhìn an aon rud an-uiridh"
+    },
+    {
+     "speaker": "B",
+     "text": "Cò tha a' dràibheadh a-null?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha bus aig a' chòisir, a' falbh aig 7:00 Dihaoine"
+    },
+    {
+     "speaker": "B",
+     "text": "7:00?! Tha sin cruaidh"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh tu nad chadal air a' bhus co-dhiù"
+    },
+    {
+     "speaker": "B",
+     "text": "Fìor. Dè tha sinn a' cur oirnn? An t-aodach dubh a-rithist?"
+    },
+    {
+     "speaker": "A",
+     "text": "Seadh, agus na tonnagan tartain"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart. Tha mi an dòchas nach bi sinn aig a' bhonn mar an-uiridh"
+    },
+    {
+     "speaker": "A",
+     "text": "Cha bhi! Tha sinn tòrr nas fheàrr am-bliadhna"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-09",
+   "source": "claude-opus",
+   "topic": "Iasgach air an loch",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dè mu dheidhinn iasgach air an loch Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha mi deiseil! Am feum sinn cead?"
+    },
+    {
+     "speaker": "A",
+     "text": "Feumaidh. 15 not airson an latha, gheibh sinn e aig a' bhùth"
+    },
+    {
+     "speaker": "B",
+     "text": "Bheir mi na slatan. Am bi bàta againn?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh, tha bàta beag aig bràthair-athar Sheumais"
+    },
+    {
+     "speaker": "B",
+     "text": "Sgoinneil. Dè an uair?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tràth. Mu 6:00 mus tig a' mheanbh-chuileag"
+    },
+    {
+     "speaker": "B",
+     "text": "Ugh, a' mheanbh-chuileag... bheir mi an stuth na h-aghaidh"
+    },
+    {
+     "speaker": "A",
+     "text": "Gu dearbh! An-uiridh dh'ith iad beò mi"
+    },
+    {
+     "speaker": "B",
+     "text": "haha a bheil cuimhne agad nuair a ghlac thu am breac mòr sin?"
+    },
+    {
+     "speaker": "A",
+     "text": "2 kg! Chan fhaca tu a leithid"
+    },
+    {
+     "speaker": "B",
+     "text": "Bha e nas fhaisge air 800 g"
+    },
+    {
+     "speaker": "A",
+     "text": "Breugaire!! Chì sinn cò ghlacas am fear as motha"
+    },
+    {
+     "speaker": "B",
+     "text": "Air adhart ma-thà. Am fear a chailleas, ceannaichidh e dinnear dhan fhear eile"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-10",
+   "source": "claude-opus",
+   "topic": "Oidhche nam pàrant",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An deach thu gu oidhche nam pàrant an-raoir?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chaidh. Bha e fada! Bha mi ann gu 20:45"
+    },
+    {
+     "speaker": "A",
+     "text": "Dè thuirt an tidsear mu Mhòrag?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha i math air leughadh ach tha i a' bruidhinn cus sa chlas"
+    },
+    {
+     "speaker": "A",
+     "text": "haha cò às a fhuair i sin?!"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil fios 'am cò às idir ;)"
+    },
+    {
+     "speaker": "A",
+     "text": "Agus an àireamhachd?"
+    },
+    {
+     "speaker": "B",
+     "text": "Feumaidh i obrachadh air na clàran-iomadachaidh"
+    },
+    {
+     "speaker": "A",
+     "text": "Faodaidh sinn geama a dhèanamh dheth sa chàr"
+    },
+    {
+     "speaker": "B",
+     "text": "Deagh bheachd. Tha an tidsear ùr gu math snog cuideachd"
+    },
+    {
+     "speaker": "A",
+     "text": "Cò às a tha i?"
+    },
+    {
+     "speaker": "B",
+     "text": "Às an Eilean Sgitheanach. Tha Gàidhlig bhrèagha aice"
+    },
+    {
+     "speaker": "A",
+     "text": "Math sin. Bha dragh orm mu dheidhinn sin"
+    },
+    {
+     "speaker": "B",
+     "text": "Na gabh dragh, tha a' chlann measail oirre mu thràth"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-11",
+   "source": "claude-opus",
+   "topic": "Club leabhraichean",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An do chrìochnaich thu an leabhar airson a' chlub?"
+    },
+    {
+     "speaker": "B",
+     "text": "Leth-shlighe troimhe... tha e cho slaodach!"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh e nas fheàrr an dèidh caibideil 12, creid thusa mi"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha mi an dòchas. Cuin a tha sinn a' coinneachadh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Diardaoin, an taigh Ealasaid. 19:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Am bu chòir dhomh rudeigin a thoirt leam?"
+    },
+    {
+     "speaker": "A",
+     "text": "Botal fìon no briosgaidean, rud sam bith"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart. Dè tha thu a' smaoineachadh mun phrìomh charactar?"
+    },
+    {
+     "speaker": "A",
+     "text": "Na can dad! Chan eil mi airson rud sam bith a mhilleadh dhut"
+    },
+    {
+     "speaker": "B",
+     "text": "lol cha do dh'fhaighnich mi dè thachras, dìreach dè do bheachd"
+    },
+    {
+     "speaker": "A",
+     "text": "Uill... chan eil earbsa agam innte ;)"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm, tha sin inntinneach. Leughaidh mi 50 duilleag eile a-nochd"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-12",
+   "source": "claude-opus",
+   "topic": "Camanachd",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An robh thu aig a' gheama camanachd Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bha! Abair geama. 3-2 aig an deireadh!"
+    },
+    {
+     "speaker": "A",
+     "text": "Chunnaic mi na tadhail air an fhòn. Bha an dàrna fear iongantach"
+    },
+    {
+     "speaker": "B",
+     "text": "Bha. Bhuail e am ball bho 30 slat!"
+    },
+    {
+     "speaker": "A",
+     "text": "Cò a th' againn an ath sheachdain?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sgioba Bhàideanaich, air falbh"
+    },
+    {
+     "speaker": "A",
+     "text": "O, bidh sin duilich. Tha iad làidir am-bliadhna"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha, ach tha sinn air a bhith a' cluich gu math o chionn ghoirid"
+    },
+    {
+     "speaker": "A",
+     "text": "A bheil thu a' dol ann? Am faighinn lioft bhuat?"
+    },
+    {
+     "speaker": "B",
+     "text": "Gu dearbh. Bidh mi a' falbh aig 11:30"
+    },
+    {
+     "speaker": "A",
+     "text": "Air leth! Bheir mi na pìosan"
+    },
+    {
+     "speaker": "B",
+     "text": "Agus na dìochuimhnich do chòta, bha e fuar fliuch an turas mu dheireadh"
+    },
+    {
+     "speaker": "A",
+     "text": "Fuar fliuch? Bha e uabhasach! Bha m' òrdagan reòthte"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-13",
+   "source": "claude-opus",
+   "topic": "Mullach a' leigeil a-steach",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tha an t-uisge a' tighinn a-steach tron mhullach a-rithist"
+    },
+    {
+     "speaker": "B",
+     "text": "Anns an t-seòmar-chadail?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha. Tha bucaid agam air an làr a-nis"
+    },
+    {
+     "speaker": "B",
+     "text": "An do dh'innis thu don uachdaran?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chuir mi post-d thuige Diluain. Cha d' fhuair mi freagairt"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir fòn thuige. Tha post-d ro fhurasta a leigeil seachad"
+    },
+    {
+     "speaker": "A",
+     "text": "Feuchaidh mi a-màireach sa mhadainn"
+    },
+    {
+     "speaker": "B",
+     "text": "Agus tog dealbhan. Ma bhios trioblaid ann, bidh fianais agad"
+    },
+    {
+     "speaker": "A",
+     "text": "Deagh bheachd. Tha clòimh-liath air a' bhalla mu thràth"
+    },
+    {
+     "speaker": "B",
+     "text": "Ugh, chan eil sin math dhut. Agus tha thu a' pàigheadh 650 not sa mhìos!"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha fios agam. Mura dèan e dad, coimheadaidh mi airson àite eile"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha flat falamh aig mo cho-ogha, innsidh mi dhut ma tha e fhathast ri fhaighinn"
+    },
+    {
+     "speaker": "A",
+     "text": "Ò, bhiodh sin math. Tapadh leat!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-14",
+   "source": "claude-opus",
+   "topic": "Tiodhlac pòsaidh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dè tha sinn a' faighinn do Choinneach agus Sìne airson na bainnse?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha liosta aca air-loidhne, nach eil?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha, ach chan eil air fhàgail ach rudan daor"
+    },
+    {
+     "speaker": "B",
+     "text": "Mar dè?"
+    },
+    {
+     "speaker": "A",
+     "text": "Inneal cofaidh 280 not..."
+    },
+    {
+     "speaker": "B",
+     "text": "Ò, mo chreach. Dè mu dheidhinn airgead ann an cairt?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha sin beagan fuar, nach eil?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil! Tha iad a' sàbhaladh airson taigh, bhiodh iad toilichte"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceart gu leòr. 50 not an urra?"
+    },
+    {
+     "speaker": "B",
+     "text": "Glè mhath. Ceannaichidh mi cairt bhrèagha"
+    },
+    {
+     "speaker": "A",
+     "text": "Agus sgrìobhaidh tusa na facail! Tha do làmh-sgrìobhaidh nas fheàrr"
+    },
+    {
+     "speaker": "B",
+     "text": "lol ceart. Dè an latha a tha a' bhanais a-rithist?"
+    },
+    {
+     "speaker": "A",
+     "text": "14 den Ògmhios, aig 13:00 san eaglais"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuiridh mi sin san fhòn agam an-dràsta"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-15",
+   "source": "claude-opus",
+   "topic": "Cairt-banca air chall",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Cha lorg mi mo chairt-banca idir!!"
+    },
+    {
+     "speaker": "B",
+     "text": "O chan e. Càit an robh i agad mu dheireadh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Anns a' bhùth-ghrosairean an-dè, tha mi a' smaoineachadh"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir fòn thuca, 's dòcha gun do lorg cuideigin i"
+    },
+    {
+     "speaker": "A",
+     "text": "Rinn mi sin. Chan eil i aca"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart, feumaidh tu a reothadh san aplacaid an-dràsta"
+    },
+    {
+     "speaker": "A",
+     "text": "Dèanta. Chan eil dad neònach air a' chunntas co-dhiù"
+    },
+    {
+     "speaker": "B",
+     "text": "Math sin. Faodaidh tu cairt ùr òrdachadh san aon àite"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha iad ag ràdh 5 gu 7 làithean-obrach"
+    },
+    {
+     "speaker": "B",
+     "text": "Bheir mi iasad airgid dhut ma bhios feum agad air"
+    },
+    {
+     "speaker": "A",
+     "text": "Taing mhòr, ach bu chòir dhomh a bhith ceart gu leòr"
+    },
+    {
+     "speaker": "B",
+     "text": "Agus thoir sùil sa chòta dhubh agad... tha fios agad cò ris a tha thu coltach"
+    },
+    {
+     "speaker": "A",
+     "text": "Bha i sa phòcaid a-staigh. Na can dad"
+    },
+    {
+     "speaker": "B",
+     "text": "HAHAHA dìreach mar a bha dùil agam"
+    },
+    {
+     "speaker": "A",
+     "text": "Agus tha i reòthte a-nis. Sgoinneil."
+    },
+    {
+     "speaker": "B",
+     "text": "Faodaidh tu a fuasgladh a-rithist, chan eil ann ach putan"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-16",
+   "source": "claude-opus",
+   "topic": "Oifis na comhairle",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "A bheil fios agad cuin a tha oifis na comhairle fosgailte Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil i fosgailte idir Disathairne, tha eagal orm"
+    },
+    {
+     "speaker": "A",
+     "text": "Och, feumaidh mi cead-pàircidh ùr fhaighinn"
+    },
+    {
+     "speaker": "B",
+     "text": "Nach urrainn dhut a dhèanamh air-loidhne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Dh'fheuch mi, ach dh'iarr iad dearbhadh seòlaidh agus cha do dh'obraich an luchdachadh suas"
+    },
+    {
+     "speaker": "B",
+     "text": "Thoir leat bile an dealain agus do chead-dràibhidh, sin a dh'iarr iad ormsa"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceart. Dè cho fada 's a bha agad ri feitheamh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mu 40 mionaid... bha tòrr dhaoine a' feitheamh aig 10:00"
+    },
+    {
+     "speaker": "A",
+     "text": "Mo chreach! Thèid mi ann Diluain aig 9:00 ma-thà"
+    },
+    {
+     "speaker": "B",
+     "text": "Deagh bheachd. Agus tha e a' cosg 35 nota airson bliadhna"
+    },
+    {
+     "speaker": "A",
+     "text": "35 nota?! Bha e 25 nota an-uiridh"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha a h-uile càil nas daoire a-nis, a charaid"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha sin fìor. Tapadh leat co-dhiù!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-17",
+   "source": "claude-opus",
+   "topic": "Nàbaidhean ùra",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An cuala tu am fuaim a-raoir? Bha e mar gum biodh cuideigin a' gluasad àirneis"
+    },
+    {
+     "speaker": "B",
+     "text": "Chuala! Tha teaghlach ùr a' gluasad a-steach dhan taigh aig Mòrag"
+    },
+    {
+     "speaker": "A",
+     "text": "O, an do reic i e mu dheireadh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Reic. Tha i a' fuireach còmhla ri a nighinn ann an Inbhir Nis a-nis"
+    },
+    {
+     "speaker": "A",
+     "text": "Dè seòrsa dhaoine a th' annta, na daoine ùra?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil fios agam fhathast. Chunnaic mi càraid òg agus cù mòr dubh"
+    },
+    {
+     "speaker": "A",
+     "text": "Cù eile! Bidh e a' comhartaich fad na h-oidhche coltach ris an fhear eile"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, na bi cho gruamach. Bu chòir dhuinn fàilte a chur orra"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceart gu leòr. Nì mi bonnach no rudeigin"
+    },
+    {
+     "speaker": "B",
+     "text": "Sgoinneil. A-màireach aig 6 uairean?"
+    },
+    {
+     "speaker": "A",
+     "text": "Glè mhath, thig thusa a-null an toiseach"
+    },
+    {
+     "speaker": "B",
+     "text": "Bheir mi botal fìona leam"
+    },
+    {
+     "speaker": "A",
+     "text": "'S e deagh nàbaidh a th' annad!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-18",
+   "source": "claude-opus",
+   "topic": "Fighe",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tha mi air tòiseachadh air fighe!"
+    },
+    {
+     "speaker": "B",
+     "text": "Thusa? Fighe? Cha chreid mi e"
+    },
+    {
+     "speaker": "A",
+     "text": "Dha-rìribh! Tha geansaidh beag a' dol agam airson mac mo pheathar"
+    },
+    {
+     "speaker": "B",
+     "text": "Seadh, nach tusa a tha sgileil. Cò às a fhuair thu am pàtran?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bho sheann leabhar aig mo sheanmhair, bho 1975"
+    },
+    {
+     "speaker": "B",
+     "text": "Iongantach. Dè an dath a th' air?"
+    },
+    {
+     "speaker": "A",
+     "text": "Gorm is geal, mar bhratach na h-Alba"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha math dha-rìribh"
+    },
+    {
+     "speaker": "A",
+     "text": "Ach tha mi air dà shnàthaid a bhriseadh mar-thà..."
+    },
+    {
+     "speaker": "B",
+     "text": "Ciamar a rinn thu sin?!"
+    },
+    {
+     "speaker": "A",
+     "text": "Na faighnich. Tha mi a' fighe ro theann, a rèir coltais"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha buidheann fighe anns an leabharlann Dimàirt aig 7f, tha mi a' smaoineachadh"
+    },
+    {
+     "speaker": "A",
+     "text": "O, bhiodh sin math. An tig thu còmhla rium?"
+    },
+    {
+     "speaker": "B",
+     "text": "Thig, ach cha bhi mise a' fighe, dìreach ag òl tì"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-19",
+   "source": "claude-opus",
+   "topic": "Druim goirt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ciamar a tha do dhruim an-diugh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nas fheàrr na bha e, ach fhathast goirt nuair a chromas mi"
+    },
+    {
+     "speaker": "A",
+     "text": "An robh thu aig an dotair?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bha, Diluain. Thuirt i gun do ghoirtich mi fèith"
+    },
+    {
+     "speaker": "A",
+     "text": "Och, truagh. Dè thuirt i riut a dhèanamh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Fois, pilichean, agus eacarsaichean sìmplidh gach madainn"
+    },
+    {
+     "speaker": "A",
+     "text": "Agus a bheil thu gan dèanamh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Uill... uaireannan"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahaha! Dèan iad, a ghràidh, no bidh e nas miosa"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha fios agam, tha fios agam. Tha coinneamh eile agam aig a' chlinic Dihaoine"
+    },
+    {
+     "speaker": "A",
+     "text": "Math. A bheil thu ag iarraidh lioft ann?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bhiodh sin sgoinneil, tha e aig 2:15"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh mi agad aig 1:45 ma-thà"
+    },
+    {
+     "speaker": "B",
+     "text": "Mìle taing!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-20",
+   "source": "claude-opus",
+   "topic": "Beinn Nibheis",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "A bheil thu deiseil airson Beinn Nibheis Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha mhòr! Dè an t-sìde a tha iad ag ràdh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Grianach sa mhadainn, ceò is gaoth às dèidh 2:00"
+    },
+    {
+     "speaker": "B",
+     "text": "Feumaidh sinn tòiseachadh tràth ma-thà"
+    },
+    {
+     "speaker": "A",
+     "text": "Aig 7:00 bhon phàirc-chàraichean?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart gu leòr. Fàgaidh mi an taigh aig 5:30"
+    },
+    {
+     "speaker": "A",
+     "text": "Na dìochuimhnich còta-uisge, fiù 's ma bhios a' ghrian a' deàrrsadh"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha fios agam... bha mi bog fliuch an-uiridh"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahaha, cha dìochuimhnich mi gu bràth an aghaidh agad"
+    },
+    {
+     "speaker": "B",
+     "text": "Bheir mi na ceapairean agus flasg teatha"
+    },
+    {
+     "speaker": "A",
+     "text": "Agus bheir mise seoclaid. Tòrr seoclaid"
+    },
+    {
+     "speaker": "B",
+     "text": "Cia mheud uair a thìde a bheir e?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mu 7 uairean suas is sìos, ma thèid gu math leinn"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart, chì mi thu Disathairne!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-21",
+   "source": "claude-opus",
+   "topic": "Am banca-bìdh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Am b' urrainn dhut cuideachadh aig a' bhanca-bìdh Disathairne?"
+    },
+    {
+     "speaker": "B",
+     "text": "Is dòcha. Dè na h-uairean?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bho 10:00 gu 1:00. Tha dithis air tarraing a-mach"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceart, faodaidh mi tighinn gu 12:00 co-dhiù"
+    },
+    {
+     "speaker": "A",
+     "text": "Sin sgoinneil, tapadh leat!"
+    },
+    {
+     "speaker": "B",
+     "text": "Dè bhios agam ri dhèanamh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh tu a' cur rudan air na sgeilpichean agus a' pacadh bhogsaichean"
+    },
+    {
+     "speaker": "B",
+     "text": "Gu math furasta. Am bi feum agam air rud sònraichte?"
+    },
+    {
+     "speaker": "A",
+     "text": "Brògan làidir. Thig an lorraidh aig 10:30 agus bidh bogsaichean troma ann"
+    },
+    {
+     "speaker": "B",
+     "text": "Agus cofaidh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh cofaidh ann, agus briosgaidean ma bhios sinn fortanach"
+    },
+    {
+     "speaker": "B",
+     "text": "Bidh mi ann ma-thà!"
+    },
+    {
+     "speaker": "A",
+     "text": "Àlainn. Innsidh mi do Chatrìona gu bheil thu a' tighinn"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-22",
+   "source": "claude-opus",
+   "topic": "Na cearcan",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Rug na cearcan a' chiad ugh an-diugh!"
+    },
+    {
+     "speaker": "B",
+     "text": "O, math thu! Cia mheud cearc a th' agad a-nis?"
+    },
+    {
+     "speaker": "A",
+     "text": "Còig. Agus tha ainm air a h-uile tè"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, dè na h-ainmean?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mòrag, Peigi, Seonag, Flòraidh agus Ceit Mhòr"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceit Mhòr? Carson \"Mhòr\"?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chan fhaca tu i. Tha i coltach ri turcaire"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha. Agus a bheil iad sàbhailte bhon t-sionnach?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chuir mi lìon ùr timcheall a' chrò an t-seachdain sa chaidh, chosg e 60 nota"
+    },
+    {
+     "speaker": "B",
+     "text": "Math. Chaill mo phiuthar a h-uile tè an-uiridh"
+    },
+    {
+     "speaker": "A",
+     "text": "Och, tha sin uabhasach. Tha mi gan dùnadh a-staigh gach oidhche"
+    },
+    {
+     "speaker": "B",
+     "text": "Ma bhios cus uighean agad, gabhaidh mise leth-dhusan"
+    },
+    {
+     "speaker": "A",
+     "text": "Gheibh thu a' chiad leth-dhusan an-asgaidh"
+    },
+    {
+     "speaker": "B",
+     "text": "Sin cùmhnant!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-23",
+   "source": "claude-opus",
+   "topic": "Am plumair",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Thàinig am plumair mu dheireadh!"
+    },
+    {
+     "speaker": "B",
+     "text": "Mu dheireadh thall! Dè thuirt e?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha uisge air a bhith a' sileadh bhon phìob fon t-sinc fad mhìosan"
+    },
+    {
+     "speaker": "B",
+     "text": "Mìosan?! Agus cha do mhothaich thu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bha am preas dorcha, ceart?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha. Dè chosg e?"
+    },
+    {
+     "speaker": "A",
+     "text": "120 nota airson na h-obrach agus 18 nota airson nam pàirtean"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil sin dona, airson Glaschu"
+    },
+    {
+     "speaker": "A",
+     "text": "Chan eil. Ach feumaidh e tilleadh Diciadain, tha an taigh-beag briste cuideachd"
+    },
+    {
+     "speaker": "B",
+     "text": "Dè tha ceàrr air?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha e a' ruith gun stad. Tha am fuaim gam chur às mo chiall"
+    },
+    {
+     "speaker": "B",
+     "text": "Thoir dhomh àireamh a' phlumair, tha an aon rud agamsa"
+    },
+    {
+     "speaker": "A",
+     "text": "Cuiridh mi thugad e a-nis"
+    },
+    {
+     "speaker": "B",
+     "text": "Taing mhòr!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-24",
+   "source": "claude-opus",
+   "topic": "Am banca a' dùnadh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tha am banca ann am Port Rìgh a' dùnadh!"
+    },
+    {
+     "speaker": "B",
+     "text": "Dè? Cuin?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aig deireadh na bliadhna. Thàinig litir an-diugh"
+    },
+    {
+     "speaker": "B",
+     "text": "Abair naidheachd. Càite am faigh na seann daoine airgead a-nis?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha iad ag ràdh gum bi bhan a' tighinn uair san t-seachdain"
+    },
+    {
+     "speaker": "B",
+     "text": "Uair san t-seachdain! Chan eil sin gu leòr idir"
+    },
+    {
+     "speaker": "A",
+     "text": "Chan eil. Agus chan eil a h-uile duine air-loidhne"
+    },
+    {
+     "speaker": "B",
+     "text": "Mo mhàthair, mar eisimpleir. Chan eil fòn ceart fhèin aice"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha coinneamh phoblach ann an talla a' bhaile Diardaoin"
+    },
+    {
+     "speaker": "B",
+     "text": "Thèid mi ann. Dè an uair?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aig 7:30f"
+    },
+    {
+     "speaker": "B",
+     "text": "Bheir mi mo mhàthair leam cuideachd, bidh i airson a beachd a thoirt seachad"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh, gun teagamh!"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-25",
+   "source": "claude-opus",
+   "topic": "An taigh-dhealbh",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "A bheil thu airson a dhol dhan taigh-dhealbh a-nochd?"
+    },
+    {
+     "speaker": "B",
+     "text": "Dè tha a' dol?"
+    },
+    {
+     "speaker": "A",
+     "text": "Am film ùr mu na bàtaichean-iasgaich, am fear a chaidh a dhèanamh ann an Leòdhas"
+    },
+    {
+     "speaker": "B",
+     "text": "O tha, chuala mi gu bheil e math. Cuin?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha e a' tòiseachadh aig 8:15"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm, tha mi ag obair gu 7:30"
+    },
+    {
+     "speaker": "A",
+     "text": "Gheibh sinn biadh an toiseach ma-thà, no popcorn co-dhiù"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha popcorn mar dhinnear. Ceart gu leòr"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceannaichidh mi na tiogaidean air-loidhne, 10 nota an duine"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuiridh mi an t-airgead thugad"
+    },
+    {
+     "speaker": "A",
+     "text": "Na gabh dragh, ceannaichidh tusa an deoch"
+    },
+    {
+     "speaker": "B",
+     "text": "Dèal! Coinnichidh mi riut aig an doras"
+    },
+    {
+     "speaker": "A",
+     "text": "Sgoinneil, chì mi thu a-nochd"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-26",
+   "source": "claude-opus",
+   "topic": "A' lorg flat",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chaidh mi a choimhead air flat ann an Dùn Èideann an-diugh!"
+    },
+    {
+     "speaker": "B",
+     "text": "Seadh?! Càite?"
+    },
+    {
+     "speaker": "A",
+     "text": "Faisg air Lìte. Dà sheòmar-cadail, 1150 nota gach mìos"
+    },
+    {
+     "speaker": "B",
+     "text": "Uh... daor"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha fios agam, ach tha sin àbhaisteach an-dràsta"
+    },
+    {
+     "speaker": "B",
+     "text": "Fìor. Ciamar a bha e?"
+    },
+    {
+     "speaker": "A",
+     "text": "Glan, solas math, ach tha an cidsin glè bheag"
+    },
+    {
+     "speaker": "B",
+     "text": "Am bi cead peata ann? Dè mu dheidhinn Bobaidh?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sin an duilgheadas... chan eil iad ag iarraidh cait"
+    },
+    {
+     "speaker": "B",
+     "text": "Och. Faighnich dhaibh co-dhiù, uaireannan bidh iad sùbailte"
+    },
+    {
+     "speaker": "A",
+     "text": "Chuir mi post-d an-dè, chan eil freagairt ann fhathast"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha dusan duine eile a' coimhead air, is dòcha"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha. Bha 15 duine air an staidhre còmhla rium!"
+    },
+    {
+     "speaker": "B",
+     "text": "Mo chreach. Guma math a thèid leat, a charaid"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-27",
+   "source": "claude-opus",
+   "topic": "Banais Seonaig",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An d' fhuair thu cuireadh gu banais Seonaig?"
+    },
+    {
+     "speaker": "B",
+     "text": "Fhuair! 13 dhen Ògmhios, anns an Òban"
+    },
+    {
+     "speaker": "A",
+     "text": "Sgoinneil. Dè tha thu a' dol a chur ort?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha do smaoinich mi air fhathast. Is dòcha an deise ghorm"
+    },
+    {
+     "speaker": "A",
+     "text": "Feumaidh mise dreasa ùr. Chan eil càil agam"
+    },
+    {
+     "speaker": "B",
+     "text": "An tèid sinn a cheannach còmhla Disathairne?"
+    },
+    {
+     "speaker": "A",
+     "text": "Thèid. Agus càite am fuirich sinn?"
+    },
+    {
+     "speaker": "B",
+     "text": "Lorg mi taigh-òsta beag faisg air a' chidhe, 95 nota an oidhche"
+    },
+    {
+     "speaker": "A",
+     "text": "Gabhaidh sinn seòmar còmhla, bidh e nas saoire"
+    },
+    {
+     "speaker": "B",
+     "text": "Glè mhath. Agus an tèid sinn ann sa chàr agad?"
+    },
+    {
+     "speaker": "A",
+     "text": "Thèid, ma bhios tusa a' dràibheadh air an t-slighe dhachaigh!"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha, dèanta"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-28",
+   "source": "claude-opus",
+   "topic": "An gym",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chaidh mi dhan gym an-diugh airson a' chiad uair ann am bliadhna"
+    },
+    {
+     "speaker": "B",
+     "text": "Wow! Ciamar a chaidh dhut?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha mi a' faireachdainn mar gun do bhuail bus mi"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha, sin dìreach a' chiad seachdain"
+    },
+    {
+     "speaker": "A",
+     "text": "Rinn mi 20 mionaid air a' bhaidhsagal agus beagan cuideaman"
+    },
+    {
+     "speaker": "B",
+     "text": "Math fhèin! Dè cho tric 's a tha thu an dùil a dhol ann?"
+    },
+    {
+     "speaker": "A",
+     "text": "Trì tursan san t-seachdain, sin am plana"
+    },
+    {
+     "speaker": "B",
+     "text": "Thig mi còmhla riut Diluain mas toil leat"
+    },
+    {
+     "speaker": "A",
+     "text": "Bhiodh sin math, bhiodh e na b' fhasa le cuideigin eile"
+    },
+    {
+     "speaker": "B",
+     "text": "Aig 6:30 sa mhadainn?"
+    },
+    {
+     "speaker": "A",
+     "text": "6:30?! A bheil thu às do chiall?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha e falamh aig an uair sin!"
+    },
+    {
+     "speaker": "A",
+     "text": "Ceart... feuchaidh mi. Ach na bi a' gàireachdainn orm"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha bhi, tha mi a' gealltainn"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-29",
+   "source": "claude-opus",
+   "topic": "Am parsail air chall",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "An d' fhuair thu parsail dhòmhsa? Tha iad ag ràdh gun deach a lìbhrigeadh"
+    },
+    {
+     "speaker": "B",
+     "text": "Chan eil sgeul air an seo"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha an aplacaid ag ràdh \"air fhàgail aig nàbaidh\" aig 11:42"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha robh duine aig an doras. Bha mi a-staigh fad na maidne"
+    },
+    {
+     "speaker": "A",
+     "text": "Uabhasach. Tha na brògan-coiseachd agam ann!"
+    },
+    {
+     "speaker": "B",
+     "text": "Feuch an taigh aig Dòmhnall air an taobh eile"
+    },
+    {
+     "speaker": "A",
+     "text": "Dh'fhaighnich mi dha mar-thà. Chan eil e aigesan nas motha"
+    },
+    {
+     "speaker": "B",
+     "text": "Cuir fòn chun a' chompanaidh ma-thà"
+    },
+    {
+     "speaker": "A",
+     "text": "Dh'fheuch mi, bha mi 25 mionaid a' feitheamh agus an uair sin chaidh an loidhne sìos"
+    },
+    {
+     "speaker": "B",
+     "text": "Grrr. Cuir post-d leis an àireamh-leantainn"
+    },
+    {
+     "speaker": "A",
+     "text": "Deagh bheachd. Chosg iad 89 nota!"
+    },
+    {
+     "speaker": "B",
+     "text": "Gheibh thu d' airgead air ais, tha mi cinnteach"
+    },
+    {
+     "speaker": "A",
+     "text": "Tha mi an dòchas. Tapadh leat co-dhiù"
+    }
+   ]
+  },
+  {
+   "id": "opus-gd-30",
+   "source": "claude-opus",
+   "topic": "Co-là-breith Sheanair",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bidh Seanair 90 a-màireach! A bheil a h-uile càil deiseil?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cha mhòr. Tha a' chèic aig Mamaidh, tha na cathraichean sa chàr"
+    },
+    {
+     "speaker": "A",
+     "text": "Cia mheud duine a tha a' tighinn?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mu 35. Tha bràthair mo sheanar a' tighinn à Canada fhèin!"
+    },
+    {
+     "speaker": "A",
+     "text": "Dha-rìribh? Cha do choinnich mi riamh ris"
+    },
+    {
+     "speaker": "B",
+     "text": "Tha e 86, ach tha e nas beòthaile na mise"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahaha. Am bi ceòl ann?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bidh, tha Calum a' toirt a bhogsa leis. Agus bidh òrain Ghàidhlig ann gun teagamh"
+    },
+    {
+     "speaker": "A",
+     "text": "Àlainn. Bidh Seanair cho toilichte"
+    },
+    {
+     "speaker": "B",
+     "text": "Thig aig 2:00 gus cuideachadh leis an talla"
+    },
+    {
+     "speaker": "A",
+     "text": "Bidh mi ann aig 1:30. An toir mi rudeigin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ceapairean, ma tha ùine agad"
+    },
+    {
+     "speaker": "A",
+     "text": "Nì mi dà dhusan"
+    },
+    {
+     "speaker": "B",
+     "text": "Sàr-mhath. Na can facal ri Seanair, 's e iongnadh a th' ann!"
+    }
+   ]
+  }
+ ]
+}

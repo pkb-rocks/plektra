@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-nl-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "De trein naar Utrecht vertrekt vandaag van spoor 4, let op de aankondigingen."
+  },
+  {
+   "id": "haiku-nl-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mijn oma bakt elke zondag een appeltaart, en niemand mag er vooraf aan."
+  },
+  {
+   "id": "haiku-nl-p003",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het regent al sinds dinsdag, dus de fietsen staan nog steeds in de schuur."
+  },
+  {
+   "id": "haiku-nl-p004",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Na het eten lopen we nog even langs de gracht, als het droog blijft."
+  },
+  {
+   "id": "haiku-nl-p005",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ik heb mijn sleutels weer niet gevonden, dus ik bel even de buren."
+  },
+  {
+   "id": "haiku-nl-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "De bibliotheek is op maandag dicht, maar op woensdagavond tot 21:00 open."
+  },
+  {
+   "id": "haiku-nl-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Wie zijn hond los laat lopen in het park, moet hem ook weer aan de lijn doen."
+  },
+  {
+   "id": "haiku-nl-p008",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het hele gezin zat om half zeven al aan tafel, want Lotte had honger."
+  },
+  {
+   "id": "haiku-nl-p009",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "We hebben de vakantie in Zeeland geboekt: twee weken, een huisje vlak bij zee."
+  },
+  {
+   "id": "haiku-nl-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "De winkel aan de overkant verkoopt verse kaas en stroopwafels per kilo."
+  },
+  {
+   "id": "haiku-nl-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ik vergeet altijd de melk, dus schrijf ik het nu op mijn hand."
+  },
+  {
+   "id": "haiku-nl-p012",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Hoe laat is de afspraak bij de kapper eigenlijk, 10:15 of 10:45?"
+  },
+  {
+   "id": "haiku-nl-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Heb je het nieuwe album al gehoord, of wacht je tot het vrijdag uitkomt?"
+  },
+  {
+   "id": "haiku-nl-p014",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Die oude molen aan de rivier draait nog steeds, dankzij de vrijwilligers."
+  },
+  {
+   "id": "haiku-nl-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "De kinderen speelden tot het donker werd, toen moesten ze eindelijk naar binnen."
+  },
+  {
+   "id": "haiku-nl-p016",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ze heeft drie talen gestudeerd: Frans, Spaans en Italiaans."
+  },
+  {
+   "id": "haiku-nl-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het kopieerapparaat op de tweede verdieping is weer kapot, gebruik de andere."
+  },
+  {
+   "id": "haiku-nl-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "De wekker ging om zes uur af, maar ik sliep nog tien minuten door."
+  },
+  {
+   "id": "haiku-nl-p019",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Wij gaan elk jaar naar de Efteling, al is het alleen voor de achtbanen."
+  },
+  {
+   "id": "haiku-nl-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het restaurant is dicht vanwege een verbouwing, de heropening is in maart."
+  },
+  {
+   "id": "haiku-nl-p021",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Zijn broer woont in Groningen en belt bijna elke zondagavond."
+  },
+  {
+   "id": "haiku-nl-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het ziekenhuis heeft een nieuwe parkeergarage, bij ingang B is het het voordeligst."
+  },
+  {
+   "id": "haiku-nl-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Dat was de beste pannenkoek die ik ooit heb gegeten, zei Sanne tevreden."
+  },
+  {
+   "id": "haiku-nl-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Het bos achter het huis ruikt na de regen naar mos en natte aarde."
+  },
+  {
+   "id": "haiku-nl-p025",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mijn telefoon is leeg, dus ik laad hem op in de keuken en blijf daar even zitten."
+  },
+  {
+   "id": "haiku-nl-p026",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Wie vandaag zijn tas al inpakt, hoeft morgen niet meer te zoeken,\" zei mijn moeder altijd."
+  },
+  {
+   "id": "haiku-nl-p027",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Een goed plan is half gewonnen, maar de andere helft vraagt om doorzettingsvermogen."
+  },
+  {
+   "id": "haiku-nl-p028",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Rust is geen luxe, maar een plek om weer op adem te komen.\""
+  },
+  {
+   "id": "haiku-nl-p029",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Iedereen begint klein; de grote verhalen komen later vanzelf (of niet, dat maakt niet uit)."
+  },
+  {
+   "id": "haiku-nl-p030",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Vertel het verhaal eerlijk, dan hoeft niemand het later te raden,\" zei de docent."
+  },
+  {
+   "id": "haiku-nl-p031",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Wie te lang wacht op het perfecte moment, mist vaak de kans die al voor de deur staat."
+  },
+  {
+   "id": "haiku-nl-p032",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Kleine stappen zijn ook stappen,\" stond er op de muur bij het station."
+  },
+  {
+   "id": "haiku-nl-p033",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Geluk is niet iets dat je vindt; het is iets dat je opbouwt, dag na dag."
+  },
+  {
+   "id": "haiku-nl-p034",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Lachen is gratis, maar het levert wel veel op,\" zei de bakker tegen zijn klanten."
+  },
+  {
+   "id": "haiku-nl-p035",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Een fout maken is geen falen, zolang je er iets van leert."
+  },
+  {
+   "id": "haiku-nl-p036",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Schrijf het op voordat je het vergeet,\" zei mijn leraar, en hij had gelijk."
+  },
+  {
+   "id": "haiku-nl-p037",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Wie samen werkt, komt verder dan de sterkste die alleen loopt; dat weet elke voetbalploeg."
+  },
+  {
+   "id": "haiku-nl-p038",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Het gras is niet groener aan de overkant, maar het ligt wel dichterbij,\" grapte Sofie."
+  },
+  {
+   "id": "haiku-nl-p039",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Het beste advies is vaak het simpelste: ga op tijd naar bed en sta op met een glimlach."
+  },
+  {
+   "id": "haiku-nl-p040",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Blijf nieuwsgierig, want vragen stellen houdt je scherp,\" zei de oude meester."
+  },
+  {
+   "id": "haiku-nl-p041",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Vrijheid betekent niet dat je alles mag, maar dat je zelf kiest wat je doet."
+  },
+  {
+   "id": "haiku-nl-p042",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Een kopje thee lost geen problemen op, maar het maakt ze wel draaglijker,\" vond mijn tante."
+  },
+  {
+   "id": "haiku-nl-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "De tijd die je aan vrienden besteedt, is nooit tijd die verloren gaat."
+  },
+  {
+   "id": "haiku-nl-p044",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "\"Wie de regen vergeet, mist de regenboog,\" zei mijn dochter op de fiets naar school."
+  },
+  {
+   "id": "haiku-nl-p045",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Eerlijkheid duurt het langst, ook al is het op korte termijn het moeilijkst."
+  },
+  {
+   "id": "haiku-nl-p046",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Zet de wasmachine op 40 graden en controleer het label van je trui voordat je start."
+  },
+  {
+   "id": "haiku-nl-p047",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Verwarm de oven voor op 180 graden en klop boter en suiker in een kom luchtig."
+  },
+  {
+   "id": "haiku-nl-p048",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Haal de stekker uit het stopcontact voordat je het apparaat schoonmaakt met een vochtige doek."
+  },
+  {
+   "id": "haiku-nl-p049",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Zet je wekker op 06:45, leg je fiets klaar en vergeet je portemonnee niet."
+  },
+  {
+   "id": "haiku-nl-p050",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Druk linksonder op de knop, kies \"Opslaan\" en sluit het venster daarna af."
+  },
+  {
+   "id": "haiku-nl-p051",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Meng het zout, de peper en de paprikapoeder in een kommetje voordat je het vlees bestrooit."
+  },
+  {
+   "id": "haiku-nl-p052",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Vul het formulier volledig in met je naam, geboortedatum en postcode, zonder spaties."
+  },
+  {
+   "id": "haiku-nl-p053",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Draai de kraan langzaam open en laat het water twee minuten lopen voordat je drinkt."
+  },
+  {
+   "id": "haiku-nl-p054",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Bewaar de bon tot na de garantietermijn, want zonder bon wordt een claim lastig."
+  },
+  {
+   "id": "haiku-nl-p055",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Schud de fles goed voor gebruik, anders zakt het bezinksel naar de bodem."
+  },
+  {
+   "id": "haiku-nl-p056",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Snijd eerst de ui, voeg daarna pas de champignons en de knoflook toe."
+  },
+  {
+   "id": "haiku-nl-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Neem de bus vanaf de voorkant van het station en stap uit bij de derde halte."
+  },
+  {
+   "id": "haiku-nl-p058",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Controleer de banden elke maand, vooral voordat je op vakantie vertrekt."
+  },
+  {
+   "id": "haiku-nl-p059",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Zet je telefoon even uit, zodat je morgen met een frisse blik kunt beginnen."
+  },
+  {
+   "id": "haiku-nl-p060",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Laat het deeg ongeveer een uur rijzen op een warme plek, afgedekt met een theedoek."
+  },
+  {
+   "id": "haiku-nl-p061",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Vul het tankje tot aan de streep, draai de dop goed dicht en let op de bandenspanning."
+  },
+  {
+   "id": "haiku-nl-p062",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Zet het water op het vuur en voeg het zout toe zodra het begint te koken."
+  },
+  {
+   "id": "haiku-nl-p063",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Draag altijd handschoenen wanneer je met de chemicaliën in het lab werkt."
+  },
+  {
+   "id": "haiku-nl-p064",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Sla je bestanden elke dag op in de cloud en maak wekelijks een extra backup op een schijf."
+  },
+  {
+   "id": "haiku-nl-p065",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Bel aan en wacht rustig tot iemand opendoet, zonder de bel steeds opnieuw in te drukken."
+  },
+  {
+   "id": "haiku-nl-p066",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Gemeente opent nieuwe fietsroute tussen Zwolle en Kampen langs de IJssel"
+  },
+  {
+   "id": "haiku-nl-p067",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Treinverkeer tussen Amersfoort en Utrecht hervat na storing van vrijdagochtend"
+  },
+  {
+   "id": "haiku-nl-p068",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Bakkerij in Haarlem wint landelijke prijs voor het beste roggebrood van 2026"
+  },
+  {
+   "id": "haiku-nl-p069",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Zomerfestival trekt dit weekend meer dan 40.000 bezoekers naar het stadspark"
+  },
+  {
+   "id": "haiku-nl-p070",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Prijs van melk stijgt voor het eerst sinds drie jaar: zes cent per liter"
+  },
+  {
+   "id": "haiku-nl-p071",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Lokale school test lessen op basis van vier dagen per week, met een proefjaar"
+  },
+  {
+   "id": "haiku-nl-p072",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nieuwe parkeertarieven in Den Haag gaan in op 1 september"
+  },
+  {
+   "id": "haiku-nl-p073",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Voetbalclub promoveert na spannende play-offs: 3-2 in de verlenging"
+  },
+  {
+   "id": "haiku-nl-p074",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Onderzoek: gebruikers tikken sneller op toetsenborden met voorspellende correctie"
+  },
+  {
+   "id": "haiku-nl-p075",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Rijksmuseum verlengt tentoonstelling over Rembrandt tot eind november"
+  },
+  {
+   "id": "haiku-nl-p076",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Brand in winkelcentrum Zuid: geen gewonden, winkels blijven de komende dagen dicht"
+  },
+  {
+   "id": "haiku-nl-p077",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Raad wil fietsparkeren bij het centraal station verdubbelen tegen 2028"
+  },
+  {
+   "id": "haiku-nl-p078",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Wethouder: \"Veiligheid op het Stationsplein krijgt extra aandacht\""
+  },
+  {
+   "id": "haiku-nl-p079",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Kaaswinkel op de Markt zoekt vrijwilligers voor de drukke kerstperiode"
+  },
+  {
+   "id": "haiku-nl-p080",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Concert in Groningen verplaatst naar grotere zaal wegens grote belangstelling"
+  }
+ ]
+}

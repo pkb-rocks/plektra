@@ -1,0 +1,1858 @@
+{
+ "chats": [
+  {
+   "id": "opus-vi-01",
+   "source": "claude-opus",
+   "topic": "Đi phỏng vấn xin việc",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mai em đi phỏng vấn ở công ty logistics đó chị ơi"
+    },
+    {
+     "speaker": "B",
+     "text": "ôi chúc mừng em! mấy giờ vậy?"
+    },
+    {
+     "speaker": "A",
+     "text": "9h sáng, mà em run quá trời"
+    },
+    {
+     "speaker": "B",
+     "text": "bình tĩnh, cứ chuẩn bị kỹ phần giới thiệu bản thân là được"
+    },
+    {
+     "speaker": "A",
+     "text": "họ bảo có cả vòng test tiếng Anh nữa"
+    },
+    {
+     "speaker": "B",
+     "text": "thì sao, tiếng Anh em ổn mà"
+    },
+    {
+     "speaker": "A",
+     "text": "nói thì ổn, chứ nghe người ta nói nhanh là em đơ luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "haha ko sao, nghe không rõ thì cứ xin họ nhắc lại"
+    },
+    {
+     "speaker": "A",
+     "text": "còn vụ lương nữa, nếu họ hỏi mong muốn bao nhiêu thì em nói sao?"
+    },
+    {
+     "speaker": "B",
+     "text": "em tìm hiểu mặt bằng chung trước, rồi đưa ra một khoảng, kiểu 15 đến 18 triệu"
+    },
+    {
+     "speaker": "A",
+     "text": "dạ, em sợ nói cao quá họ loại luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "không đâu, nói thấp quá mới thiệt đó em"
+    },
+    {
+     "speaker": "A",
+     "text": "dạ em hiểu r. mai mặc áo sơ mi trắng chắc ổn ha?"
+    },
+    {
+     "speaker": "B",
+     "text": "ổn! nhớ đi sớm 15 phút, mai chị chờ tin em nha"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-02",
+   "source": "claude-opus",
+   "topic": "Mèo cào sofa",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ê con mèo nhà tao lại cào nát cái sofa rồi"
+    },
+    {
+     "speaker": "B",
+     "text": "=)) mua trụ cào móng cho nó chưa?"
+    },
+    {
+     "speaker": "A",
+     "text": "mua rồi, 250k, mà nó chê, nó chỉ thích cào sofa thôi"
+    },
+    {
+     "speaker": "B",
+     "text": "thử xịt chút catnip lên trụ coi"
+    },
+    {
+     "speaker": "A",
+     "text": "catnip là cỏ mèo hả? mua ở đâu?"
+    },
+    {
+     "speaker": "B",
+     "text": "shop thú cưng gần chợ có bán đó, tầm 40k một gói"
+    },
+    {
+     "speaker": "A",
+     "text": "ok mai tao ghé. nó còn hay nhảy lên bàn bếp nữa"
+    },
+    {
+     "speaker": "B",
+     "text": "mèo mà, mày cấm cũng như không"
+    },
+    {
+     "speaker": "A",
+     "text": "tối qua nó làm rơi cả tô cá kho của mẹ tao"
+    },
+    {
+     "speaker": "B",
+     "text": "trời đất!! rồi sao?"
+    },
+    {
+     "speaker": "A",
+     "text": "mẹ tao đòi đem nó cho bà ngoại nuôi luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "thôi đừng, bé Mướp dễ thương vậy mà"
+    },
+    {
+     "speaker": "A",
+     "text": "thì tao đang năn nỉ đây nè, chắc phải mua lồng cho nó ngủ ban đêm"
+    },
+    {
+     "speaker": "B",
+     "text": "mua cái lồng rộng chút nha, chật quá nó stress đó"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-03",
+   "source": "claude-opus",
+   "topic": "Quà cưới bạn thân",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "tháng sau thằng Huy cưới, mày tính mừng bao nhiêu?"
+    },
+    {
+     "speaker": "B",
+     "text": "tao định bỏ phong bì 500k, mày thấy ít ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "bạn thân từ cấp 3 mà, chắc phải 1 triệu"
+    },
+    {
+     "speaker": "B",
+     "text": "ừ cũng đúng. tiệc ở đâu vậy?"
+    },
+    {
+     "speaker": "A",
+     "text": "nhà hàng bên quận 7, 18h ngày 12/12"
+    },
+    {
+     "speaker": "B",
+     "text": "thứ bảy hả? ok tao rảnh"
+    },
+    {
+     "speaker": "A",
+     "text": "hay tụi mình góp tiền mua quà luôn, đỡ phải nghĩ"
+    },
+    {
+     "speaker": "B",
+     "text": "mua gì giờ, nồi chiên không dầu hả =))"
+    },
+    {
+     "speaker": "A",
+     "text": "nhà nó có 2 cái rồi, nó than suốt"
+    },
+    {
+     "speaker": "B",
+     "text": "vậy thôi đưa tiền mặt cho lẹ, vợ chồng nó tự mua"
+    },
+    {
+     "speaker": "A",
+     "text": "ok chốt vậy. mày mặc vest không?"
+    },
+    {
+     "speaker": "B",
+     "text": "chắc mặc sơ mi thôi, vest nóng muốn xỉu"
+    },
+    {
+     "speaker": "A",
+     "text": "ừ, nhớ đi đúng giờ nha, lần trước mày tới lúc người ta ăn xong rồi"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-04",
+   "source": "claude-opus",
+   "topic": "Hội chợ đồ cũ",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "chủ nhật này có hội chợ đồ cũ ở công viên gần nhà văn hóa, đi không?"
+    },
+    {
+     "speaker": "B",
+     "text": "đi! tao đang muốn kiếm cái máy ảnh phim"
+    },
+    {
+     "speaker": "A",
+     "text": "tao thì muốn bán bớt quần áo, tủ chật cứng rồi"
+    },
+    {
+     "speaker": "B",
+     "text": "thuê sạp hết bao nhiêu?"
+    },
+    {
+     "speaker": "A",
+     "text": "100k một buổi, chia đôi với tao nha"
+    },
+    {
+     "speaker": "B",
+     "text": "được, tao đem thêm mấy cuốn truyện tranh cũ"
+    },
+    {
+     "speaker": "A",
+     "text": "truyện gì vậy, còn đủ bộ ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "thiếu vài tập thôi, bán rẻ cho nhanh"
+    },
+    {
+     "speaker": "A",
+     "text": "áo khoác tao mua 600k, giờ bán 150k chắc có người lấy"
+    },
+    {
+     "speaker": "B",
+     "text": "ừ, nhớ ghi giá rõ ràng, khách hay trả giá lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "mấy giờ dọn hàng?"
+    },
+    {
+     "speaker": "B",
+     "text": "6h30 phải có mặt, 7h là người ta tới rồi"
+    },
+    {
+     "speaker": "A",
+     "text": "sớm dữ vậy?! thôi được, tao mang bánh mì cho cả hai"
+    },
+    {
+     "speaker": "B",
+     "text": "đỉnh! nhớ mang theo túi nilon đựng đồ cho khách nha"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-05",
+   "source": "claude-opus",
+   "topic": "Chuyến bay bị delay",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "chuyến bay của chị delay rồi em ơi, chắc 23h mới tới"
+    },
+    {
+     "speaker": "B",
+     "text": "trời, delay mấy tiếng vậy chị?"
+    },
+    {
+     "speaker": "A",
+     "text": "gần 3 tiếng, họ báo do thời tiết xấu"
+    },
+    {
+     "speaker": "B",
+     "text": "vậy em đón chị lúc 23h nha"
+    },
+    {
+     "speaker": "A",
+     "text": "thôi muộn quá, chị đi taxi về cũng được"
+    },
+    {
+     "speaker": "B",
+     "text": "không được, khuya rồi chị đi một mình em không yên tâm"
+    },
+    {
+     "speaker": "A",
+     "text": "hãng có phát phiếu ăn 100k nè, chị đang ngồi ăn phở"
+    },
+    {
+     "speaker": "B",
+     "text": "phở sân bay chắc 100k không đủ đâu =))"
+    },
+    {
+     "speaker": "A",
+     "text": "đúng r, chị bù thêm 45k =))"
+    },
+    {
+     "speaker": "B",
+     "text": "chị nhớ sạc pin điện thoại, có gì nhắn em liền"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, có ổ cắm ngay cạnh ghế chị ngồi"
+    },
+    {
+     "speaker": "B",
+     "text": "lúc nào lên máy bay thì báo em một tiếng nha"
+    },
+    {
+     "speaker": "A",
+     "text": "ừ, cảm ơn em nhiều, về chị bao em đi ăn"
+    },
+    {
+     "speaker": "B",
+     "text": "hứa rồi đó nha! em ghi lại rồi"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-06",
+   "source": "claude-opus",
+   "topic": "Đá bóng tối thứ năm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "tối thứ năm có đá bóng ko anh em?"
+    },
+    {
+     "speaker": "B",
+     "text": "có, sân cỏ nhân tạo chỗ cũ, 19h nha"
+    },
+    {
+     "speaker": "A",
+     "text": "đủ người chưa? tuần trước thiếu 2 đứa phải đá 5 người"
+    },
+    {
+     "speaker": "B",
+     "text": "giờ mới có 8, cần thêm 2 nữa"
+    },
+    {
+     "speaker": "A",
+     "text": "để em rủ thằng Khoa, nó mới chuyển về Sài Gòn"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, nó đá vị trí nào?"
+    },
+    {
+     "speaker": "A",
+     "text": "thủ môn, mà bắt cũng tạm được"
+    },
+    {
+     "speaker": "B",
+     "text": "ngon, đang thiếu thủ môn nhất luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "tiền sân chia sao anh?"
+    },
+    {
+     "speaker": "B",
+     "text": "600k một tiếng rưỡi, chia đầu người, tầm 60k mỗi đứa"
+    },
+    {
+     "speaker": "A",
+     "text": "ok. ai mang nước?"
+    },
+    {
+     "speaker": "B",
+     "text": "mày mang thùng nước suối đi, tao trả lại tiền sau"
+    },
+    {
+     "speaker": "A",
+     "text": "chốt kèo! đội thua bao trà đá nha"
+    },
+    {
+     "speaker": "B",
+     "text": "lại trà đá... thôi được, lần này tụi tao ko thua đâu"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-07",
+   "source": "claude-opus",
+   "topic": "Luyện thi IELTS",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ê mày đăng ký thi IELTS chưa?"
+    },
+    {
+     "speaker": "B",
+     "text": "rồi, ngày 15/11 thi, đang muốn khóc đây"
+    },
+    {
+     "speaker": "A",
+     "text": "mục tiêu bao nhiêu?"
+    },
+    {
+     "speaker": "B",
+     "text": "6.5 để đủ điều kiện xét học bổng"
+    },
+    {
+     "speaker": "A",
+     "text": "phần nào khó nhất?"
+    },
+    {
+     "speaker": "B",
+     "text": "writing, task 2 tao viết mãi không đủ 250 chữ"
+    },
+    {
+     "speaker": "A",
+     "text": "tao có bộ đề với bài mẫu nè, gửi qua Zalo cho"
+    },
+    {
+     "speaker": "B",
+     "text": "thật hả? cứu tao một mạng rồi"
+    },
+    {
+     "speaker": "A",
+     "text": "speaking thì sao, có luyện với ai ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "tự nói trước gương thôi, nghe như đứa dở hơi"
+    },
+    {
+     "speaker": "A",
+     "text": "haha cuối tuần cafe luyện với tao, tao hỏi mày trả lời"
+    },
+    {
+     "speaker": "B",
+     "text": "ok! thứ bảy 9h được ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "được, quán quen nha. mày bao nước là được"
+    },
+    {
+     "speaker": "B",
+     "text": "đơn giản! đậu học bổng tao bao cả tháng luôn"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-08",
+   "source": "claude-opus",
+   "topic": "Đơn hàng giao chậm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "đơn hàng bên shop đó giao chưa vậy em?"
+    },
+    {
+     "speaker": "B",
+     "text": "chưa chị ơi, app báo đang ở kho Bình Dương từ thứ hai"
+    },
+    {
+     "speaker": "A",
+     "text": "lâu vậy, chị đặt cái nồi cơm điện từ tuần trước rồi"
+    },
+    {
+     "speaker": "B",
+     "text": "để em nhắn shop hỏi thử"
+    },
+    {
+     "speaker": "A",
+     "text": "ừ hỏi giùm chị, mai chị cần nấu cho cả nhà"
+    },
+    {
+     "speaker": "B",
+     "text": "shop trả lời rồi, họ bảo bên vận chuyển quá tải, 2-3 ngày nữa mới tới"
+    },
+    {
+     "speaker": "A",
+     "text": "trời ơi... vậy mai chị nấu bằng gì"
+    },
+    {
+     "speaker": "B",
+     "text": "mượn tạm nồi nhà cô Tư đi chị"
+    },
+    {
+     "speaker": "A",
+     "text": "thôi chị ra siêu thị mua luôn, rồi hủy đơn kia"
+    },
+    {
+     "speaker": "B",
+     "text": "đơn đang vận chuyển thì ko hủy được đâu chị"
+    },
+    {
+     "speaker": "A",
+     "text": "vậy lúc giao tới chị từ chối nhận được ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "được, nhưng chị trả trước 790k qua ví điện tử rồi, phải chờ hoàn tiền"
+    },
+    {
+     "speaker": "A",
+     "text": "hoàn mất bao lâu?"
+    },
+    {
+     "speaker": "B",
+     "text": "thường 3 đến 5 ngày làm việc"
+    },
+    {
+     "speaker": "A",
+     "text": "thôi kệ, chờ thêm vậy. lần sau chị mua ở tiệm gần nhà cho chắc"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-09",
+   "source": "claude-opus",
+   "topic": "Mua vé xe về quê ăn Tết",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mày mua vé xe về Quảng Ngãi chưa?"
+    },
+    {
+     "speaker": "B",
+     "text": "chưa, mở bán từ hôm qua mà web cứ treo hoài"
+    },
+    {
+     "speaker": "A",
+     "text": "tao mua được rồi, xe giường nằm 28 tháng Chạp"
+    },
+    {
+     "speaker": "B",
+     "text": "trời, may vậy! giá bao nhiêu?"
+    },
+    {
+     "speaker": "A",
+     "text": "650k, ngày thường có 400k thôi"
+    },
+    {
+     "speaker": "B",
+     "text": "Tết mà, nhà xe tăng giá là chuyện bình thường"
+    },
+    {
+     "speaker": "A",
+     "text": "mày thử gọi tổng đài coi, đôi khi họ còn giữ chỗ cho khách gọi điện"
+    },
+    {
+     "speaker": "B",
+     "text": "gọi từ sáng tới giờ, toàn máy bận"
+    },
+    {
+     "speaker": "A",
+     "text": "hay mày đi tàu, chậm hơn nhưng đỡ say xe"
+    },
+    {
+     "speaker": "B",
+     "text": "tàu cũng hết vé giường rồi, chỉ còn ghế ngồi cứng"
+    },
+    {
+     "speaker": "A",
+     "text": "14 tiếng ngồi ghế cứng thì gãy lưng =))"
+    },
+    {
+     "speaker": "B",
+     "text": "thôi tao thử thêm lần nữa tối nay, 22h hệ thống ít người"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, mua được nhắn tao, có khi mình đi chung chuyến"
+    },
+    {
+     "speaker": "B",
+     "text": "chung chuyến thì vui, tao mang theo bánh tráng với khô mực"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-10",
+   "source": "claude-opus",
+   "topic": "Tiền điện phòng trọ",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "tháng này tiền điện phòng mình 1tr2 đó mấy đứa"
+    },
+    {
+     "speaker": "B",
+     "text": "hả?! tháng trước có 700k thôi mà"
+    },
+    {
+     "speaker": "A",
+     "text": "tại máy lạnh, có người mở cả ngày lẫn đêm"
+    },
+    {
+     "speaker": "B",
+     "text": "ừ thì... tao làm ở nhà nên mở hơi nhiều"
+    },
+    {
+     "speaker": "A",
+     "text": "tao biết mà =)) thôi giờ tính sao?"
+    },
+    {
+     "speaker": "B",
+     "text": "tao chịu thêm 200k, phần còn lại chia đều"
+    },
+    {
+     "speaker": "A",
+     "text": "vậy là mỗi người 250k nha, 4 đứa"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, mai tao chuyển khoản luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "với lại mình thống nhất để máy lạnh 26 độ thôi nha"
+    },
+    {
+     "speaker": "B",
+     "text": "26 nóng lắm, 25 được ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "25 cũng được, nhưng ra khỏi phòng nhớ tắt"
+    },
+    {
+     "speaker": "B",
+     "text": "ok ok, tao dán tờ giấy nhắc ở cửa luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "đỉnh. nhớ chuyển khoản trước thứ sáu, chủ nhà thu vào ngày 5"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-11",
+   "source": "claude-opus",
+   "topic": "Cho con học thêm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "chị ơi, bé Na nhà chị học thêm toán ở đâu vậy?"
+    },
+    {
+     "speaker": "B",
+     "text": "ở trung tâm gần trường đó em, cô dạy kỹ lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "học phí sao chị?"
+    },
+    {
+     "speaker": "B",
+     "text": "1tr8 một tháng, tuần 3 buổi, mỗi buổi 90 phút"
+    },
+    {
+     "speaker": "A",
+     "text": "cũng hơi cao ha. bé Bin nhà em đang yếu phần phân số"
+    },
+    {
+     "speaker": "B",
+     "text": "lớp 4 hả? cô có lớp riêng cho lớp 4 đó"
+    },
+    {
+     "speaker": "A",
+     "text": "dạ đúng rồi. mà học buổi tối có mệt quá không chị?"
+    },
+    {
+     "speaker": "B",
+     "text": "lớp 17h30 đến 19h, về ăn cơm là vừa"
+    },
+    {
+     "speaker": "A",
+     "text": "vậy cũng được. em đăng ký cho bé học thử được ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "được, buổi đầu học thử miễn phí. để chị gửi số trung tâm cho em"
+    },
+    {
+     "speaker": "A",
+     "text": "dạ em cảm ơn chị nhiều"
+    },
+    {
+     "speaker": "B",
+     "text": "không có gì. mà đừng ép bé quá nha, tụi nhỏ cũng cần chơi nữa"
+    },
+    {
+     "speaker": "A",
+     "text": "dạ, em chỉ muốn bé đỡ sợ toán thôi"
+    },
+    {
+     "speaker": "B",
+     "text": "vậy là đúng rồi. có gì em cứ hỏi chị nha"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-12",
+   "source": "claude-opus",
+   "topic": "Đi cắt tóc",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "tóc tao dài quá rồi, mày hay cắt ở đâu?"
+    },
+    {
+     "speaker": "B",
+     "text": "tiệm anh Long đầu hẻm, 80k gội cắt luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "rẻ vậy? cắt có đẹp ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "đẹp, mà phải đặt lịch trước, cuối tuần đông lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "tao muốn cắt kiểu undercut, ổn ko ta"
+    },
+    {
+     "speaker": "B",
+     "text": "mặt mày tròn, cắt undercut chắc hợp đó"
+    },
+    {
+     "speaker": "A",
+     "text": "mày nói thật hay đang chọc tao vậy =))"
+    },
+    {
+     "speaker": "B",
+     "text": "thật mà!! đưa hình mẫu là ảnh hiểu liền"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, thứ bảy 10h tao đi được"
+    },
+    {
+     "speaker": "B",
+     "text": "để tao nhắn ảnh giữ chỗ cho"
+    },
+    {
+     "speaker": "A",
+     "text": "cảm ơn nha. cắt xong tao gửi hình mày duyệt"
+    },
+    {
+     "speaker": "B",
+     "text": "nhớ đừng nhuộm nha, lần trước mày nhuộm vàng xấu hoắc"
+    },
+    {
+     "speaker": "A",
+     "text": "lần đó là tai nạn thôi!!"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-13",
+   "source": "claude-opus",
+   "topic": "Mất ví trên xe buýt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "chết rồi, tao làm rơi ví trên xe buýt"
+    },
+    {
+     "speaker": "B",
+     "text": "hả? trong đó có gì?"
+    },
+    {
+     "speaker": "A",
+     "text": "căn cước, thẻ ngân hàng, với khoảng 300k tiền mặt"
+    },
+    {
+     "speaker": "B",
+     "text": "khóa thẻ ngay đi, tiền mặt thì thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "khóa trên app rồi. còn căn cước thì sao?"
+    },
+    {
+     "speaker": "B",
+     "text": "ra công an phường khai báo rồi làm lại, nhanh mà"
+    },
+    {
+     "speaker": "A",
+     "text": "tao thử gọi tổng đài xe buýt trước, biết đâu có người nhặt được"
+    },
+    {
+     "speaker": "B",
+     "text": "ừ, tuyến số mấy?"
+    },
+    {
+     "speaker": "A",
+     "text": "tuyến 32, khoảng 8h15 sáng nay"
+    },
+    {
+     "speaker": "B",
+     "text": "hy vọng gặp người tốt. mà sao mày làm rơi được hay vậy?"
+    },
+    {
+     "speaker": "A",
+     "text": "tao đứng lên nhường ghế, chắc ví tuột khỏi túi quần"
+    },
+    {
+     "speaker": "B",
+     "text": "làm việc tốt mà xui ghê =(("
+    },
+    {
+     "speaker": "A",
+     "text": "đó... mà khoan, tổng đài báo có người nộp lại rồi!!"
+    },
+    {
+     "speaker": "B",
+     "text": "trời ơi may quá! tối nay đi ăn mừng"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-14",
+   "source": "claude-opus",
+   "topic": "Tìm quán cà phê làm việc",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "có quán cafe nào yên tĩnh để ngồi làm việc ko? wifi mạnh nha"
+    },
+    {
+     "speaker": "B",
+     "text": "quán trên tầng 2 gần chợ đó, ít người lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "có ổ cắm ko? laptop tao pin yếu"
+    },
+    {
+     "speaker": "B",
+     "text": "có, bàn nào cũng có ổ cắm, mở tới 22h"
+    },
+    {
+     "speaker": "A",
+     "text": "nước bao nhiêu?"
+    },
+    {
+     "speaker": "B",
+     "text": "cà phê sữa 35k, ngồi cả ngày cũng ko ai đuổi =))"
+    },
+    {
+     "speaker": "A",
+     "text": "ngon. có mở nhạc to ko? tao cần gọi họp với khách"
+    },
+    {
+     "speaker": "B",
+     "text": "nhạc nhẹ thôi, mà mày gọi thì nên ngồi góc ngoài ban công"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, chiều nay tao ra thử. mày ra chung ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "chiều tao kẹt việc, 16h tao mới rảnh"
+    },
+    {
+     "speaker": "A",
+     "text": "vậy 16h tao giữ chỗ cho mày"
+    },
+    {
+     "speaker": "B",
+     "text": "chốt! nhớ gọi giùm tao ly bạc xỉu ít đá"
+    },
+    {
+     "speaker": "A",
+     "text": "rồi rồi, ít đá ít ngọt, tao biết mà"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-15",
+   "source": "claude-opus",
+   "topic": "Kẹt xe giờ cao điểm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "em ơi anh kẹt xe trên cầu rồi, chắc trễ 20 phút"
+    },
+    {
+     "speaker": "B",
+     "text": "trời, kẹt dữ vậy anh?"
+    },
+    {
+     "speaker": "A",
+     "text": "có vụ va chạm ở dưới chân cầu, xe đứng im luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "anh có sao không? đi chậm thôi nha"
+    },
+    {
+     "speaker": "A",
+     "text": "anh không sao, chỉ là không nhúc nhích được"
+    },
+    {
+     "speaker": "B",
+     "text": "vậy em vào quán ngồi trước nha, gọi nước luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "ừ, em gọi cho anh trà đào nha"
+    },
+    {
+     "speaker": "B",
+     "text": "ok. mà sáng mai anh đổi giờ đi làm đi, 7h là kẹt rồi"
+    },
+    {
+     "speaker": "A",
+     "text": "anh biết mà, mai anh đi 6h30 cho chắc"
+    },
+    {
+     "speaker": "B",
+     "text": "hay là đi metro? giờ có tuyến mới rồi đó"
+    },
+    {
+     "speaker": "A",
+     "text": "ga gần nhà anh cũng phải đi bộ 15 phút, chắc thử coi"
+    },
+    {
+     "speaker": "B",
+     "text": "thử đi, đỡ hít khói bụi nữa"
+    },
+    {
+     "speaker": "A",
+     "text": "xe nhích rồi em! 10 phút nữa anh tới"
+    },
+    {
+     "speaker": "B",
+     "text": "okee, chạy từ từ thôi nha anh"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-16",
+   "source": "claude-opus",
+   "topic": "Làm lại căn cước",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Mai mày đi làm căn cước với tao ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ở đâu? Công an phường hả?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ừ, mở cửa từ 7h30, nghe nói đông lắm"
+    },
+    {
+     "speaker": "B",
+     "text": "Sáng mai tao phải đi làm, chiều được ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chiều họ làm đến 4h30 thôi"
+    },
+    {
+     "speaker": "B",
+     "text": "Vậy tầm 2h nhé. Cần mang gì?"
+    },
+    {
+     "speaker": "A",
+     "text": "Căn cước cũ với sổ hộ khẩu... mà giờ hình như ko cần sổ nữa"
+    },
+    {
+     "speaker": "B",
+     "text": "Cứ mang theo cho chắc. Có mất tiền ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Đổi thì 50 nghìn, cấp lại thì 70 nghìn"
+    },
+    {
+     "speaker": "B",
+     "text": "Rẻ mà. Chụp ảnh luôn tại chỗ hả?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ừ, nhớ mặc áo có cổ, đừng mặc áo ba lỗ như lần trước"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha lần đó tao bị đuổi về thật đấy"
+    },
+    {
+     "speaker": "A",
+     "text": "Thôi mai 1h45 tao qua đón"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, cảm ơn mày nhé!"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-17",
+   "source": "claude-opus",
+   "topic": "Hàng xóm hát karaoke",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tối qua nhà bên cạnh hát karaoke đến 12h đêm, chị có nghe ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nghe chứ! Chị còn ko ngủ được"
+    },
+    {
+     "speaker": "A",
+     "text": "Tuần này là lần thứ ba rồi đấy"
+    },
+    {
+     "speaker": "B",
+     "text": "Hay mình sang nói chuyện nhẹ nhàng với họ xem"
+    },
+    {
+     "speaker": "A",
+     "text": "Em ngại lắm, ông chú đó trông dữ dữ"
+    },
+    {
+     "speaker": "B",
+     "text": "Thật ra chú ấy hiền mà, chỉ hay uống bia thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Vậy chị đi với em nhé?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, chiều nay khoảng 5h, lúc cô ấy đi chợ về"
+    },
+    {
+     "speaker": "A",
+     "text": "Mình nói gì bây giờ hả chị?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cứ nói là nhà có con nhỏ, xin hát đến 10h thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Hợp lý. Em mang ít xoài sang làm quà luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "Khéo thế! Vậy chắc chắn thành công"
+    },
+    {
+     "speaker": "A",
+     "text": "Hi vọng vậy, chứ em thiếu ngủ lắm rồi"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-18",
+   "source": "claude-opus",
+   "topic": "Chụp ảnh ở Hồ Tây",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Cậu xem ảnh tớ chụp ở Hồ Tây chưa?"
+    },
+    {
+     "speaker": "B",
+     "text": "Xem rồi, đẹp quá!! Máy mới à?"
+    },
+    {
+     "speaker": "A",
+     "text": "Máy cũ mua lại thôi, 6 triệu rưỡi"
+    },
+    {
+     "speaker": "B",
+     "text": "Rẻ thế! Có ống kính gì?"
+    },
+    {
+     "speaker": "A",
+     "text": "Một ống 50mm, chụp chân dung xịn lắm"
+    },
+    {
+     "speaker": "B",
+     "text": "Tớ thích tấm hoàng hôn có con thuyền nhất"
+    },
+    {
+     "speaker": "A",
+     "text": "Tấm đó tớ đợi gần 1 tiếng đấy"
+    },
+    {
+     "speaker": "B",
+     "text": "Kiên nhẫn ghê. Cuối tuần tớ đi cùng được ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Được chứ. Sáng Chủ nhật đi phố cổ nhé, 5h30"
+    },
+    {
+     "speaker": "B",
+     "text": "5h30 sáng á?!"
+    },
+    {
+     "speaker": "A",
+     "text": "Phải đi sớm mới có ánh sáng đẹp, lại vắng người"
+    },
+    {
+     "speaker": "B",
+     "text": "Thôi được, vì nghệ thuật vậy"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha. Nhớ mang áo khoác, sáng sớm lạnh đấy"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-19",
+   "source": "claude-opus",
+   "topic": "Bố bị đau dạ dày",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bố đỡ chưa ạ? Hôm qua mẹ bảo bố đau dạ dày"
+    },
+    {
+     "speaker": "B",
+     "text": "Đỡ hơn rồi con, chỉ hơi mệt thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Bố đi khám chưa?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chưa, bố mua thuốc ở hiệu thuốc uống rồi"
+    },
+    {
+     "speaker": "A",
+     "text": "Bố ơi, đi khám đi ạ, đau mấy ngày rồi còn gì"
+    },
+    {
+     "speaker": "B",
+     "text": "Bệnh viện đông lắm, phải chờ cả buổi"
+    },
+    {
+     "speaker": "A",
+     "text": "Con đặt lịch online cho bố rồi, sáng thứ Năm lúc 8h15"
+    },
+    {
+     "speaker": "B",
+     "text": "Nhanh thế à? Con cứ lo"
+    },
+    {
+     "speaker": "A",
+     "text": "Con lo thật mà. Bố nhớ nhịn ăn sáng nhé, có thể phải nội soi"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, bố biết rồi. Mẹ đi cùng bố"
+    },
+    {
+     "speaker": "A",
+     "text": "Con sẽ xin nghỉ nửa ngày để chở bố mẹ đi"
+    },
+    {
+     "speaker": "B",
+     "text": "Không cần đâu, bố mẹ đi taxi được"
+    },
+    {
+     "speaker": "A",
+     "text": "Bố cứ để con. Con đến lúc 7h nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, con ngoan quá"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-20",
+   "source": "claude-opus",
+   "topic": "Họp phụ huynh lớp 3A",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chị ơi tối nay họp phụ huynh lớp 3A mấy giờ ạ?"
+    },
+    {
+     "speaker": "B",
+     "text": "7h tối em ạ, ở phòng học của lớp"
+    },
+    {
+     "speaker": "A",
+     "text": "Em đi làm về muộn, chắc tới 7h15"
+    },
+    {
+     "speaker": "B",
+     "text": "Ko sao, đầu buổi cô chủ nhiệm chỉ nói chung chung thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Nghe nói lần này bàn chuyện quỹ lớp à chị?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, mỗi bạn đóng 300 nghìn một kỳ"
+    },
+    {
+     "speaker": "A",
+     "text": "Hơi nhiều chị nhỉ. Kỳ trước có 200 nghìn"
+    },
+    {
+     "speaker": "B",
+     "text": "Họ bảo để mua máy chiếu với quạt mới"
+    },
+    {
+     "speaker": "A",
+     "text": "À thế thì được. Còn chuyện ăn bán trú thì sao?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chị định hỏi cô luôn, con chị về toàn kêu cơm nguội"
+    },
+    {
+     "speaker": "A",
+     "text": "Con em cũng kêu thế, lại còn hay bỏ rau"
+    },
+    {
+     "speaker": "B",
+     "text": "Mình cùng góp ý nhé, nhẹ nhàng thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Vâng, chị giữ giúp em một chỗ nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok em, chị ngồi bàn đầu"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-21",
+   "source": "claude-opus",
+   "topic": "Nấu cơm từ thiện",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Cuối tuần này có ai đi nấu cơm từ thiện ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tớ đi! Ở bệnh viện huyện à?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ừ, sáng thứ Bảy, tập trung lúc 5h30 để nấu"
+    },
+    {
+     "speaker": "B",
+     "text": "Sớm thế. Cần mang gì ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mang tạp dề với găng tay. Nhóm mình nấu 200 suất"
+    },
+    {
+     "speaker": "B",
+     "text": "Trời, nhiều thế! Có đủ người ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mới có 8 người, cần thêm ít nhất 4 người nữa"
+    },
+    {
+     "speaker": "B",
+     "text": "Để tớ rủ thêm Linh với Tuấn"
+    },
+    {
+     "speaker": "A",
+     "text": "Tuyệt quá! Ai có xe máy chở đồ thì càng tốt"
+    },
+    {
+     "speaker": "B",
+     "text": "Tuấn có xe, chắc ok"
+    },
+    {
+     "speaker": "A",
+     "text": "Mỗi người góp 50k mua rau với thịt nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, tớ chuyển khoản luôn tối nay"
+    },
+    {
+     "speaker": "A",
+     "text": "Cảm ơn cậu nhiều nhé, có cậu đỡ lo hẳn"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-22",
+   "source": "claude-opus",
+   "topic": "Vườn rau trên sân thượng",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Mẹ ơi rau muống trên sân thượng bị sâu ăn hết lá rồi"
+    },
+    {
+     "speaker": "B",
+     "text": "Trời ơi! Con có phun nước tỏi ớt như mẹ dặn ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Con quên mất mấy hôm..."
+    },
+    {
+     "speaker": "B",
+     "text": "Thế thì chịu rồi. Nhổ hết đi rồi gieo lại"
+    },
+    {
+     "speaker": "A",
+     "text": "Còn cà chua thì đang ra quả mẹ ạ"
+    },
+    {
+     "speaker": "B",
+     "text": "Tốt quá. Nhớ cắm cọc buộc lại kẻo gió làm đổ"
+    },
+    {
+     "speaker": "A",
+     "text": "Con buộc rồi. Có 12 quả xanh rồi đấy"
+    },
+    {
+     "speaker": "B",
+     "text": "Giỏi! Mà cây ớt thì sao?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ớt vẫn tốt, cay xé lưỡi luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha giống ớt nhà bà ngoại đấy. Cuối tuần mẹ sang xem nhé"
+    },
+    {
+     "speaker": "A",
+     "text": "Mẹ mang thêm đất với phân bò giúp con được ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Được, mẹ mua 2 bao ở chợ hoa"
+    },
+    {
+     "speaker": "A",
+     "text": "Con cảm ơn mẹ! Mẹ đến thì con nấu canh rau ngót"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-23",
+   "source": "claude-opus",
+   "topic": "Thợ sửa điều hòa",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Anh ơi, điều hòa nhà em chảy nước, mai anh qua được ko ạ?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mai anh kín lịch rồi em, thứ Tư được ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Thứ Tư em đi làm đến 6h chiều"
+    },
+    {
+     "speaker": "B",
+     "text": "Vậy 6h30 anh qua nhé"
+    },
+    {
+     "speaker": "A",
+     "text": "Dạ được ạ. Sửa thế này hết bao nhiêu anh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Phải xem đã em. Vệ sinh thì 250 nghìn, nếu thiếu ga thì thêm tiền ga"
+    },
+    {
+     "speaker": "A",
+     "text": "Còn nếu hỏng bo mạch thì sao anh?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cái đó thì đắt hơn, tầm 1 triệu 5 trở lên"
+    },
+    {
+     "speaker": "A",
+     "text": "Ối... thôi mong là chỉ cần vệ sinh"
+    },
+    {
+     "speaker": "B",
+     "text": "Máy em dùng mấy năm rồi?"
+    },
+    {
+     "speaker": "A",
+     "text": "Khoảng 6 năm, chưa vệ sinh lần nào"
+    },
+    {
+     "speaker": "B",
+     "text": "Vậy chắc tắc ống thoát nước thôi, em yên tâm"
+    },
+    {
+     "speaker": "A",
+     "text": "Dạ, em cảm ơn anh. Nhà em ở tầng 4, ko có thang máy nha anh"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok em, ko sao"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-24",
+   "source": "claude-opus",
+   "topic": "Ra ngân hàng mở khóa thẻ",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Chị ơi, chị biết ngân hàng gần nhà mình thứ Bảy có làm việc ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Chỉ sáng thứ Bảy thôi em, đến 11h30"
+    },
+    {
+     "speaker": "A",
+     "text": "Em bị khóa thẻ vì nhập sai mã PIN 3 lần"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, lại quên mật khẩu à?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mới đổi tuần trước mà quên luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "Mang căn cước ra quầy là họ mở cho, nhanh thôi"
+    },
+    {
+     "speaker": "A",
+     "text": "Có mất phí ko chị?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hình như ko, lần trước chị làm miễn phí"
+    },
+    {
+     "speaker": "A",
+     "text": "May quá. Mà em cũng muốn mở sổ tiết kiệm luôn"
+    },
+    {
+     "speaker": "B",
+     "text": "Lãi suất kỳ hạn 6 tháng bây giờ tầm 4,5% một năm"
+    },
+    {
+     "speaker": "A",
+     "text": "Cũng được. Em gửi thử 20 triệu xem sao"
+    },
+    {
+     "speaker": "B",
+     "text": "Nhớ hỏi kỹ nếu rút trước hạn thì mất bao nhiêu lãi nhé"
+    },
+    {
+     "speaker": "A",
+     "text": "Dạ, em cảm ơn chị!"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-25",
+   "source": "claude-opus",
+   "topic": "Đi xem phim",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Tối nay đi xem phim ko? Phim kinh dị mới ra đấy"
+    },
+    {
+     "speaker": "B",
+     "text": "Phim kinh dị á? Thôi tớ sợ lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "Có tớ đây mà, sợ gì"
+    },
+    {
+     "speaker": "B",
+     "text": "Lần trước cậu còn hét to hơn tớ đấy!!"
+    },
+    {
+     "speaker": "A",
+     "text": "Hehe chuyện cũ rồi. Hay xem phim hoạt hình?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok hoạt hình đi. Suất mấy giờ?"
+    },
+    {
+     "speaker": "A",
+     "text": "Có suất 19h45 với 21h10"
+    },
+    {
+     "speaker": "B",
+     "text": "19h45 đi, xem xong còn đi ăn"
+    },
+    {
+     "speaker": "A",
+     "text": "Thứ Ba vé có 60k thôi, tớ đặt luôn nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, lấy ghế giữa nha, đừng ngồi hàng đầu"
+    },
+    {
+     "speaker": "A",
+     "text": "Đặt rồi, hàng F ghế 7 với 8"
+    },
+    {
+     "speaker": "B",
+     "text": "Tuyệt. Bắp nước để tớ mua"
+    },
+    {
+     "speaker": "A",
+     "text": "Bắp vị caramel nhé!"
+    },
+    {
+     "speaker": "B",
+     "text": "Biết rồi, lần nào cũng caramel"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-26",
+   "source": "claude-opus",
+   "topic": "Tìm phòng trọ",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Em ơi, phòng trọ ở Cầu Giấy em xem hôm qua thế nào?"
+    },
+    {
+     "speaker": "B",
+     "text": "Phòng đẹp chị ạ, có ban công, nhưng giá 4 triệu 2"
+    },
+    {
+     "speaker": "A",
+     "text": "Có bao điện nước ko em?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ko ạ, điện 4 nghìn một số, nước 100k một người"
+    },
+    {
+     "speaker": "A",
+     "text": "Hơi đắt. Chủ nhà có dễ tính ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cô chủ nhìn hiền, nhưng phải cọc 2 tháng"
+    },
+    {
+     "speaker": "A",
+     "text": "Tận 2 tháng à? Thường chỉ cọc 1 tháng thôi mà"
+    },
+    {
+     "speaker": "B",
+     "text": "Em cũng định thương lượng"
+    },
+    {
+     "speaker": "A",
+     "text": "Đi làm từ đó mất bao lâu?"
+    },
+    {
+     "speaker": "B",
+     "text": "Đi xe máy khoảng 20 phút nếu ko tắc đường"
+    },
+    {
+     "speaker": "A",
+     "text": "Hà Nội thì làm gì có lúc ko tắc"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha cũng đúng. Chiều nay em xem thêm một phòng ở Dịch Vọng nữa"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, xem kỹ khóa cửa với chỗ để xe nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Dạ, em sẽ chụp ảnh gửi chị"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-27",
+   "source": "claude-opus",
+   "topic": "Đám cưới ở quê",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Mày nhận được thiệp cưới của Hương chưa?"
+    },
+    {
+     "speaker": "B",
+     "text": "Nhận rồi! Ngày 15/12 đúng ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ừ, tổ chức ở quê, Nam Định"
+    },
+    {
+     "speaker": "B",
+     "text": "Xa thế. Mình đi xe khách hả?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tao định thuê xe 7 chỗ, chia ra mỗi đứa tầm 300k"
+    },
+    {
+     "speaker": "B",
+     "text": "Được đấy, đi cùng cho vui"
+    },
+    {
+     "speaker": "A",
+     "text": "Mấy giờ xuất phát nhỉ? Tiệc lúc 11h trưa"
+    },
+    {
+     "speaker": "B",
+     "text": "Đi từ 7h sáng cho chắc, cuối năm đường đông lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "Ừ. Mà mặc gì đây?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tao mặc áo dài, mày mặc cùng màu ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hồng phấn nhé! Chụp ảnh cho đẹp"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, chiều mai đi may luôn kẻo ko kịp"
+    },
+    {
+     "speaker": "A",
+     "text": "Đi, 3h chiều tao qua"
+    },
+    {
+     "speaker": "B",
+     "text": "Để tao hỏi tiệm may xem mất mấy ngày"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-28",
+   "source": "claude-opus",
+   "topic": "Đi tập gym",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ông ơi mai đi gym ko? Tôi vừa đăng ký gói 6 tháng"
+    },
+    {
+     "speaker": "B",
+     "text": "Gói 6 tháng bao nhiêu?"
+    },
+    {
+     "speaker": "A",
+     "text": "2 triệu 4, có cả xông hơi"
+    },
+    {
+     "speaker": "B",
+     "text": "Cũng rẻ. Tôi đang tập ở phòng gần công ty"
+    },
+    {
+     "speaker": "A",
+     "text": "Sang đây tập chung cho có động lực"
+    },
+    {
+     "speaker": "B",
+     "text": "Mai mấy giờ?"
+    },
+    {
+     "speaker": "A",
+     "text": "6h tối, tập ngực với tay sau"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok. Lần trước tôi đẩy ngực được 60kg rồi đấy"
+    },
+    {
+     "speaker": "A",
+     "text": "Ghê vậy! Tôi mới được 40kg thôi"
+    },
+    {
+     "speaker": "B",
+     "text": "Từ từ thôi, tập sai tư thế là đau vai lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "Biết rồi, mai ông chỉ tôi nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Được, nhưng tập xong phải bao tôi trà chanh"
+    },
+    {
+     "speaker": "A",
+     "text": "Chốt! Trà chanh với hướng dương luôn"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-29",
+   "source": "claude-opus",
+   "topic": "Xe máy chết máy giữa đường",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ơi cứu tao với, xe chết máy giữa đường rồi"
+    },
+    {
+     "speaker": "B",
+     "text": "Mày đang ở đâu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Gần cầu vượt, cách nhà mày tầm 2km"
+    },
+    {
+     "speaker": "B",
+     "text": "Đề ko nổ à? Thử đạp cần khởi động xem"
+    },
+    {
+     "speaker": "A",
+     "text": "Đạp mãi ko được, hay hết xăng nhỉ"
+    },
+    {
+     "speaker": "B",
+     "text": "Kim xăng chỉ bao nhiêu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ờ... chỉ vạch đỏ. Hôm qua tao quên đổ"
+    },
+    {
+     "speaker": "B",
+     "text": "Trời ơi! Đứng đấy, tao mang 1 lít xăng ra"
+    },
+    {
+     "speaker": "A",
+     "text": "Mày là nhất! Cây xăng gần nhất xa lắm"
+    },
+    {
+     "speaker": "B",
+     "text": "10 phút nữa tao tới. Đứng chỗ nào có bóng râm mà đợi"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, tao đứng trước tiệm tạp hóa màu xanh"
+    },
+    {
+     "speaker": "B",
+     "text": "Tới rồi, thấy mày rồi"
+    },
+    {
+     "speaker": "A",
+     "text": "Tối nay tao bao mày bún chả nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Nhất trí! Lần sau nhớ đổ xăng đi ông tướng"
+    }
+   ]
+  },
+  {
+   "id": "opus-vi-30",
+   "source": "claude-opus",
+   "topic": "Giỗ ông nội",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Anh ơi, Chủ nhật này giỗ ông nội, anh về được ko?"
+    },
+    {
+     "speaker": "B",
+     "text": "Anh về được. Mấy giờ làm cỗ?"
+    },
+    {
+     "speaker": "A",
+     "text": "Mẹ bảo 9h sáng cúng, 11h ăn cơm"
+    },
+    {
+     "speaker": "B",
+     "text": "Cả họ về đông ko em?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chắc khoảng 5 mâm, cô Hạnh ở Sài Gòn cũng ra"
+    },
+    {
+     "speaker": "B",
+     "text": "Lâu lắm rồi ko gặp cô Hạnh. Anh mang gì về?"
+    },
+    {
+     "speaker": "A",
+     "text": "Anh mua giúp em ít hoa quả với bánh cốm nhé"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok. Có cần phụ nấu ko?"
+    },
+    {
+     "speaker": "A",
+     "text": "Có chứ! Mẹ với thím đang lo làm nem, cần người cuốn"
+    },
+    {
+     "speaker": "B",
+     "text": "Anh cuốn nem xấu lắm"
+    },
+    {
+     "speaker": "A",
+     "text": "Xấu cũng được, quan trọng là có mặt"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha ok. Tối thứ Bảy anh về luôn"
+    },
+    {
+     "speaker": "A",
+     "text": "Dạ, em bảo mẹ dọn phòng cho anh"
+    },
+    {
+     "speaker": "B",
+     "text": "Ừ, nhắn mẹ đừng nấu nhiều quá"
+    }
+   ]
+  }
+ ]
+}

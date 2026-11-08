@@ -1,0 +1,1562 @@
+{
+ "chats": [
+  {
+   "id": "haiku-nl-01",
+   "source": "claude-haiku",
+   "topic": "Afspraakje zaterdag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hoi, zin om zaterdag iets te gaan eten?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja leuk! waar denk je aan?"
+    },
+    {
+     "speaker": "A",
+     "text": "die nieuwe tent aan de Oudegracht, heb je die al gezien?"
+    },
+    {
+     "speaker": "B",
+     "text": "nee nog niet, is het duur?"
+    },
+    {
+     "speaker": "A",
+     "text": "best wel, een hoofdgerecht kost al 22 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "haha ok, maar voor een keer mag dat wel"
+    },
+    {
+     "speaker": "A",
+     "text": "precies! reserveer ik om 19:30?"
+    },
+    {
+     "speaker": "B",
+     "text": "19:30 is prima, ik kom met de fiets"
+    },
+    {
+     "speaker": "A",
+     "text": "tof, dan ben ik er rond 19:15 zodat ik nog een plekje regel"
+    },
+    {
+     "speaker": "B",
+     "text": "je bent altijd te vroeg joh"
+    },
+    {
+     "speaker": "A",
+     "text": "haha dat klopt, ik ben een beetje een zenuwpees"
+    },
+    {
+     "speaker": "B",
+     "text": "maak je niet druk, het wordt gezellig"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-02",
+   "source": "claude-haiku",
+   "topic": "Deadline project",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "heb jij de presentatie voor maandag al af?"
+    },
+    {
+     "speaker": "B",
+     "text": "nee, ik zit nog met de cijfers van kwartaal drie"
+    },
+    {
+     "speaker": "A",
+     "text": "kan ik helpen? ik heb de grafieken al gemaakt"
+    },
+    {
+     "speaker": "B",
+     "text": "graag! stuur maar door, dan kijk ik ze vanavond na"
+    },
+    {
+     "speaker": "A",
+     "text": "heb je de nieuwe template gezien die de baas heeft gestuurd?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, die is wel strak, maar de kleuren zijn wat fel"
+    },
+    {
+     "speaker": "A",
+     "text": "ik vind het oké, zeker voor de klant uit Rotterdam"
+    },
+    {
+     "speaker": "B",
+     "text": "vergeet niet de slide met de planning toe te voegen"
+    },
+    {
+     "speaker": "A",
+     "text": "zit al in de map, oké?"
+    },
+    {
+     "speaker": "B",
+     "text": "top, dan ben ik morgen om 9 uur klaar"
+    },
+    {
+     "speaker": "A",
+     "text": "ik ben al om 8 uur op kantoor, dan kunnen we nog even overleggen"
+    },
+    {
+     "speaker": "B",
+     "text": "afgesproken, neem je wel koffie mee?"
+    },
+    {
+     "speaker": "A",
+     "text": "haha altijd, ook voor jou"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-03",
+   "source": "claude-haiku",
+   "topic": "Verhuizen naar Utrecht",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hoe gaat het met het inpakken? ben je al begonnen?"
+    },
+    {
+     "speaker": "B",
+     "text": "net begonnen, ik heb nu 14 dozen en nog veel meer te gaan"
+    },
+    {
+     "speaker": "A",
+     "text": "zoveel? ik had er maar acht nodig"
+    },
+    {
+     "speaker": "B",
+     "text": "ik heb nog een hele kast met boeken en oude schoenen"
+    },
+    {
+     "speaker": "A",
+     "text": "gooi wat weg, dan wordt het makkelijker"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, ik ga morgen naar de kringloop met de rommel"
+    },
+    {
+     "speaker": "A",
+     "text": "en de verhuiswagen, heb je die al geregeld?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, via een verhuurbedrijf in Amersfoort, 95 euro per dag"
+    },
+    {
+     "speaker": "A",
+     "text": "best prijzig, maar goed als je het met vrienden doet"
+    },
+    {
+     "speaker": "B",
+     "text": "precies, Mark en Sanne helpen zaterdag met tillen"
+    },
+    {
+     "speaker": "A",
+     "text": "top, dan koop ik pizza's voor iedereen"
+    },
+    {
+     "speaker": "B",
+     "text": "dat is een goed plan, de buren vinden het vast ook fijn"
+    },
+    {
+     "speaker": "A",
+     "text": "heb je de sleutel al van de nieuwe woning?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, vrijdag om 10 uur haal ik hem op"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-04",
+   "source": "claude-haiku",
+   "topic": "Hardlopen in het park",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "zin om morgen te gaan hardlopen in het Vondelpark?"
+    },
+    {
+     "speaker": "B",
+     "text": "hoe laat?"
+    },
+    {
+     "speaker": "A",
+     "text": "half 9, dan is het nog niet zo druk"
+    },
+    {
+     "speaker": "B",
+     "text": "te vroeg voor mij joh, kan het om 10 uur?"
+    },
+    {
+     "speaker": "A",
+     "text": "10 uur is wel laat, maar prima, ik wacht bij de ingang"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, ik neem de route van 8 kilometer mee"
+    },
+    {
+     "speaker": "A",
+     "text": "dat is voor mij nog wat ver, ik doe 5"
+    },
+    {
+     "speaker": "B",
+     "text": "geen probleem, dan rennen we gewoon apart"
+    },
+    {
+     "speaker": "A",
+     "text": "lol, of we spreken af bij de vijver"
+    },
+    {
+     "speaker": "B",
+     "text": "goed idee, en daarna even een kopje koffie?"
+    },
+    {
+     "speaker": "A",
+     "text": "altijd, mits het weer niet omslaat"
+    },
+    {
+     "speaker": "B",
+     "text": "de app zegt 14 graden en droog, dus het gaat goed"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-05",
+   "source": "claude-haiku",
+   "topic": "Stamppot voor vrijdag",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "wat eten we vrijdag? ik wil stamppot maken"
+    },
+    {
+     "speaker": "B",
+     "text": "lekker! boerenkool of hutspot?"
+    },
+    {
+     "speaker": "A",
+     "text": "boerenkool, want ik heb nog rookworst in de vriezer"
+    },
+    {
+     "speaker": "B",
+     "text": "perfect, dan koop ik de aardappelen en de andijvie"
+    },
+    {
+     "speaker": "A",
+     "text": "andijvie kan ook, maar die is nu erg duur"
+    },
+    {
+     "speaker": "B",
+     "text": "wat kost die dan, 3 euro per kilo?"
+    },
+    {
+     "speaker": "A",
+     "text": "bijna, dus we nemen gewoon de boerenkool van de markt"
+    },
+    {
+     "speaker": "B",
+     "text": "ik vergeet altijd de mosterd, ga ik weer doen"
+    },
+    {
+     "speaker": "A",
+     "text": "en de appelstroop ook, voor de kinderen"
+    },
+    {
+     "speaker": "B",
+     "text": "haha die slaan ook alles weg"
+    },
+    {
+     "speaker": "A",
+     "text": "dan koop ik ook een pot honing voor erbij"
+    },
+    {
+     "speaker": "B",
+     "text": "ik zorg voor de wijn, een rode van de Albert Heijn"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-06",
+   "source": "claude-haiku",
+   "topic": "Nieuwe laptop",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ik heb een nieuwe laptop gekocht, maar hij is al traag"
+    },
+    {
+     "speaker": "B",
+     "text": "wat voor merk? en hoeveel geheugen heeft hij?"
+    },
+    {
+     "speaker": "A",
+     "text": "acht gigabyte, het is een bekend merk maar wel goedkoop"
+    },
+    {
+     "speaker": "B",
+     "text": "dat is weinig, zeker als je veel tabjes open hebt"
+    },
+    {
+     "speaker": "A",
+     "text": "ik heb ook Chrome staan, dat vreet alles op"
+    },
+    {
+     "speaker": "B",
+     "text": "probeer eens een ander programma of zet Chrome uit de start-up"
+    },
+    {
+     "speaker": "A",
+     "text": "ik heb al een hoop programma's verwijderd, maar het helpt niet echt"
+    },
+    {
+     "speaker": "B",
+     "text": "heb je al een update gedaan? soms is dat de oplossing"
+    },
+    {
+     "speaker": "A",
+     "text": "nog niet, ik doe het vanavond"
+    },
+    {
+     "speaker": "B",
+     "text": "zet de harde schijf ook eens na, er staat vast veel rommel op"
+    },
+    {
+     "speaker": "A",
+     "text": "dankjewel, ik laat het weten als het gelukt is"
+    },
+    {
+     "speaker": "B",
+     "text": "lukt het niet, breng hem gewoon even langs bij de winkel"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-07",
+   "source": "claude-haiku",
+   "topic": "Citytrip naar Gent",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "zullen we volgend weekend naar Gent? het weer wordt top"
+    },
+    {
+     "speaker": "B",
+     "text": "ja leuk! trein of auto?"
+    },
+    {
+     "speaker": "A",
+     "text": "trein, want parkeren in het centrum kost een fortuin"
+    },
+    {
+     "speaker": "B",
+     "text": "klopt, en de trein vanaf Utrecht is rond de 25 euro retour"
+    },
+    {
+     "speaker": "A",
+     "text": "we kunnen een hostel boeken aan de Korenlei"
+    },
+    {
+     "speaker": "B",
+     "text": "ik ben daar al eens geweest, het is er druk in het weekend"
+    },
+    {
+     "speaker": "A",
+     "text": "dan maar een hotel aan de rand van de stad"
+    },
+    {
+     "speaker": "B",
+     "text": "prima, dan fietsen we naar het centrum toe"
+    },
+    {
+     "speaker": "A",
+     "text": "wil je de Gravensteen zien? of liever de Graslei?"
+    },
+    {
+     "speaker": "B",
+     "text": "beide! en daarna gaan we naar de mosselbar"
+    },
+    {
+     "speaker": "A",
+     "text": "haha, jij en je mosselen, goed plan"
+    },
+    {
+     "speaker": "B",
+     "text": "je kent me goed joh, ik vind die dingen gewoon lekker"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-08",
+   "source": "claude-haiku",
+   "topic": "Verjaardag van oma",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "oma wordt volgende week 85, weet jij wat we haar geven?"
+    },
+    {
+     "speaker": "B",
+     "text": "ik dacht aan een fotoboek met oude foto's van opa"
+    },
+    {
+     "speaker": "A",
+     "text": "mooi idee, maar dat kost best veel tijd om te maken"
+    },
+    {
+     "speaker": "B",
+     "text": "dat klopt, ik heb al een paar foto's gescand"
+    },
+    {
+     "speaker": "A",
+     "text": "zal ik de taart regelen? bij de bakker in de straat"
+    },
+    {
+     "speaker": "B",
+     "text": "doe maar, en neem gerust een appeltaart, die lust ze graag"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, en wie komt er allemaal? tante Ria ook?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, die komt met haar nieuwe vriend uit Arnhem"
+    },
+    {
+     "speaker": "A",
+     "text": "wat leuk, dan wordt het een drukke middag"
+    },
+    {
+     "speaker": "B",
+     "text": "gelukkig is de tuin groot, dan kunnen de kinderen buiten spelen"
+    },
+    {
+     "speaker": "A",
+     "text": "zal ik de stoelen regelen bij de buurman?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja graag, die heeft er genoeg, dankjewel"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-09",
+   "source": "claude-haiku",
+   "topic": "Serie van gisteravond",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "heb jij de nieuwe aflevering van die Nederlandse serie al gezien?"
+    },
+    {
+     "speaker": "B",
+     "text": "gisteravond! het einde was zo spannend, ik kon niet slapen"
+    },
+    {
+     "speaker": "A",
+     "text": "ik kijk nog maar aflevering drie, ik heb geen zin in spoilers"
+    },
+    {
+     "speaker": "B",
+     "text": "oké, ik zeg niks. maar je moet echt doorkijken"
+    },
+    {
+     "speaker": "A",
+     "text": "dat zal ik doen. wie is eigenlijk de moordenaar in jouw ogen?"
+    },
+    {
+     "speaker": "B",
+     "text": "haha ik zeg het niet! wel dat de vader het niet was"
+    },
+    {
+     "speaker": "A",
+     "text": "dat denk ik ook, maar hij lijkt zo verdacht"
+    },
+    {
+     "speaker": "B",
+     "text": "precies, dat is de truc van de makers"
+    },
+    {
+     "speaker": "A",
+     "text": "zullen we volgende week samen kijken bij jou?"
+    },
+    {
+     "speaker": "B",
+     "text": "prima, dan maak ik popcorn met zout en karamel"
+    },
+    {
+     "speaker": "A",
+     "text": "lekker, ik breng de cola mee"
+    },
+    {
+     "speaker": "B",
+     "text": "afgesproken, en niet vroegtijdig gaan slapen hoor"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-10",
+   "source": "claude-haiku",
+   "topic": "Boodschappen bij Albert Heijn",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "moet ik nog iets meenemen van de Albert Heijn?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, melk, eieren en een pak koffie graag"
+    },
+    {
+     "speaker": "A",
+     "text": "en hoeveel eieren? er zijn er nog zes in de koelkast"
+    },
+    {
+     "speaker": "B",
+     "text": "neem er een tray van twaalf, we bakken dit weekend"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, en brood? het volkorenbrood is weer in de aanbieding"
+    },
+    {
+     "speaker": "B",
+     "text": "dat is top, pak er twee"
+    },
+    {
+     "speaker": "A",
+     "text": "ik zie ook kaas van 3 euro, dat is de goedkope variant"
+    },
+    {
+     "speaker": "B",
+     "text": "neem gerust, mits het niet te oud is"
+    },
+    {
+     "speaker": "A",
+     "text": "de uiterste houdbaarheid is nog een week, dus prima"
+    },
+    {
+     "speaker": "B",
+     "text": "dank je wel! ik maak je het geld straks over"
+    },
+    {
+     "speaker": "A",
+     "text": "geen haast, we rekenen het wel af in het weekend"
+    },
+    {
+     "speaker": "B",
+     "text": "afgesproken, tot zo!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-11",
+   "source": "claude-haiku",
+   "topic": "Afspraak bij de huisarts",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hoi, ik moet morgen naar de huisarts, zal ik je meenemen?"
+    },
+    {
+     "speaker": "B",
+     "text": "nee joh, het is maar een controle van mijn bloeddruk"
+    },
+    {
+     "speaker": "A",
+     "text": "oké, maar moet je nuchter komen?"
+    },
+    {
+     "speaker": "B",
+     "text": "dat weet ik niet, ik bel het even na"
+    },
+    {
+     "speaker": "A",
+     "text": "belangrijk, dan krijg je geen gedoe met het bloedprikken"
+    },
+    {
+     "speaker": "B",
+     "text": "het is ook al bijna 10 uur, zal ik het nu checken?"
+    },
+    {
+     "speaker": "A",
+     "text": "doe maar, ik wacht hier even"
+    },
+    {
+     "speaker": "B",
+     "text": "ze zeggen dat ik niks hoef te eten, alleen water"
+    },
+    {
+     "speaker": "A",
+     "text": "dan koop ik vanavond een broodje voor na afloop"
+    },
+    {
+     "speaker": "B",
+     "text": "lief, maar ik denk dat ik gewoon thuis ontbijt"
+    },
+    {
+     "speaker": "A",
+     "text": "prima, laat even weten hoe het gegaan is"
+    },
+    {
+     "speaker": "B",
+     "text": "tuurlijk, ik app je vanmiddag"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-12",
+   "source": "claude-haiku",
+   "topic": "Speelavond met vrienden",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "vrijdag speelavond bij mij? we hebben nog een nieuw bordspel"
+    },
+    {
+     "speaker": "B",
+     "text": "welk spel is het?"
+    },
+    {
+     "speaker": "A",
+     "text": "Catan, maar dan met de uitbreiding voor zeevaarders"
+    },
+    {
+     "speaker": "B",
+     "text": "ik kan er niks van, maar ik leer het wel"
+    },
+    {
+     "speaker": "A",
+     "text": "geen probleem, ik leg het uit voor we beginnen"
+    },
+    {
+     "speaker": "B",
+     "text": "Sven komt ook, hij wint altijd met die nederzettingen"
+    },
+    {
+     "speaker": "A",
+     "text": "haha dan moeten we hem op een plank zetten"
+    },
+    {
+     "speaker": "B",
+     "text": "tip: ik neem chips mee en een zak drop"
+    },
+    {
+     "speaker": "A",
+     "text": "dat is de perfecte combinatie, dank je"
+    },
+    {
+     "speaker": "B",
+     "text": "hoe laat beginnen we eigenlijk?"
+    },
+    {
+     "speaker": "A",
+     "text": "om 20:00, dan hebben we nog tijd voor het eten"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, ik ben er om acht uur, belooft"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-13",
+   "source": "claude-haiku",
+   "topic": "Tentamen statistiek",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "heb je de stof van hoofdstuk 7 al doorgenomen?"
+    },
+    {
+     "speaker": "B",
+     "text": "nog niet helemaal, de regressie snap ik niet goed"
+    },
+    {
+     "speaker": "A",
+     "text": "ik heb een goede samenvatting, stuur ik je straks"
+    },
+    {
+     "speaker": "B",
+     "text": "dank je! hoe is het tentamen eigenlijk, moeilijk?"
+    },
+    {
+     "speaker": "A",
+     "text": "vorig jaar vielen er veel studenten af op de meervoudige regressie"
+    },
+    {
+     "speaker": "B",
+     "text": "stom, ik ben bang dat ik dat ook vergeet"
+    },
+    {
+     "speaker": "A",
+     "text": "oefen de voorbeelden van de vorige keer, dan komt het goed"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, morgen in de bibliotheek? dan oefenen we samen"
+    },
+    {
+     "speaker": "A",
+     "text": "prima, maar pas om 14 uur, ik heb een werkcollege"
+    },
+    {
+     "speaker": "B",
+     "text": "geen probleem, ik neem de oude tentamens mee"
+    },
+    {
+     "speaker": "A",
+     "text": "top, zorg ook voor koffie, die van de bieb is verschrikkelijk"
+    },
+    {
+     "speaker": "B",
+     "text": "haha afgesproken, mijn eigen thermoskan is klaar"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-14",
+   "source": "claude-haiku",
+   "topic": "Regen en storm",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "wat een storm vannacht, heb je geslapen?"
+    },
+    {
+     "speaker": "B",
+     "text": "nauwelijks, de wind was zo hard dat de deur bleef klappen"
+    },
+    {
+     "speaker": "A",
+     "text": "bij mij waaide de tuinstoel zo de straat op"
+    },
+    {
+     "speaker": "B",
+     "text": "gelukkig niemand gewond, en het is nu wel droog"
+    },
+    {
+     "speaker": "A",
+     "text": "de treinen rijden niet, dus ik moet de fiets pakken"
+    },
+    {
+     "speaker": "B",
+     "text": "in deze wind? veel succes, straks ben je helemaal nat"
+    },
+    {
+     "speaker": "A",
+     "text": "ik heb een regenjas, dus het valt wel mee"
+    },
+    {
+     "speaker": "B",
+     "text": "ik zit thuis, de kantoren zijn toch dicht vandaag"
+    },
+    {
+     "speaker": "A",
+     "text": "geluksvogel, ik moet nog naar de klant in Haarlem"
+    },
+    {
+     "speaker": "B",
+     "text": "neem dan onderweg een warme chocolademelk bij de tankstation"
+    },
+    {
+     "speaker": "A",
+     "text": "haha altijd een plan, en jij blijft lekker binnen"
+    },
+    {
+     "speaker": "B",
+     "text": "tuurlijk, ik heb een film klaar liggen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-15",
+   "source": "claude-haiku",
+   "topic": "NS vertraging",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "de trein van 17:12 heeft 20 minuten vertraging, weet jij meer?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, er is een storing bij Amersfoort, het staat op de app"
+    },
+    {
+     "speaker": "A",
+     "text": "maar ik sta nu al 15 minuten op het perron, ergens in de kou"
+    },
+    {
+     "speaker": "B",
+     "text": "je kunt misschien de bus pakken, die gaat via het centrum"
+    },
+    {
+     "speaker": "A",
+     "text": "klopt, maar die is ook vol en rijdt maar eens per uur"
+    },
+    {
+     "speaker": "B",
+     "text": "dan wachten we dus gewoon hier, sorry joh"
+    },
+    {
+     "speaker": "A",
+     "text": "geeft niet, ik kreeg net een bericht dat de NS een deel van de kosten vergoedt"
+    },
+    {
+     "speaker": "B",
+     "text": "echt? misschien moet ik ook even checken"
+    },
+    {
+     "speaker": "A",
+     "text": "je kunt het via de app aanvragen, bij 30 minuten vertraging"
+    },
+    {
+     "speaker": "B",
+     "text": "ik heb het gisteren ook gedaan, het duurde alleen wel een week"
+    },
+    {
+     "speaker": "A",
+     "text": "ach, het is toch 1,80 euro extra? geen ramp"
+    },
+    {
+     "speaker": "B",
+     "text": "ja zeg, ik heb het niet over het geld, het gaat om het principe"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-16",
+   "source": "claude-haiku",
+   "topic": "Sollicitatiegesprek",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hoe ging het gesprek bij die bank? je was er zenuwachtig voor"
+    },
+    {
+     "speaker": "B",
+     "text": "best wel, ze vroegen waarom ik na vijf jaar wil veranderen"
+    },
+    {
+     "speaker": "A",
+     "text": "en wat heb je geantwoord?"
+    },
+    {
+     "speaker": "B",
+     "text": "dat ik meer verantwoordelijkheid wil en graag met klanten werk"
+    },
+    {
+     "speaker": "A",
+     "text": "goed antwoord! hebben ze al iets gezegd over het salaris?"
+    },
+    {
+     "speaker": "B",
+     "text": "nee, ze bellen volgende week donderdag tussen 10:00 en 12:00"
+    },
+    {
+     "speaker": "A",
+     "text": "spannend hoor, ik duim voor je"
+    },
+    {
+     "speaker": "B",
+     "text": "dank je! ik heb ook een praktijkopdracht gekregen, twee uur werk"
+    },
+    {
+     "speaker": "A",
+     "text": "oei, dat klinkt pittig. heb je tijd om te oefenen?"
+    },
+    {
+     "speaker": "B",
+     "text": "vanavond nog even, anders wordt het niks haha"
+    },
+    {
+     "speaker": "A",
+     "text": "succes, je redt het vast"
+    },
+    {
+     "speaker": "B",
+     "text": "hoop het, ik ben al bang voor het wachten op dat telefoontje"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-17",
+   "source": "claude-haiku",
+   "topic": "Tweedehands fiets",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ik heb een tweedehands fiets gezien op Marktplaats, 150 euro"
+    },
+    {
+     "speaker": "B",
+     "text": "wat voor merk? let op de remmen en het frame!"
+    },
+    {
+     "speaker": "A",
+     "text": "een Batavus uit 2014, ziet er redelijk uit, alleen de bel is kapot"
+    },
+    {
+     "speaker": "B",
+     "text": "vraag ook of hij het slot en de sleutels erbij heeft"
+    },
+    {
+     "speaker": "A",
+     "text": "doe ik, en of de fiets gewoon op naam staat"
+    },
+    {
+     "speaker": "B",
+     "text": "haha dat moet je zelf nagaan, maar het slot is belangrijk"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, ik ga morgen kijken om 17:30 bij het station in Delft"
+    },
+    {
+     "speaker": "B",
+     "text": "neem iemand mee, dan sta je sterker"
+    },
+    {
+     "speaker": "A",
+     "text": "goed idee, mijn broer komt mee"
+    },
+    {
+     "speaker": "B",
+     "text": "en betaal niet vooraf, altijd pas bij het ophalen"
+    },
+    {
+     "speaker": "A",
+     "text": "afgesproken, ik laat je weten hoe het ging"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-18",
+   "source": "claude-haiku",
+   "topic": "Kat van de buren",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "de kat van de buren is weer op ons balkon geweest!"
+    },
+    {
+     "speaker": "B",
+     "text": "haha Mies zeker? die loopt overal rond"
+    },
+    {
+     "speaker": "A",
+     "text": "ze heeft mijn basilicum omgegooid, de aarde ligt overal"
+    },
+    {
+     "speaker": "B",
+     "text": "sorry joh, ik zal het bij de buren aankaarten"
+    },
+    {
+     "speaker": "A",
+     "text": "geen ramp, maar kun je de balkondeur dicht houden?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, ik laat hem vanavond wel binnen als hij komt"
+    },
+    {
+     "speaker": "A",
+     "text": "hij miauwt nu al twintig minuten onder het raam"
+    },
+    {
+     "speaker": "B",
+     "text": "dan heeft hij honger, ik heb nog wat kattenbrokjes"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, dan geef ik hem een schaaltje, anders blijft hij hangen"
+    },
+    {
+     "speaker": "B",
+     "text": "prima, dan komt hij tenminste niet meer op jouw balkon"
+    },
+    {
+     "speaker": "A",
+     "text": "hopelijk maakt hij zich morgen weer uit de voeten"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-19",
+   "source": "claude-haiku",
+   "topic": "Kapotte auto",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mijn auto doet raar bij het starten, hij klikt alleen maar"
+    },
+    {
+     "speaker": "B",
+     "text": "klinkt naar de accu, heb je hem al laten checken?"
+    },
+    {
+     "speaker": "A",
+     "text": "nee, morgen om 8 uur heb ik een afspraak bij de garage"
+    },
+    {
+     "speaker": "B",
+     "text": "kost zo'n accu niet al snel 180 euro?"
+    },
+    {
+     "speaker": "A",
+     "text": "wel ja, het is een Golf uit 2011 dus hij is oud"
+    },
+    {
+     "speaker": "B",
+     "text": "kijk of de klemmen niet los zitten, dat gebeurt vaak"
+    },
+    {
+     "speaker": "A",
+     "text": "goed idee, ik ga het zo even bekijken met een zaklamp"
+    },
+    {
+     "speaker": "B",
+     "text": "anders kan ik je met startkabels helpen"
+    },
+    {
+     "speaker": "A",
+     "text": "top, zet je de auto dan wel aan de kant?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, rond half zes ben ik bij je"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-20",
+   "source": "claude-haiku",
+   "topic": "Concertkaartjes",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "de kaartverkoop voor Fluffy Nachtdieren begint om 10:00!"
+    },
+    {
+     "speaker": "B",
+     "text": "wat, ik was het helemaal vergeten, ben je al in de rij?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, ik sta er sinds 9:45 en het loopt snel op"
+    },
+    {
+     "speaker": "B",
+     "text": "zoveel mensen? wat kosten de kaartjes?"
+    },
+    {
+     "speaker": "A",
+     "text": "49 euro per stuk, en er zijn nog maar zes staanplaatsen"
+    },
+    {
+     "speaker": "B",
+     "text": "pak er twee, dan zijn we er allebei bij!"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, maar het systeem hangt al"
+    },
+    {
+     "speaker": "B",
+     "text": "ververs de pagina, anders verlies je je plek"
+    },
+    {
+     "speaker": "A",
+     "text": "ik heb het!! vak B, rij 4, geen staanplaats"
+    },
+    {
+     "speaker": "B",
+     "text": "eindelijk! stuur even het bedrag, dan betaal ik je direct"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-21",
+   "source": "claude-haiku",
+   "topic": "Tandarts",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "morgen moet ik naar de tandarts voor een gaatje"
+    },
+    {
+     "speaker": "B",
+     "text": "oei, hoe laat is je afspraak?"
+    },
+    {
+     "speaker": "A",
+     "text": "14:15, maar ik ben zo bang voor de boor"
+    },
+    {
+     "speaker": "B",
+     "text": "vraag of ze verdoving geven, dat helpt echt"
+    },
+    {
+     "speaker": "A",
+     "text": "ze hebben lachgas aangeboden, dat neem ik wel"
+    },
+    {
+     "speaker": "B",
+     "text": "lachgas is best relaxed, ik heb het een keer gehad"
+    },
+    {
+     "speaker": "A",
+     "text": "haha ik hoop dat het niet te erg is"
+    },
+    {
+     "speaker": "B",
+     "text": "daarna even een ijsje halen als beloning?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, dat is mijn plan, bij de Italiaan om de hoek"
+    },
+    {
+     "speaker": "B",
+     "text": "geen zoete dingen meer hè, anders heb je straks weer een gaatje"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-22",
+   "source": "claude-haiku",
+   "topic": "Tuin en tomaten",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mijn tomaten groeien als gek, maar de blaadjes worden geel"
+    },
+    {
+     "speaker": "B",
+     "text": "geef je ze te veel water? dat geeft vaak rot"
+    },
+    {
+     "speaker": "A",
+     "text": "ik geef elke dag water, misschien wel te veel"
+    },
+    {
+     "speaker": "B",
+     "text": "probeer het om de dag, en alleen aan de voet van de plant"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, en de paprika's heb ik in de zon gezet"
+    },
+    {
+     "speaker": "B",
+     "text": "paprika's houden van warmte, dat is goed"
+    },
+    {
+     "speaker": "A",
+     "text": "ik ga zaterdag nieuwe potgrond halen bij de tuinwinkel"
+    },
+    {
+     "speaker": "B",
+     "text": "neem ook een compostmix mee, dat helpt echt"
+    },
+    {
+     "speaker": "A",
+     "text": "dan kan ik na de oogst weer lekkere tomatensaus maken"
+    },
+    {
+     "speaker": "B",
+     "text": "jij met je tomatensaus, ik wil eerst mijn bietjes proeven!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-23",
+   "source": "claude-haiku",
+   "topic": "Vlucht geannuleerd",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "de vlucht naar Lissabon is geannuleerd, heb je het gezien?"
+    },
+    {
+     "speaker": "B",
+     "text": "nee! wanneer? ik vertrek al donderdag"
+    },
+    {
+     "speaker": "A",
+     "text": "de mail kwam om 6 uur vanochtend, nu zoek ik een andere vlucht"
+    },
+    {
+     "speaker": "B",
+     "text": "oef, krijg je een vergoeding?"
+    },
+    {
+     "speaker": "A",
+     "text": "ze zeggen 250 euro als het binnen 14 dagen gebeurt"
+    },
+    {
+     "speaker": "B",
+     "text": "check de voorwaarden even, anders wordt het gedoe"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, ik heb het formulier al ingevuld op de website"
+    },
+    {
+     "speaker": "B",
+     "text": "lekker snel, en wat met het hotel?"
+    },
+    {
+     "speaker": "A",
+     "text": "die boeking was flexibel, dus dat is gelukkig geregeld"
+    },
+    {
+     "speaker": "B",
+     "text": "mooi, hopelijk vliegen we morgen wel!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-24",
+   "source": "claude-haiku",
+   "topic": "Ouderavond op school",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "heb je de uitnodiging voor de ouderavond gezien?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, dinsdag om 19:30, maar ik kan niet tot 20:00 blijven"
+    },
+    {
+     "speaker": "A",
+     "text": "wij gaan wel, Lotte heeft volgende week een toets"
+    },
+    {
+     "speaker": "B",
+     "text": "welk vak is het?"
+    },
+    {
+     "speaker": "A",
+     "text": "Frans, daar is ze niet zo goed in en dat stresst haar"
+    },
+    {
+     "speaker": "B",
+     "text": "jammer, ik vind het altijd lastig om de juf te bereiken"
+    },
+    {
+     "speaker": "A",
+     "text": "via het ouderportaal kun je mailen, dat werkt wel goed"
+    },
+    {
+     "speaker": "B",
+     "text": "goed idee, dan stuur ik morgen even een berichtje"
+    },
+    {
+     "speaker": "A",
+     "text": "en neem je de laatste rapportage mee?"
+    },
+    {
+     "speaker": "B",
+     "text": "ja, die ligt al op de keukentafel, dank je!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-25",
+   "source": "claude-haiku",
+   "topic": "Pakket kwijt",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mijn bestelling van Zalando is nog steeds niet binnen"
+    },
+    {
+     "speaker": "B",
+     "text": "wanneer zou die komen? dat is toch al drie dagen geleden?"
+    },
+    {
+     "speaker": "A",
+     "text": "de track and trace zegt afgeleverd, maar ik vind niks"
+    },
+    {
+     "speaker": "B",
+     "text": "misschien bij de buren? heb je al gevraagd?"
+    },
+    {
+     "speaker": "A",
+     "text": "ik ben er geweest, niemand weet ervan"
+    },
+    {
+     "speaker": "B",
+     "text": "bel de vervoerder even, dat gaat meestal sneller"
+    },
+    {
+     "speaker": "A",
+     "text": "wacht, ik zie nu dat het pakket in Almere bij het ophaalpunt ligt"
+    },
+    {
+     "speaker": "B",
+     "text": "haha dus het is nog onderweg, ik ben benieuwd naar je nieuwe jas"
+    },
+    {
+     "speaker": "A",
+     "text": "ach, ik was er zelf ook nog niet helemaal bij"
+    },
+    {
+     "speaker": "B",
+     "text": "laat het weten als hij er is!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-26",
+   "source": "claude-haiku",
+   "topic": "Trouwfeest plannen",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "we hebben de datum voor de bruiloft vastgezet: 14 juni"
+    },
+    {
+     "speaker": "B",
+     "text": "wat leuk!! waar gaan jullie trouwen?"
+    },
+    {
+     "speaker": "A",
+     "text": "in het kasteel bij Doorn, de locatie is echt prachtig"
+    },
+    {
+     "speaker": "B",
+     "text": "hoeveel gasten verwachten jullie?"
+    },
+    {
+     "speaker": "A",
+     "text": "rond de 80, dat wordt wel een flinke klus"
+    },
+    {
+     "speaker": "B",
+     "text": "wie doet de catering? de Italiaan vonden wij altijd lekker"
+    },
+    {
+     "speaker": "A",
+     "text": "de eerste offerte is 65 euro per persoon"
+    },
+    {
+     "speaker": "B",
+     "text": "dat is best veel, maar wel de moeite waard denk ik"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, we bekijken het nog even met de familie"
+    },
+    {
+     "speaker": "B",
+     "text": "stuur maar door, ik help wel met de uitnodigingen"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-27",
+   "source": "claude-haiku",
+   "topic": "Vakantiefoto's sorteren",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "ik ben eindelijk begonnen met het sorteren van de vakantiefoto's"
+    },
+    {
+     "speaker": "B",
+     "text": "hoeveel zijn het er?"
+    },
+    {
+     "speaker": "A",
+     "text": "meer dan 4000, het is een chaos op mijn harde schijf"
+    },
+    {
+     "speaker": "B",
+     "text": "ik heb een programma gezien dat dubbele foto's zoekt"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, dat is handig, anders ben je er eeuwig mee bezig"
+    },
+    {
+     "speaker": "B",
+     "text": "heb je al mappen per jaar gemaakt?"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, en nu zet ik ze ook in de cloud als backup"
+    },
+    {
+     "speaker": "B",
+     "text": "goed idee, dan verlies je ze niet bij een crash"
+    },
+    {
+     "speaker": "A",
+     "text": "en die foto van ons op de Veluwe vond ik echt mooi!"
+    },
+    {
+     "speaker": "B",
+     "text": "stuur me die eens, die wil ik ook"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-28",
+   "source": "claude-haiku",
+   "topic": "Lawaaiige buren",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "de buren boren weer in het weekend om 9 uur, echt irritant"
+    },
+    {
+     "speaker": "B",
+     "text": "oei, heb je ze al aangesproken?"
+    },
+    {
+     "speaker": "A",
+     "text": "nog niet, ik wacht even op een rustig moment"
+    },
+    {
+     "speaker": "B",
+     "text": "geef ze gewoon een briefje, dat werkt vaak"
+    },
+    {
+     "speaker": "A",
+     "text": "goed idee, maar ik wil het niet te heftig maken"
+    },
+    {
+     "speaker": "B",
+     "text": "een vriendelijk briefje is altijd beter dan boos worden"
+    },
+    {
+     "speaker": "A",
+     "text": "ok, ik schrijf het morgen, nu ga ik slapen"
+    },
+    {
+     "speaker": "B",
+     "text": "succes! en als het niet helpt, weet ik ook niet meer hoe"
+    },
+    {
+     "speaker": "A",
+     "text": "haha dank, misschien gooi ik er even een oordop bij"
+    },
+    {
+     "speaker": "B",
+     "text": "succes ermee, en laat maar horen of het werkt!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-29",
+   "source": "claude-haiku",
+   "topic": "Yogales",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "heb jij zin om vrijdag met me naar yoga te gaan?"
+    },
+    {
+     "speaker": "B",
+     "text": "wat voor yoga? ik ben totaal niet lenig"
+    },
+    {
+     "speaker": "A",
+     "text": "Hatha yoga, rustig tempo, het is voor beginners"
+    },
+    {
+     "speaker": "B",
+     "text": "hoe laat begint het en hoelang duurt het?"
+    },
+    {
+     "speaker": "A",
+     "text": "18:30 tot 19:30, in de studio naast de bakker"
+    },
+    {
+     "speaker": "B",
+     "text": "ok, ik kom, al is het alleen om te zien hoe jij je tenen aanraakt haha"
+    },
+    {
+     "speaker": "A",
+     "text": "lol, dat wordt vast een ramp"
+    },
+    {
+     "speaker": "B",
+     "text": "neem een mat mee, die hebben ze niet altijd"
+    },
+    {
+     "speaker": "A",
+     "text": "goed idee, ik heb er nog een in de kast liggen"
+    },
+    {
+     "speaker": "B",
+     "text": "dan zie ik je vrijdag, misschien na afloop nog een thee?"
+    }
+   ]
+  },
+  {
+   "id": "haiku-nl-30",
+   "source": "claude-haiku",
+   "topic": "Jeugdvoetbal",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "mijn zoon wil volgend jaar bij de voetbalclub, wat denk jij?"
+    },
+    {
+     "speaker": "B",
+     "text": "leuk! hoe oud is hij ook alweer?"
+    },
+    {
+     "speaker": "A",
+     "text": "acht, dus hij mag net mee in de F-jeugd"
+    },
+    {
+     "speaker": "B",
+     "text": "is er een proefles? dan kan hij het zelf ervaren"
+    },
+    {
+     "speaker": "A",
+     "text": "ja, woensdag van 17:00 tot 18:00 op het sportpark"
+    },
+    {
+     "speaker": "B",
+     "text": "neem dan scheenbeschermers en een gymtas mee"
+    },
+    {
+     "speaker": "A",
+     "text": "zeker, hij heeft nog schoenen van vorig jaar"
+    },
+    {
+     "speaker": "B",
+     "text": "let op het vervoer, het sportpark ligt een eind weg"
+    },
+    {
+     "speaker": "A",
+     "text": "ik rijd hem wel, of hij gaat met de fiets als het droog is"
+    },
+    {
+     "speaker": "B",
+     "text": "prima, laat weten hoe de proefles ging!"
+    }
+   ]
+  }
+ ]
+}

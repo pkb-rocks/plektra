@@ -1,0 +1,4180 @@
+{
+ "chats": [
+  {
+   "id": "haiku-en-01",
+   "source": "claude-haiku",
+   "topic": "After-work plans",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "hey r u free after work today?"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah till 6, then im done. whats up"
+    },
+    {
+     "speaker": "A",
+     "text": "wanna grab a drink at the pub near the station? just wanna talk tbh"
+    },
+    {
+     "speaker": "B",
+     "text": "sure but i gotta be home by 8, my roommate is cooking"
+    },
+    {
+     "speaker": "A",
+     "text": "ok so like 6:30 then? we can do 1 drink"
+    },
+    {
+     "speaker": "B",
+     "text": "ye fine. ill walk over from the office"
+    },
+    {
+     "speaker": "A",
+     "text": "cool. brb getting coffee rn lol"
+    },
+    {
+     "speaker": "B",
+     "text": "dont drink 3 coffees again, ur gonna explode"
+    },
+    {
+     "speaker": "A",
+     "text": "haha too late already"
+    },
+    {
+     "speaker": "B",
+     "text": "ok see u there at 6:30!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-02",
+   "source": "claude-haiku",
+   "topic": "Picking up the kids",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "can u pick up the kids from school tomorrow? i got stuck in a meeting"
+    },
+    {
+     "speaker": "B",
+     "text": "hmm what time"
+    },
+    {
+     "speaker": "A",
+     "text": "3:15 at the gate. they both have football after so no rush"
+    },
+    {
+     "speaker": "B",
+     "text": "idk if i can make it, my car is at the garage till noon"
+    },
+    {
+     "speaker": "A",
+     "text": "ugh ok. i'll ask my mom"
+    },
+    {
+     "speaker": "B",
+     "text": "or i can bike there, its only 15 min"
+    },
+    {
+     "speaker": "A",
+     "text": "ur a legend. ngl i was panicking"
+    },
+    {
+     "speaker": "B",
+     "text": "lol no stress. text me if ur mom cant"
+    },
+    {
+     "speaker": "A",
+     "text": "she probably can. also lily needs new shin guards"
+    },
+    {
+     "speaker": "B",
+     "text": "ok add it to the list, size medium?"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah i think so, check the box in the hall"
+    },
+    {
+     "speaker": "B",
+     "text": "found it, looks like a medium, thanks!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-03",
+   "source": "claude-haiku",
+   "topic": "Flatshare cleaning rota",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "whose turn is it to clean the bathroom??"
+    },
+    {
+     "speaker": "B",
+     "text": "i thought it was marcos?"
+    },
+    {
+     "speaker": "A",
+     "text": "marco says it was u last week"
+    },
+    {
+     "speaker": "B",
+     "text": "lol he's making things up again. i did it two weeks ago"
+    },
+    {
+     "speaker": "A",
+     "text": "well it's disgusting now, someone needs to do it"
+    },
+    {
+     "speaker": "B",
+     "text": "ok ok, we need a cleaning rota anyway. can we make one sunday?"
+    },
+    {
+     "speaker": "A",
+     "text": "yes but no same tasks for the same people every time pls"
+    },
+    {
+     "speaker": "B",
+     "text": "agreed. rotate the bins, the bathroom and the kitchen"
+    },
+    {
+     "speaker": "A",
+     "text": "and the fridge. someone please clean the fridge!!"
+    },
+    {
+     "speaker": "B",
+     "text": "ha yes. ill make a sheet and put it in the group chat tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "perfect. also who ate my yoghurt"
+    },
+    {
+     "speaker": "B",
+     "text": "not me!! ask marco"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-04",
+   "source": "claude-haiku",
+   "topic": "Concert presale",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did u get tickets for the show in august??"
+    },
+    {
+     "speaker": "B",
+     "text": "not yet, presale starts thursday at 10 right?"
+    },
+    {
+     "speaker": "A",
+     "text": "yes but i read they sell out in minutes"
+    },
+    {
+     "speaker": "B",
+     "text": "ugh. so i need to be on the site at 9:55"
+    },
+    {
+     "speaker": "A",
+     "text": "ill be ready, lets go for 2 tickets in block c"
+    },
+    {
+     "speaker": "B",
+     "text": "c is fine but not too far back pls"
+    },
+    {
+     "speaker": "A",
+     "text": "row 10 maybe? thats what i saw on the seating plan"
+    },
+    {
+     "speaker": "B",
+     "text": "row 10 is good. how much are they roughly"
+    },
+    {
+     "speaker": "A",
+     "text": "around 45 bucks each i think, plus fees"
+    },
+    {
+     "speaker": "B",
+     "text": "ok thats fine. my card details are saved so it should be quick"
+    },
+    {
+     "speaker": "A",
+     "text": "good. lets not refresh the page 500 times lol"
+    },
+    {
+     "speaker": "B",
+     "text": "no promises haha"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-05",
+   "source": "claude-haiku",
+   "topic": "Flat bike tire",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "my bike got another flat tire, the back one again"
+    },
+    {
+     "speaker": "B",
+     "text": "ugh. do u have a patch kit?"
+    },
+    {
+     "speaker": "A",
+     "text": "think its in my bag somewhere. where r u"
+    },
+    {
+     "speaker": "B",
+     "text": "at the uni bike rack, near the canteen"
+    },
+    {
+     "speaker": "A",
+     "text": "ok ill come over, i dont have a spare tube tho"
+    },
+    {
+     "speaker": "B",
+     "text": "then we gotta buy one, the bike shop on 5th st is open till 7"
+    },
+    {
+     "speaker": "A",
+     "text": "ok lets go now before they close"
+    },
+    {
+     "speaker": "B",
+     "text": "also the seat is loose again btw"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah i noticed. i think its the bolt under the seat"
+    },
+    {
+     "speaker": "B",
+     "text": "we can fix it at home after dinner, i have an allen key"
+    },
+    {
+     "speaker": "A",
+     "text": "ok but u owe me a pizza for this"
+    },
+    {
+     "speaker": "B",
+     "text": "deal. pepperoni?"
+    },
+    {
+     "speaker": "A",
+     "text": "obviously, pepperoni is the only option"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-06",
+   "source": "claude-haiku",
+   "topic": "Cover letter feedback",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did u read through my cover letter?"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah just now. its good but the opening is too generic"
+    },
+    {
+     "speaker": "A",
+     "text": "hmm ok what would u change"
+    },
+    {
+     "speaker": "B",
+     "text": "start with the actual role and why u applied, not 'i have always been passionate about tech'"
+    },
+    {
+     "speaker": "A",
+     "text": "lol fair. what about the part with the project"
+    },
+    {
+     "speaker": "B",
+     "text": "that's strong but add numbers. how many ppl and how long?"
+    },
+    {
+     "speaker": "A",
+     "text": "i led a team of 8 for about 4 months"
+    },
+    {
+     "speaker": "B",
+     "text": "thats the line. 8 people, 4 months, plus the result"
+    },
+    {
+     "speaker": "A",
+     "text": "the result was a 20 percent cost reduction"
+    },
+    {
+     "speaker": "B",
+     "text": "put that in too. when is the deadline btw?"
+    },
+    {
+     "speaker": "A",
+     "text": "friday midnight"
+    },
+    {
+     "speaker": "B",
+     "text": "then u better finish tonight, idk if im being helpful or annoying"
+    },
+    {
+     "speaker": "A",
+     "text": "both haha. thanks man, sending it tomorrow morning"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-07",
+   "source": "claude-haiku",
+   "topic": "Birthday gift for Mara",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "what do we get mara for her 30th?"
+    },
+    {
+     "speaker": "B",
+     "text": "no idea. she said last week she needs a new pan"
+    },
+    {
+     "speaker": "A",
+     "text": "true but that feels kinda boring tbh"
+    },
+    {
+     "speaker": "B",
+     "text": "what about a cooking class voucher? she always watches those shows"
+    },
+    {
+     "speaker": "A",
+     "text": "oh yes, thats better. how much should we split it?"
+    },
+    {
+     "speaker": "B",
+     "text": "maybe 25 each? we are 4 people"
+    },
+    {
+     "speaker": "A",
+     "text": "ok works for me. can u buy the voucher?"
+    },
+    {
+     "speaker": "B",
+     "text": "sure, but u write the card"
+    },
+    {
+     "speaker": "A",
+     "text": "deal. but NOT the cringe card like last time lol"
+    },
+    {
+     "speaker": "B",
+     "text": "that was rough. this time just happy birthday and our names"
+    },
+    {
+     "speaker": "A",
+     "text": "perfect. when is the party?"
+    },
+    {
+     "speaker": "B",
+     "text": "saturday at 7 at her place. bring snacks maybe"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-08",
+   "source": "claude-haiku",
+   "topic": "Train cancelled",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "r u at the station already? my train is 40 mins late"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah been standing here 20 mins. the train to leeds got cancelled"
+    },
+    {
+     "speaker": "A",
+     "text": "wait what, how r u getting home then"
+    },
+    {
+     "speaker": "B",
+     "text": "bus at 6:15 maybe. not sure its even running"
+    },
+    {
+     "speaker": "A",
+     "text": "i was gonna pick u up but i wont make it before 7:30"
+    },
+    {
+     "speaker": "B",
+     "text": "its fine. ill take the tram if the bus is a no go"
+    },
+    {
+     "speaker": "A",
+     "text": "ok let me know when ur home pls"
+    },
+    {
+     "speaker": "B",
+     "text": "will do. the train app is also showing old data btw"
+    },
+    {
+     "speaker": "A",
+     "text": "thats so annoying. contacted support?"
+    },
+    {
+     "speaker": "B",
+     "text": "not yet, too frustrated rn lol. tomorrow maybe"
+    },
+    {
+     "speaker": "A",
+     "text": "fair enough. dont freeze on the platform"
+    },
+    {
+     "speaker": "B",
+     "text": "no promises, its freezing here"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-09",
+   "source": "claude-haiku",
+   "topic": "Sick cat",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "my cat hasnt eaten since yesterday. im kinda worried"
+    },
+    {
+     "speaker": "B",
+     "text": "oh no. is he acting weird otherwise?"
+    },
+    {
+     "speaker": "A",
+     "text": "just sleeping in the corner and ignoring his food"
+    },
+    {
+     "speaker": "B",
+     "text": "i would call the vet asap, they might still be open till 5"
+    },
+    {
+     "speaker": "A",
+     "text": "ok calling now. do u think i need to bring him in?"
+    },
+    {
+     "speaker": "B",
+     "text": "idk, but with no food for a day i'd go. better safe than sorry"
+    },
+    {
+     "speaker": "A",
+     "text": "ok im leaving at 4 then. can u come with me?"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah of course, i'll head over. where's the carrier?"
+    },
+    {
+     "speaker": "A",
+     "text": "in the hallway behind the door"
+    },
+    {
+     "speaker": "B",
+     "text": "cool. good luck and send me updates!!"
+    },
+    {
+     "speaker": "A",
+     "text": "thanks, hopefully its just a hairball lol"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-10",
+   "source": "claude-haiku",
+   "topic": "Last night's match",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did u watch the game last night??"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah and that red card was insane"
+    },
+    {
+     "speaker": "A",
+     "text": "ref was wrong imo, that wasnt a foul at all"
+    },
+    {
+     "speaker": "B",
+     "text": "ngl the keeper did nothing though, that goal was soft"
+    },
+    {
+     "speaker": "A",
+     "text": "true. do u think we can still make the playoffs?"
+    },
+    {
+     "speaker": "B",
+     "text": "maybe if we win the next 3, idk tbh"
+    },
+    {
+     "speaker": "A",
+     "text": "we looked good against the top teams though"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah but up front we're just wasteful. the striker keeps missing sitters"
+    },
+    {
+     "speaker": "A",
+     "text": "haha yes, dude had an open goal and kicked it into the stands"
+    },
+    {
+     "speaker": "B",
+     "text": "lol. r u coming to the match saturday?"
+    },
+    {
+     "speaker": "A",
+     "text": "yes, kickoff 2pm. ill grab the tickets online"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-11",
+   "source": "claude-haiku",
+   "topic": "Grandma's lentil soup",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "u got grandma's lentil soup recipe? i wanna make it tonight"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah i'll send u a pic of the card, her handwriting is awful lol"
+    },
+    {
+     "speaker": "A",
+     "text": "thanks!! ok what's in it"
+    },
+    {
+     "speaker": "B",
+     "text": "2 cups lentils, 2 carrots, 1 leek, veggie stock about 1.5 liters"
+    },
+    {
+     "speaker": "A",
+     "text": "how long does it take?"
+    },
+    {
+     "speaker": "B",
+     "text": "like 35 min until the lentils are soft"
+    },
+    {
+     "speaker": "A",
+     "text": "and the vinegar? thats weird"
+    },
+    {
+     "speaker": "B",
+     "text": "trust me, a splash at the end makes it taste amazing"
+    },
+    {
+     "speaker": "A",
+     "text": "ok i'll try. do u wanna come for dinner?"
+    },
+    {
+     "speaker": "B",
+     "text": "yes, i'll bring bread. what time?"
+    },
+    {
+     "speaker": "A",
+     "text": "7 is good, i'll make enough for 3 people just in case"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-12",
+   "source": "claude-haiku",
+   "topic": "Phone won't turn on",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "my phone won't turn on since this morning. what do i do"
+    },
+    {
+     "speaker": "B",
+     "text": "did u try charging it?"
+    },
+    {
+     "speaker": "A",
+     "text": "yes but the charging light doesn't even come on"
+    },
+    {
+     "speaker": "B",
+     "text": "hold the power button for like 30 secs"
+    },
+    {
+     "speaker": "A",
+     "text": "already did, nothing happened"
+    },
+    {
+     "speaker": "B",
+     "text": "maybe the battery is totally drained. leave it plugged in for 30 min"
+    },
+    {
+     "speaker": "A",
+     "text": "ok. if that doesn't work i'll have to go to the shop i guess"
+    },
+    {
+     "speaker": "B",
+     "text": "probably. is it still under warranty?"
+    },
+    {
+     "speaker": "A",
+     "text": "i think so, its only 14 months old"
+    },
+    {
+     "speaker": "B",
+     "text": "then bring the receipt just in case"
+    },
+    {
+     "speaker": "A",
+     "text": "ok good, otherwise i'd have to buy a whole new one!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-13",
+   "source": "claude-haiku",
+   "topic": "Summer trip to Portugal",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "want to go to portugal this summer? i saw some good deals"
+    },
+    {
+     "speaker": "B",
+     "text": "yes!! when r u thinking"
+    },
+    {
+     "speaker": "A",
+     "text": "mid july for a week, i'm free then"
+    },
+    {
+     "speaker": "B",
+     "text": "that's peak season tho, how much is an apartment"
+    },
+    {
+     "speaker": "A",
+     "text": "around 680 dollars for the week, 2 people, with a kitchen"
+    },
+    {
+     "speaker": "B",
+     "text": "hmm thats not bad. is it near the beach?"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah, 400 meters according to the listing"
+    },
+    {
+     "speaker": "B",
+     "text": "sounds good. can i think about it till the weekend?"
+    },
+    {
+     "speaker": "A",
+     "text": "sure, u can cancel for free until monday"
+    },
+    {
+     "speaker": "B",
+     "text": "ok then lets decide by thursday"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-14",
+   "source": "claude-haiku",
+   "topic": "Tax forms",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "have u got ur tax forms yet? i can't find mine"
+    },
+    {
+     "speaker": "B",
+     "text": "should be in the online portal under documents"
+    },
+    {
+     "speaker": "A",
+     "text": "oh there it is. do i also need the health insurance statement?"
+    },
+    {
+     "speaker": "B",
+     "text": "only if u had costs u want to deduct, like dental stuff"
+    },
+    {
+     "speaker": "A",
+     "text": "i got new glasses in feb, does that count?"
+    },
+    {
+     "speaker": "B",
+     "text": "probably yes if u paid it yourself and had a prescription"
+    },
+    {
+     "speaker": "A",
+     "text": "i think i still have the prescription somewhere lol"
+    },
+    {
+     "speaker": "B",
+     "text": "then find it, otherwise u lose the deduction"
+    },
+    {
+     "speaker": "A",
+     "text": "ok deadline is april 15 right? i'll do a session saturday"
+    },
+    {
+     "speaker": "B",
+     "text": "yes, want me to help u go through it?"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-15",
+   "source": "claude-haiku",
+   "topic": "Stats exam panic",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "i'm gonna fail the stats exam i think. i don't get the formulas at all"
+    },
+    {
+     "speaker": "B",
+     "text": "oh no. which topic is the worst?"
+    },
+    {
+     "speaker": "A",
+     "text": "regression, i don't even know what a residual is"
+    },
+    {
+     "speaker": "B",
+     "text": "basically the distance between the real value and the line"
+    },
+    {
+     "speaker": "A",
+     "text": "oh really? i never got that from the lecture. can u go through last week's problem?"
+    },
+    {
+     "speaker": "B",
+     "text": "sure, send it over"
+    },
+    {
+     "speaker": "A",
+     "text": "number 4, i get 2.3 but the answer says 1.8"
+    },
+    {
+     "speaker": "B",
+     "text": "did u mess up the mean? that's the usual mistake"
+    },
+    {
+     "speaker": "A",
+     "text": "oh no, i forgot to divide by 7. ugh"
+    },
+    {
+     "speaker": "B",
+     "text": "happens all the time. library tomorrow at 10?"
+    },
+    {
+     "speaker": "A",
+     "text": "yes perfect, thanks!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-16",
+   "source": "claude-haiku",
+   "topic": "Garage sale",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "we should do a garage sale this saturday. i got tons of stuff lying around"
+    },
+    {
+     "speaker": "B",
+     "text": "sure, when does it start?"
+    },
+    {
+     "speaker": "A",
+     "text": "sellers from 8am, buyers from 10"
+    },
+    {
+     "speaker": "B",
+     "text": "that's early af. do we need a table?"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah, borrow one from the church hall, they charge 5 bucks"
+    },
+    {
+     "speaker": "B",
+     "text": "ok i'll bring the box of books and the clothes rack"
+    },
+    {
+     "speaker": "A",
+     "text": "nice. what about the old coffee machine?"
+    },
+    {
+     "speaker": "B",
+     "text": "it hasn't worked in 2 years lol"
+    },
+    {
+     "speaker": "A",
+     "text": "then it goes on the table as decor, someone might buy it"
+    },
+    {
+     "speaker": "B",
+     "text": "u r unbelievable. see u saturday at 8!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-17",
+   "source": "claude-haiku",
+   "topic": "Apartment approved",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "the landlord approved us for the first of december!!"
+    },
+    {
+     "speaker": "B",
+     "text": "omg congrats!! how big is it?"
+    },
+    {
+     "speaker": "A",
+     "text": "62 sqm, 2 bedrooms, balcony facing south. rent is 890 dollars including bills"
+    },
+    {
+     "speaker": "B",
+     "text": "that's pretty good tbh. when can we get the keys?"
+    },
+    {
+     "speaker": "A",
+     "text": "not till november 28th, so we can paint before we move in"
+    },
+    {
+     "speaker": "B",
+     "text": "i can help on the 29th. do u have a van?"
+    },
+    {
+     "speaker": "A",
+     "text": "nope, do u know anyone with a big car?"
+    },
+    {
+     "speaker": "B",
+     "text": "my brother has a pickup, i'll ask him"
+    },
+    {
+     "speaker": "A",
+     "text": "that would be amazing, i'll buy u a beer"
+    },
+    {
+     "speaker": "B",
+     "text": "deal, texting him now"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-18",
+   "source": "claude-haiku",
+   "topic": "Brake quote",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "car passed the inspection but the garage wants 480 dollars for brakes"
+    },
+    {
+     "speaker": "B",
+     "text": "ouch. front or back?"
+    },
+    {
+     "speaker": "A",
+     "text": "front discs and pads, back just pads"
+    },
+    {
+     "speaker": "B",
+     "text": "how old is the car anyway"
+    },
+    {
+     "speaker": "A",
+     "text": "9 years and about 140000 miles. i called 2 other places"
+    },
+    {
+     "speaker": "B",
+     "text": "what did they say?"
+    },
+    {
+     "speaker": "A",
+     "text": "one wanted 390 and the other 430 including labor"
+    },
+    {
+     "speaker": "B",
+     "text": "i'd go with the cheaper one but ask if the parts are original"
+    },
+    {
+     "speaker": "A",
+     "text": "will do. maybe i'll drive there on friday"
+    },
+    {
+     "speaker": "B",
+     "text": "good, and get the quote in writing or it might get more expensive"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah good point, thanks man"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-19",
+   "source": "claude-haiku",
+   "topic": "Weekend gardening",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "r u free this weekend? the lawn needs mowing badly"
+    },
+    {
+     "speaker": "B",
+     "text": "yeah saturday morning works. how long does it take?"
+    },
+    {
+     "speaker": "A",
+     "text": "like 2 hours with the big mower, its a lot of grass"
+    },
+    {
+     "speaker": "B",
+     "text": "and the hedge? it looks wild lol"
+    },
+    {
+     "speaker": "A",
+     "text": "i'll trim that on sunday if u help"
+    },
+    {
+     "speaker": "B",
+     "text": "ok. u have gloves? mine ripped"
+    },
+    {
+     "speaker": "A",
+     "text": "yeah i got a spare pair in the shed"
+    },
+    {
+     "speaker": "B",
+     "text": "nice. we also need new soil for the flower beds"
+    },
+    {
+     "speaker": "A",
+     "text": "home depot has bags for like 6 bucks, i'll grab them"
+    },
+    {
+     "speaker": "B",
+     "text": "perfect. bring the car so we can load it all at once"
+    },
+    {
+     "speaker": "A",
+     "text": "deal, see u saturday!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-20",
+   "source": "claude-haiku",
+   "topic": "New fitness class",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "i joined a new fitness class at the rec center, its actually fun"
+    },
+    {
+     "speaker": "B",
+     "text": "what do u do in it?"
+    },
+    {
+     "speaker": "A",
+     "text": "mix of strength and cardio, tuesdays at 6:30"
+    },
+    {
+     "speaker": "B",
+     "text": "sounds exhausting haha. how long have u been going"
+    },
+    {
+     "speaker": "A",
+     "text": "two weeks now, the instructor is super nice"
+    },
+    {
+     "speaker": "B",
+     "text": "how much is it?"
+    },
+    {
+     "speaker": "A",
+     "text": "49 dollars for 8 sessions, not bad imo"
+    },
+    {
+     "speaker": "B",
+     "text": "could i come along? im so unathletic"
+    },
+    {
+     "speaker": "A",
+     "text": "lol you dont need to be fit, there are all levels"
+    },
+    {
+     "speaker": "B",
+     "text": "ok i'll think about it. when is the next session"
+    },
+    {
+     "speaker": "A",
+     "text": "tuesday 6:30, i'll send u the link"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-21",
+   "source": "claude-haiku",
+   "topic": "Dentist appointment",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hey, can you cover the school run tomorrow? I've got the dentist at 9"
+    },
+    {
+     "speaker": "B",
+     "text": "Sure, what time do you need me at the gate?"
+    },
+    {
+     "speaker": "A",
+     "text": "Quarter past eight, Milo hates being late"
+    },
+    {
+     "speaker": "B",
+     "text": "Got it. Is it the filling or the check up?"
+    },
+    {
+     "speaker": "A",
+     "text": "Filling, the one that's been bugging me since March"
+    },
+    {
+     "speaker": "B",
+     "text": "Ouch. Do you want me to bring you a coffee after?"
+    },
+    {
+     "speaker": "A",
+     "text": "Please!! Oat milk, no sugar. Don't let them talk me into whitening again"
+    },
+    {
+     "speaker": "B",
+     "text": "lol I'll try. Remind me what the insurance covers?"
+    },
+    {
+     "speaker": "A",
+     "text": "Two checkups a year, the rest is 50 pounds deductible"
+    },
+    {
+     "speaker": "B",
+     "text": "That's the same as last time, right"
+    },
+    {
+     "speaker": "A",
+     "text": "Yep. I'll ask the receptionist for the receipt again"
+    },
+    {
+     "speaker": "B",
+     "text": "Good luck. Text me when you're out ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-22",
+   "source": "claude-haiku",
+   "topic": "Moving boxes and a van",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "We've got 31 boxes and the van is booked for Saturday at 7am. Please tell me you're free"
+    },
+    {
+     "speaker": "B",
+     "text": "I'm free! Do you want me to label the kitchen stuff?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes please. Kitchen says KITCHEN, books say BOOKS, nothing fancy"
+    },
+    {
+     "speaker": "B",
+     "text": "Do we need to hire the trolley?"
+    },
+    {
+     "speaker": "A",
+     "text": "Already got one from the neighbour, Mr Harris said we can keep it till Sunday"
+    },
+    {
+     "speaker": "B",
+     "text": "Nice. Who's bringing the drill? The bed frame is not going to dismantle itself"
+    },
+    {
+     "speaker": "A",
+     "text": "Dad said he'll come with his toolbox, he's bringing sandwiches too"
+    },
+    {
+     "speaker": "B",
+     "text": "Your dad is a legend. I'll bring energy drinks then"
+    },
+    {
+     "speaker": "A",
+     "text": "Don't forget the cleaning stuff. The landlord checks the oven, apparently"
+    },
+    {
+     "speaker": "B",
+     "text": "Ugh. Fine, I'll scrub the oven. Anything else I should know?"
+    },
+    {
+     "speaker": "A",
+     "text": "Keys go in the blue envelope on the windowsill. Don't lose it!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-23",
+   "source": "claude-haiku",
+   "topic": "Binge-watching a series",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Have you started the new season of Harbour Lights yet??"
+    },
+    {
+     "speaker": "B",
+     "text": "Not yet, I'm still stuck on episode 6 of the first one"
+    },
+    {
+     "speaker": "A",
+     "text": "Don't spoil it for me!! But the cliffhanger last night was insane"
+    },
+    {
+     "speaker": "B",
+     "text": "Okay, I'll watch tonight. Just tell me it's worth it"
+    },
+    {
+     "speaker": "A",
+     "text": "It's worth it. The detective is hiding something, I'm sure"
+    },
+    {
+     "speaker": "B",
+     "text": "Lol every detective is hiding something. Who do you think did it?"
+    },
+    {
+     "speaker": "A",
+     "text": "Honestly the harbour master. He was at the warehouse in episode 2"
+    },
+    {
+     "speaker": "B",
+     "text": "No way. That's too obvious, the writers would never do that"
+    },
+    {
+     "speaker": "A",
+     "text": "Still, I'd put money on him. Maybe even 20 quid"
+    },
+    {
+     "speaker": "B",
+     "text": "Bet accepted, loser buys the pizza on Friday"
+    },
+    {
+     "speaker": "A",
+     "text": "Deal. Come round at 8? I'll get the crisps this time"
+    },
+    {
+     "speaker": "B",
+     "text": "Only if you don't eat them all like last week ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-24",
+   "source": "claude-haiku",
+   "topic": "Pub quiz team",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Quiz is on Thursday, are you still in for the team?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes! Who else is coming? Last time we came last. Embarrassing"
+    },
+    {
+     "speaker": "A",
+     "text": "Mike, Priya and maybe Jo if she finishes work early"
+    },
+    {
+     "speaker": "B",
+     "text": "Priya is good at geography, and Mike does the music round"
+    },
+    {
+     "speaker": "A",
+     "text": "Jo is good at everything, annoyingly. We need a name too"
+    },
+    {
+     "speaker": "B",
+     "text": "How about Quizzy McQuizface? Lol"
+    },
+    {
+     "speaker": "A",
+     "text": "Too long. The Usual Suspects sounds better"
+    },
+    {
+     "speaker": "B",
+     "text": "Fine, but the sign-up sheet has a limit of 30 characters"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, The Usual Suspects is 19, we're fine"
+    },
+    {
+     "speaker": "B",
+     "text": "Also, is it 5 pounds per person or per team??"
+    },
+    {
+     "speaker": "A",
+     "text": "Per person, so we pay 20 total for four"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, I'll bring cash. Last time the card machine was broken"
+    },
+    {
+     "speaker": "A",
+     "text": "Bring snacks as well, the bar has crisps for 3 pounds, that's robbery"
+    },
+    {
+     "speaker": "B",
+     "text": "Ha, see you at 7:30. Don't be late, Mike always is!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-25",
+   "source": "claude-haiku",
+   "topic": "Online gaming with friends",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Are you on tonight? We're starting the raid at 9 but we need a healer"
+    },
+    {
+     "speaker": "B",
+     "text": "I can do 9 to 11, my exam is tomorrow morning"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfect. Do you still have the old healer build?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yeah, although I changed the talents last week. I'll check"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, let me know if you want the new gear list"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes please. Also, did Sam fix his mic? It sounded like a dying robot"
+    },
+    {
+     "speaker": "A",
+     "text": "lol he got a new one, it's better now. Try not to shout at him"
+    },
+    {
+     "speaker": "B",
+     "text": "No promises. Last time he disconnected in the boss fight"
+    },
+    {
+     "speaker": "A",
+     "text": "Honestly the boss was too hard without him. Sorry, you're on your own now ;)"
+    },
+    {
+     "speaker": "B",
+     "text": "Thanks for nothing haha. See you on Discord at nine"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-26",
+   "source": "claude-haiku",
+   "topic": "Group project deadline",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Our group report is due Friday at 5pm and we're still missing the methods section"
+    },
+    {
+     "speaker": "B",
+     "text": "I thought Ella was doing methods?"
+    },
+    {
+     "speaker": "A",
+     "text": "She sent half of it yesterday, the rest is supposed to come tonight"
+    },
+    {
+     "speaker": "B",
+     "text": "Let's not wait. Do we have the data tables?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, I put them in the shared folder. Check the Excel file, the second tab"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, found it. Some numbers look off though, row 14 is weird"
+    },
+    {
+     "speaker": "A",
+     "text": "Ugh. Maybe a copy paste error from the first draft. I'll fix it"
+    },
+    {
+     "speaker": "B",
+     "text": "Thanks. Can you also check the references? Half of them are missing a year"
+    },
+    {
+     "speaker": "A",
+     "text": "Will do. Tomorrow morning okay for a final read?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, but let's meet at the library, not the cafe. Last time we talked the whole time"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha true. 10am in the library then, I'll bring coffee"
+    },
+    {
+     "speaker": "B",
+     "text": "Make it two coffees and I'll bring the sources"
+    },
+    {
+     "speaker": "A",
+     "text": "Deal. Don't forget your student card, the desk asks for it!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-27",
+   "source": "claude-haiku",
+   "topic": "Forecast for the BBQ",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Are we still doing the BBQ on Sunday? Weather says rain from midday"
+    },
+    {
+     "speaker": "B",
+     "text": "The forecast changes every hour. Let's check again tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "I checked three apps, they all say something different. Lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Then we set up the gazebo just in case. Who's bringing the chairs?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tom has six, we need at least eight"
+    },
+    {
+     "speaker": "B",
+     "text": "Okay, I'll ask Sarah. Are the burgers vegan-friendly for Jen?"
+    },
+    {
+     "speaker": "A",
+     "text": "I got the veggie ones, plus halloumi for the rest of us"
+    },
+    {
+     "speaker": "B",
+     "text": "Yum. Did you get charcoal or gas? The gas was empty last time"
+    },
+    {
+     "speaker": "A",
+     "text": "Charcoal, but it takes forever to heat up. Start early"
+    },
+    {
+     "speaker": "B",
+     "text": "Do you think we can do it at 4pm if it stays dry?"
+    },
+    {
+     "speaker": "A",
+     "text": "Maybe, let's text everyone at 2pm and decide then"
+    },
+    {
+     "speaker": "B",
+     "text": "Fine. Fingers crossed for sun!! ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-28",
+   "source": "claude-haiku",
+   "topic": "Cooking for my in-laws",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "My in-laws are coming for dinner on Friday. Any ideas that won't be a disaster?"
+    },
+    {
+     "speaker": "B",
+     "text": "Roast chicken is hard to mess up. Do they eat meat?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, but Gerald doesn't like skin. Weird I know"
+    },
+    {
+     "speaker": "B",
+     "text": "Then chicken thighs, skinless. Serve with roast potatoes and green beans"
+    },
+    {
+     "speaker": "A",
+     "text": "Is that too boring? I want to impress them a bit"
+    },
+    {
+     "speaker": "B",
+     "text": "Make a dessert then. Sticky toffee pudding always works"
+    },
+    {
+     "speaker": "A",
+     "text": "I've never made that. How long does it take?"
+    },
+    {
+     "speaker": "B",
+     "text": "About an hour, but you can make the sauce the day before"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok good. Can I borrow your big roasting tin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sure, it's in the cupboard above the sink. Wash it first though lol"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha yes. Thanks for the help, you're a lifesaver"
+    },
+    {
+     "speaker": "B",
+     "text": "No problem. Take photos, I want to see the pudding!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-29",
+   "source": "claude-haiku",
+   "topic": "Wifi keeps dropping",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "The wifi keeps dropping every 20 minutes. Driving me nuts"
+    },
+    {
+     "speaker": "B",
+     "text": "Have you tried restarting the router?"
+    },
+    {
+     "speaker": "A",
+     "text": "Twice. The light goes orange and then red"
+    },
+    {
+     "speaker": "B",
+     "text": "Could be the line or the router itself. Do you have a cable spare?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yeah, I'll plug the laptop straight into the router. Let's see if it works"
+    },
+    {
+     "speaker": "B",
+     "text": "And if the internet is fine on cable, it's the wifi signal"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, cable works for now. Still weird. The provider website says no outages"
+    },
+    {
+     "speaker": "B",
+     "text": "Call them and ask for a line check. Do it on speaker"
+    },
+    {
+     "speaker": "A",
+     "text": "They'll put me on hold for 40 minutes, I know"
+    },
+    {
+     "speaker": "B",
+     "text": "Put the kettle on first then ;) Seriously though, get them to send an engineer"
+    },
+    {
+     "speaker": "A",
+     "text": "Ugh. Fine. Calling after lunch"
+    },
+    {
+     "speaker": "B",
+     "text": "Let me know what they say. I can't survive without my Netflix either"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-30",
+   "source": "claude-haiku",
+   "topic": "Interrail to Vienna",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Thinking about doing Vienna by train in August. Are you in?"
+    },
+    {
+     "speaker": "B",
+     "text": "How many days? I can't get more than five off"
+    },
+    {
+     "speaker": "A",
+     "text": "Four would be enough. Route via Munich, overnight train from there"
+    },
+    {
+     "speaker": "B",
+     "text": "Overnight sounds cheap but I hate sleeping sitting up"
+    },
+    {
+     "speaker": "A",
+     "text": "There are couchettes, the bunk beds in shared cabins. I'll look at the prices"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok that's a fair option. How much extra for a couchette?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 30 to 40 euros each, I think"
+    },
+    {
+     "speaker": "B",
+     "text": "Fine by me. Do we book the hostel now or later?"
+    },
+    {
+     "speaker": "A",
+     "text": "Now, the good ones fill up fast in summer"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, send me the link. I'll check my holiday days at work tomorrow"
+    },
+    {
+     "speaker": "A",
+     "text": "Will do. Vienna has amazing coffee houses btw, we have to go to one"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes! Just no more five hour queues like last time, deal?"
+    },
+    {
+     "speaker": "A",
+     "text": "Deal. Bring a power bank, the trains are full of phones on charge"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-31",
+   "source": "claude-haiku",
+   "topic": "Cousin's wedding RSVP",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Did you reply to Lily's wedding invite? The deadline is this Friday"
+    },
+    {
+     "speaker": "B",
+     "text": "Not yet, I didn't know if I'd be able to take the Saturday off"
+    },
+    {
+     "speaker": "A",
+     "text": "It's on the 14th of June in Brighton, so a long weekend would work"
+    },
+    {
+     "speaker": "B",
+     "text": "True. Do I need to bring a plus one? The card says Name and guest"
+    },
+    {
+     "speaker": "A",
+     "text": "I think they meant that, yes. Is your partner coming?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, Hannah wants to come. She already said she'd sit with the kids table, lol"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha. So I'll put two places down then"
+    },
+    {
+     "speaker": "B",
+     "text": "Do you know what the dress code is? Smart casual?"
+    },
+    {
+     "speaker": "A",
+     "text": "Lily said cocktail, so nice dress or suit. Not white obviously"
+    },
+    {
+     "speaker": "B",
+     "text": "Obviously. I'm wearing the navy one from Dad's birthday"
+    },
+    {
+     "speaker": "A",
+     "text": "Good choice. Email the RSVP tonight so you don't forget!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-32",
+   "source": "claude-haiku",
+   "topic": "Dog walker schedule",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Could you walk Biscuit on Wednesday? I've got back to back meetings until 6"
+    },
+    {
+     "speaker": "B",
+     "text": "Of course! What time works?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around noon and then again at five. He needs his lunch walk properly"
+    },
+    {
+     "speaker": "B",
+     "text": "Does he still pull on the lead near other dogs?"
+    },
+    {
+     "speaker": "A",
+     "text": "Only if they come too close. Go past the big park, it's quieter"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, got it. Does he get fed at lunch?"
+    },
+    {
+     "speaker": "A",
+     "text": "Half a tin, it's in the fridge. Not the whole thing, he gets fat"
+    },
+    {
+     "speaker": "B",
+     "text": "Noted. Anything else I should know?"
+    },
+    {
+     "speaker": "A",
+     "text": "He steals socks from the laundry basket, so keep the door shut"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha my cat does the same thing. Brings them to my bed like a present"
+    },
+    {
+     "speaker": "A",
+     "text": "That's sweet. Thanks, I owe you a pint! I'll send pics"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes please, only the good ones though ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-33",
+   "source": "claude-haiku",
+   "topic": "Lost house keys",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I've lost my house keys. Probably on the bus this morning"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh no. Did you check the lost property office?"
+    },
+    {
+     "speaker": "A",
+     "text": "Called them, nothing handed in. Typical"
+    },
+    {
+     "speaker": "B",
+     "text": "Where's the spare set?"
+    },
+    {
+     "speaker": "A",
+     "text": "With my mum in Leeds, she's away until Sunday"
+    },
+    {
+     "speaker": "B",
+     "text": "You can crash at mine tonight, the sofa bed is free"
+    },
+    {
+     "speaker": "A",
+     "text": "You're a star. Do you think the locksmith will charge a fortune?"
+    },
+    {
+     "speaker": "B",
+     "text": "Probably around 150 quid, it's an emergency call-out"
+    },
+    {
+     "speaker": "A",
+     "text": "I'll ring the landlord first, he might have a spare"
+    },
+    {
+     "speaker": "B",
+     "text": "Good idea. Also get the lock changed if the keys were stolen"
+    },
+    {
+     "speaker": "A",
+     "text": "Honestly I think I just dropped them. Anyway, sorry for the drama"
+    },
+    {
+     "speaker": "B",
+     "text": "No drama. Come round at 6, I'll make pasta"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-34",
+   "source": "claude-haiku",
+   "topic": "MOT test for the car",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "The car needs an MOT by the end of the month. Do you think it'll pass?"
+    },
+    {
+     "speaker": "B",
+     "text": "How many miles on it now?"
+    },
+    {
+     "speaker": "A",
+     "text": "About 98000. The brakes were a bit squeaky last year"
+    },
+    {
+     "speaker": "B",
+     "text": "Get the garage to check them first, otherwise you're failing for sure"
+    },
+    {
+     "speaker": "A",
+     "text": "They quoted 60 pounds for the check, which seems fair"
+    },
+    {
+     "speaker": "B",
+     "text": "And the headlight? Left one looked dim when we drove home"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, I forgot about that. A new bulb is only a few quid"
+    },
+    {
+     "speaker": "B",
+     "text": "Get it done before the test, cheap way to avoid a fail"
+    },
+    {
+     "speaker": "A",
+     "text": "Appointment is the 28th at 8:15am. I'm in the office by nine"
+    },
+    {
+     "speaker": "B",
+     "text": "I can drive you there if you want, I'm free that morning"
+    },
+    {
+     "speaker": "A",
+     "text": "You're the best. Can you bring the car back to mine after?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, but then you owe me a fry-up at the cafe. Deal?"
+    },
+    {
+     "speaker": "A",
+     "text": "Deal. Make it two sausages please ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-35",
+   "source": "claude-haiku",
+   "topic": "Hiking in the Lake District",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Fancy a hike in the Lake District in October? I've been wanting to do Helvellyn"
+    },
+    {
+     "speaker": "B",
+     "text": "Helvellyn is a serious climb, are you sure? Which route?"
+    },
+    {
+     "speaker": "A",
+     "text": "From Glenridding, up Swirral Edge, about 12 km"
+    },
+    {
+     "speaker": "B",
+     "text": "That's doable. How many metres of ascent?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 950, I think. Steep at the end"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, I'm in. But we pack waterproofs, the forecast is grim"
+    },
+    {
+     "speaker": "A",
+     "text": "The forecast is always grim up there lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Yeah but I don't want a repeat of last time, we were soaked for hours"
+    },
+    {
+     "speaker": "A",
+     "text": "Fair. Trekking poles too? My knees are not what they were"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, get the poles, I'll bring the flask and sandwiches"
+    },
+    {
+     "speaker": "A",
+     "text": "Train or car? Parking in Glenridding is a nightmare"
+    },
+    {
+     "speaker": "B",
+     "text": "Train to Penrith, then a bus. Earlier start is better, 7am?"
+    },
+    {
+     "speaker": "A",
+     "text": "7am it is. Bring the good boots this time ;)"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-36",
+   "source": "claude-haiku",
+   "topic": "Cancelling a gym membership",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I need to cancel my gym membership. Any idea how?"
+    },
+    {
+     "speaker": "B",
+     "text": "Do they need a letter or can you do it online?"
+    },
+    {
+     "speaker": "A",
+     "text": "The contract says written notice, 30 days before the end of the month"
+    },
+    {
+     "speaker": "B",
+     "text": "That's annoying. How much is it?"
+    },
+    {
+     "speaker": "A",
+     "text": "35 pounds a month, and I haven't been in three months"
+    },
+    {
+     "speaker": "B",
+     "text": "Then send it today, otherwise they'll auto renew"
+    },
+    {
+     "speaker": "A",
+     "text": "I found a template online, just need to add my member number"
+    },
+    {
+     "speaker": "B",
+     "text": "Put the date and your address on it too. Keep a copy"
+    },
+    {
+     "speaker": "A",
+     "text": "Sure, will do. Do I need to sign anything else?"
+    },
+    {
+     "speaker": "B",
+     "text": "Just the letter. Send it recorded delivery so you have proof"
+    },
+    {
+     "speaker": "A",
+     "text": "Good call. Are you coming to spin tonight? ;)"
+    },
+    {
+     "speaker": "B",
+     "text": "Nope, you just cancelled your membership, go and have a nap"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-37",
+   "source": "claude-haiku",
+   "topic": "Job interview prep",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I have a job interview on Monday at a logistics company. I'm so nervous"
+    },
+    {
+     "speaker": "B",
+     "text": "You'll be fine! What are they asking?"
+    },
+    {
+     "speaker": "A",
+     "text": "Strengths, weaknesses and why I want to work there"
+    },
+    {
+     "speaker": "B",
+     "text": "Weakness is always the trap question. Have you got an answer?"
+    },
+    {
+     "speaker": "A",
+     "text": "I'll say I sometimes take on too much. Is that okay?"
+    },
+    {
+     "speaker": "B",
+     "text": "Works, but add how you deal with it now. Show you've learned from it"
+    },
+    {
+     "speaker": "A",
+     "text": "Good point. The interview is at 10, I'm worried about the train"
+    },
+    {
+     "speaker": "B",
+     "text": "Leave an hour early, the rail replacement buses are a joke right now"
+    },
+    {
+     "speaker": "A",
+     "text": "Ugh. I'll take the car then. Where do I park?"
+    },
+    {
+     "speaker": "B",
+     "text": "Check their site, they probably have a car park for visitors"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok. Should I wear a suit or is smart casual fine?"
+    },
+    {
+     "speaker": "B",
+     "text": "Suit, even if they're relaxed. First impressions matter"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, thanks. Text me when it's over!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Of course, you've got this!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-38",
+   "source": "claude-haiku",
+   "topic": "Last-minute cinema trip",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Got two tickets for the 8:15 showing tonight, I'm running late though"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh nice. Which film?"
+    },
+    {
+     "speaker": "A",
+     "text": "The animated one with the raccoon. It's not deep but it's funny"
+    },
+    {
+     "speaker": "B",
+     "text": "Perfect. I'll be at the entrance at 7:45, we can grab popcorn"
+    },
+    {
+     "speaker": "A",
+     "text": "Popcorn is 9 pounds now, that's criminal"
+    },
+    {
+     "speaker": "B",
+     "text": "Lol we'll share a small one then. Who's paying for the tickets?"
+    },
+    {
+     "speaker": "A",
+     "text": "I'll pay, you get the popcorn. Deal?"
+    },
+    {
+     "speaker": "B",
+     "text": "Deal. Row F or in the middle?"
+    },
+    {
+     "speaker": "A",
+     "text": "Row F is free, seats 11 and 12. Good spot"
+    },
+    {
+     "speaker": "B",
+     "text": "Great. See you there, and don't be late again!!"
+    },
+    {
+     "speaker": "A",
+     "text": "I'm literally running right now, the bus is taking forever"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-39",
+   "source": "claude-haiku",
+   "topic": "Restaurant booking mix-up",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "The restaurant lost our booking for tonight. We're standing outside in the rain"
+    },
+    {
+     "speaker": "B",
+     "text": "Are you serious? Ask them to check under my surname"
+    },
+    {
+     "speaker": "A",
+     "text": "Already did, they say they have us down for tomorrow"
+    },
+    {
+     "speaker": "B",
+     "text": "That's not right, I confirmed it on Tuesday. Show them the email"
+    },
+    {
+     "speaker": "A",
+     "text": "Showing them now. The manager is looking at the screen"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, any luck? We're 15 minutes away"
+    },
+    {
+     "speaker": "A",
+     "text": "They found a table but it's the cramped one near the toilets lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Better than standing outside. Ask for a drink on the house"
+    },
+    {
+     "speaker": "A",
+     "text": "The waiter already offered free garlic bread. Not bad"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha ok, that's some compensation. See you soon, keep the seat warm"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha yes, hurry up. The bread is going fast!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-40",
+   "source": "claude-haiku",
+   "topic": "Christmas market meetup",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Are you up for the Christmas market on Saturday? Mulled wine is calling"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes! Which one? The big one in the city centre or the small one by the church?"
+    },
+    {
+     "speaker": "A",
+     "text": "The small one, it's cosier and less crowded"
+    },
+    {
+     "speaker": "B",
+     "text": "Good call. What time, afternoon or evening?"
+    },
+    {
+     "speaker": "A",
+     "text": "Four o'clock, we can see the lights come on at dark"
+    },
+    {
+     "speaker": "B",
+     "text": "Perfect. Do you want to get dinner after?"
+    },
+    {
+     "speaker": "A",
+     "text": "Maybe sausages at the stall by the fountain. Those were amazing last year"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh yes, with the mustard. I'll be the one smelling of smoke lol"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha. Bring gloves, last year my fingers went numb"
+    },
+    {
+     "speaker": "B",
+     "text": "I know. I'm bringing two pairs this time"
+    },
+    {
+     "speaker": "A",
+     "text": "Smart. Shall we meet at the big clock at 3:50 then?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, I'll be on time for once ;)"
+    },
+    {
+     "speaker": "A",
+     "text": "Don't make promises you can't keep!!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-41",
+   "source": "claude-haiku",
+   "topic": "Noisy neighbours upstairs",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Is it normal that the couple upstairs rearrange their furniture at 11pm every night?"
+    },
+    {
+     "speaker": "B",
+     "text": "Ugh, no. Quiet hours usually start at 10pm, check your lease"
+    },
+    {
+     "speaker": "A",
+     "text": "I did. It says 10pm, so they're definitely breaking it"
+    },
+    {
+     "speaker": "B",
+     "text": "Have you talked to them yet? Could be a one-off"
+    },
+    {
+     "speaker": "A",
+     "text": "Not yet. I'm not great at confrontation tbh"
+    },
+    {
+     "speaker": "B",
+     "text": "Just leave a polite note under their door, that's usually enough"
+    },
+    {
+     "speaker": "A",
+     "text": "Hmm. Do I sign it or stay anonymous?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sign it, anonymous notes look worse lol"
+    },
+    {
+     "speaker": "A",
+     "text": "Fair. I'll write it tonight and slip it under the door in the morning"
+    },
+    {
+     "speaker": "B",
+     "text": "Good plan. If it keeps going, the letting agent can help"
+    },
+    {
+     "speaker": "A",
+     "text": "Thanks, I'll try the note first. Fingers crossed"
+    },
+    {
+     "speaker": "B",
+     "text": "Let me know how it goes. I'm around this weekend if you need backup"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha, you'd make a good wingman. Cheers!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-42",
+   "source": "claude-haiku",
+   "topic": "Fridge on its last legs",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "My fridge has been making a weird humming noise since this morning"
+    },
+    {
+     "speaker": "B",
+     "text": "Is it still cold inside?"
+    },
+    {
+     "speaker": "A",
+     "text": "Kind of, but the milk already feels a bit warm :("
+    },
+    {
+     "speaker": "B",
+     "text": "Oh no. Did you try unplugging it and plugging it back in?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, didn't help. The compressor just runs non-stop now"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds like the thermostat or the compressor. Is it still under warranty?"
+    },
+    {
+     "speaker": "A",
+     "text": "No idea, it's about five years old. Probably not"
+    },
+    {
+     "speaker": "B",
+     "text": "Check the receipt anyway, some brands offer longer cover"
+    },
+    {
+     "speaker": "A",
+     "text": "Good shout. Should I put the food on the balcony for now? It's only 4 degrees out"
+    },
+    {
+     "speaker": "B",
+     "text": "No way, your ice cream would turn to soup. Use a cool box"
+    },
+    {
+     "speaker": "A",
+     "text": "I've got one from the summer barbecue. Thanks mate!"
+    },
+    {
+     "speaker": "B",
+     "text": "Anytime. Let me know when the engineer has been"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-43",
+   "source": "claude-haiku",
+   "topic": "First week at a new job",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Day five at the new job and I already feel like I'm drowning in emails"
+    },
+    {
+     "speaker": "B",
+     "text": "Oof. Did your manager at least show you around?"
+    },
+    {
+     "speaker": "A",
+     "text": "Briefly. Then she said 'you'll pick it up' and disappeared into a meeting"
+    },
+    {
+     "speaker": "B",
+     "text": "That's rough. Who else is on your team?"
+    },
+    {
+     "speaker": "A",
+     "text": "Two people, both super friendly, but they're flat out too"
+    },
+    {
+     "speaker": "B",
+     "text": "Ask them to block off half an hour for questions. Works wonders"
+    },
+    {
+     "speaker": "A",
+     "text": "Good idea. I was too scared to interrupt anyone"
+    },
+    {
+     "speaker": "B",
+     "text": "Everyone is at the start, nobody expects you to know everything yet"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, that's reassuring. Lunch with Priya tomorrow?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes! Take a proper lunch break, not at your desk this time"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, you're right. Coffee in the park it is"
+    },
+    {
+     "speaker": "B",
+     "text": "Great. Tell me the name of that Italian place you mentioned, I'm curious"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-44",
+   "source": "claude-haiku",
+   "topic": "Toddler ear infection",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Mia has been crying all night, she keeps pulling at her left ear"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh no, poor thing. Temperature?"
+    },
+    {
+     "speaker": "A",
+     "text": "38.5 at midnight. We gave her Calpol and she slept a bit"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds like an ear infection. Are you calling the GP in the morning?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, the surgery opens at 8, I'll be first in line"
+    },
+    {
+     "speaker": "B",
+     "text": "Good, don't wait. Ear infections in toddlers can get nasty quickly"
+    },
+    {
+     "speaker": "A",
+     "text": "Yeah, that's what scares me. Do you still have Lily's old travel pillow?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, it's in the car boot. Why, is she sleeping in the car?"
+    },
+    {
+     "speaker": "A",
+     "text": "No, the taxi to the surgery. She'd be more comfortable with it"
+    },
+    {
+     "speaker": "B",
+     "text": "Makes sense. I'll drop it round, give me twenty minutes"
+    },
+    {
+     "speaker": "A",
+     "text": "You're a lifesaver. Text me when you're at the door"
+    },
+    {
+     "speaker": "B",
+     "text": "Will do. Keep her warm and give her plenty of fluids"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-45",
+   "source": "claude-haiku",
+   "topic": "Charity bake sale",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Are you bringing something to the bake sale on Saturday? We need cakes for the table"
+    },
+    {
+     "speaker": "B",
+     "text": "Yep, I'm making lemon drizzle. Is that ok?"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfect! We're aiming for two pounds a slice"
+    },
+    {
+     "speaker": "B",
+     "text": "Two pounds is fair for lemon drizzle. Does it need to be nut free?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes please, we had that allergy issue last year"
+    },
+    {
+     "speaker": "B",
+     "text": "No problem, my drizzle is nut free anyway. Where do I drop it off?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hall at 8:30, the caterers set up at 9"
+    },
+    {
+     "speaker": "B",
+     "text": "Sure. Can I borrow the big urn? My coffee machine has died"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, the urn is basically the only thing that works here. Bring a flask too"
+    },
+    {
+     "speaker": "B",
+     "text": "Brilliant, I'll bring two flasks then"
+    },
+    {
+     "speaker": "A",
+     "text": "Thanks love. You're saving the day"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-46",
+   "source": "claude-haiku",
+   "topic": "Deposit back from the landlord",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Still no word from the landlord about our deposit, it's been six weeks"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm. Did they send the inventory report?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, they claim the oven needs professional cleaning. Ridiculous"
+    },
+    {
+     "speaker": "B",
+     "text": "Did you take photos when you moved out?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes! Dozens. They're stored in the cloud"
+    },
+    {
+     "speaker": "B",
+     "text": "Perfect. Reply in writing and ask for the deposit back within 14 days"
+    },
+    {
+     "speaker": "A",
+     "text": "Is that the legal deadline or just a suggestion?"
+    },
+    {
+     "speaker": "B",
+     "text": "Deposits should be protected in a scheme, so check the deadline on their website"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, I'll look it up tonight"
+    },
+    {
+     "speaker": "B",
+     "text": "Good. Send the email tonight and attach the photos"
+    },
+    {
+     "speaker": "A",
+     "text": "Will do. I'm not paying for a cleaner I never booked"
+    },
+    {
+     "speaker": "B",
+     "text": "Stand your ground. You deserve your 900 pounds back"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-47",
+   "source": "claude-haiku",
+   "topic": "Sunday brunch spot",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Brunch on Sunday? That new place by the canal has amazing pancakes"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds lovely. What time were you thinking?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 11, before it gets packed"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, but I'm not waiting in a queue for an hour"
+    },
+    {
+     "speaker": "A",
+     "text": "We can book online, they have slots at 11 and 11:30"
+    },
+    {
+     "speaker": "B",
+     "text": "Grab the 11, I'll be there. I need a strong coffee first"
+    },
+    {
+     "speaker": "A",
+     "text": "Oat latte for you, right?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, plus some avocado toast if they've still got it"
+    },
+    {
+     "speaker": "A",
+     "text": "They had it last time, I think it's on the menu forever"
+    },
+    {
+     "speaker": "B",
+     "text": "Excellent. See you there, don't be late like last month!"
+    },
+    {
+     "speaker": "A",
+     "text": "Cheeky. I was only twelve minutes late"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-48",
+   "source": "claude-haiku",
+   "topic": "Watering plants while away",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Could you water my plants while I'm in Spain next week? Be a star"
+    },
+    {
+     "speaker": "B",
+     "text": "Of course! How often do they need it?"
+    },
+    {
+     "speaker": "A",
+     "text": "Tomatoes every day, the rest every few days. The cacti are fine"
+    },
+    {
+     "speaker": "B",
+     "text": "Got it. Where's the key?"
+    },
+    {
+     "speaker": "A",
+     "text": "Under the blue plant pot by the door, or with Mrs Hughes next door"
+    },
+    {
+     "speaker": "B",
+     "text": "Under the plant pot? Brave. Is that where the spare is?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha, yes. The neighbour knows the spot too, so don't panic"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, I'll check the weather. If it's sunny, I'll go early in the morning"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, the tomatoes hate the midday sun"
+    },
+    {
+     "speaker": "B",
+     "text": "Noted. Send me a photo of the beach so I feel jealous"
+    },
+    {
+     "speaker": "A",
+     "text": "Deal! I'll send one of the tomatoes too, to prove they're still alive"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, perfect. Enjoy the sun!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-49",
+   "source": "claude-haiku",
+   "topic": "Book club pick",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "We need to pick a book for next month's club. Any ideas?"
+    },
+    {
+     "speaker": "B",
+     "text": "What about the new crime novel everyone's talking about?"
+    },
+    {
+     "speaker": "A",
+     "text": "Already read it, the twist was obvious from page 50"
+    },
+    {
+     "speaker": "B",
+     "text": "Ouch. How about a shorter one then? Under 300 pages"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, that's a better plan. Nobody wants a huge book in winter"
+    },
+    {
+     "speaker": "B",
+     "text": "Good point. Anything from last year's list that we skipped?"
+    },
+    {
+     "speaker": "A",
+     "text": "The one about the sea captain, I still have it"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh I loved that. Maybe too similar though, the last pick was also a sea story"
+    },
+    {
+     "speaker": "A",
+     "text": "True. Let's vote in the group chat. Three options, one winner"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds fair. I'll send my shortlist tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "Great. And I'll bake something, no excuses this time"
+    },
+    {
+     "speaker": "B",
+     "text": "You're spoiling us. Chocolate ones please lol"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-50",
+   "source": "claude-haiku",
+   "topic": "Theatre season tickets",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Fancy a theatre season ticket? They've got six shows next year"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm, what's the price per show?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 18 pounds each, so about 100 pounds for the lot"
+    },
+    {
+     "speaker": "B",
+     "text": "That's decent. Are the seats any good?"
+    },
+    {
+     "speaker": "A",
+     "text": "Row H is fine, anything further back is a bit far"
+    },
+    {
+     "speaker": "B",
+     "text": "Middle of row J then? Usually a good sightline"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, that's what I was going to pick. Central and not too close"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds good. Do you want me to pay half now?"
+    },
+    {
+     "speaker": "A",
+     "text": "No rush, I'll book it on Monday when the sale starts"
+    },
+    {
+     "speaker": "B",
+     "text": "Perfect. Put a reminder in your phone, these things sell fast"
+    },
+    {
+     "speaker": "A",
+     "text": "Already done. They've also got a comedy night I'd love to see"
+    },
+    {
+     "speaker": "B",
+     "text": "Let's add that too, I'll need a laugh after the winter"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-51",
+   "source": "claude-haiku",
+   "topic": "Algebra help for Sam",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Can you help Sam with his algebra homework tomorrow? I'm stuck at work"
+    },
+    {
+     "speaker": "B",
+     "text": "Sure, what's he working on?"
+    },
+    {
+     "speaker": "A",
+     "text": "Simultaneous equations, and he's really frustrated about it"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, that's tricky at first. I'll take a look tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "Thanks! He got the same answer wrong three times"
+    },
+    {
+     "speaker": "B",
+     "text": "Probably a sign error when he moves the terms across"
+    },
+    {
+     "speaker": "A",
+     "text": "Yeah, that's exactly what I thought. Maybe the video from his teacher helps?"
+    },
+    {
+     "speaker": "B",
+     "text": "Which one? You haven't sent me the link yet"
+    },
+    {
+     "speaker": "A",
+     "text": "Sending it now. Oh, and he says he'll do it if you bring pizza, lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, negotiating already. He's learning fast"
+    },
+    {
+     "speaker": "A",
+     "text": "He gets that from his dad, unfortunately"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-52",
+   "source": "claude-haiku",
+   "topic": "Wrong bank transfer",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Help, I just sent 250 pounds to the wrong account!!"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh no. Who was it meant for?"
+    },
+    {
+     "speaker": "A",
+     "text": "My landlord, but I typed the sort code wrong. Now it's a stranger"
+    },
+    {
+     "speaker": "B",
+     "text": "Call your bank straight away, they might be able to recall it"
+    },
+    {
+     "speaker": "A",
+     "text": "I'm on hold, the queue is ages and the music is awful"
+    },
+    {
+     "speaker": "B",
+     "text": "Keep trying, don't hang up. Ask for the payment recall team"
+    },
+    {
+     "speaker": "A",
+     "text": "They said I need to fill in a form and they'll contact the other bank"
+    },
+    {
+     "speaker": "B",
+     "text": "Do it today if you can, the sooner the better"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok. The other bank doesn't have to send it back though, right?"
+    },
+    {
+     "speaker": "B",
+     "text": "Correct, they need permission from the recipient, so it's not guaranteed"
+    },
+    {
+     "speaker": "A",
+     "text": "Great, that's reassuring. Sorry for bothering you"
+    },
+    {
+     "speaker": "B",
+     "text": "Don't be silly. Let me know what they say, I'm rooting for you"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-53",
+   "source": "claude-haiku",
+   "topic": "Pottery class",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I signed us up for the pottery class at the community centre. You in?"
+    },
+    {
+     "speaker": "B",
+     "text": "Wait, when? I'm not very arty"
+    },
+    {
+     "speaker": "A",
+     "text": "Tuesdays, 7 to 9. Beginners, and they supply all the clay"
+    },
+    {
+     "speaker": "B",
+     "text": "Hmm. Tuesdays work for me. How much?"
+    },
+    {
+     "speaker": "A",
+     "text": "80 pounds for six weeks, which is fine I think"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, that's reasonable. Will I make anything useful?"
+    },
+    {
+     "speaker": "A",
+     "text": "Probably a wonky mug. That's the tradition"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, love a wonky mug. Count me in!"
+    },
+    {
+     "speaker": "A",
+     "text": "Great! Should we bring anything?"
+    },
+    {
+     "speaker": "B",
+     "text": "Old clothes, apparently clay gets everywhere. Trust me"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, I'll wear my worst jumper then"
+    },
+    {
+     "speaker": "B",
+     "text": "Perfect, see you in the studio. Save me a spot near the window"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-54",
+   "source": "claude-haiku",
+   "topic": "Winter weekend in Austria",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Who's up for a snowy weekend in Austria in February?"
+    },
+    {
+     "speaker": "B",
+     "text": "I'm in if it's not too expensive. Which resort?"
+    },
+    {
+     "speaker": "A",
+     "text": "Something near Innsbruck, the train is only about four hours from Munich"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok, that's actually easy. Do we need to rent skis?"
+    },
+    {
+     "speaker": "A",
+     "text": "We could hire them there, but it's cheaper to bring our own"
+    },
+    {
+     "speaker": "B",
+     "text": "Fair. I'm only good on the easy slopes, just so you know"
+    },
+    {
+     "speaker": "A",
+     "text": "No stress, we'll stay on the blue runs. Lots of good cafes too"
+    },
+    {
+     "speaker": "B",
+     "text": "Now you've sold me. How much is the lift pass?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 55 euros a day, and we can share a chalet to save money"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds great. Let me check my leave first, I'll reply tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "Brilliant, the more the merrier. Bring your best woolly socks"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-55",
+   "source": "claude-haiku",
+   "topic": "Trousers need hemming",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Do you know a good tailor? These trousers are two inches too long"
+    },
+    {
+     "speaker": "B",
+     "text": "Yes, the one on Market Street, near the post office"
+    },
+    {
+     "speaker": "A",
+     "text": "Are they pricey? I could do it myself but my sewing is shocking"
+    },
+    {
+     "speaker": "B",
+     "text": "Usually around 12 pounds for a simple hem. Quick turnaround too"
+    },
+    {
+     "speaker": "A",
+     "text": "Perfect. Do they need them today or can I wait till Friday?"
+    },
+    {
+     "speaker": "B",
+     "text": "Depends how busy they are. Just call ahead to check"
+    },
+    {
+     "speaker": "A",
+     "text": "Good idea. Can they keep the original length, like the front?"
+    },
+    {
+     "speaker": "B",
+     "text": "Probably. Tell them to keep the turn-up if you want it"
+    },
+    {
+     "speaker": "A",
+     "text": "Oh, I didn't know there was a turn-up. You're right, it's a bit fancy"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, that's a classic look. Enjoy your new trousers"
+    },
+    {
+     "speaker": "A",
+     "text": "Thanks! At least they won't drag on the pavement anymore"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-56",
+   "source": "claude-haiku",
+   "topic": "Burst pipe in the flat",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Water is coming through my kitchen ceiling. Help!"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh no! Turn the stopcock off if you can find it"
+    },
+    {
+     "speaker": "A",
+     "text": "Under the sink? I'm turning it now, but the water's still going"
+    },
+    {
+     "speaker": "B",
+     "text": "Ok. Put buckets and towels down, and move the rugs"
+    },
+    {
+     "speaker": "A",
+     "text": "Got it. The plumber's emergency line is ringing, I'm calling now"
+    },
+    {
+     "speaker": "B",
+     "text": "Good. Did you take photos for the insurance?"
+    },
+    {
+     "speaker": "A",
+     "text": "Not yet! Taking some now, it's a mess"
+    },
+    {
+     "speaker": "B",
+     "text": "Do it quick before anything else gets soaked"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, done. The downstairs neighbour is going to be furious"
+    },
+    {
+     "speaker": "B",
+     "text": "Tell her you're sorry, and offer to pay for her carpet cleaning"
+    },
+    {
+     "speaker": "A",
+     "text": "I think I'll have to. Thanks for staying on the phone with me"
+    },
+    {
+     "speaker": "B",
+     "text": "No worries, what a nightmare. Keep me posted"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-57",
+   "source": "claude-haiku",
+   "topic": "Lost phone in a taxi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I left my phone in a black taxi last night!! Please tell me you have Find My"
+    },
+    {
+     "speaker": "B",
+     "text": "I do! Where's it showing?"
+    },
+    {
+     "speaker": "A",
+     "text": "Still in the same area, near the old station. It's moving though"
+    },
+    {
+     "speaker": "B",
+     "text": "Ouch, it might be on its way somewhere. Did you call the taxi firm?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, waiting on hold again, typical. The driver hasn't answered"
+    },
+    {
+     "speaker": "B",
+     "text": "Try the company app, sometimes drivers reply there"
+    },
+    {
+     "speaker": "A",
+     "text": "Good idea, I'll try now. Should I call the police?"
+    },
+    {
+     "speaker": "B",
+     "text": "Not yet. Let's see if the app works first"
+    },
+    {
+     "speaker": "A",
+     "text": "Ok, they've replied! He says he'll drop it at the depot at 8"
+    },
+    {
+     "speaker": "B",
+     "text": "Phew. That's lucky. Which depot?"
+    },
+    {
+     "speaker": "A",
+     "text": "The one on Harbour Road. I'll go and pick it up in the morning"
+    },
+    {
+     "speaker": "B",
+     "text": "Brilliant. Next time, take a photo of the number plate"
+    },
+    {
+     "speaker": "A",
+     "text": "Ha, yes, I'll do that. Lesson learned!"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-58",
+   "source": "claude-haiku",
+   "topic": "Carpool to the coast",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Driving to the coast on Friday, got room for two more if you want a lift"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh nice! What time are you leaving?"
+    },
+    {
+     "speaker": "A",
+     "text": "Around 6:30pm. We'll be there by 10 if the traffic is ok"
+    },
+    {
+     "speaker": "B",
+     "text": "That's late. I finish work at five, so it's doable"
+    },
+    {
+     "speaker": "A",
+     "text": "Great. Do you want to split the petrol? Maybe 15 pounds each"
+    },
+    {
+     "speaker": "B",
+     "text": "Sure. Who else is in the car?"
+    },
+    {
+     "speaker": "A",
+     "text": "Just me and Ben. He's really chatty, be warned lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, I can handle chatty. Do we stop for food?"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, we'll stop at a service station on the motorway"
+    },
+    {
+     "speaker": "B",
+     "text": "Sounds good. I'll bring snacks for the way"
+    },
+    {
+     "speaker": "A",
+     "text": "Brilliant. Honestly, this trip is going to be fun"
+    },
+    {
+     "speaker": "B",
+     "text": "Agreed. See you Friday at the usual place"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-59",
+   "source": "claude-haiku",
+   "topic": "First date at a coffee shop",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Hey, I'm in the coffee shop by the harbour, window table with a red mug"
+    },
+    {
+     "speaker": "B",
+     "text": "Sorry, the tube was delayed!! I'll be there in five minutes"
+    },
+    {
+     "speaker": "A",
+     "text": "No stress. I've ordered a tea already"
+    },
+    {
+     "speaker": "B",
+     "text": "Great. How will I spot you?"
+    },
+    {
+     "speaker": "A",
+     "text": "I'm wearing a green jumper, I'll wave if you don't see me"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh, I can see you already. Hi!"
+    },
+    {
+     "speaker": "A",
+     "text": "Haha, hi! You look just like your photos"
+    },
+    {
+     "speaker": "B",
+     "text": "Thanks, I think. Did you have a good day?"
+    },
+    {
+     "speaker": "A",
+     "text": "Chaotic, but I'm glad I made it here. Your day?"
+    },
+    {
+     "speaker": "B",
+     "text": "Long meeting, two cups of coffee, and I'm still tired"
+    },
+    {
+     "speaker": "A",
+     "text": "I can see the coffee has worked a little"
+    },
+    {
+     "speaker": "B",
+     "text": "Ha, fair. So, what do you do for fun?"
+    },
+    {
+     "speaker": "A",
+     "text": "Cycling, cooking, and far too much time on the sofa with a series"
+    },
+    {
+     "speaker": "B",
+     "text": "Same. My weakness is anything involving a detective"
+    }
+   ]
+  },
+  {
+   "id": "haiku-en-60",
+   "source": "claude-haiku",
+   "topic": "Parents evening at school",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Parents evening is on Wednesday, can you come with me?"
+    },
+    {
+     "speaker": "B",
+     "text": "What time? I need to pick up my mum before that"
+    },
+    {
+     "speaker": "A",
+     "text": "Seven pm in the main hall. Her teacher wants to talk about the school trip"
+    },
+    {
+     "speaker": "B",
+     "text": "Another trip? The last one cost a fortune"
+    },
+    {
+     "speaker": "A",
+     "text": "Yes, the coach to Scotland is around 180 pounds this year"
+    },
+    {
+     "speaker": "B",
+     "text": "Ouch. Let's go and ask whether there's a cheaper option"
+    },
+    {
+     "speaker": "A",
+     "text": "I'm making a list of questions already"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, you're so organised. Honestly, I'd never remember them all"
+    },
+    {
+     "speaker": "A",
+     "text": "Well, somebody has to do it, two kids is a lot to keep track of"
+    },
+    {
+     "speaker": "B",
+     "text": "I'll bring the coffee then. It's going to be a long evening"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-01",
+   "source": "gpt-6.1-terra",
+   "topic": "Meeting",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are we still meeting at 7"
+    },
+    {
+     "speaker": "B",
+     "text": "yes where should we go"
+    },
+    {
+     "speaker": "A",
+     "text": "the little park near the bridge"
+    },
+    {
+     "speaker": "B",
+     "text": "could we make it 7:30"
+    },
+    {
+     "speaker": "A",
+     "text": "sure I need to shop first"
+    },
+    {
+     "speaker": "B",
+     "text": "great I will bring the ball"
+    },
+    {
+     "speaker": "A",
+     "text": "should I get some water too"
+    },
+    {
+     "speaker": "B",
+     "text": "yes two bottles would be nice"
+    },
+    {
+     "speaker": "A",
+     "text": "cool see you there tomorrow"
+    },
+    {
+     "speaker": "B",
+     "text": "see you then!!"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-02",
+   "source": "gpt-6.1-terra",
+   "topic": "Work",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are you at the office today"
+    },
+    {
+     "speaker": "B",
+     "text": "not yet I arrive at 9:30"
+    },
+    {
+     "speaker": "A",
+     "text": "can you bring the report"
+    },
+    {
+     "speaker": "B",
+     "text": "yes the latest version is ready"
+    },
+    {
+     "speaker": "A",
+     "text": "great I will check the numbers"
+    },
+    {
+     "speaker": "B",
+     "text": "do you need anything else"
+    },
+    {
+     "speaker": "A",
+     "text": "just the table from last week"
+    },
+    {
+     "speaker": "B",
+     "text": "I will send it right now"
+    },
+    {
+     "speaker": "A",
+     "text": "thanks see you later"
+    },
+    {
+     "speaker": "B",
+     "text": "see u soon"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-03",
+   "source": "gpt-6.1-terra",
+   "topic": "Moving",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "how is the packing going"
+    },
+    {
+     "speaker": "B",
+     "text": "slowly but the kitchen is done"
+    },
+    {
+     "speaker": "A",
+     "text": "do you need help on Saturday"
+    },
+    {
+     "speaker": "B",
+     "text": "yes from 10 would be great"
+    },
+    {
+     "speaker": "A",
+     "text": "I can bring some boxes too"
+    },
+    {
+     "speaker": "B",
+     "text": "please bring three big ones"
+    },
+    {
+     "speaker": "A",
+     "text": "will everything fit in the car"
+    },
+    {
+     "speaker": "B",
+     "text": "I think two trips should work"
+    },
+    {
+     "speaker": "A",
+     "text": "ok I will be on time"
+    },
+    {
+     "speaker": "B",
+     "text": "thanks that helps a lot"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-04",
+   "source": "gpt-6.1-terra",
+   "topic": "Sports",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are you coming to practice"
+    },
+    {
+     "speaker": "B",
+     "text": "yes if the rain stops"
+    },
+    {
+     "speaker": "A",
+     "text": "the forecast says dry after 6"
+    },
+    {
+     "speaker": "B",
+     "text": "then meet me at the gate"
+    },
+    {
+     "speaker": "A",
+     "text": "should I bring the new ball"
+    },
+    {
+     "speaker": "B",
+     "text": "yes the old one leaks air"
+    },
+    {
+     "speaker": "A",
+     "text": "I might be ten minutes late"
+    },
+    {
+     "speaker": "B",
+     "text": "no problem we will warm up"
+    },
+    {
+     "speaker": "A",
+     "text": "see you soon bring water"
+    },
+    {
+     "speaker": "B",
+     "text": "will do see you"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-05",
+   "source": "gpt-6.1-terra",
+   "topic": "Cooking",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "what should we cook tonight"
+    },
+    {
+     "speaker": "B",
+     "text": "I am in the mood for pasta"
+    },
+    {
+     "speaker": "A",
+     "text": "tomatoes or mushrooms with that"
+    },
+    {
+     "speaker": "B",
+     "text": "mushrooms please and lots of garlic"
+    },
+    {
+     "speaker": "A",
+     "text": "do we have enough cream"
+    },
+    {
+     "speaker": "B",
+     "text": "idk I will check the fridge"
+    },
+    {
+     "speaker": "A",
+     "text": "I can bring oat milk instead"
+    },
+    {
+     "speaker": "B",
+     "text": "good idea and some salad"
+    },
+    {
+     "speaker": "A",
+     "text": "shall we eat at half past seven"
+    },
+    {
+     "speaker": "B",
+     "text": "yes that works for me"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-06",
+   "source": "gpt-6.1-terra",
+   "topic": "Technology",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "my tablet is not charging"
+    },
+    {
+     "speaker": "B",
+     "text": "did you try another cable"
+    },
+    {
+     "speaker": "A",
+     "text": "not yet I am looking for one"
+    },
+    {
+     "speaker": "B",
+     "text": "you can borrow mine to test"
+    },
+    {
+     "speaker": "A",
+     "text": "thanks does your light turn on"
+    },
+    {
+     "speaker": "B",
+     "text": "yes after a few seconds"
+    },
+    {
+     "speaker": "A",
+     "text": "oh your cable works fine"
+    },
+    {
+     "speaker": "B",
+     "text": "then your cable is probably broken"
+    },
+    {
+     "speaker": "A",
+     "text": "I will order another tomorrow"
+    },
+    {
+     "speaker": "B",
+     "text": "glad it was an easy fix"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-07",
+   "source": "gpt-6.1-terra",
+   "topic": "Travel",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did you check the train times"
+    },
+    {
+     "speaker": "B",
+     "text": "yes the first leaves at 8:12"
+    },
+    {
+     "speaker": "A",
+     "text": "that is a bit too early"
+    },
+    {
+     "speaker": "B",
+     "text": "the next one leaves at 9:40"
+    },
+    {
+     "speaker": "A",
+     "text": "perfect we can eat breakfast first"
+    },
+    {
+     "speaker": "B",
+     "text": "should we reserve our seats"
+    },
+    {
+     "speaker": "A",
+     "text": "yes a window seat would be nice"
+    },
+    {
+     "speaker": "B",
+     "text": "I will book tonight"
+    },
+    {
+     "speaker": "A",
+     "text": "great how much does it cost"
+    },
+    {
+     "speaker": "B",
+     "text": "around 24 euros I think"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-08",
+   "source": "gpt-6.1-terra",
+   "topic": "Family",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "is everyone coming for lunch Sunday"
+    },
+    {
+     "speaker": "B",
+     "text": "almost my brother is still working"
+    },
+    {
+     "speaker": "A",
+     "text": "oh when does he finish"
+    },
+    {
+     "speaker": "B",
+     "text": "probably around 4 in the afternoon"
+    },
+    {
+     "speaker": "A",
+     "text": "then we can have coffee later"
+    },
+    {
+     "speaker": "B",
+     "text": "I will bake a small cake"
+    },
+    {
+     "speaker": "A",
+     "text": "should I bring some fruit"
+    },
+    {
+     "speaker": "B",
+     "text": "yes apples and pears please"
+    },
+    {
+     "speaker": "A",
+     "text": "all right see you Sunday"
+    },
+    {
+     "speaker": "B",
+     "text": "we look forward to it"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-09",
+   "source": "gpt-6.1-terra",
+   "topic": "Series",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did you watch the new episode"
+    },
+    {
+     "speaker": "B",
+     "text": "yes I saw it last night"
+    },
+    {
+     "speaker": "A",
+     "text": "what did you think of the ending"
+    },
+    {
+     "speaker": "B",
+     "text": "surprising but pretty good tbh"
+    },
+    {
+     "speaker": "A",
+     "text": "I had to rewind that scene"
+    },
+    {
+     "speaker": "B",
+     "text": "lol same it was wild"
+    },
+    {
+     "speaker": "A",
+     "text": "do you think another season is coming"
+    },
+    {
+     "speaker": "B",
+     "text": "idk I have not read anything"
+    },
+    {
+     "speaker": "A",
+     "text": "guess we will have to wait"
+    },
+    {
+     "speaker": "B",
+     "text": "please no spoilers for the others"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-10",
+   "source": "gpt-6.1-terra",
+   "topic": "Shopping",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "I am going to the store"
+    },
+    {
+     "speaker": "B",
+     "text": "could you pick up some milk"
+    },
+    {
+     "speaker": "A",
+     "text": "sure how much do we need"
+    },
+    {
+     "speaker": "B",
+     "text": "two liters and some bread please"
+    },
+    {
+     "speaker": "A",
+     "text": "which bread would you like"
+    },
+    {
+     "speaker": "B",
+     "text": "the dark one with seeds"
+    },
+    {
+     "speaker": "A",
+     "text": "it costs 2,50 today"
+    },
+    {
+     "speaker": "B",
+     "text": "great please get eggs too"
+    },
+    {
+     "speaker": "A",
+     "text": "anything else before I pay"
+    },
+    {
+     "speaker": "B",
+     "text": "no thanks that is all"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-11",
+   "source": "gpt-6.1-terra",
+   "topic": "Appointment",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "when is your appointment tomorrow"
+    },
+    {
+     "speaker": "B",
+     "text": "at 11:15 at the clinic"
+    },
+    {
+     "speaker": "A",
+     "text": "shall I pick you up afterward"
+    },
+    {
+     "speaker": "B",
+     "text": "yes please if you have time"
+    },
+    {
+     "speaker": "A",
+     "text": "I will be nearby after twelve"
+    },
+    {
+     "speaker": "B",
+     "text": "great I will text you then"
+    },
+    {
+     "speaker": "A",
+     "text": "do you need anything beforehand"
+    },
+    {
+     "speaker": "B",
+     "text": "no I packed everything already"
+    },
+    {
+     "speaker": "A",
+     "text": "good luck I hope it goes well"
+    },
+    {
+     "speaker": "B",
+     "text": "thanks see you tomorrow"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-12",
+   "source": "gpt-6.1-terra",
+   "topic": "Gaming",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are you online tonight"
+    },
+    {
+     "speaker": "B",
+     "text": "yes around 8 I think"
+    },
+    {
+     "speaker": "A",
+     "text": "shall we try the new map"
+    },
+    {
+     "speaker": "B",
+     "text": "definitely I have not seen it"
+    },
+    {
+     "speaker": "A",
+     "text": "me neither this should be fun"
+    },
+    {
+     "speaker": "B",
+     "text": "does anyone have a working mic"
+    },
+    {
+     "speaker": "A",
+     "text": "mine works again after the update"
+    },
+    {
+     "speaker": "B",
+     "text": "nice I just need to log in"
+    },
+    {
+     "speaker": "A",
+     "text": "brb starting my computer now"
+    },
+    {
+     "speaker": "B",
+     "text": "no rush we can wait"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-13",
+   "source": "gpt-6.1-terra",
+   "topic": "University",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "did you understand the assignment"
+    },
+    {
+     "speaker": "B",
+     "text": "partly but question 3 is hard"
+    },
+    {
+     "speaker": "A",
+     "text": "want to look at it together"
+    },
+    {
+     "speaker": "B",
+     "text": "yes tomorrow after the lecture"
+    },
+    {
+     "speaker": "A",
+     "text": "I am free at 2"
+    },
+    {
+     "speaker": "B",
+     "text": "meet at the library then"
+    },
+    {
+     "speaker": "A",
+     "text": "sure I will bring my notes"
+    },
+    {
+     "speaker": "B",
+     "text": "great I will bring my laptop"
+    },
+    {
+     "speaker": "A",
+     "text": "see you tomorrow and thanks"
+    },
+    {
+     "speaker": "B",
+     "text": "we will figure it out"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-14",
+   "source": "gpt-6.1-terra",
+   "topic": "Weather",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "is it windy there too"
+    },
+    {
+     "speaker": "B",
+     "text": "yes leaves are flying everywhere"
+    },
+    {
+     "speaker": "A",
+     "text": "is it supposed to rain later"
+    },
+    {
+     "speaker": "B",
+     "text": "the app says maybe after 3"
+    },
+    {
+     "speaker": "A",
+     "text": "then I will go outside now"
+    },
+    {
+     "speaker": "B",
+     "text": "take a jacket just in case"
+    },
+    {
+     "speaker": "A",
+     "text": "good call it is really cold"
+    },
+    {
+     "speaker": "B",
+     "text": "yesterday it was 20 degrees"
+    },
+    {
+     "speaker": "A",
+     "text": "and today only nine?!"
+    },
+    {
+     "speaker": "B",
+     "text": "autumn weather I guess"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-15",
+   "source": "gpt-6.1-terra",
+   "topic": "Car",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "when is your car appointment"
+    },
+    {
+     "speaker": "B",
+     "text": "Friday at 8 in the morning"
+    },
+    {
+     "speaker": "A",
+     "text": "can I pick you up afterward"
+    },
+    {
+     "speaker": "B",
+     "text": "that would be great thanks"
+    },
+    {
+     "speaker": "A",
+     "text": "how long will the check take"
+    },
+    {
+     "speaker": "B",
+     "text": "they said about two hours"
+    },
+    {
+     "speaker": "A",
+     "text": "then we can get some coffee"
+    },
+    {
+     "speaker": "B",
+     "text": "sure coffee is on me"
+    },
+    {
+     "speaker": "A",
+     "text": "deal see you Friday morning"
+    },
+    {
+     "speaker": "B",
+     "text": "see you and drive safely"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-16",
+   "source": "gpt-6.1-terra",
+   "topic": "Garden",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "your tomatoes look really good"
+    },
+    {
+     "speaker": "B",
+     "text": "thanks the sun helped a lot"
+    },
+    {
+     "speaker": "A",
+     "text": "when did you plant them"
+    },
+    {
+     "speaker": "B",
+     "text": "early May in little pots"
+    },
+    {
+     "speaker": "A",
+     "text": "I will try that next year"
+    },
+    {
+     "speaker": "B",
+     "text": "use loose soil and enough water"
+    },
+    {
+     "speaker": "A",
+     "text": "how often do you water them"
+    },
+    {
+     "speaker": "B",
+     "text": "every morning when it is hot"
+    },
+    {
+     "speaker": "A",
+     "text": "thanks for the tip"
+    },
+    {
+     "speaker": "B",
+     "text": "sure show me your plants later"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-17",
+   "source": "gpt-6.1-terra",
+   "topic": "Music",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "do you have a driving playlist"
+    },
+    {
+     "speaker": "B",
+     "text": "yes I am making one now"
+    },
+    {
+     "speaker": "A",
+     "text": "please add something relaxing too"
+    },
+    {
+     "speaker": "B",
+     "text": "sure and a few old songs"
+    },
+    {
+     "speaker": "A",
+     "text": "how long is the drive"
+    },
+    {
+     "speaker": "B",
+     "text": "almost three hours without a break"
+    },
+    {
+     "speaker": "A",
+     "text": "then we need more music"
+    },
+    {
+     "speaker": "B",
+     "text": "send me your three favorites"
+    },
+    {
+     "speaker": "A",
+     "text": "I will after dinner"
+    },
+    {
+     "speaker": "B",
+     "text": "perfect thank you"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-18",
+   "source": "gpt-6.1-terra",
+   "topic": "Pet",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "how is the little dog doing"
+    },
+    {
+     "speaker": "B",
+     "text": "much better he is asleep now"
+    },
+    {
+     "speaker": "A",
+     "text": "has he eaten anything today"
+    },
+    {
+     "speaker": "B",
+     "text": "yes a small portion this morning"
+    },
+    {
+     "speaker": "A",
+     "text": "should I walk him later"
+    },
+    {
+     "speaker": "B",
+     "text": "yes but just a short walk"
+    },
+    {
+     "speaker": "A",
+     "text": "I can be there at 5"
+    },
+    {
+     "speaker": "B",
+     "text": "that works thanks for helping"
+    },
+    {
+     "speaker": "A",
+     "text": "should I bring his toy"
+    },
+    {
+     "speaker": "B",
+     "text": "yes the blue one please"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-19",
+   "source": "gpt-6.1-terra",
+   "topic": "Birthday",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are we planning something Saturday"
+    },
+    {
+     "speaker": "B",
+     "text": "yes maybe a small surprise"
+    },
+    {
+     "speaker": "A",
+     "text": "I could bake a cake"
+    },
+    {
+     "speaker": "B",
+     "text": "great I will get the drinks"
+    },
+    {
+     "speaker": "A",
+     "text": "how many people are coming"
+    },
+    {
+     "speaker": "B",
+     "text": "seven have said yes so far"
+    },
+    {
+     "speaker": "A",
+     "text": "shall we start at 7"
+    },
+    {
+     "speaker": "B",
+     "text": "yes then everything will be ready"
+    },
+    {
+     "speaker": "A",
+     "text": "I will bring candles too"
+    },
+    {
+     "speaker": "B",
+     "text": "great this will be fun"
+    }
+   ]
+  },
+  {
+   "id": "terra-en-20",
+   "source": "gpt-6.1-terra",
+   "topic": "Languages",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "are you still studying every evening"
+    },
+    {
+     "speaker": "B",
+     "text": "mostly just ten minutes a day"
+    },
+    {
+     "speaker": "A",
+     "text": "does the new app help"
+    },
+    {
+     "speaker": "B",
+     "text": "yes especially the short exercises"
+    },
+    {
+     "speaker": "A",
+     "text": "I forget new words so quickly"
+    },
+    {
+     "speaker": "B",
+     "text": "I write them on little cards"
+    },
+    {
+     "speaker": "A",
+     "text": "I will try that too"
+    },
+    {
+     "speaker": "B",
+     "text": "we could practice together tomorrow"
+    },
+    {
+     "speaker": "A",
+     "text": "sure at 6 on video"
+    },
+    {
+     "speaker": "B",
+     "text": "deal see you tomorrow"
+    }
+   ]
+  }
+ ]
+}

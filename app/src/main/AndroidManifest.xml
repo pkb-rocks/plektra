@@ -151,6 +151,16 @@
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:label="@string/notes_title" android:theme="@style/Theme.Plektra" />
 
+        <activity android:name=".training.KeyCorrectionActivity" android:exported="false"
+            android:label="@string/software_keyboard_key_correction_title" android:theme="@style/Theme.Plektra" />
+
+        <receiver android:name=".training.TypingTrainingReminderReceiver" android:exported="false" />
+
+        <activity android:name=".training.TypingTrainingActivity" android:exported="false"
+            android:label="@string/typing_training_title" android:theme="@style/Theme.Plektra"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density|keyboard|keyboardHidden|navigation"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity android:name=".CornerCalibrationActivity" android:exported="false"
             android:label="Displaykurve kalibrieren" android:theme="@style/Theme.Plektra" />
 

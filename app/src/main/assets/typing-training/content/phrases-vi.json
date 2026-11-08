@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-vi-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sáng nay trời mưa to quá, mình phải trú dưới mái hiên gần nửa tiếng."
+  },
+  {
+   "id": "opus-vi-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bà ngoại tôi vẫn giữ thói quen uống trà sen mỗi buổi sáng."
+  },
+  {
+   "id": "opus-vi-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chợ gần nhà mở cửa từ 5 giờ sáng, nhưng đông nhất là khoảng 7 giờ."
+  },
+  {
+   "id": "opus-vi-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bạn có biết tiệm sửa xe nào còn mở cửa lúc này không?"
+  },
+  {
+   "id": "opus-vi-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chúng tôi đã đặt bàn lúc 19:30, nhưng nhà hàng vẫn bắt chờ thêm 20 phút."
+  },
+  {
+   "id": "opus-vi-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mẹ dặn tôi mang theo áo mưa; quả nhiên, chiều đó trời đổ mưa."
+  },
+  {
+   "id": "opus-vi-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Cuốn sách này (do chị tôi tặng) đã nằm trên kệ suốt hai năm."
+  },
+  {
+   "id": "opus-vi-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tháng này tiền nhà tăng thêm 500.000 đồng, thật khó mà xoay xở."
+  },
+  {
+   "id": "opus-vi-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Con mèo nhà hàng xóm lại nằm ngủ trên nóc xe của tôi!"
+  },
+  {
+   "id": "opus-vi-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ông tôi kể rằng hồi trẻ, ông từng đạp xe từ Huế ra Hà Nội."
+  },
+  {
+   "id": "opus-vi-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nếu ngày mai không mưa, cả nhà sẽ đi dã ngoại ở bờ hồ."
+  },
+  {
+   "id": "opus-vi-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tôi quên mật khẩu wifi lần thứ ba trong tuần - thật đáng xấu hổ."
+  },
+  {
+   "id": "opus-vi-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Đêm qua mất điện từ 21 giờ đến gần nửa đêm, nóng không ngủ được."
+  },
+  {
+   "id": "opus-vi-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hàng phở đầu ngõ đã bán ở đó hơn ba mươi năm rồi."
+  },
+  {
+   "id": "opus-vi-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ai để quên chiếc ô màu xanh ở phòng họp tầng 3 vậy?"
+  },
+  {
+   "id": "opus-vi-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Cô giáo khen bài văn của em, nhưng nhắc em viết chữ cẩn thận hơn."
+  },
+  {
+   "id": "opus-vi-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sau cơn bão, cả xóm cùng nhau dọn dẹp cây đổ trên đường."
+  },
+  {
+   "id": "opus-vi-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chuyến xe khách cuối cùng rời bến lúc 22:15; đừng để lỡ nhé!"
+  },
+  {
+   "id": "opus-vi-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tôi đã học tiếng Nhật được hai năm, nhưng vẫn ngại nói chuyện với người lạ."
+  },
+  {
+   "id": "opus-vi-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hôm qua em bé nhà tôi lần đầu tiên tự đi được năm bước."
+  },
+  {
+   "id": "opus-vi-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Giá xăng lại tăng: hôm nay đã lên tới 24.500 đồng một lít."
+  },
+  {
+   "id": "opus-vi-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mùa thu Hà Nội có mùi hoa sữa thoang thoảng khắp các con phố."
+  },
+  {
+   "id": "opus-vi-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bạn đã bao giờ thử ngồi thuyền trên sông vào lúc bình minh chưa?"
+  },
+  {
+   "id": "opus-vi-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Anh ấy chạy bộ mỗi sáng, dù trời nắng hay mưa."
+  },
+  {
+   "id": "opus-vi-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Quán cà phê ở góc phố vừa đổi chủ, đồ uống cũng ngon hơn hẳn."
+  },
+  {
+   "id": "opus-vi-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tôi tìm thấy một lá thư cũ bố viết từ năm 1985 trong ngăn kéo."
+  },
+  {
+   "id": "opus-vi-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Thư viện thành phố mở cửa đến 20 giờ, kể cả thứ bảy."
+  },
+  {
+   "id": "opus-vi-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Đường này hay ngập mỗi khi triều cường lên, nên đi đường vòng cho an toàn."
+  },
+  {
+   "id": "opus-vi-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Không ai nhớ ai là người đã đặt tên cho con chó là \"Mực\"."
+  },
+  {
+   "id": "opus-vi-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hai chị em cãi nhau suốt buổi chỉ vì cái điều khiển ti vi."
+  },
+  {
+   "id": "opus-vi-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Món canh chua của mẹ luôn có vị ngọt của dứa và mùi thơm của rau ngổ."
+  },
+  {
+   "id": "opus-vi-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Năm nay trường tôi tổ chức hội trại vào cuối tháng 3."
+  },
+  {
+   "id": "opus-vi-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Trời ơi, chiếc áo này giặt một lần mà đã co lại cả cỡ!"
+  },
+  {
+   "id": "opus-vi-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tàu chậm hơn dự kiến 40 phút, vì vậy chúng tôi lỡ cả buổi họp đầu tiên."
+  },
+  {
+   "id": "opus-vi-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ông bà tôi trồng một vườn rau nhỏ sau nhà: cải, hành, mồng tơi và ớt."
+  },
+  {
+   "id": "opus-vi-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Có ai biết vì sao điện thoại tôi cứ tự tắt khi pin còn 20% không?"
+  },
+  {
+   "id": "opus-vi-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Đứa cháu năm tuổi hỏi tôi tại sao mặt trăng cứ đi theo xe."
+  },
+  {
+   "id": "opus-vi-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chúng tôi chia tiền bữa ăn qua ứng dụng, mỗi người 135.000 đồng."
+  },
+  {
+   "id": "opus-vi-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Lâu lắm rồi tôi mới được ngủ một giấc tới tận 9 giờ sáng."
+  },
+  {
+   "id": "opus-vi-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nhà văn hóa phường sẽ mở lớp dạy bơi miễn phí cho trẻ em trong hè."
+  },
+  {
+   "id": "opus-vi-p041",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Đi chậm mà chắc còn hơn chạy nhanh rồi vấp ngã.\""
+  },
+  {
+   "id": "opus-vi-p042",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Một ly cà phê ngon có thể cứu cả một buổi sáng tồi tệ.\""
+  },
+  {
+   "id": "opus-vi-p043",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Nhà có thể nhỏ, nhưng bữa cơm phải đủ người.\""
+  },
+  {
+   "id": "opus-vi-p044",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Người chịu hỏi đường thì không bao giờ lạc lâu.\""
+  },
+  {
+   "id": "opus-vi-p045",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Mưa rồi cũng tạnh; điều quan trọng là bạn có mang ô hay không.\""
+  },
+  {
+   "id": "opus-vi-p046",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Đừng đợi rảnh mới đọc sách; hãy đọc sách để biết quý thời gian.\""
+  },
+  {
+   "id": "opus-vi-p047",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Ai cũng muốn đi xa, nhưng ai cũng nhớ đường về nhà.\""
+  },
+  {
+   "id": "opus-vi-p048",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Hôm nay gieo một hạt, mai sau có cả vườn.\""
+  },
+  {
+   "id": "opus-vi-p049",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Tiếng cười chung một mâm ngon hơn mọi món ăn đắt tiền.\""
+  },
+  {
+   "id": "opus-vi-p050",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Học một ngôn ngữ mới là mở thêm một cánh cửa sổ.\""
+  },
+  {
+   "id": "opus-vi-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Biển không vội, nhưng sóng vẫn về đến bờ.\""
+  },
+  {
+   "id": "opus-vi-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Chiếc xe cũ đi chậm, nhưng chưa bao giờ bỏ ai giữa đường.\""
+  },
+  {
+   "id": "opus-vi-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Bàn tay chăm chỉ không bao giờ phải ngồi chờ may mắn.\""
+  },
+  {
+   "id": "opus-vi-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Lời hứa nhỏ mà giữ được còn quý hơn lời hứa lớn bị quên.\""
+  },
+  {
+   "id": "opus-vi-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Con đường quen thuộc nhất vẫn có những góc ta chưa từng nhìn thấy.\""
+  },
+  {
+   "id": "opus-vi-p056",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Đun sôi nước, để nguội khoảng 2 phút rồi mới rót vào ấm trà."
+  },
+  {
+   "id": "opus-vi-p057",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Nhấn nút màu xanh, sau đó nhập mã xác nhận gồm 6 chữ số."
+  },
+  {
+   "id": "opus-vi-p058",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Trước khi ra khỏi nhà, hãy kiểm tra lại bếp ga và khóa cửa sổ."
+  },
+  {
+   "id": "opus-vi-p059",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ngâm gạo nếp qua đêm, sáng hôm sau vo sạch và để ráo nước."
+  },
+  {
+   "id": "opus-vi-p060",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Lưu ý: không để hành lý mà không có người trông coi trong nhà ga."
+  },
+  {
+   "id": "opus-vi-p061",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Đi thẳng đến ngã tư thứ hai, rẽ trái, rồi đi thêm khoảng 200 mét."
+  },
+  {
+   "id": "opus-vi-p062",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ghi họ tên và số điện thoại vào ô bên dưới (viết chữ in hoa)."
+  },
+  {
+   "id": "opus-vi-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Rửa sạch rau, cắt khúc dài khoảng 5 cm rồi xào nhanh với tỏi."
+  },
+  {
+   "id": "opus-vi-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Phân loại rác: chai nhựa bỏ thùng màu vàng, giấy bỏ thùng màu xanh."
+  },
+  {
+   "id": "opus-vi-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Gọi điện cho phòng khám trước 10 giờ để đặt lịch hẹn trong ngày."
+  },
+  {
+   "id": "opus-vi-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Nếu quên mật khẩu, bấm vào \"Quên mật khẩu\" ở góc dưới màn hình."
+  },
+  {
+   "id": "opus-vi-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Mang theo giày thể thao, áo khoác mỏng và đủ nước uống cho cả ngày."
+  },
+  {
+   "id": "opus-vi-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Khóa xe đạp vào hàng rào; đừng khóa vào cây xanh nhé."
+  },
+  {
+   "id": "opus-vi-p069",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Hàng loạt chuyến bay bị hoãn do bão lớn ở miền Trung"
+  },
+  {
+   "id": "opus-vi-p070",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Giá rau xanh tăng mạnh sau đợt mưa kéo dài"
+  },
+  {
+   "id": "opus-vi-p071",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Thư viện lưu động lần đầu tiên về các xã vùng cao"
+  },
+  {
+   "id": "opus-vi-p072",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Trường tiểu học trong làng kỷ niệm 50 năm thành lập"
+  },
+  {
+   "id": "opus-vi-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Đội bóng đá trẻ của tỉnh giành chức vô địch sau 20 năm"
+  },
+  {
+   "id": "opus-vi-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Tuyến xe buýt mới nối liền hai đầu thành phố từ tháng 4"
+  },
+  {
+   "id": "opus-vi-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Lễ hội ẩm thực đường phố thu hút hơn 30.000 lượt khách"
+  },
+  {
+   "id": "opus-vi-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "\"Chúng tôi cần thêm công viên\" - người dân khu phố mới lên tiếng"
+  },
+  {
+   "id": "opus-vi-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Chợ đêm cuối tuần trở lại sau hai năm tạm dừng"
+  },
+  {
+   "id": "opus-vi-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Cảnh báo: triều cường dâng cao, nhiều tuyến đường có thể ngập"
+  },
+  {
+   "id": "opus-vi-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Mở lớp tiếng Anh miễn phí cho người cao tuổi tại nhà văn hóa"
+  },
+  {
+   "id": "opus-vi-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Nông dân trúng mùa vải thiều, giá bán ổn định (theo hợp tác xã)"
+  }
+ ]
+}

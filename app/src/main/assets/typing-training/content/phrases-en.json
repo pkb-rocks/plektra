@@ -1,0 +1,724 @@
+{
+ "items": [
+  {
+   "id": "terra-en-p001",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The little bird rests on the warm roof."
+  },
+  {
+   "id": "terra-en-p002",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: The little bird rests on the warm roof."
+  },
+  {
+   "id": "terra-en-p003",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Tomorrow we will visit the market by the square."
+  },
+  {
+   "id": "terra-en-p004",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: Tomorrow we will visit the market by the square."
+  },
+  {
+   "id": "terra-en-p005",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Could you please open the window a little?"
+  },
+  {
+   "id": "terra-en-p006",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Could you please open the window a little?"
+  },
+  {
+   "id": "terra-en-p007",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "After the rain, the soil smells especially fresh."
+  },
+  {
+   "id": "terra-en-p008",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: After the rain, the soil smells especially fresh."
+  },
+  {
+   "id": "terra-en-p009",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Books, cups and a small plant fill the shelf."
+  },
+  {
+   "id": "terra-en-p010",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Books, cups and a small plant fill the shelf."
+  },
+  {
+   "id": "terra-en-p011",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today the class starts at nine in the morning."
+  },
+  {
+   "id": "terra-en-p012",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: Today the class starts at nine in the morning."
+  },
+  {
+   "id": "terra-en-p013",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Fresh herbs make the soup taste even better."
+  },
+  {
+   "id": "terra-en-p014",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Fresh herbs make the soup taste even better."
+  },
+  {
+   "id": "terra-en-p015",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Why is the key beside the empty bowl?"
+  },
+  {
+   "id": "terra-en-p016",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: Why is the key beside the empty bowl?"
+  },
+  {
+   "id": "terra-en-p017",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "On Saturday we will go to the lake together."
+  },
+  {
+   "id": "terra-en-p018",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: On Saturday we will go to the lake together."
+  },
+  {
+   "id": "terra-en-p019",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Please turn off the hallway light later tonight."
+  },
+  {
+   "id": "terra-en-p020",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: Please turn off the hallway light later tonight."
+  },
+  {
+   "id": "terra-en-p021",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Clouds move slowly over the dark green hills."
+  },
+  {
+   "id": "terra-en-p022",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Clouds move slowly over the dark green hills."
+  },
+  {
+   "id": "terra-en-p023",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "A red thread runs through the whole story."
+  },
+  {
+   "id": "terra-en-p024",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: A red thread runs through the whole story."
+  },
+  {
+   "id": "terra-en-p025",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "We need flour, water and a pinch of salt."
+  },
+  {
+   "id": "terra-en-p026",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: We need flour, water and a pinch of salt."
+  },
+  {
+   "id": "terra-en-p027",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The bus will probably arrive ten minutes late."
+  },
+  {
+   "id": "terra-en-p028",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: The bus will probably arrive ten minutes late."
+  },
+  {
+   "id": "terra-en-p029",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "She opens the door and smiles for a moment."
+  },
+  {
+   "id": "terra-en-p030",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: She opens the door and smiles for a moment."
+  },
+  {
+   "id": "terra-en-p031",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Everyone drinks tea together during the break."
+  },
+  {
+   "id": "terra-en-p032",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: Everyone drinks tea together during the break."
+  },
+  {
+   "id": "terra-en-p033",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Who put away the colorful pencils this morning?"
+  },
+  {
+   "id": "terra-en-p034",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Who put away the colorful pencils this morning?"
+  },
+  {
+   "id": "terra-en-p035",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The new recipe requires a little more patience."
+  },
+  {
+   "id": "terra-en-p036",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: The new recipe requires a little more patience."
+  },
+  {
+   "id": "terra-en-p037",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "A handwritten note lies on the wooden table."
+  },
+  {
+   "id": "terra-en-p038",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: A handwritten note lies on the wooden table."
+  },
+  {
+   "id": "terra-en-p039",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "When the weather is good, we eat outside."
+  },
+  {
+   "id": "terra-en-p040",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: When the weather is good, we eat outside."
+  },
+  {
+   "id": "terra-en-p041",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "A small step can take you surprisingly far."
+  },
+  {
+   "id": "terra-en-p042",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Today: A small step can take you surprisingly far."
+  },
+  {
+   "id": "terra-en-p043",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Even a detour can offer a lovely view."
+  },
+  {
+   "id": "terra-en-p044",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Perhaps: Even a detour can offer a lovely view."
+  },
+  {
+   "id": "terra-en-p045",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Patience grows when you give it some time."
+  },
+  {
+   "id": "terra-en-p046",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Today: Patience grows when you give it some time."
+  },
+  {
+   "id": "terra-en-p047",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Those who listen closely discover new questions."
+  },
+  {
+   "id": "terra-en-p048",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Perhaps: Those who listen closely discover new questions."
+  },
+  {
+   "id": "terra-en-p049",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "A good beginning can be very quiet."
+  },
+  {
+   "id": "terra-en-p050",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Today: A good beginning can be very quiet."
+  },
+  {
+   "id": "terra-en-p051",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Sometimes a pause is the best next step."
+  },
+  {
+   "id": "terra-en-p052",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Perhaps: Sometimes a pause is the best next step."
+  },
+  {
+   "id": "terra-en-p053",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Courage begins where curiosity becomes a little stronger."
+  },
+  {
+   "id": "terra-en-p054",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Today: Courage begins where curiosity becomes a little stronger."
+  },
+  {
+   "id": "terra-en-p055",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "An open question can unlock many new doors."
+  },
+  {
+   "id": "terra-en-p056",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Perhaps: An open question can unlock many new doors."
+  },
+  {
+   "id": "terra-en-p057",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Light thoughts can brighten a difficult afternoon."
+  },
+  {
+   "id": "terra-en-p058",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Today: Light thoughts can brighten a difficult afternoon."
+  },
+  {
+   "id": "terra-en-p059",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Every attempt reveals another little path forward."
+  },
+  {
+   "id": "terra-en-p060",
+   "source": "gpt-6.1-terra",
+   "kind": "quote",
+   "text": "Perhaps: Every attempt reveals another little path forward."
+  },
+  {
+   "id": "terra-en-p061",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Sort the cards by color and size."
+  },
+  {
+   "id": "terra-en-p062",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Today: Sort the cards by color and size."
+  },
+  {
+   "id": "terra-en-p063",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Please set the alarm for half past six."
+  },
+  {
+   "id": "terra-en-p064",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Perhaps: Please set the alarm for half past six."
+  },
+  {
+   "id": "terra-en-p065",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Read the question first and mark important words."
+  },
+  {
+   "id": "terra-en-p066",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Today: Read the question first and mark important words."
+  },
+  {
+   "id": "terra-en-p067",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Mix all the ingredients slowly in a large bowl."
+  },
+  {
+   "id": "terra-en-p068",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Perhaps: Mix all the ingredients slowly in a large bowl."
+  },
+  {
+   "id": "terra-en-p069",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Check the tire pressure before your next drive."
+  },
+  {
+   "id": "terra-en-p070",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Today: Check the tire pressure before your next drive."
+  },
+  {
+   "id": "terra-en-p071",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Put the green sheet on the top stack."
+  },
+  {
+   "id": "terra-en-p072",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Perhaps: Put the green sheet on the top stack."
+  },
+  {
+   "id": "terra-en-p073",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Save the file and close the window."
+  },
+  {
+   "id": "terra-en-p074",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Today: Save the file and close the window."
+  },
+  {
+   "id": "terra-en-p075",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Turn down the heat after five more minutes."
+  },
+  {
+   "id": "terra-en-p076",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Perhaps: Turn down the heat after five more minutes."
+  },
+  {
+   "id": "terra-en-p077",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Take a jacket in case it rains later."
+  },
+  {
+   "id": "terra-en-p078",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Today: Take a jacket in case it rains later."
+  },
+  {
+   "id": "terra-en-p079",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Write your answer in the empty space."
+  },
+  {
+   "id": "terra-en-p080",
+   "source": "gpt-6.1-terra",
+   "kind": "instruction",
+   "text": "Perhaps: Write your answer in the empty space."
+  },
+  {
+   "id": "terra-en-p081",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "New bicycle path connects two quiet neighborhoods."
+  },
+  {
+   "id": "terra-en-p082",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Today: New bicycle path connects two quiet neighborhoods."
+  },
+  {
+   "id": "terra-en-p083",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Small museum opens its doors this weekend."
+  },
+  {
+   "id": "terra-en-p084",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Perhaps: Small museum opens its doors this weekend."
+  },
+  {
+   "id": "terra-en-p085",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Fresh winds bring relief after several hot days."
+  },
+  {
+   "id": "terra-en-p086",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Today: Fresh winds bring relief after several hot days."
+  },
+  {
+   "id": "terra-en-p087",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Community project brings neighbors together for a meal."
+  },
+  {
+   "id": "terra-en-p088",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Perhaps: Community project brings neighbors together for a meal."
+  },
+  {
+   "id": "terra-en-p089",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "New exhibition shows pictures of distant landscapes."
+  },
+  {
+   "id": "terra-en-p090",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Today: New exhibition shows pictures of distant landscapes."
+  },
+  {
+   "id": "terra-en-p091",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Volunteers collect litter along the little river."
+  },
+  {
+   "id": "terra-en-p092",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Perhaps: Volunteers collect litter along the little river."
+  },
+  {
+   "id": "terra-en-p093",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Library expands its collection for young readers."
+  },
+  {
+   "id": "terra-en-p094",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Today: Library expands its collection for young readers."
+  },
+  {
+   "id": "terra-en-p095",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Local team wins a close game at last."
+  },
+  {
+   "id": "terra-en-p096",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Perhaps: Local team wins a close game at last."
+  },
+  {
+   "id": "terra-en-p097",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Colorful flowers transform the square in spring."
+  },
+  {
+   "id": "terra-en-p098",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Today: Colorful flowers transform the square in spring."
+  },
+  {
+   "id": "terra-en-p099",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "An old bridge gets a fresh coat of paint."
+  },
+  {
+   "id": "terra-en-p100",
+   "source": "gpt-6.1-terra",
+   "kind": "headline",
+   "text": "Perhaps: An old bridge gets a fresh coat of paint."
+  },
+  {
+   "id": "terra-en-p101",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "She asks: \"Will you come over later?\""
+  },
+  {
+   "id": "terra-en-p102",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: She asks: \"Will you come over later?\""
+  },
+  {
+   "id": "terra-en-p103",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The plan is ready; only the time is missing."
+  },
+  {
+   "id": "terra-en-p104",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: The plan is ready; only the time is missing."
+  },
+  {
+   "id": "terra-en-p105",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "My tip: Let the sauce cool down first."
+  },
+  {
+   "id": "terra-en-p106",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: My tip: Let the sauce cool down first."
+  },
+  {
+   "id": "terra-en-p107",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The package (still unopened) is in the hall."
+  },
+  {
+   "id": "terra-en-p108",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: The package (still unopened) is in the hall."
+  },
+  {
+   "id": "terra-en-p109",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "A coffee-break chat solved the little mystery."
+  },
+  {
+   "id": "terra-en-p110",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: A coffee-break chat solved the little mystery."
+  },
+  {
+   "id": "terra-en-p111",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "What time does the last train leave?"
+  },
+  {
+   "id": "terra-en-p112",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: What time does the last train leave?"
+  },
+  {
+   "id": "terra-en-p113",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Careful, the paint is still wet!"
+  },
+  {
+   "id": "terra-en-p114",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: Careful, the paint is still wet!"
+  },
+  {
+   "id": "terra-en-p115",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "He said: \"We can try again tomorrow.\""
+  },
+  {
+   "id": "terra-en-p116",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: He said: \"We can try again tomorrow.\""
+  },
+  {
+   "id": "terra-en-p117",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The list is long; we will start today anyway."
+  },
+  {
+   "id": "terra-en-p118",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Today: The list is long; we will start today anyway."
+  },
+  {
+   "id": "terra-en-p119",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "The summer-fair opens regardless of the weather."
+  },
+  {
+   "id": "terra-en-p120",
+   "source": "gpt-6.1-terra",
+   "kind": "sentence",
+   "text": "Perhaps: The summer-fair opens regardless of the weather."
+  }
+ ]
+}

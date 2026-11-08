@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-pl-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jadę dziś do pracy pociągiem, bo samochód stoi w warsztacie na Żoliborzu."
+  },
+  {
+   "id": "haiku-pl-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Zjedliśmy obiad na rynku w Krakowie i długo rozmawialiśmy o wakacjach."
+  },
+  {
+   "id": "haiku-pl-p003",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Kto czeka na dobrą okazję, często zapomina, że ją trzeba najpierw zauważyć."
+  },
+  {
+   "id": "haiku-pl-p004",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Wpisz swoje imię, nazwisko oraz numer PESEL w odpowiednim polu formularza."
+  },
+  {
+   "id": "haiku-pl-p005",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Rząd przedstawia nowy plan rozbudowy kolei na Pomorzu"
+  },
+  {
+   "id": "haiku-pl-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Babcia piecze szarlotkę co sobotę, a cała rodzina zawsze wpada na kawę."
+  },
+  {
+   "id": "haiku-pl-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Padało przez całe popołudnie, więc zostaliśmy w domu i graliśmy w karty."
+  },
+  {
+   "id": "haiku-pl-p008",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Kto żegluje bez celu, ten nigdy nie złapie wiatru w żagle, mawiał dziadek."
+  },
+  {
+   "id": "haiku-pl-p009",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Wyłącz tryb samolotowy przed uruchomieniem aplikacji z mapą, inaczej nie zadziała nawigacja."
+  },
+  {
+   "id": "haiku-pl-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ile razy mam ci powtarzać, żebyś posprzątał swój pokój?"
+  },
+  {
+   "id": "haiku-pl-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kawa kosztuje 12 zł w kawiarni przy dworcu, ale drożdżówka dziś gratis!"
+  },
+  {
+   "id": "haiku-pl-p012",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nowe badania pokazują, że sen ma większy wpływ na naukę niż sądzono"
+  },
+  {
+   "id": "haiku-pl-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Przebiegła dziesięć kilometrów w mniej niż godzinę i to był jej nowy rekord."
+  },
+  {
+   "id": "haiku-pl-p014",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Mistrzem nie zostaje się w jeden dzień; liczy się każdy trening, nawet krótki."
+  },
+  {
+   "id": "haiku-pl-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Autobus spóźnił się dwadzieścia minut, więc ledwo zdążyliśmy na pociąg."
+  },
+  {
+   "id": "haiku-pl-p016",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Pobierz aplikację z oficjalnego sklepu i zaloguj się na swoje konto."
+  },
+  {
+   "id": "haiku-pl-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Widziałeś już nowy sezon tego serialu, czy mam nic nie zdradzać?"
+  },
+  {
+   "id": "haiku-pl-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Musimy kupić mleko, jajka, chleb i kilka jabłek na weekend."
+  },
+  {
+   "id": "haiku-pl-p019",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "To nie czas, który masz, decyduje o wszystkim, lecz to, co z nim robisz."
+  },
+  {
+   "id": "haiku-pl-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Weterynarz powiedział, że kot czuje się dobrze, ale ma teraz jeść mniej karmy."
+  },
+  {
+   "id": "haiku-pl-p021",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Warszawiacy zapłacą więcej za parkowanie od przyszłego miesiąca"
+  },
+  {
+   "id": "haiku-pl-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Umówiliśmy się przy fontannie o wpół do ósmej, a ty przyszedłeś dwadzieścia minut później!"
+  },
+  {
+   "id": "haiku-pl-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Możesz mi przesłać dojazd na imprezę? Nie mogę znaleźć drogi."
+  },
+  {
+   "id": "haiku-pl-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Po przeprowadzce minęły trzy tygodnie, zanim znaleźliśmy klucze w kartonie."
+  },
+  {
+   "id": "haiku-pl-p025",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Posortuj pranie na ciemne i jasne, a wełnę pierz w 30 stopniach."
+  },
+  {
+   "id": "haiku-pl-p026",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Projekt skończyliśmy na czas, mimo że dwie koleżanki chorowały przez cały tydzień."
+  },
+  {
+   "id": "haiku-pl-p027",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Najlepszy plan to ten, który faktycznie realizujesz, nawet jeśli nie jest idealny."
+  },
+  {
+   "id": "haiku-pl-p028",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Poszliśmy starą ścieżką przez las i zatrzymaliśmy się przy jeziorze na herbatę."
+  },
+  {
+   "id": "haiku-pl-p029",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Dzieci uwielbiają bawić się w piaskownicy, ale zawsze zapominają umyć ręce."
+  },
+  {
+   "id": "haiku-pl-p030",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Pociąg do Gdańska odwołano z powodu awarii sygnalizacji; autobus odjeżdża z peronu czwartego."
+  },
+  {
+   "id": "haiku-pl-p031",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Drużyna wygrała 3:1 po późnym golu w drugiej połowie meczu"
+  },
+  {
+   "id": "haiku-pl-p032",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Abonament kosztuje 129 zł miesięcznie, plus jednorazowa opłata 350 zł."
+  },
+  {
+   "id": "haiku-pl-p033",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jejku, jak szybko leci czas! Przecież Sylwester był dopiero wczoraj, prawda?"
+  },
+  {
+   "id": "haiku-pl-p034",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Nagrzej piekarnik do 200 stopni i piecz ciasto około 35 minut."
+  },
+  {
+   "id": "haiku-pl-p035",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Siostra pracuje na nocnej zmianie w szpitalu trzy razy w tygodniu, więc w dzień śpi."
+  },
+  {
+   "id": "haiku-pl-p036",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Kto jest odważniejszy, ten, kto upada, czy ten, który nigdy nie próbuje?"
+  },
+  {
+   "id": "haiku-pl-p037",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Kupiła używane narty na targu staroci za 200 zł i była bardzo zadowolona."
+  },
+  {
+   "id": "haiku-pl-p038",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Pamiętaj, żeby zabrać paszport, bilet i ładowarkę, kiedy jedziesz na lotnisko."
+  },
+  {
+   "id": "haiku-pl-p039",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Będzie długi wieczór, ale pizza już jedzie, a wino czeka w lodówce."
+  },
+  {
+   "id": "haiku-pl-p040",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Ceny mieszkań spadają po raz pierwszy od trzech lat, wynika z nowego raportu"
+  },
+  {
+   "id": "haiku-pl-p041",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Znowu zapomniałem kodu do zapięcia roweru, typowe dla mnie!"
+  },
+  {
+   "id": "haiku-pl-p042",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "W lipcu jedziemy nad morze i wynajmiemy mały domek blisko plaży."
+  },
+  {
+   "id": "haiku-pl-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Uśmiech nic nie kosztuje, a potrafi dać bardzo wiele z powrotem."
+  },
+  {
+   "id": "haiku-pl-p044",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Naciśnij ikonę aparatu i przytrzymaj ją przez dwie sekundy."
+  },
+  {
+   "id": "haiku-pl-p045",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Pracuje na pół etatu w bibliotece i wieczorami studiuje historię sztuki."
+  },
+  {
+   "id": "haiku-pl-p046",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Słyszałeś, że w weekend zamkną drogę między Poznaniem a Kaliszem?"
+  },
+  {
+   "id": "haiku-pl-p047",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mieliśmy bardzo przyjemny piątek z lasagne, filmem i domowymi lodami."
+  },
+  {
+   "id": "haiku-pl-p048",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mama dzwoniła dziś dwa razy, więc pewnie chce porozmawiać o świętach."
+  },
+  {
+   "id": "haiku-pl-p049",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Droga do sukcesu jest wybrukowana drobnymi decyzjami, których nikt nie zauważa."
+  },
+  {
+   "id": "haiku-pl-p050",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Uważam, że powinniśmy zarezerwować stolik od razu, bo w sobotę będzie pełno."
+  },
+  {
+   "id": "haiku-pl-p051",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Termometr wskazywał rano minus cztery stopnie, więc jezioro pokryła cienka tafla lodu."
+  },
+  {
+   "id": "haiku-pl-p052",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Przeczytaj uważnie regulamin, zanim zaakceptujesz warunki i wyślesz wniosek."
+  },
+  {
+   "id": "haiku-pl-p053",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Dawno temu w lesie za starym młynem mieszkała mała lisica z trójką dzieci."
+  },
+  {
+   "id": "haiku-pl-p054",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Tysiące widzów odwiedziło festiwal w Opolu mimo ulewnego deszczu"
+  },
+  {
+   "id": "haiku-pl-p055",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Jest bardzo dokładna i zawsze sprawdza trzy razy, czy drzwi są zamknięte."
+  },
+  {
+   "id": "haiku-pl-p056",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Zdążyliśmy zwiedzić dwa muzea, przejść długi spacer i zjeść lody przed deszczem."
+  },
+  {
+   "id": "haiku-pl-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Włóż mrożone jagody do miski i zostaw je do rozmrożenia w lodówce na noc."
+  },
+  {
+   "id": "haiku-pl-p058",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Słuchaj więcej, niż mówisz, a dowiesz się więcej niż wszyscy inni w pokoju."
+  },
+  {
+   "id": "haiku-pl-p059",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Czy możemy przenieść spotkanie na czwartek? We wtorek mam wizytę u dentysty."
+  },
+  {
+   "id": "haiku-pl-p060",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ściągnąłem trzy nowe gry, ale zdążyłem przetestować tylko pierwszą przed pracą."
+  },
+  {
+   "id": "haiku-pl-p061",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Łoś stał na środku drogi i musieliśmy mocno zahamować."
+  },
+  {
+   "id": "haiku-pl-p062",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Napisz krótką wiadomość do nauczycielki i dołącz zdjęcie w tym samym mailu."
+  },
+  {
+   "id": "haiku-pl-p063",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "To najlepsza pizza, jaką jadłem od dawna, nie mów tego Ani!"
+  },
+  {
+   "id": "haiku-pl-p064",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Potrzebujemy więcej krzeseł, stołów i świec na piątkową imprezę w sali."
+  },
+  {
+   "id": "haiku-pl-p065",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Nowe przepisy dla hulajnóg elektrycznych wejdą w życie od pierwszego stycznia"
+  },
+  {
+   "id": "haiku-pl-p066",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Zaczęła studiować pielęgniarstwo jesienią i bardzo lubi zajęcia."
+  },
+  {
+   "id": "haiku-pl-p067",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Nie musisz być idealny, żeby zacząć, ale musisz zacząć, żeby stać się dobrym."
+  },
+  {
+   "id": "haiku-pl-p068",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Słońce wschodziło nad Mazurami, a wszystko wyglądało jak z pocztówki z lat sześćdziesiątych."
+  },
+  {
+   "id": "haiku-pl-p069",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Możesz odebrać dzieci z treningu o czwartej? Wrócę z pracy później."
+  },
+  {
+   "id": "haiku-pl-p070",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Używaj tylko hasła, które sam wymyśliłeś, i zmieniaj je regularnie."
+  },
+  {
+   "id": "haiku-pl-p071",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Po trzech godzinach w kolejce w końcu zobaczyliśmy słynną wystawę w Zachęcie."
+  },
+  {
+   "id": "haiku-pl-p072",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Lubi gotować od podstaw, nawet jeśli zajmuje mu to całą niedzielę."
+  },
+  {
+   "id": "haiku-pl-p073",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Na śniadanie będą naleśniki z dżemem i bitą śmietaną dla chętnych."
+  },
+  {
+   "id": "haiku-pl-p074",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Dlaczego w poniedziałki zawsze są tak długie kolejki? Naprawdę tego nie rozumiem."
+  },
+  {
+   "id": "haiku-pl-p075",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Szkoły w Łodzi wprowadzają nowy system elektronicznej obecności od jesieni"
+  },
+  {
+   "id": "haiku-pl-p076",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Pojechaliśmy pociągiem z Krakowa do Wrocławia i zjedliśmy obiad nad Odrą."
+  },
+  {
+   "id": "haiku-pl-p077",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Sąsiad ma psa, który szczeka każdego ranka o szóstej, niestety."
+  },
+  {
+   "id": "haiku-pl-p078",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Odwaga, by ponieść porażkę, to sposób, by pokazać, że poważnie traktujesz swoją pracę."
+  },
+  {
+   "id": "haiku-pl-p079",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Nie zapomnij zapisać pliku przed zamknięciem programu, bo wszystko przepadnie."
+  },
+  {
+   "id": "haiku-pl-p080",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Mam nadzieję, że pogoda utrzyma się cały tydzień, to będziemy grillować co wieczór!"
+  }
+ ]
+}

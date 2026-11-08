@@ -55,6 +55,7 @@ import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.languageCode
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import rocks.pkb.plektra.inputmethod.NotificationHelper
 import rocks.pkb.plektra.inputmethod.aospkeyboard.AospKeyboardView
+import rocks.pkb.plektra.inputmethod.aospkeyboard.KeyCorrectionProfiles
 import rocks.pkb.plektra.inputmethod.aospkeyboard.SoftwareKeyboardLayoutTemplates
 import rocks.pkb.plektra.inputmethod.aospkeyboard.SoftwareKeyboardSymLabels
 import android.content.res.AssetManager
@@ -1756,6 +1757,8 @@ class StatusBarController(
         keyboardView.includeNumberRow = SettingsManager.getSoftwareKeyboardNumberRowEnabled(context)
         keyboardView.nearestKeyTouchEnabled =
             SettingsManager.getSoftwareKeyboardNearestKeyTouchEnabled(context)
+        keyboardView.keyCorrectionEnabled = SettingsManager.getSoftwareKeyboardKeyCorrectionEnabled(context)
+        keyboardView.keyCorrectionProfile = KeyCorrectionProfiles.forView(context, layoutName, softwareKeyboardLayoutStyle().name)
         keyboardView.shifted = uppercase
         keyboardView.shiftLocked = snapshot.capsLockEnabled
         keyboardView.ctrlOneShot = snapshot.ctrlOneShot

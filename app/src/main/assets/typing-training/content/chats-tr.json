@@ -1,0 +1,1798 @@
+{
+ "chats": [
+  {
+   "id": "opus-tr-01",
+   "source": "claude-opus",
+   "topic": "İş toplantısı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Yarınki toplantı kaçta?"
+    },
+    {
+     "speaker": "B",
+     "text": "10.00, ama müdür biraz öne çekebilir dedi"
+    },
+    {
+     "speaker": "A",
+     "text": "Sunumu kim hazırlıyor?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sen ve ben galiba :)"
+    },
+    {
+     "speaker": "A",
+     "text": "Yaa, akşama kadar bitmez bu"
+    },
+    {
+     "speaker": "B",
+     "text": "Bölüşürüz, sen satış rakamlarını hallet, ben grafikleri yaparım"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam, excel dosyasını sana atıyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Geldi, saat 18.00'e kadar dönerim"
+    },
+    {
+     "speaker": "B",
+     "text": "Bir de projektörü kontrol et, geçen sefer çalışmadı"
+    },
+    {
+     "speaker": "A",
+     "text": "Haklısın, sabah erken gidip bakarım"
+    },
+    {
+     "speaker": "A",
+     "text": "Süpersin bu arada, yarın kahveler benden"
+    },
+    {
+     "speaker": "B",
+     "text": "Sütlü olsun, şekersiz"
+    },
+    {
+     "speaker": "A",
+     "text": "Not aldım hocam"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-02",
+   "source": "claude-opus",
+   "topic": "Doktor randevusu",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Annemin hastane randevusu için MHRS'ye giremiyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Şifre mi sorun?"
+    },
+    {
+     "speaker": "A",
+     "text": "e-Devlet şifresi istiyor, annemin şifresi yok"
+    },
+    {
+     "speaker": "B",
+     "text": "PTT'den alabilir, kimlikle gidince hemen veriyorlar"
+    },
+    {
+     "speaker": "A",
+     "text": "Ücretli mi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Cüzi bir ücret var, çok değil"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam, yarın sabah götürürüm"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi bölüm için randevu lazım?"
+    },
+    {
+     "speaker": "A",
+     "text": "Kardiyoloji, kontrol zamanı geldi"
+    },
+    {
+     "speaker": "B",
+     "text": "Kardiyolojide yer bulmak zor, sabah 07.00'de bakarsan boş yer düşebiliyor"
+    },
+    {
+     "speaker": "A",
+     "text": "Tşk ederim, deneyeceğim"
+    },
+    {
+     "speaker": "B",
+     "text": "Rica ederim, annene geçmiş olsun"
+    },
+    {
+     "speaker": "A",
+     "text": "Sağ ol, aslında gayet iyi, sadece kontrol"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-03",
+   "source": "claude-opus",
+   "topic": "Oyun",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Akşam oynuyor muyuz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Olur, kaçta?"
+    },
+    {
+     "speaker": "A",
+     "text": "22.00 gibi, önce yemek yiyeyim"
+    },
+    {
+     "speaker": "B",
+     "text": "Yeni güncellemeyi indirdin mi?"
+    },
+    {
+     "speaker": "A",
+     "text": "İniyor hala, 40 GB ya"
+    },
+    {
+     "speaker": "B",
+     "text": "Yeni harita gelmiş, bir de silah dengesi değişmiş"
+    },
+    {
+     "speaker": "A",
+     "text": "İnşallah o bug'ı da düzeltmişlerdir"
+    },
+    {
+     "speaker": "B",
+     "text": "Mert'i de çağıralım mı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Çağır, üç kişi daha iyi"
+    },
+    {
+     "speaker": "B",
+     "text": "Discord'da görüşürüz o zaman"
+    },
+    {
+     "speaker": "A",
+     "text": "Bu sefer mikrofonunu düzelt, geçen sefer seni hiç duyamadık"
+    },
+    {
+     "speaker": "B",
+     "text": "Yeni kulaklık aldım, sorun olmaz"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-04",
+   "source": "claude-opus",
+   "topic": "Uçuş rötarı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Uçak 2 saat rötar yaptı :("
+    },
+    {
+     "speaker": "B",
+     "text": "Olamaz! Şimdi kaçta inersin?"
+    },
+    {
+     "speaker": "A",
+     "text": "21.40 yerine 23.30 gibi"
+    },
+    {
+     "speaker": "B",
+     "text": "Sorun değil, havalimanına gelip alırım seni"
+    },
+    {
+     "speaker": "A",
+     "text": "Gerek yok, Havabüs'le gelirim, çok geç oluyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Saçmalama, gece yarısı otobüs mü beklenir"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam o zaman, çok sağ ol"
+    },
+    {
+     "speaker": "B",
+     "text": "Sabiha mı, İstanbul Havalimanı mı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Sabiha Gökçen, iç hatlar"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, indiğinde mesaj at"
+    },
+    {
+     "speaker": "A",
+     "text": "Atarım, şimdilik kahve içip kitap okuyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "İyi yolculuklar!"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-05",
+   "source": "claude-opus",
+   "topic": "Kedi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kedimiz iki gündür yemek yemiyor, endişelendim"
+    },
+    {
+     "speaker": "B",
+     "text": "Su içiyor mu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Az içiyor, genelde uyuyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Hemen veterinere götür, kediler için iki gün uzun"
+    },
+    {
+     "speaker": "A",
+     "text": "Bizim veteriner cumartesi kapalı"
+    },
+    {
+     "speaker": "B",
+     "text": "Moda'da 7/24 açık bir klinik var, ben oraya götürüyorum"
+    },
+    {
+     "speaker": "A",
+     "text": "Adresi atar mısın?"
+    },
+    {
+     "speaker": "B",
+     "text": "Konum attım, Bahariye Caddesi'nin oralarda"
+    },
+    {
+     "speaker": "A",
+     "text": "Çok teşekkürler, hemen çıkıyoruz"
+    },
+    {
+     "speaker": "B",
+     "text": "Haber ver, merak ediyorum"
+    },
+    {
+     "speaker": "A",
+     "text": "Döndük, sadece mide rahatsızlığı, ilaç verdiler"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh, çok sevindim! Pamuk'a geçmiş olsun"
+    },
+    {
+     "speaker": "A",
+     "text": "Teşekkürler, şimdi mamasını bile yiyor"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-06",
+   "source": "claude-opus",
+   "topic": "Dizi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dün akşam yeni dizinin ilk bölümünü izledin mi?"
+    },
+    {
+     "speaker": "B",
+     "text": "İzledim! Son sahneye bayıldım"
+    },
+    {
+     "speaker": "A",
+     "text": "Ben de! Ama o kardeşi kesin bir şey saklıyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Kesin, bence babasının ölümüyle bir ilgisi var"
+    },
+    {
+     "speaker": "A",
+     "text": "Spoiler verme ama, ikinci bölümü daha izlemedim"
+    },
+    {
+     "speaker": "B",
+     "text": "Ben de izlemedim, merak etme"
+    },
+    {
+     "speaker": "A",
+     "text": "Kaç bölüm zaten?"
+    },
+    {
+     "speaker": "B",
+     "text": "8 bölüm, her perşembe yeni bölüm çıkıyor"
+    },
+    {
+     "speaker": "A",
+     "text": "Haftada bir mi?! Buna sabrım yok"
+    },
+    {
+     "speaker": "B",
+     "text": "Haha, o zaman beraber izleyelim, perşembe akşamı bize gel"
+    },
+    {
+     "speaker": "A",
+     "text": "Olur, çekirdeği ben getiririm"
+    },
+    {
+     "speaker": "B",
+     "text": "Anlaştık o zaman"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-07",
+   "source": "claude-opus",
+   "topic": "Kar",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Haberleri gördün mü? Yarın kar bekleniyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Ciddi mi? Daha kasımdayız"
+    },
+    {
+     "speaker": "A",
+     "text": "Meteoroloji uyarı yaptı, 15 cm'ye kadar kar yağabilirmiş"
+    },
+    {
+     "speaker": "B",
+     "text": "Okullar tatil olur mu acaba?"
+    },
+    {
+     "speaker": "A",
+     "text": "Valilik akşam açıklar herhalde"
+    },
+    {
+     "speaker": "B",
+     "text": "Arabaya daha kış lastiği taktırmadım"
+    },
+    {
+     "speaker": "A",
+     "text": "Yarın toplu taşımayla git bence, yollar buz tutar"
+    },
+    {
+     "speaker": "B",
+     "text": "Haklısın, metroya binerim"
+    },
+    {
+     "speaker": "A",
+     "text": "Kalın giyin, eksi 3 derece diyorlar"
+    },
+    {
+     "speaker": "B",
+     "text": "Bu sene kış erken geldi"
+    },
+    {
+     "speaker": "A",
+     "text": "Bari akşam sıcak bir salep içelim"
+    },
+    {
+     "speaker": "B",
+     "text": "Olur, köşedeki pastanede yapıyorlar"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-08",
+   "source": "claude-opus",
+   "topic": "Tatil",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bu yaz tatile nereye gidiyoruz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Kaş'a gidelim mi? Geçen sene çok övdüler"
+    },
+    {
+     "speaker": "A",
+     "text": "Olur, kaç gece?"
+    },
+    {
+     "speaker": "B",
+     "text": "Bir hafta, 15-22 temmuz arası boş musun?"
+    },
+    {
+     "speaker": "A",
+     "text": "İzin alabilirim, sorun yok"
+    },
+    {
+     "speaker": "B",
+     "text": "Pansiyonlara bakıyorum, gecesi 4000 TL civarı, kahvaltı dahil"
+    },
+    {
+     "speaker": "A",
+     "text": "Fena değil, denize yakın mı?"
+    },
+    {
+     "speaker": "B",
+     "text": "5 dakika yürüme mesafesinde"
+    },
+    {
+     "speaker": "A",
+     "text": "Süper! Otobüsle mi gideriz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Uçakla Dalaman'a, oradan araba kiralarız"
+    },
+    {
+     "speaker": "A",
+     "text": "Kaputaş'a mutlaka gidelim"
+    },
+    {
+     "speaker": "B",
+     "text": "Tabii, bir de tekne turu yapalım"
+    },
+    {
+     "speaker": "A",
+     "text": "Şimdiden heyecanlandım!"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-09",
+   "source": "claude-opus",
+   "topic": "Aile",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Annem bu pazar herkesi yemeğe çağırıyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi vesileyle?"
+    },
+    {
+     "speaker": "A",
+     "text": "Babamla evliliklerinin 35. yılı"
+    },
+    {
+     "speaker": "B",
+     "text": "Aa ne güzel! Bir şey hazırlayalım mı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bir fotoğraf albümü yaparsak çok sevinirler"
+    },
+    {
+     "speaker": "B",
+     "text": "Eski fotoğraflar kimde?"
+    },
+    {
+     "speaker": "A",
+     "text": "Teyzemde çok var, ondan isteyeceğim"
+    },
+    {
+     "speaker": "B",
+     "text": "Baskı işini ben hallederim, fotoğrafçı bir arkadaşım var"
+    },
+    {
+     "speaker": "A",
+     "text": "Harika, cumaya kadar yetişir mi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Perşembe akşamı hazır olur dedi"
+    },
+    {
+     "speaker": "A",
+     "text": "Annem kesin ağlar, biliyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Mutluluktan ağlasın, sorun yok :)"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-10",
+   "source": "claude-opus",
+   "topic": "Veda hediyesi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Selin'in veda hediyesi için para topluyoruz, katılır mısın?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tabii! Kişi başı ne kadar?"
+    },
+    {
+     "speaker": "A",
+     "text": "300 TL dedik, 12 kişiyiz"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne almayı düşünüyorsunuz?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bir akıllı saat, spor yapmayı çok seviyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Güzel fikir. IBAN'ı atar mısın?"
+    },
+    {
+     "speaker": "A",
+     "text": "Grupta var, en üste sabitledim"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, gönderdim"
+    },
+    {
+     "speaker": "A",
+     "text": "Teşekkürler! Bir de kart yazacağız, sen de bir şey yazmak ister misin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Evet, yarın ofiste yazarım"
+    },
+    {
+     "speaker": "A",
+     "text": "Cuma 16.00'da küçük bir kutlama yapacağız"
+    },
+    {
+     "speaker": "B",
+     "text": "Pasta da var mı? :)"
+    },
+    {
+     "speaker": "A",
+     "text": "Elbette, çikolatalı"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-11",
+   "source": "claude-opus",
+   "topic": "İş başvurusu",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dün mülakata girdim, sonunda!"
+    },
+    {
+     "speaker": "B",
+     "text": "Nasıl geçti?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bence iyi, yarım saat sürdü, İngilizce de sordular"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi şirketti?"
+    },
+    {
+     "speaker": "A",
+     "text": "Ankara'da bir yazılım firması, frontend pozisyonu"
+    },
+    {
+     "speaker": "B",
+     "text": "Maaştan bahsettiler mi?"
+    },
+    {
+     "speaker": "A",
+     "text": "Beklentimi sordular, ben de bir rakam söyledim, pek itiraz etmediler"
+    },
+    {
+     "speaker": "B",
+     "text": "Bu iyiye işaret! Ne zaman dönüş yapacaklar?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bir hafta içinde dediler"
+    },
+    {
+     "speaker": "B",
+     "text": "Kesin alırlar seni, tecrüben de var"
+    },
+    {
+     "speaker": "A",
+     "text": "İnşallah, bu sefer çok istiyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Olmazsa da başka fırsatlar gelir, moralini bozma"
+    },
+    {
+     "speaker": "A",
+     "text": "Haklısın, sağ ol"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-12",
+   "source": "claude-opus",
+   "topic": "Bit pazarı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Pazar günü Feriköy antika pazarına gidelim mi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Olur! Ne arıyorsun?"
+    },
+    {
+     "speaker": "A",
+     "text": "Eski bir pikap, bizimki bozuldu"
+    },
+    {
+     "speaker": "B",
+     "text": "Orada bulursun bence, geçen sefer çok vardı"
+    },
+    {
+     "speaker": "A",
+     "text": "Fiyatlar nasıl?"
+    },
+    {
+     "speaker": "B",
+     "text": "Pazarlık yaparsan 1500-2000 TL'ye bulabilirsin"
+    },
+    {
+     "speaker": "A",
+     "text": "Sabah erken mi gidelim?"
+    },
+    {
+     "speaker": "B",
+     "text": "Evet, 9 gibi, iyi parçaları erkenden kapıyorlar"
+    },
+    {
+     "speaker": "A",
+     "text": "Sonra Kurtuluş'ta kahvaltı yaparız"
+    },
+    {
+     "speaker": "B",
+     "text": "Harika plan, ben de eski kartpostallara bakarım"
+    },
+    {
+     "speaker": "A",
+     "text": "Nakit almayı unutma, çoğu yerde kart geçmiyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, bankamatikten çekerim"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-13",
+   "source": "claude-opus",
+   "topic": "Spor salonu",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Dün spor salonuna yazıldım!"
+    },
+    {
+     "speaker": "B",
+     "text": "Hadi be! Hangisine?"
+    },
+    {
+     "speaker": "A",
+     "text": "Evin yanındakine, aylık 1800 TL"
+    },
+    {
+     "speaker": "B",
+     "text": "Uygunmuş. İlk gün nasıldı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bugün merdivenden inemiyorum, her yerim ağrıyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Normal, iki üç güne geçer"
+    },
+    {
+     "speaker": "A",
+     "text": "Sence haftada kaç gün gitmeliyim?"
+    },
+    {
+     "speaker": "B",
+     "text": "Başlangıç için 3 gün yeter, arada dinlen"
+    },
+    {
+     "speaker": "A",
+     "text": "Beraber gidelim mi? Motivasyon olur"
+    },
+    {
+     "speaker": "B",
+     "text": "Olur, pazartesi ve çarşamba akşam 19.00?"
+    },
+    {
+     "speaker": "A",
+     "text": "Anlaştık, ama ilk hafta bana acı"
+    },
+    {
+     "speaker": "B",
+     "text": "Söz veremem :)"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-14",
+   "source": "claude-opus",
+   "topic": "Berber",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Abi berberin kim? Saçın hep düzgün"
+    },
+    {
+     "speaker": "B",
+     "text": "Beşiktaş'ta küçük bir dükkan var, Hasan usta"
+    },
+    {
+     "speaker": "A",
+     "text": "Fiyatı nasıl?"
+    },
+    {
+     "speaker": "B",
+     "text": "Saç sakal 600 TL, fena değil"
+    },
+    {
+     "speaker": "A",
+     "text": "Randevu lazım mı?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hafta sonu kesin lazım, hafta içi genelde boş oluyor"
+    },
+    {
+     "speaker": "A",
+     "text": "Numarasını atabilir misin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Attım, WhatsApp'tan yaz, hemen dönüyor"
+    },
+    {
+     "speaker": "A",
+     "text": "Saol kanka"
+    },
+    {
+     "speaker": "B",
+     "text": "Benden selam söyle, belki indirim yapar xd"
+    },
+    {
+     "speaker": "A",
+     "text": "Söylerim, cumartesi giderim"
+    },
+    {
+     "speaker": "B",
+     "text": "Ama çok kısa kestirme, sana uzun yakışıyor"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-15",
+   "source": "claude-opus",
+   "topic": "Kargo",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kargom 5 gündür transfer merkezinde bekliyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi firma?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aras, takipte hep aynı şey yazıyor, hiç kıpırdamıyor"
+    },
+    {
+     "speaker": "B",
+     "text": "Müşteri hizmetlerini aradın mı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aradım, 20 dakika beklettiler, sonra hat kesildi"
+    },
+    {
+     "speaker": "B",
+     "text": "Satıcıya yaz, onlar daha hızlı hallediyor"
+    },
+    {
+     "speaker": "A",
+     "text": "Yazdım, yarın bilgi vereceklermiş"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne sipariş etmiştin?"
+    },
+    {
+     "speaker": "A",
+     "text": "Annemin doğum günü hediyesi, cumartesiye lazım"
+    },
+    {
+     "speaker": "B",
+     "text": "Yetişmezse şubeden teslim iste, kendin alırsın"
+    },
+    {
+     "speaker": "A",
+     "text": "İyi fikir, şube eve 10 dakika"
+    },
+    {
+     "speaker": "B",
+     "text": "Bence en garantisi o"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-16",
+   "source": "claude-opus",
+   "topic": "Nüfus müdürlüğünde kimlik yenileme",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Yarın nüfus müdürlüğüne gidiyorum, yeni kimlik için sonunda randevu aldım"
+    },
+    {
+     "speaker": "B",
+     "text": "Oo hayırlı olsun, kaçta randevun?"
+    },
+    {
+     "speaker": "A",
+     "text": "09:40. Ama ne götürmem lazım hiç bilmiyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Eski kimliğin ve bi tane biyometrik fotoğraf yeterli bence"
+    },
+    {
+     "speaker": "A",
+     "text": "Fotoğraf şart mı? e-Devlet'te bi şey yazmıyordu"
+    },
+    {
+     "speaker": "B",
+     "text": "Bende istediler geçen sene, garanti olsun diye çektir"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam, akşam fotoğrafçıya uğrarım. Ücreti önceden mi ödüyoruz?"
+    },
+    {
+     "speaker": "B",
+     "text": "Evet, vergi dairesine ya da bankaya yatırıyosun, dekontu da yanına al"
+    },
+    {
+     "speaker": "A",
+     "text": "Off bu işlerde hep bi sıra var ya"
+    },
+    {
+     "speaker": "B",
+     "text": "Erken git, kapı açılmadan millet birikiyo"
+    },
+    {
+     "speaker": "A",
+     "text": "Randevum 9:40 ama yine de 9'da orda olurum"
+    },
+    {
+     "speaker": "B",
+     "text": "Akıllıca. Çıkınca kahve içelim mi, işyeri oraya çok yakın"
+    },
+    {
+     "speaker": "A",
+     "text": "Olur! Biterse 10:30 gibi yazarım"
+    },
+    {
+     "speaker": "B",
+     "text": "tamamdır, kolay gelsin"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-17",
+   "source": "claude-opus",
+   "topic": "Üst kattaki komşunun tadilatı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Üst kat yine sabah 8'de matkapla başladı, delirmek üzereyim"
+    },
+    {
+     "speaker": "B",
+     "text": "Ya yine mi? Geçen hafta da yapmıyorlar mıydı"
+    },
+    {
+     "speaker": "A",
+     "text": "Mutfağı yeniliyolarmış, iki hafta daha sürecekmiş"
+    },
+    {
+     "speaker": "B",
+     "text": "Site yönetiminin kuralı var bence, hafta içi 9'dan önce gürültü yasak"
+    },
+    {
+     "speaker": "A",
+     "text": "Yöneticiye mi söylesem, yoksa direkt kapılarını mı çalsam?"
+    },
+    {
+     "speaker": "B",
+     "text": "Önce kibarca kendin konuş, Ayten Hanım iyi biri aslında"
+    },
+    {
+     "speaker": "A",
+     "text": "Haklısın, ustaları bekletemiyolar herhalde"
+    },
+    {
+     "speaker": "B",
+     "text": "Aynen. Sadece 9'dan sonra başlasınlar de, yeter"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam akşam yukarı çıkıp konuşurum. Eli boş gitmeyeyim, börek yaptım zaten"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha börekle gelene kim kızar ki"
+    },
+    {
+     "speaker": "A",
+     "text": "Konuştum! Çok özür dilediler, yarından itibaren 10'da başlıyolarmış"
+    },
+    {
+     "speaker": "B",
+     "text": "Süper, gördün mü bak"
+    },
+    {
+     "speaker": "A",
+     "text": "Bi de bana tadilattan artan fayansları teklif ettiler lol"
+    },
+    {
+     "speaker": "B",
+     "text": "Al gitsin, balkona döşersin"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-18",
+   "source": "claude-opus",
+   "topic": "Seramik atölyesi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Cumartesi seramik atölyesine başladım, sana söylemiş miydim?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yok! Ne zamandır? Çarkta mı çalışıyosunuz"
+    },
+    {
+     "speaker": "A",
+     "text": "İki haftadır. Evet çarktayız ama ben hala düzgün bi kase bile yapamıyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Normal ya, ilk başta herkes çamuru etrafa fırlatıyomuş"
+    },
+    {
+     "speaker": "A",
+     "text": "Aynen benim kase ilk dakikada yamuldu, hoca resmen güldü"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahah. Ücreti ne kadar peki?"
+    },
+    {
+     "speaker": "A",
+     "text": "Aylık 2.400 TL, malzeme ve fırın dahil"
+    },
+    {
+     "speaker": "B",
+     "text": "Fena değil. Ben de gelebilir miyim, yer var mı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bi sorayım, grup 8 kişilik ama geçen hafta biri ayrıldı"
+    },
+    {
+     "speaker": "B",
+     "text": "Sorarsan süper olur, hafta sonları boşum zaten"
+    },
+    {
+     "speaker": "A",
+     "text": "Sordum, gelebilirsin!! Bu cumartesi 14:00'te deneme dersi var"
+    },
+    {
+     "speaker": "B",
+     "text": "Harika. Eski bi tişört mü giyeyim?"
+    },
+    {
+     "speaker": "A",
+     "text": "Kesinlikle, önlük veriyolar ama çamur her yere sıçrıyo"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-19",
+   "source": "claude-opus",
+   "topic": "Tahlil sonuçları",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kan tahlili sonuçlarım e-Nabız'a düşmüş"
+    },
+    {
+     "speaker": "B",
+     "text": "Eee? Her şey yolunda mı"
+    },
+    {
+     "speaker": "A",
+     "text": "Çoğu normal ama D vitamini çok düşük, 9 çıkmış"
+    },
+    {
+     "speaker": "B",
+     "text": "Oha, o baya az. Benimki 15'ti, doktor ilaç yazmıştı"
+    },
+    {
+     "speaker": "A",
+     "text": "Perşembe 11:15'e kontrol randevusu aldım"
+    },
+    {
+     "speaker": "B",
+     "text": "Muhtemelen damla ya da yüksek doz verir. Biraz da güneşe çık"
+    },
+    {
+     "speaker": "A",
+     "text": "Kasımda hangi güneş ya :)"
+    },
+    {
+     "speaker": "B",
+     "text": "Haklısın hahah. Yorgunluk falan var mıydı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Var, sürekli uykum geliyo, ondan olabileceğini hiç düşünmemiştim"
+    },
+    {
+     "speaker": "B",
+     "text": "Demire de baktırdın mı? Bende ikisi birden düşüktü"
+    },
+    {
+     "speaker": "A",
+     "text": "Ferritin de sınırda yazıyo"
+    },
+    {
+     "speaker": "B",
+     "text": "O zaman doktora hepsini sor, unutmamak için not al"
+    },
+    {
+     "speaker": "A",
+     "text": "Listeyi yaptım bile, sağ ol"
+    },
+    {
+     "speaker": "B",
+     "text": "Geçmiş olsun, sonucu bana da yaz"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-20",
+   "source": "claude-opus",
+   "topic": "Veli toplantısı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Yarın akşam veli toplantısı var, sen gelebiliyo musun?"
+    },
+    {
+     "speaker": "B",
+     "text": "Kaçta? Ben 18:00'e kadar işteyim"
+    },
+    {
+     "speaker": "A",
+     "text": "18:30'da, 3-B sınıfında"
+    },
+    {
+     "speaker": "B",
+     "text": "Yetişirim herhalde. Konu ne biliyo musun"
+    },
+    {
+     "speaker": "A",
+     "text": "Okul gezisi ve dönem notları sanırım. Bi de sınıf aidatı konuşulacak"
+    },
+    {
+     "speaker": "B",
+     "text": "Yine mi aidat? Geçen ay 500 TL vermedik mi"
+    },
+    {
+     "speaker": "A",
+     "text": "O kırtasiye içindi, şimdi sınıfa perde alınacakmış"
+    },
+    {
+     "speaker": "B",
+     "text": "Peki. Ben geziyi soracağım, Defne'nin otobüste midesi bulanıyo"
+    },
+    {
+     "speaker": "A",
+     "text": "Mantıklı. Öğretmene önceden mesaj atsan mı?"
+    },
+    {
+     "speaker": "B",
+     "text": "Toplantıda söylerim, Selin Hoca çok anlayışlı"
+    },
+    {
+     "speaker": "A",
+     "text": "Ben de Emir'in okuma ödevlerini soracağım, çok zorlanıyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Bizimki de öyle, seçilen kitaplar ağır geliyo bence"
+    },
+    {
+     "speaker": "A",
+     "text": "Birlikte söyleriz o zaman"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, 18:20'de okul kapısında buluşalım"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-21",
+   "source": "claude-opus",
+   "topic": "Barınakta gönüllülük",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Pazar günü barınakta gönüllüler toplanıyo, gelir misin?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi barınak? Belediyeninki mi"
+    },
+    {
+     "speaker": "A",
+     "text": "Evet, mama dağıtımı ve köpek gezdirme yapılacak"
+    },
+    {
+     "speaker": "B",
+     "text": "Çok isterim ama hiç gitmedim, ne yapmam gerekiyo"
+    },
+    {
+     "speaker": "A",
+     "text": "Bi form dolduruyosun, sonra sorumlu biri her şeyi anlatıyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Saat kaçta?"
+    },
+    {
+     "speaker": "A",
+     "text": "10:00 gibi başlıyo, öğlene kadar sürüyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Yanımızda bi şey götürelim mi"
+    },
+    {
+     "speaker": "A",
+     "text": "Eski battaniye ve havlu çok lazım, kış geliyo ya"
+    },
+    {
+     "speaker": "B",
+     "text": "Annemde bi sürü var, isteyeyim"
+    },
+    {
+     "speaker": "A",
+     "text": "Süper! Kuru mama alacaksan 15 kiloluk torbalar daha mantıklı"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, cumartesi markete uğrarım"
+    },
+    {
+     "speaker": "A",
+     "text": "Seni 9:30'da alırım, arabayla gideriz"
+    },
+    {
+     "speaker": "B",
+     "text": "Anlaştık, şimdiden heyecanlandım"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-22",
+   "source": "claude-opus",
+   "topic": "Bahçede sarımsak dikimi",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Bahçeye sarımsak dikmek için geç mi kaldık sence?"
+    },
+    {
+     "speaker": "B",
+     "text": "Yok ya, kasım tam zamanı. Ben geçen hafta diktim"
+    },
+    {
+     "speaker": "A",
+     "text": "Dişleri kaç cm derine koyuyosun"
+    },
+    {
+     "speaker": "B",
+     "text": "5 cm kadar, aralarında da bi karış bırak"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam. Domatesleri de söktüm, toprak çok yorgun görünüyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Bi de gübre at, yanmış inek gübresi iyi gelir"
+    },
+    {
+     "speaker": "A",
+     "text": "Pazardan mı alıyosun onu?"
+    },
+    {
+     "speaker": "B",
+     "text": "Köyden gelen bi amca var, çuvalı 150 TL"
+    },
+    {
+     "speaker": "A",
+     "text": "Ucuzmuş! Bana da 2 çuval söyler misin"
+    },
+    {
+     "speaker": "B",
+     "text": "Söylerim, cumartesi getiriyo zaten"
+    },
+    {
+     "speaker": "A",
+     "text": "Sende marul fidesi kaldı mı bi de?"
+    },
+    {
+     "speaker": "B",
+     "text": "6 tane var, gelirken al"
+    },
+    {
+     "speaker": "A",
+     "text": "Harikasın, ben de sana kurutulmuş biber getiririm"
+    },
+    {
+     "speaker": "B",
+     "text": "anlaştık o zaman"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-23",
+   "source": "claude-opus",
+   "topic": "Kombi arızası ve tesisatçı",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kombi yine arıza verdi, sıcak su yok"
+    },
+    {
+     "speaker": "B",
+     "text": "Ekranda ne yazıyo?"
+    },
+    {
+     "speaker": "A",
+     "text": "F28 diye bi kod"
+    },
+    {
+     "speaker": "B",
+     "text": "O genelde ateşleme sorunu. Gaz vanası açık mı, bi kontrol et"
+    },
+    {
+     "speaker": "A",
+     "text": "Açık. Tesisatçı lazım bence, tanıdığın var mı?"
+    },
+    {
+     "speaker": "B",
+     "text": "Mehmet Usta var, çok düzgün çalışır. Numarasını atıyım"
+    },
+    {
+     "speaker": "A",
+     "text": "Atarsan sevinirim. Sence ne kadar ister"
+    },
+    {
+     "speaker": "B",
+     "text": "Bakım için 1.200 TL civarı diyodu, parça değişirse ayrı"
+    },
+    {
+     "speaker": "A",
+     "text": "Bugün gelebilir mi acaba, iki gündür duş alamadım"
+    },
+    {
+     "speaker": "B",
+     "text": "Sordum, 17:00 gibi uğrayabilirmiş"
+    },
+    {
+     "speaker": "A",
+     "text": "Süpersin! 16:30'da evde olurum"
+    },
+    {
+     "speaker": "B",
+     "text": "Filtreye de baktırmayı unutma"
+    },
+    {
+     "speaker": "A",
+     "text": "Geldi gitti, elektrot kirlenmiş. Temizledi, şu an çalışıyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Oh be, geçmiş olsun"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-24",
+   "source": "claude-opus",
+   "topic": "Banka şubesinde sıra",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Şubedeyim, sıra numaram 147, önümde 23 kişi var"
+    },
+    {
+     "speaker": "B",
+     "text": "Ahaha klasik. Ne için gittin"
+    },
+    {
+     "speaker": "A",
+     "text": "Kartım bloke oldu, şifreyi üç kere yanlış girdim"
+    },
+    {
+     "speaker": "B",
+     "text": "Mobil uygulamadan açamıyo musun onu?"
+    },
+    {
+     "speaker": "A",
+     "text": "Denedim, şubeye gelin diyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Kimliğini yanına aldın mı bari"
+    },
+    {
+     "speaker": "A",
+     "text": "Evet. Hazır gelmişken maaş hesabı da açtıracağım, yeni işte bu bankayla çalışıyolar"
+    },
+    {
+     "speaker": "B",
+     "text": "Promosyon var mı sor bi, bazen baya iyi para veriyolar"
+    },
+    {
+     "speaker": "A",
+     "text": "Ciddi mi? Hiç bilmiyodum"
+    },
+    {
+     "speaker": "B",
+     "text": "Sor kesin, şirketle anlaşmalarına bağlı"
+    },
+    {
+     "speaker": "A",
+     "text": "Sıra geldi sonunda! 50 dakika sürdü"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne dediler?"
+    },
+    {
+     "speaker": "A",
+     "text": "Kart açıldı, promosyon da 3 yıllık 9.000 TL'ymiş"
+    },
+    {
+     "speaker": "B",
+     "text": "Fena değil, hayırlı olsun"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-25",
+   "source": "claude-opus",
+   "topic": "Sinemaya gitmek",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Akşam sinemaya gidelim mi? Yeni çıkan korku filmi var"
+    },
+    {
+     "speaker": "B",
+     "text": "Korku mu ya, sonra gece uyuyamam"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahah tamam, o zaman Kapadokya'da geçen şu komedi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Onu duydum, yorumları iyi. Seans kaçta?"
+    },
+    {
+     "speaker": "A",
+     "text": "19:15 ve 21:45 var"
+    },
+    {
+     "speaker": "B",
+     "text": "19:15 olsun, yarın iş var"
+    },
+    {
+     "speaker": "A",
+     "text": "Biletleri alıyorum, tanesi 220 TL"
+    },
+    {
+     "speaker": "B",
+     "text": "Öğrenci indirimi var mı, kartım hala geçerli"
+    },
+    {
+     "speaker": "A",
+     "text": "Var ama girişte kartı göstermen lazım"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam yanımda. Ortalardan yer seç"
+    },
+    {
+     "speaker": "A",
+     "text": "G sırasında 7 ve 8'i aldım"
+    },
+    {
+     "speaker": "B",
+     "text": "Süper. Mısır benden"
+    },
+    {
+     "speaker": "A",
+     "text": "Büyük boy al ama, geçen sefer yetmedi"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam obur :) 18:50'de AVM girişinde buluşalım"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-26",
+   "source": "claude-opus",
+   "topic": "Kiralık ev arama",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Ev bakmaya başladım, Kadıköy'de 2+1'ler uçmuş"
+    },
+    {
+     "speaker": "B",
+     "text": "Ortalama ne kadar ya?"
+    },
+    {
+     "speaker": "A",
+     "text": "35 binin altında neredeyse hiçbi şey yok"
+    },
+    {
+     "speaker": "B",
+     "text": "Oha. Biraz uzaklaşsan, mesela Maltepe?"
+    },
+    {
+     "speaker": "A",
+     "text": "Oraya da baktım, 26-28 bin civarı"
+    },
+    {
+     "speaker": "B",
+     "text": "Depozito da iki kira istiyolar dimi"
+    },
+    {
+     "speaker": "A",
+     "text": "Evet, bi de emlakçı komisyonu bi kira. Toplasan servet"
+    },
+    {
+     "speaker": "B",
+     "text": "Sahibinden olan ilanlara bak, komisyonsuz çıkıyo bazen"
+    },
+    {
+     "speaker": "A",
+     "text": "Yarın 11:00'de sahibinden bi daireye bakacağım"
+    },
+    {
+     "speaker": "B",
+     "text": "Gelmemi ister misin? Rutubet falan kontrol ederiz"
+    },
+    {
+     "speaker": "A",
+     "text": "Çok iyi olur, heyecandan hep bi şey kaçırıyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Su basıncı, doğalgaz, aidat... hepsini soralım"
+    },
+    {
+     "speaker": "A",
+     "text": "İlanda aidat 1.500 TL yazıyodu"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, konumu at, orda buluşuruz"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-27",
+   "source": "claude-opus",
+   "topic": "Bodrum'da düğün",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Burcu'nun düğün davetiyesi sana da geldi mi?"
+    },
+    {
+     "speaker": "B",
+     "text": "Geldi! 14 Haziran, Bodrum'da kır düğünü"
+    },
+    {
+     "speaker": "A",
+     "text": "Az önce otel fiyatlarına baktım, korkunç"
+    },
+    {
+     "speaker": "B",
+     "text": "Birlikte kalalım mı, masraf yarı yarıya olur"
+    },
+    {
+     "speaker": "A",
+     "text": "Çok iyi fikir. 13'ünde gidip 15'inde döneriz"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne giyeceksin peki? Davetiyede rahat şık yazıyo"
+    },
+    {
+     "speaker": "A",
+     "text": "Açık renk bi elbise düşünüyorum, çimde topuklu giymem"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha akıllıca. Hediye ne yapalım?"
+    },
+    {
+     "speaker": "A",
+     "text": "Bi liste hazırlamışlar mı acaba"
+    },
+    {
+     "speaker": "B",
+     "text": "Listeleri yokmuş, çeyrek altın takarız bence"
+    },
+    {
+     "speaker": "A",
+     "text": "Çeyrek şimdi kaç para oldu biliyo musun?"
+    },
+    {
+     "speaker": "B",
+     "text": "Hiç bakmadım, bakmaya korkuyorum"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahah. Neyse uçak biletlerine bakıyorum, sabah uçuşu olur mu"
+    },
+    {
+     "speaker": "B",
+     "text": "Olur ama 06:00 uçuşu olmasın lütfen"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-28",
+   "source": "claude-opus",
+   "topic": "Spor salonu",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Spor salonuna yazıldım sonunda!"
+    },
+    {
+     "speaker": "B",
+     "text": "Vay be, hangisine?"
+    },
+    {
+     "speaker": "A",
+     "text": "Evin yanındakine, 6 aylık 9.000 TL"
+    },
+    {
+     "speaker": "B",
+     "text": "Fena değil. PT de var mı"
+    },
+    {
+     "speaker": "A",
+     "text": "İlk ay iki ücretsiz ders veriyolar"
+    },
+    {
+     "speaker": "B",
+     "text": "Süper, makineleri doğru kullanmayı öğrenirsin"
+    },
+    {
+     "speaker": "A",
+     "text": "Bugün ilk gün bacak çalıştırdı, merdivenden inemiyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Hahaha ilk hafta herkes öyle"
+    },
+    {
+     "speaker": "A",
+     "text": "Sen genelde kaçta gidiyosun?"
+    },
+    {
+     "speaker": "B",
+     "text": "Sabah 7'de, akşamları çok kalabalık oluyo"
+    },
+    {
+     "speaker": "A",
+     "text": "ben sabah kalkamam, akşam 20:00 gibi giderim"
+    },
+    {
+     "speaker": "B",
+     "text": "O zaman cumartesi beraber gidelim mi"
+    },
+    {
+     "speaker": "A",
+     "text": "olur, 11:00'de?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, su şişeni unutma"
+    },
+    {
+     "speaker": "A",
+     "text": "Havluyu da, yoksa içeri almıyolar"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-29",
+   "source": "claude-opus",
+   "topic": "Kaybolan kargo",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Kargom 3 gündür transfer merkezinde bekliyo, hiç kıpırdamıyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Hangi firma?"
+    },
+    {
+     "speaker": "A",
+     "text": "Hiç sorma, adını duyunca sinirim bozuluyo. Son hareket 28.10'da"
+    },
+    {
+     "speaker": "B",
+     "text": "Müşteri hizmetlerini aradın mı"
+    },
+    {
+     "speaker": "A",
+     "text": "20 dakika beklettiler, sonra şubeyle görüşün dediler"
+    },
+    {
+     "speaker": "B",
+     "text": "Direkt şubeye git, bazen rafta unutuyolar"
+    },
+    {
+     "speaker": "A",
+     "text": "Gittim! Sistemde görünüyo ama paket ortada yok diyolar"
+    },
+    {
+     "speaker": "B",
+     "text": "İçinde ne vardı?"
+    },
+    {
+     "speaker": "A",
+     "text": "Annemin doğum günü hediyesi, 1.850 TL'lik kahve makinesi"
+    },
+    {
+     "speaker": "B",
+     "text": "Oha. Satıcıya da yaz, genelde onlar süreci başlatıyo"
+    },
+    {
+     "speaker": "A",
+     "text": "Yazdım, tutanak isteyeceklermiş galiba"
+    },
+    {
+     "speaker": "B",
+     "text": "O zaman şubeden imzalı bi kayıp tutanağı al"
+    },
+    {
+     "speaker": "A",
+     "text": "Tamam yarın sabah tekrar gidiyorum"
+    },
+    {
+     "speaker": "B",
+     "text": "Kolay gelsin, inşallah bulunur"
+    }
+   ]
+  },
+  {
+   "id": "opus-tr-30",
+   "source": "claude-opus",
+   "topic": "Babaannenin doğum günü",
+   "turns": [
+    {
+     "speaker": "A",
+     "text": "Babaannemin 80. yaş günü için aile yemeği yapıyoruz, cumartesi gelebiliyo musun?"
+    },
+    {
+     "speaker": "B",
+     "text": "Tabii ki! Nerede yapıyosunuz"
+    },
+    {
+     "speaker": "A",
+     "text": "Halamların bahçesinde, saat 13:00'te"
+    },
+    {
+     "speaker": "B",
+     "text": "Ne getireyim? Tatlı yapabilirim"
+    },
+    {
+     "speaker": "A",
+     "text": "Annem pasta sipariş etti, sen kısır yapsan çok iyi olur"
+    },
+    {
+     "speaker": "B",
+     "text": "Tamam, büyük bi tepsi yaparım. Kaç kişi olacak?"
+    },
+    {
+     "speaker": "A",
+     "text": "25 kişi falan, kuzenler Ankara'dan geliyo"
+    },
+    {
+     "speaker": "B",
+     "text": "Vay kalabalık. Hediye düşündünüz mü"
+    },
+    {
+     "speaker": "A",
+     "text": "Hep beraber eski fotoğraflardan bi albüm yaptırdık"
+    },
+    {
+     "speaker": "B",
+     "text": "Ay ne tatlı, kesin ağlar"
+    },
+    {
+     "speaker": "A",
+     "text": "Hahah amaç o değil ama muhtemel"
+    },
+    {
+     "speaker": "B",
+     "text": "Albümde benim de bi fotoğrafım olsun ama"
+    },
+    {
+     "speaker": "A",
+     "text": "Merak etme, düğün fotoğrafın zaten içinde"
+    },
+    {
+     "speaker": "B",
+     "text": "Süper. Cumartesi görüşürüz o zaman"
+    }
+   ]
+  }
+ ]
+}

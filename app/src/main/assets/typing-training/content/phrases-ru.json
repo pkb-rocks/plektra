@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "haiku-ru-p001",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Утром туман стелился над рекой, а к обеду выглянуло солнце и стало тепло."
+  },
+  {
+   "id": "haiku-ru-p002",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Мы договорились встретиться у фонтана, но ты, как обычно, пришёл на полчаса позже."
+  },
+  {
+   "id": "haiku-ru-p003",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Библиотека работает до восьми, поэтому успеешь вернуть книги после работы."
+  },
+  {
+   "id": "haiku-ru-p004",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Если поезд опоздает больше чем на десять минут, мы возьмём такси."
+  },
+  {
+   "id": "haiku-ru-p005",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Старый мост закрыли на ремонт, и теперь все ездят через площадь."
+  },
+  {
+   "id": "haiku-ru-p006",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Она всегда говорит, что уже поздно, хотя часы показывают только девять."
+  },
+  {
+   "id": "haiku-ru-p007",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "В этом году яблок уродилось много, так что варенья хватит на всю зиму."
+  },
+  {
+   "id": "haiku-ru-p008",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Сосед снова включил музыку, и стены в квартире просто дрожат."
+  },
+  {
+   "id": "haiku-ru-p009",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Кофе остыл, пока я читал письмо от сестры из Новосибирска."
+  },
+  {
+   "id": "haiku-ru-p010",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Не забудь зарядку, иначе в дороге телефон сядет на самом интересном месте."
+  },
+  {
+   "id": "haiku-ru-p011",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Магазин на углу переехал, теперь хлеб приходится покупать в соседнем квартале."
+  },
+  {
+   "id": "haiku-ru-p012",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Дети весь вечер строили башню из кубиков и спорили, какая она должна быть."
+  },
+  {
+   "id": "haiku-ru-p013",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "После дождя в лесу пахнет грибами, мхом и мокрой корой."
+  },
+  {
+   "id": "haiku-ru-p014",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Я давно не был в этом кафе, но пирожки там всё такие же вкусные."
+  },
+  {
+   "id": "haiku-ru-p015",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Поезд на Самару отправляется с третьего пути, не перепутай платформу."
+  },
+  {
+   "id": "haiku-ru-p016",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Тёплый свитер лежит в шкафу, а я всё равно мёрзну в этой квартире."
+  },
+  {
+   "id": "haiku-ru-p017",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Учитель сказал, что проект можно сдать в понедельник, если будет готов."
+  },
+  {
+   "id": "haiku-ru-p018",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Вода в озере такая холодная, что через минуту пальцы перестают чувствоваться."
+  },
+  {
+   "id": "haiku-ru-p019",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ключи от дачи лежат под ковриком, если, конечно, их не унёс ветер."
+  },
+  {
+   "id": "haiku-ru-p020",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Мы долго искали парковку, пока не заметили свободное место у больницы."
+  },
+  {
+   "id": "haiku-ru-p021",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Бабушка печёт пироги по воскресеньям, и к обеду кухня пахнет корицей."
+  },
+  {
+   "id": "haiku-ru-p022",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Новый фильм оказался длиннее, чем мы ожидали, зато финал стоил того."
+  },
+  {
+   "id": "haiku-ru-p023",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Вечером мы пили чай на балконе и смотрели, как зажигаются окна в домах напротив."
+  },
+  {
+   "id": "haiku-ru-p024",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Если погода испортится, перенесём прогулку на следующие выходные."
+  },
+  {
+   "id": "haiku-ru-p025",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Компьютер снова завис посреди важного файла, и я вспомнил, что не сохранял."
+  },
+  {
+   "id": "haiku-ru-p026",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "На базаре было шумно, продавцы кричали про свежую рыбу и малину по пятьдесят рублей."
+  },
+  {
+   "id": "haiku-ru-p027",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Сын выучил стихотворение наизусть, хотя утром говорил, что не сможет."
+  },
+  {
+   "id": "haiku-ru-p028",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Прогноз обещал солнце, но к вечеру небо затянуло тучами и начался дождь."
+  },
+  {
+   "id": "haiku-ru-p029",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Соседский кот любит спать на нашем подоконнике, особенно когда батареи горячие."
+  },
+  {
+   "id": "haiku-ru-p030",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "За окном Москва, а мы сидим в поезде и считаем, сколько остановок осталось."
+  },
+  {
+   "id": "haiku-ru-p031",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Терпение не значит ждать, терпение значит идти шаг за шагом."
+  },
+  {
+   "id": "haiku-ru-p032",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Тот, кто рано встаёт, не всегда успевает, но всегда хотя бы начинает."
+  },
+  {
+   "id": "haiku-ru-p033",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Дорога учит больше, чем любая карта: главное не сворачивать на полпути."
+  },
+  {
+   "id": "haiku-ru-p034",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Ты не обязан знать всё, достаточно знать, где найти ответ."
+  },
+  {
+   "id": "haiku-ru-p035",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Мелочи решают всё, особенно когда ты думаешь, что их никто не заметит."
+  },
+  {
+   "id": "haiku-ru-p036",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Лучше один раз спросить, чем десять раз ошибиться в одиночку."
+  },
+  {
+   "id": "haiku-ru-p037",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Тишина иногда говорит громче любых слов; просто умей её слушать."
+  },
+  {
+   "id": "haiku-ru-p038",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Кто ищет друга без недостатков, останется без друзей вообще."
+  },
+  {
+   "id": "haiku-ru-p039",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Счастье бывает разное: иногда это тёплый хлеб и хорошая компания."
+  },
+  {
+   "id": "haiku-ru-p040",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Не сравнивай свою середину с чужим началом (особенно в интернете)."
+  },
+  {
+   "id": "haiku-ru-p041",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Каждый день приносит новый шанс, и каждый вечер его можно упустить."
+  },
+  {
+   "id": "haiku-ru-p042",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Сделанное вовремя ценится выше сделанного идеально, но позже."
+  },
+  {
+   "id": "haiku-ru-p043",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Смелость не в том, чтобы не бояться, а в том, чтобы идти вперёд."
+  },
+  {
+   "id": "haiku-ru-p044",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Слова уходят, а поступки остаются в памяти людей надолго."
+  },
+  {
+   "id": "haiku-ru-p045",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Не бойся медленного пути, бойся пути, с которого нельзя вернуться."
+  },
+  {
+   "id": "haiku-ru-p046",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Внимательный взгляд находит красоту там, где другие проходят мимо."
+  },
+  {
+   "id": "haiku-ru-p047",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Пока ты ждёшь идеального момента, жизнь уже проходит мимо окна."
+  },
+  {
+   "id": "haiku-ru-p048",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Что посеешь, то и пожнёшь, но урожай иногда приходит с опозданием."
+  },
+  {
+   "id": "haiku-ru-p049",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Маленький шаг сегодня лучше большого плана на завтра, который так и не начался."
+  },
+  {
+   "id": "haiku-ru-p050",
+   "source": "claude-haiku",
+   "kind": "quote",
+   "text": "Учиться никогда не поздно, особенно если хочется понимать, а не просто помнить."
+  },
+  {
+   "id": "haiku-ru-p051",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Открой настройки и выбери раздел \"Клавиатура\", затем включи подсказки."
+  },
+  {
+   "id": "haiku-ru-p052",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Перед запуском проверьте, что кабель подключён к розетке, а не к удлинителю."
+  },
+  {
+   "id": "haiku-ru-p053",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Замесите тесто, накройте полотенцем и оставьте на час в тёплом месте."
+  },
+  {
+   "id": "haiku-ru-p054",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Нажмите и удерживайте кнопку питания, пока экран не погаснет полностью."
+  },
+  {
+   "id": "haiku-ru-p055",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Не открывайте окна в грозу, закройте шторы и отключите технику от сети."
+  },
+  {
+   "id": "haiku-ru-p056",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Соберите все документы в одну папку и подпишите каждый лист синей ручкой."
+  },
+  {
+   "id": "haiku-ru-p057",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Перемешайте соус, добавьте соль по вкусу и подавайте холодным к мясу."
+  },
+  {
+   "id": "haiku-ru-p058",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Чтобы сохранить файл, выберите \"Сохранить как\" и укажите формат документа."
+  },
+  {
+   "id": "haiku-ru-p059",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Полейте рассаду тёплой водой утром, но не заливайте землю до самого края горшка."
+  },
+  {
+   "id": "haiku-ru-p060",
+   "source": "claude-haiku",
+   "kind": "instruction",
+   "text": "Вымойте руки перед едой, а после прогулки снимите обувь у порога."
+  },
+  {
+   "id": "haiku-ru-p061",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Новые правила парковки вступят в силу с первого декабря"
+  },
+  {
+   "id": "haiku-ru-p062",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Городской марафон перенесли на весну из-за погоды"
+  },
+  {
+   "id": "haiku-ru-p063",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Школьники создали робота, который собирает мусор во дворах"
+  },
+  {
+   "id": "haiku-ru-p064",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Цены на овощи на рынках снизились почти на треть"
+  },
+  {
+   "id": "haiku-ru-p065",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Ремонт моста завершится раньше срока, сообщили в мэрии"
+  },
+  {
+   "id": "haiku-ru-p066",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Футбольный клуб одержал победу в последней минуте матча"
+  },
+  {
+   "id": "haiku-ru-p067",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Библиотека открыла читальный зал для студентов на ночь"
+  },
+  {
+   "id": "haiku-ru-p068",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Врачи напомнили о важности прививок перед зимним сезоном"
+  },
+  {
+   "id": "haiku-ru-p069",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Фестиваль уличной еды соберёт более сорока поваров со всей страны"
+  },
+  {
+   "id": "haiku-ru-p070",
+   "source": "claude-haiku",
+   "kind": "headline",
+   "text": "Новый парк у реки откроют в конце весны, обещают скамейки и велодорожки"
+  },
+  {
+   "id": "haiku-ru-p071",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Уже почти полночь, а мы всё спорим, кто должен мыть посуду после ужина."
+  },
+  {
+   "id": "haiku-ru-p072",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ты уверен, что дверь заперта, или снова проверять вернёшься?"
+  },
+  {
+   "id": "haiku-ru-p073",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Почему в этом автобусе всегда тесно, даже в воскресенье утром?"
+  },
+  {
+   "id": "haiku-ru-p074",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Ого, ты уже закончил ремонт на кухне! Выглядит потрясающе."
+  },
+  {
+   "id": "haiku-ru-p075",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Мы решили ехать на велосипедах (хоть и далеко), зато без пробок."
+  },
+  {
+   "id": "haiku-ru-p076",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Отчёт нужно отправить до пятницы; если не успеем, попросим отсрочку."
+  },
+  {
+   "id": "haiku-ru-p077",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Кофейня на углу открылась заново: теперь тут есть и веганские пирожные."
+  },
+  {
+   "id": "haiku-ru-p078",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Сколько стоит проезд с пересадкой, если карта уже почти пустая?"
+  },
+  {
+   "id": "haiku-ru-p079",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Сначала мы смешали соль с водой, потом добавили муку, и тесто получилось мягкое."
+  },
+  {
+   "id": "haiku-ru-p080",
+   "source": "claude-haiku",
+   "kind": "sentence",
+   "text": "Письмо пришло с опозданием на два дня, зато с подробным объяснением (и извинениями)."
+  }
+ ]
+}

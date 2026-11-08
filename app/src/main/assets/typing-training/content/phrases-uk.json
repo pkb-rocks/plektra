@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-uk-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Зранку я завжди п'ю каву на балконі, поки місто ще спить."
+  },
+  {
+   "id": "opus-uk-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Якщо в суботу буде дощ, ми перенесемо пікнік на неділю."
+  },
+  {
+   "id": "opus-uk-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Бібліотека працює до 19:00, крім понеділка."
+  },
+  {
+   "id": "opus-uk-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Хто залишив відчинене вікно на кухні в такий вітер?"
+  },
+  {
+   "id": "opus-uk-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Я не встигла на автобус о 7:15 і двадцять хвилин чекала на зупинці."
+  },
+  {
+   "id": "opus-uk-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Бабуся ліпить найкращі вареники з вишнями (принаймні так кажуть сусіди)."
+  },
+  {
+   "id": "opus-uk-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Після трьох днів дощу нарешті визирнуло сонце!"
+  },
+  {
+   "id": "opus-uk-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Пекарня на розі відкривається о шостій, а круасани закінчуються до дев'ятої."
+  },
+  {
+   "id": "opus-uk-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ти не бачив, куди я поклала ключі від машини?"
+  },
+  {
+   "id": "opus-uk-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Оренда велосипеда коштує 150 грн на годину, разом зі шоломом."
+  },
+  {
+   "id": "opus-uk-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Я досі пам'ятаю запах бузку в дідовому садку."
+  },
+  {
+   "id": "opus-uk-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Конференцію перенесли з 12 на 19 березня через негоду."
+  },
+  {
+   "id": "opus-uk-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Тільки не кажи, що знову забув про день народження сестри!"
+  },
+  {
+   "id": "opus-uk-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "У селі немає зв'язку, тому подзвоню, коли повернуся до міста."
+  },
+  {
+   "id": "opus-uk-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Холодильник порожній: ні молока, ні яєць, ні хліба."
+  },
+  {
+   "id": "opus-uk-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Майже 70% пасажирів їдуть ранковим рейсом."
+  },
+  {
+   "id": "opus-uk-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Сусідський пес гавкає щоразу, коли повз проходить листоноша."
+  },
+  {
+   "id": "opus-uk-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Не знаєш, чи працює аптека на розі цілодобово?"
+  },
+  {
+   "id": "opus-uk-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ми купили старий стіл на блошиному ринку й пофарбували його в синій колір."
+  },
+  {
+   "id": "opus-uk-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Восени Львів пахне кавою, мокрою бруківкою і опалим листям."
+  },
+  {
+   "id": "opus-uk-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Щосереди ми з дідом граємо в шахи у дворі."
+  },
+  {
+   "id": "opus-uk-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Нічний потяг до Ужгорода вирушає о 21:40 з першої колії."
+  },
+  {
+   "id": "opus-uk-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Приходьте в неділю на обід, я наготую голубців!"
+  },
+  {
+   "id": "opus-uk-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Малий спитав, чому небо синє, а я не знала, що відповісти."
+  },
+  {
+   "id": "opus-uk-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Цього місяця квартплата зросла до 2400 грн (через опалення)."
+  },
+  {
+   "id": "opus-uk-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Здається, батарея в телефоні тримає дедалі менше."
+  },
+  {
+   "id": "opus-uk-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Наприкінці стежки стоїть маленька дерев'яна церква з видом на гори."
+  },
+  {
+   "id": "opus-uk-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Дві кави, будь ласка: одне лате без цукру й одне американо з молоком."
+  },
+  {
+   "id": "opus-uk-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Я так і не зрозуміла, навіщо дядько зберігав усі старі газети."
+  },
+  {
+   "id": "opus-uk-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Рейс затримується на сорок хвилин через туман."
+  },
+  {
+   "id": "opus-uk-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Візьми светр, бо ввечері біля річки прохолодно."
+  },
+  {
+   "id": "opus-uk-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Договір підписуємо в четвер об 11:00 у нотаріуса."
+  },
+  {
+   "id": "opus-uk-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Раз на рік усі двоюрідні брати й сестри збираються в батьківській хаті."
+  },
+  {
+   "id": "opus-uk-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Скільки разів я просила не залишати взуття в коридорі?"
+  },
+  {
+   "id": "opus-uk-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Кіт спить на ноутбуці, тож сьогодні я не працюю."
+  },
+  {
+   "id": "opus-uk-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Рахунок вийшов 1860 грн на п'ятьох, разом із вином."
+  },
+  {
+   "id": "opus-uk-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "На базарі в п'ятницю помідори були по 45 грн за кілограм."
+  },
+  {
+   "id": "opus-uk-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "На Хрещатику був такий затор, що я годину їхала три кілометри."
+  },
+  {
+   "id": "opus-uk-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Учора ввечері ми дивилися документальний фільм про лелек, і він був дуже зворушливий."
+  },
+  {
+   "id": "opus-uk-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Тітка привезла з Полтавщини мед, сушені яблука і банку смородинового варення."
+  },
+  {
+   "id": "opus-uk-p041",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Ріка не питає, котра година, вона просто тече далі.\""
+  },
+  {
+   "id": "opus-uk-p042",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Як казав мій дід: \"Добре вино любить терпіння й гарну компанію.\""
+  },
+  {
+   "id": "opus-uk-p043",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Хто готує з любов'ю, тому рецепт не потрібен\", сказала тітка Галя."
+  },
+  {
+   "id": "opus-uk-p044",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Один друг на вокзалі вартий десяти в місті.\""
+  },
+  {
+   "id": "opus-uk-p045",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Вулиці пам'ятають те, що ми давно забули.\""
+  },
+  {
+   "id": "opus-uk-p046",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Не рахуй роки, рахуй літа\", написала вона на листівці."
+  },
+  {
+   "id": "opus-uk-p047",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Дощ ніколи не спізнюється на своє побачення.\""
+  },
+  {
+   "id": "opus-uk-p048",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Борщ, як і дружба, смачніший на другий день.\""
+  },
+  {
+   "id": "opus-uk-p049",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Наша вчителька повторювала: \"Помилки - це сходинки, а не стіна.\""
+  },
+  {
+   "id": "opus-uk-p050",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Кава - лише привід, головне - розмова.\""
+  },
+  {
+   "id": "opus-uk-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Хоч як високо злетиш, гніздо лишається там, де ти почав.\""
+  },
+  {
+   "id": "opus-uk-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Місяцю не потрібен дозвіл, щоб освітити подвір'я.\""
+  },
+  {
+   "id": "opus-uk-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Не спитаєш - не знайдеш дороги до села\", наполягав дядько."
+  },
+  {
+   "id": "opus-uk-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Терпіння - найкращий супутник у дорозі.\""
+  },
+  {
+   "id": "opus-uk-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Старі хати пахнуть історіями (і трохи вологою).\""
+  },
+  {
+   "id": "opus-uk-p056",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Змішайте борошно з цукром і поступово додавайте молоко."
+  },
+  {
+   "id": "opus-uk-p057",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Утримуйте кнопку 5 секунд, доки не засвітиться зелений індикатор."
+  },
+  {
+   "id": "opus-uk-p058",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Випікайте за 180 градусів приблизно 45 хвилин, до золотистої скоринки."
+  },
+  {
+   "id": "opus-uk-p059",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Заповніть анкету й надішліть її до 30 червня."
+  },
+  {
+   "id": "opus-uk-p060",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Перекрийте воду на вводі, перш ніж міняти змішувач."
+  },
+  {
+   "id": "opus-uk-p061",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Для довідки натисніть 2 і залишайтеся на лінії."
+  },
+  {
+   "id": "opus-uk-p062",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Не забудьте взяти з собою паспорт і квиток!"
+  },
+  {
+   "id": "opus-uk-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Наріжте буряк соломкою й тушкуйте його з морквою на повільному вогні."
+  },
+  {
+   "id": "opus-uk-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Виберіть \"Налаштування\", потім \"Мова\" і змініть на українську."
+  },
+  {
+   "id": "opus-uk-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Поливайте вазон раз на тиждень, не частіше."
+  },
+  {
+   "id": "opus-uk-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Збережіть чек: без нього обмін чи повернення неможливі."
+  },
+  {
+   "id": "opus-uk-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "На другому світлофорі поверніть праворуч і паркуйтеся за пекарнею."
+  },
+  {
+   "id": "opus-uk-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Пластик викидайте в жовтий контейнер, а скло - в зелений."
+  },
+  {
+   "id": "opus-uk-p069",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Метро в четвер працюватиме за скороченим графіком через ремонт колії"
+  },
+  {
+   "id": "opus-uk-p070",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Спека: до 38 градусів у понеділок у Києві та Одесі"
+  },
+  {
+   "id": "opus-uk-p071",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Новий автобусний маршрут з'єднає аеропорт із центром Львова"
+  },
+  {
+   "id": "opus-uk-p072",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Полтавська міськрада: безкоштовні уроки плавання для дітей улітку"
+  },
+  {
+   "id": "opus-uk-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Стартує кінофестиваль: 120 фільмів із 40 країн"
+  },
+  {
+   "id": "opus-uk-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Оренда житла для студентів подорожчала на 8% за рік"
+  },
+  {
+   "id": "opus-uk-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Історичний кінотеатр на набережній знову відкривається після 15 років"
+  },
+  {
+   "id": "opus-uk-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Де найкраще спостерігати зорепад Персеїди в серпні?"
+  },
+  {
+   "id": "opus-uk-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Фермери Херсонщини просять підтримки після посухи"
+  },
+  {
+   "id": "opus-uk-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Продуктовий кошик дорожчає: що зміниться з 1 листопада"
+  },
+  {
+   "id": "opus-uk-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Школярі з Житомира виграли європейський конкурс з робототехніки"
+  },
+  {
+   "id": "opus-uk-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "У Карпатах відкрили новий туристичний маршрут завдовжки 25 км"
+  }
+ ]
+}

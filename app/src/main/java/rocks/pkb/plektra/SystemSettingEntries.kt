@@ -4,6 +4,13 @@ package rocks.pkb.plektra
 internal fun systemSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("advanced.notes", R.string.notes_title,
         summaryRes = R.string.notes_description, route = SettingRoute(SettingsDestination.Advanced)),
+    SettingEntry("advanced.key_correction", R.string.key_correction_calibration_title,
+        summaryRes = R.string.key_correction_calibration_summary, route = SettingRoute(SettingsDestination.Advanced)),
+    SettingEntry("advanced.typing_training", R.string.typing_training_title,
+        summaryRes = R.string.typing_training_settings_description, route = SettingRoute(SettingsDestination.Advanced)),
+    SettingEntry("advanced.typing_training_reminder", R.string.typing_training_reminder_setting_title,
+        summaryRes = R.string.typing_training_reminder_setting_description, route = SettingRoute(SettingsDestination.Advanced),
+        availabilityCheck = { rocks.pkb.plektra.training.TypingTrainingReminderPolicy.isAvailable() }),
     SettingEntry("advanced.corner_calibration", R.string.corner_calibration_title,
         summaryRes = R.string.corner_calibration_description, route = SettingRoute(SettingsDestination.Advanced),
         availabilityCheck = { context -> rocks.pkb.plektra.inputmethod.DeviceSpecific.isTitan2EliteDevice() || SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context) }),

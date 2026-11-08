@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-tr-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tramvay bu sabah on dakika gecikti, toplantıya geç kaldım."
+  },
+  {
+   "id": "opus-tr-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Anahtarlarımı nereye koyduğumu bilmiyorum; dün montumun cebindeydi."
+  },
+  {
+   "id": "opus-tr-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yarın da yağmur yağarsa evde kalıp kutu oyunu oynarız."
+  },
+  {
+   "id": "opus-tr-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Komşumuz her pazar bize sıcacık poğaça getiriyor."
+  },
+  {
+   "id": "opus-tr-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Üç şey istiyorum: sessizlik, bir battaniye ve demli bir çay."
+  },
+  {
+   "id": "opus-tr-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sence yeni bir telefona bu kadar para vermeye değer mi?"
+  },
+  {
+   "id": "opus-tr-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mağaza hafta içi 09.00-21.00 arası, cumartesi ise öğlene kadar açık."
+  },
+  {
+   "id": "opus-tr-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sonunda tezimi teslim ettim! Şimdi bir hafta sadece uyuyacağım."
+  },
+  {
+   "id": "opus-tr-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sözleşmedeki küçük yazıları (her zamanki gibi) kimse okumadı."
+  },
+  {
+   "id": "opus-tr-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Pencereyi açtım ve odayı yeni biçilmiş çimen kokusu doldurdu."
+  },
+  {
+   "id": "opus-tr-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Babaanneme göre kuru fasulyenin sırrı sabır ve bol tereyağı."
+  },
+  {
+   "id": "opus-tr-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Buzdolabının kapısını bütün gece açık bırakan kim?"
+  },
+  {
+   "id": "opus-tr-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "E-postayı gönderdim ama eki eklemeyi unutmuşum."
+  },
+  {
+   "id": "opus-tr-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Gelecek cuma saat 18.30'da okulun spor salonunda yıl sonu gösterisi var."
+  },
+  {
+   "id": "opus-tr-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Köpek yine terliğimi kaptı ve bahçenin en ucuna götürdü."
+  },
+  {
+   "id": "opus-tr-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yumurta kaç dakika kaynarsa rafadan olur?"
+  },
+  {
+   "id": "opus-tr-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Şifremi unuttum, oysa daha dün değiştirmiştim."
+  },
+  {
+   "id": "opus-tr-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Göl kenarında oturup güneşin batışını izledik."
+  },
+  {
+   "id": "opus-tr-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hesap 1.245 TL tuttu, servis ücreti dahil değil."
+  },
+  {
+   "id": "opus-tr-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mektubu iki kez okudum, yine de ne istediğini anlamadım."
+  },
+  {
+   "id": "opus-tr-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Gelebilirsen erken gel; buralarda park yeri bulmak çok zor."
+  },
+  {
+   "id": "opus-tr-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yeğenim yedi yaşında ve satrançta beni çoktan geçti."
+  },
+  {
+   "id": "opus-tr-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "İlkbaharda salonu boyatmak istiyoruz - belki açık yeşile."
+  },
+  {
+   "id": "opus-tr-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ankara treni 14.05'te Söğütlüçeşme'den, 3 numaralı perondan kalkıyor."
+  },
+  {
+   "id": "opus-tr-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Küçük kız şiirini bitirince herkes ayakta alkışladı."
+  },
+  {
+   "id": "opus-tr-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yemin ederim, sadece bir dilim pasta yiyecektim!"
+  },
+  {
+   "id": "opus-tr-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kütüphanede alçak sesle konuşulur, telefonla görüşmek ise yasak."
+  },
+  {
+   "id": "opus-tr-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yolunu kaybedersen köşedeki fırına sor; orada herkesi tanırlar."
+  },
+  {
+   "id": "opus-tr-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kahve makinesi yine yanıp sönüyor: kireç mi çözülecek, filtre mi değişecek?"
+  },
+  {
+   "id": "opus-tr-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bu yıl yılbaşını ilk kez Uludağ'da geçireceğiz."
+  },
+  {
+   "id": "opus-tr-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Takımımız çarşamba 3-1 kazandı, oysa kimse onlara güvenmiyordu."
+  },
+  {
+   "id": "opus-tr-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Çekmecede 1987'den kalma eski bir kartpostal buldum."
+  },
+  {
+   "id": "opus-tr-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Erken kalkmaktan nefret ederim ama sabahın sessizliğine bayılırım."
+  },
+  {
+   "id": "opus-tr-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "O \"hızlı\" tamir sonunda tam üç saat sürdü."
+  },
+  {
+   "id": "opus-tr-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Lütfen vardığında haber ver; o zamana kadar gözüme uyku girmez."
+  },
+  {
+   "id": "opus-tr-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Pazarda domatesler şimdi çok güzel, üstelik ucuz."
+  },
+  {
+   "id": "opus-tr-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bu şarkı bana hep ilk yaz kampını hatırlatıyor."
+  },
+  {
+   "id": "opus-tr-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kedi pencerenin pervazına kurulmuş, güvercinleri gözlüyor."
+  },
+  {
+   "id": "opus-tr-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kaleye yürüyerek ne kadar sürer? Yarım saat mi?"
+  },
+  {
+   "id": "opus-tr-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Eski bisiklet paslanmış ama zinciri hâlâ kusursuz çalışıyor."
+  },
+  {
+   "id": "opus-tr-p041",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Yarın sabah 8'de orada olurum - otobüs de aynı fikirdeyse."
+  },
+  {
+   "id": "opus-tr-p042",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Komşunun bahçesindeki erik ağacı çiçek açmış bile."
+  },
+  {
+   "id": "opus-tr-p043",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bugün annemin doğum günü olduğunu unutmadın, değil mi?"
+  },
+  {
+   "id": "opus-tr-p044",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kasada cüzdanımı evde unuttuğumu fark ettim."
+  },
+  {
+   "id": "opus-tr-p045",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bu akşam menemen var: biberli, domatesli ve bol peynirli."
+  },
+  {
+   "id": "opus-tr-p046",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ofiste herkes nezle oldu, benim de boğazım gıcıklanmaya başladı."
+  },
+  {
+   "id": "opus-tr-p047",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Habere göre şehirdeki bisikletli sayısı %20 arttı."
+  },
+  {
+   "id": "opus-tr-p048",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Hava açıkken Çamlıca'dan Adalar bile görünüyor."
+  },
+  {
+   "id": "opus-tr-p049",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Mesele başarıp başaramayacağımız değil, ne zaman başaracağımız."
+  },
+  {
+   "id": "opus-tr-p050",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Çocuklar kardan adam yapıp dedemin atkısını boynuna doladılar."
+  },
+  {
+   "id": "opus-tr-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Kahveden tasarruf eden, sabahı da kaybeder.\""
+  },
+  {
+   "id": "opus-tr-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Sabırlı bahçıvan asıl hasadı ikinci yıl yapar."
+  },
+  {
+   "id": "opus-tr-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Yalnızca hiç soru sormayan insan yanılmaz.\""
+  },
+  {
+   "id": "opus-tr-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Bugün sinirini bozan şey, yarın akşam sofrada güzel bir hikâye olur."
+  },
+  {
+   "id": "opus-tr-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Acele etme, ama önce sefer saatlerine bak!\""
+  },
+  {
+   "id": "opus-tr-p056",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "İyi bir komşu, dolu bir kilerden daha değerlidir."
+  },
+  {
+   "id": "opus-tr-p057",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"En kısa yol çoğu zaman kimsenin önermediği o dolambaçtır.\""
+  },
+  {
+   "id": "opus-tr-p058",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Kendine gülebilen insan asla sıkılmaz."
+  },
+  {
+   "id": "opus-tr-p059",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Sessiz insanların düşünceleri sandığından daha gürültülüdür.\""
+  },
+  {
+   "id": "opus-tr-p060",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Elinde iyi bir kitap varsa hiçbir tren gecikmez."
+  },
+  {
+   "id": "opus-tr-p061",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Şemsiyeni hep yağmurun en çok yağacağı gün evde unutursun.\""
+  },
+  {
+   "id": "opus-tr-p062",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Her büyük yolculuk unutulan bir şarj aletiyle başlar."
+  },
+  {
+   "id": "opus-tr-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Fırını kapat ve keki beş dakika daha içinde beklet."
+  },
+  {
+   "id": "opus-tr-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Formu büyük harflerle doldurun ve sayfanın altını imzalayın."
+  },
+  {
+   "id": "opus-tr-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Işık yeşil yanıp sönene kadar düğmeye üç kez basın."
+  },
+  {
+   "id": "opus-tr-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Şifre en az 8 karakter olmalı; büyük harf, küçük harf ve rakam içermeli."
+  },
+  {
+   "id": "opus-tr-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Üçüncü durakta in, postanenin oradan sağa dön."
+  },
+  {
+   "id": "opus-tr-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "30 derecede, ters çevirerek yıkayın; sıkmayın!"
+  },
+  {
+   "id": "opus-tr-p069",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Unu sütle pürüzsüz olana kadar çırp ve bir tutam tuz ekle."
+  },
+  {
+   "id": "opus-tr-p070",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Telefonu yeniden başlat, sonra güncellemeyi bir kez daha dene."
+  },
+  {
+   "id": "opus-tr-p071",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Lütfen biletinizi yolculuk sonuna kadar saklayınız."
+  },
+  {
+   "id": "opus-tr-p072",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Kapıyı kilitle ve anahtarı paspasın altına bırak."
+  },
+  {
+   "id": "opus-tr-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Hafta sonu hava soğuyor, yüksek kesimlerde ilk kar bekleniyor"
+  },
+  {
+   "id": "opus-tr-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Sahil boyunca yeni bisiklet yolu yapılıyor, baharda bitmesi planlanıyor"
+  },
+  {
+   "id": "opus-tr-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Şehrin ilk ambalajsız marketi merkezde kapılarını açtı"
+  },
+  {
+   "id": "opus-tr-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Yaz festivali rekor kırdı: 120 bin ziyaretçi geldi"
+  },
+  {
+   "id": "opus-tr-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Toplu taşımaya zam mı geliyor? Belediye meclisi salı günü karar verecek"
+  },
+  {
+   "id": "opus-tr-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Yerel öğrenciler ulusal robot yarışmasında birinci oldu"
+  },
+  {
+   "id": "opus-tr-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Marmaray'da bakım çalışması: bazı seferler iptal edildi"
+  },
+  {
+   "id": "opus-tr-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Tarihi çarşı yenileniyor (esnaf geçici olarak taşınacak)"
+  }
+ ]
+}

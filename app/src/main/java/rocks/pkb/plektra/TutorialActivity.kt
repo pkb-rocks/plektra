@@ -1212,6 +1212,8 @@ fun TutorialWhatsNewPageContent(
             )
         }
 
+        TypingTrainingWhatsNewCard()
+
         if (page.summary.improvements.isNotEmpty()) {
             Spacer(modifier = Modifier.height(6.dp))
             page.summary.improvements.forEach { improvement ->

@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-cs-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tramvaj dnes ráno nejela, takže jsem do práce došel pěšky."
+  },
+  {
+   "id": "opus-cs-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nevím, kam jsem dal klíče; včera byly ještě v kapse od bundy."
+  },
+  {
+   "id": "opus-cs-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Jestli bude zítra pršet, zůstaneme doma a zahrajeme si deskovky."
+  },
+  {
+   "id": "opus-cs-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sousedka nám každou neděli nosí čerstvě upečenou bábovku."
+  },
+  {
+   "id": "opus-cs-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "K večeru potřebuju jen tři věci: klid, deku a horký čaj."
+  },
+  {
+   "id": "opus-cs-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Myslíš, že se vyplatí dát tolik peněz za nový telefon?"
+  },
+  {
+   "id": "opus-cs-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Obchod má ve všední dny otevřeno od 7:00 do 20:00, v sobotu jen do poledne."
+  },
+  {
+   "id": "opus-cs-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Konečně jsem odevzdal diplomku! Teď budu týden jenom spát."
+  },
+  {
+   "id": "opus-cs-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Drobné písmo ve smlouvě (jako obvykle) nikdo nečetl."
+  },
+  {
+   "id": "opus-cs-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Otevřela jsem okno a pokoj zaplnila vůně čerstvě posečené trávy."
+  },
+  {
+   "id": "opus-cs-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Podle babičky potřebuje dobrý guláš hodně cibule a ještě víc trpělivosti."
+  },
+  {
+   "id": "opus-cs-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kdo nechal přes noc otevřenou lednici?"
+  },
+  {
+   "id": "opus-cs-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "E-mail jsem odeslal, ale příloha se bohužel nepřipojila."
+  },
+  {
+   "id": "opus-cs-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Příští pátek v 18:30 začíná v tělocvičně školní akademie."
+  },
+  {
+   "id": "opus-cs-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Pes mi zase ukradl bačkoru a odnesl ji na konec zahrady."
+  },
+  {
+   "id": "opus-cs-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Jak dlouho se musí vařit vajíčko, aby zůstalo naměkko?"
+  },
+  {
+   "id": "opus-cs-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Zapomněl jsem heslo, přitom jsem si ho nastavil teprve včera."
+  },
+  {
+   "id": "opus-cs-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Seděli jsme u rybníka a dívali se, jak zapadá slunce."
+  },
+  {
+   "id": "opus-cs-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Celkem to dělá 1 245 Kč, spropitné není v ceně."
+  },
+  {
+   "id": "opus-cs-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Přečetl jsem ten dopis dvakrát a pořád nechápu, co po mně chce."
+  },
+  {
+   "id": "opus-cs-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Přijď dřív, jestli můžeš; zaparkovat se tady skoro nedá."
+  },
+  {
+   "id": "opus-cs-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Synovcovi je sedm let a v šachách mě už poráží."
+  },
+  {
+   "id": "opus-cs-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Na jaře chceme vymalovat obývák - asi světle zelenou."
+  },
+  {
+   "id": "opus-cs-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Rychlík do Ostravy odjíždí ve 14:05 z hlavního nádraží, z druhé koleje."
+  },
+  {
+   "id": "opus-cs-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Všichni tleskali, když holčička dorecitovala svou básničku."
+  },
+  {
+   "id": "opus-cs-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Přísahám, že jsem chtěl sníst jen jeden kousek dortu!"
+  },
+  {
+   "id": "opus-cs-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "V knihovně se mluví potichu a telefonovat se tam nesmí vůbec."
+  },
+  {
+   "id": "opus-cs-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kdybys zabloudil, zeptej se v pekárně na rohu; tam znají každého."
+  },
+  {
+   "id": "opus-cs-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kávovar zase bliká: chce odvápnit, nebo vyměnit filtr?"
+  },
+  {
+   "id": "opus-cs-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Letos poprvé slavíme Silvestra na horách v Krkonoších."
+  },
+  {
+   "id": "opus-cs-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ve středu náš tým vyhrál 3:1, i když mu nikdo nevěřil."
+  },
+  {
+   "id": "opus-cs-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "V šuplíku jsem našel starou pohlednici z roku 1987."
+  },
+  {
+   "id": "opus-cs-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nesnáším brzké vstávání, ale ranní ticho prostě miluju."
+  },
+  {
+   "id": "opus-cs-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ta \"rychlá\" oprava nakonec trvala tři hodiny."
+  },
+  {
+   "id": "opus-cs-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Prosím, napiš mi, až dorazíš; do té doby stejně neusnu."
+  },
+  {
+   "id": "opus-cs-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Na trhu mají teď skvělá rajčata, a navíc levná."
+  },
+  {
+   "id": "opus-cs-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tahle písnička mi vždycky připomene první letní tábor."
+  },
+  {
+   "id": "opus-cs-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Kočka sedí na parapetu a pozoruje holuby na střeše."
+  },
+  {
+   "id": "opus-cs-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Jak dlouho se jde pěšky na hrad? Půl hodiny?"
+  },
+  {
+   "id": "opus-cs-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Staré kolo je celé rezavé, ale řetěz pořád běží bez chyby."
+  },
+  {
+   "id": "opus-cs-p041",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Zítra v 8 jsem tam - pokud to autobus vidí stejně."
+  },
+  {
+   "id": "opus-cs-p042",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Sousedům na zahradě už kvete třešeň."
+  },
+  {
+   "id": "opus-cs-p043",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Snad jsi nezapomněl, že má dneska máma narozeniny?"
+  },
+  {
+   "id": "opus-cs-p044",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "U pokladny jsem zjistila, že jsem nechala peněženku doma."
+  },
+  {
+   "id": "opus-cs-p045",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Dneska budou palačinky: s tvarohem, s marmeládou a s kakaem."
+  },
+  {
+   "id": "opus-cs-p046",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "V kanceláři jsou všichni nachlazení a mě už taky škrábe v krku."
+  },
+  {
+   "id": "opus-cs-p047",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Podle článku vzrostl počet cyklistů ve městě o 20 %."
+  },
+  {
+   "id": "opus-cs-p048",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Za jasného počasí je z rozhledny vidět až na Sněžku."
+  },
+  {
+   "id": "opus-cs-p049",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Otázka nezní, jestli se to povede, ale kdy."
+  },
+  {
+   "id": "opus-cs-p050",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Děti postavily sněhuláka a uvázaly mu dědovu šálu."
+  },
+  {
+   "id": "opus-cs-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Kdo šetří na kávě, přijde o celé ráno.\""
+  },
+  {
+   "id": "opus-cs-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Trpělivý zahradník sklízí nejvíc až druhým rokem."
+  },
+  {
+   "id": "opus-cs-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Nemýlí se jen ten, kdo se nikdy na nic nezeptá.\""
+  },
+  {
+   "id": "opus-cs-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Co tě dnes rozčiluje, bude zítra dobrá historka k večeři."
+  },
+  {
+   "id": "opus-cs-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Spěchej pomalu, ale nejdřív se podívej do jízdního řádu!\""
+  },
+  {
+   "id": "opus-cs-p056",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Dobrý soused má větší cenu než plná spíž."
+  },
+  {
+   "id": "opus-cs-p057",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Nejkratší cesta bývá ta oklika, kterou ti nikdo nedoporučil.\""
+  },
+  {
+   "id": "opus-cs-p058",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Kdo se umí smát sám sobě, nikdy se nenudí."
+  },
+  {
+   "id": "opus-cs-p059",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Myšlenky tichých lidí jsou hlasitější, než by sis myslel.\""
+  },
+  {
+   "id": "opus-cs-p060",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "S dobrou knížkou nemá žádný vlak zpoždění."
+  },
+  {
+   "id": "opus-cs-p061",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Deštník necháš doma vždycky přesně ten den, kdy bude lejt.\""
+  },
+  {
+   "id": "opus-cs-p062",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Každá velká cesta začíná zapomenutou nabíječkou."
+  },
+  {
+   "id": "opus-cs-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Vypni troubu a nech koláč uvnitř ještě pět minut."
+  },
+  {
+   "id": "opus-cs-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Vyplňte formulář hůlkovým písmem a podepište ho dole na stránce."
+  },
+  {
+   "id": "opus-cs-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Stiskni tlačítko třikrát, dokud kontrolka nezačne blikat zeleně."
+  },
+  {
+   "id": "opus-cs-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Heslo musí mít aspoň 8 znaků; použij malá i velká písmena a číslice."
+  },
+  {
+   "id": "opus-cs-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Vystup na třetí zastávce a u pošty zahni doprava."
+  },
+  {
+   "id": "opus-cs-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Prát na 30 stupňů, naruby; neždímat!"
+  },
+  {
+   "id": "opus-cs-p069",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Rozmíchej mouku s mlékem do hladka a přidej špetku soli."
+  },
+  {
+   "id": "opus-cs-p070",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Restartuj telefon a pak zkus aktualizaci znovu."
+  },
+  {
+   "id": "opus-cs-p071",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Jízdenku si prosím uschovejte až do konce cesty."
+  },
+  {
+   "id": "opus-cs-p072",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Zamkni dveře a klíč dej pod rohožku."
+  },
+  {
+   "id": "opus-cs-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "O víkendu se ochladí, na horách může napadnout první sníh"
+  },
+  {
+   "id": "opus-cs-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Podél Vltavy vznikne nová cyklostezka, hotová má být na jaře"
+  },
+  {
+   "id": "opus-cs-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "V centru otevřel první bezobalový obchod ve městě"
+  },
+  {
+   "id": "opus-cs-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Letní festival překonal rekord: přišlo 120 tisíc návštěvníků"
+  },
+  {
+   "id": "opus-cs-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Zdraží městská doprava? Zastupitelstvo rozhodne v úterý"
+  },
+  {
+   "id": "opus-cs-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Místní studenti vyhráli celostátní soutěž v robotice"
+  },
+  {
+   "id": "opus-cs-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Výluka na trati do Berouna: místo vlaků jezdí náhradní autobusy"
+  },
+  {
+   "id": "opus-cs-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Stará tržnice projde opravou (trhovci se dočasně přestěhují)"
+  }
+ ]
+}

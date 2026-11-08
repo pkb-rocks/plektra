@@ -215,6 +215,9 @@ class AospKeyboardView @JvmOverloads constructor(
             invalidateKeyboard()
         }
     var nearestKeyTouchEnabled: Boolean = true
+    /** Per-tap key correction (#176); also gated by [KeyCorrection.editorAllowsCorrection]. */
+    var keyCorrectionEnabled: Boolean = false
+    var keyCorrectionProfile: KeyCorrectionProfile? = null
     var shifted: Boolean = false
         set(value) {
             if (field == value) {
@@ -412,6 +415,11 @@ class AospKeyboardView @JvmOverloads constructor(
         }
 
     private val keys = mutableListOf<Key>()
+    /** Letters typed on this keyboard since the last word boundary; context for key correction. */
+    private val wordPrefix = StringBuilder()
+    private var wordPrefixGeneration = -1
+    /** Plain hit-test key under the touch-down point, which may differ from the corrected key. */
+    private var downGeometricKey: Key? = null
     private var geometryRevision = 0
     private var tracedGeometryRevision = -1
     private var tracedGeometrySink: TouchTraceSink? = null
@@ -764,7 +772,9 @@ class AospKeyboardView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 val pointerIndex = event.actionIndex
-                val key = findKey(event.getX(pointerIndex), event.getY(pointerIndex))
+                val geometricKey = findKey(event.getX(pointerIndex), event.getY(pointerIndex))
+                val key = correctedKey(event.getX(pointerIndex), event.getY(pointerIndex), geometricKey)
+                downGeometricKey = geometricKey
                 pressedKey = key
                 activePointerId = event.getPointerId(pointerIndex)
                 spaceSwipeActive = false
@@ -791,8 +801,13 @@ class AospKeyboardView @JvmOverloads constructor(
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
                 val pointerIndex = event.actionIndex
-                val key = findKey(event.getX(pointerIndex), event.getY(pointerIndex)) ?: return true
-                if (key.spec.type.isHoldModifier() && !hasSymLayerOutput(key)) return true
+                val geometricKey = findKey(event.getX(pointerIndex), event.getY(pointerIndex)) ?: return true
+                if (geometricKey.spec.type.isHoldModifier() && !hasSymLayerOutput(geometricKey)) return true
+                val key = if (heldModifierKey == null) {
+                    correctedKey(event.getX(pointerIndex), event.getY(pointerIndex), geometricKey) ?: geometricKey
+                } else {
+                    geometricKey
+                }
                 if (heldModifierKey == null) {
                     val previousKey = pressedKey
                     if (
@@ -807,6 +822,7 @@ class AospKeyboardView @JvmOverloads constructor(
                     }
                     activePointerId = event.getPointerId(pointerIndex)
                     pressedKey = key
+                    downGeometricKey = geometricKey
                     spaceSwipeActive = false
                     spaceSwipeLastX = event.getX(pointerIndex)
                     spaceLongPressArmed = false
@@ -860,9 +876,11 @@ class AospKeyboardView @JvmOverloads constructor(
                     return true
                 }
                 val key = findKey(pointerX, pointerY)
-                if (key != pressedKey) {
+                // A corrected key stays pressed while the finger remains on the touched key.
+                if (key != pressedKey && key != downGeometricKey) {
                     handler.removeCallbacks(longPressRunnable)
                     dismissPopup()
+                    downGeometricKey = null
                     pressedKey = key
                     invalidateKeyboard()
                     key?.let {
@@ -1027,6 +1045,44 @@ class AospKeyboardView @JvmOverloads constructor(
                 theme?.let(::keyCornerRadius) ?: dp(6f).toFloat(),
                 bottomKeys.minBy { it.visualRect.left }.visualRect,
                 bottomKeys.maxBy { it.visualRect.right }.visualRect)
+        }
+    }
+
+    private fun correctedKey(x: Float, y: Float, geometricKey: Key?): Key? {
+        if (geometricKey == null || !keyCorrectionEnabled || !KeyCorrection.editorAllowsCorrection) return geometricKey
+        if (TouchTraceHub.editorAllowsTrace || symPageActive || isModifierPreviewLayerActive()) return geometricKey
+        if (!isCorrectableKey(geometricKey)) return geometricKey
+        syncWordPrefix()
+        val candidates = keys.withIndex().filter { isCorrectableKey(it.value) }.map { (index, key) ->
+            KeyCorrection.Candidate(index, characterOutput(key.spec), key.hitRect.left, key.hitRect.top, key.hitRect.right, key.hitRect.bottom)
+        }
+        val metrics = resources.displayMetrics
+        val decision = KeyCorrection.decide(
+            x, y, candidates, keys.indexOf(geometricKey), metrics.xdpi, metrics.ydpi,
+            keyCorrectionProfile, wordPrefix.toString()
+        )
+        return keys.getOrNull(decision.index) ?: geometricKey
+    }
+
+    /** Single letters and digits take part in key correction; Space, Shift and symbols never do. */
+    private fun isCorrectableKey(key: Key): Boolean =
+        key.spec.type == KeyType.CHAR && characterOutput(key.spec).singleOrNull()?.isLetterOrDigit() == true
+
+    private fun syncWordPrefix() {
+        if (wordPrefixGeneration != KeyCorrection.contextGeneration) {
+            wordPrefix.clear()
+            wordPrefixGeneration = KeyCorrection.contextGeneration
+        }
+    }
+
+    private fun trackWordPrefix(key: Key) {
+        syncWordPrefix()
+        when {
+            key.spec.type == KeyType.BACKSPACE -> if (wordPrefix.isNotEmpty()) wordPrefix.setLength(wordPrefix.length - 1)
+            key.spec.type == KeyType.CHAR && characterOutput(key.spec).singleOrNull()?.isLetter() == true ->
+                wordPrefix.append(characterOutput(key.spec).lowercase()).also { if (it.length > 32) it.delete(0, it.length - 32) }
+            key.spec.type == KeyType.SHIFT || key.spec.type == KeyType.CTRL || key.spec.type == KeyType.ALT -> Unit
+            else -> wordPrefix.clear()
         }
     }
 
@@ -1595,6 +1651,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun dispatchKey(key: Key) {
+        trackWordPrefix(key)
         TouchTraceHub.activeSink?.let { sink ->
             ensureGeometryTraced(sink)
             sink.onKeyCommitted(

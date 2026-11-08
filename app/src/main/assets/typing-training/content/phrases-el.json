@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-el-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το πρωί πίνω τον καφέ μου στο μπαλκόνι, πριν ξυπνήσει η γειτονιά."
+  },
+  {
+   "id": "opus-el-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Αν βρέξει το Σάββατο, θα αναβάλουμε την εκδρομή στο Πήλιο."
+  },
+  {
+   "id": "opus-el-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η βιβλιοθήκη κλείνει στις 8:30 το βράδυ, εκτός από την Κυριακή."
+  },
+  {
+   "id": "opus-el-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ποιος άφησε ανοιχτό το παράθυρο της κουζίνας με τέτοιο αέρα;"
+  },
+  {
+   "id": "opus-el-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Δεν πρόλαβα το λεωφορείο των 7:15 και περίμενα είκοσι λεπτά στη στάση."
+  },
+  {
+   "id": "opus-el-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η θεία μου φτιάχνει την καλύτερη σπανακόπιτα της Κρήτης (κατά τη γνώμη της, τουλάχιστον)."
+  },
+  {
+   "id": "opus-el-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Μετά από τρεις μέρες βροχή, επιτέλους βγήκε ο ήλιος!"
+  },
+  {
+   "id": "opus-el-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ο φούρνος της γειτονιάς ανοίγει στις 6 και τα κουλούρια τελειώνουν μέχρι τις 9."
+  },
+  {
+   "id": "opus-el-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Έχεις δει πού έβαλα τα κλειδιά του αυτοκινήτου;"
+  },
+  {
+   "id": "opus-el-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η ενοικίαση κοστίζει 35 ευρώ τη μέρα, μαζί με την ασφάλεια."
+  },
+  {
+   "id": "opus-el-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Θυμάμαι ακόμα τη μυρωδιά του γιασεμιού στην αυλή του παππού."
+  },
+  {
+   "id": "opus-el-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το συνέδριο μεταφέρθηκε από τις 12 στις 19 Μαρτίου λόγω απεργίας."
+  },
+  {
+   "id": "opus-el-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Μη μου πεις ότι ξέχασες πάλι τα γενέθλια της αδερφής σου!"
+  },
+  {
+   "id": "opus-el-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Στο χωριό δεν έχει σήμα, οπότε θα σε πάρω όταν κατέβω στην πόλη."
+  },
+  {
+   "id": "opus-el-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το ψυγείο είναι άδειο: ούτε γάλα, ούτε αυγά, ούτε ψωμί."
+  },
+  {
+   "id": "opus-el-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το 70% των επιβατών ταξιδεύει με το πρωινό δρομολόγιο."
+  },
+  {
+   "id": "opus-el-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ο σκύλος του γείτονα γαβγίζει κάθε φορά που περνάει ο ταχυδρόμος."
+  },
+  {
+   "id": "opus-el-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Μήπως ξέρεις αν εφημερεύει απόψε το φαρμακείο της γωνίας;"
+  },
+  {
+   "id": "opus-el-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Αγοράσαμε ένα παλιό τραπέζι από το παζάρι και το βάψαμε μπλε."
+  },
+  {
+   "id": "opus-el-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η Θεσσαλονίκη το φθινόπωρο έχει μια μελαγχολία που δεν τη βρίσκεις αλλού."
+  },
+  {
+   "id": "opus-el-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Κάθε Τετάρτη παίζουμε τάβλι στο καφενείο της πλατείας."
+  },
+  {
+   "id": "opus-el-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το πλοίο για τη Σύρο αναχωρεί από τον Πειραιά στις 7:25 το πρωί."
+  },
+  {
+   "id": "opus-el-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Έλα να φάμε μαζί την Κυριακή, θα φτιάξω γεμιστά!"
+  },
+  {
+   "id": "opus-el-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ο μικρός ρώτησε γιατί ο ουρανός είναι μπλε και δεν ήξερα τι να του πω."
+  },
+  {
+   "id": "opus-el-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Τα κοινόχρηστα αυτόν τον μήνα ανέβηκαν στα 64 ευρώ (λόγω πετρελαίου)."
+  },
+  {
+   "id": "opus-el-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Νομίζω ότι η μπαταρία του κινητού μου κρατάει όλο και λιγότερο."
+  },
+  {
+   "id": "opus-el-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Στο τέλος του μονοπατιού υπάρχει ένα εκκλησάκι με θέα στο πέλαγος."
+  },
+  {
+   "id": "opus-el-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Δύο καφέδες, παρακαλώ: έναν φρέντο εσπρέσο σκέτο και έναν καπουτσίνο μέτριο."
+  },
+  {
+   "id": "opus-el-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ποτέ δεν κατάλαβα γιατί ο θείος μου φύλαγε όλα τα παλιά περιοδικά."
+  },
+  {
+   "id": "opus-el-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η πτήση έχει καθυστέρηση σαράντα λεπτών λόγω κακοκαιρίας."
+  },
+  {
+   "id": "opus-el-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Πάρε μια ζακέτα μαζί σου, το βράδυ δροσίζει κοντά στη θάλασσα."
+  },
+  {
+   "id": "opus-el-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Το συμβόλαιο υπογράφεται την Πέμπτη στις 11 το πρωί, στο γραφείο του συμβολαιογράφου."
+  },
+  {
+   "id": "opus-el-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Μια φορά τον χρόνο μαζευόμαστε όλα τα ξαδέρφια στο πατρικό."
+  },
+  {
+   "id": "opus-el-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Πόσες φορές σου έχω πει να μην αφήνεις τα παπούτσια στον διάδρομο;"
+  },
+  {
+   "id": "opus-el-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Η γάτα κοιμάται πάνω στο λάπτοπ, άρα σήμερα δεν δουλεύω."
+  },
+  {
+   "id": "opus-el-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ο λογαριασμός βγήκε 86 ευρώ για πέντε άτομα, μαζί με το κρασί."
+  },
+  {
+   "id": "opus-el-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Στη λαϊκή της Παρασκευής οι ντομάτες είχαν 1,20 το κιλό."
+  },
+  {
+   "id": "opus-el-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Είχε τόση κίνηση στην Κηφισίας που έκανα μία ώρα για δέκα χιλιόμετρα."
+  },
+  {
+   "id": "opus-el-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Χθες βράδυ είδαμε ένα ντοκιμαντέρ για τα χελιδόνια, και ήταν πολύ συγκινητικό."
+  },
+  {
+   "id": "opus-el-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ο Θοδωρής έφερε από την Κεφαλονιά λάδι, ρίγανη και ένα βάζο μέλι."
+  },
+  {
+   "id": "opus-el-p041",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Η θάλασσα δεν ρωτάει τι ώρα είναι, απλώς σε περιμένει.\""
+  },
+  {
+   "id": "opus-el-p042",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Όπως έλεγε ο παππούς μου: \"Το καλό κρασί θέλει υπομονή και καλή παρέα.\""
+  },
+  {
+   "id": "opus-el-p043",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Όποιος μαγειρεύει με αγάπη, δεν χρειάζεται συνταγή\", είπε η κυρα-Λένη."
+  },
+  {
+   "id": "opus-el-p044",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Ένας φίλος στο λιμάνι αξίζει όσο δέκα στην πόλη.\""
+  },
+  {
+   "id": "opus-el-p045",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Οι δρόμοι της πόλης θυμούνται όσα εμείς ξεχνάμε.\""
+  },
+  {
+   "id": "opus-el-p046",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Μη μετράς τα χρόνια, μέτρα τα καλοκαίρια\", μου έγραψε σε μια κάρτα."
+  },
+  {
+   "id": "opus-el-p047",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Η βροχή είναι η μόνη που δεν αργεί ποτέ στο ραντεβού της.\""
+  },
+  {
+   "id": "opus-el-p048",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Η φασολάδα, όπως και η φιλία, είναι πιο νόστιμη την επόμενη μέρα.\""
+  },
+  {
+   "id": "opus-el-p049",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "Η δασκάλα μας έλεγε: \"Τα λάθη είναι σκαλοπάτια, όχι τοίχος.\""
+  },
+  {
+   "id": "opus-el-p050",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Ο καφές είναι η πρόφαση, η κουβέντα είναι ο σκοπός.\""
+  },
+  {
+   "id": "opus-el-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Όσο ψηλά κι αν πετάξεις, η φωλιά σου μένει εκεί που ξεκίνησες.\""
+  },
+  {
+   "id": "opus-el-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Το φεγγάρι δεν ζητάει άδεια για να φωτίσει την αυλή.\""
+  },
+  {
+   "id": "opus-el-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Αν δεν ρωτήσεις, δεν θα βρεις ποτέ τον δρόμο για το χωριό\", επέμενε ο θείος."
+  },
+  {
+   "id": "opus-el-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Η υπομονή είναι ο καλύτερος συνταξιδιώτης.\""
+  },
+  {
+   "id": "opus-el-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Τα παλιά σπίτια μυρίζουν ιστορίες (και λίγη υγρασία).\""
+  },
+  {
+   "id": "opus-el-p056",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ανακατέψτε το αλεύρι με τη ζάχαρη και προσθέστε σιγά σιγά το γάλα."
+  },
+  {
+   "id": "opus-el-p057",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Πατήστε το κουμπί για 5 δευτερόλεπτα, μέχρι να ανάψει η πράσινη λυχνία."
+  },
+  {
+   "id": "opus-el-p058",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ψήστε στους 180 βαθμούς για περίπου 45 λεπτά, μέχρι να ροδίσει."
+  },
+  {
+   "id": "opus-el-p059",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Συμπληρώστε την αίτηση και στείλτε τη μέχρι τις 30 Ιουνίου."
+  },
+  {
+   "id": "opus-el-p060",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Κλείστε τον γενικό διακόπτη του νερού πριν αλλάξετε τη βρύση."
+  },
+  {
+   "id": "opus-el-p061",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Για πληροφορίες, πατήστε 2 και περιμένετε στη γραμμή."
+  },
+  {
+   "id": "opus-el-p062",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Μην ξεχάσετε να πάρετε μαζί την αστυνομική σας ταυτότητα!"
+  },
+  {
+   "id": "opus-el-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Κόψτε τις πατάτες κυδωνάτες και περιχύστε τες με λεμόνι και ρίγανη."
+  },
+  {
+   "id": "opus-el-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Επιλέξτε \"Ρυθμίσεις\", μετά \"Γλώσσα\" και αλλάξτε σε ελληνικά."
+  },
+  {
+   "id": "opus-el-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ποτίζετε τη γλάστρα μία φορά την εβδομάδα, όχι πιο συχνά."
+  },
+  {
+   "id": "opus-el-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Κρατήστε την απόδειξη: χωρίς αυτήν δεν γίνεται αλλαγή ή επιστροφή."
+  },
+  {
+   "id": "opus-el-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Στρίψτε δεξιά στο δεύτερο φανάρι και παρκάρετε πίσω από τον φούρνο."
+  },
+  {
+   "id": "opus-el-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Ρίξτε τα ανακυκλώσιμα στον μπλε κάδο και τα υπόλοιπα στον πράσινο."
+  },
+  {
+   "id": "opus-el-p069",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Χωρίς μετρό την Πέμπτη από τις 10 έως τις 4 λόγω στάσης εργασίας"
+  },
+  {
+   "id": "opus-el-p070",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Καύσωνας: έως 41 βαθμούς τη Δευτέρα σε Αθήνα και Λάρισα"
+  },
+  {
+   "id": "opus-el-p071",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Νέα γραμμή λεωφορείου συνδέει το αεροδρόμιο με το κέντρο του Ηρακλείου"
+  },
+  {
+   "id": "opus-el-p072",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Δήμος Πατρέων: δωρεάν μαθήματα κολύμβησης για παιδιά το καλοκαίρι"
+  },
+  {
+   "id": "opus-el-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Αυλαία για το φεστιβάλ κινηματογράφου με 120 ταινίες από 40 χώρες"
+  },
+  {
+   "id": "opus-el-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Αυξήσεις έως 8% στα ενοίκια των φοιτητικών σπιτιών"
+  },
+  {
+   "id": "opus-el-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Ξανανοίγει μετά από 15 χρόνια το ιστορικό σινεμά της παραλίας"
+  },
+  {
+   "id": "opus-el-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Πού θα δείτε τη βροχή των Περσείδων τον Αύγουστο;"
+  },
+  {
+   "id": "opus-el-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Οι αγρότες της Κρήτης ζητούν στήριξη μετά τις πυρκαγιές"
+  },
+  {
+   "id": "opus-el-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Πιο ακριβό το καλάθι του νοικοκυριού: τι αλλάζει από 1η Νοεμβρίου"
+  },
+  {
+   "id": "opus-el-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Μαθητές από τη Λάρισα κέρδισαν πανευρωπαϊκό διαγωνισμό ρομποτικής"
+  },
+  {
+   "id": "opus-el-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Γαλάζιες σημαίες: η Ελλάδα ξανά στις πρώτες θέσεις"
+  }
+ ]
+}

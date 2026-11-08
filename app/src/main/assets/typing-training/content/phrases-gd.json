@@ -1,0 +1,484 @@
+{
+ "items": [
+  {
+   "id": "opus-gd-p001",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bha an t-sìde cho math an-diugh 's gun do dh'ith sinn ar dìnnear a-muigh."
+  },
+  {
+   "id": "opus-gd-p002",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Thàinig am post anmoch a-rithist; tha e coltach gu bheil an rathad dùinte."
+  },
+  {
+   "id": "opus-gd-p003",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nuair a ràinig mi an cladach, bha na ròin nan laighe air na creagan."
+  },
+  {
+   "id": "opus-gd-p004",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Am faca tu an iuchair agam? Bha i air a' bhòrd sa mhadainn."
+  },
+  {
+   "id": "opus-gd-p005",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha mo sheanair a' fuireach ann an taigh beag geal ri taobh na mara."
+  },
+  {
+   "id": "opus-gd-p006",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Cheannaich mi dà lof, sia uighean agus bainne aig a' bhùth."
+  },
+  {
+   "id": "opus-gd-p007",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chaidh a' choinneamh a chur dheth, ach cha do dh'innis duine dhomh!"
+  },
+  {
+   "id": "opus-gd-p008",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha an leabhar seo (a fhuair mi bho mo phiuthar) air leth math."
+  },
+  {
+   "id": "opus-gd-p009",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Dh'fhalbh am bus aig 8:15 agus bha mi fhathast a' ruith sìos an rathad."
+  },
+  {
+   "id": "opus-gd-p010",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ma bhios an t-uisge ann a-màireach, fuirichidh sinn a-staigh le geama-bùird."
+  },
+  {
+   "id": "opus-gd-p011",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chuala mi gu bheil bùth-chofaidh ùr a' fosgladh sa bhaile an ath mhìos."
+  },
+  {
+   "id": "opus-gd-p012",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Rinn a' chlann caisteal-gainmhich mòr, agus an uair sin thàinig an làn."
+  },
+  {
+   "id": "opus-gd-p013",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha mi air a bhith ag ionnsachadh Gàidhlig o chionn trì bliadhna a-nis."
+  },
+  {
+   "id": "opus-gd-p014",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Cò a dh'fhàg an doras fosgailte? Tha an cat air teicheadh a-mach!"
+  },
+  {
+   "id": "opus-gd-p015",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bha fàileadh arain ùir a' tighinn bhon taigh-fuine aig sia uairean sa mhadainn."
+  },
+  {
+   "id": "opus-gd-p016",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Dh'fheuch sinn ris a' bheinn a dhìreadh, ach thill sinn air sgàth a' cheò."
+  },
+  {
+   "id": "opus-gd-p017",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha an seann rathad-iarainn dùinte o chionn fhada, ach tha slighe-coiseachd air a-nis."
+  },
+  {
+   "id": "opus-gd-p018",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Thug mi an cù sìos chun na tràghad, agus ruith e dìreach dhan mhuir."
+  },
+  {
+   "id": "opus-gd-p019",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bha an deigh cho tiugh air an uinneig 's gun tug e fichead mionaid orm a sgrìobadh."
+  },
+  {
+   "id": "opus-gd-p020",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha a' bhùth dùinte Didòmhnaich, mar sin ceannaich na tha a dhìth ort Disathairne."
+  },
+  {
+   "id": "opus-gd-p021",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chòrd an cèilidh rinn gu mòr: bha ceòl, dannsa agus tì gu leòr ann."
+  },
+  {
+   "id": "opus-gd-p022",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bha mi cho sgìth an-raoir 's gun do thuit mi nam chadal air an t-sòfa."
+  },
+  {
+   "id": "opus-gd-p023",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha prìs a' pheatrail air a dhol suas a-rithist; tha e a-nis 1.62 not an liotair."
+  },
+  {
+   "id": "opus-gd-p024",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "A bheil fios agad cuin a bhios an t-aiseag mu dheireadh a' falbh a-nochd?"
+  },
+  {
+   "id": "opus-gd-p025",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Lorg mi seann litir san lobht, sgrìobhte le mo shean-seanmhair ann an 1952."
+  },
+  {
+   "id": "opus-gd-p026",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chuir an tidsear an obair-dachaigh air an làrach-lìn, ach chan obraich an ceangal."
+  },
+  {
+   "id": "opus-gd-p027",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Nach eil e iongantach cho luath 's a tha a' chlann a' fàs?"
+  },
+  {
+   "id": "opus-gd-p028",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bha an fhras cho trom 's nach fhaca sinn an taobh eile den t-sràid."
+  },
+  {
+   "id": "opus-gd-p029",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha an taigh-bìdh beag air a' chidhe a' reic an èisg as ùire san sgìre."
+  },
+  {
+   "id": "opus-gd-p030",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Thòisich e a' cur an t-sneachda aig meadhan-oidhche, agus cha do stad e gu madainn."
+  },
+  {
+   "id": "opus-gd-p031",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Bidh sinn a' cruinneachadh san talla aig 19:30 airson na h-òraid mu eachdraidh an eilein."
+  },
+  {
+   "id": "opus-gd-p032",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Cha robh fios agam gun robh thu cho math air an fhidhill!"
+  },
+  {
+   "id": "opus-gd-p033",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha mi an dòchas gun tig thu a chèilidh oirnn nuair a bhios tu san sgìre."
+  },
+  {
+   "id": "opus-gd-p034",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Chaill mi mo mhiotagan a-rithist - an treas paidhir am-bliadhna!"
+  },
+  {
+   "id": "opus-gd-p035",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha an loch reòthte, ach chan eil an deigh tiugh gu leòr airson coiseachd oirre."
+  },
+  {
+   "id": "opus-gd-p036",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Às dèidh na stoirme, bha craobhan nan laighe air feadh an rathaid."
+  },
+  {
+   "id": "opus-gd-p037",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Tha mo sheanmhair ag ràdh gu bheil an t-sìde a' dol am feabhas."
+  },
+  {
+   "id": "opus-gd-p038",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Thug am bàta-iasgaich a-steach dà bhogsa de ghiomaich aig dol fodha na grèine."
+  },
+  {
+   "id": "opus-gd-p039",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Rinn mi brot leis na glasraich às a' ghàrradh, agus bha e blasta."
+  },
+  {
+   "id": "opus-gd-p040",
+   "source": "claude-opus",
+   "kind": "sentence",
+   "text": "Ciamar a chanas tu am facal seo? Chan eil mi cinnteach idir."
+  },
+  {
+   "id": "opus-gd-p041",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Cha tig an t-aiseag nas luaithe ged a choimheadas tu air an uaireadair.\""
+  },
+  {
+   "id": "opus-gd-p042",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Is fheàrr cupa tì le caraid na cèic leat fhèin.\""
+  },
+  {
+   "id": "opus-gd-p043",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Cha bhi an t-iasg nas motha a chionn 's gun innis thu an sgeul dà uair.\""
+  },
+  {
+   "id": "opus-gd-p044",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Tha an ceò a' falach na beinne, ach chan eil e ga toirt air falbh.\""
+  },
+  {
+   "id": "opus-gd-p045",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Am fear a chuireas an coire air, gheibh e na sgeulachdan.\""
+  },
+  {
+   "id": "opus-gd-p046",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Bidh an rathad fada nuair a bhios an cridhe trom.\""
+  },
+  {
+   "id": "opus-gd-p047",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Chan eil droch shìde ann; chan eil ann ach droch chòta.\""
+  },
+  {
+   "id": "opus-gd-p048",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Ionnsaich am facal an-diugh, agus bruidhinn an cànan a-màireach.\""
+  },
+  {
+   "id": "opus-gd-p049",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Is beag an t-eilean anns nach eil sgeulachd.\""
+  },
+  {
+   "id": "opus-gd-p050",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Cha do rinn cabhag a-riamh aran math.\""
+  },
+  {
+   "id": "opus-gd-p051",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Fàg an doras fosgailte, agus thig an cèilidh thugad.\""
+  },
+  {
+   "id": "opus-gd-p052",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Tha gach cnoc nas àirde nuair a tha am poca nas truime.\""
+  },
+  {
+   "id": "opus-gd-p053",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Is e an dàrna cupa an cupa as fheàrr.\""
+  },
+  {
+   "id": "opus-gd-p054",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Coisich air a' chladach, agus fàgaidh na draghan agad thu.\""
+  },
+  {
+   "id": "opus-gd-p055",
+   "source": "claude-opus",
+   "kind": "quote",
+   "text": "\"Bheir gàire an rathad nas giorra.\""
+  },
+  {
+   "id": "opus-gd-p056",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Cuir an coire air, agus fàg am poca-tì sa chupa airson trì mionaidean."
+  },
+  {
+   "id": "opus-gd-p057",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Brùth am putan gorm, an uair sin cuir a-steach an còd: 4821."
+  },
+  {
+   "id": "opus-gd-p058",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Dùin na h-uinneagan uile mus fàg thu an taigh, gu h-àraidh an tè sa chidsin."
+  },
+  {
+   "id": "opus-gd-p059",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Measgaich am flùr agus an t-ìm, agus cuir bainne ris beag air bheag."
+  },
+  {
+   "id": "opus-gd-p060",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Cuimhnich: na fàg do bhaga leis fhèin aig a' chidhe."
+  },
+  {
+   "id": "opus-gd-p061",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Lean an t-slighe-coiseachd chun na drochaid, agus tionndaidh gu do làimh chlì."
+  },
+  {
+   "id": "opus-gd-p062",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Sgrìobh d' ainm agus do sheòladh-puist sa bhogsa gu h-ìosal (ann an litrichean mòra)."
+  },
+  {
+   "id": "opus-gd-p063",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Cùm am brot air teas ìosal, agus cuir mu chuairt e a h-uile còig mionaidean."
+  },
+  {
+   "id": "opus-gd-p064",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Na cuir am bogsa dearg san sgudal; tha e airson ath-chuairteachadh."
+  },
+  {
+   "id": "opus-gd-p065",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Cuir fòn chun an ionad-slàinte ro 10:00 agus iarr àm airson an dotair fhaicinn."
+  },
+  {
+   "id": "opus-gd-p066",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Feuch am facal-faire a-rithist, no brùth \"Dhìochuimhnich mi e\" gu h-ìosal."
+  },
+  {
+   "id": "opus-gd-p067",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Thoir leat brògan-coiseachd làidir, còta-uisge agus biadh airson an latha."
+  },
+  {
+   "id": "opus-gd-p068",
+   "source": "claude-opus",
+   "kind": "instruction",
+   "text": "Glas an rothar ris an fheansa, chan ann ris a' chraoibh."
+  },
+  {
+   "id": "opus-gd-p069",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Aiseagan air an cur dheth a-rithist air sgàth gaoth làidir"
+  },
+  {
+   "id": "opus-gd-p070",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Comann eachdraidh ionadail a' fosgladh taisbeanadh ùr san talla"
+  },
+  {
+   "id": "opus-gd-p071",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Prìsean thaighean air na h-eileanan suas 8% ann am bliadhna"
+  },
+  {
+   "id": "opus-gd-p072",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Sgoil bheag na dùthcha a' comharrachadh 150 bliadhna"
+  },
+  {
+   "id": "opus-gd-p073",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Sgioba camanachd òg a' buannachadh na cuaiche airson a' chiad uair"
+  },
+  {
+   "id": "opus-gd-p074",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Seirbheis bus ùr eadar na bailtean beaga bhon Ghiblean"
+  },
+  {
+   "id": "opus-gd-p075",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Fèis-chiùil a' tarraing còrr is 2,000 neach dhan bhaile"
+  },
+  {
+   "id": "opus-gd-p076",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "\"Tha sinn feumach air taighean\" - muinntir a' bhaile a' bruidhinn a-mach"
+  },
+  {
+   "id": "opus-gd-p077",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Bùth-choimhearsnachd a' sàbhaladh na sràide (le taic bho 300 neach)"
+  },
+  {
+   "id": "opus-gd-p078",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Leabharlann-siubhail a' tilleadh dha na glinn an ath mhìos"
+  },
+  {
+   "id": "opus-gd-p079",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Rabhadh: sneachda trom ri thighinn air na rathaidean àrda a-nochd"
+  },
+  {
+   "id": "opus-gd-p080",
+   "source": "claude-opus",
+   "kind": "headline",
+   "text": "Clasaichean an-asgaidh do luchd-ionnsachaidh na Gàidhlig: clàraich ro 30 Sultain"
+  }
+ ]
+}

@@ -445,6 +445,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Exact Typing: the raw-mode choice also covers WebAPKs (matched via their host browser).
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
         inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
+        // Key correction never touches restricted, literal, raw or typing-training fields.
+        rocks.pkb.plektra.inputmethod.aospkeyboard.KeyCorrection.editorAllowsCorrection =
+            inputContextState.restrictedReason == null && !inputContextState.isAppRawMode && !TouchTraceHub.editorAllowsTrace
+        rocks.pkb.plektra.inputmethod.aospkeyboard.KeyCorrection.invalidateWordContext()
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -1899,6 +1903,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() }
         )
         inputEventRouter.suggestionController = suggestionController
+        rocks.pkb.plektra.inputmethod.aospkeyboard.KeyCorrection.charContext =
+            rocks.pkb.plektra.inputmethod.aospkeyboard.CharContext { prefix -> suggestionController.nextCharWeights(prefix) }
         
         // Preload dictionary in background so it's ready when user focuses a field
         suggestionController.preloadDictionary()
@@ -4432,6 +4438,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     ) {
         val perfStart = ImePerfLogger.mark()
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        // Typing moves the cursor forward by a character or two; anything else loses the word context.
+        if (newSelStart != newSelEnd || newSelStart < oldSelStart || newSelStart - oldSelStart > 2) {
+            rocks.pkb.plektra.inputmethod.aospkeyboard.KeyCorrection.invalidateWordContext()
+        }
         liveSpeechEditor?.let { editor ->
             val expected = if (candidatesEnd >= 0) candidatesEnd else editor.expectedCursor
             if ((oldSelStart != newSelStart || oldSelEnd != newSelEnd) &&

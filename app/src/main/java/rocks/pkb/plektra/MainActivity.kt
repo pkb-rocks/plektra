@@ -212,6 +212,7 @@ class MainActivity : LocalizedComponentActivity() {
             // Schedule periodic background update checks (every 24 hours).
             UpdateCheckWorker.schedule(applicationContext)
         }
+        rocks.pkb.plektra.training.TypingTrainingReminderWorker.schedule(applicationContext)
 
         enableEdgeToEdge()
         setContent {

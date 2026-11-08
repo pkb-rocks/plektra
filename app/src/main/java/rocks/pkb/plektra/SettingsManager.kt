@@ -175,6 +175,10 @@ object SettingsManager {
     private const val KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE = "software_keyboard_layout_style" // compact | extended_iso | full_ansi | full_iso
     private const val KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED = "software_keyboard_number_row_enabled"
     private const val KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED = "software_keyboard_nearest_key_touch_enabled"
+    private const val KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_ENABLED = "software_keyboard_key_correction_enabled"
+    private const val KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_PROFILES = "software_keyboard_key_correction_profiles"
+    private const val KEY_TYPING_TRAINING_REMINDER_ENABLED = "typing_training_reminder_enabled"
+    private const val KEY_TYPING_TRAINING_REMINDER_LAST_AT = "typing_training_reminder_last_at"
     private const val KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY = "software_keyboard_left_modifier_key"
     private const val KEY_SOFTWARE_KEYBOARD_RIGHT_MODIFIER_KEY = "software_keyboard_right_modifier_key"
     private const val KEY_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_ENABLED = "software_keyboard_long_press_layer_popup_enabled"
@@ -672,6 +676,40 @@ object SettingsManager {
     fun setSoftwareKeyboardNearestKeyTouchEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED, enabled)
+            .apply()
+    }
+
+    /** Weekly reminder to practise and share typing-training sessions; nightly builds only. */
+    fun getTypingTrainingReminderEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_TYPING_TRAINING_REMINDER_ENABLED, true)
+
+    fun setTypingTrainingReminderEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_TYPING_TRAINING_REMINDER_ENABLED, enabled).apply()
+    }
+
+    fun getTypingTrainingReminderLastAt(context: Context): Long =
+        getPreferences(context).getLong(KEY_TYPING_TRAINING_REMINDER_LAST_AT, 0L)
+
+    fun setTypingTrainingReminderLastAt(context: Context, atMs: Long) {
+        getPreferences(context).edit().putLong(KEY_TYPING_TRAINING_REMINDER_LAST_AT, atMs).apply()
+    }
+
+    fun getSoftwareKeyboardKeyCorrectionEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_ENABLED, false)
+
+    fun setSoftwareKeyboardKeyCorrectionEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_ENABLED, enabled)
+            .apply()
+    }
+
+    /** Calibrated touch models per device posture and layout, as JSON (see KeyCorrectionProfile). */
+    fun getSoftwareKeyboardKeyCorrectionProfiles(context: Context): String? =
+        getPreferences(context).getString(KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_PROFILES, null)
+
+    fun setSoftwareKeyboardKeyCorrectionProfiles(context: Context, json: String) {
+        getPreferences(context).edit()
+            .putString(KEY_SOFTWARE_KEYBOARD_KEY_CORRECTION_PROFILES, json)
             .apply()
     }
 

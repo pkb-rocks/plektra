@@ -419,6 +419,38 @@ class AospKeyboardViewTest {
     }
 
     @Test
+    fun keyCorrectionPicksContextLetterAtBoundaryAndKeepsItWhileFingerStays() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            this.listener = listener
+            keyCorrectionEnabled = true
+        }
+        val e = field<RectF>(keyForLabel(view, "e"), "hitRect")
+        val r = field<RectF>(keyForLabel(view, "r"), "hitRect")
+        val (dx, dy) = centerOfLabel(view, "d")
+        try {
+            KeyCorrection.charContext = CharContext { prefix -> if (prefix == "d") mapOf('e' to 100f, 'r' to 1f) else null }
+            KeyCorrection.editorAllowsCorrection = true
+            TouchTraceHub.editorAllowsTrace = false
+            KeyCorrection.invalidateWordContext()
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, dx, dy, 0L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, dx, dy, 20L))
+            // Just inside r, at the e|r boundary; a small move stays on the touched key.
+            val x = r.left + 0.5f
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, r.centerY(), 40L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_MOVE, x + 1f, r.centerY(), 50L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x + 1f, r.centerY(), 60L))
+            // A clear hit in the middle of r is never re-decided.
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, r.centerX(), r.centerY(), 80L))
+            view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, r.centerX(), r.centerY(), 100L))
+        } finally {
+            KeyCorrection.charContext = null
+        }
+        assertTrue(e.right <= r.left + 1f)
+        assertEquals(listOf("d", "e", "r"), listener.texts)
+    }
+
+    @Test
     fun shiftKeyTap_notifiesListener() {
         val listener = RecordingListener()
         val view = measuredKeyboard().apply {

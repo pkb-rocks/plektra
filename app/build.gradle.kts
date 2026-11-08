@@ -45,6 +45,16 @@ fun hasSigningConfig(storePath: String?, storePass: String?, alias: String?, key
 fun gradleBooleanProperty(name: String): Boolean =
     providers.gradleProperty(name).orNull?.equals("true", ignoreCase = true) == true
 
+/** Trimmed stdout of a git command, or null when git is missing or fails. */
+fun gitOutput(vararg args: String): String? = runCatching {
+    val result = providers.exec {
+        commandLine("git", *args)
+        workingDir = rootDir
+        isIgnoreExitValue = true
+    }
+    result.standardOutput.asText.get().trim().takeIf { result.result.get().exitValue == 0 }
+}.getOrNull()
+
 fun shouldValidateNightlySigning(taskNames: List<String>): Boolean {
     if (taskNames.isEmpty()) {
         return true
@@ -124,6 +134,26 @@ android {
         buildConfigField("String", "GITHUB_REPOSITORY", "\"$githubRepository\"")
         buildConfigField("String", "APK_VARIANT", "\"full\"")
         buildConfigField("boolean", "ENABLE_ACCESSIBILITY_SERVICE", "true")
+        // Build provenance for typing-training sessions. Overridable for builds outside a git checkout.
+        val gitCommit = providers.gradleProperty("PLEKTRA_GIT_COMMIT").orNull
+            ?: gitOutput("rev-parse", "HEAD").orEmpty()
+        val gitDirty = providers.gradleProperty("PLEKTRA_GIT_DIRTY").orNull
+            ?: gitOutput("status", "--porcelain")?.let { it.isNotEmpty().toString() }
+            ?: "unknown"
+        buildConfigField("String", "GIT_COMMIT", "\"$gitCommit\"")
+        // "true", "false" or "unknown"; untracked files count as dirty.
+        buildConfigField("String", "GIT_DIRTY", "\"$gitDirty\"")
+        // Opt-in typing-training upload: sessions are end-to-end encrypted to this age recipient.
+        buildConfigField(
+            "String",
+            "TYPING_TRAINING_UPLOAD_URL",
+            "\"${(project.findProperty("plektra.typingTrainingUploadUrl") as String?).orEmpty()}\""
+        )
+        buildConfigField(
+            "String",
+            "TYPING_TRAINING_AGE_RECIPIENT",
+            "\"age12cagf6q6lgzaexquzkqmprtj8rkgsqkfp53jc5643tdy5q8aay4qj0w27s\""
+        )
     }
 
     signingConfigs {
@@ -477,6 +507,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    // X25519 for age-format encryption of shared typing-training sessions (minSdk < 33 lacks XDH)
+    implementation("com.google.crypto.tink:tink-android:1.13.0")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     // RecyclerView per performance ottimali nella griglia emoji
     implementation("androidx.recyclerview:recyclerview:1.3.2")

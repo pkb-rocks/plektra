@@ -41,6 +41,23 @@ class SuggestionController(
 ) {
 
     private val appContext = context.applicationContext
+
+    /**
+     * Relative weights of the character following [prefix] among dictionary words of the active
+     * language, or null while the dictionary is not loaded. Used by on-screen key correction.
+     */
+    fun nextCharWeights(prefix: String): Map<Char, Float>? {
+        val repository = dictionaryRepository
+        if (!repository.isReady || prefix.isEmpty()) return null
+        val weights = HashMap<Char, Float>()
+        for (entry in repository.lookupByPrefixMerged(prefix, 400)) {
+            val word = entry.word.lowercase(currentLocale)
+            if (word.length <= prefix.length || !word.startsWith(prefix)) continue
+            // Frequencies are on a logarithmic 0..255 scale.
+            weights.merge(word[prefix.length], kotlin.math.exp(entry.frequency / 24f), Float::plus)
+        }
+        return weights
+    }
     private val debugLogging: Boolean = debugLogging
     private val userDictionaryStore = UserDictionaryStore()
     private val dictionaryRepositoryCache = mutableMapOf<String, DictionaryRepository>()

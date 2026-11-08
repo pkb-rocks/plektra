@@ -75,6 +75,7 @@ import rikka.shizuku.Shizuku
 import androidx.compose.runtime.LaunchedEffect
 import android.content.pm.PackageManager
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Keyboard
 
 /**
  * Advanced settings screen.
@@ -608,6 +609,76 @@ fun AdvancedSettingsScreen(
                                 }
                             }
                         }
+
+                        Surface(modifier = Modifier.fillMaxWidth().settingRow("advanced.key_correction") {
+                            context.startActivity(Intent(context, rocks.pkb.plektra.training.KeyCorrectionActivity::class.java))
+                        }) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.TouchApp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.key_correction_calibration_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.key_correction_calibration_summary),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        Surface(modifier = Modifier.fillMaxWidth().settingRow("advanced.typing_training") {
+                            context.startActivity(Intent(context, rocks.pkb.plektra.training.TypingTrainingActivity::class.java))
+                        }) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Keyboard,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.typing_training_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.typing_training_settings_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        TypingTrainingReminderSetting()
 
                         Surface(modifier = Modifier.fillMaxWidth().settingRow("advanced.notes") {
                             context.startActivity(Intent(context, NotesActivity::class.java))

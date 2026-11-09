@@ -509,9 +509,7 @@ class AlternateCharacterManager(
                         if (!symChar.isNullOrEmpty()) {
                             longPressActivated[keyCode] = true
 
-                            if (!insertedChar.isNullOrEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
-                            }
+                            deleteInsertedText(keyCode, insertedChar, inputConnection)
 
                             if (handleBoundaryTextBeforeCommit(symChar, inputConnection)) {
                                 onAltCharInserted?.invoke(symChar[0])
@@ -565,7 +563,7 @@ class AlternateCharacterManager(
                             if (shiftChar != null) {
                                 longPressActivated[keyCode] = true
 
-                                inputConnection.deleteSurroundingText(1, 0)
+                                deleteInsertedText(keyCode, insertedChar, inputConnection)
                                 if (!handleBoundaryTextBeforeCommit(shiftChar, inputConnection)) {
                                     inputConnection.commitText(shiftChar, 1)
                                 }
@@ -581,7 +579,7 @@ class AlternateCharacterManager(
                             longPressActivated[keyCode] = true
                             val shiftChar = resolveShiftLongPressText(keyCode, insertedChar) ?: insertedChar.uppercase()
 
-                            inputConnection.deleteSurroundingText(1, 0)
+                            deleteInsertedText(keyCode, insertedChar, inputConnection)
                             inputConnection.commitText(shiftChar, 1)
 
                             insertedNormalChars.remove(keyCode)
@@ -601,9 +599,7 @@ class AlternateCharacterManager(
                         if (altChar != null) {
                             longPressActivated[keyCode] = true
 
-                            if (insertedChar != null && insertedChar.isNotEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
-                            }
+                            deleteInsertedText(keyCode, insertedChar, inputConnection)
 
                             if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
                                 altChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
@@ -713,9 +709,44 @@ class AlternateCharacterManager(
             else -> resolveImmediatelyPrecedingTarget(snapshot, expectedText)
         } ?: return false
 
+        return replaceTarget(inputConnection, snapshot, target, variation)
+    }
+
+    /**
+     * Removes the whole text this key press inserted so a long press replaces
+     * multi-character outputs (Uyghur لا) instead of only their last character.
+     * Uses the insertion anchor when the editor still shows it; without a
+     * readable match it deletes the inserted length before the cursor.
+     */
+    private fun deleteInsertedText(
+        keyCode: Int,
+        insertedText: String?,
+        inputConnection: InputConnection
+    ) {
+        val anchor = insertedTextAnchors.remove(keyCode)
+        if (insertedText.isNullOrEmpty()) return
+
+        val snapshot = readEditorSnapshot(inputConnection)
+        val target = snapshot?.let {
+            anchor?.let { a -> resolveAnchoredTarget(inputConnection, it, a) }
+                ?: resolveImmediatelyPrecedingTarget(it, insertedText)
+        }
+        if (snapshot == null || target == null || target.second == snapshot.selectionStart) {
+            inputConnection.deleteSurroundingText(insertedText.length, 0)
+            return
+        }
+        replaceTarget(inputConnection, snapshot, target, "")
+    }
+
+    private fun replaceTarget(
+        inputConnection: InputConnection,
+        snapshot: EditorSnapshot,
+        target: Pair<Int, Int>,
+        replacement: String
+    ): Boolean {
         val selectionStart = snapshot.selectionStart
         val selectionEnd = snapshot.selectionEnd
-        val lengthDelta = variation.length - expectedText.length
+        val lengthDelta = replacement.length - (target.second - target.first)
         inputConnection.beginBatchEdit()
         inputConnection.finishComposingText()
         val composingRegionSet = inputConnection.setComposingRegion(target.first, target.second)
@@ -723,12 +754,12 @@ class AlternateCharacterManager(
             inputConnection.endBatchEdit()
             return false
         }
-        val committed = inputConnection.commitText(variation, 1)
+        val committed = inputConnection.commitText(replacement, 1)
         if (committed) {
             inputConnection.finishComposingText()
             inputConnection.setSelection(
-                adjustSelectionAfterReplacement(selectionStart, target, lengthDelta, variation.length),
-                adjustSelectionAfterReplacement(selectionEnd, target, lengthDelta, variation.length)
+                adjustSelectionAfterReplacement(selectionStart, target, lengthDelta, replacement.length),
+                adjustSelectionAfterReplacement(selectionEnd, target, lengthDelta, replacement.length)
             )
         }
         inputConnection.endBatchEdit()

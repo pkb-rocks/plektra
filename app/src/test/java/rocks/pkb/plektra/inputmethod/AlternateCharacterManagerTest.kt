@@ -9,6 +9,7 @@ import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -65,6 +66,69 @@ class AlternateCharacterManagerTest {
         }
 
         assertEquals("،؟؛", recorder.text)
+    }
+
+    @Test
+    fun shiftLongPress_replacesWholeMultiCharacterOutput() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب")
+        assertEquals("بلا", recorder.text)
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertEquals("بل", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_replacesWholeMultiCharacterOutput() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertEquals("بx", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_withoutExtractedTextDeletesInsertedLength() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب", extractedTextAvailable = false) {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertEquals("بx", recorder.text)
+        assertEquals(listOf(2 to 0), recorder.deleteCalls)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun symLongPress_replacesWholeMultiCharacterOutput() {
+        SettingsManager.setLongPressModifier(context, "sym")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب")
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertTrue(recorder.text, recorder.text.startsWith("ب"))
+        assertTrue(recorder.text, recorder.text.length > 1)
+        assertFalse(recorder.text, recorder.text.contains('ل') || recorder.text.contains('ا'))
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    private fun pressShiftedUyghurL(
+        prefix: String,
+        extractedTextAvailable: Boolean = true,
+        configure: AlternateCharacterManager.() -> Unit = {}
+    ): Pair<RecordingInputConnection, AlternateCharacterManager> {
+        val recorder = RecordingInputConnection(extractedTextAvailable)
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText(prefix, 1)
+        val manager = AlternateCharacterManager(context.assets, prefs, context).apply(configure)
+        val event = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_L, 0, KeyEvent.META_SHIFT_ON)
+        manager.handleKeyWithAltMapping(KeyEvent.KEYCODE_L, event, false, inputConnection)
+        assertEquals(prefix + "لا", recorder.text)
+        return recorder to manager
     }
 
     @Test

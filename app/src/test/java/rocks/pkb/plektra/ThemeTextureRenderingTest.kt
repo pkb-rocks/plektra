@@ -247,4 +247,46 @@ class ThemeTextureRenderingTest {
         assertThrows(IllegalArgumentException::class.java) {ThemeTextureStore.readBounded(byteArrayOf(1,2,3).inputStream(),2)}
         assertArrayEquals(byteArrayOf(1,2,3),ThemeTextureStore.readBounded(byteArrayOf(1,2,3).inputStream(),3))
     }
+    @Test
+    @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
+    fun openHardwareSymGridReappliesSavedKeyColoursAfterPhotoFails() {
+        val a=org.robolectric.Robolectric.buildActivity(android.app.Activity::class.java).setup().get()
+        val sm=rocks.pkb.plektra.SettingsManager
+        sm.getPreferences(a).edit().clear().commit()
+        sm.setSoftwareKeyboardMode(a, rocks.pkb.plektra.SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE)
+        val asset="texture-${"9".repeat(64)}.png"
+        val theme=sm.getKeyboardTheme(a,rocks.pkb.plektra.SettingsManager.KeyboardThemeTarget.HARDWARE).copy(
+            normalKey=0xff126834.toInt(), background=0xff192030.toInt(),
+            textures=mapOf("background" to rocks.pkb.plektra.KeyboardThemeTexture(asset,wholeKeyboard=true)))
+        sm.setKeyboardTheme(a,rocks.pkb.plektra.SettingsManager.KeyboardThemeTarget.HARDWARE,theme)
+        val bar=rocks.pkb.plektra.inputmethod.StatusBarController(a,rocks.pkb.plektra.inputmethod.StatusBarController.Mode.CANDIDATES_ONLY)
+        val snapshot=rocks.pkb.plektra.inputmethod.StatusBarController.StatusSnapshot(false,false,false,false,false,false,false,false,false,false,2)
+        fun render() {
+            bar.update(snapshot,symMappings=mapOf(android.view.KeyEvent.KEYCODE_Q to ""))
+            val root=bar.getLayout()!!
+            root.measure(View.MeasureSpec.makeMeasureSpec(1078,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED))
+            root.layout(0,0,root.measuredWidth,root.measuredHeight)
+        }
+        fun pixel():Int {
+            @Suppress("UNCHECKED_CAST")
+            val key=(bar.javaClass.getDeclaredField("emojiKeyButtons").apply { isAccessible = true }.get(bar) as List<View>).first()
+            val bmp=android.graphics.Bitmap.createBitmap(key.width,key.height,android.graphics.Bitmap.Config.ARGB_8888)
+            key.draw(android.graphics.Canvas(bmp))
+            return bmp.getPixel(key.width/2,key.height/2)
+        }
+        render()
+        assertEquals(android.graphics.Color.TRANSPARENT,pixel())
+        rocks.pkb.plektra.ThemeTextureStore.request(View(a),asset)
+        val deadline=System.nanoTime()+5_000_000_000L
+        while(!rocks.pkb.plektra.ThemeTextureStore.isUnavailable(asset)) { check(System.nanoTime()<deadline);Thread.sleep(10) }
+        Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+        render()
+        val afterRefresh=pixel()
+        bar.update(snapshot.copy(symPage=0))
+        render()
+        assertEquals("Rebuilding the same hardware SYM page restores the correct saved colour",theme.normalKey,pixel())
+        assertEquals("Open hardware SYM keys must regain the saved normal-key colour",theme.normalKey,afterRefresh)
+        a.finish()
+    }
+
 }

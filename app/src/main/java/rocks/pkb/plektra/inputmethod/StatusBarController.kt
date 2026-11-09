@@ -366,6 +366,7 @@ class StatusBarController(
     private var emojiKeyButtons: MutableList<View> = mutableListOf()
     private var lastSymPageRendered: Int = 0
     private var lastSymMappingsRendered: Map<Int, String>? = null
+    private var lastHardwareSymThemeRendered: KeyboardThemeColors? = null
     private var lastInputConnectionUsed: android.view.inputmethod.InputConnection? = null
     private var wasSymActive: Boolean = false
     private var isTitan2Layout: Boolean = false
@@ -1398,7 +1399,9 @@ class StatusBarController(
         container.setPadding(0, 0, 0, 0)
         val inputConnectionChanged = lastInputConnectionUsed != inputConnection
         val inputConnectionBecameAvailable = lastInputConnectionUsed == null && inputConnection != null
-        if (lastSymPageRendered == page && lastSymMappingsRendered == symMappings && !inputConnectionChanged && !inputConnectionBecameAvailable) {
+        val theme = activeThemeColors()
+        if (lastSymPageRendered == page && lastSymMappingsRendered == symMappings &&
+            lastHardwareSymThemeRendered == theme && !inputConnectionChanged && !inputConnectionBecameAvailable) {
             return
         }
         
@@ -1592,7 +1595,8 @@ class StatusBarController(
             container.addView(rowLayout)
         }
 
-        // Cache what was rendered to avoid rebuilding on each status refresh
+        // Cache the effective colours too: an asynchronous photo failure changes them.
+        lastHardwareSymThemeRendered = theme
         lastSymPageRendered = page
         lastSymMappingsRendered = HashMap(symMappings)
         lastInputConnectionUsed = inputConnection

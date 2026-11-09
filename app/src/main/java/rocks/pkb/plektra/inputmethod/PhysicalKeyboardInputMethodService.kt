@@ -1660,13 +1660,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     /**
-     * Gets the character string from the selected keyboard layout.
-     * Returns the original event character if not mapped in layout.
+     * Gets the text from the selected keyboard layout, all of it when the key types several
+     * characters (Uyghur Shift+L types لا). Returns the original event character if not mapped in layout.
      */
-    private fun getCharacterStringFromLayout(keyCode: Int, event: KeyEvent?, isShift: Boolean): String {
-        val char = getCharacterFromLayout(keyCode, event, isShift)
-        return char?.toString() ?: ""
-    }
+    private fun getCharacterStringFromLayout(keyCode: Int, event: KeyEvent?, isShift: Boolean): String =
+        LayoutMappingRepository.getMapping(keyCode)?.let { LayoutMappingRepository.resolveText(it, isShift) }
+            ?: getCharacterFromLayout(keyCode, event, isShift)?.toString().orEmpty()
 
     private fun switchToLayout(layoutName: String, showToast: Boolean) {
         activeKeyboardLayoutName = layoutName
@@ -2279,9 +2278,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             runCatching { rocks.pkb.plektra.data.emoji.EmojiRepository.getEmojiCategories(this@PhysicalKeyboardInputMethodService) }
         }
         symLayoutController.onPagedSearchRequested = {
-            candidatesBarController.requestEmojiPickerSearch()
-            symLayoutController.openEmojiPickerPage()
-            updateStatusBarText()
+            // A blocked bar opens no picker: no search may wait for its next opening.
+            if (symLayoutController.openEmojiPickerPage()) {
+                candidatesBarController.requestEmojiPickerSearch()
+                updateStatusBarText()
+            }
         }
         symLayoutController.onKeyCustomizationRequested = { page, keyCode ->
             candidatesBarController.openSymKeyCustomization(page, keyCode)
@@ -4922,11 +4923,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 event,
                 emojiSearchCtrlActive,
                 resolveTypedText = { typedEvent ->
-                    getCharacterFromLayout(
+                    getCharacterStringFromLayout(
                         typedEvent.keyCode,
                         typedEvent,
                         isShiftModifierActive(typedEvent)
-                    )?.toString()?.also { emojiSearchTextCommitted = it.isNotEmpty() }
+                    ).takeIf { it.isNotEmpty() }?.also { emojiSearchTextCommitted = true }
                 }
             )
         ) {

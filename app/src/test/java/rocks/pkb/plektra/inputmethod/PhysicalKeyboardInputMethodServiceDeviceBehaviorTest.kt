@@ -1984,6 +1984,20 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun emojiSearchOnUyghur_softOneShotTypesTheWholeMultiCharacterLetter() {
+        useLayout("uyghur")
+        val picker = openEmojiPickerSearch()
+        val modifier = modifierController()
+        modifier.clearShiftState(resetPressedState = true)
+        modifier.shiftOneShot = true
+        pressKey(KeyEvent.KEYCODE_L, 10000L)
+        assertEquals("لا", searchText(picker))
+        assertFalse(modifier.shiftOneShot)
+        pressKey(KeyEvent.KEYCODE_L, 10100L)
+        assertEquals("لال", searchText(picker))
+    }
+
+    @Test
     fun emojiSearchManualLatchSurvivesSearch() {
         val picker = openEmojiPickerSearch()
         val modifier = modifierController()

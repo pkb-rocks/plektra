@@ -33,6 +33,38 @@ class EmojiFontCoverageTest {
                     .flatMap { line -> line.split(' ').filter(String::isNotBlank) }
             }
 
+    /** Each line of the picker data: its emoji first, then its skin tones. */
+    private fun pickerLines(): List<List<String>> =
+        context.assets.list("common/emoji").orEmpty()
+            .filter { it.endsWith(".txt") && it != "minApi.txt" }
+            .flatMap { name ->
+                context.assets.open("common/emoji/$name").bufferedReader().readLines()
+                    .map { line -> line.split(' ').filter(String::isNotBlank) }
+                    .filter { it.isNotEmpty() }
+            }
+
+    @Test
+    fun everySkinToneVariantIsOnItsOwnEmojisLine() {
+        val tones = EmojiSkinTone.MODIFIERS
+        fun untoned(emoji: String) = tones.fold(emoji) { text, tone -> text.replace(tone, "") }
+        val lines = pickerLines()
+        val bases = lines.map { it.first() }.toSet()
+        val misplaced = lines.flatMap { line ->
+            line.drop(1).filter { variant ->
+                // A variant carries a tone and belongs to the emoji it tones; multi-person tones
+                // without an untoned emoji of their own (🫱🏻‍🫲🏼) belong to the shared-name emoji (🤝).
+                tones.none { it in variant } || untoned(variant).let { it != line.first() && it in bases }
+            }.map { "${line.first()} ← $it" }
+        }
+        assertTrue("Variants on another emoji's line: ${misplaced.take(10)}", misplaced.isEmpty())
+        val lineOf = lines.flatMap { line -> line.map { it to line.first() } }.toMap()
+        assertEquals("\uD83E\uDEF9", lineOf["\uD83E\uDEF9\uD83C\uDFFB"]) // 🫹🏻
+        assertEquals("\uD83E\uDEFA", lineOf["\uD83E\uDEFA\uD83C\uDFFF"]) // 🫺🏿
+        assertEquals("🤝", lineOf["\uD83E\uDEF1\uD83C\uDFFB\u200D\uD83E\uDEF2\uD83C\uDFFC"]) // 🫱🏻‍🫲🏼
+        assertEquals(6, lines.first { it.first() == "\uD83E\uDEF9" }.size)
+        assertEquals(26, lines.first { it.first() == "💑" }.size)
+    }
+
     @Test
     fun bundledFontMetadataCoversEveryPickerEmoji() {
         val bytes = context.assets.open(EmojiRendering.FONT_ASSET).use { it.readBytes() }

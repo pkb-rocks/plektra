@@ -144,23 +144,15 @@ def parse_emoji_test(text: str) -> tuple[str, list[dict[str, str]]]:
     return version, records
 
 
-def load_category_files(
-    emoji_dir: Path,
-) -> tuple[dict[str, list[list[str]]], dict[str, tuple[str, int]]]:
+def load_category_files(emoji_dir: Path) -> dict[str, list[list[str]]]:
     files: dict[str, list[list[str]]] = OrderedDict()
-    token_locations: dict[str, tuple[str, int]] = {}
     for file_name in GROUP_TO_FILE.values():
-        lines: list[list[str]] = []
-        for line in (emoji_dir / file_name).read_text(encoding="utf-8").splitlines():
-            tokens = [token for token in line.split(" ") if token]
-            if not tokens:
-                continue
-            line_index = len(lines)
-            lines.append(tokens)
-            for token in tokens:
-                token_locations[token] = (file_name, line_index)
-        files[file_name] = lines
-    return files, token_locations
+        files[file_name] = [
+            tokens
+            for line in (emoji_dir / file_name).read_text(encoding="utf-8").splitlines()
+            if (tokens := [token for token in line.split(" ") if token])
+        ]
+    return files
 
 
 def load_min_api(path: Path) -> OrderedDict[int, list[str]]:
@@ -181,120 +173,88 @@ def min_api_for_version(version: str) -> int | None:
     return VERSION_TO_MIN_API.get(version)
 
 
-def update_categories(emoji_dir: Path, records: list[dict[str, str]]) -> int:
-    files, token_locations = load_category_files(emoji_dir)
-    local_tokens = set(token_locations)
-    added_records: list[dict[str, str]] = []
-    new_lines_by_file: dict[str, OrderedDict[str, list[str]]] = {
-        file_name: OrderedDict() for file_name in GROUP_TO_FILE.values()
-    }
+def base_of(record: dict[str, str], qualified: set[str], untoned_by_name: dict[str, str]) -> str:
+    """The emoji whose line [record] belongs on: itself, or the untoned emoji it tones.
 
-    for record in records:
-        emoji = record["emoji"]
-        if emoji in local_tokens:
-            continue
-        file_name = GROUP_TO_FILE.get(record["group"])
-        if not file_name:
-            continue
-        base = strip_skin_tones(emoji)
-        if base in token_locations and emoji != base:
-            base_file, line_index = token_locations[base]
-            if emoji not in files[base_file][line_index]:
-                files[base_file][line_index].append(emoji)
-                token_locations[emoji] = (base_file, line_index)
-                local_tokens.add(emoji)
-                added_records.append(record)
-            continue
-        grouped = new_lines_by_file[file_name].setdefault(base, [])
-        if emoji == base:
-            grouped.insert(0, emoji)
-        elif emoji not in grouped:
-            grouped.append(emoji)
-        token_locations[emoji] = (file_name, -1)
-        local_tokens.add(emoji)
-        added_records.append(record)
-
-    for file_name, grouped_lines in new_lines_by_file.items():
-        for base, tokens in grouped_lines.items():
-            if base not in tokens:
-                tokens.insert(0, base)
-            files[file_name].append(list(OrderedDict.fromkeys(tokens)))
-
-    for file_name, lines in files.items():
-        (emoji_dir / file_name).write_text(
-            "".join(" ".join(tokens) + "\n" for tokens in lines),
-            encoding="utf-8",
-        )
-
-    min_api_path = emoji_dir / "minApi.txt"
-    min_api = load_min_api(min_api_path)
-    known_gated = {emoji for emojis in min_api.values() for emoji in emojis}
-    for record in added_records:
-        api = min_api_for_version(record["version"])
-        if api is None or record["emoji"] in known_gated:
-            continue
-        min_api.setdefault(api, []).append(record["emoji"])
-        known_gated.add(record["emoji"])
-    min_api_path.write_text(
-        "".join(f"{api} {' '.join(emojis)}\n" for api, emojis in sorted(min_api.items())),
-        encoding="utf-8",
-    )
-    return len(added_records)
+    Skin-toned sequences belong to the sequence without their tones (👋🏽 to 👋, 👨🏽‍🦰 to 👨‍🦰).
+    Multi-person sequences whose untoned form is not an emoji of its own (🫱🏻‍🫲🏼, 🧑🏻‍❤️‍💋‍🧑🏼)
+    belong to the emoji that shares their name before the colon (🤝, 💏).
+    """
+    emoji = record["emoji"]
+    untoned = strip_skin_tones(emoji)
+    if untoned == emoji:
+        return emoji
+    if untoned in qualified:
+        return untoned
+    return untoned_by_name.get(record["name"].split(":", 1)[0], emoji)
 
 
-def repair_non_rgi_heads(emoji_dir: Path, records: list[dict[str, str]]) -> int:
-    """Merges lines headed by a sequence that is not an emoji into the emoji it tones.
+def build_category_lines(records: list[dict[str, str]]) -> OrderedDict[str, list[list[str]]]:
+    """The picker's category files from emoji-test.txt: one line per emoji, its skin tones after it.
 
-    Skin-toned multi-person sequences (🫱🏻‍🫲🏼, 👩🏻‍🤝‍👩🏼) have no untoned sequence of their own:
-    their untoned form is a different emoji (🤝, 👭) that shares their name.
+    Files, lines and variants follow the order of emoji-test.txt.
     """
     qualified = {record["emoji"] for record in records}
-    by_name = {
+    untoned_by_name = {
         record["name"]: record["emoji"]
         for record in records
         if strip_skin_tones(record["emoji"]) == record["emoji"]
     }
-    name_of = {record["emoji"]: record["name"] for record in records}
-    files, token_locations = load_category_files(emoji_dir)
-    removed: set[str] = set()
-    for file_name, lines in files.items():
-        for tokens in list(lines):
-            head = tokens[0]
-            if head in qualified:
-                continue
-            variants = tokens[1:]
-            base = next(
-                (
-                    by_name.get(name_of[variant].split(":", 1)[0])
-                    for variant in variants
-                    if variant in name_of
-                ),
-                None,
-            )
-            location = token_locations.get(base) if base else None
-            if location is None:
-                continue
-            target = files[location[0]][location[1]]
-            target.extend(variant for variant in variants if variant not in target)
-            lines.remove(tokens)
-            removed.add(head)
-    if not removed:
-        return 0
+    files: OrderedDict[str, list[list[str]]] = OrderedDict(
+        (file_name, []) for file_name in GROUP_TO_FILE.values()
+    )
+    lines_by_base: dict[str, list[str]] = {}
+    for record in records:
+        file_name = GROUP_TO_FILE.get(record["group"])
+        if not file_name:
+            continue
+        emoji = record["emoji"]
+        base = base_of(record, qualified, untoned_by_name)
+        line = lines_by_base.get(base)
+        if line is None:
+            line = [base]
+            lines_by_base[base] = line
+            files[file_name].append(line)
+        if emoji not in line:
+            line.append(emoji)
+    return files
+
+
+def update_categories(emoji_dir: Path, records: list[dict[str, str]]) -> int:
+    previous_tokens = load_project_emojis(emoji_dir)
+    files = build_category_lines(records)
     for file_name, lines in files.items():
         (emoji_dir / file_name).write_text(
             "".join(" ".join(tokens) + "\n" for tokens in lines),
             encoding="utf-8",
         )
+
+    # minApi.txt keeps its curated levels; emoji new to the picker get the level of their version.
+    offered = {emoji for lines in files.values() for line in lines for emoji in line}
     min_api_path = emoji_dir / "minApi.txt"
-    min_api = load_min_api(min_api_path)
+    min_api = OrderedDict(
+        (api, [emoji for emoji in emojis if emoji in offered])
+        for api, emojis in load_min_api(min_api_path).items()
+    )
+    known_gated = {emoji for emojis in min_api.values() for emoji in emojis}
+    added = 0
+    for record in records:
+        emoji = record["emoji"]
+        if emoji not in offered or emoji in previous_tokens:
+            continue
+        added += 1
+        api = min_api_for_version(record["version"])
+        if api is None or emoji in known_gated:
+            continue
+        min_api.setdefault(api, []).append(emoji)
+        known_gated.add(emoji)
     min_api_path.write_text(
         "".join(
-            f"{api} {' '.join(emoji for emoji in emojis if emoji not in removed)}\n"
-            for api, emojis in sorted(min_api.items())
+            f"{api} {' '.join(emojis)}\n" for api, emojis in sorted(min_api.items()) if emojis
         ),
         encoding="utf-8",
     )
-    return len(removed)
+    return added
 
 
 def load_project_emojis(emoji_dir: Path) -> set[str]:
@@ -372,7 +332,7 @@ def write_shortcode_index(
 
 
 def emoji_categories(emoji_dir: Path) -> dict[str, str]:
-    files, _ = load_category_files(emoji_dir)
+    files = load_category_files(emoji_dir)
     return {
         emoji: file_name.removesuffix(".txt")
         for file_name, lines in files.items()
@@ -469,7 +429,6 @@ def generate(root: Path) -> tuple[str, int]:
     symbol_search_dir = root / "app/src/main/assets/common/symbol_search"
     emoji_version, records = parse_emoji_test(fetch_text(EMOJI_TEST_URL))
     added_count = update_categories(emoji_dir, records)
-    repair_non_rgi_heads(emoji_dir, records)
     allowed_emojis = load_project_emojis(emoji_dir)
     annotations_by_locale = {locale: fetch_annotations(locale) for locale in SEARCH_LOCALES}
     for locale, annotations in annotations_by_locale.items():

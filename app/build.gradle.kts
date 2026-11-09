@@ -517,6 +517,9 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation(libs.robolectric)
     testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    // Debug unit tests drive real Compose settings screens under Robolectric (ComponentActivity comes from ui-test-manifest).
+    testDebugImplementation(platform(libs.androidx.compose.bom))
+    testDebugImplementation(libs.androidx.ui.test.junit4)
     // Resolve the agent from Mockito's own dependency graph to keep both versions aligned.
     add(mockitoInstrumentation.name, "org.mockito:mockito-core:$mockitoVersion")
     androidTestImplementation(libs.androidx.junit)

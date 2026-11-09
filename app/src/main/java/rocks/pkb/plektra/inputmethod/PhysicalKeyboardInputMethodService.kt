@@ -3250,14 +3250,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
      * A key the emoji search took (typed into it, or a Ctrl shortcut on it) before the generic
      * key handling: it counts as a key used during a held modifier, so releasing Ctrl (or Shift)
      * afterwards doesn't leave it on as if it had been tapped alone. A [ctrlShortcut] uses up a
-     * one-shot Ctrl like any shortcut; a latched Ctrl stays for the next one.
+     * one-shot Ctrl like any shortcut; a latched Ctrl stays for the next one. Committed search
+     * text consumes one-shot Shift while leaving a held Shift and Caps Lock active.
      */
-    private fun onEmojiSearchKeyUsed(event: KeyEvent?, ctrlShortcut: Boolean) {
+    private fun onEmojiSearchKeyUsed(event: KeyEvent?, ctrlShortcut: Boolean, textCommitted: Boolean = false) {
         if ((event?.repeatCount ?: 0) == 0) otherKeyInteractedDuringHold = true
         modifierStateController.registerNonModifierKey()
         // A held Ctrl's one-shot is cleared on its release, now that a key was used during the hold
         if (ctrlShortcut && ctrlOneShot && !ctrlLatchActive && !ctrlPhysicallyPressed && !ctrlPressed) {
             ctrlOneShot = false
+            updateStatusBarText()
+        }
+        if (textCommitted && modifierStateController.consumeShiftOneShot()) {
             updateStatusBarText()
         }
     }
@@ -4910,6 +4914,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Let the picker handle text-editing shortcuts before the generic Ctrl router can
         // touch the app editor selection.
+        var emojiSearchTextCommitted = false
         if (
             emojiSearchCandidateActive &&
             candidatesBarController.isEmojiPickerSearchInputActive() &&
@@ -4921,11 +4926,16 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         typedEvent.keyCode,
                         typedEvent,
                         isShiftModifierActive(typedEvent)
-                    )?.toString()
+                    )?.toString()?.also { emojiSearchTextCommitted = it.isNotEmpty() }
                 }
             )
         ) {
-            onEmojiSearchKeyUsed(event, ctrlShortcut = emojiSearchCtrlActive)
+            onEmojiSearchKeyUsed(
+                event,
+                ctrlShortcut = emojiSearchCtrlActive,
+                textCommitted = !emojiSearchCtrlActive &&
+                    (emojiSearchTextCommitted || keyCode == KeyEvent.KEYCODE_SPACE)
+            )
             updateEmojiSearchExternalSelectionSnapshot(initialInputConnection)
             ensureEmojiSearchCursorAnchorMonitoring(initialInputConnection)
             return true

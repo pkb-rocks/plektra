@@ -1956,4 +1956,42 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertEquals(listOf('('), alternates)
     }
 
+
+    @Test
+    fun emojiSearchHeldInSearchIsConsumed() {
+        val picker = openEmojiPickerSearch()
+        val modifier = modifierController()
+        modifier.clearShiftState(resetPressedState = true)
+        val meta = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10000L, 10000L, meta))
+        pressKey(KeyEvent.KEYCODE_A, 10050L, meta)
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10000L, 10450L))
+        assertEquals("A", searchText(picker))
+        pressKey(KeyEvent.KEYCODE_B, 10500L)
+        assertEquals("Ab", searchText(picker))
+    }
+
+    @Test
+    fun emojiSearchSoftOneShotInSearchIsConsumed() {
+        val picker = openEmojiPickerSearch()
+        val modifier = modifierController()
+        modifier.clearShiftState(resetPressedState = true)
+        modifier.shiftOneShot = true
+        pressKey(KeyEvent.KEYCODE_A, 10000L)
+        assertEquals("A", searchText(picker))
+        pressKey(KeyEvent.KEYCODE_B, 10100L)
+        assertEquals("Ab", searchText(picker))
+    }
+
+    @Test
+    fun emojiSearchManualLatchSurvivesSearch() {
+        val picker = openEmojiPickerSearch()
+        val modifier = modifierController()
+        modifier.clearShiftState(resetPressedState = true)
+        modifier.capsLockEnabled = true
+        pressKey(KeyEvent.KEYCODE_A,10000L)
+        pressKey(KeyEvent.KEYCODE_B,10100L)
+        assertTrue(modifier.capsLockEnabled)
+    }
+
 }

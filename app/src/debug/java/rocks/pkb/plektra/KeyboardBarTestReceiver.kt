@@ -13,6 +13,25 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
             resultData = "Temporary software-keyboard mode cleared"
             return
         }
+        if (intent.getBooleanExtra("forceSoftwareKeyboard", false)) {
+            // Only an absent override can be restored by clearSoftwareOverride.
+            if (SettingsManager.getSoftwareKeyboardModeRuntimeOverride(context) != null) {
+                resultCode = 1
+                resultData = "A temporary software-keyboard mode is already set"
+                return
+            }
+            SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+            resultData = "Temporary software-keyboard mode set"
+            return
+        }
+        if (intent.getBooleanExtra("devices", false)) {
+            resultData = InputFlowProbe.devices(context).toString()
+            return
+        }
+        if (intent.getBooleanExtra("keymap", false)) {
+            resultData = InputFlowProbe.keymap(context).toString()
+            return
+        }
         if (intent.getBooleanExtra("inspect", false)) {
             val lines = mutableListOf<String>()
             fun inspect(view: android.view.View) {

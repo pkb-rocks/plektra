@@ -12,6 +12,7 @@
     <string name="notes_format_link">Link</string>
     <item name="notes_heading" type="id" />
     <item name="notes_body" type="id" />
+    <item name="notes_new" type="id" />
     <item name="notes_preview_body" type="id" />
     <item name="notes_markdown_toggle" type="id" />
     <item name="notes_undo_button" type="id" />

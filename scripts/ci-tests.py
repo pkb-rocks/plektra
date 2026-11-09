@@ -11,6 +11,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
+UNSORTED = 'unsorted'
 CATALOG = ROOT / 'ci/test-topics.json'
 SOURCES = {'unit': ('test', 'testDebug'), 'instrumented': ('androidTest',)}
 VARIANTS = ('StableDebug', 'StableRelease', 'NightlyDebug', 'NightlyRelease',
@@ -45,18 +46,26 @@ def validate(catalog, found):
     for kind in SOURCES:
         assignments = [name for names in catalog[kind].values() for name in names]
         duplicate = sorted(name for name, count in Counter(assignments).items() if count != 1)
-        missing = sorted(set(found[kind]) - set(assignments))
         stale = sorted(set(assignments) - set(found[kind]))
-        if duplicate or missing or stale:
-            raise ValueError(f'{kind}: duplicate={duplicate}, unassigned={missing}, missing classes={stale}')
+        if duplicate or stale:
+            raise ValueError(f'{kind}: duplicate={duplicate}, missing classes={stale}')
+        if UNSORTED in catalog[kind]:
+            raise ValueError(f'{kind}: {UNSORTED} is automatic and must not be assigned')
         if any(not names for names in catalog[kind].values()):
             raise ValueError(f'{kind}: empty topic')
 
 
+def resolved_topics(catalog, found, kind='unit'):
+    topics = dict(catalog[kind])
+    assigned = {name for names in topics.values() for name in names}
+    topics[UNSORTED] = sorted(set(found[kind]) - assigned)
+    return topics
+
+
 def validate_workflow(catalog, workflow):
     topics = re.findall(r'^\s*run: python3 scripts/ci-tests\.py run --topic ([a-z-]+)\s*$', workflow, re.M)
-    if Counter(topics) != Counter(catalog['unit'].keys()):
-        raise ValueError(f'CI topic steps differ from catalog: workflow={topics}, catalog={sorted(catalog["unit"])}')
+    if Counter(topics) != Counter([*catalog['unit'], UNSORTED]) or topics[-1:] != [UNSORTED]:
+        raise ValueError(f'CI topic steps differ from catalog: workflow={topics}, expected={sorted([*catalog["unit"], UNSORTED])}')
 
 
 def verify_results(directory, expected):
@@ -86,17 +95,28 @@ def main():
     catalog = json.loads(CATALOG.read_text())
     found = discover()
     validate(catalog, found)
+    topics = resolved_topics(catalog, found)
     if args.command == 'check':
         validate_workflow(catalog, (ROOT / '.github/workflows/ci.yml').read_text())
-        print('Every unit and instrumented test class belongs to exactly one topic.')
+        for kind in SOURCES:
+            unassigned = resolved_topics(catalog, found, kind)[UNSORTED]
+            print(f'{kind}: {len(unassigned)} unassigned test classes (Aufräumbedarf).')
+            for name in unassigned:
+                print(f'  {name}')
+        print('Every unit test class runs in one topic, including the automatic unsorted topic.')
         return 0
     if args.command == 'topics':
-        print(json.dumps(sorted(catalog['unit'])))
+        print(json.dumps([*sorted(catalog['unit']), UNSORTED]))
         return 0
-    if args.topic and args.topic not in catalog['unit']:
+    if args.topic and args.topic not in topics:
         parser.error(f'Unknown topic: {args.topic}')
-    names = catalog['unit'][args.topic] if args.topic else list(found['unit'])
+    names = topics[args.topic] if args.topic else list(found['unit'])
     expected = [name for name in names if args.variant.endswith('Debug') or found['unit'][name] != 'testDebug']
+    if args.topic and not expected:
+        print(f'{args.variant}/{args.topic}: no test classes; skipped.')
+        return 0
+    if args.topic == UNSORTED:
+        print(f'Aufräumbedarf: running {len(expected)} unassigned test classes.', flush=True)
     task = f'test{args.variant}UnitTest'
     result_dir = ROOT / 'app/build/test-results' / task
     # A failed compilation must not pass on XML left by an earlier run.

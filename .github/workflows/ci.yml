@@ -77,6 +77,9 @@ jobs:
       - name: Tests / ui-settings
         if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
         run: python3 scripts/ci-tests.py run --topic ui-settings
+      - name: Tests / unsorted (Aufräumbedarf)
+        if: ${{ !cancelled() && steps.compile.outcome == 'success' }}
+        run: python3 scripts/ci-tests.py run --topic unsorted
       - name: Analyze representative lint
         id: lint
         if: ${{ !cancelled() && steps.compile.outcome == 'success' }}

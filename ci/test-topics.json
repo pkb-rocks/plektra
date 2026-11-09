@@ -94,6 +94,7 @@
       "rocks.pkb.plektra.inputmethod.NestedStatusBarGeometryTest",
       "rocks.pkb.plektra.inputmethod.PreparedGeometryPerformanceTest",
       "rocks.pkb.plektra.inputmethod.QuickLauncherActivityTest",
+      "rocks.pkb.plektra.inputmethod.StatusBarControllerEmojiSearchGeometryTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerEmojiSearchStackTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerHardwareSymGeometryTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerSoftwareSymTest",

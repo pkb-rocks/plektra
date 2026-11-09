@@ -1,10 +1,13 @@
 # Android checks
 
-`test-topics.json` assigns every JVM, Robolectric and instrumented test class to
-exactly one topic. The source set determines execution; names such as `E2E` or
-`DeviceBehavior` do not imply a device test. The catalog check rejects missing,
-duplicate and stale assignments, and checks that CI has exactly one visible
-execution step for every unit-test topic.
+`test-topics.json` groups JVM, Robolectric and instrumented test classes by topic.
+New classes do not need a catalog entry: unassigned unit tests run automatically
+in the final `unsorted` step, labelled »Aufräumbedarf«. The catalog check lists
+unassigned classes and their count so maintainers can sort them later. Test
+failures still fail CI. Duplicate and stale assignments remain errors; CI must
+have exactly one step per curated topic and one final `unsorted` test step.
+The source set determines execution; names such as `E2E` or `DeviceBehavior` do
+not imply a device test.
 
 ```sh
 python3 scripts/ci-tests.py check
@@ -24,8 +27,9 @@ presence. Existing `FlavorBuildConfigTest`, `ImeIdentityTest`,
 runtime behavior in the canonical suite.
 
 CI compiles Stable Debug app and unit-test sources once. Nine sequential steps
-run all unit-test topics against those outputs without cleaning. Gradle rechecks
-dependencies but reuses the compiled classes. A failed test step leaves the job
+run the curated unit-test topics against those outputs without cleaning. A final
+`unsorted` step runs all remaining classes, or succeeds without invoking Gradle
+when there are none. Gradle rechecks dependencies but reuses the compiled classes. A failed test step leaves the job
 failed and later topics still run. Compilation failure skips the dependent test
 steps; cancellation stops further work. Each topic retains distinct XML and HTML
 reports under `app/build/ci-reports/StableDebug/<topic>`. The runner rejects missing,
@@ -69,7 +73,7 @@ source line and occurrence count do. Fixed findings may disappear. Warnings stay
 visible in HTML and XML reports. Review baseline changes as code; fix new findings
 instead of regenerating the baseline to pass a feature.
 
-Instrumented tests are classified but require a device or emulator and do not run
+Instrumented tests may be classified but require a device or emulator and do not run
 in this job. Device acceptance covers IME selection, split screen, physical key
 sequences, TalkBack and third-party applications. There is no measured line-coverage
 claim. Generated contracts do not prove runtime behavior on every flavor, and a

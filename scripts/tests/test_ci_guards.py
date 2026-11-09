@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[1]
 
@@ -18,13 +19,58 @@ lint = module('check_lint', SCRIPTS / 'check-lint.py')
 
 
 class CatalogGuardTest(unittest.TestCase):
-    def test_missing_duplicate_and_stale_classes_fail(self):
+    def test_duplicate_stale_and_reserved_assignments_fail(self):
         found = {'unit': {'example.SampleTest': 'test'}, 'instrumented': {}}
         for topics in ({'editing': []},
+                       {'unsorted': ['example.SampleTest']},
                        {'editing': ['example.SampleTest'], 'ui': ['example.SampleTest']},
                        {'editing': ['example.SampleTest', 'example.RemovedTest']}):
             with self.subTest(topics=topics), self.assertRaises(ValueError):
                 catalog.validate({'unit': topics, 'instrumented': {}}, found)
+
+    def test_new_classes_run_once_in_unsorted_until_maintainer_assigns_them(self):
+        found = {'unit': {'example.SampleTest': 'test', 'example.NewTest': 'testDebug'},
+                 'instrumented': {'example.DeviceTest': 'androidTest'}}
+        curated = {'unit': {'editing': ['example.SampleTest']}, 'instrumented': {}}
+        catalog.validate(curated, found)
+        self.assertEqual(['example.NewTest'], catalog.resolved_topics(curated, found)['unsorted'])
+        self.assertEqual(['example.DeviceTest'],
+                         catalog.resolved_topics(curated, found, 'instrumented')['unsorted'])
+        curated['unit']['editing'].append('example.NewTest')
+        catalog.validate(curated, found)
+        self.assertEqual([], catalog.resolved_topics(curated, found)['unsorted'])
+
+    def test_unsorted_cli_selects_only_new_tests_and_propagates_failures(self):
+        found = {'unit': {'example.SampleTest': 'test', 'example.NewTest': 'testDebug'},
+                 'instrumented': {}}
+        curated = {'unit': {'editing': ['example.SampleTest']}, 'instrumented': {}}
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch.object(catalog, 'ROOT', Path(tmp)), \
+                patch.object(catalog, 'discover', return_value=found), \
+                patch.object(catalog.json, 'loads', return_value=curated), \
+                patch.object(catalog.subprocess, 'run') as run, \
+                patch('sys.argv', ['ci-tests.py', 'run', '--topic', 'unsorted']):
+            def execute(command, **kwargs):
+                self.assertEqual(['example.NewTest'],
+                                 [command[i + 1] for i, arg in enumerate(command) if arg == '--tests'])
+                directory = Path(tmp) / 'app/build/test-results/testStableDebugUnitTest'
+                directory.mkdir(parents=True)
+                (directory / 'TEST-new.xml').write_text(
+                    '<testsuite name="example.NewTest" tests="1" failures="1"/>')
+                return type('Result', (), {'returncode': 1})()
+            run.side_effect = execute
+            self.assertEqual(1, catalog.main())
+            run.assert_called_once()
+            # No Gradle invocation when the remainder is empty, including release filtering.
+            curated['unit']['editing'].append('example.NewTest')
+            run.reset_mock()
+            self.assertEqual(0, catalog.main())
+            run.assert_not_called()
+            curated['unit']['editing'].pop()
+            with patch('sys.argv', ['ci-tests.py', 'run', '--topic', 'unsorted',
+                                    '--variant', 'StableRelease']):
+                self.assertEqual(0, catalog.main())
+                run.assert_not_called()
 
     def test_inherited_test_without_annotations_is_discovered(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -110,9 +156,12 @@ class DuplicateReportTest(unittest.TestCase):
 class WorkflowTopicTest(unittest.TestCase):
     def test_missing_extra_and_duplicate_steps_fail(self):
         topics = {'unit': {'editing': ['example.SampleTest']}}
-        valid = '        run: python3 scripts/ci-tests.py run --topic editing\n'
+        editing = '        run: python3 scripts/ci-tests.py run --topic editing\n'
+        unsorted = '        run: python3 scripts/ci-tests.py run --topic unsorted\n'
+        valid = editing + unsorted
         catalog.validate_workflow(topics, valid)
-        for workflow in ('', valid + valid, valid + valid.replace('editing', 'speech')):
+        for workflow in ('', editing, unsorted + editing, valid + valid,
+                         valid + valid.replace('editing', 'speech')):
             with self.subTest(workflow=workflow), self.assertRaises(ValueError):
                 catalog.validate_workflow(topics, workflow)
 

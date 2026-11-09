@@ -629,6 +629,77 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertTrue(modifierController().capsLockAutomatic)
     }
 
+    @Test
+    fun fieldRestartDroppingCapsDuringShiftHoldOnUyghur_doesNotBringFieldCapsLockBackOnLatin() {
+        startCapCharactersFieldOnQwerty()
+        switchSubtype("ug:uyghur")
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        restartFieldWithoutCapCharacters()
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+
+        switchSubtype("en_US:qwertz")
+        assertFalse(modifierController().capsLockAutomatic)
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun fieldRestartDroppingCapsDuringShiftHoldOnLatin_doesNotRestoreFieldCapsLock() {
+        startCapCharactersFieldOnQwerty()
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        restartFieldWithoutCapCharacters()
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+        assertFalse(modifierController().capsLockEnabled)
+
+        switchSubtype("ug:uyghur")
+        switchSubtype("en_US:qwertz")
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun fieldRestartDroppingCapsDuringShiftHeldAcrossSwitchToLatin_doesNotRestoreFieldCapsLock() {
+        startCapCharactersFieldOnQwerty()
+        switchSubtype("ug:uyghur")
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        restartFieldWithoutCapCharacters()
+        switchSubtype("en_US:qwertz")
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun fieldRestartDroppingCapsDuringShiftHeldAcrossSwitchToUyghur_doesNotRestoreFieldCapsLockOnLatin() {
+        startCapCharactersFieldOnQwerty()
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        restartFieldWithoutCapCharacters()
+        switchSubtype("ug:uyghur")
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+
+        switchSubtype("en_US:qwertz")
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun fieldRestartDroppingCapsOnUyghurWithoutHold_keepsRequestCleared() {
+        startCapCharactersFieldOnQwerty()
+        switchSubtype("ug:uyghur")
+        restartFieldWithoutCapCharacters()
+        switchSubtype("en_US:qwertz")
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun fieldRestartDroppingCapsOnLatinWithoutHold_turnsFieldCapsLockOff() {
+        startCapCharactersFieldOnQwerty()
+        restartFieldWithoutCapCharacters()
+        assertFalse(modifierController().capsLockEnabled)
+    }
+
+    private fun restartFieldWithoutCapCharacters() {
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT
+        service.onStartInput(editorInfo, true)
+        service.onStartInputView(editorInfo, true)
+    }
+
     private fun startCapCharactersFieldOnQwerty() {
         SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
         SettingsManager.setKeyboardLayout(service, "qwerty")
@@ -658,6 +729,95 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         service.onKeyDown(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q, time, time))
         service.onKeyUp(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_Q, time, time + 30L))
         assertEquals("αβ;", recorder.textBeforeCursor)
+    }
+
+    @Test
+    fun softShiftOnUyghur_isConsumedOnceByTheMultiCharacterTextOfTheNextSoftKey() {
+        useLayout("uyghur")
+        val keyboard = SoftwareKeyboardHarness()
+
+        keyboard.tap("⇧")
+        assertTrue(modifierController().shiftOneShot)
+        keyboard.tap("l")
+        assertFalse(modifierController().shiftOneShot)
+        keyboard.tap("k")
+
+        assertEquals(listOf("لا", "ك"), recorder.committedTexts)
+    }
+
+    @Test
+    fun softShiftOnLatin_isConsumedOnceByTheNextSoftKey() {
+        useLayout("qwerty")
+        val keyboard = SoftwareKeyboardHarness()
+
+        keyboard.tap("⇧")
+        keyboard.tap("a")
+        keyboard.tap("b")
+
+        assertEquals(listOf("A", "b"), recorder.committedTexts)
+    }
+
+    /**
+     * The software keyboard view wired to the service's own callbacks: taps go through
+     * AospKeyboardView touch handling, and every tap re-renders it from the service's
+     * modifier state, as the status bar does on device.
+     */
+    private inner class SoftwareKeyboardHarness {
+        private val context = RuntimeEnvironment.getApplication()
+        private val statusBar: StatusBarController =
+            getField(getField<Any>(service, "candidatesBarController"), "inputStatusBar")
+        private val view = rocks.pkb.plektra.inputmethod.aospkeyboard.AospKeyboardView(context)
+        private val parent = android.widget.FrameLayout(context).apply {
+            addView(view, android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            ))
+        }
+        private var time = 0L
+
+        init {
+            render()
+        }
+
+        fun tap(label: String) {
+            val key = getField<List<Any>>(view, "keys").first { key ->
+                getField<String>(getField<Any>(key, "spec"), "label") == label
+            }
+            val rect = getField<android.graphics.RectF>(key, "hitRect")
+            time += 100L
+            view.dispatchTouchEvent(android.view.MotionEvent.obtain(0L, time, android.view.MotionEvent.ACTION_DOWN, rect.centerX(), rect.centerY(), 0))
+            view.dispatchTouchEvent(android.view.MotionEvent.obtain(0L, time + 20L, android.view.MotionEvent.ACTION_UP, rect.centerX(), rect.centerY(), 0))
+            render()
+        }
+
+        private fun render() {
+            val modifiers = modifierController().snapshot()
+            val snapshot = StatusBarController.StatusSnapshot(
+                capsLockEnabled = modifiers.capsLockEnabled,
+                shiftPhysicallyPressed = modifiers.shiftPhysicallyPressed,
+                shiftOneShot = modifiers.shiftOneShot,
+                ctrlLatchActive = modifiers.ctrlLatchActive,
+                ctrlPhysicallyPressed = modifiers.ctrlPhysicallyPressed,
+                ctrlOneShot = modifiers.ctrlOneShot,
+                ctrlLatchFromNavMode = modifiers.ctrlLatchFromNavMode,
+                altLatchActive = modifiers.altLatchActive,
+                altPhysicallyPressed = modifiers.altPhysicallyPressed,
+                altOneShot = modifiers.altOneShot,
+                symPage = 0,
+                activeKeyboardLayoutName = SettingsManager.getKeyboardLayout(context)
+            )
+            StatusBarController::class.java.getDeclaredMethod(
+                "configureSoftwareKeyboard",
+                view.javaClass,
+                snapshot.javaClass,
+                InputConnection::class.java,
+                Map::class.java
+            ).apply { isAccessible = true }.invoke(statusBar, view, snapshot, inputConnection, null)
+            val width = android.view.View.MeasureSpec.makeMeasureSpec(1000, android.view.View.MeasureSpec.EXACTLY)
+            val height = android.view.View.MeasureSpec.makeMeasureSpec(240, android.view.View.MeasureSpec.EXACTLY)
+            parent.measure(width, height)
+            parent.layout(0, 0, 1000, 240)
+        }
     }
 
     private fun useLayout(layout: String) {

@@ -252,8 +252,10 @@ class AlternateCharacterManagerTest {
     fun altLongPress_whenEditorRejectsDeletion_insertsNothing() {
         SettingsManager.setLongPressModifier(context, "alt")
         LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        // Boundary punctuation is committed at the cursor after deleting the inserted text.
         val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
-            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "?")
+            onBoundaryTextRequested = { _, _ -> false }
         }
         recorder.deleteResult = false
 
@@ -261,6 +263,103 @@ class AlternateCharacterManagerTest {
 
         assertEquals("بلا", recorder.text)
         manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun shiftLongPress_whenEditorRejectsCommit_keepsTextAndReportsNormalCommit() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val committedNormally = mutableListOf<String>()
+        val alternates = mutableListOf<Char>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "") {
+            onNormalCharCommitted = { committedNormally += it }
+            onAltCharInserted = { alternates += it }
+        }
+        recorder.commitResult = false
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+
+        assertEquals("لا", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        assertEquals(listOf("لا"), committedNormally)
+        assertTrue(alternates.isEmpty())
+    }
+
+    @Test
+    fun shiftLongPress_afterLaterText_whenEditorRejectsCommit_leavesNoComposingRegion() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "")
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("د", 1)
+        recorder.commitResult = false
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertEquals("لاد", recorder.text)
+
+        recorder.commitResult = true
+        inputConnection.commitText("ب", 1)
+        assertEquals("لادب", recorder.text)
+        assertEquals(4, recorder.selectionStart)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun shiftLongPress_whenCommitThrows_closesComposingRegionAndBatch() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, _) = pressShiftedUyghurL(prefix = "")
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("د", 1)
+        recorder.commitThrows = true
+
+        runCatching { shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS) }
+
+        assertEquals(0, recorder.batchDepth)
+        recorder.commitThrows = false
+        inputConnection.commitText("ب", 1)
+        assertEquals("لادب", recorder.text)
+    }
+
+    @Test
+    fun shiftLongPress_withoutExtractedText_readableEmptyTextBeforeCursorChangesNothing() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val committedNormally = mutableListOf<String>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "", extractedTextAvailable = false) {
+            onNormalCharCommitted = { committedNormally += it }
+        }
+        recorder.textBeforeCursorAvailable = true
+        recorder.asProxy().setSelection(0, 0)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+
+        assertEquals("لا", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        assertEquals(listOf("لا"), committedNormally)
+    }
+
+    @Test
+    fun shiftLongPress_withoutReadableText_reportsTextTheEditorRemovedButDidNotReplace() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val committedNormally = mutableListOf<String>()
+        val alternates = mutableListOf<Char>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب", extractedTextAvailable = false) {
+            onNormalCharCommitted = { committedNormally += it }
+            onAltCharInserted = { alternates += it }
+        }
+        recorder.commitResult = false
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+
+        // Without readable text the deletion is unverified and cannot be rolled back.
+        assertEquals("ب", recorder.text)
+        assertTrue(committedNormally.isEmpty())
+        assertTrue(alternates.isEmpty())
     }
 
     @Test
@@ -567,7 +666,10 @@ class AlternateCharacterManagerTest {
     ) {
         var composingRegionResult = true
         var deleteResult = true
-        private var batchDepth = 0
+        var commitResult = true
+        var commitThrows = false
+        var batchDepth = 0
+            private set
         /** Text edits made while no batch edit was open. */
         var editsOutsideBatch = 0
 
@@ -604,7 +706,9 @@ class AlternateCharacterManagerTest {
                     editsOutsideBatch++
                 }
                 when (method.name) {
-                    "commitText" -> {
+                    "commitText" -> if (commitThrows) {
+                        throw IllegalStateException("editor gone")
+                    } else if (!commitResult) false else {
                         val committed = args?.getOrNull(0)?.toString().orEmpty()
                         if (composingStart >= 0 && composingEnd >= composingStart) {
                             text = text.replaceRange(composingStart, composingEnd, committed)

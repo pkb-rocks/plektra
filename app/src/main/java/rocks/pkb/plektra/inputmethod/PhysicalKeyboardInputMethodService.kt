@@ -2197,15 +2197,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             modifierStateController.registerNonModifierKey()
         }
         candidatesBarController.onSoftwareKeyboardTextInput = { text, inputConnection, snapshot ->
-            val ic = inputConnection ?: currentInputConnection
-            val consumedShiftOneShot = text.length == 1 &&
-                text[0].isLetter() &&
-                modifierStateController.consumeShiftOneShot()
-            val handled = handleSoftwareKeyboardTextInput(text, ic, snapshot)
-            if (consumedShiftOneShot) {
-                updateStatusBarText()
-            }
-            handled
+            handleSoftwareKeyboardTextInput(text, inputConnection ?: currentInputConnection, snapshot)
         }
         candidatesBarController.onSymTextCommitted = {
             modifierStateController.consumeShiftOneShot()
@@ -2727,7 +2719,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (DeferredPunctuationSpaceTracker.prepareForTextCommit(this, ic, text)) {
             suggestionController.onContextReset()
         }
-        ic.commitText(text, 1)
+        // One-shot Shift belongs to the text the key committed, whatever its length (Uyghur لا).
+        if (ic.commitText(text, 1) && Character.isLetter(text.codePointAt(0))) {
+            modifierStateController.consumeShiftOneShot()
+        }
         if (!snapshot.shouldDisableSuggestions) {
             suggestionController.onCharacterCommitted(text, ic)
         }

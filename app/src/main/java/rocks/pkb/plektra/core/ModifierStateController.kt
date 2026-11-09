@@ -92,6 +92,10 @@ class ModifierStateController(
 
     private val shiftStateMachine = ShiftStateMachine(doubleTapThreshold)
 
+    // The current field asks for Caps Lock (CAP_CHARACTERS). Field state, never part of a hold snapshot.
+    private var fieldCapsLockRequested = false
+    // Counts field (re)starts, so a state captured before one does not bring back the old field's request.
+    private var fieldGeneration = 0
     // The field asked for Caps Lock while an uncased layout was active; it returns on a cased one.
     private var fieldCapsLockSuspended = false
     // Counts layout changes so a state captured before one can be re-applied to the new layout.
@@ -140,7 +144,8 @@ class ModifierStateController(
         val altLatchActive: Boolean,
         val automaticCapsLock: Boolean = false,
         val fieldCapsLockSuspended: Boolean = false,
-        val layoutGeneration: Int = 0
+        val layoutGeneration: Int = 0,
+        val fieldGeneration: Int = 0
     )
 
     fun captureLogicalState(): LogicalState {
@@ -153,19 +158,31 @@ class ModifierStateController(
             altLatchActive = altState.latchActive,
             automaticCapsLock = shiftStateMachine.automaticCapsLock,
             fieldCapsLockSuspended = fieldCapsLockSuspended,
-            layoutGeneration = layoutGeneration
+            layoutGeneration = layoutGeneration,
+            fieldGeneration = fieldGeneration
         )
     }
 
     /**
      * Restores a state captured before a modifier hold. A layout change during the hold
      * is applied again to the restored state, so field Caps Lock follows the current layout.
+     * When the field restarted during the hold, only the user's Shift state is restored and
+     * the current field's Caps Lock request is applied to it instead of the captured one.
      */
     fun restoreLogicalState(captured: LogicalState) {
-        shiftStateMachine.restore(captured.shiftState, captured.automaticCapsLock)
-        fieldCapsLockSuspended = captured.fieldCapsLockSuspended
-        if (captured.layoutGeneration != layoutGeneration) {
-            applyLayoutCasing()
+        if (captured.fieldGeneration == fieldGeneration) {
+            shiftStateMachine.restore(captured.shiftState, captured.automaticCapsLock)
+            fieldCapsLockSuspended = captured.fieldCapsLockSuspended
+            if (captured.layoutGeneration != layoutGeneration) {
+                applyLayoutCasing()
+            }
+        } else {
+            shiftStateMachine.restore(if (captured.automaticCapsLock) ShiftState.OFF else captured.shiftState)
+            fieldCapsLockSuspended = false
+            if (captured.layoutGeneration != layoutGeneration) {
+                applyLayoutCasing()
+            }
+            if (fieldCapsLockRequested) applyFieldCapsLockRequest()
         }
         ctrlState.oneShot = captured.ctrlOneShot
         ctrlState.latchActive = captured.ctrlLatchActive
@@ -194,6 +211,11 @@ class ModifierStateController(
      * On an uncased layout the request waits until a cased layout becomes active.
      */
     fun requestFieldCapsLock() {
+        fieldCapsLockRequested = true
+        applyFieldCapsLockRequest()
+    }
+
+    private fun applyFieldCapsLockRequest() {
         if (shiftStateMachine.state == ShiftState.CAPS) return
         if (layoutSupportsAutomaticShift()) {
             shiftStateMachine.setAutomaticCapsLock()
@@ -202,9 +224,15 @@ class ModifierStateController(
         }
     }
 
-    /** Forgets the previous field's Caps Lock request before the field flags are applied again. */
+    /**
+     * Forgets the previous field's Caps Lock request before the field flags are applied
+     * again: Caps Lock the request turned on goes with it, user Caps Lock stays.
+     */
     fun clearFieldCapsLockRequest() {
+        fieldGeneration++
+        fieldCapsLockRequested = false
         fieldCapsLockSuspended = false
+        if (shiftStateMachine.automaticCapsLock) shiftStateMachine.setCapsLock(false)
     }
 
     /**
@@ -468,6 +496,8 @@ class ModifierStateController(
         }
 
         shiftStateMachine.reset()
+        fieldGeneration++
+        fieldCapsLockRequested = false
         fieldCapsLockSuspended = false
         shiftPressedFlag = false
         shiftPhysicallyPressedFlag = false

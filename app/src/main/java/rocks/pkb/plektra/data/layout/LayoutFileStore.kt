@@ -191,6 +191,12 @@ object LayoutFileStore {
                 ?: return invalidMapping(keyName, "lowercase must be a non-empty string")
             val uppercase = mappingObj.requiredNonEmptyString("uppercase")
                 ?: return invalidMapping(keyName, "uppercase must be a non-empty string")
+            val alt = if (mappingObj.has("alt")) {
+                mappingObj.requiredNonEmptyString("alt")
+                    ?: return invalidMapping(keyName, "alt must be a non-empty string")
+            } else {
+                null
+            }
 
             val multiTapEnabled = when {
                 !mappingObj.has("multiTapEnabled") -> false
@@ -209,7 +215,8 @@ object LayoutFileStore {
                 lowercase = lowercase,
                 uppercase = uppercase,
                 multiTapEnabled = multiTapEnabled,
-                taps = if (multiTapEnabled) taps else emptyList()
+                taps = if (multiTapEnabled) taps else emptyList(),
+                alt = alt
             )
         }
 
@@ -290,6 +297,7 @@ object LayoutFileStore {
                 val mappingObj = JSONObject()
                 mappingObj.put("lowercase", mapping.lowercase)
                 mappingObj.put("uppercase", mapping.uppercase)
+                mapping.alt?.let { mappingObj.put("alt", it) }
                 if (mapping.multiTapEnabled && mapping.taps.isNotEmpty()) {
                     mappingObj.put("multiTapEnabled", true)
                     val tapsArray = org.json.JSONArray()

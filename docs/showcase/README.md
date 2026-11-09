@@ -298,7 +298,7 @@ The software keyboard gallery uses four Pixel 7a captures in one row: Cloud Tap,
    scripts/capture-showcase.sh --serial <serial> --device titan-2-elite
    ```
 
-   To capture only some states, add `--only r6-full,r5-slim`. To force one host for every scene, add `--host notes` or `--host showcase`. The default is the host each scene asks for. `showcase` uses a plain native editor with synthetic text and an optional contrast grid; `notes` uses the Markdown editor. The plain host is independent of the Notes screen layout.
+   To capture only some states, add `--only r6-full,r5-slim`. Every scene runs in the app's Markdown notes editor. The script adds the scene text as one synthetic note beside the existing notes and removes it again at the end, together with the changed settings.
 
 **Emulator.** Start the Android Virtual Device and wait until it has finished booting. The serial is usually `emulator-5554`. The display must have no size override, so run `adb shell wm size reset` first if the script reports a mismatch. The Titan 2 Elite profile expects a 1080 by 1200 display.
 

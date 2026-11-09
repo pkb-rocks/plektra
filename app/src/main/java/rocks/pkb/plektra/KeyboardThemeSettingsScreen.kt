@@ -55,9 +55,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -125,7 +127,9 @@ fun KeyboardThemeScreen(
         }
     }
     val previewPagerState = rememberPagerState(initialPage = initialPreviewPage, pageCount = { 2 })
-    var customizationTab by remember {
+    // Saved with the draft name below: together with the pager page they identify the editor,
+    // whose photo picker registration must survive activity recreation.
+    var customizationTab by rememberSaveable {
         mutableStateOf(if (initialTab == KeyboardThemeEditorTab.Keys) 1 else 0)
     }
     val initialHardwarePreset = remember {
@@ -190,7 +194,7 @@ fun KeyboardThemeScreen(
     var showSaveAsDialog by remember { mutableStateOf(false) }
     var pendingImportedTheme by remember { mutableStateOf<KeyboardThemePreset?>(null) }
     var showNewDraftDialog by remember { mutableStateOf(false) }
-    var draftEditorName by remember { mutableStateOf<String?>(null) }
+    var draftEditorName by rememberSaveable { mutableStateOf<String?>(null) }
     val draftEditingGuard = remember { mutableStateOf(false) }
     var draftListFocusName by remember { mutableStateOf<String?>(null) }
     var deleteThemeRequest by remember { mutableStateOf<String?>(null) }
@@ -758,32 +762,34 @@ fun KeyboardThemeScreen(
                     .heightIn(max = 360.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (editedDraft != null && draftPreset != null && customizationTab == 0) {
-                    KeyboardThemeDraftColorsEditor(
-                        theme = draftPreset,
-                        populatedFields = editedDraft.populatedFields,
-                        onFieldChanged = ::updateDraft
-                    )
-                } else if (editedDraft != null && draftPreset != null) {
-                    KeyboardThemeDraftKeysEditor(
-                        theme = draftPreset,
-                        populatedFields = editedDraft.populatedFields,
-                        onFieldChanged = ::updateDraft
-                    )
-                } else if (customizationTab == 0) {
-                    KeyboardThemeColorsEditor(
-                        theme = activeTheme,
-                        preset = activePreset,
-                        isSoftware = activePreviewPage == 1,
-                        onThemeChanged = ::updateActiveTheme
-                    )
-                } else {
-                    KeyboardThemeKeysEditor(
-                        theme = activeTheme,
-                        preset = activePreset,
-                        isSoftware = activePreviewPage == 1,
-                        onThemeChanged = ::updateActiveTheme
-                    )
+                key(activeTarget, editedDraft?.name, customizationTab) {
+                    if (editedDraft != null && draftPreset != null && customizationTab == 0) {
+                        KeyboardThemeDraftColorsEditor(
+                            theme = draftPreset,
+                            populatedFields = editedDraft.populatedFields,
+                            onFieldChanged = ::updateDraft
+                        )
+                    } else if (editedDraft != null && draftPreset != null) {
+                        KeyboardThemeDraftKeysEditor(
+                            theme = draftPreset,
+                            populatedFields = editedDraft.populatedFields,
+                            onFieldChanged = ::updateDraft
+                        )
+                    } else if (customizationTab == 0) {
+                        KeyboardThemeColorsEditor(
+                            theme = activeTheme,
+                            preset = activePreset,
+                            isSoftware = activePreviewPage == 1,
+                            onThemeChanged = { changed -> updateActiveTheme(changed) }
+                        )
+                    } else {
+                        KeyboardThemeKeysEditor(
+                            theme = activeTheme,
+                            preset = activePreset,
+                            isSoftware = activePreviewPage == 1,
+                            onThemeChanged = { changed -> updateActiveTheme(changed) }
+                        )
+                    }
                 }
             }
             if (editedDraft != null) {
@@ -1836,7 +1842,7 @@ private fun keyboardThemesEquivalent(
         left.keyPopupAttached == right.keyPopupAttached &&
         left.keyPopupTailEnabled == right.keyPopupTailEnabled &&
         left.keyPreviewAfterLongPress == right.keyPreviewAfterLongPress &&
-        left.keyAlternatesPopupEnabled == right.keyAlternatesPopupEnabled
+        left.keyAlternatesPopupEnabled == right.keyAlternatesPopupEnabled && left.textures == right.textures
 }
 
 @Composable
@@ -1846,20 +1852,29 @@ private fun KeyboardThemeExportDialog(
 ) {
     val clipboardManager = LocalClipboardManager.current
     val exportString = remember(theme) {
-        SettingsManager.keyboardThemeToJsonString(theme.toSettingsTheme())
+        keyboardThemeClipboardJson(theme)
     }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Export theme") },
         text = {
-            OutlinedTextField(
-                value = exportString,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 4,
-                maxLines = 8
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (theme.hasBackgroundPhoto()) {
+                    Text(
+                        stringResource(R.string.theme_background_zip),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                OutlinedTextField(
+                    value = exportString,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 4,
+                    maxLines = 8
+                )
+            }
         },
         confirmButton = {
             TextButton(
@@ -1919,7 +1934,8 @@ private fun KeyboardThemeImportDialog(
                     if (imported == null) {
                         error = invalidMessage
                     } else {
-                        onImport(imported.toKeyboardThemePreset("Imported"))
+                        // Copied theme text cannot carry image files; keep its colours and settings.
+                        onImport(imported.copy(textures = emptyMap()).toKeyboardThemePreset("Imported"))
                     }
                 }
             ) {
@@ -1993,8 +2009,9 @@ private fun KeyboardThemeDraftColorsEditor(
     populatedFields: Set<String>,
     onFieldChanged: (String, KeyboardThemePreset) -> Unit
 ) {
+    ThemeBackgroundImageControls(theme) { onFieldChanged(DRAFT_BACKGROUND, it) }
     val items = listOf(
-        KeyboardThemeDraftColorItem(DRAFT_BACKGROUND, stringResource(R.string.keyboard_theme_background), theme.background) { theme.copy(background = it) },
+        KeyboardThemeDraftColorItem(DRAFT_BACKGROUND, stringResource(R.string.keyboard_theme_background), theme.background) { theme.withoutBackgroundPhoto().copy(background = it) },
         KeyboardThemeDraftColorItem(DRAFT_DIVIDER, stringResource(R.string.keyboard_theme_dividers), theme.divider) { theme.copy(divider = it) },
         KeyboardThemeDraftColorItem(DRAFT_NORMAL_KEY, stringResource(R.string.keyboard_theme_normal_keys), theme.normalKey) { theme.copy(normalKey = it) },
         KeyboardThemeDraftColorItem(DRAFT_SPECIAL_KEY, stringResource(R.string.keyboard_theme_special_keys), theme.specialKey) { theme.copy(specialKey = it) },
@@ -2181,13 +2198,14 @@ private fun KeyboardThemeColorsEditor(
     isSoftware: Boolean,
     onThemeChanged: (KeyboardThemePreset) -> Unit
 ) {
+    ThemeBackgroundImageControls(theme, onThemeChanged)
     val colorItems = buildList {
         add(
             KeyboardThemeColorEditorItem(
                 label = stringResource(R.string.keyboard_theme_background),
                 color = theme.background,
                 presetColor = preset.background,
-                onColorChanged = { onThemeChanged(theme.copy(background = it)) }
+                onColorChanged = { onThemeChanged(theme.withoutBackgroundPhoto().copy(background = it)) }
             )
         )
         add(

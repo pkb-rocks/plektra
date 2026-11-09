@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,9 +51,23 @@ private const val SOFTWARE_PREVIEW_KEYBOARD_BOTTOM_PADDING_DP = 12f
 private const val SOFTWARE_PREVIEW_LED_HEIGHT_DP = 6.5f
 private const val SOFTWARE_PREVIEW_MODIFIER_DOUBLE_TAP_MS = 450L
 
+/** Changes when a theme photo becomes unusable or usable again, so previews re-apply their theme. */
+@Composable
+private fun rememberThemeImageRevision(): State<Long> {
+    val revision = remember { mutableLongStateOf(ThemeTextureStore.revision) }
+    DisposableEffect(Unit) {
+        val listener = { revision.longValue = ThemeTextureStore.revision }
+        ThemeTextureStore.addAvailabilityListener(listener)
+        listener()
+        onDispose { ThemeTextureStore.removeAvailabilityListener(listener) }
+    }
+    return revision
+}
+
 @Composable
 internal fun HardwareKeyboardThemePreview(theme: KeyboardThemePreset) {
     val context = LocalContext.current
+    val imageRevision = rememberThemeImageRevision()
     val showBottomIndicators = SettingsManager.getModifierIndicatorShowsBottomStrip(context)
     val previewHeightDp = hardwareKeyboardPreviewHeightDp(theme, showBottomIndicators)
     val viewportHeightDp = hardwareKeyboardPreviewViewportHeightDp(showBottomIndicators)
@@ -67,7 +85,10 @@ internal fun HardwareKeyboardThemePreview(theme: KeyboardThemePreset) {
                 .fillMaxWidth()
                 .height(previewHeightDp.dp),
             factory = { viewContext -> createHardwareKeyboardThemePreviewView(viewContext, theme) },
-            update = { view -> updateHardwareKeyboardThemePreviewView(view, theme) }
+            update = { view ->
+                imageRevision.value
+                updateHardwareKeyboardThemePreviewView(view, theme)
+            }
         )
     }
 }
@@ -79,6 +100,7 @@ internal fun VirtualKeyboardThemePreview(
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+    val imageRevision = rememberThemeImageRevision()
     val viewportHeightDp = softwareKeyboardPreviewViewportHeightDp(
         screenWidthDp = configuration.screenWidthDp,
         screenHeightDp = configuration.screenHeightDp
@@ -100,7 +122,10 @@ internal fun VirtualKeyboardThemePreview(
                 .fillMaxWidth()
                 .height(viewportHeightDp.dp),
             factory = { viewContext -> createVirtualKeyboardThemePreviewView(viewContext, theme) },
-            update = { view -> updateVirtualKeyboardThemePreviewView(view, theme) }
+            update = { view ->
+                imageRevision.value
+                updateVirtualKeyboardThemePreviewView(view, theme)
+            }
         )
     }
 }
@@ -111,7 +136,7 @@ private fun createHardwareKeyboardThemePreviewView(
 ): LinearLayout {
     val root = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures.renderable()["background"])
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -146,7 +171,7 @@ private fun createHardwareKeyboardThemePreviewView(
 }
 
 private fun updateHardwareKeyboardThemePreviewView(view: android.view.View, theme: KeyboardThemePreset) {
-    view.setBackgroundColor(theme.background)
+    ThemeTextureBackground.set(view, theme.background, theme.textures.renderable()["background"])
     val colors = theme.toKeyboardThemeColors()
     (view.getTag(R.id.keyboard_theme_preview_suggestions_bar) as? FullSuggestionsBar)?.apply {
         themeOverride = colors
@@ -185,7 +210,7 @@ private fun createVirtualKeyboardThemePreviewView(
     }
     val root = AdditiveVerticalKeyboardPreviewLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures.renderable()["background"])
         layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             previewHeightPx
@@ -234,7 +259,7 @@ private fun createVirtualKeyboardThemePreviewView(
             0,
             dpToPx(context, SOFTWARE_PREVIEW_KEYBOARD_BOTTOM_PADDING_DP)
         )
-        setBackgroundColor(theme.background)
+        ThemeTextureBackground.set(this, theme.background, theme.textures.renderable()["background"])
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             virtualKeyboardSurfaceHeightPx(context, theme)
@@ -280,7 +305,8 @@ private fun updateVirtualKeyboardThemePreviewView(view: android.view.View, theme
     val previewHeightPx = virtualKeyboardPreviewHeightPx(root.context, theme)
     frame?.setBackgroundColor(theme.background)
     frame?.desiredPreviewHeightPx = previewHeightPx
-    root.setBackgroundColor(theme.background)
+    ThemeTextureBackground.set(root, theme.background, theme.textures.renderable()["background"])
+    ThemeTextureBackground.set((root as? AdditiveVerticalKeyboardPreviewLayout)?.keyboardSurface, theme.background, theme.textures.renderable()["background"])
     root.layoutParams = (root.layoutParams as? FrameLayout.LayoutParams)?.apply {
         width = ViewGroup.LayoutParams.MATCH_PARENT
         height = previewHeightPx

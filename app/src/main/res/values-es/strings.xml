@@ -9,6 +9,7 @@
     <string name="input_method_name_pl">Polski</string>
     <string name="input_method_name_es">Español</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="settings_title">Configuración</string>
     <string name="back">Atrás</string>
     <string name="settings_back_content_description">Atrás</string>
@@ -27,6 +28,14 @@
     <string name="swipe_to_delete_title">Activar Deslizar para Eliminar</string>
     <string name="swipe_incremental_threshold_title">Sensibilidad de la Barra de Deslizamiento</string>
     <string name="auto_show_keyboard_title">Mostrar Automáticamente el Teclado</string>
+    <string name="auto_show_respect_app_visibility_title">Respetar la configuración de visualización de la app</string>
+    <string name="auto_show_respect_app_visibility_description">Android y la app deciden si el teclado se abre al entrar en un campo. Tocar el campo o pulsar una tecla lo sigue abriendo.</string>
+    <string name="hardware_keypad_auto_open_title">Abrir el teclado numérico automáticamente con teclado físico</string>
+    <string name="hardware_keypad_auto_open_description">Muestra el teclado numérico o telefónico en pantalla en campos de PIN, números y teléfono. Si no, ábrelo con el botón del teclado numérico en la barra del teclado.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Capa de emojis en el cambio de página</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Incluye la página de asignación de emojis al cambiar de página en el teclado en pantalla. El selector de emojis no se ve afectado.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Teclado completo</string>
+    <string name="software_keyboard_keypad_button_description">Abrir el teclado numérico en pantalla</string>
     <string name="info_title">Información</string>
     <string name="info_description">La configuración se guarda automáticamente y se aplica inmediatamente al método de entrada.</string>
     <string name="keyboard_title">Teclado Plektra</string>
@@ -893,4 +902,31 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="caret_badge_custom_colors_description">Sustituir los colores del tema del teclado.</string>
     <string name="alt_latch_stays_on_space_title">Mantener Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Espacio y Enter desactivan Alt de un solo uso, pero mantienen Alt-Lock activo.</string>
+    <string name="keyboard_bar_hidden_apps_title">No mostrar nunca la barra</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Apps en las que la barra permanece oculta, incluso al abrirla manualmente</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Ninguna app seleccionada</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d app</item>
+        <item quantity="many">%d apps</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">En las apps que elijas aquí, Plektra nunca muestra su barra ni el teclado en pantalla: sin importar los demás ajustes de visibilidad, e incluso si intentas abrirla con una tecla, un atajo o el botón de teclado del sistema. La escritura con el teclado físico sigue funcionando, incluidas las capas SYM, los atajos, los modificadores y los códigos exactos de emoji o fragmentos. El portapapeles y el selector de emoji permanecen cerrados en estas apps.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Aplicación web: se ejecuta dentro de %1$s, así que la barra también queda oculta allí</string>
+    <string name="emoji_category_unicode_symbols">Símbolos de texto</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Apariencia de los emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (integrada)</string>
+    <string name="emoji_style_system">Fuente del sistema</string>
+    <string name="emoji_style_description">Plektra inserta emoji Unicode estándar; la app en la que escribes los muestra con su propia fuente.</string>
+    <string name="emoji_skin_tone_title">Tono de piel predeterminado</string>
+    <string name="emoji_pages_emoji_title">Pasar la página de emoji con Q y P</string>
+    <string name="emoji_pages_symbols_title">Pasar la página de símbolos con Q y P</string>
+    <string name="emoji_pages_description">Q y P pasan las páginas, Mayús+Q y Mayús+P saltan entre categorías, A abre la búsqueda. Mantén pulsado un emoji para ver sus tonos de piel. Entre los tonos de piel, P pasa a más; en un emoji de tu propia asignación, ✎ en A abre la personalización de la tecla.</string>
+    <string name="sym_paged_navigation_note">Con las páginas activadas, Q (‹) y P (›) las pasan. Tus propias asignaciones de Q y P se conservan y puedes editarlas aquí: con la página abierta, mantén SYM y pulsa Q o P para escribirlas; sin las páginas vuelven a funcionar directamente.</string>
+    <string name="sym_navigation_key_content_description">%1$s pasa las páginas (%2$s). Tu asignación: %3$s</string>
+    <string name="kaomoji_placement_title">Páginas de kaomoji</string>
+    <string name="kaomoji_placement_symbols">Después de los símbolos</string>
+    <string name="kaomoji_placement_emoji">Después de los emoji</string>
+    <string name="kaomoji_placement_off">Desactivado</string>
+    <string name="emoji_picker_extras_title">Símbolos de texto y kaomoji en el selector de emoji</string>
 </resources>

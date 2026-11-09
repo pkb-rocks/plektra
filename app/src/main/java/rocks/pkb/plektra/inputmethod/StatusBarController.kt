@@ -31,6 +31,8 @@ import rocks.pkb.plektra.R
 import rocks.pkb.plektra.MainActivity
 import rocks.pkb.plektra.SymCustomizationActivity
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.renderable
+import rocks.pkb.plektra.surfaceColour
 import rocks.pkb.plektra.SymPagesConfig
 import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
@@ -62,6 +64,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import rocks.pkb.plektra.SettingsActivity
+
+@Suppress("DEPRECATION")
+internal fun legacyEmojiSearchSafeTop(view: View?): Int {
+    val frame = android.graphics.Rect()
+    view?.getWindowVisibleDisplayFrame(frame)
+    val insets = view?.rootWindowInsets
+    return maxOf(frame.top, insets?.stableInsetTop ?: 0, insets?.systemWindowInsetTop ?: 0,
+        insets?.displayCutout?.safeInsetTop ?: 0)
+}
 
 /**
  * Manages the status bar shown by the IME, handling view creation
@@ -113,6 +124,14 @@ class StatusBarController(
         }
 
     var onSymTextCommitted: (() -> Unit)? = null
+    var onSymPageKeyTapped: ((Int) -> Boolean)? = null
+    var onSymPageKeyLongPressed: ((Int) -> Boolean)? = null
+    private var emojiPickerSearchRequested = false
+
+    /** The emoji picker opens with its search shown the next time it appears. */
+    fun requestEmojiPickerSearch() {
+        emojiPickerSearchRequested = true
+    }
 
     var onSuggestionCommitted: (() -> Unit)? = null
 
@@ -204,6 +223,16 @@ class StatusBarController(
             field = value
             variationBarView?.onSoftwareKeyboardModeToggleRequested = value
         }
+
+    /** Opens the on-screen keypad for the current field from the hardware keyboard bar. */
+    var onKeypadRequested: (() -> Unit)? = null
+        set(value) {
+            field = value
+            variationBarView?.onKeypadRequested = value
+        }
+
+    /** A layout or SYM page picked from the on-screen layout key; see [SoftwareKeyboardPageChoices]. */
+    var onSoftwareKeyboardPageChoice: ((String) -> Unit)? = null
     
     // Callback for speech recognition state changes (active/inactive)
     var onSpeechRecognitionStateChanged: ((Boolean) -> Unit)? = null
@@ -311,6 +340,10 @@ class StatusBarController(
         val softwareCtrlPreviewActive: Boolean = false,
         val softwareAltPreviewLabels: Map<Int, String> = emptyMap(),
         val softwareAltPreviewActive: Boolean = false,
+        /** Layout family for the current field; SYM pages always render over the full layout. */
+        val softwareKeypad: SoftwareKeypad = SoftwareKeypad.FULL,
+        /** Shows the contextual keypad button in the hardware keyboard bar. */
+        val keypadAccessAvailable: Boolean = false,
         // Legacy flag for backward compatibility
         val shouldDisableSmartFeatures: Boolean = false
     ) {
@@ -332,6 +365,22 @@ class StatusBarController(
     private var emojiPickerView: EmojiPickerView? = null
     private var emojiPickerSearchPopup: PopupWindow? = null
     private var emojiPickerSearchPopupShowPending: Boolean = false
+    private var emojiPickerSearchGeometryPending: Boolean = false
+    private val emojiPickerSearchLayoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        scheduleEmojiPickerSearchGeometry()
+    }
+
+    /** Top of the visible screen area below status bar and cutout, in screen coordinates. */
+    internal var screenSafeTopPx: () -> Int = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics = context.getSystemService(android.view.WindowManager::class.java).currentWindowMetrics
+            metrics.bounds.top + metrics.windowInsets.getInsetsIgnoringVisibility(
+                android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.displayCutout()
+            ).top
+        } else {
+            legacyEmojiSearchSafeTop(statusBarLayout)
+        }
+    }
     private var softwareKeyboardView: AospKeyboardView? = null
 
     // removeAllViews() on the keyboard container dispatches a touch CANCEL to the
@@ -342,6 +391,7 @@ class StatusBarController(
     private var emojiKeyButtons: MutableList<View> = mutableListOf()
     private var lastSymPageRendered: Int = 0
     private var lastSymMappingsRendered: Map<Int, String>? = null
+    private var lastHardwareSymThemeRendered: KeyboardThemeColors? = null
     private var lastInputConnectionUsed: android.view.inputmethod.InputConnection? = null
     private var wasSymActive: Boolean = false
     private var isTitan2Layout: Boolean = false
@@ -465,19 +515,20 @@ class StatusBarController(
                 imeWindow.isNavigationBarContrastEnforced = false
             }
         }
-        statusBarLayout?.setBackgroundColor(activeColors.background)
+        rocks.pkb.plektra.ThemeTextureBackground.set(statusBarLayout, activeColors.background, activeColors.textures["background"])
         val roundedCorners = SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)
-        val surfaceBackground = if (roundedCorners) Color.TRANSPARENT else activeColors.background
+        val surfaceBackground = if (roundedCorners || activeColors.textures.containsKey("background")) Color.TRANSPARENT else activeColors.background
         symSurfaceStack?.setBackgroundColor(surfaceBackground)
         symSurfaceContainer?.setBackgroundColor(surfaceBackground)
+        val chromeBackground = if (activeColors.textures.containsKey("background")) Color.TRANSPARENT else activeColors.background
         (statusBarLayout as? ImeChromeLayout)?.let { chrome ->
             // Keep the spacing around the individually rounded buttons in the chrome background.
-            chrome.regularCornerColors = activeColors.background to activeColors.background
-            chrome.compactCornerColors = activeColors.background to activeColors.background
-            chrome.bottomFillColors = activeColors.background to activeColors.background
+            chrome.regularCornerColors = chromeBackground to chromeBackground
+            chrome.compactCornerColors = chromeBackground to chromeBackground
+            chrome.bottomFillColors = chromeBackground to chromeBackground
             chrome.invalidate()
         }
-        emojiKeyboardContainer?.setBackgroundColor(activeColors.background)
+        rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardContainer, activeColors.background, activeColors.textures["background"])
         variationBarView?.themeOverride = activeColors
         ledStatusView.themeOverride = activeColors
         fullSuggestionsBar?.themeOverride = activeColors
@@ -501,6 +552,7 @@ class StatusBarController(
             onHamburgerMenuRequested = onHamburgerMenuRequested,
             onMinimalUiToggleRequested = { handleMinimalUiToggleFromMenu() },
             onSoftwareKeyboardModeToggleRequested = onSoftwareKeyboardModeToggleRequested,
+            onKeypadRequested = onKeypadRequested,
             onOpenSettings = { openSettings() },
             onSymbolsPageRequested = onSymbolsPageRequested,
             onUndoRequested = onUndoRequested,
@@ -552,31 +604,34 @@ class StatusBarController(
     }
 
     private fun SettingsManager.KeyboardThemeSettings.toAospThemeOverride(): AospKeyboardView.ThemeOverride =
-        AospKeyboardView.ThemeOverride(
-            background = background,
-            divider = divider,
-            normalKey = normalKey,
-            specialKey = specialKey,
-            textAndIcons = textAndIcons,
-            ledInactive = ledInactive,
-            ledActive = ledActive,
-            ledLocked = ledLocked,
-            accent = accent,
-            keyPopup = keyPopup,
-            keyPopupSelected = keyPopupSelected,
-            keyPopupStyle = keyPopupStyle,
-            keyPopupAttached = keyPopupAttached,
-            keyPopupTailEnabled = keyPopupTailEnabled,
-            keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-            keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
-            keyCornerRadiusRatio = keyCornerRadiusRatio,
-            keyHeightScale = keyHeightScale,
-            numberRowHeightScale = numberRowHeightScale,
-            keyWidthScale = keyWidthScale,
-            rowGapScale = rowGapScale,
-            distributeHorizontalSpacing = distributeHorizontalSpacing,
-            ortholinear = ortholinear
-        )
+        textures.renderable().let { shown ->
+            AospKeyboardView.ThemeOverride(
+                background = background,
+                divider = divider,
+                normalKey = shown.surfaceColour(normalKey),
+                specialKey = shown.surfaceColour(specialKey),
+                textAndIcons = textAndIcons,
+                ledInactive = ledInactive,
+                ledActive = ledActive,
+                ledLocked = ledLocked,
+                accent = accent,
+                keyPopup = keyPopup,
+                keyPopupSelected = keyPopupSelected,
+                keyPopupStyle = keyPopupStyle,
+                keyPopupAttached = keyPopupAttached,
+                keyPopupTailEnabled = keyPopupTailEnabled,
+                keyPreviewAfterLongPress = keyPreviewAfterLongPress,
+                keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+                keyCornerRadiusRatio = keyCornerRadiusRatio,
+                keyHeightScale = keyHeightScale,
+                numberRowHeightScale = numberRowHeightScale,
+                keyWidthScale = keyWidthScale,
+                rowGapScale = rowGapScale,
+                distributeHorizontalSpacing = distributeHorizontalSpacing,
+                ortholinear = ortholinear,
+                textures = shown
+            )
+        }
 
     fun setSlimModeActive(active: Boolean) {
         if (slimModeActive == active) {
@@ -594,6 +649,7 @@ class StatusBarController(
 
     fun dismissEmojiPickerPopup() {
         emojiPickerSearchPopupShowPending = false
+        emojiKeyboardContainer?.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         emojiPickerSearchPopup?.let { popup ->
             if (popup.isShowing) popup.dismiss()
             popup.contentView = null
@@ -1259,6 +1315,11 @@ class StatusBarController(
                 heightPx = null,
                 onKeyboardLayoutRequested = null
             )
+            // The popup window sizes the picker; a fixed height would push its controls out.
+            view.layoutParams?.takeIf { it.height != ViewGroup.LayoutParams.MATCH_PARENT }?.let { params ->
+                params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                view.layoutParams = params
+            }
         }
         val colors = activeThemeColors()
         view.configureControls(if (pickerShownAboveSoftwareKeyboard) dpToPx(32f) else hardwareSymKeyHeightPx(colors))
@@ -1266,12 +1327,16 @@ class StatusBarController(
 
         // Only scroll to top when view is just added (first open or switching pages)
         // Don't scroll if view is already in container (user is browsing)
-        if (lastSymPageRendered != 4) {
-            view.refresh() // First time or switching from another page
+        if (lastSymPageRendered != 4 || view.showsOutdatedEmoji()) {
+            view.refresh() // First time, switching from another page, or the offered emoji changed
         } else if (wasDetachedFromHost) {
             view.scrollToTop() // View was just added (happens when reopening after being removed)
         }
         lastSymPageRendered = 4
+        if (emojiPickerSearchRequested) {
+            emojiPickerSearchRequested = false
+            view.post { view.showSearch() }
+        }
     }
 
     private fun showEmojiPickerSearchPopup(
@@ -1283,7 +1348,8 @@ class StatusBarController(
     ): Boolean {
         val layout = statusBarLayout ?: return false
         val keyboardView = ensureSoftwareKeyboardViewInstance(container)
-        val keyboardHeight = softwareKeyboardHeight.takeIf { it > 0 }
+        // Without a known keyboard height the picker stays inline.
+        softwareKeyboardHeight.takeIf { it > 0 }
             ?: measureSoftwareKeyboardDesiredHeight(keyboardView, layout).takeIf { it > 0 }
             ?: return false
         configureSoftwareKeyboard(keyboardView, snapshot, inputConnection, null)
@@ -1300,11 +1366,14 @@ class StatusBarController(
                     }
                     container.removeAllViews()
                     emojiKeyButtons.clear()
+                    // Fill the container's actual height like the plain keyboard page; the desired
+                    // height can exceed it when the window is shorter (outer display, landscape).
                     container.addView(
                         keyboardView,
                         LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            keyboardHeight
+                            0,
+                            1f
                         )
                     )
                 }
@@ -1325,22 +1394,78 @@ class StatusBarController(
         if (popup.contentView !== picker) {
             popup.contentView = picker
         }
-        popup.width = context.resources.displayMetrics.widthPixels
-        popup.height = EmojiPickerView.configuredHeightPx(context)
+        container.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
+        container.addOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         if (!popup.isShowing && !emojiPickerSearchPopupShowPending) {
             emojiPickerSearchPopupShowPending = true
             layout.post {
                 emojiPickerSearchPopupShowPending = false
                 if (picker.isSearchPanelShowing() && !popup.isShowing && layout.isAttachedToWindow) {
-                    popup.showAtLocation(layout, Gravity.BOTTOM, 0, keyboardHeight)
+                    val geometry = applyEmojiPickerSearchGeometry(picker) ?: return@post
+                    popup.width = geometry.width
+                    popup.height = geometry.height
+                    popup.showAtLocation(layout, Gravity.BOTTOM or Gravity.START, 0, geometry.bottomOffset)
                 }
             }
+        } else {
+            scheduleEmojiPickerSearchGeometry()
         }
         return true
     }
 
+    private class EmojiSearchPopupGeometry(val width: Int, val height: Int, val bottomOffset: Int)
+
+    private fun scheduleEmojiPickerSearchGeometry() {
+        val layout = statusBarLayout ?: return
+        if (emojiPickerSearchGeometryPending) return
+        emojiPickerSearchGeometryPending = true
+        // Runs after the pass that triggered it; geometry is read from laid-out views.
+        layout.post {
+            emojiPickerSearchGeometryPending = false
+            val popup = emojiPickerSearchPopup ?: return@post
+            val picker = popup.contentView as? EmojiPickerView ?: return@post
+            if (!popup.isShowing || !picker.isSearchPanelShowing()) return@post
+            val geometry = applyEmojiPickerSearchGeometry(picker) ?: return@post
+            popup.update(0, geometry.bottomOffset, geometry.width, geometry.height)
+        }
+    }
+
+    /**
+     * Places the search popup between the visible screen top and the keyboard, measured from the
+     * IME window as laid out. Lends keyboard rows to the popup when the space above is too small.
+     */
+    private fun applyEmojiPickerSearchGeometry(picker: EmojiPickerView): EmojiSearchPopupGeometry? {
+        val container = emojiKeyboardContainer ?: return null
+        val keyboardView = softwareKeyboardView?.takeIf { it.parent === container } ?: return null
+        if (container.height <= 0) return null
+        val root = container.rootView
+        val rootOnScreen = IntArray(2).also(root::getLocationOnScreen)
+        val containerInWindow = IntArray(2).also(container::getLocationInWindow)
+        val containerTop = containerInWindow[1] + container.paddingTop
+        val keyboardSpace = container.height - container.paddingTop - container.paddingBottom
+        val safeTop = screenSafeTopPx() - rootOnScreen[1]
+        val split = EmojiSearchPopupSplit.resolve(
+            spaceAbove = containerTop - safeTop,
+            keyboardHeight = keyboardSpace,
+            preferredPopupHeight = EmojiPickerView.configuredHeightPx(context),
+            minimumPopupHeight = picker.minimumSearchHeightPx()
+        )
+        (keyboardView.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+            if (params.topMargin != split.keyboardTopInset) {
+                params.topMargin = split.keyboardTopInset
+                keyboardView.layoutParams = params
+            }
+        }
+        return EmojiSearchPopupGeometry(
+            width = root.width,
+            height = split.popupHeight,
+            bottomOffset = root.height - (containerTop + split.keyboardTopInset)
+        )
+    }
+
     private fun dismissEmojiPickerSearchPopup(picker: EmojiPickerView) {
         emojiPickerSearchPopupShowPending = false
+        emojiKeyboardContainer?.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         val popup = emojiPickerSearchPopup ?: return
         if (popup.isShowing) {
             picker.reorderingWithinContainer {
@@ -1365,7 +1490,9 @@ class StatusBarController(
         container.setPadding(0, 0, 0, 0)
         val inputConnectionChanged = lastInputConnectionUsed != inputConnection
         val inputConnectionBecameAvailable = lastInputConnectionUsed == null && inputConnection != null
-        if (lastSymPageRendered == page && lastSymMappingsRendered == symMappings && !inputConnectionChanged && !inputConnectionBecameAvailable) {
+        val theme = activeThemeColors()
+        if (lastSymPageRendered == page && lastSymMappingsRendered == symMappings &&
+            lastHardwareSymThemeRendered == theme && !inputConnectionChanged && !inputConnectionBecameAvailable) {
             return
         }
         
@@ -1516,11 +1643,13 @@ class StatusBarController(
                 val label = keyLabels[keyCode] ?: ""
                 val content = symMappings[keyCode] ?: ""
                 
-                val keyButton = createEmojiKeyButton(label, content, keyHeight, page)
+                val keyButton = createEmojiKeyButton(label, content, keyHeight, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
                 emojiKeyButtons.add(keyButton)
                 keyButton.isLongClickable = true
                 keyButton.setOnLongClickListener {
-                    openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+                    if (onSymPageKeyLongPressed?.invoke(keyCode) != true) {
+                        openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+                    }
                     true
                 }
                 
@@ -1529,6 +1658,7 @@ class StatusBarController(
                     keyButton.isClickable = true
                     keyButton.isFocusable = true
                     keyButton.setOnClickListener {
+                        if (onSymPageKeyTapped?.invoke(keyCode) == true) return@setOnClickListener
                         commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
                     }
                 }
@@ -1556,7 +1686,8 @@ class StatusBarController(
             container.addView(rowLayout)
         }
 
-        // Cache what was rendered to avoid rebuilding on each status refresh
+        // Cache the effective colours too: an asynchronous photo failure changes them.
+        lastHardwareSymThemeRendered = theme
         lastSymPageRendered = page
         lastSymMappingsRendered = HashMap(symMappings)
         lastInputConnectionUsed = inputConnection
@@ -1584,11 +1715,14 @@ class StatusBarController(
             if (
                 params.width != ViewGroup.LayoutParams.MATCH_PARENT ||
                 params.height != 0 ||
-                params.weight != 1f
+                params.weight != 1f ||
+                params.topMargin != 0
             ) {
                 params.width = ViewGroup.LayoutParams.MATCH_PARENT
                 params.height = 0
                 params.weight = 1f
+                // Rows lent to the emoji search popup return to the keyboard.
+                params.topMargin = 0
                 keyboardView.layoutParams = params
             }
         }
@@ -1741,6 +1875,21 @@ class StatusBarController(
                 return true
             }
 
+            override fun onPageChoice(id: String) {
+                onSoftwareKeyboardNonShiftInteraction?.invoke()
+                val page = SoftwareKeyboardPageChoices.pageFromId(id)
+                if (page in 3..4 || (page == null && snapshot.symPage in 3..4)) {
+                    prepareSoftwareKeyboardForSymbolTransition()
+                }
+                onSoftwareKeyboardPageChoice?.invoke(id)
+            }
+
+            override fun onSymbolKey(keyCode: Int): Boolean =
+                onSymPageKeyTapped?.invoke(keyCode) == true
+
+            override fun onSymbolKeyLongPress(keyCode: Int): Boolean =
+                onSymPageKeyLongPressed?.invoke(keyCode) == true
+
             override fun onSymbolLongPress(keyCode: Int): Boolean {
                 val page = snapshot.symPage
                 if (page !in 1..2) {
@@ -1751,6 +1900,12 @@ class StatusBarController(
             }
         }
         keyboardView.layoutName = layoutName
+        keyboardView.keypad = if (snapshot.symPage == 0) snapshot.softwareKeypad else SoftwareKeypad.FULL
+        keyboardView.layoutKeyLabel = context.getString(R.string.software_keyboard_choice_letters)
+        keyboardView.pageChoices = SoftwareKeyboardPageChoices.build(
+            SettingsManager.getOnScreenSymPageCycleConfig(context),
+            softwareKeyboardPageChoiceLabels()
+        )
         keyboardView.layoutStyle = softwareKeyboardLayoutStyle()
         keyboardView.includeNumberRow = SettingsManager.getSoftwareKeyboardNumberRowEnabled(context)
         keyboardView.nearestKeyTouchEnabled =
@@ -1778,13 +1933,15 @@ class StatusBarController(
         }
         keyboardView.symPageLabels = activeSymProjection.contentByKeyCode
         keyboardView.symPageTextLabels = activeSymProjection.contentByBaseText
+        keyboardView.symPageFreeKeyCodes =
+            if (keyboardView.symPageActive) rocks.pkb.plektra.core.SymLayoutController.shownFreeKeys else emptySet()
         keyboardView.symPreviewLabels = snapshot.softwareSymPreviewLabels
         keyboardView.symPreviewTextLabels = snapshot.softwareSymPreviewTextLabels
         keyboardView.ctrlPreviewLabels = snapshot.softwareCtrlPreviewLabels
         keyboardView.ctrlPreviewIconRes = snapshot.softwareCtrlPreviewIconRes
         keyboardView.ctrlShortcutDisplay = SettingsManager.getSoftwareCtrlShortcutDisplay(context)
         keyboardView.altPreviewLabels = snapshot.softwareAltPreviewLabels
-        val symKeySpec = nextSoftwareSymKeySpec(snapshot.symPage)
+        val symKeySpec = nextSoftwareSymKeySpec(snapshot.symPage, snapshot.softwareKeypad)
         keyboardView.symbolsLabel = symKeySpec.label
         keyboardView.symbolsIconRes = symKeySpec.iconRes
         keyboardView.spacebarLabel = buildSoftwareKeyboardSpacebarLabel(snapshot)
@@ -1814,7 +1971,7 @@ class StatusBarController(
     private fun prepareSoftwareKeyboardForSymbolTransition() {
         val activeColors = softwareTheme()
         emojiKeyboardContainer?.apply {
-            setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(this, activeColors.background, activeColors.textures["background"])
         }
         // Also covers the stacked layout where the keyboard is not the first container child.
         (softwareKeyboardView ?: emojiKeyboardContainer?.getChildAt(0) as? AospKeyboardView)
@@ -1826,8 +1983,19 @@ class StatusBarController(
         val iconRes: Int? = null
     )
 
-    private fun nextSoftwareSymKeySpec(currentPage: Int): SoftwareSymKeySpec {
-        val pageValues = SettingsManager.getSymPagesConfig(context).enabledOrderedPages().mapNotNull { page ->
+    private fun softwareKeyboardPageChoiceLabels() = SoftwareKeyboardPageChoices.Labels(
+        letters = context.getString(R.string.software_keyboard_choice_letters),
+        number = context.getString(R.string.software_keyboard_choice_number),
+        phone = context.getString(R.string.software_keyboard_choice_phone),
+        emojiLayer = "☺",
+        symbols = context.getString(R.string.software_keyboard_choice_symbols),
+        device = context.getString(R.string.software_keyboard_choice_device),
+        clipboard = "📋",
+        emojiPicker = "😀"
+    )
+
+    private fun nextSoftwareSymKeySpec(currentPage: Int, keypad: SoftwareKeypad = SoftwareKeypad.FULL): SoftwareSymKeySpec {
+        val pageValues = SettingsManager.getOnScreenSymPageCycleConfig(context).enabledOrderedPages().mapNotNull { page ->
             when (page) {
                 rocks.pkb.plektra.SymPagesConfig.PAGE_EMOJI -> 1
                 rocks.pkb.plektra.SymPagesConfig.PAGE_SYMBOLS -> 2
@@ -1855,7 +2023,13 @@ class StatusBarController(
             2 -> SoftwareSymKeySpec("", R.drawable.ic_emoji_symbols_24)
             3 -> SoftwareSymKeySpec("", R.drawable.ic_content_paste_24)
             4 -> SoftwareSymKeySpec("", R.drawable.ic_emoji_emotions_24)
-            else -> SoftwareSymKeySpec("ABC")
+            // Returning from a SYM page lands on the field's keypad when one is active.
+            else -> SoftwareSymKeySpec(
+                context.getString(
+                    if (keypad == SoftwareKeypad.FULL) R.string.software_keyboard_choice_letters
+                    else R.string.software_keyboard_choice_number
+                )
+            )
         }
     }
 
@@ -1991,12 +2165,17 @@ class StatusBarController(
             row.forEachIndexed { index, labelChar ->
                 val label = labelChar.toString().uppercase()
                 val content = softwareSymContentByChar[labelChar] ?: softwareSymbolFallback(labelChar)
-                val keyButton = createEmojiKeyButton(label, content, keyHeight, page)
+                val keyButton = createEmojiKeyButton(label, content, keyHeight, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
+                val letterKeyCode = SoftwareKeyboardSymLabels.keyCodeForChar(labelChar, layoutName)
                 if (content.isNotEmpty() && inputConnection != null) {
                     keyButton.isClickable = true
                     keyButton.isFocusable = true
                     keyButton.setOnClickListener {
+                        if (letterKeyCode != null && onSymPageKeyTapped?.invoke(letterKeyCode) == true) return@setOnClickListener
                         commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
+                    }
+                    if (letterKeyCode != null) {
+                        keyButton.setOnLongClickListener { onSymPageKeyLongPressed?.invoke(letterKeyCode) == true }
                     }
                 }
                 rowLayout.addView(keyButton, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
@@ -2337,6 +2516,11 @@ class StatusBarController(
         return button
     }
 
+    /** Opens the customization of [keyCode] on SYM [page] with its picker, as holding the key does. */
+    fun openSymKeyCustomization(page: Int, keyCode: Int) {
+        openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+    }
+
     private fun openSymCustomization(page: Int, keyCode: Int?, openPicker: Boolean) {
         val prefs = context.getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
         val currentSymPage = prefs.getInt("current_sym_page", 0)
@@ -2373,7 +2557,13 @@ class StatusBarController(
      * @param height L'altezza del tasto
      * @param page La pagina attiva (1=emoji, 2=caratteri)
      */
-    private fun createEmojiKeyButton(label: String, content: String, height: Int, page: Int): View {
+    private fun createEmojiKeyButton(
+        label: String,
+        content: String,
+        height: Int,
+        page: Int,
+        pagedKind: rocks.pkb.plektra.core.SymPagedLayer.Kind? = null
+    ): View {
         val theme = activeThemeColors()
         val keyLayout = FrameLayout(context).apply {
             setPadding(0, 0, 0, 0) // Nessun padding per permettere all'emoji di occupare tutto lo spazio
@@ -2408,10 +2598,21 @@ class StatusBarController(
             (heightInDp * 0.75f)
         }
         
+        val textLike = pagedKind == rocks.pkb.plektra.core.SymPagedLayer.Kind.KAOMOJI ||
+            content.codePointCount(0, content.length) > 3 && !content.any { Character.isSurrogate(it) }
         val contentText = TextView(context).apply {
-            text = content
+            text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(context, content)
             textSize = contentTextSize // textSize è in sp
             gravity = Gravity.CENTER
+            if (textLike) {
+                // Kaomoji and other long text: one line, shrunk to fit the key
+                maxLines = 1
+                setPadding(dpToPx(2f), 0, dpToPx(2f), dpToPx(8f))
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this, 6, contentTextSize.toInt().coerceAtLeast(7), 1, TypedValue.COMPLEX_UNIT_SP
+                )
+                setTextColor(theme.textAndIcons)
+            }
             if (roundedCorners) setTextColor(theme.textAndIcons)
             // Per pagina 2 (caratteri), rendi bianco e in grassetto
             if (page == 2) {
@@ -2462,6 +2663,37 @@ class StatusBarController(
             content = contentGroup)
         
         return keyLayout
+    }
+
+    /**
+     * A key of the customization grid that the layer's pages use to turn ([arrow]): the arrow
+     * in its corner, its own mapping dimmed but still shown and editable, as it types again
+     * without the pages and with SYM held.
+     */
+    private fun markNavigationKey(keyButton: View, label: String, content: String, arrow: String) {
+        val key = keyButton as? FrameLayout ?: return
+        key.getChildAt(0)?.let { contentGroup ->
+            (contentGroup as? ViewGroup)?.getChildAt(0)?.alpha = 0.4f
+        }
+        key.addView(TextView(context).apply {
+            text = arrow
+            textSize = 16f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(activeThemeColors().accent)
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.START
+                leftMargin = dpToPx(4f)
+            }
+        })
+        key.contentDescription = context.getString(
+            R.string.sym_navigation_key_content_description,
+            label,
+            arrow,
+            content.ifBlank { "—" }
+        )
     }
 
     private fun buildSymKeyContentDescription(label: String, content: String): String {
@@ -2607,9 +2839,7 @@ class StatusBarController(
     }
 
     private fun closeSymAfterTouchKeyIfNeeded(): Boolean {
-        val shouldClose =
-            SettingsManager.getSymAutoClose(context) &&
-            SettingsManager.getSymAutoCloseOnTouch(context)
+        val shouldClose = SettingsManager.symAutoClosesAfterCommit(context, touch = true)
         if (shouldClose) {
             onSymCloseRequested?.invoke()
         }
@@ -2658,10 +2888,12 @@ class StatusBarController(
         )
         val label = keyLabels[keyCode] ?: ""
         val content = symMappings[keyCode] ?: ""
-        val keyButton = createEmojiKeyButton(label, content, height, page)
+        val keyButton = createEmojiKeyButton(label, content, height, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
         keyButton.isLongClickable = true
         keyButton.setOnLongClickListener {
-            openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+            if (onSymPageKeyLongPressed?.invoke(keyCode) != true) {
+                openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+            }
             true
         }
         
@@ -2669,6 +2901,7 @@ class StatusBarController(
             keyButton.isClickable = true
             keyButton.isFocusable = true
             keyButton.setOnClickListener {
+                if (onSymPageKeyTapped?.invoke(keyCode) == true) return@setOnClickListener
                 commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
             }
         }
@@ -2689,7 +2922,8 @@ class StatusBarController(
     fun createCustomizableEmojiKeyboard(
         symMappings: Map<Int, String>,
         onKeyClick: (Int, String) -> Unit,
-        page: Int = 1 // Default a pagina 1 (emoji)
+        page: Int = 1, // Default a pagina 1 (emoji)
+        navigationKeys: Map<Int, String> = emptyMap()
     ): View {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
         val container = LinearLayout(context).apply {
@@ -2809,19 +3043,19 @@ class StatusBarController(
                 when (rowIndex) {
                     0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
                         for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, index == row.size - 1)
+                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, index == row.size - 1)
                         }
                     }
                     1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
                         for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                     }
                     2 -> { // Row 3: Z X C V [Close Placeholder] [Globe Placeholder] B N M [Gap]
                         // Z X C V (4 keys)
                         for (i in 0..3) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
                         
                         // Close Button Placeholder (no icon in customization preview)
@@ -2834,7 +3068,7 @@ class StatusBarController(
                         
                         // B N M (3 keys)
                         for (i in 4..6) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
 
                         // Right Gap (placeholder for the physical cutout/space at the end of row 3)
@@ -2859,6 +3093,7 @@ class StatusBarController(
                 
                 // Usa la stessa funzione createEmojiKeyButton della tastiera reale
                 val keyButton = createEmojiKeyButton(label, emoji, keyHeight, page)
+                navigationKeys[keyCode]?.let { markNavigationKey(keyButton, label, emoji, it) }
                 
                 // Aggiungi click listener
                 keyButton.setOnClickListener {
@@ -2897,6 +3132,7 @@ class StatusBarController(
         spacing: Int,
         page: Int,
         onKeyClick: (Int, String) -> Unit,
+        navigationKeys: Map<Int, String>,
         isLast: Boolean
     ) {
         val keyLabels = mapOf(
@@ -2913,6 +3149,7 @@ class StatusBarController(
         val label = keyLabels[keyCode] ?: ""
         val emoji = symMappings[keyCode] ?: ""
         val keyButton = createEmojiKeyButton(label, emoji, height, page)
+        navigationKeys[keyCode]?.let { markNavigationKey(keyButton, label, emoji, it) }
         keyButton.setOnClickListener {
             onKeyClick(keyCode, emoji)
         }
@@ -2931,7 +3168,7 @@ class StatusBarController(
             view.alpha = 1f
             view.translationY = 0f
             view.visibility = View.VISIBLE
-            backgroundView?.setBackgroundColor(activeThemeColors().background)
+            activeThemeColors().let { rocks.pkb.plektra.ThemeTextureBackground.set(backgroundView, it.background, it.textures["background"]) }
             return
         }
         val height = view.height
@@ -2949,10 +3186,7 @@ class StatusBarController(
 
         // Restore the theme background, including its transparency, without animation.
         backgroundView?.let { bgView ->
-            if (bgView.background !is ColorDrawable) {
-                bgView.background = ColorDrawable(activeThemeColors().background)
-            }
-            (bgView.background as? ColorDrawable)?.color = activeThemeColors().background
+            activeThemeColors().let { rocks.pkb.plektra.ThemeTextureBackground.set(bgView, it.background, it.textures["background"]) }
         }
 
         val animator = ValueAnimator.ofFloat(measuredHeight.toFloat(), 0f).apply {
@@ -3019,6 +3253,7 @@ class StatusBarController(
 
     fun update(snapshot: StatusSnapshot, emojiMapText: String = "", inputConnection: android.view.inputmethod.InputConnection? = null, symMappings: Map<Int, String>? = null) {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
+        buttonRegistry.keypadAccessAvailable = snapshot.keypadAccessAvailable
         val isFullSoftwareKeyboardMode =
             mode == Mode.INPUT_VIEW &&
                 SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
@@ -3088,11 +3323,7 @@ class StatusBarController(
         layout.visibility = View.VISIBLE
         applyAccessibilityLiveRegionPreference(layout)
         
-        if (layout.background !is ColorDrawable) {
-            layout.background = ColorDrawable(activeTheme.background)
-        } else if (snapshot.symPage == 0) {
-            (layout.background as ColorDrawable).color = activeThemeColors().background
-        }
+        rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
         
         modifiersContainerView.visibility = View.GONE
         val showHardwareBottomIndicators = barPresentation.bottomIndicators
@@ -3208,10 +3439,7 @@ class StatusBarController(
             variationsBar?.resetVariationsState()
 
             // Pin background and hide variations while showing clipboard grid
-            if (layout.background !is ColorDrawable) {
-                layout.background = ColorDrawable(activeColors.background)
-            }
-            (layout.background as? ColorDrawable)?.color = activeThemeColors().background
+            rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
             variationsWrapperView?.apply {
                 visibility = View.GONE
                 isEnabled = false
@@ -3221,7 +3449,7 @@ class StatusBarController(
 
             val measured = ensureEmojiKeyboardMeasuredHeight(emojiKeyboardView, layout, forceReMeasure = true)
             val animationHeight = if (measured > 0) measured else defaultSymHeightPx
-            emojiKeyboardView.setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, activeColors.background, activeColors.textures["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             val surfaceHeight = resolveSurfaceHeightWithOptionalLed(animationHeight, showLedStrip)
             setSurfaceCloseVisible(true)
@@ -3269,7 +3497,7 @@ class StatusBarController(
             val measured = measureSoftwareKeyboardDesiredHeight(emojiKeyboardView, layout)
             val keyboardHeight = if (measured > 0) measured else defaultSymHeightPx
             lastSoftwareKeyboardHeight = keyboardHeight
-            emojiKeyboardView.setBackgroundColor(softwareThemeSettings.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, softwareThemeSettings.background, softwareThemeSettings.textures.renderable()["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             applySymSurfaceLayout(
                 symSurfaceView,
@@ -3309,10 +3537,7 @@ class StatusBarController(
             variationsBar?.resetVariationsState()
 
             // Restore the theme background and hide variations while SYM animates.
-            if (layout.background !is ColorDrawable) {
-                layout.background = ColorDrawable(activeColors.background)
-            }
-            (layout.background as? ColorDrawable)?.color = activeThemeColors().background
+            rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
             if (isSoftwareKeyboardOverlayPage) {
                 variationsWrapperView?.apply {
                     visibility = View.VISIBLE
@@ -3340,7 +3565,7 @@ class StatusBarController(
             )
             val surfaceHeight = resolveSurfaceHeightWithOptionalLed(symHeight, showLedStrip)
             lastSymHeight = surfaceHeight
-            emojiKeyboardView.setBackgroundColor(activeColors.background)
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, activeColors.background, activeColors.textures["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             applySymSurfaceLayout(
                 symSurfaceView,

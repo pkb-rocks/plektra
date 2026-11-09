@@ -12,6 +12,7 @@
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="settings_title">Cài đặt</string>
     <string name="back">Quay lại</string>
     <string name="settings_back_content_description">Quay lại</string>
@@ -38,6 +39,14 @@
     <string name="swipe_incremental_threshold_title">Độ nhạy thanh vuốt</string>
     <string name="swipe_incremental_threshold_description">Khoảng cách cần để di chuyển con trỏ một vị trí. Giá trị thấp làm con trỏ di chuyển nhanh hơn.</string>
     <string name="auto_show_keyboard_title">Tự động hiển thị bàn phím</string>
+    <string name="auto_show_respect_app_visibility_title">Tuân theo cài đặt hiển thị của ứng dụng</string>
+    <string name="auto_show_respect_app_visibility_description">Android và ứng dụng quyết định bàn phím có mở khi vào một trường hay không. Chạm vào trường hoặc nhấn một phím vẫn mở bàn phím.</string>
+    <string name="hardware_keypad_auto_open_title">Tự động mở bàn phím số khi dùng bàn phím vật lý</string>
+    <string name="hardware_keypad_auto_open_description">Hiển thị bàn phím số hoặc bàn phím điện thoại trên màn hình trong các trường PIN, số và điện thoại. Nếu không, hãy mở bằng nút bàn phím số trên thanh bàn phím.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Lớp emoji trong vòng chuyển trang</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Đưa trang emoji gán cho phím vào vòng chuyển trang của bàn phím ảo. Bộ chọn emoji không bị ảnh hưởng.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Bàn phím đầy đủ</string>
+    <string name="software_keyboard_keypad_button_description">Mở bàn phím số trên màn hình</string>
     <string name="alt_ctrl_speech_shortcut_title">Nhận dạng giọng nói Alt+Ctrl / BlackBerry Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Bật phím tắt Alt+Ctrl / BlackBerry Alt+0 để bắt đầu nhận dạng giọng nói</string>
     <string name="static_variation_bar_mode_title">Thanh biến thể tĩnh</string>
@@ -893,4 +902,29 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="caret_badge_custom_colors_description">Thay thế màu của giao diện bàn phím.</string>
     <string name="alt_latch_stays_on_space_title">Giữ Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Space và Enter tắt Alt một lần nhưng vẫn giữ Alt-Lock hoạt động.</string>
+    <string name="keyboard_bar_hidden_apps_title">Không bao giờ hiện thanh</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Ứng dụng mà thanh luôn ẩn, kể cả khi mở thủ công</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Chưa chọn ứng dụng nào</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="other">%d ứng dụng</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Trong các ứng dụng bạn chọn ở đây, Plektra không bao giờ hiện thanh của nó hay bàn phím ảo: bất kể các cài đặt hiển thị khác, và kể cả khi bạn thử mở bằng phím, phím tắt hoặc nút bàn phím của hệ thống. Gõ bằng bàn phím vật lý vẫn hoạt động, bao gồm các lớp SYM, phím tắt, phím bổ trợ và mã emoji hoặc đoạn mẫu chính xác. Bảng nhớ tạm và bộ chọn emoji luôn đóng trong các ứng dụng này.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Ứng dụng web — chạy bên trong %1$s, nên thanh cũng bị ẩn ở đó</string>
+    <string name="emoji_category_unicode_symbols">Ký hiệu văn bản</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Giao diện emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (tích hợp)</string>
+    <string name="emoji_style_system">Phông chữ hệ thống</string>
+    <string name="emoji_style_description">Plektra chèn emoji Unicode chuẩn; ứng dụng bạn đang gõ hiển thị chúng bằng phông chữ riêng.</string>
+    <string name="emoji_skin_tone_title">Tông da mặc định</string>
+    <string name="emoji_pages_emoji_title">Lật trang emoji bằng Q và P</string>
+    <string name="emoji_pages_symbols_title">Lật trang ký hiệu bằng Q và P</string>
+    <string name="emoji_pages_description">Q và P lật trang, Shift+Q và Shift+P chuyển giữa các danh mục, A mở tìm kiếm. Giữ một emoji để chọn tông da. Trong các tông da, P chuyển sang các tông khác; với emoji trong bố cục phím của bạn, ✎ trên A mở phần tùy chỉnh phím.</string>
+    <string name="sym_paged_navigation_note">Khi bật các trang, Q (‹) và P (›) dùng để lật trang. Gán phím riêng của bạn cho Q và P vẫn được lưu và có thể chỉnh sửa tại đây: khi trang đang mở, giữ SYM và nhấn Q hoặc P để nhập chúng; khi tắt các trang, chúng lại hoạt động trực tiếp.</string>
+    <string name="sym_navigation_key_content_description">%1$s lật trang (%2$s). Gán phím của bạn: %3$s</string>
+    <string name="kaomoji_placement_title">Trang kaomoji</string>
+    <string name="kaomoji_placement_symbols">Sau ký hiệu</string>
+    <string name="kaomoji_placement_emoji">Sau emoji</string>
+    <string name="kaomoji_placement_off">Tắt</string>
+    <string name="emoji_picker_extras_title">Ký hiệu văn bản và kaomoji trong bộ chọn emoji</string>
 </resources>

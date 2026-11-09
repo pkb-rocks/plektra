@@ -13,6 +13,7 @@
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Ρυθμίσεις</string>
@@ -103,6 +104,14 @@
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Αυτόματη εμφάνιση πληκτρολογίου</string>
     <string name="auto_show_keyboard_description">Εμφανίζει αυτόματα το πληκτρολόγιο οθόνης σε πεδία κειμένου.</string>
+    <string name="auto_show_respect_app_visibility_title">Τήρηση προεπιλογών εμφάνισης της εφαρμογής</string>
+    <string name="auto_show_respect_app_visibility_description">Το Android και η εφαρμογή αποφασίζουν αν το πληκτρολόγιο ανοίγει όταν εισέρχεστε σε ένα πεδίο. Το πάτημα στο πεδίο ή ενός πλήκτρου εξακολουθεί να το ανοίγει.</string>
+    <string name="hardware_keypad_auto_open_title">Αυτόματο άνοιγμα αριθμητικού πληκτρολογίου με φυσικό πληκτρολόγιο</string>
+    <string name="hardware_keypad_auto_open_description">Εμφανίζει το αριθμητικό ή τηλεφωνικό πληκτρολόγιο οθόνης σε πεδία PIN, αριθμών και τηλεφώνου. Διαφορετικά ανοίξτε το με το κουμπί αριθμητικού πληκτρολογίου στη γραμμή πληκτρολογίου.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Σελίδα emoji πλήκτρων στην εναλλαγή σελίδων</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Συμπεριλαμβάνει τη σελίδα αντιστοίχισης emoji στην εναλλαγή σελίδων του πληκτρολογίου οθόνης. Ο επιλογέας emoji δεν επηρεάζεται.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Πλήρες πληκτρολόγιο</string>
+    <string name="software_keyboard_keypad_button_description">Άνοιγμα αριθμητικού πληκτρολογίου οθόνης</string>
 
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 για φωνητική εισαγωγή</string>
@@ -1736,4 +1745,30 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_caret_modifier_badge">δρομέας, κέρσορας, shift, alt, ctrl, sym, caps lock, επικάλυψη, σήμα, τροποποιητής, ένδειξη</string>
     <string name="caret_badge_custom_colors_title">Χρήση προσαρμοσμένων χρωμάτων</string>
     <string name="caret_badge_custom_colors_description">Αντικατάσταση των χρωμάτων του θέματος πληκτρολογίου.</string>
+    <string name="keyboard_bar_hidden_apps_title">Να μην εμφανίζεται ποτέ η γραμμή</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Εφαρμογές όπου η γραμμή παραμένει κρυφή, ακόμη και με χειροκίνητο άνοιγμα</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Δεν επιλέχθηκαν εφαρμογές</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d εφαρμογή</item>
+        <item quantity="other">%d εφαρμογές</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Στις εφαρμογές που επιλέγετε εδώ, το Plektra δεν εμφανίζει ποτέ τη γραμμή του ούτε το πληκτρολόγιο οθόνης: ανεξάρτητα από τις υπόλοιπες ρυθμίσεις ορατότητας, ακόμη και αν προσπαθήσετε να την ανοίξετε με πλήκτρο, συντόμευση ή το κουμπί πληκτρολογίου του συστήματος. Η πληκτρολόγηση με το φυσικό πληκτρολόγιο συνεχίζει να λειτουργεί, μαζί με τα επίπεδα SYM, τις συντομεύσεις, τους τροποποιητές και τους ακριβείς κωδικούς emoji ή αποσπασμάτων. Το πρόχειρο και η επιλογή emoji παραμένουν κλειστά σε αυτές τις εφαρμογές.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Εφαρμογή ιστού — εκτελείται μέσα στο %1$s, άρα η γραμμή είναι κρυφή κι εκεί</string>
+    <string name="emoji_category_unicode_symbols">Σύμβολα κειμένου</string>
+    <string name="emoji_category_kaomoji">Καομότζι</string>
+    <string name="emoji_style_title">Εμφάνιση emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (ενσωματωμένη)</string>
+    <string name="emoji_style_system">Γραμματοσειρά συστήματος</string>
+    <string name="emoji_style_description">Το Plektra εισάγει τυπικά emoji Unicode· η εφαρμογή στην οποία γράφεις τα εμφανίζει με τη δική της γραμματοσειρά.</string>
+    <string name="emoji_skin_tone_title">Προεπιλεγμένος τόνος δέρματος</string>
+    <string name="emoji_pages_emoji_title">Ξεφύλλισμα σελίδας emoji με Q και P</string>
+    <string name="emoji_pages_symbols_title">Ξεφύλλισμα σελίδας συμβόλων με Q και P</string>
+    <string name="emoji_pages_description">Τα Q και P αλλάζουν σελίδα, Shift+Q και Shift+P μεταβαίνουν μεταξύ κατηγοριών, το A ανοίγει την αναζήτηση. Κράτησε πατημένο ένα emoji για τους τόνους δέρματος. Στους τόνους δέρματος, το P δείχνει περισσότερους· για ένα emoji της δικής σου αντιστοίχισης, το ✎ στο A ανοίγει την προσαρμογή του πλήκτρου.</string>
+    <string name="sym_paged_navigation_note">Με ενεργές τις σελίδες, τα Q (‹) και P (›) αλλάζουν σελίδα. Οι δικές σου αντιστοιχίσεις των Q και P παραμένουν αποθηκευμένες και επεξεργάζονται εδώ: με ανοιχτή τη σελίδα, κράτησε πατημένο το SYM και πάτησε Q ή P για να τις πληκτρολογήσεις· χωρίς τις σελίδες ισχύουν ξανά απευθείας.</string>
+    <string name="sym_navigation_key_content_description">Το %1$s αλλάζει σελίδα (%2$s). Η αντιστοίχισή σου: %3$s</string>
+    <string name="kaomoji_placement_title">Σελίδες καομότζι</string>
+    <string name="kaomoji_placement_symbols">Μετά τα σύμβολα</string>
+    <string name="kaomoji_placement_emoji">Μετά τα emoji</string>
+    <string name="kaomoji_placement_off">Ανενεργό</string>
+    <string name="emoji_picker_extras_title">Σύμβολα κειμένου και καομότζι στον επιλογέα emoji</string>
 </resources>

@@ -9,6 +9,7 @@
     <string name="input_method_name_pl">Polski</string>
     <string name="input_method_name_es">Español</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="settings_title">Ustawienia</string>
     <string name="back">Wstecz</string>
     <string name="settings_back_content_description">Wstecz</string>
@@ -27,6 +28,14 @@
     <string name="swipe_to_delete_title">Włącz Przesunięcie do Usunięcia</string>
     <string name="swipe_incremental_threshold_title">Czułość Paska Przesuwania</string>
     <string name="auto_show_keyboard_title">Automatycznie Pokaż Klawiaturę</string>
+    <string name="auto_show_respect_app_visibility_title">Respektuj ustawienia wyświetlania aplikacji</string>
+    <string name="auto_show_respect_app_visibility_description">Android i aplikacja decydują, czy klawiatura otworzy się po wejściu w pole. Dotknięcie pola lub naciśnięcie klawisza nadal ją otwiera.</string>
+    <string name="hardware_keypad_auto_open_title">Automatycznie otwieraj klawiaturę numeryczną przy klawiaturze fizycznej</string>
+    <string name="hardware_keypad_auto_open_description">Pokazuje ekranową klawiaturę numeryczną lub telefoniczną w polach PIN, liczbowych i telefonicznych. W przeciwnym razie otwórz ją przyciskiem klawiatury numerycznej na pasku klawiatury.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Warstwa emoji w przełączaniu stron</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Uwzględnia stronę emoji przypisanych do klawiszy przy przełączaniu stron klawiatury ekranowej. Nie wpływa na wybór emoji.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Pełna klawiatura</string>
+    <string name="software_keyboard_keypad_button_description">Otwórz ekranową klawiaturę numeryczną</string>
     <string name="info_title">Informacje</string>
     <string name="info_description">Ustawienia są automatycznie zapisywane i natychmiast stosowane do metody wprowadzania.</string>
     <string name="keyboard_title">Klawiatura Plektra</string>
@@ -893,4 +902,32 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="caret_badge_custom_colors_description">Zastąp kolory motywu klawiatury.</string>
     <string name="alt_latch_stays_on_space_title">Zachowaj Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Spacja i Enter wyłączają jednorazowy Alt, ale pozostawiają Alt-Lock aktywny.</string>
+    <string name="keyboard_bar_hidden_apps_title">Nigdy nie pokazuj paska</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Aplikacje, w których pasek pozostaje ukryty, nawet przy ręcznym otwarciu</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Nie wybrano aplikacji</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d aplikacja</item>
+        <item quantity="few">%d aplikacje</item>
+        <item quantity="many">%d aplikacji</item>
+        <item quantity="other">%d aplikacji</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">W wybranych tutaj aplikacjach Plektra nigdy nie pokazuje paska ani klawiatury ekranowej: niezależnie od innych ustawień widoczności, a także wtedy, gdy próbujesz otworzyć go klawiszem, skrótem lub systemowym przyciskiem klawiatury. Pisanie na klawiaturze fizycznej działa dalej, w tym warstwy SYM, skróty, modyfikatory i dokładne kody emoji lub fragmentów. Schowek i selektor emoji pozostają w tych aplikacjach zamknięte.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Aplikacja webowa — działa wewnątrz %1$s, więc pasek jest ukryty także tam</string>
+    <string name="emoji_category_unicode_symbols">Symbole tekstowe</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Wygląd emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (wbudowana)</string>
+    <string name="emoji_style_system">Czcionka systemowa</string>
+    <string name="emoji_style_description">Plektra wstawia standardowe emoji Unicode; aplikacja, w której piszesz, wyświetla je własną czcionką.</string>
+    <string name="emoji_skin_tone_title">Domyślny odcień skóry</string>
+    <string name="emoji_pages_emoji_title">Przewijaj stronę emoji klawiszami Q i P</string>
+    <string name="emoji_pages_symbols_title">Przewijaj stronę symboli klawiszami Q i P</string>
+    <string name="emoji_pages_description">Q i P przewracają strony, Shift+Q i Shift+P przeskakują między kategoriami, A otwiera wyszukiwanie. Przytrzymaj emoji, aby zobaczyć odcienie skóry. Wśród odcieni skóry P przechodzi do kolejnych; dla emoji z własnego układu ✎ na A otwiera dostosowanie klawisza.</string>
+    <string name="sym_paged_navigation_note">Gdy strony są włączone, Q (‹) i P (›) je przewracają. Twoje własne przypisania Q i P pozostają zapisane i można je tu edytować: przy otwartej stronie przytrzymaj SYM i naciśnij Q lub P, aby je wpisać; bez stron działają znowu bezpośrednio.</string>
+    <string name="sym_navigation_key_content_description">%1$s przewraca strony (%2$s). Twoje przypisanie: %3$s</string>
+    <string name="kaomoji_placement_title">Strony kaomoji</string>
+    <string name="kaomoji_placement_symbols">Po symbolach</string>
+    <string name="kaomoji_placement_emoji">Po emoji</string>
+    <string name="kaomoji_placement_off">Wyłączone</string>
+    <string name="emoji_picker_extras_title">Symbole tekstowe i kaomoji w selektorze emoji</string>
 </resources>

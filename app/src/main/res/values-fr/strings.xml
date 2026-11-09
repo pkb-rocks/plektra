@@ -25,6 +25,14 @@
     <string name="clear_alt_on_space_description">Désactive Alt ponctuel et Alt-Lock, sauf si « Conserver Alt-Lock » est activé ci-dessous.</string>
     <string name="swipe_to_delete_title">Balayer pour supprimer</string>
     <string name="auto_show_keyboard_title">Afficher Automatiquement le Clavier</string>
+    <string name="auto_show_respect_app_visibility_title">Respecter les réglages d\'affichage de l\'app</string>
+    <string name="auto_show_respect_app_visibility_description">Android et l\'app décident si le clavier s\'ouvre à l\'entrée dans un champ. Toucher le champ ou appuyer sur une touche l\'ouvre toujours.</string>
+    <string name="hardware_keypad_auto_open_title">Ouvrir automatiquement le pavé numérique avec un clavier physique</string>
+    <string name="hardware_keypad_auto_open_description">Affiche le pavé numérique ou téléphonique à l\'écran dans les champs PIN, numériques et téléphoniques. Sinon, ouvrez-le avec le bouton du pavé dans la barre du clavier.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Couche d\'emojis dans le changement de page</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Inclut la page d\'emojis associés aux touches lors du changement de page du clavier à l\'écran. Le sélecteur d\'emojis n\'est pas concerné.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Clavier complet</string>
+    <string name="software_keyboard_keypad_button_description">Ouvrir le pavé numérique à l\'écran</string>
     <string name="info_title">Informations</string>
     <string name="info_description">Les paramètres sont automatiquement enregistrés et appliqués immédiatement à la méthode de saisie.</string>
     <string name="keyboard_title">Clavier Plektra</string>
@@ -515,6 +523,7 @@
     <string name="input_method_name_pt">Português</string>
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="nav_mode_warning_icon">⚠</string>
     <string name="sym_reset_confirm_title">Réinitialiser</string>
     <string name="sym_reset_confirm_message">Réinitialiser tous les mappings SYM ? Action irréversible.</string>
@@ -893,4 +902,31 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="caret_badge_custom_colors_description">Remplacer les couleurs du thème du clavier.</string>
     <string name="alt_latch_stays_on_space_title">Conserver Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Espace et Entrée désactivent Alt ponctuel mais gardent Alt-Lock actif.</string>
+    <string name="keyboard_bar_hidden_apps_title">Ne jamais afficher la barre</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Apps dans lesquelles la barre reste masquée, même ouverte manuellement</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Aucune app sélectionnée</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d app</item>
+        <item quantity="many">%d apps</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Dans les apps choisies ici, Plektra n’affiche jamais sa barre ni le clavier à l’écran : quels que soient les autres réglages de visibilité, et même si vous essayez de l’ouvrir avec une touche, un raccourci ou le bouton clavier du système. La saisie au clavier physique continue de fonctionner, y compris les couches SYM, les raccourcis, les modificateurs et les codes exacts d’emoji ou d’extraits. Le presse-papiers et le sélecteur d’emoji restent fermés dans ces apps.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Application web : s’exécute dans %1$s, donc la barre y est aussi masquée</string>
+    <string name="emoji_category_unicode_symbols">Symboles textuels</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Apparence des emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (intégrée)</string>
+    <string name="emoji_style_system">Police du système</string>
+    <string name="emoji_style_description">Plektra insère des emoji Unicode standard ; l’app dans laquelle vous écrivez les affiche avec sa propre police.</string>
+    <string name="emoji_skin_tone_title">Teinte de peau par défaut</string>
+    <string name="emoji_pages_emoji_title">Feuilleter la page emoji avec Q et P</string>
+    <string name="emoji_pages_symbols_title">Feuilleter la page symboles avec Q et P</string>
+    <string name="emoji_pages_description">Q et P tournent les pages, Maj+Q et Maj+P passent d’une catégorie à l’autre, A ouvre la recherche. Maintenez un emoji pour ses teintes de peau. Parmi les teintes, P passe aux suivantes ; pour un emoji de votre propre disposition, ✎ sur A ouvre la personnalisation de la touche.</string>
+    <string name="sym_paged_navigation_note">Avec les pages activées, Q (‹) et P (›) les tournent. Vos propres attributions de Q et P restent enregistrées et modifiables ici : page ouverte, maintenez SYM et appuyez sur Q ou P pour les saisir ; sans les pages, elles s’appliquent de nouveau directement.</string>
+    <string name="sym_navigation_key_content_description">%1$s tourne les pages (%2$s). Votre attribution : %3$s</string>
+    <string name="kaomoji_placement_title">Pages kaomoji</string>
+    <string name="kaomoji_placement_symbols">Après les symboles</string>
+    <string name="kaomoji_placement_emoji">Après les emoji</string>
+    <string name="kaomoji_placement_off">Désactivé</string>
+    <string name="emoji_picker_extras_title">Symboles textuels et kaomoji dans le sélecteur d’emoji</string>
 </resources>

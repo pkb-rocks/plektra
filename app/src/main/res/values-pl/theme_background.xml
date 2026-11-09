@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Zdjęcie w tle</string>
+    <string name="theme_background_photo">Wybierz zdjęcie</string>
+    <string name="theme_background_change">Zmień zdjęcie</string>
+    <string name="theme_background_remove">Usuń zdjęcie</string>
+    <string name="theme_background_loading">Przygotowywanie zdjęcia…</string>
+    <string name="theme_background_failed">Nie można użyć tego obrazu. Spróbuj innego obrazu poniżej 16 MB.</string>
+    <string name="theme_background_help">Pokazuje samo zdjęcie za tą klawiaturą. Poniższe kolory pozostają zapisane.</string>
+    <string name="theme_background_active_help">Klawisze, podpowiedzi i przyciski są przezroczyste, aby zdjęcie było widoczne. Ich kolory pozostają zapisane i wracają po usunięciu zdjęcia.</string>
+    <string name="theme_background_zip">Zdjęcie nie jest częścią skopiowanego tekstu motywu, który zawiera tylko kolory i ustawienia klawiszy. Aby przenieść zdjęcie, użyj pełnej kopii zapasowej (ZIP).</string>
+</resources>

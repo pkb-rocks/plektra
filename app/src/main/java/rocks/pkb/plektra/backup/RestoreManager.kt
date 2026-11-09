@@ -96,7 +96,9 @@ object RestoreManager {
 
             val snapshot = RestoreSnapshot(context, File(workingDir, "rollback"))
             try {
-                val fileSummary = FileBackupHelper.restoreFiles(context, filesDir)
+                val ordinaryFiles = FileBackupHelper.restoreFiles(context, filesDir)
+                val imageFiles = ThemeImageBackup.restore(context, File(extractedDir, "theme-images"))
+                val fileSummary = ordinaryFiles.copy(restoredFiles = ordinaryFiles.restoredFiles + imageFiles)
                 val excludedKeys = BackupPreferencePolicy.runtimeDerivedKeys +
                     if (importMode == ImportMode.ADAPT_TO_CURRENT_DEVICE) {
                         BackupPreferencePolicy.targetDeviceDerivedKeys
@@ -154,7 +156,13 @@ object RestoreManager {
         require(!metadataFile.exists() || metadata != null) { "Invalid backup metadata" }
         val prefs = PreferencesBackupHelper.readPreferencesFromBackup(File(extractedDir, "prefs"))
         val fileCount = FileBackupHelper.validateRestoreFiles(File(extractedDir, "files"))
-        require(prefs.values.any { it.isNotEmpty() } || fileCount > 0) {
+        val images = ThemeImageBackup.validate(File(extractedDir, "theme-images"))
+        val themeValues = prefs["plektra_prefs"].orEmpty().filterKeys { it.startsWith("keyboard_theme_") }
+            .values.mapNotNull { it.value as? String }
+        // A dangling reference falls back to the theme's colours, so it is logged rather than rejected.
+        val missing = rocks.pkb.plektra.ThemeTextureModel.referencedAssets(themeValues) - images.toSet()
+        if (missing.isNotEmpty()) Log.w(TAG, "Backup lacks ${missing.size} referenced theme image(s)")
+        require(prefs.values.any { it.isNotEmpty() } || fileCount > 0 || images.isNotEmpty()) {
             "Backup contains no supported settings or user files"
         }
         return metadata to prefs
@@ -164,7 +172,7 @@ object RestoreManager {
         private val preferenceFiles = listOf("plektra_prefs", "notes").associateWith { name ->
             context.getSharedPreferences(name, Context.MODE_PRIVATE).all.mapValues { (_, value) -> PreferenceValue.fromAny(value)!! }
         }
-        private val roots = FileBackupHelper.managedRestoreRoots()
+        private val roots = FileBackupHelper.managedRestoreRoots() + "theme-images"
 
         init {
             directory.mkdirs()
@@ -203,6 +211,7 @@ object RestoreManager {
                 }
                 check(editor.commit()) { "Unable to roll back restored preferences" }
             }
+            rocks.pkb.plektra.ThemeTextureStore.invalidate()
         }
 
         private fun copy(source: File, target: File) {

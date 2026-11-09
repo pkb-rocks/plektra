@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,20 +24,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import rocks.pkb.plektra.inputmethod.WebApkHost
 
-private data class RawModeApp(
+private data class SelectedApp(
     val packageName: String,
     val label: String,
     val icon: Drawable?,
     val hostBrowser: String?
 )
 
-private fun resolveRawModeApp(context: Context, packageName: String): RawModeApp {
+private fun resolveSelectedApp(context: Context, packageName: String): SelectedApp {
     val packageManager = context.packageManager
     val label = runCatching {
         packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0)).toString()
     }.getOrDefault(packageName)
     val icon = runCatching { packageManager.getApplicationIcon(packageName) }.getOrNull()
-    return RawModeApp(packageName, label, icon, WebApkHost.hostBrowser(context, packageName))
+    return SelectedApp(packageName, label, icon, WebApkHost.hostBrowser(context, packageName))
 }
 
 @Composable
@@ -44,11 +45,49 @@ fun AppRawModeScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit
 ) {
+    AppSelectionListScreen(
+        modifier = modifier,
+        onBack = onBack,
+        titleRes = R.string.app_raw_mode_title,
+        descriptionRes = R.string.app_raw_mode_description,
+        webApkNoteRes = R.string.app_raw_mode_webapk_note,
+        readPackages = SettingsManager::getRawModePackages,
+        setSelected = SettingsManager::setRawModeApp
+    )
+}
+
+@Composable
+fun KeyboardBarHiddenAppsScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit
+) {
+    AppSelectionListScreen(
+        modifier = modifier,
+        onBack = onBack,
+        titleRes = R.string.keyboard_bar_hidden_apps_title,
+        descriptionRes = R.string.keyboard_bar_hidden_apps_description,
+        webApkNoteRes = R.string.keyboard_bar_hidden_apps_webapk_note,
+        readPackages = SettingsManager::getKeyboardBarHiddenPackages,
+        setSelected = SettingsManager::setKeyboardBarHiddenInApp
+    )
+}
+
+/** A per-app package list: the apps picked here get one setting switched on. */
+@Composable
+private fun AppSelectionListScreen(
+    modifier: Modifier,
+    onBack: () -> Unit,
+    @StringRes titleRes: Int,
+    @StringRes descriptionRes: Int,
+    @StringRes webApkNoteRes: Int,
+    readPackages: (Context) -> Set<String>,
+    setSelected: (Context, String, Boolean) -> Unit
+) {
     val context = LocalContext.current
-    var packages by remember { mutableStateOf(SettingsManager.getRawModePackages(context)) }
+    var packages by remember { mutableStateOf(readPackages(context)) }
     var showPicker by remember { mutableStateOf(false) }
     val apps = remember(packages) {
-        packages.map { resolveRawModeApp(context, it) }.sortedBy { it.label.lowercase() }
+        packages.map { resolveSelectedApp(context, it) }.sortedBy { it.label.lowercase() }
     }
 
     Column(
@@ -75,7 +114,7 @@ fun AppRawModeScreen(
                     )
                 }
                 Text(
-                    text = stringResource(R.string.app_raw_mode_title),
+                    text = stringResource(titleRes),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -92,7 +131,7 @@ fun AppRawModeScreen(
         }
 
         Text(
-            text = stringResource(R.string.app_raw_mode_description),
+            text = stringResource(descriptionRes),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -144,8 +183,8 @@ fun AppRawModeScreen(
                     app.hostBrowser?.let { host ->
                         Text(
                             text = stringResource(
-                                R.string.app_raw_mode_webapk_note,
-                                resolveRawModeApp(context, host).label
+                                webApkNoteRes,
+                                resolveSelectedApp(context, host).label
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
@@ -153,8 +192,8 @@ fun AppRawModeScreen(
                     }
                 }
                 IconButton(onClick = {
-                    SettingsManager.setRawModeApp(context, app.packageName, false)
-                    packages = SettingsManager.getRawModePackages(context)
+                    setSelected(context, app.packageName, false)
+                    packages = readPackages(context)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.DeleteOutline,
@@ -170,8 +209,8 @@ fun AppRawModeScreen(
     if (showPicker) {
         AppPickerDialog(
             onAppSelected = { app ->
-                SettingsManager.setRawModeApp(context, app.packageName, true)
-                packages = SettingsManager.getRawModePackages(context)
+                setSelected(context, app.packageName, true)
+                packages = readPackages(context)
             },
             onDismiss = { showPicker = false }
         )

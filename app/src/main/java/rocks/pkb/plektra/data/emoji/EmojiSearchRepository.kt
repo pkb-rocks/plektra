@@ -3,9 +3,9 @@ package rocks.pkb.plektra.data.emoji
 import android.content.Context
 import android.os.Build
 import androidx.annotation.VisibleForTesting
+import rocks.pkb.plektra.data.search.SearchScorer
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.text.Normalizer
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -21,10 +21,15 @@ object EmojiSearchRepository {
     private const val SEARCH_ASSET_DIR = "common/emoji_search"
     private const val EN_LOCALE = "en"
 
+    /**
+     * [matched] is the exact sequence the query named, typed or pasted as an emoji (👋🏽, 👩🏽‍💻):
+     * what the result shows and types instead of [entry] in the default skin tone.
+     */
     data class EmojiSearchResult(
         val entry: EmojiRepository.EmojiEntry,
         val categoryId: String,
-        val score: Int
+        val score: Int,
+        val matched: String? = null
     )
 
     class EmojiSearchIndex internal constructor(
@@ -35,24 +40,13 @@ object EmojiSearchRepository {
         val entry: EmojiRepository.EmojiEntry,
         val categoryId: String,
         val categoryOrder: Int,
-        val terms: List<SearchTerm>
-    )
-
-    internal data class SearchTerm(
-        val normalizedText: String,
-        val kind: TermKind,
-        val preferredLocale: Boolean
+        val terms: List<SearchScorer.Term>
     )
 
     internal data class MetadataRecord(
         val name: String?,
         val keywords: List<String>
     )
-
-    internal enum class TermKind {
-        NAME,
-        KEYWORD
-    }
 
     private data class RankedResult(
         val result: EmojiSearchResult,
@@ -98,18 +92,20 @@ object EmojiSearchRepository {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
 
+        // Emoji typed or pasted as the query (👋🏽, 🫱🏻‍🫲🏼) normalize to nothing: they match literally.
         val normalizedQuery = normalizeSearchText(trimmed)
-        if (normalizedQuery.isEmpty()) return emptyList()
-        val allowContains = normalizedQuery.length >= 2
+        val literalQuery = withoutVariationSelectors(trimmed)
 
         return index.items.mapNotNull { item ->
-            val score = scoreItem(item, trimmed, normalizedQuery, allowContains)
+            val score = scoreItem(item, literalQuery, normalizedQuery)
             if (score <= 0) return@mapNotNull null
             RankedResult(
                 result = EmojiSearchResult(
                     entry = item.entry,
                     categoryId = item.categoryId,
-                    score = score
+                    score = score,
+                    matched = (listOf(item.entry.base) + item.entry.variants)
+                        .firstOrNull { withoutVariationSelectors(it) == literalQuery }
                 ),
                 categoryOrder = item.categoryOrder
             )
@@ -127,42 +123,19 @@ object EmojiSearchRepository {
         indexCache.clear()
     }
 
+    /** [text] without emoji/text presentation selectors, so ❤ finds ❤️ and the other way round. */
+    private fun withoutVariationSelectors(text: String): String =
+        text.filterNot { it == '\uFE0F' || it == '\uFE0E' }
+
     private fun scoreItem(
         item: IndexedEmoji,
-        rawQuery: String,
-        normalizedQuery: String,
-        allowContains: Boolean
+        literalQuery: String,
+        normalizedQuery: String
     ): Int {
-        if (item.entry.base == rawQuery) return 2000
-        if (item.entry.variants.any { it == rawQuery }) return 1900
+        if (withoutVariationSelectors(item.entry.base) == literalQuery) return 2000
+        if (item.entry.variants.any { withoutVariationSelectors(it) == literalQuery }) return 1900
 
-        var best = 0
-        for (term in item.terms) {
-            val value = term.normalizedText
-            if (value.isEmpty()) continue
-            val localeBonus = if (term.preferredLocale) 25 else 0
-
-            val candidateScore = when {
-                value == normalizedQuery -> when (term.kind) {
-                    TermKind.NAME -> 1700 + localeBonus
-                    TermKind.KEYWORD -> 1600 + localeBonus
-                }
-
-                value.startsWith(normalizedQuery) -> when (term.kind) {
-                    TermKind.NAME -> 1400 + localeBonus
-                    TermKind.KEYWORD -> 1300 + localeBonus
-                }
-
-                allowContains && value.contains(normalizedQuery) -> when (term.kind) {
-                    TermKind.NAME -> 1000 + localeBonus
-                    TermKind.KEYWORD -> 900 + localeBonus
-                }
-
-                else -> 0
-            }
-            if (candidateScore > best) best = candidateScore
-        }
-
+        val best = SearchScorer.score(item.terms, normalizedQuery)
         if (best == 0) return 0
         // Stable preference for canonical category order.
         return best - item.categoryOrder
@@ -175,7 +148,7 @@ object EmojiSearchRepository {
         val items = ArrayList<IndexedEmoji>()
         categories.forEachIndexed { categoryOrder, category ->
             category.emojis.forEach { entry ->
-                val terms = LinkedHashMap<String, SearchTerm>()
+                val terms = LinkedHashMap<String, SearchScorer.Term>()
 
                 addTermsForEmoji(
                     terms = terms,
@@ -194,7 +167,7 @@ object EmojiSearchRepository {
                 if (terms.isEmpty()) {
                     val literal = normalizeSearchText(entry.base)
                     if (literal.isNotEmpty()) {
-                        terms[literal] = SearchTerm(literal, TermKind.KEYWORD, false)
+                        terms[literal] = SearchScorer.Term(literal, SearchScorer.Kind.KEYWORD, false)
                     }
                 }
 
@@ -213,7 +186,7 @@ object EmojiSearchRepository {
     }
 
     private fun addTermsForEmoji(
-        terms: MutableMap<String, SearchTerm>,
+        terms: MutableMap<String, SearchScorer.Term>,
         metadataByEmoji: Map<String, List<Pair<MetadataRecord, Boolean>>>,
         emoji: String
     ) {
@@ -222,13 +195,13 @@ object EmojiSearchRepository {
             record.name?.let { name ->
                 val normalized = normalizeSearchText(name)
                 if (normalized.isNotEmpty() && normalized !in terms) {
-                    terms[normalized] = SearchTerm(normalized, TermKind.NAME, preferredLocale)
+                    terms[normalized] = SearchScorer.Term(normalized, SearchScorer.Kind.NAME, preferredLocale)
                 }
             }
             record.keywords.forEach { keyword ->
                 val normalized = normalizeSearchText(keyword)
                 if (normalized.isNotEmpty() && normalized !in terms) {
-                    terms[normalized] = SearchTerm(normalized, TermKind.KEYWORD, preferredLocale)
+                    terms[normalized] = SearchScorer.Term(normalized, SearchScorer.Kind.KEYWORD, preferredLocale)
                 }
             }
         }
@@ -293,7 +266,6 @@ object EmojiSearchRepository {
         }.distinct()
     }
 
-    @VisibleForTesting
     internal fun getPreferredLocaleChain(context: Context): List<String> {
         val locales = context.resources.configuration.locales
         val out = ArrayList<String>()
@@ -309,30 +281,5 @@ object EmojiSearchRepository {
     }
 
     @VisibleForTesting
-    internal fun normalizeSearchText(text: String): String {
-        val lower = text.lowercase(Locale.ROOT).trim()
-        if (lower.isEmpty()) return ""
-
-        val decomposed = Normalizer.normalize(lower, Normalizer.Form.NFD)
-        val stripped = buildString(decomposed.length) {
-            var previousSpace = false
-            decomposed.forEach { ch ->
-                val type = Character.getType(ch)
-                if (type == Character.NON_SPACING_MARK.toInt()) return@forEach
-                if (Character.isLetterOrDigit(ch)) {
-                    append(ch)
-                    previousSpace = false
-                } else if (Character.isWhitespace(ch) || ch == '-' || ch == '_') {
-                    if (!previousSpace && isNotEmpty()) {
-                        append(' ')
-                        previousSpace = true
-                    }
-                }
-            }
-            if (isNotEmpty() && last() == ' ') {
-                deleteCharAt(lastIndex)
-            }
-        }
-        return stripped
-    }
+    internal fun normalizeSearchText(text: String): String = SearchScorer.normalize(text)
 }

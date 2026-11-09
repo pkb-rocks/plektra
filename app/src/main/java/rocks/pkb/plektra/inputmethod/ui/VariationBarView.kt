@@ -83,6 +83,7 @@ class VariationBarView(
     var onHamburgerMenuRequested: (() -> Unit)? = null
     var onMinimalUiToggleRequested: (() -> Unit)? = null
     var onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null
+    var onKeypadRequested: (() -> Unit)? = null
     
     /**
      * Sets the microphone button active state (red pulsing background) during speech recognition.
@@ -180,8 +181,8 @@ class VariationBarView(
                     borderWidthPx = dpToPx(1f)
                 )
             }
-            wrapper?.setBackgroundColor(value?.background ?: Color.TRANSPARENT)
-            container?.setBackgroundColor(value?.background ?: Color.TRANSPARENT)
+            wrapper?.setBackgroundColor(value?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
+            container?.setBackgroundColor(value?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             emptyHintView?.setTextColor(colorWithAlpha(value?.textAndIcons ?: Color.WHITE, 120))
             swipeIndicator?.background = createSwipeIndicatorDrawable()
             applyHeight()
@@ -208,7 +209,7 @@ class VariationBarView(
                 variationsContainerHeight
             )
             visibility = View.GONE
-            setBackgroundColor(themeOverride?.background ?: Color.TRANSPARENT)
+            setBackgroundColor(themeOverride?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             addOnLayoutChangeListener { view, left, _, right, _, oldLeft, _, oldRight, _ ->
                 if (right - left != oldRight - oldLeft && view.visibility == View.VISIBLE) {
                     view.post {
@@ -249,7 +250,7 @@ class VariationBarView(
                 variationsContainerHeight
             )
             visibility = View.GONE
-            setBackgroundColor(themeOverride?.background ?: Color.TRANSPARENT)
+            setBackgroundColor(themeOverride?.let { if (it.textures.containsKey("background")) Color.TRANSPARENT else it.background } ?: Color.TRANSPARENT)
             addView(container)
         }
 
@@ -511,7 +512,8 @@ class VariationBarView(
             availableWidth, verticalPaddingPx(), roundedCorners, KeyboardBarTypography.scale(context),
             SettingsManager.getDynamicVariationBarSlotCount(context),
             SettingsManager.getDynamicVariationBarResizeToContent(context),
-            SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context)
+            SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context),
+            buttonRegistry?.keypadAccessAvailable == true
         )
         val hasExistingRow = currentVariationsRow != null &&
             currentVariationsRow?.parent == containerView &&
@@ -661,6 +663,7 @@ class VariationBarView(
             onHamburgerMenuRequested = onHamburgerMenuRequested,
             onMinimalUiToggleRequested = onMinimalUiToggleRequested,
             onSoftwareKeyboardModeToggleRequested = onSoftwareKeyboardModeToggleRequested,
+            onKeypadRequested = onKeypadRequested,
             onOpenSettings = { openSettings() },
             onSymbolsPageRequested = onSymbolsPageRequested,
             onUndoRequested = onUndoRequested,

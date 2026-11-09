@@ -28,10 +28,14 @@ object ExternalSpeechProvider {
     fun isAvailable(context: Context): Boolean = resolveVoiceInput(
         context.getSystemService(InputMethodManager::class.java).inputMethodList) != null
 
-    fun handOff(service: InputMethodService, voiceInput: VoiceInput): Boolean {
+    fun handOff(
+        service: InputMethodService,
+        voiceInput: VoiceInput,
+        requestShow: () -> Unit = { service.requestShowSelf(InputMethodManager.SHOW_IMPLICIT) }
+    ): Boolean {
         val connection = service.currentInputConnection ?: return false
         connection.finishComposingText()
-        service.requestShowSelf(InputMethodManager.SHOW_IMPLICIT)
+        requestShow()
         service.switchInputMethod(voiceInput.id, voiceInput.subtype)
         return true
     }

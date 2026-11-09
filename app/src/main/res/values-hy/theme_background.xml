@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Ֆոնային լուսանկար</string>
+    <string name="theme_background_photo">Ընտրել լուսանկար</string>
+    <string name="theme_background_change">Փոխել լուսանկարը</string>
+    <string name="theme_background_remove">Հեռացնել լուսանկարը</string>
+    <string name="theme_background_loading">Լուսանկարը պատրաստվում է…</string>
+    <string name="theme_background_failed">Այս պատկերը հնարավոր չէ օգտագործել։ Փորձեք 16 ՄԲ-ից փոքր այլ պատկեր։</string>
+    <string name="theme_background_help">Ցույց է տալիս հենց լուսանկարը այս ստեղնաշարի հետևում։ Ստորև գույները պահպանվում են։</string>
+    <string name="theme_background_active_help">Ստեղները, առաջարկները և կոճակները թափանցիկ են, որպեսզի լուսանկարը երևա։ Դրանց գույները պահպանվում են և վերադառնում են, երբ հեռացնեք լուսանկարը։</string>
+    <string name="theme_background_zip">Լուսանկարը չի մտնում պատճենված թեմայի տեքստի մեջ, որը պարունակում է միայն գույներ և ստեղների կարգավորումներ։ Լուսանկարը փոխանցելու համար օգտագործեք ամբողջական պահուստային պատճենը (ZIP)։</string>
+</resources>

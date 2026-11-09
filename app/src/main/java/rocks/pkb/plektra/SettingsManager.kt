@@ -66,6 +66,7 @@ object SettingsManager {
     private const val KEY_SWIPE_TO_DELETE = "swipe_to_delete"
     private const val KEY_SWIPE_TO_DELETE_PROVIDER = "swipe_to_delete_provider"
     private const val KEY_AUTO_SHOW_KEYBOARD = "auto_show_keyboard"
+    private const val KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY = "auto_show_respect_app_visibility"
     const val KEY_EXPERIMENTAL_SMOOTH_CARET = "experimental_smooth_caret"
     private const val KEY_CLEAR_ALT_ON_SPACE = "clear_alt_on_space"
     private const val KEY_ALT_CTRL_SPEECH_SHORTCUT = "alt_ctrl_speech_shortcut"
@@ -175,6 +176,9 @@ object SettingsManager {
     const val KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE = "software_keyboard_mode_runtime_override"
     private const val KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE = "software_keyboard_layout_style" // compact | extended_iso | full_ansi | full_iso
     private const val KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED = "software_keyboard_number_row_enabled"
+    const val KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE = "software_keyboard_emoji_page_in_cycle"
+    const val KEY_HARDWARE_KEYPAD_AUTO_OPEN = "hardware_keypad_auto_open"
+    private const val KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE = "field_scoped_virtual_previous_override"
     private const val KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED = "software_keyboard_nearest_key_touch_enabled"
     private const val KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY = "software_keyboard_left_modifier_key"
     private const val KEY_SOFTWARE_KEYBOARD_RIGHT_MODIFIER_KEY = "software_keyboard_right_modifier_key"
@@ -505,29 +509,33 @@ object SettingsManager {
         val keyPopupAttached: Boolean = true,
         val keyPopupTailEnabled: Boolean = true,
         val keyPreviewAfterLongPress: Boolean = false,
-        val keyAlternatesPopupEnabled: Boolean = true
+        val keyAlternatesPopupEnabled: Boolean = true,
+        val textures: Map<String, KeyboardThemeTexture> = emptyMap()
     ) {
         fun toKeyboardThemeColors(): KeyboardThemeColors =
-            KeyboardThemeColors(
-                background = background,
-                divider = divider,
-                normalKey = normalKey,
-                specialKey = specialKey,
-                textAndIcons = textAndIcons,
-                ledInactive = ledInactive,
-                ledActive = ledActive,
-                ledLocked = ledLocked,
-                accent = accent,
-                cursorSwipe = cursorSwipe,
-                keyPopup = keyPopup,
-                keyPopupSelected = keyPopupSelected,
-                suggestion = suggestion,
-                statusBarButton = statusBarButton,
-                keyCornerRadiusRatio = keyCornerRadiusRatio,
-                chromeCornerRadiusRatio = chromeCornerRadiusRatio,
-                suggestionsHeightScale = suggestionsHeightScale,
-                variationsHeightScale = variationsHeightScale
-            )
+            textures.renderable().let { shown ->
+                KeyboardThemeColors(
+                    background = background,
+                    divider = divider,
+                    normalKey = shown.surfaceColour(normalKey),
+                    specialKey = shown.surfaceColour(specialKey),
+                    textAndIcons = textAndIcons,
+                    ledInactive = ledInactive,
+                    ledActive = ledActive,
+                    ledLocked = ledLocked,
+                    accent = accent,
+                    cursorSwipe = cursorSwipe,
+                    keyPopup = keyPopup,
+                    keyPopupSelected = keyPopupSelected,
+                    suggestion = shown.surfaceColour(suggestion),
+                    statusBarButton = shown.surfaceColour(statusBarButton),
+                    keyCornerRadiusRatio = keyCornerRadiusRatio,
+                    chromeCornerRadiusRatio = chromeCornerRadiusRatio,
+                    suggestionsHeightScale = suggestionsHeightScale,
+                    variationsHeightScale = variationsHeightScale,
+                    textures = shown
+                )
+            }
     }
 
     data class NamedKeyboardTheme(
@@ -665,6 +673,73 @@ object SettingsManager {
         getPreferences(context).edit()
             .putBoolean(KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED, enabled)
             .apply()
+    }
+
+    /** The emoji key-layer page is reachable directly but stays out of the on-screen SYM cycle by default. */
+    fun getSoftwareKeyboardEmojiPageInCycle(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE, false)
+
+    fun setSoftwareKeyboardEmojiPageInCycle(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE, enabled)
+            .apply()
+    }
+
+    /** Opens the compact keypad automatically in number and phone fields on hardware keyboards. */
+    fun getHardwareKeypadAutoOpen(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_HARDWARE_KEYPAD_AUTO_OPEN, false)
+
+    fun setHardwareKeypadAutoOpen(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_HARDWARE_KEYPAD_AUTO_OPEN, enabled)
+            .apply()
+    }
+
+    /**
+     * Switches a hardware-keyboard device to the on-screen surface for the current editor. The
+     * previous runtime override is persisted so that it is restored even after a process restart.
+     */
+    fun beginFieldScopedVirtualKeyboard(context: Context) {
+        val prefs = getPreferences(context)
+        if (!prefs.contains(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE)) {
+            prefs.edit().putString(
+                KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE,
+                getSoftwareKeyboardModeRuntimeOverride(context)?.storageValue.orEmpty()
+            ).apply()
+        }
+        setSoftwareKeyboardModeRuntimeOverride(context, SoftwareKeyboardMode.FORCE_VIRTUAL)
+    }
+
+    /** Restores the override from before [beginFieldScopedVirtualKeyboard]; true if one was active. */
+    fun endFieldScopedVirtualKeyboard(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        val previous = prefs.getString(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE, null) ?: return false
+        prefs.edit().remove(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE).apply()
+        // A mode the user switched in the meantime stays.
+        if (getSoftwareKeyboardModeRuntimeOverride(context) == SoftwareKeyboardMode.FORCE_VIRTUAL) {
+            setSoftwareKeyboardModeRuntimeOverride(
+                context,
+                SoftwareKeyboardMode.values().firstOrNull { it.storageValue == previous && it != SoftwareKeyboardMode.AUTO }
+            )
+        }
+        return true
+    }
+
+    /**
+     * Pages that the on-screen SYM key and chooser cycle through. The on-screen keyboard leaves out
+     * the emoji key layer unless enabled; the physical SYM key uses [getSymPagesConfig] in every
+     * surface mode, and direct access to every page is unaffected.
+     */
+    fun getOnScreenSymPageCycleConfig(context: Context): SymPagesConfig {
+        val config = getSymPagesConfig(context)
+        return if (
+            resolveEffectiveSoftwareKeyboardMode(context) == SoftwareKeyboardMode.FORCE_VIRTUAL &&
+            !getSoftwareKeyboardEmojiPageInCycle(context)
+        ) {
+            config.copy(emojiEnabled = false)
+        } else {
+            config
+        }
     }
 
     fun getSoftwareKeyboardNearestKeyTouchEnabled(context: Context): Boolean =
@@ -917,7 +992,8 @@ object SettingsManager {
                 keyPopupAttached = json.optBoolean("key_popup_attached", defaults.keyPopupAttached),
                 keyPopupTailEnabled = json.optBoolean("key_popup_tail_enabled", defaults.keyPopupTailEnabled),
                 keyPreviewAfterLongPress = json.optBoolean("key_preview_after_long_press", defaults.keyPreviewAfterLongPress),
-                keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled)
+                keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled),
+                textures = ThemeTextureModel.decode(json.optJSONObject("textures"))
             )
         } catch (error: Exception) {
             Log.e(TAG, "Fehler beim Laden des Keyboard-Themes", error)
@@ -1385,7 +1461,8 @@ object SettingsManager {
             keyPopupAttached = json.optBoolean("key_popup_attached", defaults.keyPopupAttached),
             keyPopupTailEnabled = json.optBoolean("key_popup_tail_enabled", defaults.keyPopupTailEnabled),
             keyPreviewAfterLongPress = json.optBoolean("key_preview_after_long_press", defaults.keyPreviewAfterLongPress),
-            keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled)
+            keyAlternatesPopupEnabled = json.optBoolean("key_alternates_popup_enabled", defaults.keyAlternatesPopupEnabled),
+                textures = ThemeTextureModel.decode(json.optJSONObject("textures"))
         )
 
     private fun keyboardThemeToJson(theme: KeyboardThemeSettings): JSONObject =
@@ -1420,6 +1497,7 @@ object SettingsManager {
             put("key_popup_tail_enabled", theme.keyPopupTailEnabled)
             put("key_preview_after_long_press", theme.keyPreviewAfterLongPress)
             put("key_alternates_popup_enabled", theme.keyAlternatesPopupEnabled)
+            if (theme.textures.isNotEmpty()) put("textures", ThemeTextureModel.encode(theme.textures))
         }
 
     private fun normalizeKeyboardThemePopupStyle(value: String): String =
@@ -2239,10 +2317,45 @@ object SettingsManager {
         getPreferences(context).edit().putBoolean("keyboard_bar_show_on_launcher", enabled).apply()
     }
 
+    // Apps in which the keyboard bar never appears, regardless of every other visibility setting.
+    const val KEY_KEYBOARD_BAR_HIDDEN_APPS = "keyboard_bar_hidden_apps"
+
+    fun getKeyboardBarHiddenPackages(context: Context): Set<String> =
+        getPreferences(context).getStringSet(KEY_KEYBOARD_BAR_HIDDEN_APPS, emptySet()) ?: emptySet()
+
+    fun isKeyboardBarHiddenInApp(context: Context, packageName: String?): Boolean {
+        if (packageName.isNullOrEmpty()) return false
+        val packages = getKeyboardBarHiddenPackages(context)
+        if (packageName in packages) return true
+        // A PWA's fields live in its host browser, so hiding it hides the browser's bar too.
+        return packageName in rocks.pkb.plektra.inputmethod.WebApkHost.expandWithHosts(context, packages)
+    }
+
+    fun setKeyboardBarHiddenInApp(context: Context, packageName: String, hidden: Boolean) {
+        val current = getKeyboardBarHiddenPackages(context).toMutableSet()
+        if (hidden) current.add(packageName) else current.remove(packageName)
+        getPreferences(context).edit()
+            .putStringSet(KEY_KEYBOARD_BAR_HIDDEN_APPS, current)
+            .apply()
+    }
+
     fun getAutoShowKeyboard(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
     }
     
+    /**
+     * With automatic showing enabled, Plektra still leaves the decision to Android and the app at
+     * input start; their show requests, a tap or a key press open the keyboard.
+     */
+    fun getAutoShowRespectAppVisibility(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY, true)
+
+    fun setAutoShowRespectAppVisibility(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY, enabled)
+            .apply()
+    }
+
     /**
      * Sets the state of automatically showing the keyboard when a field gains focus.
      */
@@ -5266,6 +5379,10 @@ object SettingsManager {
             .putBoolean(KEY_SYM_AUTO_CLOSE_ON_TOUCH, enabled)
             .apply()
     }
+
+    /** Whether SYM closes after typing a symbol: a [touch] on screen also needs the touch option. */
+    fun symAutoClosesAfterCommit(context: Context, touch: Boolean): Boolean =
+        getSymAutoClose(context) && (!touch || getSymAutoCloseOnTouch(context))
 
     fun getEmojiPickerExpandedHeight(context: Context): Boolean {
         return getPreferences(context).getBoolean(

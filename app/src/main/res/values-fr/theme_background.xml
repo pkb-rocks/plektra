@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Photo d’arrière-plan</string>
+    <string name="theme_background_photo">Choisir une photo</string>
+    <string name="theme_background_change">Changer de photo</string>
+    <string name="theme_background_remove">Retirer la photo</string>
+    <string name="theme_background_loading">Préparation de la photo…</string>
+    <string name="theme_background_failed">Cette image ne peut pas être utilisée. Essayez une autre image de moins de 16 Mo.</string>
+    <string name="theme_background_help">Affiche la photo elle-même derrière ce clavier. Les couleurs ci-dessous restent enregistrées.</string>
+    <string name="theme_background_active_help">Les touches, suggestions et boutons sont transparents pour laisser voir la photo. Leurs couleurs restent enregistrées et reviennent lorsque vous retirez la photo.</string>
+    <string name="theme_background_zip">La photo ne fait pas partie du texte de thème copié, qui contient uniquement les couleurs et les réglages des touches. Pour transférer la photo, utilisez la sauvegarde complète (ZIP).</string>
+</resources>

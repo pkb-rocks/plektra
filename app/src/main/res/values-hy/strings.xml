@@ -3,6 +3,7 @@
     <string name="app_name">Plektra</string>
     <string name="input_method_name">Plektra</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="back">Հետ</string>
     <string name="settings_back_content_description">Հետ</string>
     <string name="long_press_title">Երկար սեղմում</string>
@@ -22,6 +23,14 @@
     <string name="swipe_incremental_threshold_description">Հեռավորությունը՝ կուրսորը մեկ դիրքով տեղափոխելու համար։ Ավելի փոքր արժեքները արագացնում են կուրսորը։</string>
     <string name="swipe_to_move_cursor">Սվայփ՝ կուրսորը տեղափոխելու համար</string>
     <string name="auto_show_keyboard_title">Ավտոմատ ցույց տալ ստեղնաշարը</string>
+    <string name="auto_show_respect_app_visibility_title">Հարգել հավելվածի ցուցադրման կարգավորումները</string>
+    <string name="auto_show_respect_app_visibility_description">Android-ը և հավելվածը որոշում են՝ արդյոք ստեղնաշարը բացվի դաշտ մտնելիս։ Դաշտին հպելը կամ ստեղն սեղմելը դեռ բացում է այն։</string>
+    <string name="hardware_keypad_auto_open_title">Ավտոմատ բացել թվային ստեղնաշարը ֆիզիկական ստեղնաշարով</string>
+    <string name="hardware_keypad_auto_open_description">Ցույց է տալիս էկրանի թվային կամ հեռախոսային ստեղնաշարը PIN-ի, թվերի և հեռախոսի դաշտերում։ Այլապես բացեք այն ստեղնաշարի գոտու թվային ստեղնաշարի կոճակով։</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Էմոջի շերտը էջերի փոխարկման մեջ</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Ներառում է էմոջիների ստեղնային էջը էկրանի ստեղնաշարի էջերի փոխարկման մեջ։ Էմոջիների ընտրիչը չի փոխվում։</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Ամբողջական ստեղնաշար</string>
+    <string name="software_keyboard_keypad_button_description">Բացել էկրանի թվային ստեղնաշարը</string>
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 խոսքի ճանաչում</string>
     <string name="alt_ctrl_speech_shortcut_description">Միացնել Alt+Ctrl / BlackBerry Alt+0 դյուրանցումը՝ խոսքի ճանաչումը սկսելու համար</string>
     <string name="info_title">Տեղեկատվություն</string>
@@ -893,4 +902,30 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="caret_badge_custom_colors_description">Փոխարինել ստեղնաշարի թեմայի գույները։</string>
     <string name="alt_latch_stays_on_space_title">Պահպանել Alt-Lock-ը</string>
     <string name="alt_latch_stays_on_space_description">Բացատը և Enter-ը անջատում են մեկանգամյա Alt-ը, բայց պահպանում են Alt-Lock-ը։</string>
+    <string name="keyboard_bar_hidden_apps_title">Երբեք չցուցադրել պանելը</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Հավելվածներ, որոնցում պանելը մնում է թաքնված, նույնիսկ ձեռքով բացելիս</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Հավելվածներ ընտրված չեն</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d հավելված</item>
+        <item quantity="other">%d հավելված</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Այստեղ ընտրված հավելվածներում Plektra-ն երբեք չի ցուցադրում իր պանելը կամ էկրանային ստեղնաշարը՝ անկախ տեսանելիության մյուս կարգավորումներից, և նույնիսկ եթե փորձեք այն բացել ստեղնով, դյուրանցմամբ կամ համակարգի ստեղնաշարի կոճակով։ Ֆիզիկական ստեղնաշարով մուտքագրումը շարունակում է աշխատել, ներառյալ SYM շերտերը, դյուրանցումները, մոդիֆիկատորները և emoji-ների կամ հատվածների ճշգրիտ կոդերը։ Սեղմատախտակը և emoji ընտրիչը այս հավելվածներում մնում են փակ։</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Վեբ հավելված՝ աշխատում է %1$s-ի ներսում, ուստի պանելն այնտեղ նույնպես թաքնված է</string>
+    <string name="emoji_category_unicode_symbols">Տեքստային նշաններ</string>
+    <string name="emoji_category_kaomoji">Կաոմոջի</string>
+    <string name="emoji_style_title">Էմոջիների տեսքը</string>
+    <string name="emoji_style_noto">Noto Color Emoji (ներկառուցված)</string>
+    <string name="emoji_style_system">Համակարգային տառատեսակ</string>
+    <string name="emoji_style_description">Plektra-ն տեղադրում է ստանդարտ Unicode էմոջիներ․ հավելվածը, որում գրում եք, դրանք ցուցադրում է իր տառատեսակով։</string>
+    <string name="emoji_skin_tone_title">Մաշկի լռելյայն երանգ</string>
+    <string name="emoji_pages_emoji_title">Էմոջիների էջը թերթել Q-ով և P-ով</string>
+    <string name="emoji_pages_symbols_title">Նշանների էջը թերթել Q-ով և P-ով</string>
+    <string name="emoji_pages_description">Q-ն և P-ն թերթում են էջերը, Shift+Q-ն և Shift+P-ն անցնում են կատեգորիաների միջև, A-ն բացում է որոնումը։ Պահեք էմոջին՝ մաշկի երանգների համար։ Մաշկի երանգների մեջ P-ն ցույց է տալիս մյուսները. ձեր սեփական դասավորության էմոջիի համար A-ի ✎-ը բացում է ստեղնի կարգավորումը։</string>
+    <string name="sym_paged_navigation_note">Երբ էջերը միացված են, Q-ն (‹) և P-ն (›) թերթում են դրանք։ Q-ի և P-ի ձեր սեփական նշանակումները պահպանվում են և կարող են խմբագրվել այստեղ. բաց էջի դեպքում պահեք SYM-ը և սեղմեք Q կամ P՝ դրանք մուտքագրելու համար, իսկ առանց էջերի դրանք կրկին գործում են ուղղակիորեն։</string>
+    <string name="sym_navigation_key_content_description">%1$s-ը թերթում է էջերը (%2$s)։ Ձեր նշանակումը՝ %3$s</string>
+    <string name="kaomoji_placement_title">Կաոմոջիի էջեր</string>
+    <string name="kaomoji_placement_symbols">Նշաններից հետո</string>
+    <string name="kaomoji_placement_emoji">Էմոջիներից հետո</string>
+    <string name="kaomoji_placement_off">Անջատված</string>
+    <string name="emoji_picker_extras_title">Տեքստային նշաններ և կաոմոջի էմոջիների ընտրիչում</string>
 </resources>

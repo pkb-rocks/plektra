@@ -837,6 +837,7 @@
 🛖	Hütte	Behausung|Gebäude|Haus|Hütte|Jurte|Objekt|Rundhaus|Schutz
 🛗	Fahrstuhl	Aufzug|Fahrstuhl|Haus|Lift|Symbol|Transport
 🛘	Erdrutsch	Berg|Erdbeben|Felsen|Gefahr|Katastrophe|Lawine|Murenabgang|Murgang|Schlammlawine
+🛙	Leuchtturm	Hoffnung|Leuchtfeuer|Licht|Meer|Orientierung|Schiffe|Seefahrt|Wegweiser
 🛜	WLAN	Computer|drahtlos|Hotspot|Internet|kabellos|Netzwerk|Router|Verbindung|Wi-Fi|WLAN
 🛝	Spielplatzrutsche	Rutschbahn|Rutsche|spielen|Spielplatz|Spielplatzrutsche|Vergnügungspark
 🛞	Autorad	Autorad|Autoreifen|drehen|Rad|Reifen|Reifen mit Felgen|rotieren
@@ -1151,6 +1152,9 @@
 🪈	Flöte	Band|Blaskapelle|Flöte|Holzblasinstrument|Instrument|Musik|Musikinstrument|musizieren|Orchester|Spielmannszug
 🪉	Harfe	Amor|Cupido|Harfe|Instrument|Liebe|Musik|Orchester
 🪊	Posaune	Blasinstrument|Blechbläser|Blechblasinstrument|Instrument|Jazz|Musik|schieben|traurig|ziehen
+🪋	Meteor	Atmosphäre|Feuerkugel|Gestein|Meteor|Sternschnuppe|verglühen
+🪌	Radiergummi	ausradieren|Bleistift|Fehler|radieren|Radierer|Radiergummi|Ratzefummel|wegradieren
+🪍	Kescher	einsammeln|fangen|herausholen|keschern
 🪎	Schatztruhe	Beute|Edelstein|Geld|Gold|Juwelen|Preis|Reichtum|Silber|Wertgegenstände
 🪏	Schaufel	graben|Loch|Schaufel|Schippe|Spaten
 🪐	Ringplanet	Gasplanet|Himmelskörper|Planet|Ringplanet|Saturn
@@ -1209,6 +1213,7 @@
 🫅	Person mit Krone	adelig|König|Königin|königlich|königliche Hoheit|Krönung|Monarch|Monarchin|Person|Person mit Krone|Prinz|Prinzessin
 🫆	Fingerabdruck	Fingerabdruck|Forensik|Identität|Sicherheit
 🫈	haariges Wesen	Bigfoot|Fabelwesen|Gigant|haarig|Kryptid|Riese|Sasquatch|Wald|wilder Mann|Woodwose|Yeti
+🫌	Monarchfalter	Hoffnung|Insekt|Metamorphose|Raupe|Veränderung|Verwandlung|Wechsel|zart
 🫍	Orca	Meer|Meeressäuger|Meerestier|Orka|Ozean|Wal
 🫎	Elch	Elch|Geweih|Säugetier|Tier
 🫏	Esel	austreten|Dickschädel|Dummkopf|Esel|Maultier|Säugetier|störrisch|stur|Tier
@@ -1225,6 +1230,7 @@
 🫚	Ingwer	gesund|Gewürz|Ginger Ale|Ingwer|Ingwerbier|scharf|Wurzel|würzig
 🫛	Erbsenschote	Bohne|Edamame|Erbse|Erbsen|Erbsenschote|Essen|Gemüse|Hülsenfrucht|Hülsenfrüchte|Schote
 🫜	Wurzelgemüse	Bete|Garten|Gemüse|Rote Bete|Rübe|Wurzel
+🫝	Saure Gurke	eingelegt|Essig|Gewürzgurke|Gurke|saure Gurke
 🫟	Spritzer	Farbe|Fleck|Holi|Klecks|Spritzer|Tinte
 🫠	schmelzendes Gesicht	auflösen|beschämt|flüssig|Gesicht|Hitze|Sarkasmus|sarkastisch|schmelzen|schwitzen|Smiley|verschwinden
 🫡	salutierendes Gesicht	Aye|Gesicht|jawohl|jawoll|Militär|ok|Respekt|salutieren|Smiley|zu Befehl
@@ -1237,6 +1243,7 @@
 🫨	zitterndes Doppelgesicht	Doppelgesicht|Erdbeben|Gesicht|OMG|Panik|Schock|Smiley|überrascht|verrückt|vibrieren|wow|zittern
 🫩	Gesicht mit Augenringen	Augenringe|erschöpft|Gesicht|müde|schläfrig|Smiley|übermüdet
 🫪	verzerrtes Gesicht	Angst|ängstlich|aufgedunsen|besorgt|Panik|panisch|schockiert|überrascht
+🫫	Zerbrechendes Gesicht	Spannung|Verwandlung|widerstandsfähig|zerbrechend|zerfallend
 🫯	Kampfwolke	Handgemenge|Kampf|Krawall|Prügelei|Rauferei|Schlägerei|Streit|Wortgefecht
 🫰	Hand mit gekreuztem Zeigefinger und Daumen	Daumen|Finger|Fingerherz|gekreuzt|Geld|Hand|Handgeste|Kosten|teuer|Zeigefinger
 🫱	nach rechts weisende Hand	ausgestreckt|ausstrecken|Hand|Hände|Händeschütteln|rechts|reichen|schütteln|weisen
@@ -1247,3 +1254,5 @@
 🫶	Hände, die Herz bilden	<3|Finger|Geste|Hände|Händeherz|Handgeste|Handherz|hdl|Herz|Liebe
 🫷	nach links schiebende Hand	drücken|Halt|Hand|High 5|High five|links|Moment|nein|schieben|Schluss|Stopp|warte mal|warten
 🫸	nach rechts schiebende Hand	drücken|Halt|Hand|High 5|High five|Moment|nein|rechts|schieben|Schluss|Stopp|warte mal|warten
+🫹	Daumen nach links	Daumen nach links|geschlossene Finger|neutral|zeigen
+🫺	Daumen nach rechts	Daumen nach rechts|geschlossene Finger|neutral|zeigen

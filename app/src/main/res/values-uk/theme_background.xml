@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Фонове фото</string>
+    <string name="theme_background_photo">Вибрати фото</string>
+    <string name="theme_background_change">Змінити фото</string>
+    <string name="theme_background_remove">Видалити фото</string>
+    <string name="theme_background_loading">Підготовка фото…</string>
+    <string name="theme_background_failed">Це зображення не можна використати. Спробуйте інше зображення менше 16 МБ.</string>
+    <string name="theme_background_help">Показує саме фото за цією клавіатурою. Кольори нижче зберігаються.</string>
+    <string name="theme_background_active_help">Клавіші, підказки й кнопки прозорі, щоб фото було видно. Їхні кольори зберігаються й повернуться, коли ви видалите фото.</string>
+    <string name="theme_background_zip">Фото не входить до скопійованого тексту теми — він містить лише кольори та налаштування клавіш. Щоб перенести фото, використайте повну резервну копію (ZIP).</string>
+</resources>

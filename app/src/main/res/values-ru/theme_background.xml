@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Фоновое фото</string>
+    <string name="theme_background_photo">Выбрать фото</string>
+    <string name="theme_background_change">Изменить фото</string>
+    <string name="theme_background_remove">Удалить фото</string>
+    <string name="theme_background_loading">Подготовка фото…</string>
+    <string name="theme_background_failed">Это изображение нельзя использовать. Попробуйте другое изображение меньше 16 МБ.</string>
+    <string name="theme_background_help">Показывает само фото за этой клавиатурой. Цвета ниже сохраняются.</string>
+    <string name="theme_background_active_help">Клавиши, подсказки и кнопки прозрачны, чтобы фото было видно. Их цвета сохраняются и вернутся, когда вы удалите фото.</string>
+    <string name="theme_background_zip">Фото не входит в скопированный текст темы — он содержит только цвета и настройки клавиш. Чтобы перенести фото, используйте полную резервную копию (ZIP).</string>
+</resources>

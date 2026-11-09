@@ -19,6 +19,7 @@
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -111,6 +112,20 @@
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Show keyboard automatically</string>
     <string name="auto_show_keyboard_description">Show the on-screen keyboard automatically in text fields.</string>
+    <string name="auto_show_respect_app_visibility_title">Respect app display defaults</string>
+    <string name="auto_show_respect_app_visibility_description">Leave it to Android and the app whether the keyboard opens when a field is entered. Tapping the field or pressing a key still opens it.</string>
+    <string name="hardware_keypad_auto_open_title">Open keypad automatically with a hardware keyboard</string>
+    <string name="hardware_keypad_auto_open_description">Show the on-screen number or phone keypad in PIN, number and phone fields. Otherwise open it with the keypad button in the keyboard bar.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Emoji key layer in page cycle</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Include the emoji key-layer page when cycling pages on the on-screen keyboard. The emoji picker is not affected.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Full keyboard</string>
+    <string name="software_keyboard_keypad_button_description">Open on-screen keypad</string>
+    <!-- Neutral page-chooser labels, shared by all UI languages like the key labels they name. -->
+    <string name="software_keyboard_choice_letters" translatable="false">ABC</string>
+    <string name="software_keyboard_choice_number" translatable="false">123</string>
+    <string name="software_keyboard_choice_phone" translatable="false">+*#</string>
+    <string name="software_keyboard_choice_symbols" translatable="false">#+=</string>
+    <string name="software_keyboard_choice_device" translatable="false">Sym</string>
     
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 for speech input</string>
@@ -1636,6 +1651,15 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="extended_status_bar_title">Full keyboard bar</string>
     <string name="keyboard_bar_show_on_launcher">Show bar on the launcher home screen</string>
     <string name="keyboard_bar_show_on_launcher_description">Also show the bar when Niagara uses an invisible input field on its home screen.</string>
+    <string name="keyboard_bar_hidden_apps_title">Never show the bar</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Apps in which the bar stays hidden, even when opened manually</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">No apps selected</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d app</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">In the apps you pick here, Plektra never shows its bar or on-screen keyboard: regardless of the other visibility settings, and even when you try to open it with a key, a shortcut or the system keyboard button. Hardware typing keeps working, including SYM layers, shortcuts, modifiers and exact emoji or snippet codes. The clipboard and the emoji picker stay closed in these apps.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Web app — runs inside %1$s, so the bar is hidden there too</string>
     <string name="keyboard_bar_suggestions">Suggestions</string>
     <string name="keyboard_bar_actions">Variations and menu</string>
     <string name="keyboard_bar_slim_description">The quick toggle switches between your normal and Slim profiles.</string>
@@ -1962,4 +1986,21 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_auto_correction_exact_typing">exact typing, raw, per app, terminal, termux, ssh, disable autocorrect, auto-capitalization</string>
     <string name="caret_badge_custom_colors_title">Use custom colours</string>
     <string name="caret_badge_custom_colors_description">Override the keyboard theme colours.</string>
+    <string name="emoji_category_unicode_symbols">Text symbols</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Emoji appearance</string>
+    <string name="emoji_style_noto">Noto Color Emoji (built in)</string>
+    <string name="emoji_style_system">System font</string>
+    <string name="emoji_style_description">Plektra inserts standard Unicode emoji; the app you type in draws them with its own font.</string>
+    <string name="emoji_skin_tone_title">Default skin tone</string>
+    <string name="emoji_pages_emoji_title">Turn the emoji page with Q and P</string>
+    <string name="emoji_pages_symbols_title">Turn the symbols page with Q and P</string>
+    <string name="emoji_pages_description">Q and P turn the pages, Shift+Q and Shift+P jump between categories, A opens the search. Hold an emoji for its skin tones. Among an emoji’s skin tones, P turns to more of them and, for an emoji of your own key mapping, ✎ on A opens the key’s customization.</string>
+    <string name="sym_paged_navigation_note">With the pages on, Q (‹) and P (›) turn them. Your own mappings of Q and P stay saved and can be edited here: while the page is open, hold SYM and press Q or P to type them; with the pages off they type again on their own.</string>
+    <string name="sym_navigation_key_content_description">%1$s turns the pages (%2$s). Your mapping: %3$s</string>
+    <string name="kaomoji_placement_title">Kaomoji pages</string>
+    <string name="kaomoji_placement_symbols">After the symbols</string>
+    <string name="kaomoji_placement_emoji">After the emoji</string>
+    <string name="kaomoji_placement_off">Off</string>
+    <string name="emoji_picker_extras_title">Text symbols and kaomoji in the emoji picker</string>
 </resources>

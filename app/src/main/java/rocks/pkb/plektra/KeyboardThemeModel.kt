@@ -35,7 +35,8 @@ internal data class KeyboardThemePreset(
     val keyPopupAttached: Boolean = true,
     val keyPopupTailEnabled: Boolean = true,
     val keyPreviewAfterLongPress: Boolean = false,
-    val keyAlternatesPopupEnabled: Boolean = true
+    val keyAlternatesPopupEnabled: Boolean = true,
+    val textures: Map<String, KeyboardThemeTexture> = emptyMap()
 )
 
 internal data class KeyboardThemeOption(
@@ -73,53 +74,59 @@ internal fun KeyboardThemePreset.withSoftwareKeyboardDefaults(): KeyboardThemePr
     }
 
 internal fun KeyboardThemePreset.toAospThemeOverride(): AospKeyboardView.ThemeOverride =
-    AospKeyboardView.ThemeOverride(
-        background = background,
-        divider = divider,
-        normalKey = normalKey,
-        specialKey = specialKey,
-        textAndIcons = textAndIcons,
-        ledInactive = ledInactive,
-        ledActive = ledActive,
-        ledLocked = ledLocked,
-        accent = accent,
-        keyPopup = keyPopup,
-        keyPopupSelected = keyPopupSelected,
-        keyCornerRadiusRatio = keyCornerRadiusRatio,
-        keyHeightScale = keyHeightScale,
-        numberRowHeightScale = numberRowHeightScale,
-        keyWidthScale = keyWidthScale,
-        rowGapScale = rowGapScale,
-        distributeHorizontalSpacing = distributeHorizontalSpacing,
-        ortholinear = ortholinear,
-        keyPopupStyle = keyPopupStyle,
-        keyPopupAttached = keyPopupAttached,
-        keyPopupTailEnabled = keyPopupTailEnabled,
-        keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
-    )
+    textures.renderable().let { shown ->
+        AospKeyboardView.ThemeOverride(
+            background = background,
+            divider = divider,
+            normalKey = shown.surfaceColour(normalKey),
+            specialKey = shown.surfaceColour(specialKey),
+            textAndIcons = textAndIcons,
+            ledInactive = ledInactive,
+            ledActive = ledActive,
+            ledLocked = ledLocked,
+            accent = accent,
+            keyPopup = keyPopup,
+            keyPopupSelected = keyPopupSelected,
+            keyCornerRadiusRatio = keyCornerRadiusRatio,
+            keyHeightScale = keyHeightScale,
+            numberRowHeightScale = numberRowHeightScale,
+            keyWidthScale = keyWidthScale,
+            rowGapScale = rowGapScale,
+            distributeHorizontalSpacing = distributeHorizontalSpacing,
+            ortholinear = ortholinear,
+            keyPopupStyle = keyPopupStyle,
+            keyPopupAttached = keyPopupAttached,
+            keyPopupTailEnabled = keyPopupTailEnabled,
+            keyPreviewAfterLongPress = keyPreviewAfterLongPress,
+            keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+            textures = shown
+        )
+    }
 
 internal fun KeyboardThemePreset.toKeyboardThemeColors(): KeyboardThemeColors =
-    KeyboardThemeColors(
-        background = background,
-        divider = divider,
-        normalKey = normalKey,
-        specialKey = specialKey,
-        textAndIcons = textAndIcons,
-        ledInactive = ledInactive,
-        ledActive = ledActive,
-        ledLocked = ledLocked,
-        accent = accent,
-        cursorSwipe = cursorSwipe,
-        keyPopup = keyPopup,
-        keyPopupSelected = keyPopupSelected,
-        suggestion = suggestion,
-        statusBarButton = statusBarButton,
-        keyCornerRadiusRatio = keyCornerRadiusRatio,
-        chromeCornerRadiusRatio = chromeCornerRadiusRatio,
-        suggestionsHeightScale = suggestionsHeightScale,
-        variationsHeightScale = variationsHeightScale
-    )
+    textures.renderable().let { shown ->
+        KeyboardThemeColors(
+            background = background,
+            divider = divider,
+            normalKey = shown.surfaceColour(normalKey),
+            specialKey = shown.surfaceColour(specialKey),
+            textAndIcons = textAndIcons,
+            ledInactive = ledInactive,
+            ledActive = ledActive,
+            ledLocked = ledLocked,
+            accent = accent,
+            cursorSwipe = cursorSwipe,
+            keyPopup = keyPopup,
+            keyPopupSelected = keyPopupSelected,
+            suggestion = shown.surfaceColour(suggestion),
+            statusBarButton = shown.surfaceColour(statusBarButton),
+            keyCornerRadiusRatio = keyCornerRadiusRatio,
+            chromeCornerRadiusRatio = chromeCornerRadiusRatio,
+            suggestionsHeightScale = suggestionsHeightScale,
+            variationsHeightScale = variationsHeightScale,
+            textures = shown
+        )
+    }
 
 internal fun KeyboardThemePreset.toSettingsTheme(): SettingsManager.KeyboardThemeSettings =
     SettingsManager.KeyboardThemeSettings(
@@ -152,7 +159,8 @@ internal fun KeyboardThemePreset.toSettingsTheme(): SettingsManager.KeyboardThem
         keyPopupAttached = keyPopupAttached,
         keyPopupTailEnabled = keyPopupTailEnabled,
         keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
+        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+        textures = textures
     )
 
 internal fun SettingsManager.KeyboardThemeSettings.toKeyboardThemePreset(name: String): KeyboardThemePreset =
@@ -187,7 +195,8 @@ internal fun SettingsManager.KeyboardThemeSettings.toKeyboardThemePreset(name: S
         keyPopupAttached = keyPopupAttached,
         keyPopupTailEnabled = keyPopupTailEnabled,
         keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
+        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+        textures = textures
     )
 
 internal fun SettingsManager.NamedKeyboardTheme.toKeyboardThemeOption(): KeyboardThemeOption {

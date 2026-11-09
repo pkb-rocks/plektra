@@ -19,10 +19,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import rocks.pkb.plektra.data.emoji.EmojiRepository
 import rocks.pkb.plektra.data.emoji.EmojiSearchRepository
+import rocks.pkb.plektra.data.symbols.PickerExtras
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Dialog for selecting an emoji.
- * Loads emoji categories from assets (common/emoji).
+ * Loads emoji categories from assets (common/emoji), followed by the text symbols and kaomoji
+ * the keyboard's emoji picker offers (when turned on there).
  */
 @Composable
 fun EmojiPickerDialog(
@@ -40,14 +44,16 @@ fun EmojiPickerDialog(
         runCatching {
             val categories = EmojiRepository.getEmojiCategories(context)
             val searchIndex = EmojiSearchRepository.getSearchIndex(context)
-            categories to searchIndex
+            val extras = withContext(Dispatchers.IO) { PickerExtras.load(context) }
+            Triple(categories + extras.categories, searchIndex, extras)
         }
-            .onSuccess { (categories, searchIndex) ->
+            .onSuccess { (categories, searchIndex, extras) ->
                 selectedCategoryId = categories.firstOrNull()?.id
                 uiState = EmojiPickerState(
                     isLoading = false,
                     categories = categories,
                     searchIndex = searchIndex,
+                    extras = extras,
                     error = null
                 )
             }
@@ -149,8 +155,13 @@ fun EmojiPickerDialog(
                         val isSearching = trimmedQuery.isNotEmpty()
                         val searchResults = if (isSearching) {
                             uiState.searchIndex?.let { index ->
-                                EmojiSearchRepository.search(index, trimmedQuery).map { it.entry }
-                            }.orEmpty()
+                                EmojiSearchRepository.search(index, trimmedQuery).map { result ->
+                                    // The emoji searched for as it was given (👋🏽), its other variants on hold
+                                    result.matched?.let { matched ->
+                                        EmojiRepository.EmojiEntry(matched, listOf(result.entry.base) + result.entry.variants - matched)
+                                    } ?: result.entry
+                                }
+                            }.orEmpty() + uiState.extras.search(context, trimmedQuery).map { it.entry }
                         } else {
                             emptyList()
                         }
@@ -199,6 +210,12 @@ fun EmojiPickerDialog(
                             val selectedCategory = categories.firstOrNull { it.id == selectedCategoryId } ?: categories.first()
                             selectedCategory.emojis
                         }
+                        // Kaomoji are wide: shrunk to fit, and fewer to a row on their own tab
+                        val kaomojiShown = !isSearching && selectedCategoryId == EmojiRepository.KAOMOJI_CATEGORY_ID
+                        val kaomoji = remember(categories) {
+                            categories.firstOrNull { it.id == EmojiRepository.KAOMOJI_CATEGORY_ID }
+                                ?.emojis?.mapTo(HashSet()) { it.base }.orEmpty()
+                        }
 
                         val contentKey = if (isSearching) {
                             "search:$trimmedQuery:${entriesToShow.size}"
@@ -222,10 +239,11 @@ fun EmojiPickerDialog(
                                         val padding = (4 * context.resources.displayMetrics.density).toInt()
 
                                         val columns = (screenWidth / (emojiSize + spacing)).coerceAtLeast(4)
+                                            .let { if (kaomojiShown) (it / 3).coerceAtLeast(2) else it }
 
                                         recyclerView.apply {
                                             layoutManager = GridLayoutManager(context, columns)
-                                            adapter = EmojiEntryRecyclerViewAdapter(entriesToShow) { emoji ->
+                                            adapter = EmojiEntryRecyclerViewAdapter(entriesToShow, textLike = { it in kaomoji }) { emoji ->
                                                 onEmojiSelected(emoji)
                                                 onDismiss()
                                             }
@@ -237,7 +255,7 @@ fun EmojiPickerDialog(
                                         recyclerView
                                     },
                                     update = { recyclerView ->
-                                        recyclerView.adapter = EmojiEntryRecyclerViewAdapter(entriesToShow) { emoji ->
+                                        recyclerView.adapter = EmojiEntryRecyclerViewAdapter(entriesToShow, textLike = { it in kaomoji }) { emoji ->
                                             onEmojiSelected(emoji)
                                             onDismiss()
                                         }
@@ -257,6 +275,7 @@ private data class EmojiPickerState(
     val isLoading: Boolean = true,
     val categories: List<EmojiRepository.EmojiCategory> = emptyList(),
     val searchIndex: EmojiSearchRepository.EmojiSearchIndex? = null,
+    val extras: PickerExtras = PickerExtras.NONE,
     val error: String? = null
 )
 

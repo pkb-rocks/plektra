@@ -7,7 +7,14 @@ import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.core.SymLayoutController
 
-/** Owns explicit show requests; framework callbacks alone never prove that a child was drawn. */
+/**
+ * Owns explicit show requests; framework callbacks alone never prove that a child was drawn.
+ *
+ * Visibility precedence, strongest first: [isSurfaceBlocked] (per-app "never show the bar")
+ * vetoes every surface, including explicit opens, hardware-key recovery and transient SYM
+ * pages; then [allowsPersistentSurface] together with transient content; then configured
+ * content and automatic show decisions. New overrides must stay below the app block.
+ */
 class KeyboardVisibilityController(
     private val context: Context,
     private val candidatesBarController: CandidatesBarController,
@@ -32,7 +39,8 @@ class KeyboardVisibilityController(
     private val requestShowInputView: () -> Unit,
     private val refreshStatusBar: () -> Unit,
     private val trace: (String) -> Unit = {},
-    private val allowsPersistentSurface: () -> Boolean = { true }
+    private val allowsPersistentSurface: () -> Boolean = { true },
+    private val isSurfaceBlocked: () -> Boolean = { false }
 ) {
     enum class RenderedSurface { HIDDEN, FULL_INPUT_VIEW, CANDIDATES_VIEW }
 
@@ -78,8 +86,8 @@ class KeyboardVisibilityController(
         return !usesCandidatesView() && hasConfiguredContent()
     }
 
-    fun allowsSurface(): Boolean = allowsPersistentSurface() ||
-        symLayoutController.currentSymPage() > 0 || candidatesBarController.hasTransientContent()
+    fun allowsSurface(): Boolean = !isSurfaceBlocked() && (allowsPersistentSurface() ||
+        symLayoutController.currentSymPage() > 0 || candidatesBarController.hasTransientContent())
 
     private fun hasConfiguredContent(): Boolean = allowsSurface() && (rocks.pkb.plektra.KeyboardBarConfiguration.read(context)
             .presentation(candidatesBarController.isSlimModeActive()).hasPersistentContent ||
@@ -94,11 +102,15 @@ class KeyboardVisibilityController(
         if (hasConfiguredContent()) {
             ensureImeSurfaceVisible()
         } else {
-            cancelPendingSurfaceTransition()
-            setCandidatesViewShown(false)
-            hideInputWindow()
-            requestHideInputView()
+            closeSurface()
         }
+    }
+
+    private fun closeSurface() {
+        cancelPendingSurfaceTransition()
+        setCandidatesViewShown(false)
+        hideInputWindow()
+        requestHideInputView()
     }
 
     fun ensureImeSurfaceVisible() {
@@ -167,13 +179,34 @@ class KeyboardVisibilityController(
         postToUiDelayed(RETRY_DELAY_MS) { present(ticket, attempt + 1) }
     }
 
-    fun shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled: Boolean): Boolean =
+    /**
+     * The hardware bar always follows the editor (the service holds it back only while a
+     * [HardwareKeypadAutoOpen] decision waits for Android). The on-screen keyboard shows itself on input start
+     * only when automatic showing is on and app/Android display defaults are not respected: Android
+     * does not tell an IME the window's soft-input state, so respecting them means waiting for
+     * Android's show request (forward navigation, STATE_VISIBLE, a tap) instead of forcing a show.
+     */
+    fun shouldShowSurfaceOnInputStart(
+        autoShowKeyboardEnabled: Boolean,
+        respectAppVisibility: Boolean = false
+    ): Boolean =
         SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) !=
-            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL || autoShowKeyboardEnabled
+            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL || (autoShowKeyboardEnabled && !respectAppVisibility)
 
     fun onImeWindowVisibilityChanged(shown: Boolean) {
         windowShown = shown
         trace("window shown=$shown changing=$changingSurface")
+        if (shown && isSurfaceBlocked()) {
+            // Android can still show the window itself, e.g. after a config change or a
+            // show request raced with the app switch. Hide once the framework show settles.
+            postToUi {
+                if (windowShown && isSurfaceBlocked()) {
+                    trace("blocked_surface_hidden")
+                    closeSurface()
+                }
+            }
+            return
+        }
         if (!shown && waitingForBackendHide) {
             waitingForBackendHide = false
             // Let Android finish clearing mShowInputRequested before starting the new backend.
@@ -261,6 +294,10 @@ class KeyboardVisibilityController(
 
     fun onKeyboardSurfaceChanged(ensureInputViewShown: Boolean, requireActiveTextField: Boolean = false) {
         cancelPendingSurfaceTransition()
+        if (isSurfaceBlocked()) {
+            if (windowShown) closeSurface()
+            return
+        }
         if (requireActiveTextField && !hasActiveTextField()) return
         if (windowShown && !usesCandidatesView() && renderedSurface() == RenderedSurface.FULL_INPUT_VIEW) {
             refreshStatusBar()

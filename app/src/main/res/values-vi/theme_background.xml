@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Ảnh nền</string>
+    <string name="theme_background_photo">Chọn ảnh</string>
+    <string name="theme_background_change">Đổi ảnh</string>
+    <string name="theme_background_remove">Xóa ảnh</string>
+    <string name="theme_background_loading">Đang chuẩn bị ảnh…</string>
+    <string name="theme_background_failed">Không thể dùng ảnh này. Hãy thử ảnh khác nhỏ hơn 16 MB.</string>
+    <string name="theme_background_help">Hiển thị chính bức ảnh phía sau bàn phím này. Các màu bên dưới vẫn được lưu.</string>
+    <string name="theme_background_active_help">Phím, gợi ý và nút trở nên trong suốt để ảnh hiện ra. Màu của chúng vẫn được lưu và sẽ trở lại khi bạn xóa ảnh.</string>
+    <string name="theme_background_zip">Ảnh không nằm trong văn bản chủ đề đã sao chép, vốn chỉ chứa màu và cài đặt phím. Để chuyển ảnh, hãy dùng bản sao lưu đầy đủ (ZIP).</string>
+</resources>

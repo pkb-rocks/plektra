@@ -602,6 +602,8 @@ fun SymCustomizationScreen(
             }
         }
 
+        EmojiPagesSettingsSection()
+
         HorizontalDivider()
 
         }
@@ -609,18 +611,39 @@ fun SymCustomizationScreen(
         if (editingLayerPage != null) {
         // Customizable keyboard grid - uses the same layout as the real keyboard
         val statusBarController = remember { StatusBarController(context) }
+        // With the layer's pages on, Q and P turn them: shown on the grid and explained, their
+        // own mappings kept
+        val pagedLayer = remember(editingLayerPage) {
+            if (editingLayerPage == 2) EmojiPagesSettings.symbolPagesEnabled(context) else EmojiPagesSettings.emojiPagesEnabled(context)
+        }
+        val navigationKeys = if (pagedLayer) {
+            mapOf(
+                rocks.pkb.plektra.core.SymPagedLayer.PREVIOUS_KEY to rocks.pkb.plektra.core.SymPagedLayer.PREVIOUS_LABEL,
+                rocks.pkb.plektra.core.SymPagedLayer.NEXT_KEY to rocks.pkb.plektra.core.SymPagedLayer.NEXT_LABEL
+            )
+        } else {
+            emptyMap()
+        }
+        if (pagedLayer) {
+            Text(
+                text = stringResource(R.string.sym_paged_navigation_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
 
         // Show the grid based on the selected tab
         when (editingLayerPage) {
             1 -> {
                 // Emoji tab
-                key(symMappingsPage1, titan2LayoutEnabled) {
+                key(symMappingsPage1, titan2LayoutEnabled, pagedLayer) {
                     AndroidView(
                         factory = { ctx ->
                             statusBarController.createCustomizableEmojiKeyboard(symMappingsPage1, { keyCode, emoji ->
                                 selectedKeyCode = keyCode
                                 showEmojiPicker = true
-                            }, page = 1)
+                            }, page = 1, navigationKeys = navigationKeys)
                         },
                         update = { _ ->
                             // The key(titan2LayoutEnabled) will trigger a full recomposition/re-factory
@@ -631,13 +654,13 @@ fun SymCustomizationScreen(
             }
             2 -> {
                 // Characters tab
-                key(symMappingsPage2, titan2LayoutEnabled) {
+                key(symMappingsPage2, titan2LayoutEnabled, pagedLayer) {
                     AndroidView(
                         factory = { ctx ->
                             statusBarController.createCustomizableEmojiKeyboard(symMappingsPage2, { keyCode, character ->
                                 selectedKeyCode = keyCode
                                 showCharacterPicker = true
-                            }, page = 2)
+                            }, page = 2, navigationKeys = navigationKeys)
                         },
                         update = { _ ->
                             // The key(titan2LayoutEnabled) will trigger a full recomposition/re-factory

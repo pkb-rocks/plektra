@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Hintergrundfoto</string>
+    <string name="theme_background_photo">Foto auswählen</string>
+    <string name="theme_background_change">Foto ändern</string>
+    <string name="theme_background_remove">Foto entfernen</string>
+    <string name="theme_background_loading">Foto wird vorbereitet…</string>
+    <string name="theme_background_failed">Dieses Bild kann nicht verwendet werden. Versuche ein anderes Bild unter 16 MB.</string>
+    <string name="theme_background_help">Zeigt das Foto selbst hinter dieser Tastatur. Die Farben unten bleiben gespeichert.</string>
+    <string name="theme_background_active_help">Tasten, Vorschläge und Schaltflächen sind durchsichtig, damit das Foto sichtbar ist. Ihre Farben bleiben gespeichert und kehren zurück, wenn du das Foto entfernst.</string>
+    <string name="theme_background_zip">Das Foto ist nicht im kopierten Thementext enthalten; dieser enthält nur Farben und Tasteneinstellungen. Übertrage das Foto mit der vollständigen Sicherung (ZIP).</string>
+</resources>

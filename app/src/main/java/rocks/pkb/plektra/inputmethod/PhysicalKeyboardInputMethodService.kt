@@ -67,6 +67,7 @@ import rocks.pkb.plektra.inputmethod.trackpad.TrackpadEventDeviceResolver
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadGestureDetector
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadAxisRange
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadCoordinateMapper
+import rocks.pkb.plektra.inputmethod.expansion.ExpansionPresentation
 import rocks.pkb.plektra.inputmethod.expansion.ExpansionRuntimeConfig
 import rocks.pkb.plektra.inputmethod.expansion.ExpansionTriggerKind
 import rocks.pkb.plektra.inputmethod.expansion.SnippetExpansionSource
@@ -131,6 +132,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // SharedPreferences for settings
     private lateinit var prefs: SharedPreferences
     private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+    // A theme photo that cannot load falls back to the saved colours. Nothing in the status
+    // snapshot changes then, so the rendered state must be invalidated to re-apply the theme.
+    private val themeImageAvailabilityListener: () -> Unit = {
+        invalidateRenderedStatusSnapshot()
+        updateStatusBarText()
+    }
     private var lastSystemLocalesSignature: String = ""
     private var lastImeConfiguration: Configuration? = null
 
@@ -255,6 +262,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     private val shouldDisableAutoCapitalize: Boolean
         get() {
+            if (!LayoutMappingRepository.supportsAutoCapitalization) return true
             if (!inputContextState.shouldDisableAutoCapitalize) return false
             // Explicit app or field opt-outs take priority over the optional
             // capitalization of restricted field types such as email and URL.
@@ -267,6 +275,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     
     // Current package name
     private var currentPackageName: String? = null
+    /** Per-app "never show the bar"; vetoes every IME surface while hardware input keeps working. */
+    private var keyboardBarHiddenInEditor = false
     
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
@@ -285,6 +295,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private lateinit var typingSoundPlayer: TypingSoundPlayer
     private var skipNextSelectionUpdateAfterCommit: Boolean = false
     private var editorHasActiveSelection: Boolean = false
+    private val softwareKeypadSession = SoftwareKeypadSession()
+    private val hardwareKeypadAutoOpen = HardwareKeypadAutoOpen()
     private lateinit var keyboardVisibilityController: KeyboardVisibilityController
     private lateinit var launcherShortcutController: LauncherShortcutController
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
@@ -416,6 +428,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Exact Typing: the raw-mode choice also covers WebAPKs (matched via their host browser).
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
         inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
+        keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, info?.packageName)
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -623,6 +636,42 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun applySoftwareKeyboardPageChoice(id: String) {
+        if (!inputContextState.isEditable || !keyboardVisibilityController.allowsSurface()) return
+        SoftwareKeyboardPageChoices.keypadFromId(id)?.let { keypad ->
+            softwareKeypadSession.select(keypad)
+            symLayoutController.closeSymPage()
+            updateStatusBarText()
+            return
+        }
+        val page = SoftwareKeyboardPageChoices.pageFromId(id) ?: return
+        ensureImeSurfaceVisible()
+        symLayoutController.openPage(page)
+        updateStatusBarText()
+    }
+
+    /**
+     * Opens the on-screen keypad for the current field. On a hardware keyboard this switches to the
+     * virtual surface only until the editor changes.
+     */
+    private fun openKeypadForCurrentField() {
+        // App blocking and other surface policies take precedence over every manual entry.
+        if (!inputContextState.isEditable || currentInputConnection == null ||
+            !keyboardVisibilityController.allowsSurface()
+        ) return
+        if (SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
+        ) {
+            SettingsManager.beginFieldScopedVirtualKeyboard(this)
+        }
+        ensureImeSurfaceVisible()
+        updateStatusBarText()
+    }
+
+    private fun endTemporaryKeypad() {
+        SettingsManager.endFieldScopedVirtualKeyboard(this)
     }
 
     private fun scheduleStatusBarTextUpdate(delayMs: Long = CURSOR_UPDATE_DELAY) {
@@ -879,7 +928,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Use Android's keyboard hand-off, as in HeliBoard. The voice IME commits
         // directly to the current editor and returns via switchToPreviousInputMethod.
         // Do not open FUTO's singleInstance recognition Activity for a result.
-        ExternalSpeechProvider.handOff(this, voiceInput)
+        ExternalSpeechProvider.handOff(this, voiceInput) { requestOwnShow(InputMethodManager.SHOW_IMPLICIT) }
     }
 
     private fun updateSpeechPreview(text: String) {
@@ -1510,6 +1559,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun requestAutoCapShiftOneShot(): Boolean {
+        if (!LayoutMappingRepository.supportsAutoCapitalization) return false
         if (isAutoCapSuppressedAtCursor()) return false
         return modifierStateController.requestShiftOneShotFromAutoCap()
     }
@@ -1616,17 +1666,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     /**
-     * Gets the character string from the selected keyboard layout.
-     * Returns the original event character if not mapped in layout.
+     * Gets the text from the selected keyboard layout, all of it when the key types several
+     * characters (Uyghur Shift+L types لا). Returns the original event character if not mapped in layout.
      */
-    private fun getCharacterStringFromLayout(keyCode: Int, event: KeyEvent?, isShift: Boolean): String {
-        val char = getCharacterFromLayout(keyCode, event, isShift)
-        return char?.toString() ?: ""
-    }
+    private fun getCharacterStringFromLayout(keyCode: Int, event: KeyEvent?, isShift: Boolean): String =
+        LayoutMappingRepository.getMapping(keyCode)?.let { LayoutMappingRepository.resolveText(it, isShift) }
+            ?: getCharacterFromLayout(keyCode, event, isShift)?.toString().orEmpty()
 
     private fun switchToLayout(layoutName: String, showToast: Boolean) {
         activeKeyboardLayoutName = layoutName
         LayoutMappingRepository.loadLayout(assets, layoutName, this)
+        modifierStateController.onLayoutChanged()
         variationStateController = VariationStateController(
             VariationRepository.loadVariations(assets, this, activeKeyboardLayoutName)
         )
@@ -1831,13 +1881,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         lastSystemLocalesSignature = resources.configuration.locales.toLanguageTags()
         lastImeConfiguration = Configuration(resources.configuration)
         prefs = getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
+        // A keypad opened on a hardware keyboard is field-scoped and must not survive a restart.
+        SettingsManager.endFieldScopedVirtualKeyboard(this)
         clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
         physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
 
         // Clear legacy nav mode notification since we now rely on the status icon only.
         NotificationHelper.cancelNavModeNotification(this)
 
-        modifierStateController = ModifierStateController(DOUBLE_TAP_THRESHOLD)
+        modifierStateController = ModifierStateController(DOUBLE_TAP_THRESHOLD) {
+            LayoutMappingRepository.supportsAutoCapitalization
+        }
         updateModifierTapLatchSettings()
         navModeController = NavModeController(this, modifierStateController)
         navModeController.setOnNavModeChangedListener { isActive ->
@@ -1917,7 +1971,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         activationPolicy = SettingsManager.getEmojiSymbolsActivationPolicy(this),
                         exactOnClose = SettingsManager.getEmojiSymbolsExactOnClose(this)
                     )
-                )
+                ).map { config ->
+                    // A hidden bar must not keep invisible candidates that Space/Tab/Enter accept.
+                    if (keyboardBarHiddenInEditor) config.copy(presentation = ExpansionPresentation.OFF) else config
+                }
             },
             showSuggestionBar = { labels, onSelected ->
                 candidatesBarController.showExpansionSuggestions(labels, onSelected)
@@ -2091,7 +2148,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         candidatesBarController.onSoftwareKeyboardSymToggleRequested = {
             ensureImeSurfaceVisible()
-            symLayoutController.toggleSymPage()
+            symLayoutController.toggleSymPage(onScreen = true)
             updateStatusBarText()
         }
         candidatesBarController.onSymCloseRequested = {
@@ -2145,15 +2202,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             modifierStateController.registerNonModifierKey()
         }
         candidatesBarController.onSoftwareKeyboardTextInput = { text, inputConnection, snapshot ->
-            val ic = inputConnection ?: currentInputConnection
-            val consumedShiftOneShot = text.length == 1 &&
-                text[0].isLetter() &&
-                modifierStateController.consumeShiftOneShot()
-            val handled = handleSoftwareKeyboardTextInput(text, ic, snapshot)
-            if (consumedShiftOneShot) {
-                updateStatusBarText()
-            }
-            handled
+            handleSoftwareKeyboardTextInput(text, inputConnection ?: currentInputConnection, snapshot)
         }
         candidatesBarController.onSymTextCommitted = {
             modifierStateController.consumeShiftOneShot()
@@ -2167,6 +2216,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         candidatesBarController.onSoftwareKeyboardModeToggleRequested = {
             toggleSoftwareKeyboardModeFromStatusBar()
+        }
+        candidatesBarController.onKeypadRequested = {
+            openKeypadForCurrentField()
+        }
+        candidatesBarController.onSoftwareKeyboardPageChoice = { id ->
+            // Chosen on touch release; overlay pages replace the touched view, so leave dispatch first.
+            uiHandler.post { applySoftwareKeyboardPageChoice(id) }
         }
         clipboardHistoryManager.addHistoryChangeListener {
             candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
@@ -2220,7 +2276,36 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
         }
-        symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager)
+        symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager) {
+            !keyboardBarHiddenInEditor
+        }
+        // The emoji pages read the emoji categories synchronously: load them ahead.
+        expansionAssetScope.launch {
+            runCatching { rocks.pkb.plektra.data.emoji.EmojiRepository.getEmojiCategories(this@PhysicalKeyboardInputMethodService) }
+        }
+        symLayoutController.onPagedSearchRequested = {
+            // A blocked bar opens no picker: no search may wait for its next opening.
+            if (symLayoutController.openEmojiPickerPage()) {
+                candidatesBarController.requestEmojiPickerSearch()
+                updateStatusBarText()
+            }
+        }
+        symLayoutController.onKeyCustomizationRequested = { page, keyCode ->
+            candidatesBarController.openSymKeyCustomization(page, keyCode)
+        }
+        candidatesBarController.onSymPageKeyTapped = { keyCode ->
+            symLayoutController.handlePagedTouchTap(
+                keyCode,
+                currentInputConnection,
+                updateStatusBar = { updateStatusBarText() },
+                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+            )
+        }
+        candidatesBarController.onSymPageKeyLongPressed = { keyCode ->
+            symLayoutController.handlePagedTouchLongPress(keyCode).also { handled ->
+                if (handled) updateStatusBarText()
+            }
+        }
         keyboardVisibilityController = KeyboardVisibilityController(
             context = this,
             candidatesBarController = candidatesBarController,
@@ -2231,6 +2316,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 SettingsManager.getShowKeyboardBarOnLauncher(this) ||
                     !LauncherEditorPolicy.isNiagaraHomeEditor(currentInputEditorInfo)
             },
+            isSurfaceBlocked = { keyboardBarHiddenInEditor },
             isNavModeLatched = { ctrlLatchFromNavMode },
             currentInputConnection = { currentInputConnection },
             isInputViewShown = { isInputViewShown },
@@ -2254,7 +2340,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             showInputWindow = { showInput -> showWindow(showInput) },
             hideInputWindow = { hideWindow() },
             requestHideInputView = { requestHideSelf(0) },
-            requestShowInputView = ::requestKeyboardInputView,
+            requestShowInputView = { requestOwnShow() },
             trace = ::traceImeVisibility,
             refreshStatusBar = {
                 invalidateRenderedStatusSnapshot()
@@ -2489,6 +2575,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Handler(Looper.getMainLooper()).post {
                     updateStatusBarText()
                 }
+            } else if (key == SettingsManager.KEY_KEYBOARD_BAR_HIDDEN_APPS) {
+                Handler(Looper.getMainLooper()).post {
+                    keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(
+                        this, currentInputEditorInfo?.packageName
+                    )
+                    // Closes an open clipboard or emoji picker page and drops invisible candidates.
+                    symLayoutController.currentSymPage()
+                    if (keyboardBarHiddenInEditor) {
+                        if (::textExpansionController.isInitialized) textExpansionController.clear()
+                        // Back to the hardware surface: no open keypad decision or field-scoped keypad.
+                        hardwareKeypadAutoOpen.settle()
+                        endTemporaryKeypad()
+                    }
+                    invalidateRenderedStatusSnapshot()
+                    updateStatusBarText()
+                    keyboardVisibilityController.onKeyboardBarConfigurationChanged()
+                }
             } else if (SettingsManager.isModifierIndicatorPreferenceKey(key) ||
                 key == "suggestions_enabled" || key == "suggestions_bold" || key == "status_bar_variations_visible" ||
                 key?.startsWith("slim_status_bar_slots_") == true ||
@@ -2509,6 +2612,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         Log.d(TRACKPAD_DEBUG_TAG, "onCreate: SharedPreferences listener registered")
+        rocks.pkb.plektra.ThemeTextureStore.addAvailabilityListener(themeImageAvailabilityListener)
         
         // Register broadcast receiver for permission request result
         permissionResultReceiver = object : BroadcastReceiver() {
@@ -2648,7 +2752,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (DeferredPunctuationSpaceTracker.prepareForTextCommit(this, ic, text)) {
             suggestionController.onContextReset()
         }
-        ic.commitText(text, 1)
+        // One-shot Shift belongs to the text the key committed, whatever its length (Uyghur لا).
+        if (ic.commitText(text, 1) && Character.isLetter(text.codePointAt(0))) {
+            modifierStateController.consumeShiftOneShot()
+        }
         if (!snapshot.shouldDisableSuggestions) {
             suggestionController.onCharacterCommitted(text, ic)
         }
@@ -2763,7 +2870,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 val downTime = modifierDownTimes[keyCode] ?: 0L
                 val now = SystemClock.uptimeMillis()
                 val holdDuration = if (downTime > 0L) now - downTime else 0L
-                if (holdDuration >= 300L && symLayoutController.currentSymPage() == 0) {
+                if (holdDuration >= AospKeyboardView.SYM_HOLD_MIN_MS && symLayoutController.currentSymPage() == 0) {
                     symChordUsedSinceKeyDown = true
                 }
                 modifierDownTimes.remove(keyCode)
@@ -2771,7 +2878,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 // activated SYM page use the same view, so posting KEY_UP would draw one frame
                 // of the base keyboard between them. Overlay pages replace the touched view and
                 // must still be posted to avoid mutating the hierarchy during touch dispatch.
-                if (symLayoutController.peekNextSymPage() in 3..4) {
+                if (symLayoutController.peekNextSymPage(onScreen = true) in 3..4) {
                     uiHandler.post {
                         dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_UP)
                     }
@@ -2910,6 +3017,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         prefsListener?.let {
             prefs.unregisterOnSharedPreferenceChangeListener(it)
         }
+        rocks.pkb.plektra.ThemeTextureStore.removeAvailabilityListener(themeImageAvailabilityListener)
         
         cancelSpeechRecognition()
         speechScope.cancel()
@@ -3004,10 +3112,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     override fun onShowInputRequested(flags: Int, configChange: Boolean): Boolean {
         if (!keyboardVisibilityController.allowsSurface()) return false
+        // Decide before Plektra answers with its own show request, which settles an open decision.
+        val openKeypad = hardwareKeypadAutoOpen.onShowRequested(configChange)
         val accepted = super.onShowInputRequested(flags, configChange)
         if (::keyboardVisibilityController.isInitialized) {
             keyboardVisibilityController.onExplicitShowRequested()
         }
+        if (openKeypad) openKeypadForCurrentField()
         traceImeVisibility("onShowInputRequested accepted=$accepted flags=$flags")
         return !keyboardVisibilityController.usesCandidatesView()
     }
@@ -3044,7 +3155,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         setExtractViewShown(true)
     }
 
-    private fun requestKeyboardInputView() = requestShowSelf(0)
+    /** Every show request of Plektra's own goes through here. */
+    private fun requestOwnShow(flags: Int = 0) {
+        // Android cannot tell this request's answer from an app request; see HardwareKeypadAutoOpen.
+        hardwareKeypadAutoOpen.settle()
+        requestShowSelf(flags)
+    }
 
     /**
      * Evaluates whether the IME should run in fullscreen mode.
@@ -3137,6 +3253,26 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         deactivateVariations()
         refreshStatusBar()
         navModeController.refreshNavModeState()
+    }
+
+    /**
+     * A key the emoji search took (typed into it, or a Ctrl shortcut on it) before the generic
+     * key handling: it counts as a key used during a held modifier, so releasing Ctrl (or Shift)
+     * afterwards doesn't leave it on as if it had been tapped alone. A [ctrlShortcut] uses up a
+     * one-shot Ctrl like any shortcut; a latched Ctrl stays for the next one. Committed search
+     * text consumes one-shot Shift while leaving a held Shift and Caps Lock active.
+     */
+    private fun onEmojiSearchKeyUsed(event: KeyEvent?, ctrlShortcut: Boolean, textCommitted: Boolean = false) {
+        if ((event?.repeatCount ?: 0) == 0) otherKeyInteractedDuringHold = true
+        modifierStateController.registerNonModifierKey()
+        // A held Ctrl's one-shot is cleared on its release, now that a key was used during the hold
+        if (ctrlShortcut && ctrlOneShot && !ctrlLatchActive && !ctrlPhysicallyPressed && !ctrlPressed) {
+            ctrlOneShot = false
+            updateStatusBarText()
+        }
+        if (textCommitted && modifierStateController.consumeShiftOneShot()) {
+            updateStatusBarText()
+        }
     }
 
     private fun disableEmojiSearchInputCapture() {
@@ -3326,6 +3462,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             softwareCtrlPreviewActive = shouldShowSoftwareCtrlPreview(modifierSnapshot),
             softwareAltPreviewLabels = buildSoftwareAltPreviewLabels(modifierSnapshot),
             softwareAltPreviewActive = shouldShowSoftwareAltPreview(modifierSnapshot),
+            softwareKeypad = softwareKeypadSession.resolved(),
+            keypadAccessAvailable = state.isEditable &&
+                effectiveSoftwareKeyboardMode != SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
+                SoftwareKeypadPolicy.autoKeypadFor(state.inputType) != SoftwareKeypad.FULL,
             // Legacy flag for backward compatibility
             shouldDisableSmartFeatures = shouldDisableSmartFeatures
         )
@@ -3647,6 +3787,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val isEditable = state.isEditable
         val isReallyEditable = state.isReallyEditable
         isInputViewActive = isEditable
+        softwareKeypadSession.onFieldStarted(state.inputType, restarting)
+        if (!restarting) hardwareKeypadAutoOpen.settle()
         keyboardVisibilityController.onInputStarted(restarting)
         if (!keyboardVisibilityController.allowsSurface()) {
             keyboardVisibilityController.onKeyboardBarConfigurationChanged()
@@ -3662,11 +3804,24 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         
         if (isEditable && isReallyEditable && !restarting && isInputViewActive) {
+            val respectAppVisibility = SettingsManager.getAutoShowRespectAppVisibility(this)
             val shouldShowSurface = keyboardVisibilityController.shouldShowSurfaceOnInputStart(
-                autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this)
+                autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this),
+                respectAppVisibility = respectAppVisibility
             )
-            if (shouldShowSurface) {
-                ensureImeSurfaceVisible()
+            // A blocked surface opens no keypad and leaves no decision waiting for a later unblock.
+            val autoOpenKeypad = keyboardVisibilityController.allowsSurface() &&
+                SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+                SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
+                SoftwareKeypadPolicy.shouldAutoOpenOnHardware(
+                    state.inputType,
+                    SettingsManager.getHardwareKeypadAutoOpen(this)
+                )
+            when {
+                // No own show while the decision is open: the next show request is the app's.
+                autoOpenKeypad && respectAppVisibility -> hardwareKeypadAutoOpen.begin()
+                autoOpenKeypad -> openKeypadForCurrentField()
+                shouldShowSurface -> ensureImeSurfaceVisible()
             }
         }
         
@@ -3691,6 +3846,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
         // Always reset shift one-shot when entering a field (both restarting and new field)
         // Then let auto-cap logic decide if it should be enabled
+        modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
             
@@ -3699,7 +3855,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { modifierStateController.capsLockEnabled = true },
+                enableCapsLock = { modifierStateController.requestFieldCapsLock() },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
@@ -3739,6 +3895,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         // Always reset shift one-shot when entering a field (both restarting and new field)
         // Then let auto-cap logic decide if it should be enabled
+        modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
             
@@ -3747,7 +3904,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { modifierStateController.capsLockEnabled = true },
+                enableCapsLock = { modifierStateController.requestFieldCapsLock() },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
@@ -3797,6 +3954,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         caretBadgeController.onEditorGone()
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         keyboardVisibilityController.cancelPendingSurfaceTransition()
+        hardwareKeypadAutoOpen.settle()
+        endTemporaryKeypad()
+        softwareKeypadSession.onFieldFinished()
         accidentalKeyPressFilter.reset()
         isInputViewActive = false
         if (::candidatesBarController.isInitialized) {
@@ -4704,6 +4864,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val initialInputConnection = currentInputConnection
         val inputType = info?.inputType ?: EditorInfo.TYPE_NULL
         val hasEditableField = initialInputConnection != null && inputType != EditorInfo.TYPE_NULL
+        // Accepted hardware input settles the keypad choice before shortcut early returns.
+        if (hasEditableField && keyCode != KeyEvent.KEYCODE_BACK && event != null &&
+            event.flags and KeyEvent.FLAG_SOFT_KEYBOARD == 0) {
+            hardwareKeypadAutoOpen.settle()
+        }
         if (event_?.repeatCount == 0) consumedLanguageSwitchKeys.remove(keyCode_)
         else if (keyCode_ in consumedLanguageSwitchKeys) return true
         val languageCtrl = event?.isCtrlPressed == true || ctrlPressed || ctrlPhysicallyPressed ||
@@ -4758,6 +4923,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Let the picker handle text-editing shortcuts before the generic Ctrl router can
         // touch the app editor selection.
+        var emojiSearchTextCommitted = false
         if (
             emojiSearchCandidateActive &&
             candidatesBarController.isEmojiPickerSearchInputActive() &&
@@ -4765,14 +4931,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 event,
                 emojiSearchCtrlActive,
                 resolveTypedText = { typedEvent ->
-                    getCharacterFromLayout(
+                    getCharacterStringFromLayout(
                         typedEvent.keyCode,
                         typedEvent,
                         isShiftModifierActive(typedEvent)
-                    )?.toString()
+                    ).takeIf { it.isNotEmpty() }?.also { emojiSearchTextCommitted = true }
                 }
             )
         ) {
+            onEmojiSearchKeyUsed(
+                event,
+                ctrlShortcut = emojiSearchCtrlActive,
+                textCommitted = !emojiSearchCtrlActive &&
+                    (emojiSearchTextCommitted || keyCode == KeyEvent.KEYCODE_SPACE)
+            )
             updateEmojiSearchExternalSelectionSnapshot(initialInputConnection)
             ensureEmojiSearchCursorAnchorMonitoring(initialInputConnection)
             return true
@@ -4798,6 +4970,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 toggleMinimalUi = { keyboardVisibilityController.toggleSlimMode() }
             )
             if (handled) {
+                // The router used up a Ctrl one-shot itself
+                onEmojiSearchKeyUsed(event, ctrlShortcut = false)
                 updateEmojiSearchExternalSelectionSnapshot(initialInputConnection)
                 ensureEmojiSearchCursorAnchorMonitoring(initialInputConnection)
                 return true
@@ -5218,6 +5392,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ctrlLatchActive ||
             ctrlOneShot ||
             ctrlLatchFromNavMode
+        val layoutTextForKey = if (!altActiveNow && !ctrlActiveNow && LayoutMappingRepository.isMapped(keyCode)) {
+            LayoutMappingRepository.getCharacterStringWithModifiers(
+                keyCode, event?.isShiftPressed == true || shiftLayerLatched, capsLockEnabled, shiftOneShot
+            )
+        } else null
         when {
             keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DEL -> {
                 DeferredPunctuationSpaceTracker.clear()
@@ -5225,6 +5404,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             !altActiveNow && !ctrlActiveNow && ic != null -> {
                 val typedText = when {
                     keyCode == KeyEvent.KEYCODE_SPACE -> " "
+                    layoutTextForKey != null -> layoutTextForKey
                     event?.unicodeChar?.takeIf { it != 0 } != null -> event.unicodeChar.toChar().toString()
                     else -> ""
                 }
@@ -5272,7 +5452,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     autoCorrectionManager = autoCorrectionManager,
                     inputContextState = state,
                     enableShiftOneShot = { requestAutoCapShiftOneShot() },
-                    editorInfo = info
+                    editorInfo = info,
+                    typedText = layoutTextForKey
                 ) { updateStatusBarText() }
             ) {
                 return true
@@ -5638,7 +5819,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (keyCode == KEYCODE_SYM) {
             symPhysicallyPressed = false
             if (symTogglePendingOnKeyUp && !symChordUsedSinceKeyDown) {
-                symLayoutController.toggleSymPage()
+                // The on-screen SYM key arrives here as a synthetic soft-keyboard event.
+                val onScreen = event != null && event.flags and KeyEvent.FLAG_SOFT_KEYBOARD != 0
+                symLayoutController.toggleSymPage(onScreen)
             }
             symTogglePendingOnKeyUp = false
             symChordUsedSinceKeyDown = false
@@ -5646,6 +5829,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         
+        if (symLayoutController.handlePagedKeyUp(
+                keyCode,
+                currentInputConnection,
+                updateStatusBar = { updateStatusBarText() },
+                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+            )
+        ) {
+            return true
+        }
         if (symLayoutController.handleKeyUp(keyCode, shiftPressed)) {
             return true
         }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Background photo</string>
+    <string name="theme_background_photo">Choose photo</string>
+    <string name="theme_background_change">Change photo</string>
+    <string name="theme_background_remove">Remove photo</string>
+    <string name="theme_background_loading">Preparing photo…</string>
+    <string name="theme_background_failed">This image cannot be used. Try another image under 16 MB.</string>
+    <string name="theme_background_help">Shows the photo itself behind this keyboard. The colours below stay saved.</string>
+    <string name="theme_background_active_help">Keys, suggestions and buttons are transparent so the photo shows through. Their colours stay saved and return when you remove the photo.</string>
+    <string name="theme_background_zip">The photo is not part of copied theme text, which holds colours and key settings only. To transfer the photo, use the full backup (ZIP).</string>
+</resources>

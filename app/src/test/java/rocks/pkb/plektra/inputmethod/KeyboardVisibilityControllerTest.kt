@@ -52,6 +52,47 @@ class KeyboardVisibilityControllerTest {
     }
 
     @Test
+    fun inputStartShowRespectsAppDefaultsOnlyForTheOnScreenKeyboard() {
+        val h = Harness()
+        // Hardware bar follows every editor; neither setting removes it.
+        for (auto in listOf(false, true)) for (respect in listOf(false, true)) {
+            assertTrue(h.controller.shouldShowSurfaceOnInputStart(auto, respect))
+        }
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        assertTrue(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true, respectAppVisibility = false))
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true, respectAppVisibility = true))
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = false, respectAppVisibility = false))
+        assertTrue(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true))
+    }
+
+    @Test
+    fun respectingAppDefaultsStillHonorsAndroidShowRequestAndManualKey() {
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        val h = Harness()
+        h.controller.onInputStarted(restarting = false)
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(true, respectAppVisibility = true))
+        assertTrue(h.actions.isEmpty())
+        h.controller.onExplicitShowRequested()
+        h.runNext()
+        assertEquals(1, h.showRequests)
+
+        val manual = Harness()
+        manual.controller.onInputStarted(restarting = false)
+        manual.controller.onHardwareInputRequested()
+        manual.runNext()
+        assertEquals(1, manual.showRequests)
+    }
+
+    @Test
+    fun blockedSurfaceIgnoresManualShowRequests() {
+        val h = Harness().apply { allowPersistent = false }
+        // allowsSurface stays the gate for explicit requests as well.
+        h.controller.onExplicitShowRequested()
+        assertTrue(h.actions.isEmpty())
+        assertEquals(0, h.showRequests)
+    }
+
+    @Test
     fun evaluationDoesNotShowAttachOrScheduleAnySurface() {
         val h = Harness()
         for (experimental in listOf(false, true)) {
@@ -455,8 +496,106 @@ class KeyboardVisibilityControllerTest {
         assertEquals(1, h.showRequests)
     }
 
+    @Test
+    fun blockedAppVetoesEveryShowPathIncludingTransientPagesAndVirtualMode() {
+        for (mode in listOf(SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)) {
+            for (experimental in listOf(false, true)) {
+                SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, mode)
+                SettingsManager.setExperimentalCandidatesViewEnabled(context, experimental)
+                val h = Harness()
+                h.blocked = true
+                // A transient page would override the launcher suppression, but never the app block.
+                h.symLayout.toggleSymPage()
+                assertTrue(h.symLayout.currentSymPage() > 0)
+                assertFalse(h.controller.allowsSurface())
+                assertFalse(h.controller.onEvaluateInputViewShown(true))
+                h.controller.ensureImeSurfaceVisible()
+                h.controller.onExplicitShowRequested()
+                repeat(5) { h.controller.onHardwareInputRequested() }
+                h.controller.onKeyboardSurfaceChanged(ensureInputViewShown = true)
+                h.drain()
+                assertEquals(0, h.showRequests + h.inputAttachments + h.candidatesAttachments)
+                assertTrue(h.windowShows.isEmpty())
+                assertTrue(h.candidatesShown.none { it })
+                h.symLayout.closeSymPage()
+            }
+        }
+    }
+
+    @Test
+    fun appBlockedMidRetryStopsTheRetryWithoutAnotherShow() {
+        val h = Harness()
+        h.controller.ensureImeSurfaceVisible()
+        h.runNext()
+        assertEquals(1, h.inputAttachments)
+        h.blocked = true
+        h.drain()
+        assertEquals(1, h.inputAttachments)
+        assertEquals(1, h.showRequests)
+        assertTrue(h.windowShows.isEmpty())
+    }
+
+    @Test
+    fun windowShownByFrameworkInBlockedAppIsHiddenAfterTheShowSettles() {
+        val h = Harness()
+        h.blocked = true
+        h.controller.onImeWindowVisibilityChanged(true)
+        // Hiding synchronously would re-enter Android's unfinished show.
+        assertEquals(0, h.windowHides + h.hideRequests)
+        h.runNextUiAction()
+        assertEquals(1, h.windowHides)
+        assertEquals(1, h.hideRequests)
+
+        // Already hidden again before the posted check runs: nothing left to hide.
+        h.controller.onImeWindowVisibilityChanged(true)
+        h.controller.onImeWindowVisibilityChanged(false)
+        h.drain()
+        assertEquals(1, h.windowHides)
+    }
+
+    @Test
+    fun backendSwitchWithVisibleWindowInBlockedAppClosesInsteadOfResizing() {
+        val h = Harness()
+        h.rendered = RenderedSurface.FULL_INPUT_VIEW
+        h.inputShown = true
+        h.controller.onImeWindowVisibilityChanged(true)
+        h.blocked = true
+        h.controller.onKeyboardSurfaceChanged(ensureInputViewShown = false)
+        assertEquals(1, h.windowHides)
+        assertEquals(1, h.hideRequests)
+        assertEquals(0, h.refreshes)
+    }
+
+    @Test
+    fun switchingFromBlockedToAllowedAppShowsAgainAndBack() {
+        val h = Harness()
+        h.blocked = true
+        h.controller.onInputStarted(restarting = false)
+        h.controller.onKeyboardBarConfigurationChanged()
+        assertEquals(1, h.hideRequests)
+        h.controller.ensureImeSurfaceVisible()
+        assertTrue(h.actions.isEmpty())
+
+        h.blocked = false
+        h.controller.onInputStarted(restarting = false)
+        h.controller.ensureImeSurfaceVisible()
+        h.runNextUiAction()
+        assertEquals(1, h.showRequests)
+        h.rendered = RenderedSurface.FULL_INPUT_VIEW
+        h.inputShown = true
+        h.controller.onImeWindowVisibilityChanged(true)
+        h.drain()
+
+        h.blocked = true
+        h.controller.onInputStarted(restarting = false)
+        h.controller.onKeyboardBarConfigurationChanged()
+        assertEquals(2, h.hideRequests)
+        assertEquals(1, h.showRequests)
+    }
+
     private inner class Harness {
         var allowPersistent = true
+        var blocked = false
         var active = true
         var connection: InputConnection? = mock(InputConnection::class.java)
         var inputShown = false
@@ -475,10 +614,11 @@ class KeyboardVisibilityControllerTest {
         val actions = mutableListOf<Pair<Long, () -> Unit>>()
         private val prefs = context.getSharedPreferences("keyboard_visibility_controller_test", Context.MODE_PRIVATE)
         private val alternate = AlternateCharacterManager(context.assets, prefs, context)
+        val symLayout = SymLayoutController(context, prefs, alternate)
         val controller = KeyboardVisibilityController(
             context = context,
             candidatesBarController = CandidatesBarController(context),
-            symLayoutController = SymLayoutController(context, prefs, alternate),
+            symLayoutController = symLayout,
             isInputViewActive = { active },
             hasActiveTextField = { active },
             isNavModeLatched = { false },
@@ -501,7 +641,8 @@ class KeyboardVisibilityControllerTest {
             },
             requestShowInputView = { showRequests++ },
             refreshStatusBar = { refreshes++ },
-            allowsPersistentSurface = { allowPersistent }
+            allowsPersistentSurface = { allowPersistent },
+            isSurfaceBlocked = { blocked }
         )
         fun runNext() = actions.removeAt(0).second.invoke()
         fun hasImmediateActions() = actions.any { it.first == 0L }

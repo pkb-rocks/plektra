@@ -47,8 +47,8 @@
 ❎	cross mark button	×|button|cross|mark|multiplication|multiply|square|x
 ❓	red question mark	?|mark|punctuation|question|red
 ❔	white question mark	?|mark|outlined|punctuation|question|white
-❕	white exclamation mark	!|exclamation|mark|outlined|punctuation|white
-❗	red exclamation mark	!|exclamation|mark|punctuation|red
+❕	white exclamation mark	!|bang|exclamation|mark|outlined|punctuation|white
+❗	red exclamation mark	!|bang|exclamation|mark|punctuation|red
 ➕	plus	+|plus
 ➖	minus	-|−|heavy|math|minus|sign
 ➗	divide	÷|divide|division|heavy|math|sign
@@ -837,6 +837,7 @@
 🛖	hut	home|house|hut|roundhouse|shelter|yurt
 🛗	elevator	accessibility|elevator|hoist|lift
 🛘	landslide	avalanche|danger|disaster|earthquake|mountain|mudslide|rocks
+🛙	lighthouse	beacon|enlightenment|guidance|hope|light|maritime|navigation|sea|signal
 🛜	wireless	broadband|computer|connectivity|hotspot|internet|network|router|smartphone|wi-fi|wifi|wireless|wlan
 🛝	playground slide	amusement|park|play|playground|playing|slide|sliding|theme
 🛞	wheel	car|circle|tire|turn|vehicle|wheel
@@ -1151,6 +1152,9 @@
 🪈	flute	band|fife|flautist|flute|instrument|marching|music|orchestra|piccolo|pipe|recorder|woodwind
 🪉	harp	cupid|harp|instrument|love|music|orchestra
 🪊	trombone	brass|instrument|jazz|music|sad|slide
+🪋	meteor	apocalypse|falling|fireball|gravity|rock|space|star
+🪌	eraser	correction|delete|drawing|erase|error|mistake|remove|rub|undo|writing
+🪍	net with handle	catch|collect|mesh|trap
 🪎	treasure chest	gem|gold|jewels|loot|money|prize|silver|valuables|wealth
 🪏	shovel	bury|dig|garden|hole|plant|scoop|shovel|snow|spade
 🪐	ringed planet	planet|ringed|saturn|saturnine
@@ -1209,6 +1213,7 @@
 🫅	person with crown	crown|monarch|noble|person|regal|royal|royalty
 🫆	fingerprint	clue|crime|detective|fingerprint|forensics|identity|mystery|print|safety|trace
 🫈	hairy creature	bigfoot|cryptid|forest|giant|hairy|sasquatch|woodwose|yeti
+🫌	monarch butterfly	caterpillar|change|fragile|hope|insect|metamorphosis|migration|transformation
 🫍	orca	marine|ocean|whale
 🫎	moose	alces|animal|antlers|elk|mammal|moose
 🫏	donkey	animal|ass|burro|donkey|hinny|mammal|mule|stubborn
@@ -1225,6 +1230,7 @@
 🫚	ginger root	beer|ginger|health|herb|natural|root|spice
 🫛	pea pod	beans|beanstalk|edamame|legume|pea|pod|soybean|vegetable|veggie
 🫜	root vegetable	beet|food|garden|radish|root|salad|turnip|vegetable|vegetarian
+🫝	pickle	brine|condiment|cucumber|ferment|gherkin|relish|trouble
 🫟	splatter	drip|holi|ink|liquid|mess|paint|spill|splatter|stain
 🫠	melting face	disappear|dissolve|embarrassed|face|haha|heat|hot|liquid|lol|melt|melting|sarcasm|sarcastic
 🫡	saluting face	face|good|luck|ma’am|OK|respect|salute|saluting|sir|troops|yes
@@ -1237,6 +1243,7 @@
 🫨	shaking face	crazy|daze|earthquake|face|omg|panic|shaking|shock|surprise|vibrate|whoa|wow
 🫩	face with bags under eyes	bags|bored|exhausted|eyes|face|fatigued|late|sleepy|tired|weary
 🫪	distorted face	anxiety|bloated|panic|shocked|surprised|vulnerable
+🫫	cracking face	breaking|crumbling|masking|resilience|reveal|tension|transformation
 🫯	fight cloud	argument|brawl|debate|disagreement|fight|ruckus|wrestle
 🫰	hand with index finger and thumb crossed	<3|crossed|expensive|finger|hand|heart|index|love|money|snap|thumb
 🫱	rightwards hand	hand|handshake|hold|reach|right|rightward|rightwards|shake
@@ -1247,3 +1254,5 @@
 🫶	heart hands	<3|hands|heart|love|you
 🫷	leftwards pushing hand	block|five|halt|hand|high|hold|leftward|leftwards|pause|push|pushing|refuse|slap|stop|wait
 🫸	rightwards pushing hand	block|five|halt|hand|high|hold|pause|push|pushing|refuse|rightward|rightwards|slap|stop|wait
+🫹	leftwards thumb sign	grip|left|neutral|point|that|this
+🫺	rightwards thumb sign	grip|neutral|point|right|that|this

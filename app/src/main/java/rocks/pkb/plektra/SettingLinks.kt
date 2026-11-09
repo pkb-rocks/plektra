@@ -47,6 +47,7 @@ object SettingLinkIds {
     const val TEXT_INPUT_SMART_QUOTES = "text_input.smart_quotes"
     const val TEXT_INPUT_CLEAR_ALT_ON_SPACE = "text_input.clear_alt_on_space"
     const val TEXT_INPUT_AUTO_SHOW_KEYBOARD = "text_input.auto_show_keyboard"
+    const val TEXT_INPUT_AUTO_SHOW_RESPECT_APP_VISIBILITY = "text_input.auto_show_respect_app_visibility"
     const val TEXT_INPUT_EXPERIMENTAL_SMOOTH_CARET = "text_input.experimental_smooth_caret"
     const val TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT = "text_input.alt_ctrl_speech_shortcut"
     const val TEXT_INPUT_SHIFT_BACKSPACE_DELETE = "text_input.shift_backspace_delete"
@@ -442,6 +443,14 @@ object SettingLinkRegistry {
             R.string.auto_show_keyboard_title,
             R.string.auto_show_keyboard_description,
             destination = SettingsDestination.TextInput
+        ),
+        SettingEntry(
+            id = SettingLinkIds.TEXT_INPUT_AUTO_SHOW_RESPECT_APP_VISIBILITY,
+            titleRes = R.string.auto_show_respect_app_visibility_title,
+            summaryRes = R.string.auto_show_respect_app_visibility_description,
+            route = SettingRoute(destination = SettingsDestination.TextInput),
+            unavailableFallbackId = SettingLinkIds.TEXT_INPUT_AUTO_SHOW_KEYBOARD,
+            availabilityCheck = { SettingsManager.getAutoShowKeyboard(it) }
         ),
         entry(
             SettingLinkIds.TEXT_INPUT_EXPERIMENTAL_SMOOTH_CARET,
@@ -944,6 +953,13 @@ object SettingLinkRegistry {
             "status_bar.show_on_launcher",
             R.string.keyboard_bar_show_on_launcher,
             R.string.keyboard_bar_show_on_launcher_description,
+            destination = SettingsDestination.Customization,
+            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
+        ),
+        entry(
+            "status_bar.hidden_apps",
+            R.string.keyboard_bar_hidden_apps_title,
+            R.string.keyboard_bar_hidden_apps_row_description,
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
         ),

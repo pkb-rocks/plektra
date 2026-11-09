@@ -271,6 +271,7 @@ class BackupPreferenceContractIntegrationTest {
             "app_enter_behavior_enabled" to PreferenceValueType.BOOLEAN,
             "app_enter_behavior_preset" to PreferenceValueType.STRING,
             "app_enter_behavior_overrides" to PreferenceValueType.STRING,
+            "keyboard_bar_hidden_apps" to PreferenceValueType.STRING_SET,
             "nav_mode_ctrl_hold_enabled" to PreferenceValueType.BOOLEAN,
             "dynamic_variation_bar_resize_to_content" to PreferenceValueType.BOOLEAN,
             "typing_sound_mode" to PreferenceValueType.STRING,

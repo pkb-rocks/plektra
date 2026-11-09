@@ -43,8 +43,17 @@ import rocks.pkb.plektra.data.layout.JsonLayoutLoader
 import rocks.pkb.plektra.data.layout.LayoutMapping
 import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.inputmethod.NotificationHelper
+import rocks.pkb.plektra.inputmethod.SoftwareKeyboardPageChoices
+import rocks.pkb.plektra.inputmethod.SoftwareKeypad
 import java.util.Locale
 import kotlin.math.abs
+
+// Scripts whose profile letters are shown on the software keys. Other
+// non-Latin profiles (e.g. Greek, Armenian) still show the QWERTY base.
+private val SOFTWARE_PROFILE_SCRIPTS = setOf(Character.UnicodeScript.CYRILLIC, Character.UnicodeScript.ARABIC)
+
+/** How opaque a SYM page's key with nothing on it is drawn (of 255). */
+private const val FREE_KEY_ALPHA = 90
 
 /**
  * AOSP LatinIME alphabet key plane embedded in Plektra.
@@ -72,6 +81,12 @@ class AospKeyboardView @JvmOverloads constructor(
         fun onKeyStroke(keyCode: Int, text: String): Boolean = false
         fun onSymbolText(text: String): Boolean = false
         fun onSymbolLongPress(keyCode: Int): Boolean = false
+        /** A layout or page was picked from the layout key: [SoftwareKeyboardPageChoices] id. */
+        fun onPageChoice(id: String) = Unit
+        /** A letter key of the active SYM page tapped, by its hardware key code; true when handled. */
+        fun onSymbolKey(keyCode: Int): Boolean = false
+        /** A letter key of the active SYM page held, before [onSymbolLongPress]; true when handled. */
+        fun onSymbolKeyLongPress(keyCode: Int): Boolean = false
     }
 
     data class ThemeOverride(
@@ -97,7 +112,8 @@ class AospKeyboardView @JvmOverloads constructor(
         val keyWidthScale: Float = 1f,
         val rowGapScale: Float = 1f,
         val distributeHorizontalSpacing: Boolean = true,
-        val ortholinear: Boolean = false
+        val ortholinear: Boolean = false,
+        val textures: Map<String, rocks.pkb.plektra.KeyboardThemeTexture> = emptyMap()
     )
 
     enum class SoftwareLayoutStyle {
@@ -107,7 +123,12 @@ class AospKeyboardView @JvmOverloads constructor(
         FULL_ISO
     }
 
-    private enum class KeyType { CHAR, SHIFT, BACKSPACE, SYMBOLS, CTRL, ALT, COMMA, PERIOD, SPACE, ENTER, LANGUAGE }
+    companion object {
+        /** A SYM press at least this long is a hold, not a tap: its release never switches pages. */
+        const val SYM_HOLD_MIN_MS = 300L
+    }
+
+    private enum class KeyType { CHAR, SHIFT, BACKSPACE, SYMBOLS, CTRL, ALT, COMMA, PERIOD, SPACE, ENTER, LANGUAGE, LAYOUT }
 
     private data class KeySpec(
         val type: KeyType,
@@ -146,7 +167,8 @@ class AospKeyboardView @JvmOverloads constructor(
 
     private data class MoreKeyChoice(
         val label: String,
-        val output: String
+        val output: String,
+        val pageChoiceId: String? = null
     )
 
     private data class MoreKeysPanelState(
@@ -163,17 +185,22 @@ class AospKeyboardView @JvmOverloads constructor(
         val layerKeyHeight: Float,
         val padding: Float,
         var selectedIndex: Int = -1,
-        var selectedLayerIndex: Int = -1
+        var selectedLayerIndex: Int = -1,
+        val pageChooser: Boolean = false
     )
 
     private data class PreviewPopupState(
         val label: String,
         val rect: RectF,
-        val hasMoreKeys: Boolean
+        val hasMoreKeys: Boolean,
+        /** The label comes from a SYM page, whose emoji the bundled font draws. */
+        val symPageLabel: Boolean = false
     )
 
     var listener: Listener? = null
+    // Mappings of a non-Latin profile whose letters replace the software keys.
     private var cyrillicMappings: Map<Int, LayoutMapping> = emptyMap()
+    private var profileScript: Character.UnicodeScript? = null
     private var profileFileRevision: Pair<Long, Long>? = null
 
     var layoutName: String = "qwerty"
@@ -187,11 +214,11 @@ class AospKeyboardView @JvmOverloads constructor(
             field = normalized
             profileFileRevision = revision
             val mappings = JsonLayoutLoader.loadLayout(context.assets, normalized, context).orEmpty()
-            cyrillicMappings = mappings.takeIf { profile ->
-                profile.values.any { mapping ->
-                    mapping.lowercase.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.CYRILLIC }
-                }
-            }.orEmpty()
+            profileScript = mappings.values.asSequence()
+                .flatMap { mapping -> mapping.lowercase.asSequence() }
+                .map { Character.UnicodeScript.of(it.code) }
+                .firstOrNull { it in SOFTWARE_PROFILE_SCRIPTS }
+            cyrillicMappings = if (profileScript != null) mappings else emptyMap()
             rebuildKeys(width, height)
             invalidateKeyboard()
         }
@@ -214,6 +241,29 @@ class AospKeyboardView @JvmOverloads constructor(
             requestLayout()
             invalidateKeyboard()
         }
+    /** Compact keypad replacing the letter rows; [SoftwareKeypad.FULL] keeps the regular layout. */
+    var keypad: SoftwareKeypad = SoftwareKeypad.FULL
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            dismissPopup()
+            rebuildKeys(width, height)
+            requestLayout()
+            invalidateKeyboard()
+        }
+    var layoutKeyLabel: String = "ABC"
+        set(value) {
+            val normalized = value.ifBlank { "ABC" }
+            if (field == normalized) {
+                return
+            }
+            field = normalized
+            invalidateKeyboard()
+        }
+    /** Entries of the chooser opened by holding the layout key; empty disables the chooser. */
+    var pageChoices: List<SoftwareKeyboardPageChoices.Choice> = emptyList()
     var nearestKeyTouchEnabled: Boolean = true
     var shifted: Boolean = false
         set(value) {
@@ -336,6 +386,15 @@ class AospKeyboardView @JvmOverloads constructor(
             field = value
             invalidateKeyboard()
         }
+    /** Keys (key codes) of the SYM page that hold nothing on it: drawn empty and dimmed, they do nothing. */
+    var symPageFreeKeyCodes: Set<Int> = emptySet()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            invalidateKeyboard()
+        }
     var ctrlPreviewLabels: Map<Int, String> = emptyMap()
         set(value) {
             if (field == value) {
@@ -400,10 +459,20 @@ class AospKeyboardView @JvmOverloads constructor(
     var longPressHintProvider: ((String) -> String?)? = null
     var longPressLayerAlternatesProvider: ((String) -> List<LongPressLayerAlternative>)? = null
     var longPressLayerPopupBelowKey: Boolean = true
+    private var backgroundBeforePhoto: Drawable? = null
     var themeOverride: ThemeOverride? = null
         set(value) {
             if (field == value) {
                 return
+            }
+            val image = value?.textures?.get("background")
+            val hadPhoto = field?.textures?.containsKey("background") == true
+            if (image != null) {
+                if (!hadPhoto) backgroundBeforePhoto = background
+                rocks.pkb.plektra.ThemeTextureBackground.set(this, value?.background ?: Color.BLACK, image)
+            } else if (hadPhoto) {
+                background = backgroundBeforePhoto
+                backgroundBeforePhoto = null
             }
             field = value
             rebuildKeys(width, height)
@@ -426,6 +495,7 @@ class AospKeyboardView @JvmOverloads constructor(
     private val handler = Handler(Looper.getMainLooper())
     private var longPressTriggered = false
     private val longPressRunnable = Runnable { showMoreKeysOrRepeat() }
+    private val symHoldPageChooserRunnable = Runnable { showPageChooserAfterSymHold() }
     private var spaceSwipeActive = false
     private var spaceSwipeLastX = 0f
     private var spaceLongPressArmed = false
@@ -504,6 +574,8 @@ class AospKeyboardView @JvmOverloads constructor(
     private var surfaceFrameKey: List<Any>? = null
     private val preparedKeySurfaces = mutableMapOf<RectF, rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.CanvasSurface>()
     private val inkOffsets = mutableMapOf<List<Any>, android.graphics.PointF>()
+    /** Laid-out labels with emoji drawn by the bundled font, by label, size, colour and space. */
+    private val emojiLabelLayouts = HashMap<List<Any>, android.text.StaticLayout?>()
 
     private fun prepareKeySurfaces() {
         val frame = rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.canvasFrame(this, standaloneBarGeometry)
@@ -589,13 +661,16 @@ class AospKeyboardView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         themeOverride?.let {
-            canvas.drawColor(it.background)
+            // View.draw has already painted our backdrop (or the shared ancestor did).
+            // An opaque fill here would hide the photo behind the entire key grid.
+            if (!it.textures.containsKey("background")) canvas.drawColor(it.background)
         } ?: drawDrawable(canvas, keyboardBackground, RectF(0f, 0f, width.toFloat(), height.toFloat()))
         prepareKeySurfaces()
         keys.forEach { key ->
             val surface = key.surface
             val center = surface?.center ?: android.graphics.PointF(key.visualRect.centerX(), key.visualRect.centerY())
-            val save = canvas.save()
+            val free = isFreeSymPageKey(key)
+            val save = if (free) canvas.saveLayerAlpha(key.visualRect, FREE_KEY_ALPHA) else canvas.save()
             if (surface != null) canvas.clipPath(surface.path)
             val theme = themeOverride
             if (surface?.ledShaped == true && theme != null) {
@@ -611,6 +686,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 drawDrawable(canvas, backgroundFor(key), key.visualRect)
             }
             canvas.restoreToCount(save)
+            if (free) return@forEach
             val previewIcon = previewIconFor(key)
             if (previewIcon != null) {
                 if (ctrlShortcutDisplay == SettingsManager.SoftwareCtrlShortcutDisplay.CORNER_ICONS) {
@@ -634,7 +710,7 @@ class AospKeyboardView @JvmOverloads constructor(
             val label = SoftwareKeyboardActionLabels.display(layerLabel ?: displayLabel(key.spec))
             textPaint.textSize = when (key.spec.type) {
                 KeyType.SPACE -> sp(12f)
-                KeyType.SYMBOLS -> sp(16f)
+                KeyType.SYMBOLS, KeyType.LAYOUT -> sp(16f)
                 KeyType.ENTER, KeyType.SHIFT, KeyType.BACKSPACE, KeyType.CTRL, KeyType.ALT, KeyType.LANGUAGE -> sp(23f)
                 else -> sp(24f)
             }
@@ -647,7 +723,29 @@ class AospKeyboardView @JvmOverloads constructor(
             if (layerLabel == null && drawFunctionalIcon(canvas, key, center)) {
                 return@forEach
             }
-            if (surface == null) {
+            val labelWidth = key.visualRect.width() - dp(8f)
+            val labelHeight = key.visualRect.height() - dp(4f)
+            val emojiLayout = layerLabel?.let { emojiLabelLayout(label, labelWidth, labelHeight) }
+            if (emojiLayout == null) {
+                // Fit every text label, including functional labels at large font scales.
+                repeat(4) {
+                    val scale = minOf(
+                        labelWidth / textPaint.measureText(label),
+                        labelHeight / textPaint.fontMetrics.let { it.descent - it.ascent }
+                    )
+                    if (scale >= 1f) return@repeat
+                    textPaint.textSize = kotlin.math.floor(textPaint.textSize * scale).coerceAtLeast(1f)
+                }
+            }
+            if (emojiLayout != null) {
+                val save = canvas.save()
+                canvas.translate(
+                    key.visualRect.centerX() - emojiLayout.width / 2f,
+                    center.y - ctrlLabelOffset - emojiLayout.height / 2f
+                )
+                emojiLayout.draw(canvas)
+                canvas.restoreToCount(save)
+            } else if (surface == null) {
                 val baseline = center.y - ctrlLabelOffset - (textPaint.fontMetrics.ascent + textPaint.fontMetrics.descent) / 2f
                 canvas.drawText(label, center.x, baseline, textPaint)
             } else {
@@ -671,6 +769,43 @@ class AospKeyboardView @JvmOverloads constructor(
                 canvas.drawText(SoftwareKeyboardActionLabels.display(longPressHint), key.visualRect.right - dp(9f), key.visualRect.top + dp(12f), hintPaint)
                 hintPaint.textAlign = Paint.Align.CENTER
             }
+        }
+    }
+
+    /**
+     * [label] laid out with its emoji drawn by the bundled emoji font, when that is in use and
+     * draws some of it; null for plain text. EmojiCompat draws its emoji as spans, which only a
+     * text layout draws: Canvas.drawText would use the system font (boxes for newer emoji, and
+     * sequences it doesn't know split into their parts). The text is made smaller until the
+     * laid-out line fits [maxWidth] by [maxHeight] px.
+     */
+    private fun emojiLabelLayout(label: String, maxWidth: Float, maxHeight: Float): android.text.StaticLayout? {
+        val width = maxWidth.toInt().coerceAtLeast(1)
+        val height = maxHeight.toInt().coerceAtLeast(1)
+        val rendering = rocks.pkb.plektra.data.emoji.EmojiRendering
+        // Until the bundled font has loaded, labels are plain text; laid out again once it has
+        return emojiLabelLayouts.getOrPut(listOf(label, textPaint.textSize, textPaint.color, width, height, rendering.isReady(context))) {
+            val display = rendering.forDisplay(context, label)
+            val drawnByFont = display is android.text.Spanned &&
+                display.getSpans(0, display.length, android.text.style.ReplacementSpan::class.java).isNotEmpty()
+            if (!drawnByFont) return@getOrPut null
+            if (emojiLabelLayouts.size > 256) emojiLabelLayouts.clear()
+            val paint = android.text.TextPaint(textPaint).apply { textAlign = Paint.Align.LEFT }
+            fun layOut() = android.text.StaticLayout.Builder.obtain(display, 0, display.length, paint, width)
+                .setAlignment(android.text.Layout.Alignment.ALIGN_CENTER)
+                .setIncludePad(false)
+                .setMaxLines(1)
+                .build()
+            // An emoji span takes the width its glyph needs at the text size, whatever the
+            // layout's width: what is drawn is measured and the text size scaled down to fit
+            var layout = layOut()
+            repeat(4) {
+                val scale = minOf(width / layout.getLineWidth(0), height / layout.height.toFloat())
+                if (scale >= 1f || paint.textSize <= 1f) return@getOrPut layout
+                paint.textSize = kotlin.math.floor(paint.textSize * scale).coerceAtLeast(1f)
+                layout = layOut()
+            }
+            layout
         }
     }
 
@@ -765,10 +900,13 @@ class AospKeyboardView @JvmOverloads constructor(
                 key?.let {
                     NotificationHelper.triggerTapHapticFeedback(this@AospKeyboardView)
                     listener?.onKeyPressSound(soundKeyCodeFor(it))
-                    if (it.spec.type.isHoldModifier() && !hasSymLayerOutput(it)) {
+                    if (it.spec.type.isHoldModifier() && !hasSymLayerOutput(it) && !opensPageChooser(it)) {
                         heldModifierKey = it
                         heldModifierPointerId = event.getPointerId(pointerIndex)
                         listener?.onModifierKeyDown(soundKeyCodeFor(it))
+                        if (opensPageChooserAfterSymHold(it)) {
+                            handler.postDelayed(symHoldPageChooserRunnable, maxOf(longPressTimeoutMs, SYM_HOLD_MIN_MS))
+                        }
                         invalidateKeyboard()
                     } else {
                         if (!isModifierPreviewLayerActive()) {
@@ -782,7 +920,9 @@ class AospKeyboardView @JvmOverloads constructor(
             MotionEvent.ACTION_POINTER_DOWN -> {
                 val pointerIndex = event.actionIndex
                 val key = findKey(event.getX(pointerIndex), event.getY(pointerIndex)) ?: return true
-                if (key.spec.type.isHoldModifier() && !hasSymLayerOutput(key)) return true
+                // Any second finger during a SYM hold starts a chord, which keeps SYM a modifier.
+                handler.removeCallbacks(symHoldPageChooserRunnable)
+                if (key.spec.type.isHoldModifier() && !hasSymLayerOutput(key) && !opensPageChooser(key)) return true
                 if (heldModifierKey == null) {
                     val previousKey = pressedKey
                     if (
@@ -852,6 +992,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 val key = findKey(pointerX, pointerY)
                 if (key != pressedKey) {
                     handler.removeCallbacks(longPressRunnable)
+                    handler.removeCallbacks(symHoldPageChooserRunnable)
                     dismissPopup()
                     pressedKey = key
                     invalidateKeyboard()
@@ -888,14 +1029,12 @@ class AospKeyboardView @JvmOverloads constructor(
                 if (pointerId == activePointerId) {
                     handler.removeCallbacks(longPressRunnable)
                     moreKeysPanelState?.let { panel ->
-                        val selected = selectedMoreKey(event.getX(pointerIndex), event.getY(pointerIndex), panel)
+                        val selected = selectedMoreKeyChoice(panel)
                         dismissPopup()
                         pressedKey = null
                         activePointerId = -1
                         invalidateKeyboard()
-                        if (selected != null) {
-                            listener?.onText(selected)
-                        }
+                        dispatchMoreKeyChoice(selected)
                         return true
                     }
                     val key = pressedKey
@@ -920,13 +1059,11 @@ class AospKeyboardView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 handler.removeCallbacks(longPressRunnable)
                 moreKeysPanelState?.let { panel ->
-                    val selected = selectedMoreKey(event.x, event.y, panel)
+                    val selected = selectedMoreKeyChoice(panel)
                     dismissPopup()
                     pressedKey = null
                     invalidateKeyboard()
-                    if (selected != null) {
-                        listener?.onText(selected)
-                    }
+                    dispatchMoreKeyChoice(selected)
                     return true
                 }
                 val key = pressedKey
@@ -1017,14 +1154,59 @@ class AospKeyboardView @JvmOverloads constructor(
         }
     }
 
-    private fun keyboardRowCount(): Int = if (includeNumberRow) 5 else 4
+    private fun keyboardRowCount(): Int = if (includeNumberRow && keypad == SoftwareKeypad.FULL) 5 else 4
 
     private fun rowHeights(rowCount: Int): List<Int> =
         List(rowCount) { rowIndex ->
-            if (includeNumberRow && rowIndex == 0) preferredNumberRowHeightPx else preferredKeyHeightPx
+            if (includeNumberRow && keypad == SoftwareKeypad.FULL && rowIndex == 0) {
+                preferredNumberRowHeightPx
+            } else {
+                preferredKeyHeightPx
+            }
         }
 
+    /** Four columns: three digit columns and a function column, with the layout key bottom left. */
+    private fun keypadRows(keypad: SoftwareKeypad): List<List<KeySpec>> {
+        val cell = 25f
+        fun digit(ch: Char, column: Int) = charSpec(ch, column * cell, widthPercent = cell)
+        fun text(label: String, xPercent: Float, widthPercent: Float = cell, moreKeys: List<String> = emptyList()) =
+            KeySpec(KeyType.CHAR, label, moreKeys = moreKeys, xPercent = xPercent, widthPercent = widthPercent)
+        val space = KeySpec(KeyType.SPACE, "␣", output = " ", xPercent = 3 * cell, widthPercent = cell)
+        val backspace = KeySpec(KeyType.BACKSPACE, "⌫", xPercent = 3 * cell, widthPercent = cell)
+        val enter = KeySpec(KeyType.ENTER, "↵", output = "\n", xPercent = 3 * cell, widthPercent = cell)
+        val phone = keypad == SoftwareKeypad.PHONE
+        val row1 = listOf(digit('1', 0), digit('2', 1), digit('3', 2)) +
+            if (phone) {
+                text("+", 3 * cell, moreKeys = listOf("-", "(", ")", "/", "."))
+            } else {
+                text("-", 3 * cell, moreKeys = listOf("+", "/", ":"))
+            }
+        val row2 = listOf(digit('4', 0), digit('5', 1), digit('6', 2), space)
+        val row3 = listOf(digit('7', 0), digit('8', 1), digit('9', 2), backspace)
+        val row4 = if (phone) {
+            listOf(
+                KeySpec(KeyType.LAYOUT, "ABC", xPercent = 0f, widthPercent = cell / 2f),
+                // Dialer conventions: long-press * for a pause, # for a wait.
+                text("*", cell / 2f, widthPercent = cell / 2f, moreKeys = listOf(",")),
+                text("0", cell, moreKeys = listOf("+")),
+                text("#", 2 * cell, moreKeys = listOf(";")),
+                enter.copy(xPercent = 3 * cell)
+            )
+        } else {
+            listOf(
+                KeySpec(KeyType.LAYOUT, "ABC", xPercent = 0f, widthPercent = cell),
+                digit('0', 1),
+                text(".", 2 * cell, moreKeys = listOf(",")),
+                enter.copy(xPercent = 3 * cell)
+            )
+        }
+        return listOf(row1, row2, row3, row4)
+    }
+
     private fun rowsFor(layout: String, style: SoftwareLayoutStyle): List<List<KeySpec>> {
+        if (keypad != SoftwareKeypad.FULL) {
+            return keypadRows(keypad)
+        }
         val family = SoftwareKeyboardLayoutTemplates.familyFor(layout)
         val rowStrings = SoftwareKeyboardLayoutTemplates.rowTemplateFor(family, style)
         if (style == SoftwareLayoutStyle.FULL_ANSI || style == SoftwareLayoutStyle.FULL_ISO) {
@@ -1234,7 +1416,11 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun profileMapping(spec: KeySpec): LayoutMapping? =
-        if (spec.type in listOf(KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD)) profileMappingForText(spec.output) else null
+        if (keypad == SoftwareKeypad.FULL && spec.type in listOf(KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD)) {
+            profileMappingForText(spec.output)
+        } else {
+            null
+        }
 
     internal fun profileMappingForText(text: String): LayoutMapping? =
         cyrillicMappings[physicalKeyCodeForText(text)]
@@ -1246,8 +1432,9 @@ class AospKeyboardView @JvmOverloads constructor(
 
     private fun displayLabel(spec: KeySpec): String = when (spec.type) {
         KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD -> characterOutput(spec)
-        KeyType.SPACE -> spacebarLabel
+        KeyType.SPACE -> if (keypad == SoftwareKeypad.FULL) spacebarLabel else "␣"
         KeyType.SYMBOLS -> symbolsLabel
+        KeyType.LAYOUT -> layoutKeyLabel
         else -> spec.label
     }
 
@@ -1320,6 +1507,7 @@ class AospKeyboardView @JvmOverloads constructor(
             KeyType.SPACE -> "space"
             KeyType.ENTER -> "enter"
             KeyType.LANGUAGE -> "language"
+            KeyType.LAYOUT -> "layout"
         }
     }
 
@@ -1370,6 +1558,7 @@ class AospKeyboardView @JvmOverloads constructor(
             KeyType.SPACE -> context.getString(R.string.software_keyboard_accessibility_space)
             KeyType.ENTER -> context.getString(R.string.software_keyboard_accessibility_enter)
             KeyType.LANGUAGE -> context.getString(R.string.software_keyboard_accessibility_language_switch)
+            KeyType.LAYOUT -> context.getString(R.string.software_keyboard_accessibility_full_keyboard)
         }
     }
 
@@ -1385,7 +1574,7 @@ class AospKeyboardView @JvmOverloads constructor(
 
     private fun accessibilityStateDescription(key: Key): String? {
         val states = buildList {
-            if (!isEnabled) {
+            if (!isEnabled || isFreeSymPageKey(key)) {
                 add(context.getString(R.string.software_keyboard_accessibility_disabled))
             }
             if (isAccessibilityKeySelected(key)) {
@@ -1420,7 +1609,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun displayAltHint(key: Key): String {
-        if (symPageActive) return ""
+        if (symPageActive || keypad != SoftwareKeypad.FULL) return ""
         if (key.spec.type !in listOf(KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD)) return ""
         return longPressHintProvider
             ?.invoke(key.spec.output)
@@ -1461,6 +1650,11 @@ class AospKeyboardView @JvmOverloads constructor(
             altPreviewActive
     }
 
+    /** A key of the SYM page with nothing on it: no letter is drawn on it, a touch does nothing. */
+    private fun isFreeSymPageKey(key: Key): Boolean =
+        symPageActive && !ctrlLayerActive() && modifierPreviewKeyCodeFor(key) in symPageFreeKeyCodes &&
+            symPageLabelFor(key) == null
+
     private fun symPageLabelFor(key: Key): String? {
         if (!symPageActive) return null
         if (heldModifierKey?.spec?.type == KeyType.CTRL || ctrlPreviewActive) return null
@@ -1484,6 +1678,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun dispatchKey(key: Key) {
+        if (isFreeSymPageKey(key)) return
         if (dispatchSymLayerTextIfNeeded(key)) {
             return
         }
@@ -1508,6 +1703,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 listener?.onModifierKeyUp(KeyEvent.KEYCODE_ALT_LEFT)
             }
             KeyType.LANGUAGE -> listener?.onLanguageSwitch()
+            KeyType.LAYOUT -> listener?.onPageChoice(SoftwareKeyboardPageChoices.LETTERS)
         }
     }
 
@@ -1518,6 +1714,11 @@ class AospKeyboardView @JvmOverloads constructor(
             symPageActive -> symPageLabelFor(key)
             else -> null
         } ?: return false
+        if (symPageActive) {
+            // The SYM page's own keys (page turns, search, emoji variants) act by key, not text
+            val keyCode = modifierPreviewKeyCodeFor(key)
+            if (keyCode != KeyEvent.KEYCODE_UNKNOWN && listener?.onSymbolKey(keyCode) == true) return true
+        }
         return listener?.onSymbolText(text) == true
     }
 
@@ -1531,6 +1732,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun releaseHeldModifier() {
+        handler.removeCallbacks(symHoldPageChooserRunnable)
         val key = heldModifierKey ?: return
         listener?.onModifierKeyUp(soundKeyCodeFor(key))
         heldModifierKey = null
@@ -1559,6 +1761,10 @@ class AospKeyboardView @JvmOverloads constructor(
         if (isModifierPreviewLayerActive()) {
             return
         }
+        if (opensPageChooser(key)) {
+            showPageChooser(key)
+            return
+        }
         if (key.spec.type == KeyType.BACKSPACE) {
             longPressTriggered = true
             listener?.onKeyPressSound(KeyEvent.KEYCODE_DEL)
@@ -1574,11 +1780,13 @@ class AospKeyboardView @JvmOverloads constructor(
             return
         }
         if (symPageActive) {
-            if (!key.spec.type.canOpenSymbolPicker()) {
+            if (!key.spec.type.canOpenSymbolPicker() || isFreeSymPageKey(key)) {
                 return
             }
             val keyCode = soundKeyCodeFor(key)
-            if (listener?.onSymbolLongPress(keyCode) == true) {
+            val symKeyCode = modifierPreviewKeyCodeFor(key)
+            val symKeyHandled = symKeyCode != KeyEvent.KEYCODE_UNKNOWN && listener?.onSymbolKeyLongPress(symKeyCode) == true
+            if (symKeyHandled || listener?.onSymbolLongPress(keyCode) == true) {
                 longPressTriggered = true
                 dismissPopup()
                 invalidateKeyboard()
@@ -1694,16 +1902,18 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun showPreview(key: Key) {
-        if (isModifierPreviewLayerActive()) return
+        if (isModifierPreviewLayerActive() || isFreeSymPageKey(key)) return
         if (key.spec.type != KeyType.CHAR && key.spec.type != KeyType.COMMA && key.spec.type != KeyType.PERIOD) return
         val previewWidth = maxOf(key.visualRect.width() + dp(18f), dp(52f).toFloat())
         val previewHeight = dp(72f).toFloat()
         val popupLeft = (key.visualRect.centerX() - previewWidth / 2f).coerceIn(0f, width - previewWidth)
         val popupTop = key.visualRect.top - previewHeight - popupVerticalOffset(themeOverride)
+        val symLabel = symPageLabelFor(key)
         previewPopupState = PreviewPopupState(
-            label = SoftwareKeyboardActionLabels.display(symPageLabelFor(key) ?: displayLabel(key.spec)),
+            label = SoftwareKeyboardActionLabels.display(symLabel ?: displayLabel(key.spec)),
             rect = RectF(popupLeft, popupTop, popupLeft + previewWidth, popupTop + previewHeight),
-            hasMoreKeys = longPressAlternatesFor(key).isNotEmpty()
+            hasMoreKeys = longPressAlternatesFor(key).isNotEmpty(),
+            symPageLabel = symLabel != null
         )
         moreKeysPanelState = null
         updatePopupOverlay()
@@ -1743,16 +1953,83 @@ class AospKeyboardView @JvmOverloads constructor(
         invalidateKeyboard()
     }
 
-    private fun selectedMoreKey(x: Float, y: Float, panel: MoreKeysPanelState): String? {
-        val layerIndex = selectedLayerKeyIndex(x, y, panel)
-        if (layerIndex >= 0) {
-            return panel.layerKeys.getOrNull(layerIndex)?.output
+    private fun selectedMoreKeyChoice(panel: MoreKeysPanelState): MoreKeyChoice? {
+        // Commit the choice the user saw highlighted, without a second hit test on release.
+        panel.selectedLayerIndex.takeIf { it >= 0 }?.let { return panel.layerKeys.getOrNull(it) }
+        return panel.keys.getOrNull(panel.selectedIndex)
+    }
+
+    private fun dispatchMoreKeyChoice(choice: MoreKeyChoice?) {
+        choice ?: return
+        val pageChoiceId = choice.pageChoiceId
+        if (pageChoiceId != null) {
+            listener?.onPageChoice(pageChoiceId)
+        } else if (choice.output.isNotEmpty()) {
+            listener?.onText(choice.output)
         }
-        panel.selectedLayerIndex.takeIf { it >= 0 }?.let { selectedLayerIndex ->
-            return panel.layerKeys.getOrNull(selectedLayerIndex)?.output
-        }
-        val index = selectedMoreKeyIndex(x, y, panel).takeIf { it >= 0 } ?: panel.selectedIndex
-        return panel.keys.getOrNull(index)?.output
+    }
+
+    /** Keys that open the chooser on a regular long press instead of acting as a modifier. */
+    private fun opensPageChooser(key: Key): Boolean =
+        pageChoices.isNotEmpty() &&
+            (key.spec.type == KeyType.LAYOUT || (key.spec.type == KeyType.SYMBOLS && symPageActive))
+
+    /**
+     * On the letter page SYM stays a hold modifier, so its preview and chords keep working; holding
+     * it without a chord or slide opens the same chooser as on the other pages.
+     */
+    private fun opensPageChooserAfterSymHold(key: Key): Boolean =
+        pageChoices.isNotEmpty() && key.spec.type == KeyType.SYMBOLS && !symPageActive
+
+    private fun showPageChooserAfterSymHold() {
+        val key = heldModifierKey?.takeIf { it == pressedKey && chordKey == null && opensPageChooserAfterSymHold(it) }
+            ?: return
+        // Ends the SYM preview; after SYM_HOLD_MIN_MS the release does not switch pages.
+        releaseHeldModifier()
+        pressedKey = key
+        showPageChooser(key)
+    }
+
+    private fun showPageChooser(key: Key) {
+        longPressTriggered = true
+        dismissPopup()
+        val choices = pageChoices.map { MoreKeyChoice(label = it.label, output = "", pageChoiceId = it.id) }
+        val padding = dp(6f).coerceAtMost(width / 4)
+        val itemWidth = dp(56f).coerceAtMost((width - padding * 2).coerceAtLeast(1))
+        val columns = ((width - padding * 2) / itemWidth).coerceAtLeast(1).coerceAtMost(choices.size)
+        val rows = (choices.size + columns - 1) / columns
+        val itemHeight = dp(48f)
+        val popupWidth = padding * 2 + columns * itemWidth
+        val popupHeight = padding * 2 + rows * itemHeight
+        val tailHeight = themeOverride?.let(::popupTailHeight) ?: dp(8f).toFloat()
+        val viewLocation = IntArray(2).also(::getLocationOnScreen)
+        val rootLocation = IntArray(2).also(rootView::getLocationOnScreen)
+        val windowTopInView = (rootLocation[1] - viewLocation[1]).toFloat()
+        // The chooser opens from the bottom-left corner: align its left edge with the key.
+        val popupLeft = (key.visualRect.left).coerceIn(0f, (width - popupWidth).toFloat().coerceAtLeast(0f))
+        val popupTop = (key.visualRect.top - popupHeight - tailHeight).coerceAtLeast(windowTopInView)
+        moreKeysPanelState = MoreKeysPanelState(
+            baseKey = key,
+            keys = choices,
+            layerKeys = emptyList(),
+            popupRectInView = RectF(popupLeft, popupTop, popupLeft + popupWidth, popupTop + popupHeight),
+            layerPopupRectInView = null,
+            layerPopupBelowKey = false,
+            keyWidth = itemWidth.toFloat(),
+            keyHeight = itemHeight.toFloat(),
+            columns = columns,
+            layerKeyWidth = 0f,
+            layerKeyHeight = 0f,
+            padding = padding.toFloat(),
+            // Releasing without sliding onto an entry keeps the current page.
+            selectedIndex = -1,
+            selectedLayerIndex = -1,
+            pageChooser = true
+        )
+        previewPopupState = null
+        NotificationHelper.triggerTapHapticFeedback(this)
+        updatePopupOverlay()
+        invalidateKeyboard()
     }
 
     private fun selectedMoreKeyIndex(x: Float, y: Float, panel: MoreKeysPanelState): Int {
@@ -1804,7 +2081,7 @@ class AospKeyboardView @JvmOverloads constructor(
             KeyType.SHIFT -> KeyEvent.KEYCODE_SHIFT_LEFT
             KeyType.CTRL -> KeyEvent.KEYCODE_CTRL_LEFT
             KeyType.ALT -> KeyEvent.KEYCODE_ALT_LEFT
-            KeyType.SYMBOLS, KeyType.LANGUAGE -> KeyEvent.KEYCODE_SYM
+            KeyType.SYMBOLS, KeyType.LANGUAGE, KeyType.LAYOUT -> KeyEvent.KEYCODE_SYM
             KeyType.COMMA -> KeyEvent.KEYCODE_COMMA
             KeyType.PERIOD -> KeyEvent.KEYCODE_PERIOD
             KeyType.CHAR -> physicalKeyCodeForText(key.spec.output)
@@ -1838,6 +2115,9 @@ class AospKeyboardView @JvmOverloads constructor(
         if (!key.spec.type.canShowLongPressAlternates()) {
             return emptyList()
         }
+        if (keypad != SoftwareKeypad.FULL) {
+            return key.spec.moreKeys
+        }
         val providerAlternates = longPressAlternatesProvider
             ?.invoke(key.spec.output)
             ?.filter { it.isNotEmpty() }
@@ -1853,7 +2133,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 overflowMappings.flatMap { extra ->
                     listOf(if (shifted) extra.uppercase else extra.lowercase) +
                         extra.taps.map { if (shifted) it.uppercase else it.lowercase }
-                }.filter { text -> text.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.CYRILLIC } }
+                }.filter { text -> text.any { Character.UnicodeScript.of(it.code) == profileScript } }
             val usableAlternates = profileAlternates.filter { it.isNotEmpty() && it != characterOutput(key.spec) }
             return (usableAlternates + providerAlternates).distinct()
         }
@@ -1867,7 +2147,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun longPressLayerAlternatesFor(key: Key): List<LongPressLayerAlternative> {
-        if (!key.spec.type.canShowLongPressAlternates()) {
+        if (!key.spec.type.canShowLongPressAlternates() || keypad != SoftwareKeypad.FULL) {
             return emptyList()
         }
         return longPressLayerAlternatesProvider
@@ -1889,6 +2169,19 @@ class AospKeyboardView @JvmOverloads constructor(
         textPaint.textSize = sp(30f)
         textPaint.typeface = Typeface.DEFAULT
         textPaint.color = themeOverride?.textAndIcons ?: Color.rgb(238, 238, 238)
+        // Emoji in the preview are drawn by the bundled font too, as on the key
+        val emojiLayout = if (popup.symPageLabel) {
+            emojiLabelLayout(popup.label, rect.width() - dp(8f), rect.height() - dp(8f))
+        } else {
+            null
+        }
+        if (emojiLayout != null) {
+            val save = canvas.save()
+            canvas.translate(rect.centerX() - emojiLayout.width / 2f, rect.centerY() - emojiLayout.height / 2f)
+            emojiLayout.draw(canvas)
+            canvas.restoreToCount(save)
+            return
+        }
         val baselineOffset = -(textPaint.ascent() + textPaint.descent()) / 2f
         canvas.drawText(popup.label, rect.centerX(), rect.centerY() + baselineOffset, textPaint)
     }
@@ -1903,7 +2196,7 @@ class AospKeyboardView @JvmOverloads constructor(
                     theme,
                     panelRect,
                     panel.baseKey.visualRect.centerX() + offsetX,
-                    hasTail = shouldDrawPopupTail(theme)
+                    hasTail = panel.pageChooser || shouldDrawPopupTail(theme)
                 )
             } else {
                 drawDrawable(canvas, moreKeysBackground, panelRect)
@@ -1919,7 +2212,11 @@ class AospKeyboardView @JvmOverloads constructor(
                         drawDrawable(canvas, normalKeyBackground, rect)
                     }
                 }
-                textPaint.textSize = minOf(sp(24f), rect.height() * .5f)
+                textPaint.textSize = if (panel.pageChooser) {
+                    minOf(sp(18f), previewTextSize(choice.label, rect))
+                } else {
+                    minOf(sp(24f), rect.height() * .5f)
+                }
                 textPaint.typeface = Typeface.DEFAULT
                 textPaint.color = theme?.let {
                     if (index == panel.selectedIndex) readableTextColor(it.keyPopupSelected) else it.textAndIcons
@@ -2190,7 +2487,8 @@ class AospKeyboardView @JvmOverloads constructor(
             type == KeyType.CTRL ||
             type == KeyType.ALT ||
             type == KeyType.ENTER ||
-            type == KeyType.LANGUAGE
+            type == KeyType.LANGUAGE ||
+            type == KeyType.LAYOUT
 
     private fun KeyType.canShowLongPressAlternates(): Boolean =
         this == KeyType.CHAR || this == KeyType.COMMA || this == KeyType.PERIOD

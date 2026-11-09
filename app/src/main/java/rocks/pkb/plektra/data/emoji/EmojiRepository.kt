@@ -17,6 +17,9 @@ object EmojiRepository {
     private const val EMOJI_ASSET_DIR = "common/emoji"
     const val RECENTS_CATEGORY_ID = "RECENTS"
 
+    const val SYMBOLS_CATEGORY_ID = "UNICODE_SYMBOLS"
+    const val KAOMOJI_CATEGORY_ID = "KAOMOJI"
+
     data class EmojiEntry(val base: String, val variants: List<String>)
     data class EmojiCategory(
         val id: String,
@@ -24,7 +27,11 @@ object EmojiRepository {
         val emojis: List<EmojiEntry>
     )
 
+    @Volatile
     private var cachedCategories: List<EmojiCategory>? = null
+
+    /** The categories when already loaded, without loading them. */
+    fun cachedCategoriesOrNull(): List<EmojiCategory>? = cachedCategories
 
     suspend fun getEmojiCategories(context: Context): List<EmojiCategory> {
         return cachedCategories ?: loadEmojiCategories(context).also { cachedCategories = it }
@@ -32,6 +39,25 @@ object EmojiRepository {
 
     fun clearCache() {
         cachedCategories = null
+        entryIndex = null
+    }
+
+    @Volatile
+    private var entryIndex: Pair<List<EmojiCategory>, Map<String, EmojiEntry>>? = null
+
+    /** The entry [emoji] belongs to, as its base or one of its variants; null if not loaded. */
+    fun findEntry(emoji: String): EmojiEntry? {
+        val categories = cachedCategories ?: return null
+        val index = entryIndex?.takeIf { it.first === categories }?.second ?: HashMap<String, EmojiEntry>().also { map ->
+            categories.forEach { category ->
+                category.emojis.forEach { entry ->
+                    map.putIfAbsent(entry.base, entry)
+                    entry.variants.forEach { map.putIfAbsent(it, entry) }
+                }
+            }
+            entryIndex = categories to map
+        }
+        return index[emoji]
     }
 
     /**
@@ -91,7 +117,12 @@ object EmojiRepository {
             if (index >= 0) index else Int.MAX_VALUE // Unknown files go to the end
         }
 
-        val availability = EmojiAvailability.fromAssets(assetManager)
+        // With the bundled font, offer exactly what it draws; otherwise what the system font draws.
+        val availability = if (EmojiRendering.awaitReady(context)) {
+            EmojiAvailability.bundledFont { emoji -> EmojiRendering.bundledFontDraws(context, emoji) == true }
+        } else {
+            EmojiAvailability.fromAssets(assetManager)
+        }
 
         sortedFiles.mapNotNull { fileName ->
             val emojis = parseEmojiFile(context, fileName, availability)
@@ -133,6 +164,8 @@ object EmojiRepository {
         }.getOrElse { emptyList() }
     }
 
+    fun categoryNameRes(categoryId: String): Int? = mapCategoryRes(categoryId)
+
     private fun mapCategoryRes(fileName: String): Int? {
         return when (fileName.substringBefore(".txt")) {
             "SMILEYS_AND_EMOTION" -> rocks.pkb.plektra.R.string.emoji_category_smileys_and_emotion
@@ -144,6 +177,8 @@ object EmojiRepository {
             "OBJECTS" -> rocks.pkb.plektra.R.string.emoji_category_objects
             "SYMBOLS" -> rocks.pkb.plektra.R.string.emoji_category_symbols
             "FLAGS" -> rocks.pkb.plektra.R.string.emoji_category_flags
+            SYMBOLS_CATEGORY_ID -> rocks.pkb.plektra.R.string.emoji_category_unicode_symbols
+            KAOMOJI_CATEGORY_ID -> rocks.pkb.plektra.R.string.emoji_category_kaomoji
             else -> null
         }
     }
@@ -163,6 +198,8 @@ object EmojiRepository {
             "OBJECTS" -> rocks.pkb.plektra.R.drawable.ic_lightbulb_24
             "SYMBOLS" -> rocks.pkb.plektra.R.drawable.ic_emoji_symbols_24
             "FLAGS" -> rocks.pkb.plektra.R.drawable.ic_flag_24
+            SYMBOLS_CATEGORY_ID -> rocks.pkb.plektra.R.drawable.ic_unicode_symbols_24
+            KAOMOJI_CATEGORY_ID -> rocks.pkb.plektra.R.drawable.ic_kaomoji_24
             else -> rocks.pkb.plektra.R.drawable.ic_schedule_24
         }
     }

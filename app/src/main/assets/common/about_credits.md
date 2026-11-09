@@ -59,8 +59,20 @@ Plektra includes short typing sound samples derived from CC0 sound effects:
 - [Typewriter sounds](https://opengameart.org/content/typewriter-sounds) by Cassie-OrbitGames, CC0 1.0.
 - [Mechanical Sounds](https://opengameart.org/content/mechanical-sounds) by BMacZero, CC0 1.0.
 
-#### Unicode CLDR
-Emoji search keywords are generated from [Unicode CLDR](https://github.com/unicode-org/cldr-json) annotation data and filtered for Plektra's bundled emoji set.
+#### Unicode CLDR, Unicode Emoji and Unicode Character Database
+Emoji and symbol search keywords are generated from [Unicode CLDR](https://github.com/unicode-org/cldr-json) 49.0.0 annotation data; the emoji categories and the symbol list are generated from [Unicode Emoji and Unicode Character Database](https://www.unicode.org/Public/18.0.0/) 18.0 data.
+
+License: Unicode License v3. Copyright © 1991-2026 Unicode, Inc. (Unicode Emoji and Character Database) and © 2015-2024 Unicode, Inc. (CLDR). The full copyright and permission notices are included in the app as `assets/common/licenses/Unicode-3.0.txt` and `assets/common/licenses/Unicode-3.0-CLDR.txt`.
+
+#### Noto Color Emoji
+Plektra draws emoji in its own views with the bundled [Noto Color Emoji](https://github.com/googlefonts/noto-emoji) font (release `v2026-09-24-unicode18_0`).
+
+License: SIL Open Font License, Version 1.1, included in the app as `assets/common/licenses/OFL-1.1.txt`.
+
+#### Flux Keyboard
+The kaomoji collection and the emoji, symbol and kaomoji pages are adapted from [Flux Keyboard](https://github.com/Flux-Sniffer-Mods/Flux-Keyboard) 2.0.0.
+
+License: GNU General Public License version 3.
 
 #### Leipzig Corpora Collection / Wortschatz Leipzig
 Bundled base dictionaries are frequency-list derivatives built mainly from [Leipzig Corpora Collection / Wortschatz Leipzig](https://corpora.uni-leipzig.de/) word-frequency data, with Plektra-specific filtering, normalization, and additions. Downloadable dictionary assets are maintained in the companion [plektra-dict](https://github.com/pkb-rocks/plektra-dict) repository.

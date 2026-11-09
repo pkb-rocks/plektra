@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Φωτογραφία φόντου</string>
+    <string name="theme_background_photo">Επιλογή φωτογραφίας</string>
+    <string name="theme_background_change">Αλλαγή φωτογραφίας</string>
+    <string name="theme_background_remove">Αφαίρεση φωτογραφίας</string>
+    <string name="theme_background_loading">Προετοιμασία φωτογραφίας…</string>
+    <string name="theme_background_failed">Αυτή η εικόνα δεν μπορεί να χρησιμοποιηθεί. Δοκίμασε άλλη εικόνα κάτω από 16 MB.</string>
+    <string name="theme_background_help">Εμφανίζει την ίδια τη φωτογραφία πίσω από αυτό το πληκτρολόγιο. Τα παρακάτω χρώματα παραμένουν αποθηκευμένα.</string>
+    <string name="theme_background_active_help">Τα πλήκτρα, οι προτάσεις και τα κουμπιά είναι διάφανα ώστε να φαίνεται η φωτογραφία. Τα χρώματά τους παραμένουν αποθηκευμένα και επανέρχονται όταν αφαιρέσεις τη φωτογραφία.</string>
+    <string name="theme_background_zip">Η φωτογραφία δεν περιλαμβάνεται στο αντιγραμμένο κείμενο θέματος, που περιέχει μόνο χρώματα και ρυθμίσεις πλήκτρων. Για μεταφορά της φωτογραφίας χρησιμοποίησε το πλήρες αντίγραφο ασφαλείας (ZIP).</string>
+</resources>

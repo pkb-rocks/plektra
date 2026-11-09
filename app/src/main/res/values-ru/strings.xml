@@ -11,6 +11,7 @@
     <string name="input_method_name_pt">Português</string>
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="settings_title">Настройки</string>
     <string name="back">Назад</string>
     <string name="settings_back_content_description">Назад</string>
@@ -31,6 +32,14 @@
     <string name="swipe_incremental_threshold_title">Чувствительность полоски свайпа</string>
     <string name="swipe_incremental_threshold_description">Расстояние, необходимая чтобы сдвинуть курсор на одну позицию. Уменьшение значения заставляет курсор двигаться быстрее.</string>
     <string name="auto_show_keyboard_title">Автопоказ клавиатуры</string>
+    <string name="auto_show_respect_app_visibility_title">Учитывать настройки отображения приложения</string>
+    <string name="auto_show_respect_app_visibility_description">Android и приложение решают, открывается ли клавиатура при входе в поле. Нажатие на поле или клавишу по-прежнему открывает её.</string>
+    <string name="hardware_keypad_auto_open_title">Автоматически открывать цифровую клавиатуру при физической клавиатуре</string>
+    <string name="hardware_keypad_auto_open_description">Показывает экранную цифровую или телефонную клавиатуру в полях PIN, чисел и телефонов. Иначе откройте её кнопкой цифровой клавиатуры на панели клавиатуры.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Слой эмодзи в переключении страниц</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Включает страницу эмодзи на клавишах в переключение страниц экранной клавиатуры. Выбор эмодзи не затрагивается.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Полная клавиатура</string>
+    <string name="software_keyboard_keypad_button_description">Открыть экранную цифровую клавиатуру</string>
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 распознавание речи</string>
     <string name="alt_ctrl_speech_shortcut_description">Включить сочетание Alt+Ctrl / BlackBerry Alt+0 для запуска распознавания речи</string>
     <string name="static_variation_bar_mode_title">Статическая панель вариантов</string>
@@ -893,4 +902,32 @@ Nav Mode использует физическое положение клави
     <string name="caret_badge_custom_colors_description">Заменить цвета темы клавиатуры.</string>
     <string name="alt_latch_stays_on_space_title">Сохранять Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Пробел и Enter сбрасывают одноразовый Alt, но оставляют Alt-Lock активным.</string>
+    <string name="keyboard_bar_hidden_apps_title">Никогда не показывать панель</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Приложения, в которых панель остаётся скрытой, даже при ручном открытии</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Приложения не выбраны</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d приложение</item>
+        <item quantity="few">%d приложения</item>
+        <item quantity="many">%d приложений</item>
+        <item quantity="other">%d приложения</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">В выбранных здесь приложениях Plektra никогда не показывает панель и экранную клавиатуру: независимо от остальных настроек видимости и даже при попытке открыть её клавишей, сочетанием клавиш или системной кнопкой клавиатуры. Ввод с физической клавиатуры продолжает работать, включая слои SYM, сочетания клавиш, модификаторы и точные коды эмодзи или фрагментов. Буфер обмена и выбор эмодзи в этих приложениях остаются закрытыми.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Веб-приложение — работает внутри %1$s, поэтому панель скрыта и там</string>
+    <string name="emoji_category_unicode_symbols">Текстовые символы</string>
+    <string name="emoji_category_kaomoji">Каомодзи</string>
+    <string name="emoji_style_title">Вид эмодзи</string>
+    <string name="emoji_style_noto">Noto Color Emoji (встроенный)</string>
+    <string name="emoji_style_system">Системный шрифт</string>
+    <string name="emoji_style_description">Plektra вставляет стандартные эмодзи Unicode; приложение, в котором вы пишете, показывает их своим шрифтом.</string>
+    <string name="emoji_skin_tone_title">Тон кожи по умолчанию</string>
+    <string name="emoji_pages_emoji_title">Листать страницу эмодзи клавишами Q и P</string>
+    <string name="emoji_pages_symbols_title">Листать страницу символов клавишами Q и P</string>
+    <string name="emoji_pages_description">Q и P листают страницы, Shift+Q и Shift+P переходят между категориями, A открывает поиск. Удерживайте эмодзи, чтобы выбрать тон кожи. Среди тонов кожи P листает дальше; для эмодзи из вашей собственной раскладки ✎ на A открывает настройку клавиши.</string>
+    <string name="sym_paged_navigation_note">Когда страницы включены, Q (‹) и P (›) листают их. Ваши собственные назначения Q и P сохраняются, и их можно изменить здесь: при открытой странице удерживайте SYM и нажмите Q или P, чтобы ввести их; без страниц они снова работают напрямую.</string>
+    <string name="sym_navigation_key_content_description">%1$s листает страницы (%2$s). Ваше назначение: %3$s</string>
+    <string name="kaomoji_placement_title">Страницы каомодзи</string>
+    <string name="kaomoji_placement_symbols">После символов</string>
+    <string name="kaomoji_placement_emoji">После эмодзи</string>
+    <string name="kaomoji_placement_off">Выкл.</string>
+    <string name="emoji_picker_extras_title">Текстовые символы и каомодзи в выборе эмодзи</string>
 </resources>

@@ -42,6 +42,10 @@ object LayoutMappingRepository {
     )
 
     private var currentLayout: Map<Int, LayoutMapping> = defaultLayout
+    private var altMappings: Map<Int, String> = emptyMap()
+
+    var supportsAutoCapitalization: Boolean = true
+        private set
 
     fun loadLayout(
         assets: AssetManager,
@@ -49,18 +53,38 @@ object LayoutMappingRepository {
         context: Context? = null
     ): Map<Int, LayoutMapping> {
         val layout = JsonLayoutLoader.loadLayout(assets, layoutName, context) ?: defaultLayout
-        currentLayout = layout
+        setLayout(layout)
         Log.d(TAG, "Keyboard layout loaded: $layoutName")
         return layout
     }
 
     fun setLayout(layout: Map<Int, LayoutMapping>) {
         currentLayout = layout
+        altMappings = layout.mapNotNull { (keyCode, mapping) ->
+            mapping.alt?.let { keyCode to it }
+        }.toMap()
+        supportsAutoCapitalization = supportsAutoCapitalization(layout)
+    }
+
+    /**
+     * Shift can select extra letters in an uncased script such as Arabic.
+     * Automatic capitalization must not silently select that alternate layer.
+     * Layouts without any letters keep the default behaviour.
+     */
+    internal fun supportsAutoCapitalization(layout: Map<Int, LayoutMapping>): Boolean {
+        val texts = layout.values.flatMap { mapping ->
+            listOf(mapping.lowercase, mapping.uppercase) + mapping.taps.flatMap { listOf(it.lowercase, it.uppercase) }
+        }
+        val letters = texts.flatMap { it.asIterable() }.filter { it.isLetter() }
+        return letters.isEmpty() || letters.any { it.isLowerCase() || it.isUpperCase() }
     }
 
     fun getLayout(): Map<Int, LayoutMapping> = currentLayout
 
     fun getMapping(keyCode: Int): LayoutMapping? = currentLayout[keyCode]
+
+    fun applyAltMappings(baseMappings: Map<Int, String>): Map<Int, String> =
+        if (altMappings.isEmpty()) baseMappings else baseMappings + altMappings
 
     fun resolveText(
         mapping: LayoutMapping,

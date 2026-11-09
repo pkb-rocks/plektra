@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_title">Foto de fondo</string>
+    <string name="theme_background_photo">Elegir foto</string>
+    <string name="theme_background_change">Cambiar foto</string>
+    <string name="theme_background_remove">Quitar foto</string>
+    <string name="theme_background_loading">Preparando foto…</string>
+    <string name="theme_background_failed">No se puede usar esta imagen. Prueba con otra de menos de 16 MB.</string>
+    <string name="theme_background_help">Muestra la propia foto detrás de este teclado. Los colores de abajo se conservan.</string>
+    <string name="theme_background_active_help">Las teclas, sugerencias y botones son transparentes para que se vea la foto. Sus colores se conservan y vuelven al quitar la foto.</string>
+    <string name="theme_background_zip">La foto no forma parte del texto de tema copiado, que solo contiene colores y ajustes de teclas. Para transferir la foto, usa la copia de seguridad completa (ZIP).</string>
+</resources>

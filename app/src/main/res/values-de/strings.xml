@@ -15,6 +15,7 @@
     <string name="input_method_name_pl">Polski</string>
     <string name="input_method_name_es">Español</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="settings_title">Einstellungen</string>
     <string name="back">Zurück</string>
     <string name="settings_back_content_description">Zurück</string>
@@ -65,6 +66,14 @@
     <string name="swipe_incremental_threshold_title">Wischleisten-Empfindlichkeit</string>
     <string name="auto_show_keyboard_title">Tastatur automatisch anzeigen</string>
     <string name="auto_show_keyboard_description">Zeigt die Bildschirmtastatur automatisch in Textfeldern.</string>
+    <string name="auto_show_respect_app_visibility_title">Anzeigevorgaben der App beachten</string>
+    <string name="auto_show_respect_app_visibility_description">Android und die App entscheiden, ob die Tastatur beim Betreten eines Felds erscheint. Antippen des Felds oder ein Tastendruck öffnet sie weiterhin.</string>
+    <string name="hardware_keypad_auto_open_title">Ziffernblock bei Hardwaretastatur automatisch öffnen</string>
+    <string name="hardware_keypad_auto_open_description">Zeigt in PIN-, Zahlen- und Telefonfeldern den Ziffern- oder Telefonblock auf dem Bildschirm. Sonst öffnet ihn die Tastaturtaste in der Tastaturleiste.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Emoji-Belegung im Seitenwechsel</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Nimmt die Emoji-Belegungsseite in den Seitenwechsel der Bildschirmtastatur auf. Die Emoji-Auswahl bleibt davon unberührt.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Volle Tastatur</string>
+    <string name="software_keyboard_keypad_button_description">Bildschirm-Ziffernblock öffnen</string>
     <string name="info_title">Informationen</string>
     <string name="info_description">Einstellungen werden automatisch gespeichert und sofort auf die Eingabemethode angewendet.</string>
     <string name="keyboard_title">Plektra Tastatur</string>
@@ -1485,6 +1494,15 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="titan2_elite_max_icon_shrink_description">Verkleinert äußere Buttonsymbole automatisch nur bei Bedarf bis zu dieser Grenze. 0% schaltet die Verkleinerung aus; die Positionierung bleibt aktiv.</string>
     <string name="keyboard_bar_show_on_launcher">Leiste auf dem Launcher-Startbildschirm anzeigen</string>
     <string name="keyboard_bar_show_on_launcher_description">Leiste auch anzeigen, wenn Niagara auf dem Startbildschirm ein unsichtbares Eingabefeld verwendet.</string>
+    <string name="keyboard_bar_hidden_apps_title">Leiste niemals anzeigen</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Apps, in denen die Leiste verborgen bleibt – auch beim manuellen Öffnen</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Keine Apps ausgewählt</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d App</item>
+        <item quantity="other">%d Apps</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">In den hier ausgewählten Apps zeigt Plektra weder die Leiste noch die Bildschirmtastatur an: unabhängig von den übrigen Sichtbarkeitseinstellungen und auch dann nicht, wenn du sie per Taste, Kürzel oder Tastatur-Schaltfläche des Systems öffnen willst. Die Hardware-Tastatur tippt weiter, einschließlich SYM-Ebenen, Kürzeln, Modifikatoren und exakter Emoji- oder Snippet-Codes. Zwischenablage und Emoji-Auswahl bleiben in diesen Apps geschlossen.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Web-App – läuft innerhalb von %1$s, daher bleibt die Leiste auch dort verborgen</string>
     <string name="keyboard_bar_suggestions">Vorschläge</string>
     <string name="keyboard_bar_actions">Varianten und Menü</string>
     <string name="keyboard_bar_slim_description">Der schnelle Umschalter wechselt zwischen deinem normalen und deinem Slim-Profil.</string>
@@ -1652,4 +1670,21 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="caret_badge_custom_colors_description">Farben des Keyboard-Themes ersetzen.</string>
     <string name="alt_latch_stays_on_space_title">Alt eingerastet lassen</string>
     <string name="alt_latch_stays_on_space_description">Leertaste und Enter deaktivieren einmaliges Alt, lassen eingerastetes Alt aber aktiv.</string>
+    <string name="emoji_category_unicode_symbols">Textsymbole</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Emoji-Darstellung</string>
+    <string name="emoji_style_noto">Noto Color Emoji (integriert)</string>
+    <string name="emoji_style_system">Systemschrift</string>
+    <string name="emoji_style_description">Plektra fügt Unicode-Standard-Emoji ein; die App, in der du schreibst, zeigt sie mit ihrer eigenen Schrift an.</string>
+    <string name="emoji_skin_tone_title">Standard-Hautton</string>
+    <string name="emoji_pages_emoji_title">Emoji-Seite mit Q und P blättern</string>
+    <string name="emoji_pages_symbols_title">Symbolseite mit Q und P blättern</string>
+    <string name="emoji_pages_description">Q und P blättern, Umschalt+Q und Umschalt+P springen zwischen Kategorien, A öffnet die Suche. Halte ein Emoji für seine Hauttöne. Bei den Hauttönen blättert P zu weiteren; bei einem Emoji deiner eigenen Belegung öffnet ✎ auf A die Anpassung der Taste.</string>
+    <string name="sym_paged_navigation_note">Mit eingeschalteten Seiten blättern Q (‹) und P (›). Deine eigenen Belegungen von Q und P bleiben gespeichert und lassen sich hier bearbeiten: Bei geöffneter Seite tippst du sie mit gehaltener SYM-Taste und Q oder P; ohne Seiten gelten sie wieder direkt.</string>
+    <string name="sym_navigation_key_content_description">%1$s blättert (%2$s). Deine Belegung: %3$s</string>
+    <string name="kaomoji_placement_title">Kaomoji-Seiten</string>
+    <string name="kaomoji_placement_symbols">Nach den Symbolen</string>
+    <string name="kaomoji_placement_emoji">Nach den Emoji</string>
+    <string name="kaomoji_placement_off">Aus</string>
+    <string name="emoji_picker_extras_title">Textsymbole und Kaomoji im Emoji-Picker</string>
 </resources>

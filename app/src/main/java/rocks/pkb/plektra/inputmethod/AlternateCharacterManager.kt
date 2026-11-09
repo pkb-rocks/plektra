@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputConnectionWrapper
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import rocks.pkb.plektra.data.layout.isRealMultiTap
@@ -77,7 +78,7 @@ class AlternateCharacterManager(
 
     init {
         context?.let {
-            altModifierMappings.putAll(AltModifierMappingResolver.resolve(assets, it))
+            altModifierMappings.putAll(AltModifierMappingResolver.resolveBaseMappings(assets, it))
             deviceSymMappings.putAll(DeviceSymMappingRepository.load(assets, it))
         }
         symKeyMap.putAll(KeyMappingLoader.loadSymKeyMappings(assets))
@@ -93,12 +94,12 @@ class AlternateCharacterManager(
 
     fun reloadModifierAndDeviceSymMappings() {
         altModifierMappings.clear()
-        context?.let { altModifierMappings.putAll(AltModifierMappingResolver.resolve(assets, it)) }
+        context?.let { altModifierMappings.putAll(AltModifierMappingResolver.resolveBaseMappings(assets, it)) }
         deviceSymMappings.clear()
         context?.let { deviceSymMappings.putAll(DeviceSymMappingRepository.load(assets, it)) }
     }
 
-    fun getAltModifierMappings(): Map<Int, String> = altModifierMappings
+    fun getAltModifierMappings(): Map<Int, String> = LayoutMappingRepository.applyAltMappings(altModifierMappings)
 
     fun getDeviceSymMappings(): Map<Int, String> = deviceSymMappings
 
@@ -156,7 +157,7 @@ class AlternateCharacterManager(
         }
     }
 
-    fun hasAltMapping(keyCode: Int): Boolean = altModifierMappings.containsKey(keyCode)
+    fun hasAltMapping(keyCode: Int): Boolean = getAltModifierMappings().containsKey(keyCode)
 
     fun hasSymLongPressMapping(keyCode: Int, shiftPressed: Boolean): Boolean {
         val page = context?.let(SettingsManager::resolveLongPressSymPage) ?: 1
@@ -308,7 +309,7 @@ class AlternateCharacterManager(
                 shiftPressed = keyPressWasShifted[keyCode] == true
             )
             "shift" -> LayoutMappingRepository.isMapped(keyCode) && normalChar.isNotEmpty()
-            else -> altModifierMappings.containsKey(keyCode)
+            else -> hasAltMapping(keyCode)
         }
         
         if (shouldScheduleLongPress) {
@@ -325,7 +326,7 @@ class AlternateCharacterManager(
         mappingsOverride: Map<Int, String>? = null,
         defaultHandler: (Int, KeyEvent?) -> Boolean
     ): Boolean {
-        val altChar = (mappingsOverride ?: altModifierMappings)[keyCode]
+        val altChar = (mappingsOverride ?: getAltModifierMappings())[keyCode]
         return if (altChar != null) {
             if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
                 altChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
@@ -468,23 +469,14 @@ class AlternateCharacterManager(
                             }
                             if (!variations.isNullOrEmpty()) {
                                 val firstVariation = variations.first()
-                                val replaced = replaceInsertedTextWithVariation(
+                                val outcome = replaceInsertedText(
+                                    keyCode = keyCode,
                                     inputConnection = inputConnection,
-                                    expectedText = insertedChar,
-                                    anchor = insertedTextAnchors[keyCode],
-                                    variation = firstVariation
+                                    insertedText = insertedChar,
+                                    replacement = firstVariation,
+                                    commitAtCursor = null
                                 )
-                                longPressRunnables.remove(keyCode)
-                                if (replaced) {
-                                    longPressActivated[keyCode] = true
-                                    insertedNormalChars.remove(keyCode)
-                                    insertedTextAnchors.remove(keyCode)
-                                    keyPressWasShifted.remove(keyCode)
-                                    Log.d(TAG, "Long press Variations per keyCode $keyCode -> $firstVariation")
-                                    firstVariation.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
-                                } else {
-                                    Log.d(TAG, "Skipped Variations long press for keyCode $keyCode: original text changed")
-                                }
+                                finishLongPress(keyCode, outcome, firstVariation, "Variations")
                             }
                         }
                     }
@@ -507,52 +499,10 @@ class AlternateCharacterManager(
                         }
 
                         if (!symChar.isNullOrEmpty()) {
-                            longPressActivated[keyCode] = true
-
-                            if (!insertedChar.isNullOrEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
+                            val outcome = replaceInsertedText(keyCode, inputConnection, insertedChar, symChar) {
+                                commitSymbolAtCursor(symChar, inputConnection, "Sym")
                             }
-
-                            if (handleBoundaryTextBeforeCommit(symChar, inputConnection)) {
-                                onAltCharInserted?.invoke(symChar[0])
-                                insertedNormalChars.remove(keyCode)
-                                keyPressWasShifted.remove(keyCode)
-                                longPressRunnables.remove(keyCode)
-                                return@Runnable
-                            }
-
-                            val frenchSpacedPunctuation = symChar.length == 1 &&
-                                context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true &&
-                                rocks.pkb.plektra.core.Punctuation.commitFrenchSpacedPunctuation(inputConnection, symChar[0])
-                            if (frenchSpacedPunctuation) {
-                                Log.d(TAG, "Long press Sym mapping applied with French spacing for '$symChar'")
-                                onAltCharInserted?.invoke(symChar[0])
-                                insertedNormalChars.remove(keyCode)
-                                keyPressWasShifted.remove(keyCode)
-                                longPressRunnables.remove(keyCode)
-                                return@Runnable
-                            }
-
-                            val punctuationSet = autoSpacePunctuation()
-                            if (symChar[0] in punctuationSet) {
-                                val applied = AutoSpaceTracker.replaceAutoSpaceWithPunctuation(inputConnection, symChar)
-                                if (applied) {
-                                    Log.d(TAG, "Long press Sym mapping applied with auto-space replacement for '$symChar'")
-                                    onAltCharInserted?.invoke(symChar[0])
-                                    insertedNormalChars.remove(keyCode)
-                                    keyPressWasShifted.remove(keyCode)
-                                    longPressRunnables.remove(keyCode)
-                                    return@Runnable
-                                }
-                            }
-
-                            AutoSpaceTracker.clear()
-                            inputConnection.commitText(symChar, 1)
-                            insertedNormalChars.remove(keyCode)
-                            keyPressWasShifted.remove(keyCode)
-                            longPressRunnables.remove(keyCode)
-                            Log.d(TAG, "Long press Sym per keyCode $keyCode -> $symChar")
-                            onAltCharInserted?.invoke(symChar[0])
+                            finishLongPress(keyCode, outcome, symChar, "Sym")
                         }
                     }
 
@@ -563,90 +513,31 @@ class AlternateCharacterManager(
                         if (LayoutMappingRepository.isMapped(keyCode)) {
                             val shiftChar = resolveShiftLongPressText(keyCode, insertedChar)
                             if (shiftChar != null) {
-                                longPressActivated[keyCode] = true
-
-                                inputConnection.deleteSurroundingText(1, 0)
-                                if (!handleBoundaryTextBeforeCommit(shiftChar, inputConnection)) {
-                                    inputConnection.commitText(shiftChar, 1)
+                                val outcome = replaceInsertedText(keyCode, inputConnection, insertedChar, shiftChar) {
+                                    handleBoundaryTextBeforeCommit(shiftChar, inputConnection) ||
+                                        inputConnection.commitText(shiftChar, 1)
                                 }
-
-                                insertedNormalChars.remove(keyCode)
-                                keyPressWasShifted.remove(keyCode)
-                                longPressRunnables.remove(keyCode)
-                                Log.d(TAG, "Long press Shift per keyCode $keyCode -> $shiftChar")
-                                shiftChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
+                                finishLongPress(keyCode, outcome, shiftChar, "Shift")
                             }
                         } else if (insertedChar != null && insertedChar.isNotEmpty() && insertedChar[0].isLetter()) {
                             // Fallback for unmapped keys only: use Kotlin case conversion.
-                            longPressActivated[keyCode] = true
                             val shiftChar = resolveShiftLongPressText(keyCode, insertedChar) ?: insertedChar.uppercase()
-
-                            inputConnection.deleteSurroundingText(1, 0)
-                            inputConnection.commitText(shiftChar, 1)
-
-                            insertedNormalChars.remove(keyCode)
-                            keyPressWasShifted.remove(keyCode)
-                            longPressRunnables.remove(keyCode)
-                            Log.d(TAG, "Long press Shift per keyCode $keyCode -> $shiftChar (fallback)")
-                            if (shiftChar.isNotEmpty()) {
-                                onAltCharInserted?.invoke(shiftChar[0])
+                            val outcome = replaceInsertedText(keyCode, inputConnection, insertedChar, shiftChar) {
+                                inputConnection.commitText(shiftChar, 1)
                             }
+                            finishLongPress(keyCode, outcome, shiftChar, "Shift (fallback)")
                         }
                     }
 
                     else -> {
                         // Long press with Alt: use existing Alt mapping (default).
-                        val altChar = altModifierMappings[keyCode]
+                        val altChar = getAltModifierMappings()[keyCode]
 
-                        if (altChar != null) {
-                            longPressActivated[keyCode] = true
-
-                            if (insertedChar != null && insertedChar.isNotEmpty()) {
-                                inputConnection.deleteSurroundingText(1, 0)
+                        if (!altChar.isNullOrEmpty()) {
+                            val outcome = replaceInsertedText(keyCode, inputConnection, insertedChar, altChar) {
+                                commitSymbolAtCursor(altChar, inputConnection, "Alt")
                             }
-
-                            if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
-                                altChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
-                                insertedNormalChars.remove(keyCode)
-                                keyPressWasShifted.remove(keyCode)
-                                longPressRunnables.remove(keyCode)
-                                return@Runnable
-                            }
-
-                            val frenchSpacedPunctuation = altChar.length == 1 &&
-                                context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true &&
-                                rocks.pkb.plektra.core.Punctuation.commitFrenchSpacedPunctuation(inputConnection, altChar[0])
-                            if (frenchSpacedPunctuation) {
-                                Log.d(TAG, "Long press Alt mapping applied with French spacing for '$altChar'")
-                                onAltCharInserted?.invoke(altChar[0])
-                                insertedNormalChars.remove(keyCode)
-                                keyPressWasShifted.remove(keyCode)
-                                longPressRunnables.remove(keyCode)
-                                return@Runnable
-                            }
-
-                            val punctuationSet = autoSpacePunctuation()
-                            if (altChar.isNotEmpty() && altChar[0] in punctuationSet) {
-                                val applied = AutoSpaceTracker.replaceAutoSpaceWithPunctuation(inputConnection, altChar)
-                                if (applied) {
-                                    Log.d(TAG, "Long press Alt mapping applied with auto-space replacement for '$altChar'")
-                                    onAltCharInserted?.invoke(altChar[0])
-                                    insertedNormalChars.remove(keyCode)
-                                    keyPressWasShifted.remove(keyCode)
-                                    longPressRunnables.remove(keyCode)
-                                    return@Runnable
-                                }
-                            }
-
-                            AutoSpaceTracker.clear()
-                            inputConnection.commitText(altChar, 1)
-                            insertedNormalChars.remove(keyCode)
-                            keyPressWasShifted.remove(keyCode)
-                            longPressRunnables.remove(keyCode)
-                            Log.d(TAG, "Long press Alt per keyCode $keyCode -> $altChar")
-                            if (altChar.isNotEmpty()) {
-                                onAltCharInserted?.invoke(altChar[0])
-                            }
+                            finishLongPress(keyCode, outcome, altChar, "Alt")
                         }
                     }
                 }
@@ -655,6 +546,86 @@ class AlternateCharacterManager(
 
         longPressRunnables[keyCode] = runnable
         handler.postDelayed(runnable, longPressThreshold)
+    }
+
+    /**
+     * Ends a long press as [outcome] reports it. Only a replacement activates it and reports
+     * the alternate character. Unchanged text stays the key's own, which key-up reports as
+     * a normally committed character; text the editor removed without taking the
+     * replacement is reported as neither.
+     */
+    private fun finishLongPress(keyCode: Int, outcome: ReplacementOutcome, replacement: String, label: String) {
+        longPressRunnables.remove(keyCode)
+        when (outcome) {
+            ReplacementOutcome.UNCHANGED -> {
+                Log.d(TAG, "Skipped $label long press for keyCode $keyCode: text not replaced")
+                return
+            }
+            ReplacementOutcome.REMOVED -> {
+                Log.w(TAG, "$label long press for keyCode $keyCode: editor removed the text but rejected '$replacement'")
+                longPressActivated[keyCode] = true
+                insertedNormalChars.remove(keyCode)
+                keyPressWasShifted.remove(keyCode)
+                return
+            }
+            ReplacementOutcome.REPLACED -> Unit
+        }
+        longPressActivated[keyCode] = true
+        insertedNormalChars.remove(keyCode)
+        keyPressWasShifted.remove(keyCode)
+        Log.d(TAG, "Long press $label per keyCode $keyCode -> $replacement")
+        replacement.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
+    }
+
+    /**
+     * Commits a long-press symbol at the cursor with the same boundary and spacing rules as
+     * typing. A handled spacing/boundary request is successful only if its commit was accepted.
+     */
+    private fun commitSymbolAtCursor(text: String, inputConnection: InputConnection, label: String): Boolean {
+        var commitAccepted: Boolean? = null
+        val trackedConnection = object : InputConnectionWrapper(inputConnection, false) {
+            override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean =
+                super.commitText(text, newCursorPosition).also { commitAccepted = it }
+        }
+        // An unhandled boundary can still prepare spacing before the actual symbol is committed.
+        if (handleBoundaryTextBeforeCommit(text, trackedConnection)) {
+            return commitAccepted == true
+        }
+        if (commitAccepted == false) return false
+        commitAccepted = null
+
+        val frenchSpacedPunctuation = text.length == 1 &&
+            context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true &&
+            rocks.pkb.plektra.core.Punctuation.commitFrenchSpacedPunctuation(trackedConnection, text[0])
+        if (frenchSpacedPunctuation || commitAccepted != null) {
+            Log.d(TAG, "Long press $label French spacing for '$text': accepted=$commitAccepted")
+            return commitAccepted == true
+        }
+
+        if (text[0] in autoSpacePunctuation() &&
+            AutoSpaceTracker.replaceAutoSpaceWithPunctuation(trackedConnection, text)
+        ) {
+            Log.d(TAG, "Long press $label auto-space replacement for '$text': accepted=$commitAccepted")
+            return commitAccepted == true
+        }
+
+        AutoSpaceTracker.clear()
+        return inputConnection.commitText(text, 1)
+    }
+
+    /**
+     * Whether committing [text] at the cursor can run typing rules (boundary handling,
+     * French spacing, auto-space replacement) that a plain replacement would skip.
+     */
+    private fun followsCursorTypingRules(text: String): Boolean {
+        if (text.length != 1) return false
+        val char = text[0]
+        val boundary = rocks.pkb.plektra.core.Punctuation.normalizeApostrophe(char)
+        return (onBoundaryTextRequested != null && boundary != '\'' &&
+            boundary in rocks.pkb.plektra.core.Punctuation.BOUNDARY) ||
+            char in autoSpacePunctuation() ||
+            (char in rocks.pkb.plektra.core.Punctuation.FRENCH_SPACED_PUNCTUATION &&
+                context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true)
     }
 
     private data class EditorSnapshot(
@@ -672,6 +643,28 @@ class AlternateCharacterManager(
         val prefixThroughTarget: String,
         val expectedText: String
     )
+
+    /** Where the text a key press inserted is when its long press fires. */
+    private sealed interface InsertedTextTarget {
+        /** A readable editor shows the inserted text at this range. */
+        data class Located(val start: Int, val end: Int, val snapshot: EditorSnapshot) : InsertedTextTarget
+
+        /**
+         * The editor gives no snapshot, so no absolute range: the text before the cursor
+         * either matches the inserted text ([verified]) or is not readable at all (null).
+         */
+        data class BeforeCursor(val verified: Boolean) : InsertedTextTarget
+
+        /** Readable editor state shows the inserted text is not where it was put. */
+        data object Refuted : InsertedTextTarget
+    }
+
+    /**
+     * What a long-press replacement did to the editor. The input connection has no
+     * transaction with rollback, so a deletion it accepted stays when it then rejects the
+     * replacement ([REMOVED]); edits that can avoid that replace the range in one commit.
+     */
+    private enum class ReplacementOutcome { REPLACED, UNCHANGED, REMOVED }
 
     private fun captureInsertedTextAnchor(
         inputConnection: InputConnection,
@@ -699,40 +692,156 @@ class AlternateCharacterManager(
         )
     }
 
-    private fun replaceInsertedTextWithVariation(
+    /**
+     * Replaces the whole text this key press inserted with [replacement], so multi-character
+     * outputs (Uyghur لا) and surrogate pairs are replaced as one unit.
+     *
+     * A range a readable editor still shows is replaced in place with one commit through a
+     * composing region, also when text was typed after it; the selection moves with it.
+     * Only a replacement that typing rules may rewrite at the cursor (see
+     * [followsCursorTypingRules]) and an editor without a readable snapshot go through
+     * [commitAtCursor] after deleting the inserted length before the cursor. Without
+     * [commitAtCursor] those cases are left unchanged. Nothing is changed when readable
+     * editor state contradicts the insertion; only an editor that offers no readable text
+     * at all gets the deletion unverified.
+     */
+    private fun replaceInsertedText(
+        keyCode: Int,
+        inputConnection: InputConnection,
+        insertedText: String?,
+        replacement: String,
+        commitAtCursor: (() -> Boolean)?
+    ): ReplacementOutcome {
+        val anchor = insertedTextAnchors.remove(keyCode)
+        if (replacement.isEmpty()) return ReplacementOutcome.UNCHANGED
+        if (insertedText.isNullOrEmpty()) {
+            // The key press inserted nothing (Alt/Sym-only key): just commit.
+            return if (commitAtCursor?.invoke() == true) ReplacementOutcome.REPLACED else ReplacementOutcome.UNCHANGED
+        }
+
+        return when (val target = resolveInsertedTextTarget(inputConnection, insertedText, anchor)) {
+            InsertedTextTarget.Refuted -> ReplacementOutcome.UNCHANGED
+            is InsertedTextTarget.BeforeCursor -> if (commitAtCursor == null) {
+                ReplacementOutcome.UNCHANGED
+            } else {
+                deleteBeforeCursorAndCommit(inputConnection, insertedText.length, commitAtCursor)
+            }
+            is InsertedTextTarget.Located -> {
+                val range = target.start to target.end
+                val atCursor = target.end == target.snapshot.selectionStart
+                val outcome = if (commitAtCursor != null && atCursor && followsCursorTypingRules(replacement)) {
+                    deleteBeforeCursorAndCommit(inputConnection, insertedText.length, commitAtCursor)
+                } else {
+                    replaceTarget(inputConnection, target.snapshot, range, replacement)
+                }
+                when (outcome) {
+                    ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, replacement)
+                    ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "")
+                    ReplacementOutcome.UNCHANGED -> Unit
+                }
+                outcome
+            }
+        }
+    }
+
+    private fun deleteBeforeCursorAndCommit(
+        inputConnection: InputConnection,
+        length: Int,
+        commitAtCursor: () -> Boolean
+    ): ReplacementOutcome {
+        inputConnection.beginBatchEdit()
+        try {
+            if (!inputConnection.deleteSurroundingText(length, 0)) return ReplacementOutcome.UNCHANGED
+            return if (commitAtCursor()) ReplacementOutcome.REPLACED else ReplacementOutcome.REMOVED
+        } finally {
+            inputConnection.endBatchEdit()
+        }
+    }
+
+    private fun resolveInsertedTextTarget(
         inputConnection: InputConnection,
         expectedText: String,
-        anchor: InsertedTextAnchor?,
-        variation: String
-    ): Boolean {
-        if (expectedText.isEmpty() || variation.isEmpty()) return false
-
-        val snapshot = readEditorSnapshot(inputConnection) ?: return false
-        val target = when {
-            anchor != null -> resolveAnchoredTarget(inputConnection, snapshot, anchor)
-            else -> resolveImmediatelyPrecedingTarget(snapshot, expectedText)
-        } ?: return false
-
-        val selectionStart = snapshot.selectionStart
-        val selectionEnd = snapshot.selectionEnd
-        val lengthDelta = variation.length - expectedText.length
-        inputConnection.beginBatchEdit()
-        inputConnection.finishComposingText()
-        val composingRegionSet = inputConnection.setComposingRegion(target.first, target.second)
-        if (!composingRegionSet) {
-            inputConnection.endBatchEdit()
-            return false
+        anchor: InsertedTextAnchor?
+    ): InsertedTextTarget {
+        val snapshot = readEditorSnapshot(inputConnection)
+        if (snapshot == null) {
+            // Null means unknown; readable text, even empty, has to show the inserted text.
+            val before = inputConnection.getTextBeforeCursor(expectedText.length, 0)?.toString()
+            return when (before) {
+                null -> InsertedTextTarget.BeforeCursor(verified = false)
+                expectedText -> InsertedTextTarget.BeforeCursor(verified = true)
+                else -> InsertedTextTarget.Refuted
+            }
         }
-        val committed = inputConnection.commitText(variation, 1)
-        if (committed) {
-            inputConnection.finishComposingText()
-            inputConnection.setSelection(
-                adjustSelectionAfterReplacement(selectionStart, target, lengthDelta, variation.length),
-                adjustSelectionAfterReplacement(selectionEnd, target, lengthDelta, variation.length)
+
+        val range = if (anchor != null) {
+            resolveAnchoredTarget(inputConnection, snapshot, anchor)
+                // The text before the anchor may have been rewritten (e.g. by autocorrect);
+                // the inserted text right before the cursor at its original end still matches.
+                ?: resolveImmediatelyPrecedingTarget(snapshot, expectedText)
+                    ?.takeIf { anchor.inputConnection === inputConnection && it.second == anchor.targetEnd }
+        } else {
+            resolveImmediatelyPrecedingTarget(snapshot, expectedText)
+        }
+        return range?.let { InsertedTextTarget.Located(it.first, it.second, snapshot) }
+            ?: InsertedTextTarget.Refuted
+    }
+
+    /**
+     * Keeps anchors of other keys still held valid after this manager replaced [range]
+     * in the same editor; anchors overlapping the range no longer match and are dropped.
+     */
+    private fun shiftPendingAnchors(
+        inputConnection: InputConnection,
+        range: Pair<Int, Int>,
+        replacement: String
+    ) {
+        val lengthDelta = replacement.length - (range.second - range.first)
+        for ((key, anchor) in insertedTextAnchors) {
+            if (anchor.inputConnection !== inputConnection || anchor.targetEnd <= range.first) continue
+            val relativeStart = range.first - anchor.textStart
+            val relativeEnd = range.second - anchor.textStart
+            if (anchor.targetStart < range.second || relativeStart < 0) {
+                insertedTextAnchors.remove(key)
+                continue
+            }
+            insertedTextAnchors[key] = anchor.copy(
+                targetStart = anchor.targetStart + lengthDelta,
+                targetEnd = anchor.targetEnd + lengthDelta,
+                prefixThroughTarget = anchor.prefixThroughTarget.replaceRange(relativeStart, relativeEnd, replacement)
             )
         }
-        inputConnection.endBatchEdit()
-        return committed
+    }
+
+    /**
+     * Replaces [target] with one commit into a composing region set on it. The region is
+     * finished on every path, so a rejected commit or an exception never leaves it for the
+     * next keystroke to overwrite; the selection only moves after an accepted commit.
+     */
+    private fun replaceTarget(
+        inputConnection: InputConnection,
+        snapshot: EditorSnapshot,
+        target: Pair<Int, Int>,
+        replacement: String
+    ): ReplacementOutcome {
+        val selectionStart = snapshot.selectionStart
+        val selectionEnd = snapshot.selectionEnd
+        val lengthDelta = replacement.length - (target.second - target.first)
+        inputConnection.beginBatchEdit()
+        try {
+            inputConnection.finishComposingText()
+            if (!inputConnection.setComposingRegion(target.first, target.second)) return ReplacementOutcome.UNCHANGED
+            if (!inputConnection.commitText(replacement, 1)) return ReplacementOutcome.UNCHANGED
+            inputConnection.finishComposingText()
+            inputConnection.setSelection(
+                adjustSelectionAfterReplacement(selectionStart, target, lengthDelta, replacement.length),
+                adjustSelectionAfterReplacement(selectionEnd, target, lengthDelta, replacement.length)
+            )
+            return ReplacementOutcome.REPLACED
+        } finally {
+            inputConnection.finishComposingText()
+            inputConnection.endBatchEdit()
+        }
     }
 
     private fun resolveAnchoredTarget(

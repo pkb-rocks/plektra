@@ -117,16 +117,22 @@ class ShowcaseReceiver : BroadcastReceiver() {
     }
 
     /**
-     * Replaces the Markdown editor's single notes collection with one synthetic note.
-     * The original notes preferences are saved once and put back by `--ez restore true`.
+     * Adds one synthetic note to the Markdown editor's collection and makes it the active note.
+     * Existing notes stay in place. `--ez restore true` removes the synthetic note and puts the
+     * editor state (active note, focus, view mode) back as it was before the first preset.
      */
     private fun applyNotePreset(context: Context, preset: JSONObject) {
         val prefs = context.getSharedPreferences(NOTES_PREFS, Context.MODE_PRIVATE)
         val backup = java.io.File(context.filesDir, NOTES_BACKUP)
         if (!backup.exists()) {
             val saved = JSONObject()
-            prefs.all.forEach { (key, value) -> saved.put(key, encodePref(value)) }
-            backup.writeText(saved.toString())
+            (prefs.all.keys + NOTE_CAPTURE_KEYS).forEach { key -> saved.put(key, encodePref(prefs.all[key])) }
+            val fileExisted = java.io.File(context.applicationInfo.dataDir, "shared_prefs/$NOTES_PREFS.xml").exists()
+            backup.writeText(JSONObject().put("captureFormat", 1).put("preferences", saved).put("fileExisted", fileExisted).toString())
+        }
+        // Moves legacy single-note data into the collection, as the editor does on first start.
+        if (prefs.contains("collection") || prefs.contains("heading") || prefs.contains("body")) {
+            NotesRepository(prefs).all()
         }
         val body = preset.optString("body")
         val title = preset.optString("title")
@@ -134,7 +140,7 @@ class ShowcaseReceiver : BroadcastReceiver() {
         val note = JSONObject().put("id", NOTE_ID).put("title", title).put("body", body)
             .put("cursor", cursor).put("headingFocused", false)
         val editor = prefs.edit()
-            .putString("collection", JSONArray().put(note).toString())
+            .putString("collection", withoutSyntheticNote(prefs).put(note).toString())
             .putString("active_note", NOTE_ID)
             .putString("heading", title)
             .putString("body", body)
@@ -146,12 +152,39 @@ class ShowcaseReceiver : BroadcastReceiver() {
     private fun restoreNotesPreferences(context: Context): Boolean {
         val backup = java.io.File(context.filesDir, NOTES_BACKUP)
         if (!backup.exists()) return false
-        val saved = JSONObject(backup.readText())
-        val editor = context.getSharedPreferences(NOTES_PREFS, Context.MODE_PRIVATE).edit()
-        saved.keys().forEach { key -> editor.putEncoded(key, saved.getJSONObject(key)) }
+        val document = JSONObject(backup.readText())
+        val versioned = document.opt("captureFormat") is Number
+        val wrapped = versioned || (document.opt("fileExisted") is Boolean && document.optJSONObject("preferences") != null)
+        val saved = if (wrapped) {
+            if (document.has("captureFormat")) {
+                require(document.opt("captureFormat") == 1) { "Unsupported capture backup format" }
+            }
+            require(document.opt("fileExisted") is Boolean) { "Invalid capture backup structure" }
+            document.getJSONObject("preferences")
+        } else document
+        val prefs = context.getSharedPreferences(NOTES_PREFS, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        // The collection is never restored from the backup; it only loses the synthetic note.
+        saved.keys().forEach { key -> if (key != "collection") editor.putEncoded(key, saved.getJSONObject(key)) }
+        val remaining = withoutSyntheticNote(prefs)
+        if (remaining.length() > 0 || saved.optJSONObject("collection")?.optString("type") == "string") {
+            editor.putString("collection", remaining.toString())
+        } else {
+            editor.remove("collection")
+        }
         require(editor.commit()) { "Notes restore failed" }
+        if (wrapped && !document.getBoolean("fileExisted") && prefs.all.isEmpty()) {
+            require(context.deleteSharedPreferences(NOTES_PREFS)) { "Could not remove capture-only notes preferences" }
+        }
         require(backup.delete()) { "Could not remove notes backup" }
         return true
+    }
+
+    private fun withoutSyntheticNote(prefs: android.content.SharedPreferences): JSONArray {
+        val stored = JSONArray(prefs.getString("collection", null) ?: "[]")
+        return JSONArray().also { kept ->
+            (0 until stored.length()).map(stored::getJSONObject).filter { it.optString("id") != NOTE_ID }.forEach(kept::put)
+        }
     }
 
     private fun encodePref(value: Any?): JSONObject = when (value) {
@@ -181,6 +214,7 @@ class ShowcaseReceiver : BroadcastReceiver() {
         private const val NOTES_PREFS = "notes"
         private const val NOTES_BACKUP = "showcase-notes-backup.json"
         private const val NOTE_ID = "showcase-note"
+        private val NOTE_CAPTURE_KEYS = setOf("collection", "active_note", "heading", "body", "cursor", "focus", "view_mode")
 
         private val allowed = setOf(
             "app_language_tag", "software_keyboard_mode", "software_keyboard_mode_runtime_override",

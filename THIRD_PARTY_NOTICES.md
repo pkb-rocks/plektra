@@ -60,12 +60,40 @@ Typing sound derivatives are included under `app/src/main/res/raw/typing_*.ogg`.
 - Project: Unicode Common Locale Data Repository (CLDR)
 - Source repository: https://github.com/unicode-org/cldr-json
 - Source path used by generator: `cldr-json/cldr-annotations-full/annotations`
-- License: Unicode Data Files and Software License / Unicode License
+- License: Unicode License v3 (SPDX `Unicode-3.0`), copyright © 2015-2024 Unicode, Inc.; full copyright and permission notice in `third_party/licenses/Unicode-3.0-CLDR.txt` (copy of `LICENSE` from cldr-json 49.0.0)
 
 Pastiera's local emoji search assets under `app/src/main/assets/common/emoji_search/*.tsv`
-are generated from Unicode CLDR annotation data by `scripts/generate_emoji_search_assets.py`.
+are generated from Unicode CLDR annotation data (CLDR 49.0.0) by `scripts/update_emoji_assets.py`.
 The generated TSV files are filtered to the emoji set bundled with Pastiera and normalized
 for compact local lookup.
+
+## Unicode Emoji and Unicode Character Database
+
+- Project: Unicode Emoji 18.0 (`emoji-test.txt`) and Unicode Character Database 18.0 (`UnicodeData.txt`, `emoji-data.txt`)
+- Source: https://www.unicode.org/Public/18.0.0/
+- License: Unicode License v3 (SPDX `Unicode-3.0`), copyright © 1991-2026 Unicode, Inc.; full copyright and permission notice in `third_party/licenses/Unicode-3.0.txt` (copy of https://www.unicode.org/license.txt)
+
+The emoji categories under `app/src/main/assets/common/emoji/*.txt`, the symbol list `app/src/main/assets/common/symbols/symbols.tsv`
+and the localized symbol names under `app/src/main/assets/common/symbol_search/*.tsv` (CLDR annotations) are generated
+by `scripts/update_emoji_assets.py`.
+
+## Noto Color Emoji
+
+- Project: Noto Emoji, release `v2026-09-24-unicode18_0` (font version 2.057)
+- Source: https://github.com/googlefonts/noto-emoji
+- File: `app/src/main/assets/fonts/NotoColorEmoji-emojicompat.ttf` (unmodified)
+- License: SIL Open Font License, Version 1.1 (`third_party/licenses/OFL-1.1.txt`)
+
+Pastiera draws emoji in its own views with this font (offline, through AndroidX EmojiCompat).
+
+## Flux Keyboard
+
+- Project: Flux Keyboard 2.0.0
+- Source: https://github.com/Flux-Sniffer-Mods/Flux-Keyboard
+- License: GNU General Public License version 3
+
+The kaomoji collection `app/src/main/assets/common/kaomoji/kaomoji.txt` (German search words added) and the
+emoji/symbol/kaomoji pages, default skin tone and symbol pages are adapted from Flux Keyboard.
 
 ## Leipzig Corpora Collection / Wortschatz Leipzig
 

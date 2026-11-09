@@ -47,18 +47,22 @@ class SymLayoutController(
 
     fun isSymActive(): Boolean = currentSymPage() > 0
 
-    fun toggleSymPage(): Int {
+    /** [onScreen]: the on-screen SYM key, whose cycle may leave out the emoji layer; else the physical SYM key. */
+    fun toggleSymPage(onScreen: Boolean = false): Int {
         alignSymPageToConfig()
-        val pages = buildActivePages(SettingsManager.getSymPageCycleConfig(context))
+        val pages = buildActivePages(cycleConfig(onScreen))
         symPage = nextSymPageValue(pages)
         persistSymPage()
         return symPage
     }
 
-    fun peekNextSymPage(): Int {
+    fun peekNextSymPage(onScreen: Boolean = false): Int {
         alignSymPageToConfig()
-        return nextSymPageValue(buildActivePages(SettingsManager.getSymPageCycleConfig(context)))
+        return nextSymPageValue(buildActivePages(cycleConfig(onScreen)))
     }
+
+    private fun cycleConfig(onScreen: Boolean): SymPagesConfig =
+        if (onScreen) SettingsManager.getOnScreenSymPageCycleConfig(context) else SettingsManager.getSymPagesConfig(context)
 
     fun closeSymPage(): Boolean {
         if (symPage == 0) {
@@ -191,7 +195,7 @@ class SymLayoutController(
 
     private fun nextSoftwareTextPageType(): SymPage? {
         alignSymPageToConfig()
-        val pages = buildActivePages(SettingsManager.getSymPageCycleConfig(context))
+        val pages = buildActivePages(cycleConfig(onScreen = true))
         if (pages.isEmpty()) {
             return null
         }

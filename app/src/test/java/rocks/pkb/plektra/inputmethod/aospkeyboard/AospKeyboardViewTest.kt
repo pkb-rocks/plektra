@@ -845,7 +845,91 @@ class AospKeyboardViewTest {
     }
 
     @Test
-    fun lettersPageSymKeyHoldStaysSymModifier() {
+    fun lettersPageSymKeyHold_opensChooserAfterHoldThresholdAndSelectsOnRelease() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            longPressTimeoutMs = 50L
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "SYM")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierDownKeyCodes)
+        // A short long-press setting must not turn a SYM tap into a chooser.
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(AospKeyboardView.SYM_HOLD_MIN_MS - 10, TimeUnit.MILLISECONDS)
+        assertEquals(null, field<Any?>(view, "moreKeysPanelState"))
+
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(20, TimeUnit.MILLISECONDS)
+        val panel = requireNotNull(field<Any?>(view, "moreKeysPanelState"))
+        assertTrue(field<Boolean>(panel, "pageChooser"))
+        // The SYM preview ends when the chooser opens.
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierUpKeyCodes)
+        val rect = field<RectF>(panel, "popupRectInView")
+        assertTrue(rect.bottom <= field<RectF>(keyForLabel(view, "SYM"), "visualRect").top)
+        val targetX = rect.left + field<Float>(panel, "padding") + field<Float>(panel, "keyWidth") * 1.5f
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_MOVE, targetX, rect.centerY(), 400L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, targetX, rect.centerY(), 410L))
+        assertEquals(listOf(SoftwareKeyboardPageChoices.NUMBER), listener.pageChoices)
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierUpKeyCodes)
+        assertEquals(0, listener.symbolCount)
+        assertTrue(listener.texts.isEmpty())
+    }
+
+    @Test
+    fun lettersPageSymChordBeforeHoldThreshold_keepsChordAndOpensNoChooser() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            symPreviewLabels = mapOf(KeyEvent.KEYCODE_CTRL_LEFT to "0")
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (symX, symY) = centerOfLabel(view, "SYM")
+        val (ctrlX, ctrlY) = centerOfLabel(view, "CTRL")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, symX, symY, 0L))
+        view.dispatchTouchEvent(
+            multiPointerMotion(MotionEvent.ACTION_POINTER_DOWN, 1, listOf(symX to symY, ctrlX to ctrlY), 100L)
+        )
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(1000, TimeUnit.MILLISECONDS)
+        assertEquals(null, field<Any?>(view, "moreKeysPanelState"))
+        view.dispatchTouchEvent(
+            multiPointerMotion(MotionEvent.ACTION_POINTER_UP, 1, listOf(symX to symY, ctrlX to ctrlY), 1100L)
+        )
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, symX, symY, 1200L))
+        assertEquals(listOf("0"), listener.symbolTexts)
+        assertTrue(listener.pageChoices.isEmpty())
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierUpKeyCodes)
+    }
+
+    @Test
+    fun lettersPageSymSlideBeforeHoldThreshold_opensNoChooser() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (symX, symY) = centerOfLabel(view, "SYM")
+        val (ctrlX, ctrlY) = centerOfLabel(view, "CTRL")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, symX, symY, 0L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_MOVE, ctrlX, ctrlY, 100L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(AospKeyboardView.SYM_HOLD_MIN_MS + 50, TimeUnit.MILLISECONDS)
+        val panel = field<Any?>(view, "moreKeysPanelState")
+        assertTrue(panel == null || !field<Boolean>(panel, "pageChooser"))
+    }
+
+    @Test
+    fun lettersPageSymKeyHoldWithoutChoices_staysSymModifier() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply { this.listener = listener }
+        val (x, y) = centerOfLabel(view, "SYM")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(1000, TimeUnit.MILLISECONDS)
+        assertEquals(null, field<Any?>(view, "moreKeysPanelState"))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 1000L))
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierUpKeyCodes)
+    }
+
+    @Test
+    fun lettersPageSymKeyTapStaysSymModifier() {
         val listener = RecordingListener()
         val view = measuredKeyboard().apply {
             pageChoices = chooserChoices()

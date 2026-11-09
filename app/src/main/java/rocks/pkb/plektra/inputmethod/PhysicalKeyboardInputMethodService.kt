@@ -2132,7 +2132,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         candidatesBarController.onSoftwareKeyboardSymToggleRequested = {
             ensureImeSurfaceVisible()
-            symLayoutController.toggleSymPage()
+            symLayoutController.toggleSymPage(onScreen = true)
             updateStatusBarText()
         }
         candidatesBarController.onSymCloseRequested = {
@@ -2811,7 +2811,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 val downTime = modifierDownTimes[keyCode] ?: 0L
                 val now = SystemClock.uptimeMillis()
                 val holdDuration = if (downTime > 0L) now - downTime else 0L
-                if (holdDuration >= 300L && symLayoutController.currentSymPage() == 0) {
+                if (holdDuration >= AospKeyboardView.SYM_HOLD_MIN_MS && symLayoutController.currentSymPage() == 0) {
                     symChordUsedSinceKeyDown = true
                 }
                 modifierDownTimes.remove(keyCode)
@@ -2819,7 +2819,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 // activated SYM page use the same view, so posting KEY_UP would draw one frame
                 // of the base keyboard between them. Overlay pages replace the touched view and
                 // must still be posted to avoid mutating the hierarchy during touch dispatch.
-                if (symLayoutController.peekNextSymPage() in 3..4) {
+                if (symLayoutController.peekNextSymPage(onScreen = true) in 3..4) {
                     uiHandler.post {
                         dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_UP)
                     }
@@ -3052,14 +3052,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     override fun onShowInputRequested(flags: Int, configChange: Boolean): Boolean {
         if (!keyboardVisibilityController.allowsSurface()) return false
-        // The hardware bar shows itself on input start; Android reports that as a show request too.
-        // Only a request from Android or the app (e.g. a tap) may open the keypad automatically.
-        val ownShowEcho = keyboardVisibilityController.isOwnShowPending()
+        // The hardware bar shows itself on input start; Android answers that with a show request too.
+        // Only a new request from Android or the app (e.g. a tap) may open the keypad automatically;
+        // a configuration change merely restores the window that was already shown.
+        val newShowRequest = !configChange && !keyboardVisibilityController.consumeOwnShowEcho()
         val accepted = super.onShowInputRequested(flags, configChange)
         if (::keyboardVisibilityController.isInitialized) {
             keyboardVisibilityController.onExplicitShowRequested()
         }
-        if (pendingKeypadAutoOpen && !ownShowEcho) {
+        if (pendingKeypadAutoOpen && newShowRequest) {
             pendingKeypadAutoOpen = false
             openKeypadForCurrentField()
         }
@@ -5714,7 +5715,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (keyCode == KEYCODE_SYM) {
             symPhysicallyPressed = false
             if (symTogglePendingOnKeyUp && !symChordUsedSinceKeyDown) {
-                symLayoutController.toggleSymPage()
+                // The on-screen SYM key arrives here as a synthetic soft-keyboard event.
+                val onScreen = event != null && event.flags and KeyEvent.FLAG_SOFT_KEYBOARD != 0
+                symLayoutController.toggleSymPage(onScreen)
             }
             symTogglePendingOnKeyUp = false
             symChordUsedSinceKeyDown = false

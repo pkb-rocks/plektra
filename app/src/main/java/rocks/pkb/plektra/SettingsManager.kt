@@ -722,10 +722,11 @@ object SettingsManager {
     }
 
     /**
-     * Pages that SYM cycles through. The on-screen keyboard leaves out the emoji key layer unless
-     * enabled; direct access to every page is unaffected.
+     * Pages that the on-screen SYM key and chooser cycle through. The on-screen keyboard leaves out
+     * the emoji key layer unless enabled; the physical SYM key uses [getSymPagesConfig] in every
+     * surface mode, and direct access to every page is unaffected.
      */
-    fun getSymPageCycleConfig(context: Context): SymPagesConfig {
+    fun getOnScreenSymPageCycleConfig(context: Context): SymPagesConfig {
         val config = getSymPagesConfig(context)
         return if (
             resolveEffectiveSoftwareKeyboardMode(context) == SoftwareKeyboardMode.FORCE_VIRTUAL &&

@@ -1778,7 +1778,7 @@ class StatusBarController(
         keyboardView.keypad = if (snapshot.symPage == 0) snapshot.softwareKeypad else SoftwareKeypad.FULL
         keyboardView.layoutKeyLabel = context.getString(R.string.software_keyboard_choice_letters)
         keyboardView.pageChoices = SoftwareKeyboardPageChoices.build(
-            SettingsManager.getSymPageCycleConfig(context),
+            SettingsManager.getOnScreenSymPageCycleConfig(context),
             softwareKeyboardPageChoiceLabels()
         )
         keyboardView.layoutStyle = softwareKeyboardLayoutStyle()
@@ -1868,7 +1868,7 @@ class StatusBarController(
     )
 
     private fun nextSoftwareSymKeySpec(currentPage: Int, keypad: SoftwareKeypad = SoftwareKeypad.FULL): SoftwareSymKeySpec {
-        val pageValues = SettingsManager.getSymPageCycleConfig(context).enabledOrderedPages().mapNotNull { page ->
+        val pageValues = SettingsManager.getOnScreenSymPageCycleConfig(context).enabledOrderedPages().mapNotNull { page ->
             when (page) {
                 rocks.pkb.plektra.SymPagesConfig.PAGE_EMOJI -> 1
                 rocks.pkb.plektra.SymPagesConfig.PAGE_SYMBOLS -> 2

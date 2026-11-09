@@ -84,6 +84,37 @@ class KeyboardVisibilityControllerTest {
     }
 
     @Test
+    fun ownShowEchoIsRecognizedOnlyAfterTheRequestWasIssued() {
+        val h = Harness()
+        h.controller.ensureImeSurfaceVisible()
+        // The posted presentation has not asked Android yet: a request now is not an echo.
+        assertFalse(h.controller.consumeOwnShowEcho())
+        h.runNext()
+        assertEquals(1, h.showRequests)
+        assertTrue(h.controller.consumeOwnShowEcho())
+        assertFalse(h.controller.consumeOwnShowEcho())
+    }
+
+    @Test
+    fun ownShowEchoExpiresAndNewEditorClearsIt() {
+        val stale = Harness()
+        stale.controller.ensureImeSurfaceVisible()
+        stale.runNext()
+        stale.now += 1001L
+        assertFalse(stale.controller.consumeOwnShowEcho())
+
+        val switched = Harness()
+        switched.controller.ensureImeSurfaceVisible()
+        switched.runNext()
+        switched.controller.onInputStarted(restarting = true)
+        assertTrue(switched.controller.consumeOwnShowEcho())
+        switched.controller.ensureImeSurfaceVisible()
+        switched.drain()
+        switched.controller.onInputStarted(restarting = false)
+        assertFalse(switched.controller.consumeOwnShowEcho())
+    }
+
+    @Test
     fun blockedSurfaceIgnoresManualShowRequests() {
         val h = Harness().apply { allowPersistent = false }
         // allowsSurface stays the gate for explicit requests as well.
@@ -498,6 +529,7 @@ class KeyboardVisibilityControllerTest {
 
     private inner class Harness {
         var allowPersistent = true
+        var now = 0L
         var active = true
         var connection: InputConnection? = mock(InputConnection::class.java)
         var inputShown = false
@@ -542,7 +574,8 @@ class KeyboardVisibilityControllerTest {
             },
             requestShowInputView = { showRequests++ },
             refreshStatusBar = { refreshes++ },
-            allowsPersistentSurface = { allowPersistent }
+            allowsPersistentSurface = { allowPersistent },
+            uptimeMillis = { now }
         )
         fun runNext() = actions.removeAt(0).second.invoke()
         fun hasImmediateActions() = actions.any { it.first == 0L }

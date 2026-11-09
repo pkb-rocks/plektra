@@ -44,8 +44,9 @@ class SymPageCycleTest {
         SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
         val sym = controller()
         assertFalse(SettingsManager.getSoftwareKeyboardEmojiPageInCycle(context))
-        assertEquals(2, sym.toggleSymPage())
-        assertEquals(0, sym.toggleSymPage())
+        assertEquals(2, sym.peekNextSymPage(onScreen = true))
+        assertEquals(2, sym.toggleSymPage(onScreen = true))
+        assertEquals(0, sym.toggleSymPage(onScreen = true))
         assertEquals(2, sym.nextSoftwareTextSymPage())
     }
 
@@ -54,17 +55,21 @@ class SymPageCycleTest {
         SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
         SettingsManager.setSoftwareKeyboardEmojiPageInCycle(context, true)
         val sym = controller()
-        assertEquals(1, sym.toggleSymPage())
-        assertEquals(2, sym.toggleSymPage())
+        assertEquals(1, sym.toggleSymPage(onScreen = true))
+        assertEquals(2, sym.toggleSymPage(onScreen = true))
     }
 
     @Test
-    fun hardwareCycleAndDirectEmojiAccessAreUnchanged() {
+    fun physicalCycleAndDirectEmojiAccessAreUnchangedInEverySurfaceMode() {
         SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE)
         assertEquals(1, controller().toggleSymPage())
+        assertEquals(1, controller().apply { closeSymPage() }.toggleSymPage(onScreen = true))
 
         SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
         val sym = controller()
+        sym.closeSymPage()
+        assertEquals(1, sym.peekNextSymPage())
+        assertEquals(1, sym.toggleSymPage())
         sym.closeSymPage()
         assertTrue(sym.openPage(1))
         assertEquals(1, sym.currentSymPage())

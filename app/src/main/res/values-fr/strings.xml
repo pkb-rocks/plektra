@@ -25,6 +25,14 @@
     <string name="clear_alt_on_space_description">Désactive Alt ponctuel et Alt-Lock, sauf si « Conserver Alt-Lock » est activé ci-dessous.</string>
     <string name="swipe_to_delete_title">Balayer pour supprimer</string>
     <string name="auto_show_keyboard_title">Afficher Automatiquement le Clavier</string>
+    <string name="auto_show_respect_app_visibility_title">Respecter les réglages d\'affichage de l\'app</string>
+    <string name="auto_show_respect_app_visibility_description">Android et l\'app décident si le clavier s\'ouvre à l\'entrée dans un champ. Toucher le champ ou appuyer sur une touche l\'ouvre toujours.</string>
+    <string name="hardware_keypad_auto_open_title">Ouvrir automatiquement le pavé numérique avec un clavier physique</string>
+    <string name="hardware_keypad_auto_open_description">Affiche le pavé numérique ou téléphonique à l\'écran dans les champs PIN, numériques et téléphoniques. Sinon, ouvrez-le avec le bouton du pavé dans la barre du clavier.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Couche d\'emojis dans le changement de page</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Inclut la page d\'emojis associés aux touches lors du changement de page du clavier à l\'écran. Le sélecteur d\'emojis n\'est pas concerné.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Clavier complet</string>
+    <string name="software_keyboard_keypad_button_description">Ouvrir le pavé numérique à l\'écran</string>
     <string name="info_title">Informations</string>
     <string name="info_description">Les paramètres sont automatiquement enregistrés et appliqués immédiatement à la méthode de saisie.</string>
     <string name="keyboard_title">Clavier Plektra</string>

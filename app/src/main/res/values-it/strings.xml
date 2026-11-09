@@ -60,6 +60,14 @@
     
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Mostra Automaticamente la Tastiera</string>
+    <string name="auto_show_respect_app_visibility_title">Rispetta le impostazioni di visualizzazione dell\'app</string>
+    <string name="auto_show_respect_app_visibility_description">Android e l\'app decidono se la tastiera si apre quando si entra in un campo. Toccare il campo o premere un tasto la apre comunque.</string>
+    <string name="hardware_keypad_auto_open_title">Apri automaticamente il tastierino con una tastiera fisica</string>
+    <string name="hardware_keypad_auto_open_description">Mostra il tastierino numerico o telefonico su schermo nei campi PIN, numerici e telefonici. Altrimenti aprilo con il pulsante del tastierino nella barra della tastiera.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Livello emoji nel cambio pagina</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Include la pagina delle emoji associate ai tasti nel cambio pagina della tastiera su schermo. Il selettore emoji non cambia.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Tastiera completa</string>
+    <string name="software_keyboard_keypad_button_description">Apri il tastierino su schermo</string>
 
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Riconoscimento vocale Alt+Ctrl / BlackBerry Alt+0</string>

@@ -27,6 +27,14 @@
     <string name="swipe_to_delete_title">Włącz Przesunięcie do Usunięcia</string>
     <string name="swipe_incremental_threshold_title">Czułość Paska Przesuwania</string>
     <string name="auto_show_keyboard_title">Automatycznie Pokaż Klawiaturę</string>
+    <string name="auto_show_respect_app_visibility_title">Respektuj ustawienia wyświetlania aplikacji</string>
+    <string name="auto_show_respect_app_visibility_description">Android i aplikacja decydują, czy klawiatura otworzy się po wejściu w pole. Dotknięcie pola lub naciśnięcie klawisza nadal ją otwiera.</string>
+    <string name="hardware_keypad_auto_open_title">Automatycznie otwieraj klawiaturę numeryczną przy klawiaturze fizycznej</string>
+    <string name="hardware_keypad_auto_open_description">Pokazuje ekranową klawiaturę numeryczną lub telefoniczną w polach PIN, liczbowych i telefonicznych. W przeciwnym razie otwórz ją przyciskiem klawiatury numerycznej na pasku klawiatury.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Warstwa emoji w przełączaniu stron</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Uwzględnia stronę emoji przypisanych do klawiszy przy przełączaniu stron klawiatury ekranowej. Nie wpływa na wybór emoji.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Pełna klawiatura</string>
+    <string name="software_keyboard_keypad_button_description">Otwórz ekranową klawiaturę numeryczną</string>
     <string name="info_title">Informacje</string>
     <string name="info_description">Ustawienia są automatycznie zapisywane i natychmiast stosowane do metody wprowadzania.</string>
     <string name="keyboard_title">Klawiatura Plektra</string>

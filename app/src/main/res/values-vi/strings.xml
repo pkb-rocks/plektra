@@ -38,6 +38,14 @@
     <string name="swipe_incremental_threshold_title">Độ nhạy thanh vuốt</string>
     <string name="swipe_incremental_threshold_description">Khoảng cách cần để di chuyển con trỏ một vị trí. Giá trị thấp làm con trỏ di chuyển nhanh hơn.</string>
     <string name="auto_show_keyboard_title">Tự động hiển thị bàn phím</string>
+    <string name="auto_show_respect_app_visibility_title">Tuân theo cài đặt hiển thị của ứng dụng</string>
+    <string name="auto_show_respect_app_visibility_description">Android và ứng dụng quyết định bàn phím có mở khi vào một trường hay không. Chạm vào trường hoặc nhấn một phím vẫn mở bàn phím.</string>
+    <string name="hardware_keypad_auto_open_title">Tự động mở bàn phím số khi dùng bàn phím vật lý</string>
+    <string name="hardware_keypad_auto_open_description">Hiển thị bàn phím số hoặc bàn phím điện thoại trên màn hình trong các trường PIN, số và điện thoại. Nếu không, hãy mở bằng nút bàn phím số trên thanh bàn phím.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Lớp emoji trong vòng chuyển trang</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Đưa trang emoji gán cho phím vào vòng chuyển trang của bàn phím ảo. Bộ chọn emoji không bị ảnh hưởng.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Bàn phím đầy đủ</string>
+    <string name="software_keyboard_keypad_button_description">Mở bàn phím số trên màn hình</string>
     <string name="alt_ctrl_speech_shortcut_title">Nhận dạng giọng nói Alt+Ctrl / BlackBerry Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Bật phím tắt Alt+Ctrl / BlackBerry Alt+0 để bắt đầu nhận dạng giọng nói</string>
     <string name="static_variation_bar_mode_title">Thanh biến thể tĩnh</string>

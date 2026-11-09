@@ -119,11 +119,12 @@
     <string name="software_keyboard_emoji_page_in_cycle_description">Include the emoji key-layer page when cycling pages on the on-screen keyboard. The emoji picker is not affected.</string>
     <string name="software_keyboard_accessibility_full_keyboard">Full keyboard</string>
     <string name="software_keyboard_keypad_button_description">Open on-screen keypad</string>
-    <string name="software_keyboard_choice_letters">ABC</string>
-    <string name="software_keyboard_choice_number">123</string>
-    <string name="software_keyboard_choice_phone">+*#</string>
-    <string name="software_keyboard_choice_symbols">#+=</string>
-    <string name="software_keyboard_choice_device">Sym</string>
+    <!-- Neutral page-chooser labels, shared by all UI languages like the key labels they name. -->
+    <string name="software_keyboard_choice_letters" translatable="false">ABC</string>
+    <string name="software_keyboard_choice_number" translatable="false">123</string>
+    <string name="software_keyboard_choice_phone" translatable="false">+*#</string>
+    <string name="software_keyboard_choice_symbols" translatable="false">#+=</string>
+    <string name="software_keyboard_choice_device" translatable="false">Sym</string>
     
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 for speech input</string>

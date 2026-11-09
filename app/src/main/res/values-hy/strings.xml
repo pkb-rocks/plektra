@@ -22,6 +22,14 @@
     <string name="swipe_incremental_threshold_description">Հեռավորությունը՝ կուրսորը մեկ դիրքով տեղափոխելու համար։ Ավելի փոքր արժեքները արագացնում են կուրսորը։</string>
     <string name="swipe_to_move_cursor">Սվայփ՝ կուրսորը տեղափոխելու համար</string>
     <string name="auto_show_keyboard_title">Ավտոմատ ցույց տալ ստեղնաշարը</string>
+    <string name="auto_show_respect_app_visibility_title">Հարգել հավելվածի ցուցադրման կարգավորումները</string>
+    <string name="auto_show_respect_app_visibility_description">Android-ը և հավելվածը որոշում են՝ արդյոք ստեղնաշարը բացվի դաշտ մտնելիս։ Դաշտին հպելը կամ ստեղն սեղմելը դեռ բացում է այն։</string>
+    <string name="hardware_keypad_auto_open_title">Ավտոմատ բացել թվային ստեղնաշարը ֆիզիկական ստեղնաշարով</string>
+    <string name="hardware_keypad_auto_open_description">Ցույց է տալիս էկրանի թվային կամ հեռախոսային ստեղնաշարը PIN-ի, թվերի և հեռախոսի դաշտերում։ Այլապես բացեք այն ստեղնաշարի գոտու թվային ստեղնաշարի կոճակով։</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Էմոջի շերտը էջերի փոխարկման մեջ</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Ներառում է էմոջիների ստեղնային էջը էկրանի ստեղնաշարի էջերի փոխարկման մեջ։ Էմոջիների ընտրիչը չի փոխվում։</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Ամբողջական ստեղնաշար</string>
+    <string name="software_keyboard_keypad_button_description">Բացել էկրանի թվային ստեղնաշարը</string>
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 խոսքի ճանաչում</string>
     <string name="alt_ctrl_speech_shortcut_description">Միացնել Alt+Ctrl / BlackBerry Alt+0 դյուրանցումը՝ խոսքի ճանաչումը սկսելու համար</string>
     <string name="info_title">Տեղեկատվություն</string>

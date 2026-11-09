@@ -27,6 +27,14 @@
     <string name="swipe_to_delete_title">Activar Deslizar para Eliminar</string>
     <string name="swipe_incremental_threshold_title">Sensibilidad de la Barra de Deslizamiento</string>
     <string name="auto_show_keyboard_title">Mostrar Automáticamente el Teclado</string>
+    <string name="auto_show_respect_app_visibility_title">Respetar la configuración de visualización de la app</string>
+    <string name="auto_show_respect_app_visibility_description">Android y la app deciden si el teclado se abre al entrar en un campo. Tocar el campo o pulsar una tecla lo sigue abriendo.</string>
+    <string name="hardware_keypad_auto_open_title">Abrir el teclado numérico automáticamente con teclado físico</string>
+    <string name="hardware_keypad_auto_open_description">Muestra el teclado numérico o telefónico en pantalla en campos de PIN, números y teléfono. Si no, ábrelo con el botón del teclado numérico en la barra del teclado.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Capa de emojis en el cambio de página</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Incluye la página de asignación de emojis al cambiar de página en el teclado en pantalla. El selector de emojis no se ve afectado.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Teclado completo</string>
+    <string name="software_keyboard_keypad_button_description">Abrir el teclado numérico en pantalla</string>
     <string name="info_title">Información</string>
     <string name="info_description">La configuración se guarda automáticamente y se aplica inmediatamente al método de entrada.</string>
     <string name="keyboard_title">Teclado Plektra</string>

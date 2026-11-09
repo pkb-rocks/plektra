@@ -31,6 +31,14 @@
     <string name="swipe_incremental_threshold_title">Чувствительность полоски свайпа</string>
     <string name="swipe_incremental_threshold_description">Расстояние, необходимая чтобы сдвинуть курсор на одну позицию. Уменьшение значения заставляет курсор двигаться быстрее.</string>
     <string name="auto_show_keyboard_title">Автопоказ клавиатуры</string>
+    <string name="auto_show_respect_app_visibility_title">Учитывать настройки отображения приложения</string>
+    <string name="auto_show_respect_app_visibility_description">Android и приложение решают, открывается ли клавиатура при входе в поле. Нажатие на поле или клавишу по-прежнему открывает её.</string>
+    <string name="hardware_keypad_auto_open_title">Автоматически открывать цифровую клавиатуру при физической клавиатуре</string>
+    <string name="hardware_keypad_auto_open_description">Показывает экранную цифровую или телефонную клавиатуру в полях PIN, чисел и телефонов. Иначе откройте её кнопкой цифровой клавиатуры на панели клавиатуры.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Слой эмодзи в переключении страниц</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Включает страницу эмодзи на клавишах в переключение страниц экранной клавиатуры. Выбор эмодзи не затрагивается.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Полная клавиатура</string>
+    <string name="software_keyboard_keypad_button_description">Открыть экранную цифровую клавиатуру</string>
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 распознавание речи</string>
     <string name="alt_ctrl_speech_shortcut_description">Включить сочетание Alt+Ctrl / BlackBerry Alt+0 для запуска распознавания речи</string>
     <string name="static_variation_bar_mode_title">Статическая панель вариантов</string>

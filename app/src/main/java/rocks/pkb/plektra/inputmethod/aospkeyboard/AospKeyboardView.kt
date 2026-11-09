@@ -111,6 +111,11 @@ class AospKeyboardView @JvmOverloads constructor(
         FULL_ISO
     }
 
+    companion object {
+        /** A SYM press at least this long is a hold, not a tap: its release never switches pages. */
+        const val SYM_HOLD_MIN_MS = 300L
+    }
+
     private enum class KeyType { CHAR, SHIFT, BACKSPACE, SYMBOLS, CTRL, ALT, COMMA, PERIOD, SPACE, ENTER, LANGUAGE, LAYOUT }
 
     private data class KeySpec(
@@ -455,6 +460,7 @@ class AospKeyboardView @JvmOverloads constructor(
     private val handler = Handler(Looper.getMainLooper())
     private var longPressTriggered = false
     private val longPressRunnable = Runnable { showMoreKeysOrRepeat() }
+    private val symHoldPageChooserRunnable = Runnable { showPageChooserAfterSymHold() }
     private var spaceSwipeActive = false
     private var spaceSwipeLastX = 0f
     private var spaceLongPressArmed = false
@@ -798,6 +804,9 @@ class AospKeyboardView @JvmOverloads constructor(
                         heldModifierKey = it
                         heldModifierPointerId = event.getPointerId(pointerIndex)
                         listener?.onModifierKeyDown(soundKeyCodeFor(it))
+                        if (opensPageChooserAfterSymHold(it)) {
+                            handler.postDelayed(symHoldPageChooserRunnable, maxOf(longPressTimeoutMs, SYM_HOLD_MIN_MS))
+                        }
                         invalidateKeyboard()
                     } else {
                         if (!isModifierPreviewLayerActive()) {
@@ -840,6 +849,8 @@ class AospKeyboardView @JvmOverloads constructor(
                     return true
                 }
                 handler.removeCallbacks(longPressRunnable)
+                // A chord started before the hold threshold keeps SYM a modifier.
+                handler.removeCallbacks(symHoldPageChooserRunnable)
                 chordKey = key
                 chordPointerId = event.getPointerId(pointerIndex)
                 pressedKey = key
@@ -881,6 +892,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 val key = findKey(pointerX, pointerY)
                 if (key != pressedKey) {
                     handler.removeCallbacks(longPressRunnable)
+                    handler.removeCallbacks(symHoldPageChooserRunnable)
                     dismissPopup()
                     pressedKey = key
                     invalidateKeyboard()
@@ -1609,6 +1621,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun releaseHeldModifier() {
+        handler.removeCallbacks(symHoldPageChooserRunnable)
         val key = heldModifierKey ?: return
         listener?.onModifierKeyUp(soundKeyCodeFor(key))
         heldModifierKey = null
@@ -1847,9 +1860,26 @@ class AospKeyboardView @JvmOverloads constructor(
         }
     }
 
+    /** Keys that open the chooser on a regular long press instead of acting as a modifier. */
     private fun opensPageChooser(key: Key): Boolean =
         pageChoices.isNotEmpty() &&
             (key.spec.type == KeyType.LAYOUT || (key.spec.type == KeyType.SYMBOLS && symPageActive))
+
+    /**
+     * On the letter page SYM stays a hold modifier, so its preview and chords keep working; holding
+     * it without a chord or slide opens the same chooser as on the other pages.
+     */
+    private fun opensPageChooserAfterSymHold(key: Key): Boolean =
+        pageChoices.isNotEmpty() && key.spec.type == KeyType.SYMBOLS && !symPageActive
+
+    private fun showPageChooserAfterSymHold() {
+        val key = heldModifierKey?.takeIf { it == pressedKey && chordKey == null && opensPageChooserAfterSymHold(it) }
+            ?: return
+        // Ends the SYM preview; after SYM_HOLD_MIN_MS the release does not switch pages.
+        releaseHeldModifier()
+        pressedKey = key
+        showPageChooser(key)
+    }
 
     private fun showPageChooser(key: Key) {
         longPressTriggered = true

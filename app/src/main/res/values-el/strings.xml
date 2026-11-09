@@ -103,6 +103,14 @@
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Αυτόματη εμφάνιση πληκτρολογίου</string>
     <string name="auto_show_keyboard_description">Εμφανίζει αυτόματα το πληκτρολόγιο οθόνης σε πεδία κειμένου.</string>
+    <string name="auto_show_respect_app_visibility_title">Τήρηση προεπιλογών εμφάνισης της εφαρμογής</string>
+    <string name="auto_show_respect_app_visibility_description">Το Android και η εφαρμογή αποφασίζουν αν το πληκτρολόγιο ανοίγει όταν εισέρχεστε σε ένα πεδίο. Το πάτημα στο πεδίο ή ενός πλήκτρου εξακολουθεί να το ανοίγει.</string>
+    <string name="hardware_keypad_auto_open_title">Αυτόματο άνοιγμα αριθμητικού πληκτρολογίου με φυσικό πληκτρολόγιο</string>
+    <string name="hardware_keypad_auto_open_description">Εμφανίζει το αριθμητικό ή τηλεφωνικό πληκτρολόγιο οθόνης σε πεδία PIN, αριθμών και τηλεφώνου. Διαφορετικά ανοίξτε το με το κουμπί αριθμητικού πληκτρολογίου στη γραμμή πληκτρολογίου.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Σελίδα emoji πλήκτρων στην εναλλαγή σελίδων</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Συμπεριλαμβάνει τη σελίδα αντιστοίχισης emoji στην εναλλαγή σελίδων του πληκτρολογίου οθόνης. Ο επιλογέας emoji δεν επηρεάζεται.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Πλήρες πληκτρολόγιο</string>
+    <string name="software_keyboard_keypad_button_description">Άνοιγμα αριθμητικού πληκτρολογίου οθόνης</string>
 
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 για φωνητική εισαγωγή</string>

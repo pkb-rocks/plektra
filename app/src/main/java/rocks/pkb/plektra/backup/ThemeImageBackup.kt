@@ -2,6 +2,7 @@ package rocks.pkb.plektra.backup
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -15,8 +16,9 @@ import rocks.pkb.plektra.ThemeTextureStore
 /** Versioned assets beside prefs/files/learning, never embedded in theme JSON. */
 internal object ThemeImageBackup {
     const val DIRECTORY = "theme-images"
+    private const val TAG = "ThemeImageBackup"
     private const val MANIFEST = "manifest.json"
-    private const val REFERENCE = "reference.png"
+    private const val MANIFEST_VERSION = 1
     private const val MAX_ASSETS = 512
     private const val MAX_TOTAL_BYTES = 72L * 1024 * 1024
 
@@ -29,9 +31,11 @@ internal object ThemeImageBackup {
         return digest.digest().joinToString("") { "%02x".format(it.toInt() and 255) }
     }
 
-    private fun dimensions(file: File, reference: Boolean): Pair<Int, Int> {
-        val limit = if (reference) 8L * 1024 * 1024 else 2L * 1024 * 1024
-        val edge = if (reference) 1024 else ThemeTextureModel.MAX_EDGE
+    private fun isSource(name: String) = ThemeTextureModel.sourcePattern.matches(name)
+
+    private fun dimensions(file: File, source: Boolean): Pair<Int, Int> {
+        val limit = if (source) 8L * 1024 * 1024 else 2L * 1024 * 1024
+        val edge = if (source) 1024 else ThemeTextureModel.MAX_EDGE
         require(file.length() in 1..limit) { "Theme image size is invalid" }
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         file.inputStream().buffered().use { BitmapFactory.decodeStream(it, null, bounds) }
@@ -45,32 +49,42 @@ internal object ThemeImageBackup {
         return bounds.outWidth to bounds.outHeight
     }
 
-    /** Export referenced textures only; abandoned crops and cached originals stay private. */
+    /**
+     * Export referenced images only. A missing or damaged local image is skipped instead of failing
+     * the whole backup; the theme then falls back to its colours, exactly as it does on this device.
+     */
     fun snapshot(context: Context, destination: File, themeValues: Collection<String> =
         SettingsManager.getPreferences(context).all.filterKeys { it.startsWith("keyboard_theme_") }.values.filterIsInstance<String>()): List<String> {
         val source = File(context.filesDir, DIRECTORY)
         require(destination.canonicalFile != source.canonicalFile)
         destination.mkdirs()
         destination.listFiles().orEmpty().forEach {
-            require(it.isFile && (it.name == MANIFEST || it.name == REFERENCE || (ThemeTextureModel.assetPattern.matches(it.name) || ThemeTextureModel.sourcePattern.matches(it.name))))
+            require(it.isFile && (it.name == MANIFEST || ThemeTextureModel.assetPattern.matches(it.name) || isSource(it.name)))
             check(it.delete())
         }
         val assets = ThemeTextureModel.referencedAssets(themeValues).sorted()
         require(assets.size <= MAX_ASSETS) { "Too many theme textures" }
-        val names = (if (File(source, REFERENCE).isFile) listOf(REFERENCE) else emptyList()) + assets
+        val names = mutableListOf<String>()
         val entries = JSONArray(); var total = 0L
-        for (name in names) {
+        for (name in assets) {
             val image = File(source, name)
-            require(image.isFile) { "A referenced theme texture is missing" }
-            val (width, height) = dimensions(image, name == REFERENCE || ThemeTextureModel.sourcePattern.matches(name))
-            val digest = hash(image)
-            if (name != REFERENCE) require(name == (if(ThemeTextureModel.sourcePattern.matches(name)) "source-$digest.png" else "texture-$digest.png")) { "Theme texture hash is invalid" }
+            val checked = runCatching {
+                val (width, height) = dimensions(image, isSource(name))
+                val digest = hash(image)
+                require(name == (if (isSource(name)) "source-$digest.png" else "texture-$digest.png")) { "Theme texture hash is invalid" }
+                Triple(width, height, digest)
+            }.getOrElse { failure ->
+                Log.w(TAG, "Skipping unusable theme image $name", failure)
+                null
+            } ?: continue
+            val (width, height, digest) = checked
             total += image.length(); require(total <= MAX_TOTAL_BYTES)
             image.copyTo(File(destination, name), overwrite = true)
             entries.put(JSONObject().put("name", name).put("bytes", image.length()).put("width", width)
                 .put("height", height).put("sha256", digest))
+            names += name
         }
-        File(destination, MANIFEST).writeText(JSONObject().put("version", 3).put("images", entries).toString(2))
+        File(destination, MANIFEST).writeText(JSONObject().put("version", MANIFEST_VERSION).put("images", entries).toString(2))
         return listOf("$DIRECTORY/$MANIFEST") + names.map { "$DIRECTORY/$it" }
     }
 
@@ -81,26 +95,25 @@ internal object ThemeImageBackup {
         val manifest = File(directory, MANIFEST)
         require(manifest.isFile && manifest.length() in 1..262_144L) { "Theme image manifest is missing or too large" }
         val json = JSONObject(manifest.readText())
-        val version = json.getInt("version")
-        require(version in 1..3) { "Unsupported theme image manifest" }
+        require(json.getInt("version") == MANIFEST_VERSION) { "Unsupported theme image manifest" }
         val images = json.getJSONArray("images")
-        require(images.length() <= if (version == 1) 1 else MAX_ASSETS + 1) { "Too many theme images" }
+        require(images.length() <= MAX_ASSETS) { "Too many theme images" }
         val names = mutableListOf<String>(); var total = 0L
         for (index in 0 until images.length()) {
             val entry = images.getJSONObject(index)
             val name = entry.getString("name")
-            require((name == REFERENCE || version>=2 && ThemeTextureModel.assetPattern.matches(name) || version>=3 && ThemeTextureModel.sourcePattern.matches(name)) && name !in names) {
+            require((ThemeTextureModel.assetPattern.matches(name) || isSource(name)) && name !in names) {
                 "Unsupported theme image name"
             }
             val image = File(directory, name)
             require(image.isFile && image.length() == entry.getLong("bytes")) { "Theme image is missing or truncated" }
             total += image.length(); require(total <= MAX_TOTAL_BYTES)
-            val (width, height) = dimensions(image, name == REFERENCE || ThemeTextureModel.sourcePattern.matches(name))
+            val (width, height) = dimensions(image, isSource(name))
             val digest = hash(image)
             require(width == entry.getInt("width") && height == entry.getInt("height") && digest == entry.getString("sha256")) {
                 "Theme image integrity check failed"
             }
-            if (name != REFERENCE) require(name == (if(ThemeTextureModel.sourcePattern.matches(name)) "source-$digest.png" else "texture-$digest.png")) { "Theme texture hash is invalid" }
+            require(name == (if (isSource(name)) "source-$digest.png" else "texture-$digest.png")) { "Theme texture hash is invalid" }
             names.add(name)
         }
         require(directory.listFiles().orEmpty().all { it.isFile && (it.name == MANIFEST || it.name in names) }) {
@@ -120,6 +133,7 @@ internal object ThemeImageBackup {
         try {
             target.listFiles().orEmpty().filter { it.isFile && (ThemeTextureModel.assetPattern.matches(it.name) || ThemeTextureModel.sourcePattern.matches(it.name)) }
                 .forEach { it.copyTo(File(staged, it.name)) }
+            // Existing assets are immutable and content-addressed, so incoming copies may replace them.
             for (name in images) File(source, name).copyTo(File(staged, name), overwrite = true)
             if (target.exists()) {
                 Files.move(target.toPath(), previous.toPath(), StandardCopyOption.ATOMIC_MOVE)

@@ -68,6 +68,7 @@ internal object ThemeTextureModel {
                 })
         }
     }
+    /** Every stored theme lives in a `keyboard_theme_*` preference; pruning and backups rely on that. */
     fun referencedAssets(values: Collection<String>): Set<String> = buildSet {
         fun collect(value: Any?, depth: Int) {
             require(depth <= 32) { "Theme JSON nesting is too deep" }
@@ -95,16 +96,24 @@ internal object ThemeTextureModel {
                     '}', ']' -> depth--
                 }
             }
-            when (text.trimStart().firstOrNull()) {
-                '{' -> collect(JSONObject(text), 0)
-                '[' -> collect(JSONArray(text), 0)
-            }
+            // A damaged preference cannot render an image either; it must not block backups.
+            try {
+                when (text.trimStart().firstOrNull()) {
+                    '{' -> collect(JSONObject(text), 0)
+                    '[' -> collect(JSONArray(text), 0)
+                }
+            } catch (_: org.json.JSONException) { }
         }
     }
 }
 
 internal fun Map<String, KeyboardThemeTexture>.hasWholeBackdrop() = get("background")?.wholeKeyboard == true
 internal fun Map<String, KeyboardThemeTexture>.surfaceColour(colour: Int) = if (hasWholeBackdrop()) android.graphics.Color.TRANSPARENT else colour
+
+internal fun KeyboardThemePreset.hasBackgroundPhoto() = textures.containsKey("background")
+internal fun KeyboardThemePreset.withBackgroundPhoto(image: KeyboardThemeTexture) = copy(textures = textures + ("background" to image))
+/** Solid colours are never overwritten by a photo, so removing it restores them unchanged. */
+internal fun KeyboardThemePreset.withoutBackgroundPhoto() = copy(textures = textures - "background")
 
 internal fun keyboardThemeClipboardJson(theme: KeyboardThemePreset): String =
     SettingsManager.keyboardThemeToJsonString(theme.copy(textures = emptyMap()).toSettingsTheme())

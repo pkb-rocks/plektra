@@ -73,6 +73,17 @@ class KeyboardThemeTextureTest {
         assertThrows(IllegalArgumentException::class.java) { ThemeTextureModel.referencedAssets(listOf("[".repeat(40)+"0"+"]".repeat(40))) }
         assertTrue(ThemeTextureModel.referencedAssets(listOf(JSONObject().put("name","[".repeat(80)).toString())).isEmpty())
     }
+    @Test fun removingThePhotoRestoresTheUnchangedSolidTheme() {
+        val original=keyboardThemePresets().first().copy(textures=mapOf("normal_key" to KeyboardThemeTexture(asset)))
+        val photo=original.withBackgroundPhoto(KeyboardThemeTexture(asset,wholeKeyboard=true))
+        assertTrue(photo.hasBackgroundPhoto());assertEquals(Color.TRANSPARENT,photo.toKeyboardThemeColors().normalKey)
+        assertEquals(original,photo.withoutBackgroundPhoto())
+        assertEquals(original.toKeyboardThemeColors(),photo.withoutBackgroundPhoto().toKeyboardThemeColors())
+    }
+    @Test fun damagedThemePreferenceDoesNotBlockReferenceCollection() {
+        val theme=JSONObject().put("textures",ThemeTextureModel.encode(mapOf("background" to KeyboardThemeTexture(asset))))
+        assertEquals(setOf(asset),ThemeTextureModel.referencedAssets(listOf("{\"broken\":",theme.toString())))
+    }
     @Test fun invalidInMemoryCropIsNotWrittenAsInvalidJson() {
         val value=ThemeTextureModel.encode(mapOf("background" to KeyboardThemeTexture(asset,sourceCrop=listOf(0f,0f,Float.NaN,1f))))
         assertFalse(value.getJSONObject("background").has("sourceCrop"))

@@ -159,8 +159,9 @@ object RestoreManager {
         val images = ThemeImageBackup.validate(File(extractedDir, "theme-images"))
         val themeValues = prefs["plektra_prefs"].orEmpty().filterKeys { it.startsWith("keyboard_theme_") }
             .values.mapNotNull { it.value as? String }
-        val references = rocks.pkb.plektra.ThemeTextureModel.referencedAssets(themeValues)
-        require(references.all { it in images }) { "Backup is missing a referenced theme image" }
+        // A dangling reference falls back to the theme's colours, so it is logged rather than rejected.
+        val missing = rocks.pkb.plektra.ThemeTextureModel.referencedAssets(themeValues) - images.toSet()
+        if (missing.isNotEmpty()) Log.w(TAG, "Backup lacks ${missing.size} referenced theme image(s)")
         require(prefs.values.any { it.isNotEmpty() } || fileCount > 0 || images.isNotEmpty()) {
             "Backup contains no supported settings or user files"
         }

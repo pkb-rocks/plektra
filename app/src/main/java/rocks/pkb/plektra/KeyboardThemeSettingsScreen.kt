@@ -1856,15 +1856,21 @@ private fun KeyboardThemeExportDialog(
         title = { Text("Export theme") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (theme.textures.isNotEmpty()) Text(stringResource(R.string.theme_background_zip))
-            OutlinedTextField(
-                value = exportString,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 4,
-                maxLines = 8
-            )
+                if (theme.hasBackgroundPhoto()) {
+                    Text(
+                        stringResource(R.string.theme_background_zip),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                OutlinedTextField(
+                    value = exportString,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 4,
+                    maxLines = 8
+                )
             }
         },
         confirmButton = {
@@ -1891,7 +1897,6 @@ private fun KeyboardThemeImportDialog(
     onImport: (KeyboardThemePreset) -> Unit
 ) {
     val invalidMessage = stringResource(R.string.keyboard_theme_import_invalid)
-    val imageMessage = stringResource(R.string.theme_background_zip)
     var value by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     AlertDialog(
@@ -1925,10 +1930,9 @@ private fun KeyboardThemeImportDialog(
                     val imported = SettingsManager.keyboardThemeFromJsonString(value)
                     if (imported == null) {
                         error = invalidMessage
-                    } else if (imported.textures.isNotEmpty()) {
-                        error = imageMessage
                     } else {
-                        onImport(imported.toKeyboardThemePreset("Imported"))
+                        // Copied theme text cannot carry image files; keep its colours and settings.
+                        onImport(imported.copy(textures = emptyMap()).toKeyboardThemePreset("Imported"))
                     }
                 }
             ) {
@@ -2004,7 +2008,7 @@ private fun KeyboardThemeDraftColorsEditor(
 ) {
     ThemeBackgroundImageControls(theme) { onFieldChanged(DRAFT_BACKGROUND, it) }
     val items = listOf(
-        KeyboardThemeDraftColorItem(DRAFT_BACKGROUND, stringResource(R.string.keyboard_theme_background), theme.background) { theme.copy(background = it, textures = theme.textures - "background") },
+        KeyboardThemeDraftColorItem(DRAFT_BACKGROUND, stringResource(R.string.keyboard_theme_background), theme.background) { theme.withoutBackgroundPhoto().copy(background = it) },
         KeyboardThemeDraftColorItem(DRAFT_DIVIDER, stringResource(R.string.keyboard_theme_dividers), theme.divider) { theme.copy(divider = it) },
         KeyboardThemeDraftColorItem(DRAFT_NORMAL_KEY, stringResource(R.string.keyboard_theme_normal_keys), theme.normalKey) { theme.copy(normalKey = it) },
         KeyboardThemeDraftColorItem(DRAFT_SPECIAL_KEY, stringResource(R.string.keyboard_theme_special_keys), theme.specialKey) { theme.copy(specialKey = it) },
@@ -2198,7 +2202,7 @@ private fun KeyboardThemeColorsEditor(
                 label = stringResource(R.string.keyboard_theme_background),
                 color = theme.background,
                 presetColor = preset.background,
-                onColorChanged = { onThemeChanged(theme.copy(background = it, textures = theme.textures - "background")) }
+                onColorChanged = { onThemeChanged(theme.withoutBackgroundPhoto().copy(background = it)) }
             )
         )
         add(

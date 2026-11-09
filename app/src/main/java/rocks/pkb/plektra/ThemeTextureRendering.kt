@@ -88,7 +88,26 @@ internal object ThemeTextureStore {
             return name
         } finally { temporary.delete() }
     }
+    /**
+     * Removes images that no stored theme references. Recent files are kept because an import or
+     * restore may have written them before its theme preference is committed.
+     */
+    fun pruneUnreferenced(context: Context, minimumAgeMillis: Long = 10 * 60 * 1000L) {
+        val directory = File(context.filesDir, DIRECTORY)
+        val files = directory.listFiles() ?: return
+        val referenced = try {
+            ThemeTextureModel.referencedAssets(SettingsManager.getPreferences(context).all
+                .filterKeys { it.startsWith("keyboard_theme_") }.values.filterIsInstance<String>())
+        } catch (_: Exception) { return }
+        val cutoff = System.currentTimeMillis() - minimumAgeMillis
+        for (file in files) {
+            val asset = ThemeTextureModel.assetPattern.matches(file.name) || ThemeTextureModel.sourcePattern.matches(file.name)
+            val abandonedTemporary = file.name.startsWith("image-saving-")
+            if (file.isFile && (asset || abandonedTemporary) && file.name !in referenced && file.lastModified() < cutoff) file.delete()
+        }
+    }
     suspend fun import(context: Context, uri: android.net.Uri): KeyboardThemeTexture = withContext(Dispatchers.IO) {
+        pruneUnreferenced(context)
         val bytes = context.contentResolver.openInputStream(uri)?.use { readBounded(it, 16 * 1024 * 1024) }
             ?: error("Unable to open image")
         val original = ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(bytes))) { decoder, info, _ ->
@@ -123,7 +142,8 @@ internal object ThemeTextureBackground {
 }
 
 internal class ThemeTextureDrawable(private val owner: View, val color: Int, val texture: KeyboardThemeTexture) : Drawable() {
-    private val paint = Paint().apply { isFilterBitmap = false; isAntiAlias = false }
+    // Runtime images are at most 512 px and usually upscaled, so filter instead of showing blocks.
+    private val paint = Paint().apply { isFilterBitmap = true; isAntiAlias = false }
     private val matrix = Matrix()
     private var shaderBitmap: Bitmap? = null
     private var imageShader: BitmapShader? = null

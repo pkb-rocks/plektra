@@ -70,12 +70,15 @@ class ThemePhotoBackgroundBackupTest {
         ThemeImageBackup.snapshot(context,out,listOf(frozen))
         assertTrue(File(out,photo.asset).exists());assertTrue(File(out,photo.sourceAsset!!).exists())
     }
-    @Test fun missingReferencedSourceFailsExportBeforeWritingArchive()=runBlocking {
+    @Test fun missingReferencedImageIsSkippedWithoutBlockingTheBackup()=runBlocking {
         val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))
         ThemeTextureStore.file(context,photo.sourceAsset!!).delete()
         val zip=File(context.cacheDir,"missing-source.zip")
-        assertTrue(BackupManager.createBackup(context,Uri.fromFile(zip)) is BackupResult.Failure)
-        assertFalse(zip.exists())
+        val backup=BackupManager.createBackup(context,Uri.fromFile(zip));assertTrue(backup.toString(),backup is BackupResult.Success)
+        ZipFile(zip).use {
+            assertNotNull(it.getEntry("theme-images/${photo.asset}"));assertNull(it.getEntry("theme-images/${photo.sourceAsset}"))
+        }
+        assertTrue(RestoreManager.restore(context,Uri.fromFile(zip)) is RestoreResult.Success)
     }
     @Test fun alteredImageFailsInspectionAndRestoreBeforePreferencesChange()=runBlocking {
         val photo=image();val value=theme(photo);SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,value)
@@ -109,12 +112,34 @@ class ThemePhotoBackgroundBackupTest {
         assertEquals(value,SettingsManager.getSavedKeyboardThemes(context).single().theme)
         assertArrayEquals(bytes,ThemeTextureStore.file(context,photo.asset).readBytes())
     }
-    @Test fun danglingImageReferencesAreRejectedEvenWhenPreferencesAreValid()=runBlocking {
-        val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))
+    @Test fun danglingImageReferencesRestoreAsColourFallback()=runBlocking {
+        val photo=image();val value=theme(photo);SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,value)
         val root=File(context.cacheDir,"dangling").apply {mkdirs()}
         PreferencesBackupHelper.dumpSharedPreferences(context,File(root,"prefs").apply {mkdirs()})
         val zip=File(context.cacheDir,"dangling.zip");zip.outputStream().use {ZipHelper.zip(root,it)}
-        assertTrue(RestoreManager.restore(context,Uri.fromFile(zip)) is RestoreResult.Failure)
+        SettingsManager.getPreferences(context).edit().clear().commit();File(context.filesDir,"theme-images").deleteRecursively()
+        val result=RestoreManager.restore(context,Uri.fromFile(zip));assertTrue(result.toString(),result is RestoreResult.Success)
+        assertEquals(value,SettingsManager.getKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE))
+        assertFalse(ThemeTextureStore.file(context,photo.asset).exists())
+    }
+    @Test fun unsupportedManifestVersionIsRejected() {
+        val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))
+        val folder=File(context.cacheDir,"future-manifest");ThemeImageBackup.snapshot(context,folder)
+        val manifest=File(folder,"manifest.json");manifest.writeText(JSONObject(manifest.readText()).put("version",2).toString())
+        assertThrows(IllegalArgumentException::class.java){ThemeImageBackup.validate(folder)}
+    }
+    @Test fun pruningRemovesOnlyOldUnreferencedImages() {
+        val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))
+        val old="texture-${"e".repeat(64)}.png";val recent="texture-${"f".repeat(64)}.png"
+        val longAgo=System.currentTimeMillis()-60*60*1000L
+        ThemeTextureStore.file(context,old).apply{writeBytes(bytes);setLastModified(longAgo)}
+        ThemeTextureStore.file(context,recent).writeBytes(bytes)
+        ThemeTextureStore.file(context,photo.asset).setLastModified(longAgo)
+        ThemeTextureStore.pruneUnreferenced(context)
+        assertFalse(ThemeTextureStore.file(context,old).exists())
+        assertTrue("An import may not have committed its theme yet",ThemeTextureStore.file(context,recent).exists())
+        assertTrue(ThemeTextureStore.file(context,photo.asset).exists())
+        assertTrue(ThemeTextureStore.file(context,photo.sourceAsset!!).exists())
     }
     @Test fun laterPreferenceFailureRollsBackInstalledImagesAndExistingTheme()=runBlocking {
         val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))

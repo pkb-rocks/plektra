@@ -26,4 +26,7 @@
 
     <!-- Include default/user dictionary file stored in app-private files -->
     <include domain="file" path="user_defaults.json"/>
+
+    <!-- Theme photos referenced by keyboard themes in the shared preferences -->
+    <include domain="file" path="theme-images/"/>
 </full-backup-content>

@@ -15,10 +15,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.res.stringResource
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.ui.platform.LocalContext
+import rocks.pkb.plektra.data.symbols.Kaomoji
 
 /**
  * Dialog for selecting a Unicode character.
- * Uses a RecyclerView with common Unicode characters organized by category.
+ * Uses a RecyclerView with common Unicode characters organized by category, followed by the
+ * kaomoji when the keyboard's emoji picker offers symbols and kaomoji.
  */
 @Composable
 fun UnicodeCharacterPickerDialog(
@@ -26,6 +29,7 @@ fun UnicodeCharacterPickerDialog(
     onCharacterSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     var customInput by remember { mutableStateOf("") }
 
     Dialog(
@@ -247,9 +251,16 @@ fun UnicodeCharacterPickerDialog(
                             "ℽ", "ℾ", "ℿ", "⅀", "⅁", "⅂", "⅃", "⅄", "ⅅ", "ⅆ",
                             "ⅇ", "ⅈ", "ⅉ", "⅊", "⅋", "⅌", "⅍", "ⅎ", "⅏"
                         )
-                    )
+                    ).let { categories ->
+                        // The kaomoji, as the keyboard's emoji picker offers them beside the symbols
+                        if (EmojiPagesSettings.pickerSymbolsAndKaomoji(context)) {
+                            categories + (KAOMOJI_CATEGORY to Kaomoji.all(context))
+                        } else {
+                            categories
+                        }
+                    }
                 }
-                
+
                 // Helper function to translate category keys
                 @Composable
                 fun getCategoryName(categoryKey: String): String {
@@ -261,6 +272,7 @@ fun UnicodeCharacterPickerDialog(
                         "simboli_freccia" -> stringResource(R.string.unicode_category_arrows)
                         "simboli_varie" -> stringResource(R.string.unicode_category_misc)
                         "variazioni" -> stringResource(R.string.unicode_category_variations)
+                        KAOMOJI_CATEGORY -> stringResource(R.string.emoji_category_kaomoji)
                         else -> categoryKey
                     }
                 }
@@ -311,11 +323,13 @@ fun UnicodeCharacterPickerDialog(
                                 val spacing = (2 * context.resources.displayMetrics.density).toInt()
                                 val padding = (4 * context.resources.displayMetrics.density).toInt()
                                 
-                                // Calculate number of columns based on screen width
+                                // Calculate number of columns based on screen width; kaomoji are wide
+                                val kaomojiShown = selectedCategory == KAOMOJI_CATEGORY
                                 val columns = (screenWidth / (characterSize + spacing)).coerceAtLeast(4)
+                                    .let { if (kaomojiShown) (it / 3).coerceAtLeast(2) else it }
                                 
                                 val layoutManager = GridLayoutManager(context, columns)
-                                val adapter = UnicodeCharacterRecyclerViewAdapter(selectedCharacters) { character ->
+                                val adapter = UnicodeCharacterRecyclerViewAdapter(selectedCharacters, textLike = kaomojiShown) { character ->
                                     onCharacterSelected(character)
                                     onDismiss()
                                 }
@@ -352,10 +366,4 @@ fun UnicodeCharacterPickerDialog(
     }
 }
 
-
-
-
-
-
-
-
+private const val KAOMOJI_CATEGORY = "kaomoji"

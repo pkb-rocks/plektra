@@ -922,7 +922,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="emoji_skin_tone_title">Тон шкіри за замовчуванням</string>
     <string name="emoji_pages_emoji_title">Гортати сторінку емодзі клавішами Q і P</string>
     <string name="emoji_pages_symbols_title">Гортати сторінку символів клавішами Q і P</string>
-    <string name="emoji_pages_description">Q і P гортають сторінки, Shift+Q і Shift+P переходять між категоріями, A відкриває пошук. Утримуйте емодзі, щоб вибрати тон шкіри.</string>
+    <string name="emoji_pages_description">Q і P гортають сторінки, Shift+Q і Shift+P переходять між категоріями, A відкриває пошук. Утримуйте емодзі, щоб вибрати тон шкіри. Серед тонів шкіри P гортає далі; для емодзі з вашої власної розкладки ✎ на A відкриває налаштування клавіші.</string>
     <string name="kaomoji_placement_title">Сторінки каомодзі</string>
     <string name="kaomoji_placement_symbols">Після символів</string>
     <string name="kaomoji_placement_emoji">Після емодзі</string>

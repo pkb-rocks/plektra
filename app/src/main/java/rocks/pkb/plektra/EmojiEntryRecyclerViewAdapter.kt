@@ -16,9 +16,11 @@ import rocks.pkb.plektra.data.emoji.EmojiRepository
 
 /**
  * Adapter for emoji entries with optional variants shown on long-press popup.
+ * [textLike] entries (kaomoji) are shown on one line, shrunk to fit.
  */
 class EmojiEntryRecyclerViewAdapter(
     private val entries: List<EmojiRepository.EmojiEntry>,
+    private val textLike: (String) -> Boolean = { false },
     private val onEmojiSelected: (String) -> Unit
 ) : RecyclerView.Adapter<EmojiEntryRecyclerViewAdapter.EmojiEntryViewHolder>() {
     class EmojiEntryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -65,6 +67,22 @@ class EmojiEntryRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: EmojiEntryViewHolder, position: Int) {
         val entry = entries[position]
+        holder.emojiText.apply {
+            if (textLike(entry.base)) {
+                maxLines = 1
+                setTypeface(null, Typeface.NORMAL)
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this, 8, 18, 1, android.util.TypedValue.COMPLEX_UNIT_SP
+                )
+            } else {
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
+                    this, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE
+                )
+                maxLines = Int.MAX_VALUE
+                textSize = 28.8f
+                setTypeface(null, Typeface.BOLD)
+            }
+        }
         holder.emojiText.text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(holder.emojiText.context, entry.base)
     }
 

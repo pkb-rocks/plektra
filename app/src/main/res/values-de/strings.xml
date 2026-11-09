@@ -1679,7 +1679,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="emoji_skin_tone_title">Standard-Hautton</string>
     <string name="emoji_pages_emoji_title">Emoji-Seite mit Q und P blättern</string>
     <string name="emoji_pages_symbols_title">Symbolseite mit Q und P blättern</string>
-    <string name="emoji_pages_description">Q und P blättern, Umschalt+Q und Umschalt+P springen zwischen Kategorien, A öffnet die Suche. Halte ein Emoji für seine Hauttöne.</string>
+    <string name="emoji_pages_description">Q und P blättern, Umschalt+Q und Umschalt+P springen zwischen Kategorien, A öffnet die Suche. Halte ein Emoji für seine Hauttöne. Bei den Hauttönen blättert P zu weiteren; bei einem Emoji deiner eigenen Belegung öffnet ✎ auf A die Anpassung der Taste.</string>
     <string name="kaomoji_placement_title">Kaomoji-Seiten</string>
     <string name="kaomoji_placement_symbols">Nach den Symbolen</string>
     <string name="kaomoji_placement_emoji">Nach den Emoji</string>

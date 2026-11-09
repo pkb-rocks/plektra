@@ -1099,7 +1099,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="emoji_skin_tone_title">Tonalità della pelle predefinita</string>
     <string name="emoji_pages_emoji_title">Sfoglia la pagina emoji con Q e P</string>
     <string name="emoji_pages_symbols_title">Sfoglia la pagina simboli con Q e P</string>
-    <string name="emoji_pages_description">Q e P sfogliano le pagine, Maiusc+Q e Maiusc+P saltano tra le categorie, A apre la ricerca. Tieni premuta un’emoji per le sue tonalità della pelle.</string>
+    <string name="emoji_pages_description">Q e P sfogliano le pagine, Maiusc+Q e Maiusc+P saltano tra le categorie, A apre la ricerca. Tieni premuta un’emoji per le sue tonalità della pelle. Tra le tonalità, P passa alle altre; per un’emoji della tua mappatura, ✎ su A apre la personalizzazione del tasto.</string>
     <string name="kaomoji_placement_title">Pagine kaomoji</string>
     <string name="kaomoji_placement_symbols">Dopo i simboli</string>
     <string name="kaomoji_placement_emoji">Dopo le emoji</string>

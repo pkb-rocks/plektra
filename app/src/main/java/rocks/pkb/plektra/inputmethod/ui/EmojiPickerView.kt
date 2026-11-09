@@ -39,10 +39,7 @@ import rocks.pkb.plektra.data.emoji.RecentEmojiManager
 import rocks.pkb.plektra.data.emoji.EmojiSearchRepository
 import rocks.pkb.plektra.data.emoji.EmojiRendering
 import rocks.pkb.plektra.data.emoji.EmojiSkinTone
-import rocks.pkb.plektra.data.symbols.Kaomoji
-import rocks.pkb.plektra.data.symbols.SymbolPages
-import rocks.pkb.plektra.data.symbols.SymbolSearch
-import rocks.pkb.plektra.EmojiPagesSettings
+import rocks.pkb.plektra.data.symbols.PickerExtras
 import androidx.core.widget.TextViewCompat
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import kotlinx.coroutines.CancellationException
@@ -114,8 +111,7 @@ class EmojiPickerView(
     private var pendingSearchReplacementRange: IntRange? = null
     private var tabCategoryIds: List<String> = emptyList()
     private var lastSearchResults: List<EmojiSearchRepository.EmojiSearchResult> = emptyList()
-    private var symbolIndex: SymbolSearch.Index? = null
-    private var kaomojiEntries: List<Kaomoji.Entry> = emptyList()
+    private var extras: PickerExtras = PickerExtras.NONE
     private var skinTone = 0
     /** The emoji categories shown; null while loading. */
     private var shownEmojiCategories: List<EmojiRepository.EmojiCategory>? = null
@@ -786,10 +782,11 @@ class EmojiPickerView(
                 val regularCategories = withContext(Dispatchers.IO) { EmojiRepository.getEmojiCategories(context) }
                 val recentCategory = withContext(Dispatchers.IO) { RecentEmojiManager.getRecentEmojiCategory(context) }
                 val loadedSearchIndex = withContext(Dispatchers.IO) { EmojiSearchRepository.getSearchIndex(context) }
-                val extras = withContext(Dispatchers.IO) { loadSymbolAndKaomojiCategories() }
+                val extras = withContext(Dispatchers.IO) { PickerExtras.load(context) }
+                this@EmojiPickerView.extras = extras
                 skinTone = EmojiSkinTone.get(context)
                 shownEmojiCategories = regularCategories
-                this@EmojiPickerView.regularCategories = regularCategories + extras
+                this@EmojiPickerView.regularCategories = regularCategories + extras.categories
                 this@EmojiPickerView.searchIndex = loadedSearchIndex
 
                 val allCategories = mutableListOf<EmojiRepository.EmojiCategory>()
@@ -826,50 +823,6 @@ class EmojiPickerView(
                 recyclerView.visibility = View.GONE
             }
         }
-    }
-
-    /** The text symbols and kaomoji as picker categories (recent ones first), when enabled. */
-    private fun loadSymbolAndKaomojiCategories(): List<EmojiRepository.EmojiCategory> {
-        if (!EmojiPagesSettings.pickerSymbolsAndKaomoji(context)) {
-            symbolIndex = null
-            kaomojiEntries = emptyList()
-            return emptyList()
-        }
-        symbolIndex = SymbolSearch.index(context)
-        kaomojiEntries = Kaomoji.entries(context)
-        val symbols = (SymbolSearch.recents.get(context) + SymbolPages.ALL).distinct().filter(SymbolSearch::canRender)
-        val kaomoji = (Kaomoji.recents.get(context) + kaomojiEntries.map { it.kaomoji }).distinct()
-        return listOf(
-            EmojiRepository.EmojiCategory(
-                id = EmojiRepository.SYMBOLS_CATEGORY_ID,
-                displayNameRes = EmojiRepository.categoryNameRes(EmojiRepository.SYMBOLS_CATEGORY_ID),
-                emojis = symbols.map { EmojiRepository.EmojiEntry(it, emptyList()) }
-            ),
-            EmojiRepository.EmojiCategory(
-                id = EmojiRepository.KAOMOJI_CATEGORY_ID,
-                displayNameRes = EmojiRepository.categoryNameRes(EmojiRepository.KAOMOJI_CATEGORY_ID),
-                emojis = kaomoji.map { EmojiRepository.EmojiEntry(it, emptyList()) }
-            )
-        ).filter { it.emojis.isNotEmpty() }
-    }
-
-    /** Matching text symbols, then kaomoji, after the emoji results. */
-    private fun symbolAndKaomojiResults(query: String): List<EmojiSearchRepository.EmojiSearchResult> {
-        val symbols = symbolIndex?.let { index ->
-            SymbolSearch.search(index, query, SymbolSearch.recents.get(context), limit = MAX_EXTRA_RESULTS)
-        }.orEmpty().map {
-            EmojiSearchRepository.EmojiSearchResult(
-                EmojiRepository.EmojiEntry(it.symbol, emptyList()), EmojiRepository.SYMBOLS_CATEGORY_ID, 0
-            )
-        }
-        val kaomoji = Kaomoji.search(kaomojiEntries, query, Kaomoji.recents.get(context))
-            .take(MAX_EXTRA_RESULTS)
-            .map {
-                EmojiSearchRepository.EmojiSearchResult(
-                    EmojiRepository.EmojiEntry(it.kaomoji, emptyList()), EmojiRepository.KAOMOJI_CATEGORY_ID, 0
-                )
-            }
-        return symbols + kaomoji
     }
 
     private fun spanFor(categoryId: String): Int =
@@ -992,7 +945,7 @@ class EmojiPickerView(
             return
         }
 
-        val results = EmojiSearchRepository.search(index, query) + symbolAndKaomojiResults(query)
+        val results = EmojiSearchRepository.search(index, query) + extras.search(context, query)
         lastSearchResults = results
         setSearchMode(true)
         searchAdapter.submitList(results)
@@ -1120,11 +1073,7 @@ class EmojiPickerView(
         // still runs even when cancellation lands before the coroutine body starts.
         if (categoryId == EmojiRepository.SYMBOLS_CATEGORY_ID || categoryId == EmojiRepository.KAOMOJI_CATEGORY_ID) {
             coroutineScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
-                if (categoryId == EmojiRepository.KAOMOJI_CATEGORY_ID) {
-                    Kaomoji.recents.add(context, emoji)
-                } else {
-                    SymbolSearch.recents.add(context, emoji)
-                }
+                PickerExtras.recordChosen(context, emoji, categoryId)
             }
         } else coroutineScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
             val changed = RecentEmojiManager.addRecentEmoji(
@@ -1721,7 +1670,6 @@ class EmojiPickerView(
         private const val COMPACT_HEIGHT_DP = 177f
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_EMOJI = 1
-        private const val MAX_EXTRA_RESULTS = 60
         private const val VARIANTS_PER_ROW = 6
 
         fun configuredHeightPx(context: Context): Int {

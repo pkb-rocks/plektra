@@ -919,7 +919,7 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="emoji_skin_tone_title">Tông da mặc định</string>
     <string name="emoji_pages_emoji_title">Lật trang emoji bằng Q và P</string>
     <string name="emoji_pages_symbols_title">Lật trang ký hiệu bằng Q và P</string>
-    <string name="emoji_pages_description">Q và P lật trang, Shift+Q và Shift+P chuyển giữa các danh mục, A mở tìm kiếm. Giữ một emoji để chọn tông da.</string>
+    <string name="emoji_pages_description">Q và P lật trang, Shift+Q và Shift+P chuyển giữa các danh mục, A mở tìm kiếm. Giữ một emoji để chọn tông da. Trong các tông da, P chuyển sang các tông khác; với emoji trong bố cục phím của bạn, ✎ trên A mở phần tùy chỉnh phím.</string>
     <string name="kaomoji_placement_title">Trang kaomoji</string>
     <string name="kaomoji_placement_symbols">Sau ký hiệu</string>
     <string name="kaomoji_placement_emoji">Sau emoji</string>

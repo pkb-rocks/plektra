@@ -921,7 +921,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="emoji_skin_tone_title">Teinte de peau par défaut</string>
     <string name="emoji_pages_emoji_title">Feuilleter la page emoji avec Q et P</string>
     <string name="emoji_pages_symbols_title">Feuilleter la page symboles avec Q et P</string>
-    <string name="emoji_pages_description">Q et P tournent les pages, Maj+Q et Maj+P passent d’une catégorie à l’autre, A ouvre la recherche. Maintenez un emoji pour ses teintes de peau.</string>
+    <string name="emoji_pages_description">Q et P tournent les pages, Maj+Q et Maj+P passent d’une catégorie à l’autre, A ouvre la recherche. Maintenez un emoji pour ses teintes de peau. Parmi les teintes, P passe aux suivantes ; pour un emoji de votre propre disposition, ✎ sur A ouvre la personnalisation de la touche.</string>
     <string name="kaomoji_placement_title">Pages kaomoji</string>
     <string name="kaomoji_placement_symbols">Après les symboles</string>
     <string name="kaomoji_placement_emoji">Après les emoji</string>

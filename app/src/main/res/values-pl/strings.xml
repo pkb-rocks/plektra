@@ -922,7 +922,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="emoji_skin_tone_title">Domyślny odcień skóry</string>
     <string name="emoji_pages_emoji_title">Przewijaj stronę emoji klawiszami Q i P</string>
     <string name="emoji_pages_symbols_title">Przewijaj stronę symboli klawiszami Q i P</string>
-    <string name="emoji_pages_description">Q i P przewracają strony, Shift+Q i Shift+P przeskakują między kategoriami, A otwiera wyszukiwanie. Przytrzymaj emoji, aby zobaczyć odcienie skóry.</string>
+    <string name="emoji_pages_description">Q i P przewracają strony, Shift+Q i Shift+P przeskakują między kategoriami, A otwiera wyszukiwanie. Przytrzymaj emoji, aby zobaczyć odcienie skóry. Wśród odcieni skóry P przechodzi do kolejnych; dla emoji z własnego układu ✎ na A otwiera dostosowanie klawisza.</string>
     <string name="kaomoji_placement_title">Strony kaomoji</string>
     <string name="kaomoji_placement_symbols">Po symbolach</string>
     <string name="kaomoji_placement_emoji">Po emoji</string>

@@ -13,9 +13,11 @@ import androidx.appcompat.app.AppCompatDelegate
  * Adapter for Unicode character RecyclerView.
  * Optimized for performance using classic RecyclerView.
  * Supports separators using empty string markers that span full width.
+ * [textLike] items (kaomoji) are shown on one line, shrunk to fit.
  */
 class UnicodeCharacterRecyclerViewAdapter(
     private val characters: List<String>,
+    private val textLike: Boolean = false,
     private val onCharacterClick: (String) -> Unit
 ) : RecyclerView.Adapter<UnicodeCharacterRecyclerViewAdapter.CharacterViewHolder>() {
 
@@ -49,7 +51,13 @@ class UnicodeCharacterRecyclerViewAdapter(
             val nightModeFlags = parent.context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
             val isDarkTheme = nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
             setTextColor(if (isDarkTheme) Color.WHITE else Color.BLACK)
-            setTypeface(null, Typeface.BOLD)
+            setTypeface(null, if (textLike) Typeface.NORMAL else Typeface.BOLD)
+            if (textLike) {
+                maxLines = 1
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this, 8, 18, 1, android.util.TypedValue.COMPLEX_UNIT_SP
+                )
+            }
         }
         
         // Click listener setup - only for non-separator items

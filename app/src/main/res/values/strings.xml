@@ -1995,7 +1995,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="emoji_skin_tone_title">Default skin tone</string>
     <string name="emoji_pages_emoji_title">Turn the emoji page with Q and P</string>
     <string name="emoji_pages_symbols_title">Turn the symbols page with Q and P</string>
-    <string name="emoji_pages_description">Q and P turn the pages, Shift+Q and Shift+P jump between categories, A opens the search. Hold an emoji for its skin tones.</string>
+    <string name="emoji_pages_description">Q and P turn the pages, Shift+Q and Shift+P jump between categories, A opens the search. Hold an emoji for its skin tones. Among an emoji’s skin tones, P turns to more of them and, for an emoji of your own key mapping, ✎ on A opens the key’s customization.</string>
     <string name="kaomoji_placement_title">Kaomoji pages</string>
     <string name="kaomoji_placement_symbols">After the symbols</string>
     <string name="kaomoji_placement_emoji">After the emoji</string>

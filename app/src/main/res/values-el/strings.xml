@@ -1763,7 +1763,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="emoji_skin_tone_title">Προεπιλεγμένος τόνος δέρματος</string>
     <string name="emoji_pages_emoji_title">Ξεφύλλισμα σελίδας emoji με Q και P</string>
     <string name="emoji_pages_symbols_title">Ξεφύλλισμα σελίδας συμβόλων με Q και P</string>
-    <string name="emoji_pages_description">Τα Q και P αλλάζουν σελίδα, Shift+Q και Shift+P μεταβαίνουν μεταξύ κατηγοριών, το A ανοίγει την αναζήτηση. Κράτησε πατημένο ένα emoji για τους τόνους δέρματος.</string>
+    <string name="emoji_pages_description">Τα Q και P αλλάζουν σελίδα, Shift+Q και Shift+P μεταβαίνουν μεταξύ κατηγοριών, το A ανοίγει την αναζήτηση. Κράτησε πατημένο ένα emoji για τους τόνους δέρματος. Στους τόνους δέρματος, το P δείχνει περισσότερους· για ένα emoji της δικής σου αντιστοίχισης, το ✎ στο A ανοίγει την προσαρμογή του πλήκτρου.</string>
     <string name="kaomoji_placement_title">Σελίδες καομότζι</string>
     <string name="kaomoji_placement_symbols">Μετά τα σύμβολα</string>
     <string name="kaomoji_placement_emoji">Μετά τα emoji</string>

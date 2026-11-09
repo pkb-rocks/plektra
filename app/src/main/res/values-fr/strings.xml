@@ -523,6 +523,7 @@
     <string name="input_method_name_pt">Português</string>
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_uk">Українська</string>
+    <string name="input_method_name_ug">ئۇيغۇرچە</string>
     <string name="nav_mode_warning_icon">⚠</string>
     <string name="sym_reset_confirm_title">Réinitialiser</string>
     <string name="sym_reset_confirm_message">Réinitialiser tous les mappings SYM ? Action irréversible.</string>

@@ -81,6 +81,34 @@ class ShowcaseReceiverNotesTest {
         assertEquals(listOf("Personal note"), NotesRepository(prefs).all().map { it.body })
     }
 
+    @Test fun captureFromAbsentNotesRestoresAbsenceAndClosesTheEditor() {
+        context.deleteSharedPreferences("notes")
+        val file = java.io.File(context.applicationInfo.dataDir, "shared_prefs/notes.xml")
+        org.junit.Assert.assertFalse(file.exists())
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("title", "Synthetic title").put("body", "Synthetic body").toString())))
+        val capture = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        org.junit.Assert.assertTrue(capture.get().isFinishing)
+        capture.pause().stop().destroy()
+        org.junit.Assert.assertTrue(context.getSharedPreferences("notes", Context.MODE_PRIVATE).all.isEmpty())
+        org.junit.Assert.assertFalse("no capture-only preference file", file.exists())
+    }
+
+    @Test fun newPersonalNoteCreatedDuringAnInitiallyEmptyCaptureSurvivesRestore() {
+        context.deleteSharedPreferences("notes")
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic body").toString())))
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        val repository = NotesRepository(prefs)
+        val personal = repository.create().copy(body = "New personal note")
+        repository.save(personal)
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        assertEquals(listOf(personal), repository.all())
+        org.junit.Assert.assertFalse(prefs.contains("body"))
+        org.junit.Assert.assertFalse(prefs.contains("heading"))
+    }
+
     private fun broadcast(intent: Intent): Int {
         var result: Int? = null
         context.sendOrderedBroadcast(intent.setClass(context, ShowcaseReceiver::class.java), null,

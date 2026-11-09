@@ -342,7 +342,7 @@ open class NotesActivity : Activity() {
     }
 
     private fun closeRemovedNote() {
-        if (!isFinishing && notes.all().none { it.id == selectedNote.id }) finish()
+        if (!isFinishing && (!notePrefs.contains("collection") || notes.all().none { it.id == selectedNote.id })) finish()
     }
 
     override fun onPause() {
@@ -363,7 +363,7 @@ open class NotesActivity : Activity() {
     }
 
     private fun saveNote() {
-        if (loadingNote || notes.all().none { it.id == selectedNote.id }) return
+        if (loadingNote || (!notePrefs.contains("collection") || notes.all().none { it.id == selectedNote.id })) return
         val target = if (heading.hasFocus() || (viewMode == ViewMode.PREVIEW && restoreHeadingFocus)) heading else editor
         notePrefs.edit().putString("heading", heading.text.toString()).putString("body", editor.text.toString())
             .putInt("focus", target.id).putInt("cursor", target.selectionStart.coerceAtLeast(0))

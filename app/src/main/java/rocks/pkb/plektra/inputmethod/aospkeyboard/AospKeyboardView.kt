@@ -820,6 +820,8 @@ class AospKeyboardView @JvmOverloads constructor(
             MotionEvent.ACTION_POINTER_DOWN -> {
                 val pointerIndex = event.actionIndex
                 val key = findKey(event.getX(pointerIndex), event.getY(pointerIndex)) ?: return true
+                // Any second finger during a SYM hold starts a chord, which keeps SYM a modifier.
+                handler.removeCallbacks(symHoldPageChooserRunnable)
                 if (key.spec.type.isHoldModifier() && !hasSymLayerOutput(key) && !opensPageChooser(key)) return true
                 if (heldModifierKey == null) {
                     val previousKey = pressedKey
@@ -849,8 +851,6 @@ class AospKeyboardView @JvmOverloads constructor(
                     return true
                 }
                 handler.removeCallbacks(longPressRunnable)
-                // A chord started before the hold threshold keeps SYM a modifier.
-                handler.removeCallbacks(symHoldPageChooserRunnable)
                 chordKey = key
                 chordPointerId = event.getPointerId(pointerIndex)
                 pressedKey = key

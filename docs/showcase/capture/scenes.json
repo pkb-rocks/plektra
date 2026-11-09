@@ -1,5 +1,5 @@
 {
-  "description": "Scene table for scripts/capture-showcase.sh. One entry per device and state used in sources/catalog.json. Steps run in order: a KEYCODE_* name is sent with `input keyevent`; `longpress:KEYCODE_*` is a long press; `wait:<ms>`; `tap:<x>,<y>`; `back` closes the IME. Notes are prefilled through ShowcaseReceiver (host notes) or intent extras (host showcase). Values in `settings` are written with ShowcaseReceiver and restored afterwards.",
+  "description": "Scene table for scripts/capture-showcase.sh. One entry per device and state used in sources/catalog.json. Steps run in order: a KEYCODE_* name is sent with `input keyevent`; `longpress:KEYCODE_*` is a long press; `wait:<ms>`; `tap:<x>,<y>`; `combo:KEYCODE_*+KEYCODE_*` is sent with `input keycombination`; `back` closes the IME. Every scene runs in the Markdown notes editor; ShowcaseReceiver adds the scene's note as one synthetic note beside the existing ones and removes it afterwards. Values in `settings` are written with ShowcaseReceiver and restored afterwards.",
   "devices": {
     "titan-2-elite": {
       "expected_screen": "1080x1200",
@@ -51,8 +51,6 @@
       "id": "titan-2-elite/r6-full",
       "device": "titan-2-elite",
       "state": "r6-full",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -73,8 +71,6 @@
       "id": "titan-2-elite/r6-config-full",
       "device": "titan-2-elite",
       "state": "r6-config-full",
-      "host": "showcase",
-      "background": "grid",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -89,14 +85,12 @@
         "KEYCODE_R"
       ],
       "confidence": "hardware-verified",
-      "comment": "Full bar on the grid background. Same keyboard settings as r6-full."
+      "comment": "Same keyboard settings as r6-full."
     },
     {
       "id": "titan-2-elite/r5-config-suggestions",
       "device": "titan-2-elite",
       "state": "r5-config-suggestions",
-      "host": "showcase",
-      "background": "grid",
       "theme": "Plektra Dark",
       "settings": {
         "suggestions_enabled": true,
@@ -121,8 +115,6 @@
       "id": "titan-2-elite/r5-config-leds",
       "device": "titan-2-elite",
       "state": "r5-config-leds",
-      "host": "showcase",
-      "background": "grid",
       "theme": "Plektra Dark",
       "settings": {
         "suggestions_enabled": false,
@@ -141,8 +133,6 @@
       "id": "titan-2-elite/r5-config-hidden",
       "device": "titan-2-elite",
       "state": "r5-config-hidden",
-      "host": "showcase",
-      "background": "grid",
       "theme": "Plektra Dark",
       "settings": {
         "suggestions_enabled": false,
@@ -163,8 +153,6 @@
       "id": "titan-2-elite/r5-slim",
       "device": "titan-2-elite",
       "state": "r5-slim",
-      "host": "showcase",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {
         "slim_mode_override": "slim",
@@ -188,8 +176,6 @@
       "id": "titan-2-elite/r5-shared",
       "device": "titan-2-elite",
       "state": "r5-shared",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {
         "keyboard_bar_arrangement": "SHARED"
@@ -212,8 +198,6 @@
       "id": "titan-2-elite/r5-variations",
       "device": "titan-2-elite",
       "state": "r5-variations",
-      "host": "showcase",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {
         "static_variation_bar_preset": "off",
@@ -236,8 +220,6 @@
       "id": "titan-2-elite/r2-expanded-address",
       "device": "titan-2-elite",
       "state": "r2-expanded-address",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -256,8 +238,6 @@
       "id": "titan-2-elite/r2-expanded-date",
       "device": "titan-2-elite",
       "state": "r2-expanded-date",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -275,8 +255,6 @@
       "id": "titan-2-elite/r2-expanded-email",
       "device": "titan-2-elite",
       "state": "r2-expanded-email",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -293,8 +271,6 @@
       "id": "titan-2-elite/r2-snippet-email",
       "device": "titan-2-elite",
       "state": "r2-snippet-email",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {
         "snippets_enabled": true,
@@ -317,8 +293,6 @@
       "id": "titan-2-elite/symbols",
       "device": "titan-2-elite",
       "state": "symbols",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -335,26 +309,22 @@
       "id": "titan-2-elite/selected-text-final",
       "device": "titan-2-elite",
       "state": "selected-text-final",
-      "host": "showcase",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
         "title": "Weekend plans",
-        "body": "Train tickets are booked.\nMeet at the station at nine.",
-        "selectionStart": 0,
-        "selectionEnd": 54
+        "body": "Train tickets are booked.\nMeet at the station at nine."
       },
-      "steps": [],
+      "steps": [
+        "combo:KEYCODE_CTRL_LEFT+KEYCODE_A"
+      ],
       "confidence": "approximate",
-      "comment": "Selection set through the showcase host extras (the Markdown host has no selection extra). The selection covers both lines."
+      "comment": "Ctrl+A selects both lines through the default Ctrl mapping (select_all). Not yet captured this way on hardware."
     },
     {
       "id": "titan-2-elite/modifier-final-1",
       "device": "titan-2-elite",
       "state": "modifier-final-1",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -371,8 +341,6 @@
       "id": "titan-2-elite/modifier-locked",
       "device": "titan-2-elite",
       "state": "modifier-locked",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -391,8 +359,6 @@
       "id": "titan-2-elite/r5-theme-plektra-light",
       "device": "titan-2-elite",
       "state": "r5-theme-plektra-light",
-      "host": "showcase",
-      "background": "default",
       "theme": "Plektra Light",
       "settings": {},
       "note": {
@@ -413,8 +379,6 @@
       "id": "titan-2-elite/r5-theme-nord",
       "device": "titan-2-elite",
       "state": "r5-theme-nord",
-      "host": "showcase",
-      "background": "default",
       "theme": "Nord",
       "settings": {},
       "note": {
@@ -435,8 +399,6 @@
       "id": "titan-2-elite/r5-theme-coral",
       "device": "titan-2-elite",
       "state": "r5-theme-coral",
-      "host": "showcase",
-      "background": "default",
       "theme": "Coral",
       "settings": {},
       "note": {
@@ -457,8 +419,6 @@
       "id": "titan-2-elite/r5-theme-cobalt",
       "device": "titan-2-elite",
       "state": "r5-theme-cobalt",
-      "host": "showcase",
-      "background": "default",
       "theme": "Cobalt",
       "settings": {},
       "note": {
@@ -479,8 +439,6 @@
       "id": "titan-2-elite/r5-theme-volcanic-dusk",
       "device": "titan-2-elite",
       "state": "r5-theme-volcanic-dusk",
-      "host": "showcase",
-      "background": "default",
       "theme": "Volcanic Dusk",
       "settings": {},
       "note": {
@@ -501,8 +459,6 @@
       "id": "titan-2-elite/r5-theme-epaper",
       "device": "titan-2-elite",
       "state": "r5-theme-epaper",
-      "host": "showcase",
-      "background": "default",
       "theme": "ePaper",
       "settings": {},
       "note": {
@@ -523,8 +479,6 @@
       "id": "titan-2-elite/r5-theme-high-contrast",
       "device": "titan-2-elite",
       "state": "r5-theme-high-contrast",
-      "host": "showcase",
-      "background": "default",
       "theme": "High Contrast",
       "settings": {},
       "note": {
@@ -545,8 +499,6 @@
       "id": "titan-2-elite/r5-theme-transparent-dark",
       "device": "titan-2-elite",
       "state": "r5-theme-transparent-dark",
-      "host": "showcase",
-      "background": "default",
       "theme": "Transparent Dark",
       "settings": {},
       "note": {
@@ -567,8 +519,6 @@
       "id": "titan-2/r6-full",
       "device": "titan-2",
       "state": "r6-full",
-      "host": "notes",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {
@@ -589,8 +539,6 @@
       "id": "pixel-7a/r6-full",
       "device": "pixel-7a",
       "state": "r6-full",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -611,8 +559,6 @@
       "id": "pixel-7a/r5-emoji",
       "device": "pixel-7a",
       "state": "r5-emoji",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -629,8 +575,6 @@
       "id": "pixel-7a/clipboard-probe",
       "device": "pixel-7a",
       "state": "clipboard-probe",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {
         "clipboard_history_enabled": true
@@ -649,8 +593,6 @@
       "id": "pixel-7a/key-popup-final",
       "device": "pixel-7a",
       "state": "key-popup-final",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -667,8 +609,6 @@
       "id": "pixel-7a/r2-azerty",
       "device": "pixel-7a",
       "state": "r2-azerty",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {
         "keyboard_layout": "azerty"
@@ -691,8 +631,6 @@
       "id": "pixel-7a/r2-qwerty",
       "device": "pixel-7a",
       "state": "r2-qwerty",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {
         "keyboard_layout": "qwerty"
@@ -715,8 +653,6 @@
       "id": "pixel-7a/r2-qwertz-umlauts",
       "device": "pixel-7a",
       "state": "r2-qwertz-umlauts",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {
         "keyboard_layout": "qwertz"
@@ -733,8 +669,6 @@
       "id": "pixel-7a/r2-staggered",
       "device": "pixel-7a",
       "state": "r2-staggered",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -751,8 +685,6 @@
       "id": "pixel-7a/r2-ortholinear",
       "device": "pixel-7a",
       "state": "r2-ortholinear",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -769,8 +701,6 @@
       "id": "pixel-7a/r2-nav-locked",
       "device": "pixel-7a",
       "state": "r2-nav-locked",
-      "host": "notes",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {},
       "note": {
@@ -789,8 +719,6 @@
       "id": "pixel-7a/r5-theme-volcanic-dusk",
       "device": "pixel-7a",
       "state": "r5-theme-volcanic-dusk",
-      "host": "notes",
-      "background": "default",
       "theme": "Volcanic Dusk",
       "settings": {},
       "note": {
@@ -811,8 +739,6 @@
       "id": "pixel-7a/r5-theme-high-contrast",
       "device": "pixel-7a",
       "state": "r5-theme-high-contrast",
-      "host": "notes",
-      "background": "default",
       "theme": "High Contrast",
       "settings": {},
       "note": {
@@ -833,8 +759,6 @@
       "id": "pixel-7a/gallery-cloud-tap",
       "device": "pixel-7a",
       "state": "gallery-cloud-tap",
-      "host": "showcase",
-      "background": "default",
       "theme": "Cloud Tap",
       "settings": {
         "software_keyboard_mode": "force_virtual",
@@ -864,8 +788,6 @@
       "id": "pixel-7a/gallery-moon-tap",
       "device": "pixel-7a",
       "state": "gallery-moon-tap",
-      "host": "showcase",
-      "background": "default",
       "theme": "Moon Tap",
       "settings": {
         "software_keyboard_mode": "force_virtual",
@@ -895,8 +817,6 @@
       "id": "pixel-7a/gallery-classic-cloud",
       "device": "pixel-7a",
       "state": "gallery-classic-cloud",
-      "host": "showcase",
-      "background": "default",
       "theme": "Classic Cloud",
       "settings": {
         "software_keyboard_mode": "force_virtual",
@@ -926,8 +846,6 @@
       "id": "pixel-7a/gallery-classic-midnight",
       "device": "pixel-7a",
       "state": "gallery-classic-midnight",
-      "host": "showcase",
-      "background": "default",
       "theme": "Classic Midnight",
       "settings": {
         "software_keyboard_mode": "force_virtual",
@@ -957,8 +875,6 @@
       "id": "titan-2-elite/hero-full",
       "device": "titan-2-elite",
       "state": "hero-full",
-      "host": "showcase",
-      "background": "default",
       "theme": "Plektra Dark",
       "settings": {},
       "note": {

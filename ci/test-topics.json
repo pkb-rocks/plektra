@@ -41,7 +41,7 @@
       "rocks.pkb.plektra.MarkdownListEditingTest",
       "rocks.pkb.plektra.NotesActivityTest",
       "rocks.pkb.plektra.NotesRepositoryTest",
-      "rocks.pkb.plektra.ShowcaseNotesActivityTest",
+      "rocks.pkb.plektra.ShowcaseReceiverNotesTest",
       "rocks.pkb.plektra.backup.BackupPreferenceContractIntegrationTest",
       "rocks.pkb.plektra.backup.KeyboardTextScaleBackupTest",
       "rocks.pkb.plektra.backup.NotesAndDictionaryBackupTest",

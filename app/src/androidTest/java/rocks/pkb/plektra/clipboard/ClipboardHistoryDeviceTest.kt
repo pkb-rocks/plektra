@@ -20,8 +20,8 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import rocks.pkb.plektra.R
+import rocks.pkb.plektra.SettingsActivity
 import rocks.pkb.plektra.SettingsManager
-import rocks.pkb.plektra.ShowcaseNotesActivity
 import rocks.pkb.plektra.inputmethod.ui.ClipboardHistoryView
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -124,7 +124,8 @@ class ClipboardHistoryDeviceTest {
         val clipboard = context.getSystemService(ClipboardManager::class.java)
         var originalClip: ClipData? = null
         var managerStarted = false
-        val scenario = ActivityScenario.launch(ShowcaseNotesActivity::class.java)
+        // Only a focused window is needed; the notes editor would persist its own state into the user's notes.
+        val scenario = ActivityScenario.launch(SettingsActivity::class.java)
         try {
             lateinit var editor: EditText
             scenario.onActivity { activity ->

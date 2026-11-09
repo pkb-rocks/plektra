@@ -63,14 +63,20 @@ object LayoutMappingRepository {
         altMappings = layout.mapNotNull { (keyCode, mapping) ->
             mapping.alt?.let { keyCode to it }
         }.toMap()
-        // Shift can select extra letters in an uncased script. Automatic
-        // capitalization must not silently select that alternate layer.
-        supportsAutoCapitalization = layout.values.any { mapping ->
-            (mapping.lowercase + mapping.uppercase).any { it.isLowerCase() || it.isUpperCase() } ||
-                mapping.taps.any { tap ->
-                    (tap.lowercase + tap.uppercase).any { it.isLowerCase() || it.isUpperCase() }
-                }
+        supportsAutoCapitalization = supportsAutoCapitalization(layout)
+    }
+
+    /**
+     * Shift can select extra letters in an uncased script such as Arabic.
+     * Automatic capitalization must not silently select that alternate layer.
+     * Layouts without any letters keep the default behaviour.
+     */
+    internal fun supportsAutoCapitalization(layout: Map<Int, LayoutMapping>): Boolean {
+        val texts = layout.values.flatMap { mapping ->
+            listOf(mapping.lowercase, mapping.uppercase) + mapping.taps.flatMap { listOf(it.lowercase, it.uppercase) }
         }
+        val letters = texts.flatMap { it.asIterable() }.filter { it.isLetter() }
+        return letters.isEmpty() || letters.any { it.isLowerCase() || it.isUpperCase() }
     }
 
     fun getLayout(): Map<Int, LayoutMapping> = currentLayout

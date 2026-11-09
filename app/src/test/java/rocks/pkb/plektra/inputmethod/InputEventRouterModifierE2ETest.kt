@@ -949,6 +949,26 @@ class InputEventRouterModifierE2ETest {
         assertEquals(listOf("3", ":", "!", "-", "."), inputConnectionRecorder.committedTexts)
     }
 
+    @Test
+    fun letterKeyMappedToPunctuation_keepsAltLongPressAndCommitsLayoutText() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "greek", context)
+        val callbacks = callbacksWithCurrentLayout()
+        assertTrue(alternateCharacterManager.hasAltMapping(KeyEvent.KEYCODE_Q))
+        assertTrue(routeKeyDown(KeyEvent.KEYCODE_Q, keyDown(KeyEvent.KEYCODE_Q), callbacks) is InputEventRouter.EditableFieldRoutingResult.Consume)
+        assertEquals(listOf(";"), inputConnectionRecorder.committedTexts)
+        assertTrue(alternateCharacterManager.hasPendingPress(KeyEvent.KEYCODE_Q))
+    }
+
+    @Test
+    fun letterKeyMappedToPunctuation_withoutLongPressCommitsLayoutText() {
+        rocks.pkb.plektra.data.layout.LayoutMappingRepository.loadLayout(context.assets, "greek", context)
+        SettingsManager.setLongPressModifier(context, "variations")
+        val callbacks = callbacksWithCurrentLayout()
+        assertTrue(routeKeyDown(KeyEvent.KEYCODE_Q, keyDown(KeyEvent.KEYCODE_Q), callbacks) is InputEventRouter.EditableFieldRoutingResult.Consume)
+        routeKeyDown(KeyEvent.KEYCODE_Q, keyDown(KeyEvent.KEYCODE_Q, KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON), callbacks)
+        assertEquals(listOf(";", ":"), inputConnectionRecorder.committedTexts)
+    }
+
     private fun routeKeyDown(
         keyCode: Int,
         event: KeyEvent,

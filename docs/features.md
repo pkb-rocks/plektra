@@ -31,7 +31,7 @@ Plektra focuses on efficient text input on Android devices with physical keyboar
 
 German, English and Italian dictionaries are bundled. Download other base dictionaries from Installed dictionaries. User words remain available without a base dictionary. Installing or removing a package refreshes the active keyboard.
 
-Uyghur (ئۇيغۇرچە) includes a typing layout without a dictionary. Add `ug` in Settings → Input Languages and choose the Uyghur layout. It uses Uyghur computer key positions with extra Shift and Alt shortcuts for compact keyboards such as the Zinwa Q25. See [the key mappings](development.md#uyghur-layout).
+Uyghur (ئۇيغۇرچە) includes a typing layout without a dictionary. Add Uyghur (`ug`) in Settings → Input Languages; it selects the Uyghur layout by default. It uses Uyghur computer key positions with extra Shift and Alt shortcuts for compact keyboards such as the Zinwa Q25. See [the key mappings](development.md#uyghur-layout).
 
 ## Data
 

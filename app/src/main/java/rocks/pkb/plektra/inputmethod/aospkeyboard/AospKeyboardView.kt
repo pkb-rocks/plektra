@@ -48,6 +48,10 @@ import rocks.pkb.plektra.inputmethod.SoftwareKeypad
 import java.util.Locale
 import kotlin.math.abs
 
+// Scripts whose profile letters are shown on the software keys. Other
+// non-Latin profiles (e.g. Greek, Armenian) still show the QWERTY base.
+private val SOFTWARE_PROFILE_SCRIPTS = setOf(Character.UnicodeScript.CYRILLIC, Character.UnicodeScript.ARABIC)
+
 /**
  * AOSP LatinIME alphabet key plane embedded in Plektra.
  *
@@ -184,7 +188,9 @@ class AospKeyboardView @JvmOverloads constructor(
     )
 
     var listener: Listener? = null
+    // Mappings of a non-Latin profile whose letters replace the software keys.
     private var cyrillicMappings: Map<Int, LayoutMapping> = emptyMap()
+    private var profileScript: Character.UnicodeScript? = null
     private var profileFileRevision: Pair<Long, Long>? = null
 
     var layoutName: String = "qwerty"
@@ -198,11 +204,11 @@ class AospKeyboardView @JvmOverloads constructor(
             field = normalized
             profileFileRevision = revision
             val mappings = JsonLayoutLoader.loadLayout(context.assets, normalized, context).orEmpty()
-            cyrillicMappings = mappings.takeIf { profile ->
-                normalized == "uyghur" || profile.values.any { mapping ->
-                    mapping.lowercase.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.CYRILLIC }
-                }
-            }.orEmpty()
+            profileScript = mappings.values.asSequence()
+                .flatMap { mapping -> mapping.lowercase.asSequence() }
+                .map { Character.UnicodeScript.of(it.code) }
+                .firstOrNull { it in SOFTWARE_PROFILE_SCRIPTS }
+            cyrillicMappings = if (profileScript != null) mappings else emptyMap()
             rebuildKeys(width, height)
             invalidateKeyboard()
         }
@@ -2024,7 +2030,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 overflowMappings.flatMap { extra ->
                     listOf(if (shifted) extra.uppercase else extra.lowercase) +
                         extra.taps.map { if (shifted) it.uppercase else it.lowercase }
-                }.filter { text -> text.any { Character.UnicodeScript.of(it.code) == Character.UnicodeScript.CYRILLIC } }
+                }.filter { text -> text.any { Character.UnicodeScript.of(it.code) == profileScript } }
             val usableAlternates = profileAlternates.filter { it.isNotEmpty() && it != characterOutput(key.spec) }
             return (usableAlternates + providerAlternates).distinct()
         }

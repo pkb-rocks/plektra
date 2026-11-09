@@ -1553,7 +1553,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun requestAutoCapShiftOneShot(): Boolean {
-        if (shouldDisableAutoCapitalize) return false
+        if (!LayoutMappingRepository.supportsAutoCapitalization) return false
         if (isAutoCapSuppressedAtCursor()) return false
         return modifierStateController.requestShiftOneShotFromAutoCap()
     }
@@ -5380,11 +5380,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
-        // Remapped characters must go through the layout-aware path below.
-        // In particular, a Uyghur / key is a letter, not an ASCII boundary.
-        val hasRemappedText = layoutTextForKey != null &&
-            layoutTextForKey != event?.unicodeChar?.takeIf { it != 0 }?.toChar()?.toString()
-        if (!altActiveNow && !hasRemappedText) {
+        // The pipeline classifies punctuation by the system keymap. A remapped
+        // punctuation key (e.g. Uyghur / → ئ) must use the layout-aware path
+        // below. Remapped letter keys still run the pipeline, which accepts or
+        // resets pending autocorrections.
+        val systemChar = event?.unicodeChar?.takeIf { it != 0 }?.toChar()
+        val hasRemappedPunctuation = layoutTextForKey != null && systemChar != null &&
+            !systemChar.isLetterOrDigit() && layoutTextForKey != systemChar.toString()
+        if (!altActiveNow && !hasRemappedPunctuation) {
             if (
                 inputEventRouter.handleTextInputPipeline(
                     context = this,

@@ -28,7 +28,10 @@ class AdditionalSubtypeUtilsLayoutTest {
     @Test
     fun uyghur_isSelectableWithoutDictionaryAndUsesBundledLayout() {
         val context = RuntimeEnvironment.getApplication()
-        assertTrue(rocks.pkb.plektra.getAvailableInputStyleLocales(context).contains("ug"))
+        val available = rocks.pkb.plektra.getAvailableInputStyleLocales(context)
+        assertTrue(available.containsAll(listOf("ug", "sr", "nb")))
+        // Languages already offered through a dictionary locale are not duplicated.
+        assertFalse(available.contains("da"))
         assertFalse(rocks.pkb.plektra.core.suggestions.AndroidDictionaryRepository.hasDictionaryForLocale(context, "ug"))
         listOf("ug", "ug_CN", "ug-CN", "ug-Arab-CN").forEach { locale ->
             assertEquals("uyghur", AdditionalSubtypeUtils.getLayoutForLocale(context.assets, locale, context))

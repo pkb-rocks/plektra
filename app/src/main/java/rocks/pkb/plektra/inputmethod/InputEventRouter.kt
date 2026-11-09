@@ -621,25 +621,6 @@ class InputEventRouter(
             return EditableFieldRoutingResult.Consume
         }
 
-        // Layouts can put punctuation on letter keys (e.g. Uyghur Shift+V)
-        // and letters on punctuation keys (e.g. Uyghur /). Neither may fall
-        // through to the system's Latin keymap or the alphabetic-only path.
-        val mappedText = mapping?.let {
-            LayoutMappingRepository.resolveText(it, resolvedUppercase)
-        }
-        if (
-            mapping?.isRealMultiTap == false && !mappedText.isNullOrEmpty() &&
-            (!callbacks.isAlphabeticKey(keyCode) || !mappedText.first().isLetter())
-        ) {
-            controllers.alternateCharacterManager.cancelPendingLongPress(keyCode)
-            if (shiftOneShotActive) callbacks.disableShiftOneShot()
-            if (!callbacks.handleBoundaryText(mappedText, ic)) {
-                commitTextWithTracking(ic, mappedText)
-            }
-            callbacks.updateStatusBar()
-            return EditableFieldRoutingResult.Consume
-        }
-
         val shouldUseMultiTap = mapping?.isRealMultiTap == true &&
             !shouldSuppressUppercaseEszettMultiTap(mapping, resolvedUppercase)
 
@@ -759,6 +740,28 @@ class InputEventRouter(
                 }, params.cursorUpdateDelayMs)
                 return EditableFieldRoutingResult.Consume
             }
+        }
+
+        // Layouts can put punctuation on letter keys (e.g. Greek Q → ;) and
+        // letters on punctuation keys (e.g. Uyghur / → ئ). Neither may fall
+        // through to the system's Latin keymap or the alphabetic-only path.
+        // This runs after multi-tap and long-press handling so those keep
+        // working for such keys.
+        val mappedText = mapping?.let {
+            LayoutMappingRepository.resolveText(it, resolvedUppercase)
+        }
+        if (
+            mapping?.isRealMultiTap == false && !mappedText.isNullOrEmpty() &&
+            (!callbacks.isAlphabeticKey(keyCode) || !mappedText.first().isLetter())
+        ) {
+            if (shiftOneShotActive) callbacks.disableShiftOneShot()
+            if (!callbacks.handleBoundaryText(mappedText, ic)) {
+                commitTextWithTracking(ic, mappedText)
+            }
+            Handler(Looper.getMainLooper()).postDelayed({
+                callbacks.updateStatusBar()
+            }, params.cursorUpdateDelayMs)
+            return EditableFieldRoutingResult.Consume
         }
 
         val isAlphabeticKey = callbacks.isAlphabeticKey(keyCode)

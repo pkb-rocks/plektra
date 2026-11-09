@@ -24,7 +24,7 @@ The Kotlin namespace is `rocks.pkb.plektra`. The four app identities and their u
 
 ## Uyghur layout
 
-The bundled `uyghur` layout uses Arabic-script Uyghur (`ug`, `ug_CN`). It is selectable in Settings → Input Languages without a dictionary, and does not translate the app interface. Automatic capitalization is disabled for layouts with no cased letters so it cannot select an extra letter at the beginning of a sentence. Manual Shift remains available.
+The bundled `uyghur` layout uses Arabic-script Uyghur (`ug`, `ug_CN`). Settings → Input Languages offers every language with a bundled layout, with or without a dictionary. The layout does not translate the app interface. The software keyboard shows the Uyghur letters in place of the QWERTY labels. Automatic capitalization is disabled for layouts with no cased letters so it cannot select an extra letter at the beginning of a sentence. Manual Shift remains available.
 
 The normal letter positions follow the [Microsoft Uyghur computer layout](https://learn.microsoft.com/en-us/globalization/keyboards/kbdughr1.html):
 

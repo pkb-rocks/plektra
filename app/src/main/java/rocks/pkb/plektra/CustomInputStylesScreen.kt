@@ -1483,9 +1483,27 @@ private fun normalizeLocaleTag(locale: String): String {
     return locale.trim().replace('_', '-')
 }
 
-/** Uyghur has a bundled typing layout and does not require a dictionary package. */
-internal fun getAvailableInputStyleLocales(context: Context): List<String> =
-    (getLocalesWithDictionary(context) + "ug").distinct().sorted()
+/**
+ * Input languages offered in the add dialog: every dictionary locale plus each
+ * language with a bundled layout (e.g. Uyghur), which needs no dictionary.
+ */
+internal fun getAvailableInputStyleLocales(context: Context): List<String> {
+    val dictionaryLocales = getLocalesWithDictionary(context)
+    val coveredLanguages = dictionaryLocales.map { languageOfLocale(it) }.toSet()
+    val layoutLanguages = getBundledLayoutLanguages(context).filterNot { it in coveredLanguages }
+    return (dictionaryLocales + layoutLanguages).distinct().sorted()
+}
+
+private fun languageOfLocale(locale: String): String =
+    normalizeLocaleTag(locale).substringBefore('-').lowercase()
+
+private fun getBundledLayoutLanguages(context: Context): Set<String> = try {
+    val json = context.assets.open("common/locale_layout_mapping.json").bufferedReader().use { org.json.JSONObject(it.readText()) }
+    json.keys().asSequence().map(::languageOfLocale).filter { it.isNotEmpty() }.toSet()
+} catch (e: Exception) {
+    android.util.Log.w("CustomInputStyles", "Error reading bundled locale-layout mapping", e)
+    emptySet()
+}
 
 /** Gets dictionary locales from the catalog, bundled assets and installed packages. */
 private fun getLocalesWithDictionary(context: Context): List<String> {

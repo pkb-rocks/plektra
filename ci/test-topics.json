@@ -18,6 +18,7 @@
       "rocks.pkb.plektra.T2eCornerCalibrationTest",
       "rocks.pkb.plektra.data.layout.BundledLayoutAssetsTest",
       "rocks.pkb.plektra.data.layout.LayoutFileStoreImportTest",
+      "rocks.pkb.plektra.data.layout.LayoutMappingRepositoryAutoCapTest",
       "rocks.pkb.plektra.data.layout.LayoutRepositoryManagerTest",
       "rocks.pkb.plektra.data.mappings.KeyMappingLoaderTest",
       "rocks.pkb.plektra.data.variation.VariationRepositoryLayoutOverrideTest",

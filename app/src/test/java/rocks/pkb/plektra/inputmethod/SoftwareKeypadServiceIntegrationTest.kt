@@ -15,7 +15,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -26,7 +29,10 @@ import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.SettingsManager.SoftwareKeyboardMode
 import rocks.pkb.plektra.SymPagesConfig
 import rocks.pkb.plektra.core.InputContextState
+import rocks.pkb.plektra.core.ModifierStateController
 import rocks.pkb.plektra.core.SymLayoutController
+import rocks.pkb.plektra.data.layout.LayoutMappingRepository
+import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 
 /** Hardware keypad auto-open and SYM cycling through the real service callbacks. */
 @RunWith(RobolectricTestRunner::class)
@@ -377,6 +383,83 @@ class SoftwareKeypadServiceIntegrationTest {
         SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SoftwareKeyboardMode.FORCE_VIRTUAL)
         prepareSymField()
         assertEquals(2, tapSym(onScreen = true, at = 1_000L))
+    }
+
+    // --- Uyghur layout switches inside keypad policies ---
+
+    private fun modifiers() = getField(service, "modifierStateController") as ModifierStateController
+
+    private fun bar() = getField(service, "candidatesBarController") as CandidatesBarController
+
+    private fun startOnQwerty(inputType: Int, packageName: String = "keypad.test") {
+        SettingsManager.setKeyboardLayoutAutoByLocale(context, false)
+        SettingsManager.setKeyboardLayout(context, "qwerty")
+        SettingsManager.setAutoCorrectEnabled(context, false)
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        startInput(inputType, packageName = packageName)
+    }
+
+    private fun switchSubtype(prefValue: String) {
+        val subtype = AdditionalSubtypeUtils.createAdditionalSubtypesArray(prefValue, service.assets, service).single()
+        PhysicalKeyboardInputMethodService::class.java.getDeclaredMethod(
+            "onCurrentInputMethodSubtypeChanged", android.view.inputmethod.InputMethodSubtype::class.java
+        ).apply { isAccessible = true }.invoke(service, subtype)
+    }
+
+    @Test
+    fun blockedApp_switchingToUyghurAndBack_opensNothing_fieldCapsLockFollowsTheLayout() {
+        SettingsManager.setKeyboardBarHiddenInApp(context, "blocked.app", true)
+        countOwnShows()
+        startOnQwerty(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS, packageName = "blocked.app")
+        assertTrue(modifiers().capsLockEnabled)
+
+        switchSubtype("ug:uyghur")
+        idle()
+        assertFalse(modifiers().capsLockEnabled)
+        pressKeypadButton()
+        assertFalse(appShowRequest())
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+
+        switchSubtype("en_US:qwertz")
+        idle()
+        assertTrue(modifiers().capsLockEnabled)
+        assertTrue(modifiers().capsLockAutomatic)
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        assertEquals(0, ownShows)
+        assertFalse(visibility().allowsSurface())
+    }
+
+    // Without idling: Robolectric has no window manager to answer the keypad's own show, so its
+    // presentation retries would hide the window and reset the modifiers, unlike on a device.
+    @Test
+    fun temporaryKeypadOnUyghur_softShiftGoesToTheMultiCharacterLetter_nextFieldDropsModeAndFieldCapsLock() {
+        startOnQwerty(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS)
+        pressKeypadButton()
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+
+        switchSubtype("ug:uyghur")
+        assertFalse(modifiers().capsLockEnabled)
+        bar().onSoftwareKeyboardShiftTapped!!.invoke()
+        assertTrue(modifiers().shiftOneShot)
+        val ic = getField(service, "mStartedInputConnection") as InputConnection
+        `when`(ic.commitText(any(), anyInt())).thenReturn(true)
+        val snapshot = StatusBarController.StatusSnapshot(
+            capsLockEnabled = false, shiftPhysicallyPressed = false, shiftOneShot = true,
+            ctrlLatchActive = false, ctrlPhysicallyPressed = false, ctrlOneShot = false,
+            ctrlLatchFromNavMode = false, altLatchActive = false, altPhysicallyPressed = false,
+            altOneShot = false, symPage = 0, activeKeyboardLayoutName = "uyghur"
+        )
+        assertTrue(bar().onSoftwareKeyboardTextInput!!.invoke("لا", ic, snapshot))
+        assertFalse(modifiers().shiftOneShot)
+
+        switchSubtype("en_US:qwertz")
+        assertTrue(modifiers().capsLockAutomatic)
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+
+        service.onFinishInput()
+        startInput(InputType.TYPE_CLASS_TEXT)
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        assertFalse(modifiers().capsLockEnabled)
     }
 
     private fun getField(owner: Any, name: String): Any? = findField(owner.javaClass, name).get(owner)

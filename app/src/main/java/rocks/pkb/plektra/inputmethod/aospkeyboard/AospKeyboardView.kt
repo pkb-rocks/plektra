@@ -52,6 +52,9 @@ import kotlin.math.abs
 // non-Latin profiles (e.g. Greek, Armenian) still show the QWERTY base.
 private val SOFTWARE_PROFILE_SCRIPTS = setOf(Character.UnicodeScript.CYRILLIC, Character.UnicodeScript.ARABIC)
 
+/** How opaque a SYM page's key with nothing on it is drawn (of 255). */
+private const val FREE_KEY_ALPHA = 90
+
 /**
  * AOSP LatinIME alphabet key plane embedded in Plektra.
  *
@@ -382,6 +385,15 @@ class AospKeyboardView @JvmOverloads constructor(
             field = value
             invalidateKeyboard()
         }
+    /** Keys (key codes) of the SYM page that hold nothing on it: drawn empty and dimmed, they do nothing. */
+    var symPageFreeKeyCodes: Set<Int> = emptySet()
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            invalidateKeyboard()
+        }
     var ctrlPreviewLabels: Map<Int, String> = emptyMap()
         set(value) {
             if (field == value) {
@@ -644,7 +656,8 @@ class AospKeyboardView @JvmOverloads constructor(
         keys.forEach { key ->
             val surface = key.surface
             val center = surface?.center ?: android.graphics.PointF(key.visualRect.centerX(), key.visualRect.centerY())
-            val save = canvas.save()
+            val free = isFreeSymPageKey(key)
+            val save = if (free) canvas.saveLayerAlpha(key.visualRect, FREE_KEY_ALPHA) else canvas.save()
             if (surface != null) canvas.clipPath(surface.path)
             val theme = themeOverride
             if (surface?.ledShaped == true && theme != null) {
@@ -660,6 +673,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 drawDrawable(canvas, backgroundFor(key), key.visualRect)
             }
             canvas.restoreToCount(save)
+            if (free) return@forEach
             val previewIcon = previewIconFor(key)
             if (previewIcon != null) {
                 if (ctrlShortcutDisplay == SettingsManager.SoftwareCtrlShortcutDisplay.CORNER_ICONS) {
@@ -1547,7 +1561,7 @@ class AospKeyboardView @JvmOverloads constructor(
 
     private fun accessibilityStateDescription(key: Key): String? {
         val states = buildList {
-            if (!isEnabled) {
+            if (!isEnabled || isFreeSymPageKey(key)) {
                 add(context.getString(R.string.software_keyboard_accessibility_disabled))
             }
             if (isAccessibilityKeySelected(key)) {
@@ -1623,6 +1637,11 @@ class AospKeyboardView @JvmOverloads constructor(
             altPreviewActive
     }
 
+    /** A key of the SYM page with nothing on it: no letter is drawn on it, a touch does nothing. */
+    private fun isFreeSymPageKey(key: Key): Boolean =
+        symPageActive && !ctrlLayerActive() && modifierPreviewKeyCodeFor(key) in symPageFreeKeyCodes &&
+            symPageLabelFor(key) == null
+
     private fun symPageLabelFor(key: Key): String? {
         if (!symPageActive) return null
         if (heldModifierKey?.spec?.type == KeyType.CTRL || ctrlPreviewActive) return null
@@ -1646,6 +1665,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun dispatchKey(key: Key) {
+        if (isFreeSymPageKey(key)) return
         if (dispatchSymLayerTextIfNeeded(key)) {
             return
         }
@@ -1747,7 +1767,7 @@ class AospKeyboardView @JvmOverloads constructor(
             return
         }
         if (symPageActive) {
-            if (!key.spec.type.canOpenSymbolPicker()) {
+            if (!key.spec.type.canOpenSymbolPicker() || isFreeSymPageKey(key)) {
                 return
             }
             val keyCode = soundKeyCodeFor(key)
@@ -1869,7 +1889,7 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun showPreview(key: Key) {
-        if (isModifierPreviewLayerActive()) return
+        if (isModifierPreviewLayerActive() || isFreeSymPageKey(key)) return
         if (key.spec.type != KeyType.CHAR && key.spec.type != KeyType.COMMA && key.spec.type != KeyType.PERIOD) return
         val previewWidth = maxOf(key.visualRect.width() + dp(18f), dp(52f).toFloat())
         val previewHeight = dp(72f).toFloat()

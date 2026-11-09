@@ -3246,6 +3246,22 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         navModeController.refreshNavModeState()
     }
 
+    /**
+     * A key the emoji search took (typed into it, or a Ctrl shortcut on it) before the generic
+     * key handling: it counts as a key used during a held modifier, so releasing Ctrl (or Shift)
+     * afterwards doesn't leave it on as if it had been tapped alone. A [ctrlShortcut] uses up a
+     * one-shot Ctrl like any shortcut; a latched Ctrl stays for the next one.
+     */
+    private fun onEmojiSearchKeyUsed(event: KeyEvent?, ctrlShortcut: Boolean) {
+        if ((event?.repeatCount ?: 0) == 0) otherKeyInteractedDuringHold = true
+        modifierStateController.registerNonModifierKey()
+        // A held Ctrl's one-shot is cleared on its release, now that a key was used during the hold
+        if (ctrlShortcut && ctrlOneShot && !ctrlLatchActive && !ctrlPhysicallyPressed && !ctrlPressed) {
+            ctrlOneShot = false
+            updateStatusBarText()
+        }
+    }
+
     private fun disableEmojiSearchInputCapture() {
         if (::candidatesBarController.isInitialized) {
             candidatesBarController.disableEmojiPickerSearchInputCapture()
@@ -4909,6 +4925,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             )
         ) {
+            onEmojiSearchKeyUsed(event, ctrlShortcut = emojiSearchCtrlActive)
             updateEmojiSearchExternalSelectionSnapshot(initialInputConnection)
             ensureEmojiSearchCursorAnchorMonitoring(initialInputConnection)
             return true
@@ -4934,6 +4951,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 toggleMinimalUi = { keyboardVisibilityController.toggleSlimMode() }
             )
             if (handled) {
+                // The router used up a Ctrl one-shot itself
+                onEmojiSearchKeyUsed(event, ctrlShortcut = false)
                 updateEmojiSearchExternalSelectionSnapshot(initialInputConnection)
                 ensureEmojiSearchCursorAnchorMonitoring(initialInputConnection)
                 return true

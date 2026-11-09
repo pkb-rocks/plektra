@@ -155,7 +155,12 @@ fun EmojiPickerDialog(
                         val isSearching = trimmedQuery.isNotEmpty()
                         val searchResults = if (isSearching) {
                             uiState.searchIndex?.let { index ->
-                                EmojiSearchRepository.search(index, trimmedQuery).map { it.entry }
+                                EmojiSearchRepository.search(index, trimmedQuery).map { result ->
+                                    // The emoji searched for as it was given (👋🏽), its other variants on hold
+                                    result.matched?.let { matched ->
+                                        EmojiRepository.EmojiEntry(matched, listOf(result.entry.base) + result.entry.variants - matched)
+                                    } ?: result.entry
+                                }
                             }.orEmpty() + uiState.extras.search(context, trimmedQuery).map { it.entry }
                         } else {
                             emptyList()

@@ -1829,6 +1829,8 @@ class StatusBarController(
         }
         keyboardView.symPageLabels = activeSymProjection.contentByKeyCode
         keyboardView.symPageTextLabels = activeSymProjection.contentByBaseText
+        keyboardView.symPageFreeKeyCodes =
+            if (keyboardView.symPageActive) rocks.pkb.plektra.core.SymLayoutController.shownFreeKeys else emptySet()
         keyboardView.symPreviewLabels = snapshot.softwareSymPreviewLabels
         keyboardView.symPreviewTextLabels = snapshot.softwareSymPreviewTextLabels
         keyboardView.ctrlPreviewLabels = snapshot.softwareCtrlPreviewLabels

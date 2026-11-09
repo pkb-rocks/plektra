@@ -105,6 +105,8 @@ class EmojiPickerView(
     private var searchQuery: String = ""
     private var searchJob: Job? = null
     private var isSearchMode: Boolean = false
+    /** The category tab tapped while searching: only its results show; null for all of them. */
+    private var searchCategoryFilter: String? = null
     private var isSearchPanelVisible: Boolean = false
     private var searchInputCaptureEnabled: Boolean = true
     private var containerReordering: Boolean = false
@@ -115,6 +117,8 @@ class EmojiPickerView(
     private var skinTone = 0
     /** The emoji categories shown; null while loading. */
     private var shownEmojiCategories: List<EmojiRepository.EmojiCategory>? = null
+    /** The emoji style the cells are drawn in. */
+    private var shownStyle: EmojiRendering.Style? = null
     var onSearchPanelVisibilityChanged: ((Boolean) -> Unit)? = null
     var themeOverride: KeyboardThemeColors? = null
         set(value) {
@@ -499,7 +503,7 @@ class EmojiPickerView(
     fun commitTopSearchResultAndClose() {
         if (!isSearchInputActive()) return
         val top = lastSearchResults.firstOrNull() ?: return
-        onEmojiSelected(shownText(top.entry), top.categoryId, closeAfterCommit = true)
+        onEmojiSelected(shownText(top), top.categoryId, closeAfterCommit = true)
     }
 
     private fun deleteSearchTextBackwards() {
@@ -786,6 +790,14 @@ class EmojiPickerView(
                 this@EmojiPickerView.extras = extras
                 skinTone = EmojiSkinTone.get(context)
                 shownEmojiCategories = regularCategories
+                val style = EmojiRendering.style(context)
+                if (shownStyle != null && shownStyle != style) {
+                    // The same emoji in another style: the adapters would keep the cells as
+                    // drawn, since their items are unchanged; empty them to draw every cell anew.
+                    sectionAdapter.submitList(null)
+                    searchAdapter.submitList(null)
+                }
+                shownStyle = style
                 this@EmojiPickerView.regularCategories = regularCategories + extras.categories
                 this@EmojiPickerView.searchIndex = loadedSearchIndex
 
@@ -831,8 +843,16 @@ class EmojiPickerView(
     /** What a cell shows and types: emoji in the default skin tone, symbols and kaomoji as they are. */
     private fun shownText(entry: EmojiRepository.EmojiEntry): String = EmojiSkinTone.preferred(entry, skinTone)
 
-    private fun bindCell(textView: TextView, entry: EmojiRepository.EmojiEntry, categoryId: String) {
-        val text = shownText(entry)
+    /** What a search result shows and types: the emoji searched for as it was given, if it was. */
+    private fun shownText(result: EmojiSearchRepository.EmojiSearchResult): String =
+        result.matched ?: shownText(result.entry)
+
+    private fun bindCell(
+        textView: TextView,
+        entry: EmojiRepository.EmojiEntry,
+        categoryId: String,
+        text: String = shownText(entry)
+    ) {
         when (categoryId) {
             EmojiRepository.KAOMOJI_CATEGORY_ID -> {
                 textView.maxLines = 1
@@ -945,7 +965,7 @@ class EmojiPickerView(
             return
         }
 
-        val results = EmojiSearchRepository.search(index, query) + extras.search(context, query)
+        val results = filteredByCategory(EmojiSearchRepository.search(index, query) + extras.search(context, query))
         lastSearchResults = results
         setSearchMode(true)
         searchAdapter.submitList(results)
@@ -960,6 +980,47 @@ class EmojiPickerView(
         }
     }
 
+    /**
+     * [results] of the category tab tapped while searching, in their order. On the recents tab:
+     * the results used recently, shown as they were used (👋🏽 for a recent 👋🏽).
+     */
+    private fun filteredByCategory(
+        results: List<EmojiSearchRepository.EmojiSearchResult>
+    ): List<EmojiSearchRepository.EmojiSearchResult> {
+        val filter = searchCategoryFilter ?: return results
+        if (filter != EmojiRepository.RECENTS_CATEGORY_ID) return results.filter { it.categoryId == filter }
+        val recents = RecentEmojiManager.getRecentEmojis(context)
+        return results.mapNotNull { result ->
+            val sequences = listOf(result.entry.base) + result.entry.variants
+            val used = result.matched?.takeIf { it in recents } ?: recents.firstOrNull { it in sequences }
+            used?.let { result.copy(matched = it) }
+        }
+    }
+
+    private fun onTabTapped(categoryId: String) {
+        if (isSearchMode) {
+            // Searching: the tab shows its category's results, the same tab again all of them
+            searchCategoryFilter = categoryId.takeIf { it != searchCategoryFilter }
+            updateTabsSelection()
+            applySearchNow()
+            return
+        }
+        selectedCategoryId = categoryId
+        updateTabsSelection()
+        isTabClickScroll = true
+
+        // Recents is always at position 0 when present
+        if (categoryId == EmojiRepository.RECENTS_CATEGORY_ID) {
+            (recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
+            recyclerView.post {
+                requestRecentsRefresh(requireTop = true, requireNotRecents = false)
+            }
+        } else {
+            val headerPos = headerPositions[categoryId] ?: return
+            (recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(headerPos, 0)
+        }
+    }
+
     private fun setSearchMode(enabled: Boolean) {
         if (isSearchMode == enabled) {
             // Ensure adapter is set correctly if external code changed it during refresh.
@@ -971,11 +1032,12 @@ class EmojiPickerView(
                 recyclerView.adapter = sectionAdapter
                 lm.spanSizeLookup = sectionAdapter.spanSizeLookup
             }
-            tabRow.alpha = if (enabled) 0.55f else 1f
             return
         }
 
         isSearchMode = enabled
+        searchCategoryFilter = null
+        updateTabsSelection()
         val lm = recyclerView.layoutManager as? GridLayoutManager ?: return
         if (enabled) {
             recyclerView.adapter = searchAdapter
@@ -983,9 +1045,7 @@ class EmojiPickerView(
         } else {
             recyclerView.adapter = sectionAdapter
             lm.spanSizeLookup = sectionAdapter.spanSizeLookup
-            updateTabsSelection()
         }
-        tabRow.alpha = if (enabled) 0.55f else 1f
     }
 
     private fun buildSections(categories: List<EmojiRepository.EmojiCategory>) {
@@ -1033,23 +1093,7 @@ class EmojiPickerView(
                     if (controlsHeight > 0) ViewGroup.LayoutParams.MATCH_PARENT else tabHeight,
                     1f // Equal weight for all tabs
                 )
-                setOnClickListener {
-                    if (isSearchMode) return@setOnClickListener
-                    selectedCategoryId = category.id
-                    updateTabsSelection()
-                    isTabClickScroll = true
-                    
-                    // Recents is always at position 0 when present
-                    if (category.id == EmojiRepository.RECENTS_CATEGORY_ID) {
-                        (recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
-                        recyclerView.post {
-                            requestRecentsRefresh(requireTop = true, requireNotRecents = false)
-                        }
-                    } else {
-                        val headerPos = headerPositions[category.id] ?: return@setOnClickListener
-                        (recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(headerPos, 0)
-                    }
-                }
+                setOnClickListener { onTabTapped(category.id) }
             }
             tabRow.addView(btn)
         }
@@ -1057,10 +1101,12 @@ class EmojiPickerView(
     }
 
     private fun updateTabsSelection() {
+        // Searching, the tab whose results show is selected (none while all show)
+        val selected = if (isSearchMode) searchCategoryFilter else selectedCategoryId
         for (i in 0 until tabRow.childCount) {
             val view = tabRow.getChildAt(i) as? ImageView ?: continue
             val categoryId = tabCategoryIds.getOrNull(i)
-            val isSelected = categoryId == selectedCategoryId
+            val isSelected = categoryId == selected
             // Icon always visible, only background changes
             view.background = createTabBackground(isSelected)
         }
@@ -1511,9 +1557,9 @@ class EmojiPickerView(
 
         override fun onBindViewHolder(holder: SearchEmojiViewHolder, position: Int) {
             val item = getItem(position)
-            bindCell(holder.textView, item.entry, item.categoryId)
+            bindCell(holder.textView, item.entry, item.categoryId, shownText(item))
             holder.textView.setOnClickListener {
-                onEmojiSelected(shownText(item.entry), item.categoryId)
+                onEmojiSelected(shownText(item), item.categoryId)
             }
             holder.textView.setOnLongClickListener {
                 if (item.entry.variants.isEmpty()) return@setOnLongClickListener false

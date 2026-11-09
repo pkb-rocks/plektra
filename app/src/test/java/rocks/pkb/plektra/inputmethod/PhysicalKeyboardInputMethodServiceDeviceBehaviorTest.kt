@@ -168,6 +168,70 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertFalse(modifier.ctrlLatchActive)
     }
 
+    /** The emoji picker's search open for typing, as the software keyboard's picker page has it. */
+    private fun openEmojiPickerSearch(): rocks.pkb.plektra.inputmethod.ui.EmojiPickerView {
+        val context = RuntimeEnvironment.getApplication()
+        val sym: rocks.pkb.plektra.core.SymLayoutController = getField(service, "symLayoutController")
+        if (sym.currentSymPage() != 4) sym.openEmojiPickerPage()
+        val bars: CandidatesBarController = getField(service, "candidatesBarController")
+        val picker = rocks.pkb.plektra.inputmethod.ui.EmojiPickerView(context)
+        setField(getField<StatusBarController>(bars, "inputStatusBar"), "emojiPickerView", picker)
+        picker.showSearch()
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("emoji", "🐱"))
+        return picker
+    }
+
+    private fun searchText(picker: rocks.pkb.plektra.inputmethod.ui.EmojiPickerView): String =
+        getField<android.widget.EditText>(picker, "searchField").text.toString()
+
+    private fun pressKey(keyCode: Int, start: Long, metaState: Int = 0) {
+        service.onKeyDown(keyCode, keyEvent(KeyEvent.ACTION_DOWN, keyCode, start, start, metaState))
+        service.onKeyUp(keyCode, keyEvent(KeyEvent.ACTION_UP, keyCode, start, start + 30L, metaState))
+    }
+
+    @Test
+    fun hardwareCtrlVIntoTheEmojiSearchPastesAndLeavesCtrlOff() {
+        val ctrlMeta = KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
+        for ((round, holdMs) in listOf(150L, 420L).withIndex()) {
+            val picker = openEmojiPickerSearch()
+            val t0 = 6_000L + round * 1_000L
+            service.onKeyDown(KeyEvent.KEYCODE_CTRL_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_CTRL_LEFT, t0, t0, ctrlMeta))
+            pressKey(KeyEvent.KEYCODE_V, t0 + 60L, ctrlMeta)
+            service.onKeyUp(KeyEvent.KEYCODE_CTRL_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_CTRL_LEFT, t0, t0 + holdMs))
+
+            assertEquals("held ${holdMs}ms", "🐱", searchText(picker))
+            val modifier = modifierController()
+            assertFalse("held ${holdMs}ms", modifier.ctrlOneShot)
+            assertFalse(modifier.ctrlLatchActive)
+            assertFalse(modifier.ctrlPressed)
+            assertFalse(modifier.ctrlPhysicallyPressed)
+            // The next key types its letter into the search, without Ctrl
+            pressKey(KeyEvent.KEYCODE_A, t0 + 600L)
+            assertEquals("🐱a", searchText(picker))
+            assertEquals(emptyList<String>(), recorder.committedTexts)
+        }
+    }
+
+    @Test
+    fun ctrlVIntoTheEmojiSearchUsesUpACtrlOneShotButKeepsALatchedCtrl() {
+        val picker = openEmojiPickerSearch()
+        val modifier = modifierController()
+        modifier.ctrlOneShot = true
+        pressKey(KeyEvent.KEYCODE_V, 7_000L)
+        assertEquals("🐱", searchText(picker))
+        assertFalse(modifier.ctrlOneShot)
+        pressKey(KeyEvent.KEYCODE_A, 7_100L)
+        assertEquals("🐱a", searchText(picker))
+
+        // A latched Ctrl stays latched: the user wants several shortcuts
+        modifier.ctrlLatchActive = true
+        pressKey(KeyEvent.KEYCODE_V, 7_200L)
+        assertEquals("🐱a🐱", searchText(picker))
+        assertTrue(modifier.ctrlLatchActive)
+    }
+
     @Test
     fun altDoubleTapLatch_thenSingleTapFullyDeactivates() {
         val t0 = 2_000L

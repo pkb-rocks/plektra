@@ -36,6 +36,12 @@ object SymPagedLayer {
     )
     val PER_PAGE: Int = SLOTS.size
 
+    /** The keys a generated page or the variants put items, arrows, search or edit on. */
+    val KEYS: Set<Int> = SLOTS.toSet() + setOf(PREVIOUS_KEY, NEXT_KEY, SEARCH_KEY, EDIT_KEY)
+
+    /** The [KEYS] without anything on them in [keys] (a page's or the variants' keys): they do nothing. */
+    fun freeKeys(keys: Map<Int, String>): Set<Int> = KEYS - keys.keys
+
     /** What a page shows: emoji, text symbols or kaomoji (drawn smaller, to fit). */
     enum class Kind { EMOJI, SYMBOLS, KAOMOJI }
 

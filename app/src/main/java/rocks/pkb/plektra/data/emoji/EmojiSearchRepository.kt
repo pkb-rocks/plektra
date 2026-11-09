@@ -21,10 +21,15 @@ object EmojiSearchRepository {
     private const val SEARCH_ASSET_DIR = "common/emoji_search"
     private const val EN_LOCALE = "en"
 
+    /**
+     * [matched] is the exact sequence the query named, typed or pasted as an emoji (👋🏽, 👩🏽‍💻):
+     * what the result shows and types instead of [entry] in the default skin tone.
+     */
     data class EmojiSearchResult(
         val entry: EmojiRepository.EmojiEntry,
         val categoryId: String,
-        val score: Int
+        val score: Int,
+        val matched: String? = null
     )
 
     class EmojiSearchIndex internal constructor(
@@ -98,7 +103,9 @@ object EmojiSearchRepository {
                 result = EmojiSearchResult(
                     entry = item.entry,
                     categoryId = item.categoryId,
-                    score = score
+                    score = score,
+                    matched = (listOf(item.entry.base) + item.entry.variants)
+                        .firstOrNull { withoutVariationSelectors(it) == literalQuery }
                 ),
                 categoryOrder = item.categoryOrder
             )

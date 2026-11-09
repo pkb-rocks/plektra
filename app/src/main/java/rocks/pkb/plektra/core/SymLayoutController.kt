@@ -38,6 +38,14 @@ class SymLayoutController(
         @Volatile
         var shownPagedKind: SymPagedLayer.Kind? = null
             private set
+
+        /**
+         * The keys of the generated page or the variants shown now that hold nothing: drawn
+         * empty on screen, not as letters they wouldn't type. Empty on the layer's own page.
+         */
+        @Volatile
+        var shownFreeKeys: Set<Int> = emptySet()
+            private set
     }
 
     /** A paged layer's search key was pressed: the input method opens the picker's search. */
@@ -180,14 +188,18 @@ class SymLayoutController(
     }
 
     private fun pagedMappings(layer: SymPage, shiftPressed: Boolean): Map<Int, String> {
-        val page = currentPage(layer) ?: return emptyMap()
+        val page = currentPage(layer) ?: return emptyMap<Int, String>().also { shownFreeKeys = emptySet() }
         variants?.let { shown ->
             shownPagedKind = SymPagedLayer.Kind.EMOJI
-            return SymPagedLayer.variantKeys(shown)
+            return SymPagedLayer.variantKeys(shown).also { shownFreeKeys = SymPagedLayer.freeKeys(it) }
         }
         shownPagedKind = page.kind
-        // The layer's own page shows its mapping as Shift has it now
-        return SymPagedLayer.keys(if (page.mapping != null) page.copy(mapping = mappingsForPage(layer, shiftPressed)) else page)
+        if (page.mapping == null) {
+            return SymPagedLayer.keys(page).also { shownFreeKeys = SymPagedLayer.freeKeys(it) }
+        }
+        // The layer's own page shows its mapping as Shift has it now; its other keys type as before
+        shownFreeKeys = emptySet()
+        return SymPagedLayer.keys(page.copy(mapping = mappingsForPage(layer, shiftPressed)))
     }
 
     /** Q/P: the page before/after; with [section], the previous/next section's first page. */
@@ -562,6 +574,7 @@ class SymLayoutController(
     fun currentSymMappings(shiftPressed: Boolean = false): Map<Int, String>? {
         pagedLayer()?.let { return pagedMappings(it, shiftPressed) }
         shownPagedKind = null
+        shownFreeKeys = emptySet()
         return when (currentPageType()) {
             SymPage.DEVICE -> alternateCharacterManager.getDeviceSymMappings()
             SymPage.EMOJI -> mappingsForPage(SymPage.EMOJI, shiftPressed)

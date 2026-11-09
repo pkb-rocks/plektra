@@ -33,6 +33,7 @@ import rocks.pkb.plektra.core.SymPagedLayer
 import rocks.pkb.plektra.data.emoji.EmojiRendering
 import rocks.pkb.plektra.data.emoji.TestEmojiFont
 import rocks.pkb.plektra.inputmethod.aospkeyboard.AospKeyboardView
+import rocks.pkb.plektra.inputmethod.ui.EmojiPickerView
 
 /**
  * The emoji pages on the keyboards the user touches: the full software keyboard (the AOSP key
@@ -363,5 +364,262 @@ class EmojiPagesSurfacesTest {
             @Suppress("DEPRECATION")
             metrics.scaledDensity = scaled
         }
+    }
+
+    private fun idleUntil(what: String, condition: () -> Boolean) {
+        val deadline = System.currentTimeMillis() + 10_000
+        while (!condition()) {
+            check(System.currentTimeMillis() < deadline) { "timed out waiting for $what" }
+            Shadows.shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(10)
+        }
+    }
+
+    private fun layOutAgain() {
+        val root = bar.getLayout()!!.rootView
+        root.measure(
+            View.MeasureSpec.makeMeasureSpec(activity.resources.displayMetrics.widthPixels, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(activity.resources.displayMetrics.heightPixels, View.MeasureSpec.AT_MOST)
+        )
+        root.layout(0, 0, root.measuredWidth, root.measuredHeight)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+    }
+
+    private fun picker() = field(bar, "emojiPickerView") as EmojiPickerView
+
+    /** The emoji cells the picker shows now (the grid or the search results). */
+    private fun cells(picker: EmojiPickerView): List<TextView> {
+        val grid = field(picker, "recyclerView") as androidx.recyclerview.widget.RecyclerView
+        return (0 until grid.childCount).mapNotNull { grid.getChildAt(it) as? TextView }
+            .filter { it.text.isNotEmpty() && it.contentDescription != null }
+    }
+
+    /** The emoji picker as the software keyboard's emoji key opens it, loaded. */
+    private fun openPicker(): EmojiPickerView {
+        if (sym.currentSymPage() != 4) sym.openEmojiPickerPage()
+        render()
+        val picker = picker()
+        idleUntil("the picker to load") {
+            layOutAgain()
+            (field(picker, "loadingView") as View).visibility == View.GONE && cells(picker).isNotEmpty()
+        }
+        return picker
+    }
+
+    private fun closePicker() {
+        sym.closeSymPage()
+        render()
+    }
+
+    private fun search(picker: EmojiPickerView, query: String) {
+        picker.showSearch()
+        render()
+        val field = field(picker, "searchField") as android.widget.EditText
+        field.setText("")
+        assertTrue(picker.handleSearchTextInput(query))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(300, TimeUnit.MILLISECONDS)
+        showingResults(picker)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun results(picker: EmojiPickerView) =
+        field(picker, "lastSearchResults") as List<rocks.pkb.plektra.data.emoji.EmojiSearchRepository.EmojiSearchResult>
+
+    /** Waits until the grid shows the current search results (their list is diffed off the main thread). */
+    private fun showingResults(picker: EmojiPickerView) {
+        val adapter = field(picker, "searchAdapter") as androidx.recyclerview.widget.ListAdapter<*, *>
+        idleUntil("the results in the grid") {
+            layOutAgain()
+            val shown = cells(picker).size
+            adapter.currentList == results(picker) && shown in 1..results(picker).size
+        }
+    }
+
+    @Test
+    fun aSkinTonedOrZwjEmojiSearchedForIsTheOneTyped() {
+        SettingsManager.setSoftwareKeyboardMode(activity, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        showKeyboard(StatusBarController.Mode.INPUT_VIEW)
+        for (query in listOf("👋🏽", "👩🏽‍💻", "🫱🏻‍🫲🏼", "👋")) {
+            commits.clear()
+            val picker = openPicker()
+            search(picker, query)
+            val first = cells(picker).first()
+            assertEquals("$query shown", query, first.contentDescription)
+            first.performClick()
+            Shadows.shadowOf(Looper.getMainLooper()).idle()
+            assertEquals(listOf(query), commits)
+            closePicker()
+        }
+
+        // Enter types the top result the same way
+        commits.clear()
+        val picker = openPicker()
+        search(picker, "👩🏽‍💻")
+        assertTrue(picker.handleSearchKeyDown(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER)))
+        assertEquals(listOf("👩🏽‍💻"), commits)
+    }
+
+    @Test
+    fun aWordSearchStillTypesTheDefaultSkinTone() {
+        rocks.pkb.plektra.data.emoji.EmojiSkinTone.set(activity, 3)
+        SettingsManager.setSoftwareKeyboardMode(activity, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        showKeyboard(StatusBarController.Mode.INPUT_VIEW)
+        val picker = openPicker()
+        search(picker, "waving hand")
+        val wave = cells(picker).first { it.contentDescription.toString().startsWith("👋") }
+        wave.performClick()
+        assertEquals(listOf("👋🏽"), commits)
+    }
+
+    @Test
+    fun aCategoryTabTappedWhileSearchingShowsThatCategorysResults() {
+        SettingsManager.setSoftwareKeyboardMode(activity, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        showKeyboard(StatusBarController.Mode.INPUT_VIEW)
+        val picker = openPicker()
+        search(picker, "cat")
+        val all = results(picker)
+        assertTrue(all.map { it.categoryId }.distinct().size > 1)
+        val searchField = field(picker, "searchField") as android.widget.EditText
+        val tabs = field(picker, "tabRow") as ViewGroup
+        // The recents tab comes in once an emoji is typed
+        @Suppress("UNCHECKED_CAST")
+        fun tab(id: String) = tabs.getChildAt((field(picker, "tabCategoryIds") as List<String>).indexOf(id).also { check(it >= 0) { id } })
+
+        tab("ANIMALS_AND_NATURE").performClick()
+        showingResults(picker)
+        val animals = results(picker)
+        assertTrue(animals.isNotEmpty())
+        assertTrue(animals.all { it.categoryId == "ANIMALS_AND_NATURE" })
+        assertEquals(all.filter { it.categoryId == "ANIMALS_AND_NATURE" }.map { it.entry.base }, animals.map { it.entry.base })
+        assertEquals("cat", searchField.text.toString())
+        // What the grid shows and types is the narrowed result
+        assertEquals(animals.size, cells(picker).size)
+        cells(picker).first().performClick()
+        assertEquals(listOf(animals.first().entry.base), commits)
+
+        // Another category, then the same tab again: every result again
+        tab("SMILEYS_AND_EMOTION").performClick()
+        showingResults(picker)
+        assertTrue(results(picker).isNotEmpty())
+        assertTrue(results(picker).all { it.categoryId == "SMILEYS_AND_EMOTION" })
+        tab("SMILEYS_AND_EMOTION").performClick()
+        showingResults(picker)
+        assertEquals(all, results(picker))
+
+        // Recents: the results among the recently used emoji
+        idleUntil("the typed emoji in the recents") {
+            animals.first().entry.base in rocks.pkb.plektra.data.emoji.RecentEmojiManager.getRecentEmojis(activity)
+        }
+        tab(rocks.pkb.plektra.data.emoji.EmojiRepository.RECENTS_CATEGORY_ID).performClick()
+        showingResults(picker)
+        assertEquals(listOf(animals.first().entry.base), results(picker).map { it.entry.base })
+
+        // Without a search the tabs go to their categories as before
+        searchField.setText("")
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(300, TimeUnit.MILLISECONDS)
+        tab("FLAGS").performClick()
+        assertEquals("FLAGS", field(picker, "selectedCategoryId"))
+        assertEquals(null, field(picker, "searchCategoryFilter"))
+    }
+
+    /** Whether the picker's cells draw their emoji with the bundled font. */
+    private fun drawnWithBundledFont(picker: EmojiPickerView): Boolean {
+        val spans = cells(picker).map { cell ->
+            val text = cell.text
+            text is android.text.Spanned &&
+                text.getSpans(0, text.length, android.text.style.ReplacementSpan::class.java).isNotEmpty()
+        }
+        check(spans.all { it } || spans.none { it }) { "mixed: $spans" }
+        return spans.first()
+    }
+
+    @Test
+    fun thePickerFollowsEveryEmojiStyleChange() {
+        SettingsManager.setSoftwareKeyboardMode(activity, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        showKeyboard(StatusBarController.Mode.INPUT_VIEW)
+        assertTrue(drawnWithBundledFont(openPicker()))
+        for ((change, style) in listOf(
+            EmojiRendering.Style.SYSTEM, EmojiRendering.Style.NOTO,
+            EmojiRendering.Style.SYSTEM, EmojiRendering.Style.NOTO, EmojiRendering.Style.SYSTEM
+        ).withIndex()) {
+            closePicker()
+            EmojiRendering.setStyle(activity, style)
+            // The emoji keys show meanwhile
+            sym.openEmojiPage()
+            render()
+            assertEquals("change ${change + 1} to $style", style == EmojiRendering.Style.NOTO, drawnWithBundledFont(openPicker()))
+        }
+    }
+
+    /** Pixels inside the key [label] that differ from its fill: a drawn label's ink. */
+    private fun inkIn(view: AospKeyboardView, label: String): Int {
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        view.draw(Canvas(bitmap))
+        val rect = keyRect(view, label)
+        val inset = (rect.height() * 0.2f).toInt()
+        val left = rect.left.toInt() + inset
+        val top = rect.top.toInt() + inset
+        val right = rect.right.toInt() - inset
+        val bottom = rect.bottom.toInt() - inset
+        val fill = bitmap.getPixel(left, top)
+        var ink = 0
+        for (y in top until bottom) for (x in left until right) {
+            val pixel = bitmap.getPixel(x, y)
+            val difference = kotlin.math.abs(Color.red(pixel) - Color.red(fill)) +
+                kotlin.math.abs(Color.green(pixel) - Color.green(fill)) +
+                kotlin.math.abs(Color.blue(pixel) - Color.blue(fill))
+            if (difference > 60) ink++
+        }
+        return ink
+    }
+
+    @Test
+    fun keysWithNothingOnTheRecentsAndVariantsPagesAreDrawnEmptyAndDoNothing() {
+        listOf("😀", "🐱", "👋").forEach { rocks.pkb.plektra.data.emoji.RecentEmojiManager.addRecentEmoji(activity, it) }
+        sym.closeSymPage()
+        sym.openEmojiPage()
+        sym.turnPage(1) // the recents
+        SettingsManager.setSoftwareKeyboardMode(activity, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        showKeyboard(StatusBarController.Mode.INPUT_VIEW)
+        val keys = sym.currentSymMappings()!!
+        assertEquals("👋", keys[KeyEvent.KEYCODE_W])
+        assertNull(keys[KeyEvent.KEYCODE_M])
+        val keyboard = softwareKeyboard()
+
+        // The recents' keys show them; the keys after them nothing, not their letters
+        assertTrue(inkIn(keyboard, "w") > 40)
+        for (free in listOf("t", "s", "m")) assertEquals("$free drawn empty", 0, inkIn(keyboard, free))
+        // The keys outside the page keep their labels
+        assertTrue(inkIn(keyboard, ".") > 10)
+        assertTrue(inkIn(keyboard, "q") > 10)
+        assertTrue(inkIn(keyboard, "a") > 10)
+        // A free key types nothing, previews nothing and leaves the page as it is
+        touch(keyboard, "m")
+        assertEquals(emptyList<String>(), commits)
+        assertNull(field(keyboard, "previewPopupState"))
+        assertEquals(keys, sym.currentSymMappings())
+        touch(keyboard, "w")
+        assertEquals(listOf("👋"), commits)
+
+        // The variants: P (one page of them) and A (not a mapped emoji) hold nothing
+        commits.clear()
+        keyboard.longPressTimeoutMs = 50L
+        touch(keyboard, "w", holdMs = 80L)
+        val variants = sym.currentSymMappings()!!
+        assertEquals("👋🏻", variants[KeyEvent.KEYCODE_E])
+        assertNull(variants[KeyEvent.KEYCODE_P])
+        for (free in listOf("p", "a", "o")) assertEquals("$free drawn empty", 0, inkIn(keyboard, free))
+        assertTrue(inkIn(keyboard, "q") > 10)
+        touch(keyboard, "p")
+        touch(keyboard, "a")
+        assertEquals(emptyList<String>(), commits)
+        assertEquals(variants, sym.currentSymMappings())
+        touch(keyboard, "e")
+        assertEquals(listOf("👋🏻"), commits)
+
+        // Without SYM the letters are there again
+        sym.closeSymPage()
+        render()
+        for (letter in listOf("m", "p", "a")) assertTrue("$letter drawn", inkIn(softwareKeyboard(), letter) > 10)
     }
 }

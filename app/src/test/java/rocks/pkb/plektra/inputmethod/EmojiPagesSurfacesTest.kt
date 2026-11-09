@@ -206,25 +206,32 @@ class EmojiPagesSurfacesTest {
         )
         view.symPageLabels = emoji
 
-        fun colourfulPixels(label: String): Int {
+        fun keyPixels(label: String): IntArray {
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             view.draw(Canvas(bitmap))
             val rect = keyRect(view, label)
-            var count = 0
-            for (x in rect.left.toInt() until rect.right.toInt()) for (y in rect.top.toInt() until rect.bottom.toInt()) {
-                val pixel = bitmap.getPixel(x, y)
-                val channels = listOf(Color.red(pixel), Color.green(pixel), Color.blue(pixel))
-                if (channels.max() - channels.min() > 60) count++
+            val x = rect.left.toInt()
+            val y = rect.top.toInt()
+            return IntArray(rect.width().toInt() * rect.height().toInt()).also {
+                bitmap.getPixels(it, 0, rect.width().toInt(), x, y, rect.width().toInt(), rect.height().toInt())
             }
-            return count
         }
-        assertTrue("🫹 in colour", colourfulPixels("w") > 40)
-        assertTrue("🧑‍🩰 in colour", colourfulPixels("e") > 40)
+        fun colourful(pixels: IntArray) = pixels.count { pixel ->
+            val channels = listOf(Color.red(pixel), Color.green(pixel), Color.blue(pixel))
+            channels.max() - channels.min() > 60
+        }
+        val bundled = emoji.keys.associateWith { keyPixels(if (it == KeyEvent.KEYCODE_W) "w" else "e") }
+        assertTrue("🫹 in colour", colourful(bundled.getValue(KeyEvent.KEYCODE_W)) > 40)
+        assertTrue("🧑‍🩰 in colour", colourful(bundled.getValue(KeyEvent.KEYCODE_E)) > 40)
 
-        // With the system font chosen the labels stay plain text
+        // The system font (on a device: boxes for these; here: the test machine's emoji font)
+        // draws them differently: the labels above came from the bundled font
         EmojiRendering.setStyle(activity, EmojiRendering.Style.SYSTEM)
         view.symPageLabels = emptyMap()
         view.symPageLabels = emoji
-        assertEquals(0, colourfulPixels("w"))
+        for ((keyCode, pixels) in bundled) {
+            val system = keyPixels(if (keyCode == KeyEvent.KEYCODE_W) "w" else "e")
+            assertTrue(system.indices.count { system[it] != pixels[it] } > 40)
+        }
     }
 }

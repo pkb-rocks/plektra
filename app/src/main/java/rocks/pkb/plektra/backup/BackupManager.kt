@@ -56,7 +56,10 @@ object BackupManager {
                 filesDir,
                 includeTypingSoundPack = hasTypingSoundPack
             )
-            val components = (prefComponents + fileComponents).sorted()
+            val exportedThemes = PreferencesBackupHelper.readPreferencesFromBackup(prefsDir)["plektra_prefs"].orEmpty()
+                .filterKeys { it.startsWith("keyboard_theme_") }.values.mapNotNull { it.value as? String }
+            val imageComponents = ThemeImageBackup.snapshot(context, File(workingDir, "theme-images"), exportedThemes)
+            val components = (prefComponents + fileComponents + imageComponents).sorted()
 
             val metadata = BackupMetadata(
                 versionCode = BuildConfig.VERSION_CODE,

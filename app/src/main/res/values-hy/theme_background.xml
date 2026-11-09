@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Մեկ լուսանկար ամբողջ ստեղնաշարի վրա</string>
+    <string name="theme_background_change">Փոխել լուսանկարը</string>
+    <string name="theme_background_remove">Հեռացնել լուսանկարը</string>
+    <string name="theme_background_loading">Լուսանկարի պատրաստում…</string>
+    <string name="theme_background_failed">Չհաջողվեց օգտագործել պատկերը։ Ընտրեք 16 ՄԲ-ից փոքր այլ պատկեր։</string>
+    <string name="theme_background_help">Լուսանկարը լրացնում է ստեղնաշարը։ Տեքստի և եզրերի գույները մնում են կարգավորելի։</string>
+    <string name="theme_background_zip">Լուսանկարով թեմաները փոխանցվում են ամբողջական ZIP պահուստավորմամբ։ Պատճենվող JSON-ը պարունակում է միայն գույները։</string>
+</resources>

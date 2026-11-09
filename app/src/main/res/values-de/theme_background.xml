@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Ein Foto auf der gesamten Tastatur</string>
+    <string name="theme_background_change">Foto ändern</string>
+    <string name="theme_background_remove">Foto entfernen</string>
+    <string name="theme_background_loading">Foto wird vorbereitet…</string>
+    <string name="theme_background_failed">Dieses Bild kann nicht verwendet werden. Versuche ein anderes Bild unter 16 MB.</string>
+    <string name="theme_background_help">Das Foto füllt die Tastatur. Text- und Rahmenfarben bleiben einstellbar.</string>
+    <string name="theme_background_zip">Fotothemen werden mit der vollständigen ZIP-Sicherung übertragen. Das JSON zum Kopieren enthält nur Farben.</string>
+</resources>

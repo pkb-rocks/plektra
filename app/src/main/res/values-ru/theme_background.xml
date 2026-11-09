@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_background_photo">Одно фото на всей клавиатуре</string>
+    <string name="theme_background_change">Изменить фото</string>
+    <string name="theme_background_remove">Убрать фото</string>
+    <string name="theme_background_loading">Подготовка фото…</string>
+    <string name="theme_background_failed">Не удалось использовать изображение. Выберите другое изображение размером менее 16 МБ.</string>
+    <string name="theme_background_help">Фото заполняет клавиатуру. Цвета текста и границ можно менять.</string>
+    <string name="theme_background_zip">Темы с фото переносятся с полной ZIP-копией. JSON для копирования содержит только цвета.</string>
+</resources>

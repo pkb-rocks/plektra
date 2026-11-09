@@ -3052,11 +3052,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     override fun onShowInputRequested(flags: Int, configChange: Boolean): Boolean {
         if (!keyboardVisibilityController.allowsSurface()) return false
+        // The hardware bar shows itself on input start; Android reports that as a show request too.
+        // Only a request from Android or the app (e.g. a tap) may open the keypad automatically.
+        val ownShowEcho = keyboardVisibilityController.isOwnShowPending()
         val accepted = super.onShowInputRequested(flags, configChange)
         if (::keyboardVisibilityController.isInitialized) {
             keyboardVisibilityController.onExplicitShowRequested()
         }
-        if (pendingKeypadAutoOpen) {
+        if (pendingKeypadAutoOpen && !ownShowEcho) {
             pendingKeypadAutoOpen = false
             openKeypadForCurrentField()
         }

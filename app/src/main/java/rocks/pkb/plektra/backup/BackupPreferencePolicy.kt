@@ -5,8 +5,7 @@ internal object BackupPreferencePolicy {
 
     val runtimeDerivedKeys = setOf(
         "$PLEKTRA_PREFS:slim_mode_active",
-        "$PLEKTRA_PREFS:software_keyboard_mode_runtime_override",
-        "$PLEKTRA_PREFS:field_scoped_virtual_previous_override"
+        "$PLEKTRA_PREFS:software_keyboard_mode_runtime_override"
     )
 
     val targetDeviceDerivedKeys = setOf(

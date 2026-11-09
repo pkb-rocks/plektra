@@ -311,6 +311,8 @@ class KeyboardVisibilityController(
     }
 
     fun isCandidatesOnlySurface() = usesCandidatesView()
+    /** True while Plektra's own show request is in flight; Android echoes it as a show request. */
+    fun isOwnShowPending() = pending
     fun isExpectedSurfaceRequestedOrShown(): Boolean = windowShown && renderedSurface() == expectedSurface() &&
         (usesCandidatesView() || isInputViewShown())
     fun shouldRecoverSurfaceOnHardwareKey() = !isExpectedSurfaceRequestedOrShown()

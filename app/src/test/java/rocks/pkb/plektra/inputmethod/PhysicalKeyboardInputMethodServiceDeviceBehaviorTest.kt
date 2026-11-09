@@ -42,6 +42,8 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         val context = RuntimeEnvironment.getApplication()
         DeviceSpecific.clearTestOverrides()
         SettingsManager.setSymPagesConfig(context, SymPagesConfig())
+        // Physical SYM cycling is a hardware-keyboard path; the on-screen cycle omits the emoji layer.
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE)
         SettingsManager.resetSymMappings(context)
         SettingsManager.resetSymMappingsPage2(context)
         SettingsManager.setStaticVariationBarLayerStickyEnabled(context, true)
@@ -82,6 +84,7 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
             if (::serviceController.isInitialized) serviceController.destroy()
         } finally {
             DeviceSpecific.clearTestOverrides()
+            SettingsManager.setSoftwareKeyboardModeRuntimeOverride(RuntimeEnvironment.getApplication(), null)
         }
     }
 

@@ -1692,6 +1692,8 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     private class RecordingInputConnection {
+        var commitAttempts = 0
+        var commitResult = true
         var textBeforeCursor: String = ""
         var sendKeyEventResult: Boolean = true
         var performEditorActionResult: Boolean = false
@@ -1706,8 +1708,9 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
                 InputConnection::class.java.classLoader,
                 arrayOf(InputConnection::class.java)
             ) { _, method, args ->
+                if (method.name == "commitText") commitAttempts++
                 when (method.name) {
-                    "commitText" -> {
+                    "commitText" -> if (!commitResult) false else {
                         val text = args?.getOrNull(0)?.toString()
                         if (text != null) {
                             committedTexts += text
@@ -1769,4 +1772,30 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
             }
         }
     }
+
+    @Test
+    fun longPress_realBoundaryCallbackRejectedCommit_doesNotReportAlternate() {
+        useLayout("uyghur")
+        SettingsManager.setLongPressModifier(service, "alt")
+        SettingsManager.setLongPressThreshold(service, 50L)
+        SettingsManager.setFrenchPunctuationSpacing(service, true)
+        SettingsManager.setFrenchPunctuationOnlyFrenchLayouts(service, false)
+        recorder.textBeforeCursor = "ب"
+        val manager = getField<AlternateCharacterManager>(service, "alternateCharacterManager")
+        manager.addAltKeyMapping(KeyEvent.KEYCODE_L, "?")
+        val alternates = mutableListOf<Char>()
+        manager.onAltCharInserted = { alternates += it }
+        manager.handleKeyWithAltMapping(KeyEvent.KEYCODE_L,
+            KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_L, 0, KeyEvent.META_SHIFT_ON), false, inputConnection)
+        assertEquals("بلا", recorder.textBeforeCursor)
+        val attemptsBeforeReplacement = recorder.commitAttempts
+        recorder.commitResult = false
+        shadowOf(android.os.Looper.getMainLooper()).idleFor(60, java.util.concurrent.TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, false)
+        assertEquals("ب", recorder.textBeforeCursor)
+        assertTrue("Real service boundary callback reported rejected alternate: $alternates", alternates.isEmpty())
+        assertEquals("only the handled replacement commit is attempted",
+            attemptsBeforeReplacement + 1, recorder.commitAttempts)
+    }
+
 }

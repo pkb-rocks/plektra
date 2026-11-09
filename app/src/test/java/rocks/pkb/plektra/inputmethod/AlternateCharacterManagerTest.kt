@@ -27,10 +27,17 @@ class AlternateCharacterManagerTest {
 
     private lateinit var context: Context
     private lateinit var prefs: android.content.SharedPreferences
+    private var previousFrenchSpacing = false
+    private var previousFrenchOnly = true
+    private var previousAutoSpacePunctuation = ""
 
     @Before
     fun setUp() {
         context = RuntimeEnvironment.getApplication()
+        previousFrenchSpacing = SettingsManager.getFrenchPunctuationSpacing(context)
+        previousFrenchOnly = SettingsManager.getFrenchPunctuationOnlyFrenchLayouts(context)
+        previousAutoSpacePunctuation = SettingsManager.getAutoSpacePunctuation(context)
+        rocks.pkb.plektra.core.AutoSpaceTracker.clear()
         LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         prefs = context.getSharedPreferences("alt_sym_manager_tests", Context.MODE_PRIVATE)
         prefs.edit().clear().putLong("long_press_threshold", 50L).commit()
@@ -46,6 +53,10 @@ class AlternateCharacterManagerTest {
 
     @After
     fun tearDown() {
+        SettingsManager.setFrenchPunctuationSpacing(context, previousFrenchSpacing)
+        SettingsManager.setFrenchPunctuationOnlyFrenchLayouts(context, previousFrenchOnly)
+        SettingsManager.setAutoSpacePunctuation(context, previousAutoSpacePunctuation)
+        rocks.pkb.plektra.core.AutoSpaceTracker.clear()
         LayoutMappingRepository.loadLayout(context.assets, "qwerty", context)
         SettingsManager.resetVariationsToDefault(context)
         SettingsManager.setLongPressModifier(context, "alt")
@@ -664,6 +675,7 @@ class AlternateCharacterManagerTest {
         var extractedTextAvailable: Boolean = true,
         var textBeforeCursorAvailable: Boolean = false
     ) {
+        var commitAttempts = 0
         var composingRegionResult = true
         var deleteResult = true
         var commitResult = true
@@ -700,6 +712,7 @@ class AlternateCharacterManagerTest {
                 InputConnection::class.java.classLoader,
                 arrayOf(InputConnection::class.java)
             ) { _, method, args ->
+                if (method.name == "commitText") commitAttempts++
                 if (method.name in setOf("commitText", "deleteSurroundingText", "setComposingRegion", "setSelection") &&
                     batchDepth == 0
                 ) {
@@ -794,4 +807,55 @@ class AlternateCharacterManagerTest {
             }
         }
     }
+
+    @Test
+    fun longPress_frenchSpacingRejectedCommit_doesNotReportAlternate() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        SettingsManager.setFrenchPunctuationSpacing(context, true)
+        SettingsManager.setFrenchPunctuationOnlyFrenchLayouts(context, false)
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val alternates = mutableListOf<Char>()
+        val normal = mutableListOf<String>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "?")
+            onBoundaryTextRequested = { _, _ -> false }
+            onAltCharInserted = { alternates += it }
+            onNormalCharCommitted = { normal += it }
+        }
+        recorder.textBeforeCursorAvailable = true
+        val attemptsBeforeReplacement = recorder.commitAttempts
+        recorder.commitResult = false
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, false)
+        assertEquals("ب", recorder.text)
+        assertTrue(normal.isEmpty())
+        assertTrue("Rejected French punctuation reported as alternate: $alternates", alternates.isEmpty())
+        assertEquals("only the handled replacement commit is attempted",
+            attemptsBeforeReplacement + 1, recorder.commitAttempts)
+    }
+
+    @Test
+    fun longPress_autoSpaceRejectedCommit_doesNotReportAlternate() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        SettingsManager.setFrenchPunctuationSpacing(context, false)
+        SettingsManager.setAutoSpacePunctuation(context, "?")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val alternates = mutableListOf<Char>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب ") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "?")
+            onBoundaryTextRequested = { _, _ -> false }
+            onAltCharInserted = { alternates += it }
+        }
+        rocks.pkb.plektra.core.AutoSpaceTracker.markAutoSpace()
+        recorder.textBeforeCursorAvailable = true
+        val attemptsBeforeReplacement = recorder.commitAttempts
+        recorder.commitResult = false
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, false)
+        assertEquals("ب", recorder.text)
+        assertTrue("Rejected auto-space punctuation reported as alternate: $alternates", alternates.isEmpty())
+        assertEquals("only the handled replacement commit is attempted",
+            attemptsBeforeReplacement + 1, recorder.commitAttempts)
+    }
+
 }

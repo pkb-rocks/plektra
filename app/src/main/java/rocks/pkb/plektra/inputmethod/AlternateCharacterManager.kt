@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputConnectionWrapper
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import rocks.pkb.plektra.data.layout.isRealMultiTap
@@ -578,24 +579,33 @@ class AlternateCharacterManager(
 
     /**
      * Commits a long-press symbol at the cursor with the same boundary and spacing rules as
-     * typing. Returns false only when the editor rejected a plain commit.
+     * typing. A handled spacing/boundary request is successful only if its commit was accepted.
      */
     private fun commitSymbolAtCursor(text: String, inputConnection: InputConnection, label: String): Boolean {
-        if (handleBoundaryTextBeforeCommit(text, inputConnection)) return true
+        var commitAccepted: Boolean? = null
+        val trackedConnection = object : InputConnectionWrapper(inputConnection, false) {
+            override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean =
+                super.commitText(text, newCursorPosition).also { commitAccepted = it }
+        }
+        // Existing handlers return whether they handled the request, including rejected commits.
+        // Do not retry an attempted commit; report whether the editor accepted it.
+        if (handleBoundaryTextBeforeCommit(text, trackedConnection) || commitAccepted != null) {
+            return commitAccepted == true
+        }
 
         val frenchSpacedPunctuation = text.length == 1 &&
             context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true &&
-            rocks.pkb.plektra.core.Punctuation.commitFrenchSpacedPunctuation(inputConnection, text[0])
-        if (frenchSpacedPunctuation) {
-            Log.d(TAG, "Long press $label mapping applied with French spacing for '$text'")
-            return true
+            rocks.pkb.plektra.core.Punctuation.commitFrenchSpacedPunctuation(trackedConnection, text[0])
+        if (frenchSpacedPunctuation || commitAccepted != null) {
+            Log.d(TAG, "Long press $label French spacing for '$text': accepted=$commitAccepted")
+            return commitAccepted == true
         }
 
         if (text[0] in autoSpacePunctuation() &&
-            AutoSpaceTracker.replaceAutoSpaceWithPunctuation(inputConnection, text)
+            AutoSpaceTracker.replaceAutoSpaceWithPunctuation(trackedConnection, text)
         ) {
-            Log.d(TAG, "Long press $label mapping applied with auto-space replacement for '$text'")
-            return true
+            Log.d(TAG, "Long press $label auto-space replacement for '$text': accepted=$commitAccepted")
+            return commitAccepted == true
         }
 
         AutoSpaceTracker.clear()

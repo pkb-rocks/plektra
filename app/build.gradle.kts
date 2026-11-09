@@ -437,7 +437,7 @@ listOf("stable", "stableNoAccessibility", "nightly", "nightlyNoAccessibility", "
                 bundled("OpenGameArt keyboard soundpack", "vendored:opengameart-keyboard-soundpack", "https://opengameart.org/content/keyboard-soundpack-1-typing-and-single-keystrokes", "CC0-1.0"),
                 bundled("OpenGameArt typewriter sounds", "vendored:opengameart-typewriter-sounds", "https://opengameart.org/content/typewriter-sounds", "CC0-1.0"),
                 bundled("OpenGameArt mechanical sounds", "vendored:opengameart-mechanical-sounds", "https://opengameart.org/content/mechanical-sounds", "CC0-1.0"),
-                bundled("Unicode CLDR emoji annotations", "vendored:unicode-cldr-annotations", "https://github.com/unicode-org/cldr-json", "Unicode-DFS-2016"),
+                bundled("Unicode CLDR emoji annotations", "vendored:unicode-cldr-annotations:49.0.0", "https://github.com/unicode-org/cldr-json", "Unicode-3.0"),
                 bundled("Unicode Emoji and Character Database data", "vendored:unicode-ucd-emoji:18.0", "https://www.unicode.org/Public/18.0.0/", "Unicode-3.0"),
                 bundled("Noto Color Emoji font", "vendored:noto-emoji:v2026-09-24-unicode18_0", "https://github.com/googlefonts/noto-emoji", "OFL-1.1"),
                 bundled("Flux Keyboard kaomoji collection", "vendored:flux-keyboard-kaomoji:2.0.0", "https://github.com/Flux-Sniffer-Mods/Flux-Keyboard", "GPL-3.0-or-later"),

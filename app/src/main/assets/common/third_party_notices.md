@@ -55,7 +55,7 @@ Typing sound derivatives are included under `res/raw/typing_*.ogg`.
 - Project: Unicode Common Locale Data Repository (CLDR)
 - Source repository: https://github.com/unicode-org/cldr-json
 - Source path used by generator: `cldr-json/cldr-annotations-full/annotations`
-- License: Unicode Data Files and Software License / Unicode License
+- License: Unicode License v3 (SPDX `Unicode-3.0`), copyright © 2015-2024 Unicode, Inc.; full copyright and permission notice in `assets/common/licenses/Unicode-3.0-CLDR.txt` (copy of `LICENSE` from cldr-json 49.0.0)
 
 Plektra's local emoji search assets under `assets/common/emoji_search/*.tsv`
 are generated from Unicode CLDR annotation data (CLDR 49.0.0) by `scripts/update_emoji_assets.py`.
@@ -66,7 +66,7 @@ for compact local lookup.
 
 - Project: Unicode Emoji 18.0 (`emoji-test.txt`) and Unicode Character Database 18.0 (`UnicodeData.txt`, `emoji-data.txt`)
 - Source: https://www.unicode.org/Public/18.0.0/
-- License: Unicode License v3 (https://www.unicode.org/license.txt)
+- License: Unicode License v3 (SPDX `Unicode-3.0`), copyright © 1991-2026 Unicode, Inc.; full copyright and permission notice in `assets/common/licenses/Unicode-3.0.txt` (copy of https://www.unicode.org/license.txt)
 
 The emoji categories under `assets/common/emoji/*.txt`, the symbol list `assets/common/symbols/symbols.tsv`
 and the localized symbol names under `assets/common/symbol_search/*.tsv` (CLDR annotations) are generated

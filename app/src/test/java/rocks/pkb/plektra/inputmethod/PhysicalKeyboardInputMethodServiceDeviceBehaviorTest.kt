@@ -529,14 +529,50 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     fun switchingToUyghur_clearsPendingCapitalizationFromEnglish() {
         service.onStartInput(editorInfo, false)
         assertTrue(modifierController().shiftOneShot)
+        switchSubtype("ug:uyghur")
+        assertFalse(modifierController().shiftOneShot)
+        assertEquals("د", LayoutMappingRepository.getLowercase(KeyEvent.KEYCODE_D))
+    }
+
+    @Test
+    fun switchingToUyghur_suspendsFieldCapsLockAndRestoresItOnLatin() {
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, "qwerty")
+        SettingsManager.setAutoCorrectEnabled(service, false)
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+        service.onStartInput(editorInfo, false)
+        assertTrue(modifierController().capsLockEnabled)
+
+        switchSubtype("ug:uyghur")
+        assertFalse(modifierController().capsLockEnabled)
+        service.onKeyDown(KeyEvent.KEYCODE_D, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_D, 10_000L, 10_000L))
+        service.onKeyUp(KeyEvent.KEYCODE_D, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_D, 10_000L, 10_030L))
+        assertEquals("د", recorder.committedTexts.joinToString(""))
+
+        switchSubtype("en_US:qwertz")
+        assertTrue(modifierController().capsLockEnabled)
+    }
+
+    @Test
+    fun switchingToUyghur_keepsCapsLockTheUserTurnedOn() {
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, "qwerty")
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        service.onStartInput(editorInfo, false)
+        modifierController().capsLockEnabled = true
+
+        switchSubtype("ug:uyghur")
+        assertTrue(modifierController().capsLockEnabled)
+    }
+
+    private fun switchSubtype(prefValue: String) {
         val subtype = rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.createAdditionalSubtypesArray(
-            "ug:uyghur", service.assets, service
+            prefValue, service.assets, service
         ).single()
         PhysicalKeyboardInputMethodService::class.java.getDeclaredMethod(
             "onCurrentInputMethodSubtypeChanged", android.view.inputmethod.InputMethodSubtype::class.java
         ).apply { isAccessible = true }.invoke(service, subtype)
-        assertFalse(modifierController().shiftOneShot)
-        assertEquals("د", LayoutMappingRepository.getLowercase(KeyEvent.KEYCODE_D))
     }
 
     @Test

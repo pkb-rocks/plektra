@@ -19,6 +19,25 @@ class ModifierStateControllerTest {
     private val doubleTapThreshold = 300L
 
     @Test
+    fun automaticCapsLock_becomesUserOwnedAfterAnyShiftChange() {
+        val controller = ModifierStateController(doubleTapThreshold)
+
+        controller.enableAutomaticCapsLock()
+        assertTrue(controller.capsLockEnabled)
+        assertTrue(controller.capsLockAutomatic)
+
+        val held = controller.captureLogicalState()
+        controller.capsLockEnabled = false
+        assertFalse(controller.capsLockAutomatic)
+        controller.restoreLogicalState(held)
+        assertTrue(controller.capsLockAutomatic)
+
+        controller.capsLockEnabled = true
+        assertTrue(controller.capsLockEnabled)
+        assertFalse(controller.capsLockAutomatic)
+    }
+
+    @Test
     fun testShiftTransitions() {
         val controller = ModifierStateController(doubleTapThreshold)
         

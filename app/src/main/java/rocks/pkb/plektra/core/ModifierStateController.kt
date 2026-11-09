@@ -21,6 +21,13 @@ class ModifierStateController(
         private val doubleTapThreshold: Long
     ) {
         var state: ShiftState = ShiftState.OFF
+            private set(value) {
+                field = value
+                automaticCapsLock = false
+            }
+
+        /** True while Caps Lock is the one a field's CAP_CHARACTERS flag turned on. */
+        var automaticCapsLock: Boolean = false
             private set
 
         private var lastTapTime: Long = 0
@@ -65,8 +72,14 @@ class ModifierStateController(
             state = if (enabled) ShiftState.CAPS else ShiftState.OFF
         }
 
-        fun restore(newState: ShiftState) {
+        fun setAutomaticCapsLock() {
+            state = ShiftState.CAPS
+            automaticCapsLock = true
+        }
+
+        fun restore(newState: ShiftState, automatic: Boolean = false) {
             state = newState
+            automaticCapsLock = automatic && newState == ShiftState.CAPS
         }
 
         fun reset() {
@@ -117,7 +130,8 @@ class ModifierStateController(
         val ctrlLatchActive: Boolean,
         val ctrlLatchFromNavMode: Boolean,
         val altOneShot: Boolean,
-        val altLatchActive: Boolean
+        val altLatchActive: Boolean,
+        val automaticCapsLock: Boolean = false
     )
 
     fun captureLogicalState(): LogicalState {
@@ -127,12 +141,13 @@ class ModifierStateController(
             ctrlLatchActive = ctrlState.latchActive,
             ctrlLatchFromNavMode = ctrlState.latchFromNavMode,
             altOneShot = altState.oneShot,
-            altLatchActive = altState.latchActive
+            altLatchActive = altState.latchActive,
+            automaticCapsLock = shiftStateMachine.automaticCapsLock
         )
     }
 
     fun restoreLogicalState(captured: LogicalState) {
-        shiftStateMachine.restore(captured.shiftState)
+        shiftStateMachine.restore(captured.shiftState, captured.automaticCapsLock)
         ctrlState.oneShot = captured.ctrlOneShot
         ctrlState.latchActive = captured.ctrlLatchActive
         ctrlState.latchFromNavMode = captured.ctrlLatchFromNavMode
@@ -146,6 +161,17 @@ class ModifierStateController(
     var capsLockEnabled: Boolean
         get() = shiftStateMachine.state == ShiftState.CAPS
         set(value) { shiftStateMachine.setCapsLock(value) }
+
+    /**
+     * Caps Lock turned on by the field's capitalization flags rather than by the user.
+     * Any later change to the Shift state makes it a regular, user-owned state again.
+     */
+    val capsLockAutomatic: Boolean
+        get() = shiftStateMachine.automaticCapsLock
+
+    fun enableAutomaticCapsLock() {
+        shiftStateMachine.setAutomaticCapsLock()
+    }
 
     var shiftPressed: Boolean
         get() = shiftPressedFlag

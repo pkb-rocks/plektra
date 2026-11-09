@@ -155,8 +155,10 @@ class ShowcaseReceiver : BroadcastReceiver() {
         val document = JSONObject(backup.readText())
         val versioned = document.opt("captureFormat") is Number
         val wrapped = versioned || (document.opt("fileExisted") is Boolean && document.optJSONObject("preferences") != null)
-        if (versioned) require(document.getInt("captureFormat") == 1) { "Unsupported capture backup format" }
         val saved = if (wrapped) {
+            if (document.has("captureFormat")) {
+                require(document.opt("captureFormat") == 1) { "Unsupported capture backup format" }
+            }
             require(document.opt("fileExisted") is Boolean) { "Invalid capture backup structure" }
             document.getJSONObject("preferences")
         } else document

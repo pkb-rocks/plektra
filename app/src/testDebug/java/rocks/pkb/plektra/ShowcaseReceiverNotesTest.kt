@@ -136,6 +136,25 @@ class ShowcaseReceiverNotesTest {
         org.junit.Assert.assertTrue(context.getSharedPreferences("notes", Context.MODE_PRIVATE).all.isEmpty())
     }
 
+    @Test fun invalidCaptureVersionsNeverCommitOrDeleteTheBackup() {
+        context.deleteSharedPreferences("notes")
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic body").toString())))
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        val original = prefs.all.toMap()
+        val backup = java.io.File(context.filesDir, "showcase-notes-backup.json")
+        val valid = backup.readText()
+        for (version in listOf<Any>(1.5, 4294967297L, 2, "1")) {
+            val invalid = JSONObject(valid).put("captureFormat", version).toString()
+            backup.writeText(invalid)
+            assertEquals("Reject $version", 1, broadcast(Intent().putExtra("restore", true)))
+            assertEquals(original, prefs.all)
+            assertEquals(invalid, backup.readText())
+        }
+        backup.writeText(valid)
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+    }
+
     private fun broadcast(intent: Intent): Int {
         var result: Int? = null
         context.sendOrderedBroadcast(intent.setClass(context, ShowcaseReceiver::class.java), null,

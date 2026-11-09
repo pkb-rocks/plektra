@@ -1798,4 +1798,29 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
             attemptsBeforeReplacement + 1, recorder.commitAttempts)
     }
 
+
+    @Test
+    fun longPress_deferredSpaceMustNotSwallowOpeningBracket() {
+        useLayout("uyghur")
+        SettingsManager.setLongPressModifier(service, "alt")
+        SettingsManager.setLongPressThreshold(service, 50L)
+        SettingsManager.setFrenchPunctuationSpacing(service, false)
+        SettingsManager.setAutoCorrectEnabled(service, false)
+        SettingsManager.setSpaceAfterPunctuation(service, ".")
+        rocks.pkb.plektra.core.DeferredPunctuationSpaceTracker.clear()
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+        setField(service, "inputContextState", InputContextState.fromEditorInfo(editorInfo))
+        recorder.textBeforeCursor = "ب"
+        val manager = getField<AlternateCharacterManager>(service, "alternateCharacterManager")
+        manager.addAltKeyMapping(KeyEvent.KEYCODE_PERIOD, "(")
+        val alternates = mutableListOf<Char>()
+        manager.onAltCharInserted = { alternates += it }
+        service.onKeyDown(KeyEvent.KEYCODE_PERIOD, KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_PERIOD))
+        assertEquals("ب.", recorder.textBeforeCursor)
+        shadowOf(android.os.Looper.getMainLooper()).idleFor(60, java.util.concurrent.TimeUnit.MILLISECONDS)
+        service.onKeyUp(KeyEvent.KEYCODE_PERIOD, KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_PERIOD))
+        assertEquals("ب (", recorder.textBeforeCursor)
+        assertEquals(listOf('('), alternates)
+    }
+
 }

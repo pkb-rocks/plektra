@@ -587,11 +587,12 @@ class AlternateCharacterManager(
             override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean =
                 super.commitText(text, newCursorPosition).also { commitAccepted = it }
         }
-        // Existing handlers return whether they handled the request, including rejected commits.
-        // Do not retry an attempted commit; report whether the editor accepted it.
-        if (handleBoundaryTextBeforeCommit(text, trackedConnection) || commitAccepted != null) {
+        // An unhandled boundary can still prepare spacing before the actual symbol is committed.
+        if (handleBoundaryTextBeforeCommit(text, trackedConnection)) {
             return commitAccepted == true
         }
+        if (commitAccepted == false) return false
+        commitAccepted = null
 
         val frenchSpacedPunctuation = text.length == 1 &&
             context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true &&

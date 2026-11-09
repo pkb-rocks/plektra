@@ -38,6 +38,28 @@ class LayoutFileStoreImportTest {
     }
 
     @Test
+    fun layoutAltOutputs_surviveImportAndExport() {
+        val source = """{"mappings":{"KEYCODE_N":{"lowercase":"ن","uppercase":"ن","alt":"،"}}}"""
+        assertTrue(import(source) is LayoutImportResult.Success)
+        val loaded = requireNotNull(LayoutFileStore.loadLayoutFromFile(LayoutFileStore.getLayoutFile(context, "Русский")))
+        assertEquals("،", loaded[android.view.KeyEvent.KEYCODE_N]?.alt)
+
+        val exported = LayoutFileStore.buildLayoutJsonString("uyghur", loaded, null, null)
+        val reloaded = LayoutFileStore.loadLayoutFromStream(exported.byteInputStream())
+        assertEquals(loaded, reloaded)
+    }
+
+    @Test
+    fun invalidAltOutput_isRejectedWithoutMutation() {
+        listOf("null", "123", "\"\"").forEach { invalidAlt ->
+            assertRejectedWithoutMutation(
+                """{"mappings":{"KEYCODE_N":{"lowercase":"ن","uppercase":"ن","alt":$invalidAlt}}}""",
+                LayoutImportError.INVALID_MAPPING
+            )
+        }
+    }
+
+    @Test
     fun malformedJson_isRejectedWithoutMutation() {
         assertRejectedWithoutMutation("{", LayoutImportError.MALFORMED_JSON)
     }

@@ -785,9 +785,9 @@ private fun AddCustomInputStyleDialog(
         }
     }
 
-    // Get available locales based on dictionary availability (no filtering of system locales)
+    // Input languages can have a bundled layout without a dictionary.
     val availableLocales = remember(dictionariesRevision) {
-        getLocalesWithDictionary(context).sorted()
+        getAvailableInputStyleLocales(context)
     }
 
     AlertDialog(
@@ -985,7 +985,7 @@ private fun AddCustomInputStyleDialog(
 
                     SuggestionDictionariesSelector(
                         primaryLocale = selectedLocale!!,
-                        availableLocales = availableLocales,
+                        availableLocales = getLocalesWithDictionary(context).sorted(),
                         selectedLocales = selectedSuggestionLocales,
                         onSelectedLocalesChanged = { selectedSuggestionLocales = it }
                     )
@@ -1483,10 +1483,11 @@ private fun normalizeLocaleTag(locale: String): String {
     return locale.trim().replace('_', '-')
 }
 
-/**
- * Gets list of locales that have dictionary files available.
- * Uses serialized (.dict) from assets and custom/imported folder.
- */
+/** Uyghur has a bundled typing layout and does not require a dictionary package. */
+internal fun getAvailableInputStyleLocales(context: Context): List<String> =
+    (getLocalesWithDictionary(context) + "ug").distinct().sorted()
+
+/** Gets dictionary locales from the catalog, bundled assets and installed packages. */
 private fun getLocalesWithDictionary(context: Context): List<String> {
     val localesWithDict = mutableSetOf<String>()
     localesWithDict.addAll(rocks.pkb.plektra.dictionaries.DictionaryRepositoryManager.offlineCatalog(context).items.map { it.languageTag })

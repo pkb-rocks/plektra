@@ -949,6 +949,46 @@ class AospKeyboardViewTest {
         SoftwareKeyboardPageChoices.Choice(SoftwareKeyboardPageChoices.pageId(2), "#+=")
     )
 
+    @Test
+    fun phonePlusHoldWithoutMovementCommitsTheHighlightedAlternative() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            keypad = SoftwareKeypad.PHONE
+            longPressTimeoutMs = 50L
+            this.listener = listener
+        }
+        val rect = field<RectF>(keyForLabel(view, "+"), "visualRect")
+        val x = rect.centerX()
+        val y = rect.top + 1f
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        val panel = field<Any>(view, "moreKeysPanelState")
+        assertEquals(0, field<Int>(panel, "selectedIndex"))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 70L))
+        assertEquals(listOf("-"), listener.texts)
+    }
+
+    @Test
+    fun phonePlusSlideCommitsTheLastHighlightedAlternativeOnRelease() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            keypad = SoftwareKeypad.PHONE
+            longPressTimeoutMs = 50L
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "+")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        val panel = field<Any>(view, "moreKeysPanelState")
+        val rect = field<RectF>(panel, "popupRectInView")
+        val padding = field<Float>(panel, "padding")
+        val targetX = rect.left + padding + field<Float>(panel, "keyWidth") * 1.5f
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_MOVE, targetX, rect.centerY(), 65L))
+        assertEquals(1, field<Int>(panel, "selectedIndex"))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, rect.right - padding, rect.centerY(), 70L))
+        assertEquals(listOf("("), listener.texts)
+    }
+
     private fun measuredKeyboard(): AospKeyboardView {
         val context = RuntimeEnvironment.getApplication()
         val parent = FrameLayout(context)

@@ -1029,7 +1029,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 if (pointerId == activePointerId) {
                     handler.removeCallbacks(longPressRunnable)
                     moreKeysPanelState?.let { panel ->
-                        val selected = selectedMoreKeyChoice(event.getX(pointerIndex), event.getY(pointerIndex), panel)
+                        val selected = selectedMoreKeyChoice(panel)
                         dismissPopup()
                         pressedKey = null
                         activePointerId = -1
@@ -1059,7 +1059,7 @@ class AospKeyboardView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 handler.removeCallbacks(longPressRunnable)
                 moreKeysPanelState?.let { panel ->
-                    val selected = selectedMoreKeyChoice(event.x, event.y, panel)
+                    val selected = selectedMoreKeyChoice(panel)
                     dismissPopup()
                     pressedKey = null
                     invalidateKeyboard()
@@ -1953,16 +1953,10 @@ class AospKeyboardView @JvmOverloads constructor(
         invalidateKeyboard()
     }
 
-    private fun selectedMoreKeyChoice(x: Float, y: Float, panel: MoreKeysPanelState): MoreKeyChoice? {
-        val layerIndex = selectedLayerKeyIndex(x, y, panel)
-        if (layerIndex >= 0) {
-            return panel.layerKeys.getOrNull(layerIndex)
-        }
-        panel.selectedLayerIndex.takeIf { it >= 0 }?.let { selectedLayerIndex ->
-            return panel.layerKeys.getOrNull(selectedLayerIndex)
-        }
-        val index = selectedMoreKeyIndex(x, y, panel).takeIf { it >= 0 } ?: panel.selectedIndex
-        return panel.keys.getOrNull(index)
+    private fun selectedMoreKeyChoice(panel: MoreKeysPanelState): MoreKeyChoice? {
+        // Commit the choice the user saw highlighted, without a second hit test on release.
+        panel.selectedLayerIndex.takeIf { it >= 0 }?.let { return panel.layerKeys.getOrNull(it) }
+        return panel.keys.getOrNull(panel.selectedIndex)
     }
 
     private fun dispatchMoreKeyChoice(choice: MoreKeyChoice?) {

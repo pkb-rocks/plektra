@@ -1321,7 +1321,8 @@ class EmojiPickerView(
         rocks.pkb.plektra.ThemeTextureBackground.set(this, theme?.background ?: Color.TRANSPARENT, image)
         vertical.setBackgroundColor(background)
         recyclerView.setBackgroundColor(background)
-        searchPanel.setBackgroundColor(background)
+        // This panel overlays results: keep text legible and prevent emoji showing through it.
+        searchPanel.setBackgroundColor(if (image != null) colorWithAlpha(theme.background, 255) else background)
         loadingView.setBackgroundColor(background)
         emptyView.setBackgroundColor(background)
         searchField.setTextColor(theme?.textAndIcons ?: Color.WHITE)

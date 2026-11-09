@@ -210,6 +210,21 @@ class ThemeTextureRenderingTest {
         assertFalse(keypad.background is ThemeTextureDrawable)
         assertEquals(listOf(theme.background),fills)
     }
+    @Test fun photoSearchPanelCoversEmojiResultsWithTheSavedBackgroundColour() {
+        val theme = photoTheme(texture.asset)
+        val picker = rocks.pkb.plektra.inputmethod.ui.EmojiPickerView(context)
+        picker.themeOverride = theme.toKeyboardThemeColors()
+        picker.showSearch()
+        val panel = org.robolectric.util.ReflectionHelpers.getField<View>(picker, "searchPanel")
+        assertEquals(View.VISIBLE, panel.visibility)
+        assertEquals(theme.background or 0xff000000.toInt(),
+            (panel.background as android.graphics.drawable.ColorDrawable).color)
+        val results = org.robolectric.util.ReflectionHelpers.getField<View>(picker, "recyclerView")
+        assertEquals(android.graphics.Color.TRANSPARENT,
+            (results.background as android.graphics.drawable.ColorDrawable).color)
+        assertTrue("The picker still draws the photo", picker.background is ThemeTextureDrawable)
+    }
+
     @Test fun damagedPhotoFallsBackToSavedSurfaceColours() {
         ThemeTextureStore.file(context,texture.asset).writeBytes(byteArrayOf(1,2,3))
         awaitUnavailable(View(context),texture.asset)

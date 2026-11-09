@@ -87,11 +87,12 @@ object EmojiSearchRepository {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
 
+        // Emoji typed or pasted as the query (👋🏽, 🫱🏻‍🫲🏼) normalize to nothing: they match literally.
         val normalizedQuery = normalizeSearchText(trimmed)
-        if (normalizedQuery.isEmpty() && index.items.none { it.entry.base == trimmed }) return emptyList()
+        val literalQuery = withoutVariationSelectors(trimmed)
 
         return index.items.mapNotNull { item ->
-            val score = scoreItem(item, trimmed, normalizedQuery)
+            val score = scoreItem(item, literalQuery, normalizedQuery)
             if (score <= 0) return@mapNotNull null
             RankedResult(
                 result = EmojiSearchResult(
@@ -115,13 +116,17 @@ object EmojiSearchRepository {
         indexCache.clear()
     }
 
+    /** [text] without emoji/text presentation selectors, so ❤ finds ❤️ and the other way round. */
+    private fun withoutVariationSelectors(text: String): String =
+        text.filterNot { it == '\uFE0F' || it == '\uFE0E' }
+
     private fun scoreItem(
         item: IndexedEmoji,
-        rawQuery: String,
+        literalQuery: String,
         normalizedQuery: String
     ): Int {
-        if (item.entry.base == rawQuery) return 2000
-        if (item.entry.variants.any { it == rawQuery }) return 1900
+        if (withoutVariationSelectors(item.entry.base) == literalQuery) return 2000
+        if (item.entry.variants.any { withoutVariationSelectors(it) == literalQuery }) return 1900
 
         val best = SearchScorer.score(item.terms, normalizedQuery)
         if (best == 0) return 0

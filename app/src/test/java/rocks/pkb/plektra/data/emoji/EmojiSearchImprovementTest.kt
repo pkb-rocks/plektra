@@ -2,6 +2,7 @@ package rocks.pkb.plektra.data.emoji
 
 import android.content.Context
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,5 +33,19 @@ class EmojiSearchImprovementTest {
         } finally {
             EmojiRendering.setStyle(context, EmojiRendering.Style.NOTO)
         }
+    }
+
+    @Test
+    fun emojiTypedAsTheQueryFindsItsEntry() = runBlocking {
+        TestEmojiFont.install(context)
+        val index = EmojiSearchRepository.getSearchIndex(context)
+        fun first(query: String) = EmojiSearchRepository.search(index, query).firstOrNull()?.entry?.base
+        assertEquals("👋", first("👋🏽"))
+        assertEquals("👋", first("👋"))
+        assertEquals("🤝", first("\uD83E\uDEF1\uD83C\uDFFB\u200D\uD83E\uDEF2\uD83C\uDFFC")) // 🫱🏻‍🫲🏼
+        assertEquals("🧑\u200D🩰", first("🧑🏽\u200D🩰"))
+        // With or without the emoji presentation selector
+        assertEquals("❤️", first("❤"))
+        assertEquals("❤️", first("❤️"))
     }
 }

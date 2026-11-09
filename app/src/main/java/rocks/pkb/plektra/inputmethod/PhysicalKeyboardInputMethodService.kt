@@ -1452,6 +1452,40 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
     }
 
+    private val keyEventTextOutput = KeyEventTextOutput()
+
+    private fun handleKeyEventInput(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
+            inputEventRouter.handleAltModifierKeyDown(
+                keyCode, event, modifierStateController, symLayoutController,
+                { updateStatusBarText() }, { startSpeechRecognition() }
+            )
+            return true
+        }
+        if (event == null || event.isCtrlPressed || event.isMetaPressed || event.isSymPressed ||
+            ctrlPressed || ctrlLatchActive || ctrlOneShot || navModeController.isNavModeActive()) return false
+        val ic = currentInputConnection ?: return false
+        keyEventTextOutput.textForRepeat(keyCode, event)?.let {
+            return keyEventTextOutput.sendText(keyCode, it, ic)
+        }
+        clearAltOnBoundaryIfNeeded(keyCode) { updateStatusBarText() }
+        if (!event.isAltPressed && !altPressed && !altLatchActive && !altOneShot) return false
+        val handled = inputEventRouter.handleAltModifiedKey(
+            keyCode = keyCode,
+            event = event,
+            inputConnection = ic,
+            alternateCharacterManager = alternateCharacterManager,
+            updateStatusBar = { updateStatusBarText() },
+            textOutput = { keyEventTextOutput.sendText(keyCode, it, ic) },
+            callSuperWithKey = { _, _ -> false }
+        )
+        if (handled) {
+            altOneShot = false
+            updateStatusBarText()
+        }
+        return handled
+    }
+
     private fun resolveAltMappedUnicodeForDebug(
         keyCode: Int,
         altActive: Boolean
@@ -5180,6 +5214,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         // If NO editable field is active, handle ONLY nav mode
         if (!hasEditableField) {
+            if (KeyEventInputPolicy.appliesTo(info) && !navModeController.isNavModeActive() &&
+                (languageAlt || keyEventTextOutput.hasPressedKey(keyCode) ||
+                    keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT)) {
+                return handleKeyEventInput(keyCode, event) || super.onKeyDown(keyCode, event)
+            }
             val powerShortcutsEnabled = SettingsManager.getPowerShortcutsEnabled(this)
             return inputEventRouter.handleKeyDownWithNoEditableField(
                 keyCode = keyCode,
@@ -5572,6 +5611,54 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         return keyCode != KeyEvent.KEYCODE_BACK
     }
 
+    private fun handleAltModifierKeyUp(keyCode: Int, event: KeyEvent?, allowVisualLayer: Boolean) {
+        if (altPressed) {
+            val downTime = modifierDownTimes[keyCode] ?: 0L
+            val holdDuration = if (downTime > 0) event?.eventTime?.minus(downTime) ?: 0L else 0L
+            val isLongHold = holdDuration > 300L
+            val stickyEnabled = allowVisualLayer && SettingsManager.isStaticVariationBarLayerStickyEnabled(this)
+            val isIntentionalHold = variationInteractedDuringHold || (isLongHold && !otherKeyInteractedDuringHold)
+
+            if (isIntentionalHold) {
+                modifierStateBeforeHold?.let { modifierStateController.restoreLogicalState(it) }
+                // Sticky layer activation is handled via double-tap, not hold.
+                altModifierLayerLatched = false
+                lastAltTapUpTime = 0L
+                variationInteractedDuringHold = false
+                otherKeyInteractedDuringHold = false
+                modifierStateBeforeHold = null
+                modifierStateController.altPressed = false
+                modifierStateController.altPhysicallyPressed = false
+                updateStatusBarText()
+            } else {
+                val result = modifierStateController.handleAltKeyUp(
+                    keyCode,
+                    now = ModifierKeyHandler.eventTimeOrUptime(event)
+                )
+                if (result.shouldUpdateStatusBar) {
+                    updateStatusBarText()
+                }
+                val isQuickTap = holdDuration < 300L && !variationInteractedDuringHold && !otherKeyInteractedDuringHold
+                if (stickyEnabled && isQuickTap) {
+                    val now = event?.eventTime ?: System.currentTimeMillis()
+                    if (lastAltTapUpTime > 0L && now - lastAltTapUpTime <= DOUBLE_TAP_THRESHOLD) {
+                        altModifierLayerLatched = true
+                        lastAltTapUpTime = 0L
+                        updateStatusBarText()
+                    } else {
+                        lastAltTapUpTime = now
+                    }
+                } else {
+                    lastAltTapUpTime = 0L
+                }
+            }
+            if (otherKeyInteractedDuringHold) altOneShot = false
+            variationInteractedDuringHold = false
+            otherKeyInteractedDuringHold = false
+            modifierDownTimes.remove(keyCode)
+        }
+    }
+
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
         if (!replayingProtectedNumberKey) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
@@ -5649,6 +5736,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         
+        if (keyEventTextOutput.consumeKeyUp(keyCode)) return true
+        if (!hasEditableField && KeyEventInputPolicy.appliesTo(info) &&
+            (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT)) {
+            handleAltModifierKeyUp(keyCode, event, allowVisualLayer = false)
+            return true
+        }
+
         // If NO editable field is active, handle ONLY nav mode Ctrl release
         if (!hasEditableField) {
             if (keyCode == KEYCODE_SYM) {
@@ -5768,53 +5862,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         // Handle Alt release for double-tap
         if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
-            if (altPressed) {
-                val downTime = modifierDownTimes[keyCode] ?: 0L
-                val holdDuration = if (downTime > 0) event?.eventTime?.minus(downTime) ?: 0L else 0L
-                val isLongHold = holdDuration > 300L
-                val stickyEnabled = SettingsManager.isStaticVariationBarLayerStickyEnabled(this)
-                val isIntentionalHold = variationInteractedDuringHold || (isLongHold && !otherKeyInteractedDuringHold)
-
-                if (isIntentionalHold) {
-                    modifierStateBeforeHold?.let { modifierStateController.restoreLogicalState(it) }
-                    // Sticky layer activation is handled via double-tap, not hold.
-                    altModifierLayerLatched = false
-                    lastAltTapUpTime = 0L
-                    variationInteractedDuringHold = false
-                    otherKeyInteractedDuringHold = false
-                    modifierStateBeforeHold = null
-                    modifierStateController.altPressed = false
-                    modifierStateController.altPhysicallyPressed = false
-                    updateStatusBarText()
-                } else {
-                    val result = modifierStateController.handleAltKeyUp(
-                        keyCode,
-                        now = ModifierKeyHandler.eventTimeOrUptime(event)
-                    )
-                    if (result.shouldUpdateStatusBar) {
-                        updateStatusBarText()
-                    }
-                    val isQuickTap = holdDuration < 300L && !variationInteractedDuringHold && !otherKeyInteractedDuringHold
-                    if (stickyEnabled && isQuickTap) {
-                        val now = event?.eventTime ?: System.currentTimeMillis()
-                        if (lastAltTapUpTime > 0L && now - lastAltTapUpTime <= DOUBLE_TAP_THRESHOLD) {
-                            altModifierLayerLatched = true
-                            lastAltTapUpTime = 0L
-                            updateStatusBarText()
-                        } else {
-                            lastAltTapUpTime = now
-                        }
-                    } else {
-                        lastAltTapUpTime = 0L
-                    }
-                }
-                variationInteractedDuringHold = false
-                otherKeyInteractedDuringHold = false
-                modifierDownTimes.remove(keyCode)
-            }
+            handleAltModifierKeyUp(keyCode, event, allowVisualLayer = true)
             return super.onKeyUp(keyCode, event)
         }
-        
+
         // Toggle SYM layout on key release only when SYM was tapped alone.
         if (keyCode == KEYCODE_SYM) {
             symPhysicallyPressed = false

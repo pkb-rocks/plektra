@@ -248,9 +248,12 @@ class Device:
                 self.call('install', str(apk), timeout=180)
                 self.restore(backup, values)
         else:
-            self.call('install', '-r', str(apk), timeout=180)
-            if any(name.endswith('_key') for name in speech_payload(values)):
-                self.speech(values)
+            # Replace the APK while another IME is selected. Replacing the selected
+            # service can leave Android holding a dead binding after the update.
+            with self.stopped():
+                self.call('install', '-r', str(apk), timeout=180)
+                if any(name.endswith('_key') for name in speech_payload(values)):
+                    self.speech(values)
             metadata = json.loads((backup / 'metadata.json').read_text())
             if metadata['ime'].startswith(self.package + '/'):
                 self.shell('ime', 'enable', metadata['ime'])

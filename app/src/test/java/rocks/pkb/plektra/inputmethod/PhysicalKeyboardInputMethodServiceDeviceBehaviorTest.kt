@@ -2008,4 +2008,133 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertTrue(modifier.capsLockEnabled)
     }
 
+    private fun useCalculatorInput() {
+        editorInfo.packageName = "com.google.android.calculator"
+        editorInfo.inputType = EditorInfo.TYPE_NULL
+        setField(service, "inputContextState", InputContextState.fromEditorInfo(editorInfo))
+        modifierController().clearAltState(resetPressedState = true)
+        modifierController().altTapLatches = false
+        setField(service, "isInputViewActive", false)
+        setField(service, "requestedInputViewShown", false)
+        getField<AlternateCharacterManager>(service, "alternateCharacterManager")
+            .addAltKeyMapping(KeyEvent.KEYCODE_W, "1")
+    }
+
+    @Test
+    fun calculatorAltLockSendsRepeatedDigitsAndConsumesOriginalKeyUps() {
+        useCalculatorInput()
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 10000L)
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 10100L)
+        assertTrue(modifierController().altLatchActive)
+        pressKey(KeyEvent.KEYCODE_W, 10200L)
+        pressKey(KeyEvent.KEYCODE_W, 10300L)
+        assertEquals(listOf(KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_1),
+            recorder.sentKeyEvents.map { it.keyCode })
+        assertEquals(listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP, KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP),
+            recorder.sentKeyEvents.map { it.action })
+        assertTrue(modifierController().altLatchActive)
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 10400L)
+        assertFalse(modifierController().altLatchActive)
+    }
+
+    @Test
+    fun calculatorHeldAltDigitsTakePriorityOverLauncherShortcuts() {
+        useCalculatorInput()
+        SettingsManager.setQuickLauncherAltShortcutsOutsideTextFields(service, true)
+        val meta = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+        service.onKeyDown(KeyEvent.KEYCODE_ALT_LEFT,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ALT_LEFT, 10000L, 10000L, meta))
+        pressKey(KeyEvent.KEYCODE_W, 10100L, meta)
+        service.onKeyUp(KeyEvent.KEYCODE_ALT_LEFT,
+            keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ALT_LEFT, 10000L, 10200L))
+        assertEquals(2, recorder.sentKeyEvents.size)
+        assertTrue(recorder.sentKeyEvents.all { it.keyCode == KeyEvent.KEYCODE_1 && it.metaState == 0 })
+        assertFalse(modifierController().altOneShot)
+        assertFalse(modifierController().altPressed)
+        assertEquals(null, shadowOf(service).nextStartedActivity)
+    }
+
+    @Test
+    fun otherTypeNullAppsKeepTheirExistingAltRouting() {
+        useCalculatorInput()
+        editorInfo.packageName = "com.example.other"
+        SettingsManager.setQuickLauncherAltShortcutsOutsideTextFields(service, false)
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 10000L)
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 10100L)
+        pressKey(KeyEvent.KEYCODE_W, 10200L)
+        assertTrue(recorder.sentKeyEvents.isEmpty())
+        assertFalse(modifierController().altLatchActive)
+    }
+
+    @Test
+    fun calculatorOperatorsUseTheSameMappingsWithHeldAndLockedAlt() {
+        val mappings = linkedMapOf(
+            KeyEvent.KEYCODE_A to ("*" to KeyEvent.KEYCODE_NUMPAD_MULTIPLY),
+            KeyEvent.KEYCODE_G to ("/" to KeyEvent.KEYCODE_NUMPAD_DIVIDE),
+            KeyEvent.KEYCODE_O to ("+" to KeyEvent.KEYCODE_NUMPAD_ADD),
+            KeyEvent.KEYCODE_I to ("-" to KeyEvent.KEYCODE_NUMPAD_SUBTRACT),
+            KeyEvent.KEYCODE_T to ("(" to KeyEvent.KEYCODE_NUMPAD_LEFT_PAREN),
+            KeyEvent.KEYCODE_Y to (")" to KeyEvent.KEYCODE_NUMPAD_RIGHT_PAREN),
+            KeyEvent.KEYCODE_M to ("." to KeyEvent.KEYCODE_PERIOD),
+            KeyEvent.KEYCODE_N to ("," to KeyEvent.KEYCODE_NUMPAD_COMMA)
+        )
+        for (locked in listOf(false, true)) {
+            useCalculatorInput()
+            SettingsManager.setQuickLauncherAltShortcutsOutsideTextFields(service, true)
+            val manager = getField<AlternateCharacterManager>(service, "alternateCharacterManager")
+            mappings.forEach { (key, mapping) -> manager.addAltKeyMapping(key, mapping.first) }
+            recorder.sentKeyEvents.clear()
+            val meta = if (locked) 0 else KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+            if (locked) {
+                pressKey(KeyEvent.KEYCODE_ALT_LEFT, 20000L)
+                pressKey(KeyEvent.KEYCODE_ALT_LEFT, 20100L)
+            } else {
+                service.onKeyDown(KeyEvent.KEYCODE_ALT_LEFT,
+                    keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ALT_LEFT, 20000L, 20000L, meta))
+            }
+            mappings.keys.forEachIndexed { i, key ->
+                val time = 20200L + i * 100
+                assertTrue(service.onKeyDown(key, keyEvent(KeyEvent.ACTION_DOWN, key, time, time, meta)))
+                // Firmware can report a different modifier state when the character key is released.
+                assertTrue(service.onKeyUp(key, keyEvent(KeyEvent.ACTION_UP, key, time, time + 30, 0)))
+            }
+            val expected = mappings.values.flatMap { listOf(it.second, it.second) }
+            assertEquals(expected, recorder.sentKeyEvents.map { it.keyCode })
+            assertTrue(recorder.sentKeyEvents.all { it.metaState == 0 })
+            assertEquals(0, recorder.commitAttempts)
+            assertFalse(getField<Boolean>(service, "isInputViewActive"))
+            assertFalse(getField<Boolean>(service, "requestedInputViewShown"))
+            assertEquals(null, shadowOf(service).nextStartedActivity)
+            if (!locked) {
+                service.onKeyUp(KeyEvent.KEYCODE_ALT_LEFT,
+                    keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ALT_LEFT, 20000L, 21500L))
+                assertFalse(modifierController().altOneShot)
+            }
+        }
+    }
+
+    @Test
+    fun calculatorOneShotRepeatsTheResolvedCharacterUntilKeyUp() {
+        useCalculatorInput()
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 30000L)
+        service.onKeyDown(KeyEvent.KEYCODE_W,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W, 30100L, 30100L))
+        assertFalse(modifierController().altOneShot)
+        val repeat = KeyEvent(30100L, 30200L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W, 1)
+        assertTrue(service.onKeyDown(KeyEvent.KEYCODE_W, repeat))
+        assertTrue(service.onKeyUp(KeyEvent.KEYCODE_W,
+            keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_W, 30100L, 30300L)))
+        assertEquals(List(4) { KeyEvent.KEYCODE_1 }, recorder.sentKeyEvents.map { it.keyCode })
+    }
+
+    @Test
+    fun calculatorUnmappedAltDoesNotOpenShortcutAssignment() {
+        useCalculatorInput()
+        SettingsManager.setQuickLauncherAltShortcutsOutsideTextFields(service, true)
+        getField<AlternateCharacterManager>(service, "alternateCharacterManager").removeAltKeyMapping(KeyEvent.KEYCODE_A)
+        pressKey(KeyEvent.KEYCODE_ALT_LEFT, 30000L)
+        pressKey(KeyEvent.KEYCODE_A, 30100L)
+        assertEquals(null, shadowOf(service).nextStartedActivity)
+    }
+
 }

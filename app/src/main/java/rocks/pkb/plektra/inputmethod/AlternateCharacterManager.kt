@@ -319,6 +319,9 @@ class AlternateCharacterManager(
         return true
     }
 
+    fun resolveAltText(keyCode: Int, mappingsOverride: Map<Int, String>? = null): String? =
+        (mappingsOverride ?: getAltModifierMappings())[keyCode]
+
     fun handleAltCombination(
         keyCode: Int,
         inputConnection: InputConnection,
@@ -326,7 +329,7 @@ class AlternateCharacterManager(
         mappingsOverride: Map<Int, String>? = null,
         defaultHandler: (Int, KeyEvent?) -> Boolean
     ): Boolean {
-        val altChar = (mappingsOverride ?: getAltModifierMappings())[keyCode]
+        val altChar = resolveAltText(keyCode, mappingsOverride)
         return if (altChar != null) {
             if (handleBoundaryTextBeforeCommit(altChar, inputConnection)) {
                 altChar.firstOrNull()?.let { onAltCharInserted?.invoke(it) }

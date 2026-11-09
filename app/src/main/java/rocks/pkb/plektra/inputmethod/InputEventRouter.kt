@@ -300,6 +300,26 @@ class InputEventRouter(
         val onShiftOneShotToggledOff: () -> Unit = {}
     )
 
+    fun handleAltModifierKeyDown(
+        keyCode: Int,
+        event: KeyEvent?,
+        modifiers: ModifierStateController,
+        symLayout: SymLayoutController,
+        updateStatusBar: () -> Unit,
+        startSpeechRecognition: () -> Unit
+    ) {
+        if (event?.isCtrlPressed == true && !modifiers.altPressed &&
+            SettingsManager.getAltCtrlSpeechShortcutEnabled(context)) {
+            startSpeechRecognition()
+            return
+        }
+        if (symLayout.isSymActive() && symLayout.closeSymPage()) updateStatusBar()
+        if (!modifiers.altPressed) {
+            val result = modifiers.handleAltKeyDown(keyCode, ModifierKeyHandler.eventTimeOrUptime(event))
+            if (result.shouldUpdateStatusBar) updateStatusBar()
+        }
+    }
+
     fun routeEditableFieldKeyDown(
         keyCode: Int,
         event: KeyEvent?,
@@ -366,29 +386,10 @@ class InputEventRouter(
         }
 
         if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
-            // Check if Ctrl is physically pressed (not latch) - if so, trigger speech recognition (if enabled)
-            // Only trigger if both keys are physically pressed simultaneously, not if one is in latch
-            if (event?.isCtrlPressed == true && 
-                !params.altPressed &&
-                SettingsManager.getAltCtrlSpeechShortcutEnabled(context)) {
-                callbacks.startSpeechRecognition()
-                return EditableFieldRoutingResult.Consume
-            }
-            
-            if (controllers.symLayoutController.isSymActive()) {
-                if (controllers.symLayoutController.closeSymPage()) {
-                    callbacks.updateStatusBar()
-                }
-            }
-            if (!params.altPressed) {
-                val result = controllers.modifierStateController.handleAltKeyDown(
-                    keyCode,
-                    now = ModifierKeyHandler.eventTimeOrUptime(event)
-                )
-                if (result.shouldUpdateStatusBar) {
-                    callbacks.updateStatusBar()
-                }
-            }
+            handleAltModifierKeyDown(
+                keyCode, event, controllers.modifierStateController, controllers.symLayoutController,
+                callbacks.updateStatusBar, callbacks.startSpeechRecognition
+            )
             return EditableFieldRoutingResult.Consume
         }
 
@@ -1285,9 +1286,16 @@ class InputEventRouter(
         alternateCharacterManager: AlternateCharacterManager,
         altMappingsOverride: Map<Int, String>? = null,
         updateStatusBar: () -> Unit,
+        textOutput: ((String) -> Boolean)? = null,
         callSuperWithKey: (Int, KeyEvent?) -> Boolean
     ): Boolean {
         val ic = inputConnection ?: return false
+
+        if (textOutput != null) {
+            val text = if (keyCode == KeyEvent.KEYCODE_SPACE) " " else
+                alternateCharacterManager.resolveAltText(keyCode, altMappingsOverride) ?: return false
+            return textOutput(text).also { if (it) updateStatusBar() }
+        }
 
         // Consume Alt+Space to avoid Android's symbol picker and just insert a space.
         if (keyCode == KeyEvent.KEYCODE_SPACE) {
@@ -1296,7 +1304,7 @@ class InputEventRouter(
             return true
         }
 
-        val altBindingValue = (altMappingsOverride ?: alternateCharacterManager.getAltModifierMappings())[keyCode]
+        val altBindingValue = alternateCharacterManager.resolveAltText(keyCode, altMappingsOverride)
         val mappedDpad = deviceLayerDpadKeyCode(altBindingValue)
         if (mappedDpad != null) {
             sendModifiedKeyEvent(ic, mappedDpad, ctrl = false, shift = false)

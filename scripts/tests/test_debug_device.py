@@ -54,6 +54,45 @@ class DebugDeviceTest(unittest.TestCase):
                     self.fail('Must not enter stopped scope')
         self.assertNotIn(('am', 'force-stop', device.package), calls)
 
+    def test_update_replaces_apk_and_imports_keys_before_reselecting_ime(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        original = device.package + '/KeyboardService'
+        fallback = 'other.keyboard/Service'
+        selected = [original]
+        calls = []
+
+        def shell(*args, **kwargs):
+            calls.append(args)
+            if args[:2] == ('ime', 'list'):
+                return original + '\n' + fallback
+            if args[:2] == ('ime', 'set'):
+                selected[0] = args[2]
+            if args[:2] == ('am', 'force-stop'):
+                self.assertEqual(fallback, selected[0])
+            return ''
+
+        def install(*args, **kwargs):
+            self.assertEqual(('install', '-r', 'test.apk'), args)
+            self.assertEqual(fallback, selected[0])
+
+        def speech(values):
+            self.assertEqual(fallback, selected[0])
+
+        with tempfile.TemporaryDirectory() as folder:
+            backup = Path(folder)
+            (backup / 'metadata.json').write_text(json.dumps({'ime': original}))
+            with patch.object(debug.subprocess, 'check_output', side_effect=[device.package, 'true']), \
+                 patch.object(device, 'backup'), patch.object(device, 'validate_backup'), \
+                 patch.object(device, 'current_ime', side_effect=lambda: selected[0]), \
+                 patch.object(device, 'shell', side_effect=shell), \
+                 patch.object(device, 'call', side_effect=install) as apk_install, \
+                 patch.object(device, 'speech', side_effect=speech) as key_import:
+                device.install(Path('test.apk'), backup, {'OPENAI_API_KEY': 'synthetic'})
+                apk_install.assert_called_once()
+                key_import.assert_called_once()
+        self.assertEqual(original, selected[0])
+        self.assertIn(('am', 'force-stop', device.package), calls)
+
     def test_reinstall_missing_key_never_uninstalls_the_app(self):
         device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
         with tempfile.TemporaryDirectory() as folder:

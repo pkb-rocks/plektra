@@ -356,6 +356,22 @@ class StatusBarController(
     private var emojiPickerView: EmojiPickerView? = null
     private var emojiPickerSearchPopup: PopupWindow? = null
     private var emojiPickerSearchPopupShowPending: Boolean = false
+    private var emojiPickerSearchGeometryPending: Boolean = false
+    private val emojiPickerSearchLayoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        scheduleEmojiPickerSearchGeometry()
+    }
+
+    /** Top of the visible screen area below status bar and cutout, in screen coordinates. */
+    internal var screenSafeTopPx: () -> Int = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics = context.getSystemService(android.view.WindowManager::class.java).currentWindowMetrics
+            metrics.bounds.top + metrics.windowInsets.getInsetsIgnoringVisibility(
+                android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.displayCutout()
+            ).top
+        } else {
+            0
+        }
+    }
     private var softwareKeyboardView: AospKeyboardView? = null
 
     // removeAllViews() on the keyboard container dispatches a touch CANCEL to the
@@ -624,6 +640,7 @@ class StatusBarController(
 
     fun dismissEmojiPickerPopup() {
         emojiPickerSearchPopupShowPending = false
+        emojiKeyboardContainer?.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         emojiPickerSearchPopup?.let { popup ->
             if (popup.isShowing) popup.dismiss()
             popup.contentView = null
@@ -1289,6 +1306,11 @@ class StatusBarController(
                 heightPx = null,
                 onKeyboardLayoutRequested = null
             )
+            // The popup window sizes the picker; a fixed height would push its controls out.
+            view.layoutParams?.takeIf { it.height != ViewGroup.LayoutParams.MATCH_PARENT }?.let { params ->
+                params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                view.layoutParams = params
+            }
         }
         val colors = activeThemeColors()
         view.configureControls(if (pickerShownAboveSoftwareKeyboard) dpToPx(32f) else hardwareSymKeyHeightPx(colors))
@@ -1317,7 +1339,8 @@ class StatusBarController(
     ): Boolean {
         val layout = statusBarLayout ?: return false
         val keyboardView = ensureSoftwareKeyboardViewInstance(container)
-        val keyboardHeight = softwareKeyboardHeight.takeIf { it > 0 }
+        // Without a known keyboard height the picker stays inline.
+        softwareKeyboardHeight.takeIf { it > 0 }
             ?: measureSoftwareKeyboardDesiredHeight(keyboardView, layout).takeIf { it > 0 }
             ?: return false
         configureSoftwareKeyboard(keyboardView, snapshot, inputConnection, null)
@@ -1334,11 +1357,14 @@ class StatusBarController(
                     }
                     container.removeAllViews()
                     emojiKeyButtons.clear()
+                    // Fill the container's actual height like the plain keyboard page; the desired
+                    // height can exceed it when the window is shorter (outer display, landscape).
                     container.addView(
                         keyboardView,
                         LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
-                            keyboardHeight
+                            0,
+                            1f
                         )
                     )
                 }
@@ -1359,22 +1385,78 @@ class StatusBarController(
         if (popup.contentView !== picker) {
             popup.contentView = picker
         }
-        popup.width = context.resources.displayMetrics.widthPixels
-        popup.height = EmojiPickerView.configuredHeightPx(context)
+        container.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
+        container.addOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         if (!popup.isShowing && !emojiPickerSearchPopupShowPending) {
             emojiPickerSearchPopupShowPending = true
             layout.post {
                 emojiPickerSearchPopupShowPending = false
                 if (picker.isSearchPanelShowing() && !popup.isShowing && layout.isAttachedToWindow) {
-                    popup.showAtLocation(layout, Gravity.BOTTOM, 0, keyboardHeight)
+                    val geometry = applyEmojiPickerSearchGeometry(picker) ?: return@post
+                    popup.width = geometry.width
+                    popup.height = geometry.height
+                    popup.showAtLocation(layout, Gravity.BOTTOM or Gravity.START, 0, geometry.bottomOffset)
                 }
             }
+        } else {
+            scheduleEmojiPickerSearchGeometry()
         }
         return true
     }
 
+    private class EmojiSearchPopupGeometry(val width: Int, val height: Int, val bottomOffset: Int)
+
+    private fun scheduleEmojiPickerSearchGeometry() {
+        val layout = statusBarLayout ?: return
+        if (emojiPickerSearchGeometryPending) return
+        emojiPickerSearchGeometryPending = true
+        // Runs after the pass that triggered it; geometry is read from laid-out views.
+        layout.post {
+            emojiPickerSearchGeometryPending = false
+            val popup = emojiPickerSearchPopup ?: return@post
+            val picker = popup.contentView as? EmojiPickerView ?: return@post
+            if (!popup.isShowing || !picker.isSearchPanelShowing()) return@post
+            val geometry = applyEmojiPickerSearchGeometry(picker) ?: return@post
+            popup.update(0, geometry.bottomOffset, geometry.width, geometry.height)
+        }
+    }
+
+    /**
+     * Places the search popup between the visible screen top and the keyboard, measured from the
+     * IME window as laid out. Lends keyboard rows to the popup when the space above is too small.
+     */
+    private fun applyEmojiPickerSearchGeometry(picker: EmojiPickerView): EmojiSearchPopupGeometry? {
+        val container = emojiKeyboardContainer ?: return null
+        val keyboardView = softwareKeyboardView?.takeIf { it.parent === container } ?: return null
+        if (container.height <= 0) return null
+        val root = container.rootView
+        val rootOnScreen = IntArray(2).also(root::getLocationOnScreen)
+        val containerInWindow = IntArray(2).also(container::getLocationInWindow)
+        val containerTop = containerInWindow[1] + container.paddingTop
+        val keyboardSpace = container.height - container.paddingTop - container.paddingBottom
+        val safeTop = screenSafeTopPx() - rootOnScreen[1]
+        val split = EmojiSearchPopupSplit.resolve(
+            spaceAbove = containerTop - safeTop,
+            keyboardHeight = keyboardSpace,
+            preferredPopupHeight = EmojiPickerView.configuredHeightPx(context),
+            minimumPopupHeight = picker.minimumSearchHeightPx()
+        )
+        (keyboardView.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+            if (params.topMargin != split.keyboardTopInset) {
+                params.topMargin = split.keyboardTopInset
+                keyboardView.layoutParams = params
+            }
+        }
+        return EmojiSearchPopupGeometry(
+            width = root.width,
+            height = split.popupHeight,
+            bottomOffset = root.height - (containerTop + split.keyboardTopInset)
+        )
+    }
+
     private fun dismissEmojiPickerSearchPopup(picker: EmojiPickerView) {
         emojiPickerSearchPopupShowPending = false
+        emojiKeyboardContainer?.removeOnLayoutChangeListener(emojiPickerSearchLayoutListener)
         val popup = emojiPickerSearchPopup ?: return
         if (popup.isShowing) {
             picker.reorderingWithinContainer {
@@ -1624,11 +1706,14 @@ class StatusBarController(
             if (
                 params.width != ViewGroup.LayoutParams.MATCH_PARENT ||
                 params.height != 0 ||
-                params.weight != 1f
+                params.weight != 1f ||
+                params.topMargin != 0
             ) {
                 params.width = ViewGroup.LayoutParams.MATCH_PARENT
                 params.height = 0
                 params.weight = 1f
+                // Rows lent to the emoji search popup return to the keyboard.
+                params.topMargin = 0
                 keyboardView.layoutParams = params
             }
         }

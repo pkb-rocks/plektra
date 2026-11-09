@@ -482,6 +482,11 @@ class EmojiPickerView(
         return isSearchPanelVisible
     }
 
+    /** The smallest height that keeps the controls, the search field and one full result row usable. */
+    fun minimumSearchHeightPx(): Int {
+        return controlsHeight + smallPadding * 2 + dpToPx(SEARCH_PANEL_RESERVE_DP) + emojiSize
+    }
+
     /**
      * Routes on-screen keyboard text input into the emoji search field while the
      * search input capture is active (analogous to the hardware key path).
@@ -943,7 +948,7 @@ class EmojiPickerView(
         isSearchPanelVisible = visible
         searchPanel.visibility = if (visible) View.VISIBLE else View.GONE
         recyclerView.setPadding(smallPadding, smallPadding, smallPadding,
-            smallPadding + if (visible) dpToPx(44f) else 0)
+            smallPadding + if (visible) dpToPx(SEARCH_PANEL_RESERVE_DP) else 0)
         searchToggleButton.background = createSearchToggleBackground(visible)
         applyEdgeControlAppearance()
         setSearchInputCaptureEnabled(visible)
@@ -1725,6 +1730,8 @@ class EmojiPickerView(
 
     companion object {
         private const val COMPACT_HEIGHT_DP = 177f
+        /** Space the search field overlays at the bottom of the result grid. */
+        private const val SEARCH_PANEL_RESERVE_DP = 44f
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_EMOJI = 1
         private const val VARIANTS_PER_ROW = 6

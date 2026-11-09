@@ -566,6 +566,49 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertTrue(modifierController().capsLockEnabled)
     }
 
+    @Test
+    fun midWordQuoteToApostrophe_keepsTheLayoutOutputOfTheNextKey() {
+        val shift = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+        assertEquals("ب'د", typeAfterMidWordQuote("uyghur", "ب", KeyEvent.KEYCODE_D))
+        assertEquals("ب'لا", typeAfterMidWordQuote("uyghur", "ب", KeyEvent.KEYCODE_L, shift))
+        assertEquals("ب'ئ", typeAfterMidWordQuote("uyghur", "ب", KeyEvent.KEYCODE_SLASH))
+        assertEquals("а'в", typeAfterMidWordQuote("russian_standard", "а", KeyEvent.KEYCODE_D))
+        assertEquals("α'δ", typeAfterMidWordQuote("greek", "α", KeyEvent.KEYCODE_D))
+        assertEquals("a'd", typeAfterMidWordQuote("qwerty", "a", KeyEvent.KEYCODE_D))
+        assertEquals("a'D", typeAfterMidWordQuote("qwerty", "a", KeyEvent.KEYCODE_D, shift))
+    }
+
+    @Test
+    fun greekPunctuationOnLetterKey_isCommittedOnceAsPunctuation() {
+        useLayout("greek")
+        recorder.textBeforeCursor = "αβ"
+        val time = 10_000L
+        service.onKeyDown(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q, time, time))
+        service.onKeyUp(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_Q, time, time + 30L))
+        assertEquals("αβ;", recorder.textBeforeCursor)
+    }
+
+    private fun useLayout(layout: String) {
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, layout)
+        SettingsManager.setAutoCorrectEnabled(service, false)
+        SettingsManager.setMidWordQuoteToApostrophe(service, true)
+        LayoutMappingRepository.loadLayout(service.assets, layout, service)
+        service.onStartInput(editorInfo, false)
+        // The tests type mid-sentence; drop the auto-cap one-shot of the empty field.
+        modifierController().consumeShiftOneShot()
+        recorder.committedTexts.clear()
+    }
+
+    private fun typeAfterMidWordQuote(layout: String, letter: String, keyCode: Int, meta: Int = 0): String {
+        useLayout(layout)
+        recorder.textBeforeCursor = "$letter\""
+        val time = 10_000L
+        service.onKeyDown(keyCode, keyEvent(KeyEvent.ACTION_DOWN, keyCode, time, time, meta))
+        service.onKeyUp(keyCode, keyEvent(KeyEvent.ACTION_UP, keyCode, time, time + 30L, meta))
+        return recorder.textBeforeCursor
+    }
+
     private fun switchSubtype(prefValue: String) {
         val subtype = rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.createAdditionalSubtypesArray(
             prefValue, service.assets, service

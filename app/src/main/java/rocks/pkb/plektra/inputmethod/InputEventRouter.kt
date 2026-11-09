@@ -870,11 +870,16 @@ class InputEventRouter(
         inputContextState: rocks.pkb.plektra.core.InputContextState?,
         enableShiftOneShot: (() -> Boolean)?,
         editorInfo: EditorInfo? = null,
+        typedText: String? = null,
         updateStatusBar: () -> Unit
     ): Boolean {
         val isEnterKey = keyCode == KeyEvent.KEYCODE_ENTER
         val isSpaceKey = keyCode == KeyEvent.KEYCODE_SPACE
-        val typedCharRaw = event?.unicodeChar?.takeIf { it != 0 }?.toChar()
+        // [typedText] is the layout's output for the key with modifiers applied; the
+        // system keymap only knows the Latin legend (Uyghur D → د, not d).
+        val keyText = typedText
+            ?: event?.unicodeChar?.takeIf { it != 0 }?.toChar()?.toString().orEmpty()
+        val typedCharRaw = keyText.singleOrNull()
         val typedChar = when (typedCharRaw) {
             '’', '‘', 'ʼ' -> '\''
             else -> typedCharRaw
@@ -958,8 +963,7 @@ class InputEventRouter(
             return true
         }
 
-        val smartReplacementTextForPipeline =
-            if (isSpaceKey) " " else event?.unicodeChar?.takeIf { it != 0 }?.toChar()?.toString().orEmpty()
+        val smartReplacementTextForPipeline = if (isSpaceKey) " " else keyText
         if (
             textInputController.handlePendingMidWordQuoteToApostrophe(
                 typedText = smartReplacementTextForPipeline,
@@ -1099,6 +1103,7 @@ class InputEventRouter(
                 isAutoCorrectEnabled,
                 commitBoundary = true,
                 onStatusBarUpdate = updateStatusBar,
+                boundaryCharOverride = typedChar.takeIf { isPunctuation },
                 isKnownWord = { word -> suggestionController?.isKnownWordInActiveDictionaries(word) == true }
             )
         ) {
@@ -1117,13 +1122,19 @@ class InputEventRouter(
 
         // Handle suggestions on boundary keys/punctuation (if suggestions enabled)
         if (!shouldDisableSuggestions && inputConnection != null && (isBoundaryKey || isPunctuation) && suggestionController != null) {
-            return suggestionController?.onBoundaryKey(keyCode, event, inputConnection)?.committed == true
+            return suggestionController?.onBoundaryKey(
+                keyCode,
+                event,
+                inputConnection,
+                boundaryCharOverride = typedChar.takeIf { isPunctuation }
+            )?.committed == true
         }
 
         autoCorrectionManager.handleAcceptOrResetOnOtherKeys(
             keyCode,
             event,
-            isAutoCorrectEnabled
+            isAutoCorrectEnabled,
+            typedText = keyText
         )
         return false
     }

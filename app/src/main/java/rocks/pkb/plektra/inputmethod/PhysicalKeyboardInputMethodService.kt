@@ -5400,14 +5400,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
-        // The pipeline classifies punctuation by the system keymap. A remapped
-        // punctuation key (e.g. Uyghur / → ئ) must use the layout-aware path
-        // below. Remapped letter keys still run the pipeline, which accepts or
-        // resets pending autocorrections.
-        val systemChar = event?.unicodeChar?.takeIf { it != 0 }?.toChar()
-        val hasRemappedPunctuation = layoutTextForKey != null && systemChar != null &&
-            !systemChar.isLetterOrDigit() && layoutTextForKey != systemChar.toString()
-        if (!altActiveNow && !hasRemappedPunctuation) {
+        if (!altActiveNow) {
             if (
                 inputEventRouter.handleTextInputPipeline(
                     context = this,
@@ -5423,7 +5416,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     autoCorrectionManager = autoCorrectionManager,
                     inputContextState = state,
                     enableShiftOneShot = { requestAutoCapShiftOneShot() },
-                    editorInfo = info
+                    editorInfo = info,
+                    typedText = layoutTextForKey
                 ) { updateStatusBarText() }
             ) {
                 return true

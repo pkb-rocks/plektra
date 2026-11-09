@@ -219,18 +219,18 @@ class AutoCorrectionManager(
     fun handleAcceptOrResetOnOtherKeys(
         keyCode: Int,
         event: KeyEvent?,
-        isAutoCorrectEnabled: Boolean
+        isAutoCorrectEnabled: Boolean,
+        typedText: String? = null
     ) {
         if (!isAutoCorrectEnabled || keyCode == KeyEvent.KEYCODE_DEL) {
             return
         }
 
         AutoCorrector.acceptLastCorrection()
-        if (event != null && event.unicodeChar != 0) {
-            val char = event.unicodeChar.toChar()
-            if (char.isLetterOrDigit()) {
-                AutoCorrector.clearRejectedWords()
-            }
+        val char = typedText?.firstOrNull()
+            ?: event?.unicodeChar?.takeIf { it != 0 }?.toChar()
+        if (char?.isLetterOrDigit() == true) {
+            AutoCorrector.clearRejectedWords()
         }
     }
 }

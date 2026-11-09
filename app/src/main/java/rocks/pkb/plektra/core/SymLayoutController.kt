@@ -13,7 +13,12 @@ import rocks.pkb.plektra.inputmethod.AlternateCharacterManager
 class SymLayoutController(
     private val context: Context,
     private val prefs: SharedPreferences,
-    private val alternateCharacterManager: AlternateCharacterManager
+    private val alternateCharacterManager: AlternateCharacterManager,
+    /**
+     * False while the keyboard bar is blocked. Clipboard and emoji picker exist only as bar UI
+     * and would capture keys invisibly; the key-remapping pages keep working as hardware layers.
+     */
+    private val canOpenPickerPages: () -> Boolean = { true }
 ) {
 
     companion object {
@@ -41,6 +46,7 @@ class SymLayoutController(
     }
 
     fun currentSymPage(): Int {
+        if (isPickerPage(symPage) && !canOpenPickerPages()) closeSymPage()
         alignSymPageToConfig()
         return symPage
     }
@@ -50,7 +56,7 @@ class SymLayoutController(
     /** [onScreen]: the on-screen SYM key, whose cycle may leave out the emoji layer; else the physical SYM key. */
     fun toggleSymPage(onScreen: Boolean = false): Int {
         alignSymPageToConfig()
-        val pages = buildActivePages(cycleConfig(onScreen))
+        val pages = openablePages(cycleConfig(onScreen))
         symPage = nextSymPageValue(pages)
         persistSymPage()
         return symPage
@@ -58,11 +64,14 @@ class SymLayoutController(
 
     fun peekNextSymPage(onScreen: Boolean = false): Int {
         alignSymPageToConfig()
-        return nextSymPageValue(buildActivePages(cycleConfig(onScreen)))
+        return nextSymPageValue(openablePages(cycleConfig(onScreen)))
     }
 
     private fun cycleConfig(onScreen: Boolean): SymPagesConfig =
         if (onScreen) SettingsManager.getOnScreenSymPageCycleConfig(context) else SettingsManager.getSymPagesConfig(context)
+
+    private fun openablePages(config: SymPagesConfig): List<SymPage> =
+        buildActivePages(config).filter { canOpenPickerPages() || !isPickerPage(it.toPrefValue()) }
 
     fun closeSymPage(): Boolean {
         if (symPage == 0) {
@@ -74,6 +83,7 @@ class SymLayoutController(
     }
     
     fun openClipboardPage(): Boolean {
+        if (!canOpenPickerPages()) return false
         val clipboardPageValue = SymPage.CLIPBOARD.toPrefValue()
         
         // Toggle behavior: open if closed, close if already open
@@ -88,6 +98,7 @@ class SymLayoutController(
     }
 
     fun openEmojiPickerPage(): Boolean {
+        if (!canOpenPickerPages()) return false
         val emojiPickerPageValue = SymPage.EMOJI_PICKER.toPrefValue()
         
         // Toggle behavior: open if closed, close if already open
@@ -130,6 +141,7 @@ class SymLayoutController(
     /** Opens a page directly, e.g. from the on-screen page chooser; unlike the toggles it never closes. */
     fun openPage(page: Int): Boolean {
         if (page !in 1..5 || symPage == page) return false
+        if (isPickerPage(page) && !canOpenPickerPages()) return false
         symPage = page
         persistSymPage()
         return true
@@ -362,6 +374,9 @@ class SymLayoutController(
             else -> null
         }
     }
+
+    private fun isPickerPage(page: Int): Boolean =
+        page == SymPage.CLIPBOARD.toPrefValue() || page == SymPage.EMOJI_PICKER.toPrefValue()
 
     private fun SymPage.toPrefValue(): Int = when (this) {
         SymPage.DEVICE -> 5

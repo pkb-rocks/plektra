@@ -97,6 +97,7 @@
     "editing": [
       "rocks.pkb.plektra.AppEnterBehaviorDefaultsTest",
       "rocks.pkb.plektra.AppEnterBehaviorPresetTest",
+      "rocks.pkb.plektra.SettingsManagerKeyboardBarHiddenAppsTest",
       "rocks.pkb.plektra.SettingsManagerRawModeTest",
       "rocks.pkb.plektra.SettingsManagerTextExpansionTest",
       "rocks.pkb.plektra.core.DeferredPunctuationSpaceTrackerTest",
@@ -152,6 +153,7 @@
     ],
     "keys-modifiers": [
       "rocks.pkb.plektra.core.ModifierStateControllerTest",
+      "rocks.pkb.plektra.core.SymLayoutControllerPickerGateTest",
       "rocks.pkb.plektra.core.SymPageCycleTest",
       "rocks.pkb.plektra.core.SymShiftPortTest",
       "rocks.pkb.plektra.inputmethod.AccidentalKeyPressFilterTest",

@@ -901,4 +901,12 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="caret_badge_custom_colors_description">Thay thế màu của giao diện bàn phím.</string>
     <string name="alt_latch_stays_on_space_title">Giữ Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Space và Enter tắt Alt một lần nhưng vẫn giữ Alt-Lock hoạt động.</string>
+    <string name="keyboard_bar_hidden_apps_title">Không bao giờ hiện thanh</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Ứng dụng mà thanh luôn ẩn, kể cả khi mở thủ công</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Chưa chọn ứng dụng nào</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="other">%d ứng dụng</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Trong các ứng dụng bạn chọn ở đây, Plektra không bao giờ hiện thanh của nó hay bàn phím ảo: bất kể các cài đặt hiển thị khác, và kể cả khi bạn thử mở bằng phím, phím tắt hoặc nút bàn phím của hệ thống. Gõ bằng bàn phím vật lý vẫn hoạt động, bao gồm các lớp SYM, phím tắt, phím bổ trợ và mã emoji hoặc đoạn mẫu chính xác. Bảng nhớ tạm và bộ chọn emoji luôn đóng trong các ứng dụng này.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Ứng dụng web — chạy bên trong %1$s, nên thanh cũng bị ẩn ở đó</string>
 </resources>

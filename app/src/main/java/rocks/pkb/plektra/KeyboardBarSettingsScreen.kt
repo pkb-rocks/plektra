@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.selectable
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,6 +67,7 @@ internal fun KeyboardBarSettingsScreen(
     var suggestionsEnabled by remember { mutableStateOf(SettingsManager.getSuggestionsEnabled(context)) }
     var suggestionsBold by remember { mutableStateOf(SettingsManager.getSuggestionsBold(context)) }
     var showOnLauncher by remember { mutableStateOf(SettingsManager.getShowKeyboardBarOnLauncher(context)) }
+    var hiddenAppCount by remember { mutableStateOf(SettingsManager.getKeyboardBarHiddenPackages(context).size) }
     var indicators by remember { mutableStateOf(SettingsManager.getModifierIndicators(context)) }
     var variationsVisible by remember {
         mutableStateOf(SettingsManager.areStatusBarVariationsEnabled(context))
@@ -104,6 +107,7 @@ internal fun KeyboardBarSettingsScreen(
             leftSlots = SettingsManager.getStatusBarSlotsLeft(context)
             rightSlots = SettingsManager.getStatusBarSlotsRight(context)
             showOnLauncher = SettingsManager.getShowKeyboardBarOnLauncher(context)
+            hiddenAppCount = SettingsManager.getKeyboardBarHiddenPackages(context).size
             dynamicVariationSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
             dynamicVariationsResizeToContent = SettingsManager.getDynamicVariationBarResizeToContent(context)
         }
@@ -246,6 +250,12 @@ internal fun KeyboardBarSettingsScreen(
             KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_show_on_launcher), showOnLauncher,
                 "status_bar.show_on_launcher", stringResource(R.string.keyboard_bar_show_on_launcher_description)) {
                 showOnLauncher = it; SettingsManager.setShowKeyboardBarOnLauncher(context, it)
+            }
+            KeyboardBarNavigationRow(Icons.Filled.VisibilityOff, stringResource(R.string.keyboard_bar_hidden_apps_title),
+                if (hiddenAppCount == 0) stringResource(R.string.keyboard_bar_hidden_apps_summary_none)
+                else pluralStringResource(R.plurals.keyboard_bar_hidden_apps_summary, hiddenAppCount, hiddenAppCount),
+                "status_bar.hidden_apps") {
+                openSettingsChild(context, "customization", "KeyboardBarHiddenApps")
             }
         }
         if (page == KeyboardBarSettingsPage.Buttons) {

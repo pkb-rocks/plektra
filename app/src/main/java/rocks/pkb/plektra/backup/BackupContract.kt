@@ -261,6 +261,7 @@ internal object BackupPreferenceContract {
             "hardware_keypad_auto_open" to PreferenceValueType.BOOLEAN,
             "software_keyboard_emoji_page_in_cycle" to PreferenceValueType.BOOLEAN,
             "keyboard_bar_show_on_launcher" to PreferenceValueType.BOOLEAN,
+            "keyboard_bar_hidden_apps" to PreferenceValueType.STRING_SET,
             "accessibility_live_announcements_enabled" to PreferenceValueType.BOOLEAN,
             "accessibility_read_second_row_enabled" to PreferenceValueType.BOOLEAN,
             "accessibility_suggestions_announcement_delay_ms" to PreferenceValueType.LONG,

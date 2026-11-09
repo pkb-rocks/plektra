@@ -67,6 +67,7 @@ import rocks.pkb.plektra.inputmethod.trackpad.TrackpadEventDeviceResolver
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadGestureDetector
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadAxisRange
 import rocks.pkb.plektra.inputmethod.trackpad.TrackpadCoordinateMapper
+import rocks.pkb.plektra.inputmethod.expansion.ExpansionPresentation
 import rocks.pkb.plektra.inputmethod.expansion.ExpansionRuntimeConfig
 import rocks.pkb.plektra.inputmethod.expansion.ExpansionTriggerKind
 import rocks.pkb.plektra.inputmethod.expansion.SnippetExpansionSource
@@ -267,6 +268,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     
     // Current package name
     private var currentPackageName: String? = null
+    /** Per-app "never show the bar"; vetoes every IME surface while hardware input keeps working. */
+    private var keyboardBarHiddenInEditor = false
     
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
@@ -418,6 +421,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Exact Typing: the raw-mode choice also covers WebAPKs (matched via their host browser).
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
         inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
+        keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, info?.packageName)
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -1957,7 +1961,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         activationPolicy = SettingsManager.getEmojiSymbolsActivationPolicy(this),
                         exactOnClose = SettingsManager.getEmojiSymbolsExactOnClose(this)
                     )
-                )
+                ).map { config ->
+                    // A hidden bar must not keep invisible candidates that Space/Tab/Enter accept.
+                    if (keyboardBarHiddenInEditor) config.copy(presentation = ExpansionPresentation.OFF) else config
+                }
             },
             showSuggestionBar = { labels, onSelected ->
                 candidatesBarController.showExpansionSuggestions(labels, onSelected)
@@ -2267,7 +2274,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
         }
-        symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager)
+        symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager) {
+            !keyboardBarHiddenInEditor
+        }
         keyboardVisibilityController = KeyboardVisibilityController(
             context = this,
             candidatesBarController = candidatesBarController,
@@ -2278,6 +2287,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 SettingsManager.getShowKeyboardBarOnLauncher(this) ||
                     !LauncherEditorPolicy.isNiagaraHomeEditor(currentInputEditorInfo)
             },
+            isSurfaceBlocked = { keyboardBarHiddenInEditor },
             isNavModeLatched = { ctrlLatchFromNavMode },
             currentInputConnection = { currentInputConnection },
             isInputViewShown = { isInputViewShown },
@@ -2535,6 +2545,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             } else if (SettingsManager.isKeyboardThemePreferenceKey(key)) {
                 Handler(Looper.getMainLooper()).post {
                     updateStatusBarText()
+                }
+            } else if (key == SettingsManager.KEY_KEYBOARD_BAR_HIDDEN_APPS) {
+                Handler(Looper.getMainLooper()).post {
+                    keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(
+                        this, currentInputEditorInfo?.packageName
+                    )
+                    // Closes an open clipboard or emoji picker page and drops invisible candidates.
+                    symLayoutController.currentSymPage()
+                    if (keyboardBarHiddenInEditor && ::textExpansionController.isInitialized) {
+                        textExpansionController.clear()
+                    }
+                    invalidateRenderedStatusSnapshot()
+                    updateStatusBarText()
+                    keyboardVisibilityController.onKeyboardBarConfigurationChanged()
                 }
             } else if (SettingsManager.isModifierIndicatorPreferenceKey(key) ||
                 key == "suggestions_enabled" || key == "suggestions_bold" || key == "status_bar_variations_visible" ||

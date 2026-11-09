@@ -1151,6 +1151,76 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         }
     }
 
+    @Test
+    fun hiddenBarApp_refusesShowRequestsButHardwareTypingAndSymLayerStillWork() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        SettingsManager.setKeyboardBarHiddenInApp(context, "rocks.pkb.plektra.test", true)
+        focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT)
+
+        assertFalse(visibilityController().allowsSurface())
+        assertFalse(service.onEvaluateInputViewShown())
+        assertFalse(service.onShowInputRequested(0, false))
+        assertTrue(visibilityController().shouldRecoverSurfaceOnHardwareKey())
+
+        val t0 = 9_000L
+        service.onKeyDown(KeyEvent.KEYCODE_B, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_B, t0, t0))
+        service.onKeyUp(KeyEvent.KEYCODE_B, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_B, t0, t0 + 20L))
+        tapSym(t0 + 100L)
+        service.onKeyDown(KeyEvent.KEYCODE_A, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A, t0 + 140L, t0 + 140L))
+        assertEquals("commits=${recorder.committedTexts}", listOf("b", "@"), recorder.committedTexts)
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+        assertFalse(visibilityController().allowsSurface())
+    }
+
+    @Test
+    fun hiddenBarApp_dedicatedEmojiKeyAndPickerRequestsDoNotOpenInvisiblePickers() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        SettingsManager.setKeyboardBarHiddenInApp(context, "rocks.pkb.plektra.test", true)
+        focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT)
+        setField(service, "physicalKeyboardProfileOverride", "mp01")
+
+        assertTrue(service.onKeyDown(666, keyEvent(KeyEvent.ACTION_DOWN, 666, 9_500L, 9_500L)))
+        assertEquals(0, symLayout().currentSymPage())
+        assertFalse(symLayout().openClipboardPage())
+        assertEquals(0, symLayout().currentSymPage())
+        recorder.committedTexts.clear()
+        service.onKeyDown(KeyEvent.KEYCODE_C, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_C, 9_600L, 9_600L))
+        assertEquals(listOf("c"), recorder.committedTexts)
+    }
+
+    @Test
+    fun hiddenBarApp_appSwitchAndSettingsChangeReevaluateTheBlock() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setKeyboardBarHiddenInApp(context, "com.example.blocked", true)
+
+        focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = "com.example.blocked")
+        assertFalse(visibilityController().allowsSurface())
+        focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = "com.example.allowed")
+        assertTrue(visibilityController().allowsSurface())
+        assertTrue(symLayout().openEmojiPickerPage())
+
+        // Adding the current app while a picker is open closes the picker and blocks the bar.
+        SettingsManager.setKeyboardBarHiddenInApp(context, "com.example.allowed", true)
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+        assertFalse(visibilityController().allowsSurface())
+        assertEquals(0, symLayout().currentSymPage())
+        assertFalse(service.onShowInputRequested(0, false))
+
+        SettingsManager.setKeyboardBarHiddenInApp(context, "com.example.allowed", false)
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+        assertTrue(visibilityController().allowsSurface())
+        focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = "com.example.blocked")
+        assertFalse(visibilityController().allowsSurface())
+    }
+
+    private fun visibilityController(): KeyboardVisibilityController =
+        getField(service, "keyboardVisibilityController")
+
+    private fun symLayout(): rocks.pkb.plektra.core.SymLayoutController =
+        getField(service, "symLayoutController")
+
     private fun focusNewField(
         newRecorder: RecordingInputConnection,
         inputType: Int = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,

@@ -901,4 +901,15 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="caret_badge_custom_colors_description">Zastąp kolory motywu klawiatury.</string>
     <string name="alt_latch_stays_on_space_title">Zachowaj Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Spacja i Enter wyłączają jednorazowy Alt, ale pozostawiają Alt-Lock aktywny.</string>
+    <string name="keyboard_bar_hidden_apps_title">Nigdy nie pokazuj paska</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Aplikacje, w których pasek pozostaje ukryty, nawet przy ręcznym otwarciu</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Nie wybrano aplikacji</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d aplikacja</item>
+        <item quantity="few">%d aplikacje</item>
+        <item quantity="many">%d aplikacji</item>
+        <item quantity="other">%d aplikacji</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">W wybranych tutaj aplikacjach Plektra nigdy nie pokazuje paska ani klawiatury ekranowej: niezależnie od innych ustawień widoczności, a także wtedy, gdy próbujesz otworzyć go klawiszem, skrótem lub systemowym przyciskiem klawiatury. Pisanie na klawiaturze fizycznej działa dalej, w tym warstwy SYM, skróty, modyfikatory i dokładne kody emoji lub fragmentów. Schowek i selektor emoji pozostają w tych aplikacjach zamknięte.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Aplikacja webowa — działa wewnątrz %1$s, więc pasek jest ukryty także tam</string>
 </resources>

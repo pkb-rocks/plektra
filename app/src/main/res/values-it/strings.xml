@@ -1079,4 +1079,14 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="caret_badge_custom_colors_description">Sostituisci i colori del tema della tastiera.</string>
     <string name="alt_latch_stays_on_space_title">Mantieni Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Spazio e Invio disattivano Alt singolo ma mantengono attivo Alt-Lock.</string>
+    <string name="keyboard_bar_hidden_apps_title">Non mostrare mai la barra</string>
+    <string name="keyboard_bar_hidden_apps_row_description">App in cui la barra resta nascosta, anche se aperta manualmente</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Nessuna app selezionata</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d app</item>
+        <item quantity="many">%d app</item>
+        <item quantity="other">%d app</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Nelle app scelte qui, Plektra non mostra mai la sua barra né la tastiera su schermo: indipendentemente dalle altre impostazioni di visibilità, e anche se provi ad aprirla con un tasto, una scorciatoia o il pulsante tastiera del sistema. La digitazione con la tastiera fisica continua a funzionare, inclusi i livelli SYM, le scorciatoie, i modificatori e i codici esatti di emoji o snippet. Gli appunti e il selettore emoji restano chiusi in queste app.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Web app: funziona dentro %1$s, quindi la barra è nascosta anche lì</string>
 </resources>

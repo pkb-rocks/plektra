@@ -1493,6 +1493,15 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="titan2_elite_max_icon_shrink_description">Verkleinert äußere Buttonsymbole automatisch nur bei Bedarf bis zu dieser Grenze. 0% schaltet die Verkleinerung aus; die Positionierung bleibt aktiv.</string>
     <string name="keyboard_bar_show_on_launcher">Leiste auf dem Launcher-Startbildschirm anzeigen</string>
     <string name="keyboard_bar_show_on_launcher_description">Leiste auch anzeigen, wenn Niagara auf dem Startbildschirm ein unsichtbares Eingabefeld verwendet.</string>
+    <string name="keyboard_bar_hidden_apps_title">Leiste niemals anzeigen</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Apps, in denen die Leiste verborgen bleibt – auch beim manuellen Öffnen</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Keine Apps ausgewählt</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d App</item>
+        <item quantity="other">%d Apps</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">In den hier ausgewählten Apps zeigt Plektra weder die Leiste noch die Bildschirmtastatur an: unabhängig von den übrigen Sichtbarkeitseinstellungen und auch dann nicht, wenn du sie per Taste, Kürzel oder Tastatur-Schaltfläche des Systems öffnen willst. Die Hardware-Tastatur tippt weiter, einschließlich SYM-Ebenen, Kürzeln, Modifikatoren und exakter Emoji- oder Snippet-Codes. Zwischenablage und Emoji-Auswahl bleiben in diesen Apps geschlossen.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Web-App – läuft innerhalb von %1$s, daher bleibt die Leiste auch dort verborgen</string>
     <string name="keyboard_bar_suggestions">Vorschläge</string>
     <string name="keyboard_bar_actions">Varianten und Menü</string>
     <string name="keyboard_bar_slim_description">Der schnelle Umschalter wechselt zwischen deinem normalen und deinem Slim-Profil.</string>

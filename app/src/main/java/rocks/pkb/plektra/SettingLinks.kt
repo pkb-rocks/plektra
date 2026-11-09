@@ -956,6 +956,13 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
         ),
+        entry(
+            "status_bar.hidden_apps",
+            R.string.keyboard_bar_hidden_apps_title,
+            R.string.keyboard_bar_hidden_apps_row_description,
+            destination = SettingsDestination.Customization,
+            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
+        ),
         // Modifier indicator chips (rendered on the modifiers screen)
         entry(
             SettingLinkIds.MODIFIERS_INDICATOR_BOTTOM_STRIP,

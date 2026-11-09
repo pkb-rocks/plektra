@@ -2310,6 +2310,28 @@ object SettingsManager {
         getPreferences(context).edit().putBoolean("keyboard_bar_show_on_launcher", enabled).apply()
     }
 
+    // Apps in which the keyboard bar never appears, regardless of every other visibility setting.
+    const val KEY_KEYBOARD_BAR_HIDDEN_APPS = "keyboard_bar_hidden_apps"
+
+    fun getKeyboardBarHiddenPackages(context: Context): Set<String> =
+        getPreferences(context).getStringSet(KEY_KEYBOARD_BAR_HIDDEN_APPS, emptySet()) ?: emptySet()
+
+    fun isKeyboardBarHiddenInApp(context: Context, packageName: String?): Boolean {
+        if (packageName.isNullOrEmpty()) return false
+        val packages = getKeyboardBarHiddenPackages(context)
+        if (packageName in packages) return true
+        // A PWA's fields live in its host browser, so hiding it hides the browser's bar too.
+        return packageName in rocks.pkb.plektra.inputmethod.WebApkHost.expandWithHosts(context, packages)
+    }
+
+    fun setKeyboardBarHiddenInApp(context: Context, packageName: String, hidden: Boolean) {
+        val current = getKeyboardBarHiddenPackages(context).toMutableSet()
+        if (hidden) current.add(packageName) else current.remove(packageName)
+        getPreferences(context).edit()
+            .putStringSet(KEY_KEYBOARD_BAR_HIDDEN_APPS, current)
+            .apply()
+    }
+
     fun getAutoShowKeyboard(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
     }

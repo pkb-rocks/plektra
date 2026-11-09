@@ -901,4 +901,15 @@ Nav Mode использует физическое положение клави
     <string name="caret_badge_custom_colors_description">Заменить цвета темы клавиатуры.</string>
     <string name="alt_latch_stays_on_space_title">Сохранять Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Пробел и Enter сбрасывают одноразовый Alt, но оставляют Alt-Lock активным.</string>
+    <string name="keyboard_bar_hidden_apps_title">Никогда не показывать панель</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Приложения, в которых панель остаётся скрытой, даже при ручном открытии</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Приложения не выбраны</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d приложение</item>
+        <item quantity="few">%d приложения</item>
+        <item quantity="many">%d приложений</item>
+        <item quantity="other">%d приложения</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">В выбранных здесь приложениях Plektra никогда не показывает панель и экранную клавиатуру: независимо от остальных настроек видимости и даже при попытке открыть её клавишей, сочетанием клавиш или системной кнопкой клавиатуры. Ввод с физической клавиатуры продолжает работать, включая слои SYM, сочетания клавиш, модификаторы и точные коды эмодзи или фрагментов. Буфер обмена и выбор эмодзи в этих приложениях остаются закрытыми.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Веб-приложение — работает внутри %1$s, поэтому панель скрыта и там</string>
 </resources>

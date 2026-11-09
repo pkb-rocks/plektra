@@ -1744,4 +1744,13 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_caret_modifier_badge">δρομέας, κέρσορας, shift, alt, ctrl, sym, caps lock, επικάλυψη, σήμα, τροποποιητής, ένδειξη</string>
     <string name="caret_badge_custom_colors_title">Χρήση προσαρμοσμένων χρωμάτων</string>
     <string name="caret_badge_custom_colors_description">Αντικατάσταση των χρωμάτων του θέματος πληκτρολογίου.</string>
+    <string name="keyboard_bar_hidden_apps_title">Να μην εμφανίζεται ποτέ η γραμμή</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Εφαρμογές όπου η γραμμή παραμένει κρυφή, ακόμη και με χειροκίνητο άνοιγμα</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Δεν επιλέχθηκαν εφαρμογές</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d εφαρμογή</item>
+        <item quantity="other">%d εφαρμογές</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Στις εφαρμογές που επιλέγετε εδώ, το Plektra δεν εμφανίζει ποτέ τη γραμμή του ούτε το πληκτρολόγιο οθόνης: ανεξάρτητα από τις υπόλοιπες ρυθμίσεις ορατότητας, ακόμη και αν προσπαθήσετε να την ανοίξετε με πλήκτρο, συντόμευση ή το κουμπί πληκτρολογίου του συστήματος. Η πληκτρολόγηση με το φυσικό πληκτρολόγιο συνεχίζει να λειτουργεί, μαζί με τα επίπεδα SYM, τις συντομεύσεις, τους τροποποιητές και τους ακριβείς κωδικούς emoji ή αποσπασμάτων. Το πρόχειρο και η επιλογή emoji παραμένουν κλειστά σε αυτές τις εφαρμογές.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Εφαρμογή ιστού — εκτελείται μέσα στο %1$s, άρα η γραμμή είναι κρυφή κι εκεί</string>
 </resources>

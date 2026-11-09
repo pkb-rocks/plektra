@@ -901,4 +901,15 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="caret_badge_custom_colors_description">Замінити кольори теми клавіатури.</string>
     <string name="alt_latch_stays_on_space_title">Зберігати Alt-Lock</string>
     <string name="alt_latch_stays_on_space_description">Пробіл і Enter скидають одноразовий Alt, але залишають Alt-Lock активним.</string>
+    <string name="keyboard_bar_hidden_apps_title">Ніколи не показувати панель</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Застосунки, у яких панель лишається прихованою, навіть під час ручного відкриття</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Застосунки не вибрано</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d застосунок</item>
+        <item quantity="few">%d застосунки</item>
+        <item quantity="many">%d застосунків</item>
+        <item quantity="other">%d застосунку</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">У вибраних тут застосунках Plektra ніколи не показує панель і екранну клавіатуру: незалежно від інших налаштувань видимості й навіть тоді, коли ви намагаєтеся відкрити її клавішею, комбінацією клавіш або системною кнопкою клавіатури. Введення з фізичної клавіатури працює далі, зокрема шари SYM, комбінації клавіш, модифікатори й точні коди емодзі або фрагментів. Буфер обміну й вибір емодзі в цих застосунках лишаються закритими.</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Вебзастосунок — працює всередині %1$s, тож панель прихована й там</string>
 </resources>

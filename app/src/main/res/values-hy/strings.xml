@@ -901,4 +901,13 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="caret_badge_custom_colors_description">Փոխարինել ստեղնաշարի թեմայի գույները։</string>
     <string name="alt_latch_stays_on_space_title">Պահպանել Alt-Lock-ը</string>
     <string name="alt_latch_stays_on_space_description">Բացատը և Enter-ը անջատում են մեկանգամյա Alt-ը, բայց պահպանում են Alt-Lock-ը։</string>
+    <string name="keyboard_bar_hidden_apps_title">Երբեք չցուցադրել պանելը</string>
+    <string name="keyboard_bar_hidden_apps_row_description">Հավելվածներ, որոնցում պանելը մնում է թաքնված, նույնիսկ ձեռքով բացելիս</string>
+    <string name="keyboard_bar_hidden_apps_summary_none">Հավելվածներ ընտրված չեն</string>
+    <plurals name="keyboard_bar_hidden_apps_summary">
+        <item quantity="one">%d հավելված</item>
+        <item quantity="other">%d հավելված</item>
+    </plurals>
+    <string name="keyboard_bar_hidden_apps_description">Այստեղ ընտրված հավելվածներում Plektra-ն երբեք չի ցուցադրում իր պանելը կամ էկրանային ստեղնաշարը՝ անկախ տեսանելիության մյուս կարգավորումներից, և նույնիսկ եթե փորձեք այն բացել ստեղնով, դյուրանցմամբ կամ համակարգի ստեղնաշարի կոճակով։ Ֆիզիկական ստեղնաշարով մուտքագրումը շարունակում է աշխատել, ներառյալ SYM շերտերը, դյուրանցումները, մոդիֆիկատորները և emoji-ների կամ հատվածների ճշգրիտ կոդերը։ Սեղմատախտակը և emoji ընտրիչը այս հավելվածներում մնում են փակ։</string>
+    <string name="keyboard_bar_hidden_apps_webapk_note">Վեբ հավելված՝ աշխատում է %1$s-ի ներսում, ուստի պանելն այնտեղ նույնպես թաքնված է</string>
 </resources>

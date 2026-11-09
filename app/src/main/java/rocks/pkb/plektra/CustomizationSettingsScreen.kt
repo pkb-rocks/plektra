@@ -594,6 +594,10 @@ fun CustomizationSettingsScreen(
                 )
             }
 
+            CustomizationDestination.KeyboardBarHiddenApps -> {
+                KeyboardBarHiddenAppsScreen(modifier = modifier, onBack = { navigateBack() })
+            }
+
             CustomizationDestination.DisplayGeometry -> {
                 DisplayGeometryScreen(modifier, onBack = { navigateBack() })
             }
@@ -2222,6 +2226,7 @@ private enum class CustomizationDestination {
     StatusBarButtons,
     KeyboardBarButtons,
     KeyboardBarVariations,
+    KeyboardBarHiddenApps,
     DisplayGeometry,
     KeyboardTheme,
     Sounds,

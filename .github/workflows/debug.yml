@@ -71,12 +71,15 @@ jobs:
           chmod +x ./scripts/nightly-version.sh
           ./scripts/nightly-version.sh "${{ inputs.version_name }}" >> "$GITHUB_OUTPUT"
 
-      - name: Run nightly debug-flavor unit tests
+      - name: Run canonical Stable Debug unit tests
         run: |
-          ./gradlew :app:testNightlyDebugUnitTest \
-            -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
-            -PPLEKTRA_NIGHTLY_VERSION_CODE=${{ steps.nightly_meta.outputs.version_code }} \
-            -PPLEKTRA_NIGHTLY_VERSION_SUFFIX=-nightly.${{ steps.nightly_meta.outputs.nightly_suffix }}
+          python3 scripts/ci-tests.py run --variant StableDebug \
+            --gradle-arg=-PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
+            --gradle-arg=-PPLEKTRA_NIGHTLY_VERSION_CODE=${{ steps.nightly_meta.outputs.version_code }} \
+            --gradle-arg=-PPLEKTRA_NIGHTLY_VERSION_SUFFIX=-nightly.${{ steps.nightly_meta.outputs.nightly_suffix }}
+
+      - name: Check generated variant contracts
+        run: python3 scripts/ci-variants.py
 
       - name: Build nightly APK
         run: |
@@ -84,6 +87,13 @@ jobs:
             -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
             -PPLEKTRA_NIGHTLY_VERSION_CODE=${{ steps.nightly_meta.outputs.version_code }} \
             -PPLEKTRA_NIGHTLY_VERSION_SUFFIX=-nightly.${{ steps.nightly_meta.outputs.nightly_suffix }}
+
+      - name: Verify built nightly package
+        run: |
+          python3 scripts/ci-artifact.py app/build/outputs/apk/nightly/release/app-nightly-release.apk \
+            --package rocks.pkb.plektra.nightly \
+            --version-name '${{ steps.nightly_meta.outputs.full_version }}' \
+            --version-code '${{ steps.nightly_meta.outputs.version_code }}'
 
       - name: Compute checksums
         run: sha256sum app/build/outputs/apk/nightly/release/app-nightly-release.apk | tee app/build/outputs/apk/nightly/release/app-nightly-release.apk.sha256

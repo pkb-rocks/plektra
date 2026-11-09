@@ -65,23 +65,31 @@ jobs:
 
       - name: Run stable unit tests
         run: |
-          ./gradlew :app:testStableDebugUnitTest \
-            -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
-            -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
+          python3 scripts/ci-tests.py run --variant StableDebug \
+            --gradle-arg=-PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
+            --gradle-arg=-PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
 
-      - name: Run stable F-Droid-path unit tests
+      - name: Check F-Droid generated contracts
         if: ${{ inputs.build_fdroid_artifact }}
         run: |
-          ./gradlew :app:testStableDebugUnitTest \
-            -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
-            -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
-            -PPLEKTRA_FDROID_BUILD=true
+          python3 scripts/ci-variants.py --fdroid \
+            --gradle-arg=-PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
+            --gradle-arg=-PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
+
+      - name: Check generated variant contracts
+        run: python3 scripts/ci-variants.py
 
       - name: Build release APK
         run: |
           ./gradlew :app:assembleStableRelease \
             -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
             -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }}
+
+      - name: Verify built stable package
+        run: |
+          python3 scripts/ci-artifact.py app/build/outputs/apk/stable/release/app-stable-release.apk \
+            --package rocks.pkb.plektra --version-name '${{ inputs.version_name }}' \
+            --version-code '${{ inputs.version_code }}'
 
       - name: Archive signed release outputs
         run: |
@@ -105,6 +113,13 @@ jobs:
             -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }} \
             -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
             -PPLEKTRA_FDROID_BUILD=true
+
+      - name: Verify built F-Droid package
+        if: ${{ inputs.build_fdroid_artifact }}
+        run: |
+          python3 scripts/ci-artifact.py app/build/outputs/apk/stable/release/app-stable-release-unsigned.apk \
+            --package rocks.pkb.plektra --version-name '${{ inputs.version_name }}' \
+            --version-code '${{ inputs.version_code }}'
 
       - name: Archive unsigned F-Droid outputs
         if: ${{ inputs.build_fdroid_artifact }}

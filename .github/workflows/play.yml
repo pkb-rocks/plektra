@@ -37,13 +37,33 @@ jobs:
           playUploadKeyAlias=$KEY_ALIAS
           playUploadKeyPassword=$KEY_PASSWORD
           PROPS
-      - name: Test Play variants
-        run: ./gradlew :app:testPlayStableDebugUnitTest :app:testPlayNightlyDebugUnitTest
+      - name: Run canonical Stable Debug unit tests
+        run: |
+          python3 scripts/ci-tests.py run --variant StableDebug
+      - name: Check generated variant contracts
+        run: python3 scripts/ci-variants.py
       - name: Build Play bundles
         run: |
           ./gradlew :app:bundlePlayStableRelease :app:bundlePlayNightlyRelease \
             -PPLEKTRA_VERSION_NAME=${{ inputs.version_name }} \
             -PPLEKTRA_VERSION_CODE=${{ inputs.version_code }}
+      - name: Verify built Play packages
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar \
+            -o "$RUNNER_TEMP/bundletool.jar"
+          echo "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29  $RUNNER_TEMP/bundletool.jar" | sha256sum --check
+          shopt -s nullglob
+          stable=(app/build/outputs/bundle/playStableRelease/*.aab)
+          nightly=(app/build/outputs/bundle/playNightlyRelease/*.aab)
+          test "${#stable[@]}" -eq 1
+          test "${#nightly[@]}" -eq 1
+          python3 scripts/ci-artifact.py "${stable[0]}" \
+            --bundletool "$RUNNER_TEMP/bundletool.jar" --package rocks.pkb.plektra.unsovereign \
+            --version-name '${{ inputs.version_name }}' --version-code '${{ inputs.version_code }}'
+          python3 scripts/ci-artifact.py "${nightly[0]}" \
+            --bundletool "$RUNNER_TEMP/bundletool.jar" --package rocks.pkb.plektra.unsovereign.nightly \
+            --version-name '${{ inputs.version_name }}-nightly' --version-code '${{ inputs.version_code }}'
       - uses: actions/upload-artifact@v4
         with:
           name: plektra-play-${{ inputs.version_name }}

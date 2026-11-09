@@ -4779,6 +4779,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val initialInputConnection = currentInputConnection
         val inputType = info?.inputType ?: EditorInfo.TYPE_NULL
         val hasEditableField = initialInputConnection != null && inputType != EditorInfo.TYPE_NULL
+        // Accepted hardware input settles the keypad choice before shortcut early returns.
+        if (hasEditableField && keyCode != KeyEvent.KEYCODE_BACK && event != null &&
+            event.flags and KeyEvent.FLAG_SOFT_KEYBOARD == 0) {
+            hardwareKeypadAutoOpen.settle()
+        }
         if (event_?.repeatCount == 0) consumedLanguageSwitchKeys.remove(keyCode_)
         else if (keyCode_ in consumedLanguageSwitchKeys) return true
         val languageCtrl = event?.isCtrlPressed == true || ctrlPressed || ctrlPhysicallyPressed ||
@@ -5107,10 +5112,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
         }
         
-        // The first hardware key shows only the bar and settles an open keypad decision.
-        if (keyCode != KeyEvent.KEYCODE_BACK && event != null && event.flags and KeyEvent.FLAG_SOFT_KEYBOARD == 0) {
-            hardwareKeypadAutoOpen.settle()
-        }
         val routingResult = inputEventRouter.handleEditableFieldKeyDownPrelude(
             keyCode = keyCode,
             params = InputEventRouter.EditableFieldKeyDownParams(

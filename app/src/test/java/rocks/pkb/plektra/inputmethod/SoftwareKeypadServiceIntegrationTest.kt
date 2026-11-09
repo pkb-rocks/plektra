@@ -144,6 +144,18 @@ class SoftwareKeypadServiceIntegrationTest {
     }
 
     @Test
+    fun firstHardwareAltSpace_settlesBeforeLanguageSwitch_andLaterAppShowKeepsHardwareMode() {
+        SettingsManager.setAltSpacePreviousLanguageEnabled(context, true)
+        startInput(InputType.TYPE_CLASS_NUMBER)
+        service.onKeyDown(KeyEvent.KEYCODE_SPACE,
+            KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE, 0, KeyEvent.META_ALT_ON))
+        assertFalse("a hardware shortcut must settle the keypad choice", awaiting())
+        idle()
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+    }
+
+    @Test
     fun backKeyAndOnScreenKeys_doNotSettleTheDecision() {
         startInput(InputType.TYPE_CLASS_NUMBER)
         service.onKeyDown(KeyEvent.KEYCODE_BACK, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 0))

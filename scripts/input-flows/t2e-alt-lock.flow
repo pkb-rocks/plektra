@@ -1,0 +1,12 @@
+# Titan 2 Elite: double-tapping Alt locks it until the next Alt tap (regression for 68ace8ab).
+require profile titan2elite_qwerty
+hw press ALT_LEFT
+hw press ALT_LEFT
+hw press Q
+hw press W
+hw press O
+hw press E
+expect "01+2"
+hw press ALT_LEFT
+hw press Q
+expect "01+2q"

@@ -1,0 +1,9 @@
+# Software keyboard on the Titan 2 Elite: taps, a two-finger Shift chord, space and backspace.
+screen type hi
+screen hold plektra_key_shift
+screen press plektra_key_a
+screen release plektra_key_shift
+expect "hiA"
+screen press plektra_key_space
+screen press plektra_key_backspace
+expect "hiA"

@@ -162,17 +162,27 @@ internal object ThemeTextureStore {
 
 /** Own the backdrop once; matching descendants must not repaint another crop over it. */
 internal object ThemeTextureBackground {
-    fun set(view: View?, color: Int, texture: KeyboardThemeTexture?) {
+    /**
+     * [overlay] marks a surface that covers sibling content (such as the menu row over the
+     * variation bar). It repaints the ancestor's crop at its own position instead of leaving
+     * itself transparent, so nothing underneath shows through.
+     */
+    fun set(view: View?, color: Int, texture: KeyboardThemeTexture?, overlay: Boolean = false) {
         view ?: return
         val old = view.background
         if (texture == null && old is android.graphics.drawable.ColorDrawable && old.color == color) return
-        if (old is ThemeTextureDrawable && old.color == color && old.texture == texture) return
+        if (old is ThemeTextureDrawable && old.color == color && old.texture == texture && old.overlay == overlay) return
         view.background = if (texture == null) android.graphics.drawable.ColorDrawable(color)
-            else ThemeTextureDrawable(view, color, texture)
+            else ThemeTextureDrawable(view, color, texture, overlay)
     }
 }
 
-internal class ThemeTextureDrawable(private val owner: View, val color: Int, val texture: KeyboardThemeTexture) : Drawable() {
+internal class ThemeTextureDrawable(
+    private val owner: View,
+    val color: Int,
+    val texture: KeyboardThemeTexture,
+    val overlay: Boolean = false
+) : Drawable() {
     // Runtime images are at most 512 px and usually upscaled, so filter instead of showing blocks.
     private val paint = Paint().apply { isFilterBitmap = true; isAntiAlias = false }
     private val matrix = Matrix()
@@ -181,10 +191,25 @@ internal class ThemeTextureDrawable(private val owner: View, val color: Int, val
     private var opacity = 255
     override fun draw(canvas: Canvas) {
         if (bounds.isEmpty) return
+        // The crop is laid out over the outermost surface with this backdrop.
+        var image = bounds
+        var offsetX = 0f
+        var offsetY = 0f
+        var x = 0f
+        var y = 0f
+        var child: View = owner
         var parent = owner.parent
         while (parent is View) {
+            x += child.left + child.translationX - parent.scrollX
+            y += child.top + child.translationY - parent.scrollY
             val backdrop = parent.background as? ThemeTextureDrawable
-            if (backdrop?.texture == texture) return
+            if (backdrop?.texture == texture) {
+                if (!overlay) return
+                image = backdrop.bounds
+                offsetX = x
+                offsetY = y
+            }
+            child = parent
             parent = parent.parent
         }
         paint.shader = null; paint.color = color; paint.alpha = (Color.alpha(color) * opacity / 255)
@@ -196,9 +221,10 @@ internal class ThemeTextureDrawable(private val owner: View, val color: Int, val
             imageShader = BitmapShader(bitmap, if (texture.mode == "tile") Shader.TileMode.REPEAT else Shader.TileMode.CLAMP,
                 if (texture.mode == "tile") Shader.TileMode.REPEAT else Shader.TileMode.CLAMP)
         }
-        val scale = if (texture.mode == "tile") 1f else maxOf(bounds.width().toFloat() / bitmap.width, bounds.height().toFloat() / bitmap.height)
+        val scale = if (texture.mode == "tile") 1f else maxOf(image.width().toFloat() / bitmap.width, image.height().toFloat() / bitmap.height)
         matrix.setScale(scale, scale)
-        matrix.postTranslate(bounds.left + (bounds.width() - bitmap.width * scale) / 2f, bounds.top + (bounds.height() - bitmap.height * scale) / 2f)
+        matrix.postTranslate(image.left + (image.width() - bitmap.width * scale) / 2f - offsetX,
+            image.top + (image.height() - bitmap.height * scale) / 2f - offsetY)
         imageShader!!.setLocalMatrix(matrix)
         paint.shader = imageShader; paint.alpha = (opacity * ThemeTextureModel.normalizedIntensity(texture)).toInt()
         canvas.drawRect(bounds, paint)

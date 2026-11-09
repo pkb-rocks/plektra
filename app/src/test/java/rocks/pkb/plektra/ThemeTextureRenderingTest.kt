@@ -58,6 +58,28 @@ class ThemeTextureRenderingTest {
         load(root);val canvas=RecordingCanvas();child.background.setBounds(0,0,120,40);child.background.draw(canvas)
         assertTrue(canvas.rectangles.isEmpty())
     }
+    @Test fun overlayCoversContentBelowWithTheSharedCrop() {
+        val root=FrameLayout(context);val menu=View(context);root.addView(menu)
+        ThemeTextureBackground.set(root,0xff112233.toInt(),texture);ThemeTextureBackground.set(menu,0xff112233.toInt(),texture,overlay=true)
+        load(root)
+        root.layout(0,0,400,100);menu.layout(0,40,400,80)
+        root.background.setBounds(0,0,400,100);menu.background.setBounds(0,0,400,40)
+        val matrices=mutableListOf<android.graphics.Matrix>()
+        val canvas=object:Canvas() {
+            val rectangles=mutableListOf<Rect>()
+            override fun drawRect(rect:Rect,paint:Paint) {
+                rectangles+=Rect(rect)
+                (paint.shader as? android.graphics.BitmapShader)?.let { matrices+=android.graphics.Matrix().also(it::getLocalMatrix) }
+            }
+        }
+        root.background.draw(canvas);menu.background.draw(canvas)
+        assertEquals("Root and overlay both paint colour and photo",4,canvas.rectangles.size)
+        assertEquals(Rect(0,0,400,40),canvas.rectangles[3])
+        val rootValues=FloatArray(9).also(matrices[0]::getValues);val menuValues=FloatArray(9).also(matrices[1]::getValues)
+        assertEquals(rootValues[android.graphics.Matrix.MSCALE_X],menuValues[android.graphics.Matrix.MSCALE_X],0.001f)
+        assertEquals("The overlay shows the part of the root crop behind it",rootValues[android.graphics.Matrix.MTRANS_Y]-40f,
+            menuValues[android.graphics.Matrix.MTRANS_Y],0.001f)
+    }
     @Test fun transparentFallbackAndIntensityKeepTheirAlpha() {
         val owner=View(context);ThemeTextureBackground.set(owner,0x40112233,texture.copy(intensity=.5f));load(owner)
         owner.background.setBounds(0,0,120,40);val canvas=RecordingCanvas();owner.background.draw(canvas)

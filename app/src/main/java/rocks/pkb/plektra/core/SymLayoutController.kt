@@ -43,6 +43,9 @@ class SymLayoutController(
     /** A paged layer's search key was pressed: the input method opens the picker's search. */
     var onPagedSearchRequested: (() -> Unit)? = null
 
+    /** The edit key on the variants of a mapped emoji: the input method opens that key's customization. */
+    var onKeyCustomizationRequested: ((page: Int, keyCode: Int) -> Unit)? = null
+
     private enum class SymPage {
         DEVICE,
         EMOJI,
@@ -64,13 +67,34 @@ class SymLayoutController(
     private var pagedLayerShown: SymPage? = null
     private var pageIndex = 0
     private var cachedPages: List<SymPagedLayer.Page>? = null
-    /** An emoji's variants (skin tones), shown on their own page while chosen; null when not. */
-    private var variants: List<String>? = null
-    /** A pressed emoji with variants: typed when its key comes up, its variants when held. */
-    private var pendingEmojiKey = KeyEvent.KEYCODE_UNKNOWN
-    private var pendingEmoji: String? = null
+    /** What [cachedPages] were built from: they are rebuilt when it changes. */
+    private var cachedPagesSource: PagesSource? = null
+    /** An emoji's variants (skin tones), shown on pages of their own while chosen; null when not. */
+    private var variants: SymPagedLayer.Variants? = null
+    /**
+     * A pressed emoji with variants: typed when its key comes up, its variants when held. Any
+     * other key going down first types it, so fast typing keeps the order of the presses.
+     */
+    private var pending: PendingEmoji? = null
     /** The key whose hold opened the variants: its release is spent. */
     private var variantsHeldKey = KeyEvent.KEYCODE_UNKNOWN
+
+    private data class PendingEmoji(val keyCode: Int, val emoji: String, val kind: SymPagedLayer.Kind, val recorded: Boolean)
+
+    /**
+     * The emoji offered (they change with the emoji font), the default skin tone and the kaomoji
+     * placement: settings and the font can change while the keyboard stays open.
+     */
+    private data class PagesSource(
+        val emoji: List<EmojiRepository.EmojiCategory>?,
+        val tone: Int,
+        val kaomoji: EmojiPagesSettings.KaomojiPlacement
+    ) {
+        override fun equals(other: Any?): Boolean =
+            other is PagesSource && other.emoji === emoji && other.tone == tone && other.kaomoji == kaomoji
+
+        override fun hashCode(): Int = System.identityHashCode(emoji) * 31 + tone * 7 + kaomoji.hashCode()
+    }
 
     /** The text page shown as pages now, or null when the current page isn't paged. */
     private fun pagedLayer(): SymPage? {
@@ -89,22 +113,32 @@ class SymLayoutController(
     private fun resetPagedState() {
         pageIndex = 0
         cachedPages = null
+        cachedPagesSource = null
         variants = null
-        pendingEmoji = null
-        pendingEmojiKey = KeyEvent.KEYCODE_UNKNOWN
+        pending = null
         variantsHeldKey = KeyEvent.KEYCODE_UNKNOWN
     }
 
     private fun pagesFor(layer: SymPage): List<SymPagedLayer.Page> {
-        cachedPages?.let { return it }
-        val placement = EmojiPagesSettings.kaomojiPlacement(context)
+        val source = PagesSource(
+            emoji = if (layer == SymPage.EMOJI) emojiCategories() else null,
+            tone = EmojiSkinTone.get(context),
+            kaomoji = EmojiPagesSettings.kaomojiPlacement(context)
+        )
+        cachedPages?.takeIf { source == cachedPagesSource }?.let { return it }
+        if (cachedPages != null) {
+            // The offered items changed under an open layer: start over on its own page.
+            pageIndex = 0
+            variants = null
+        }
+        val placement = source.kaomoji
         val sections = mutableListOf<SymPagedLayer.Section>()
         val pages = if (layer == SymPage.EMOJI) {
-            RecentEmojiManager.getRecentEmojis(context, SymPagedLayer.PER_PAGE).takeIf { it.isNotEmpty() }?.let {
+            RecentEmojiManager.getOfferedRecentEmojis(context, SymPagedLayer.PER_PAGE).takeIf { it.isNotEmpty() }?.let {
                 sections += SymPagedLayer.Section(SymPagedLayer.SECTION_RECENTS, SymPagedLayer.Kind.EMOJI, it)
             }
-            val tone = EmojiSkinTone.get(context)
-            emojiCategories().forEach { category ->
+            val tone = source.tone
+            source.emoji.orEmpty().forEach { category ->
                 sections += SymPagedLayer.Section(
                     category.id,
                     SymPagedLayer.Kind.EMOJI,
@@ -114,7 +148,7 @@ class SymLayoutController(
             if (placement == EmojiPagesSettings.KaomojiPlacement.EMOJI) sections += kaomojiSections()
             SymPagedLayer.buildPages(alternateCharacterManager.getSymMappings(), SymPagedLayer.Kind.EMOJI, sections)
         } else {
-            SymbolSearch.recents.get(context).take(SymPagedLayer.PER_PAGE).takeIf { it.isNotEmpty() }?.let {
+            SymbolSearch.recents.get(context).filter(SymbolSearch::canRender).take(SymPagedLayer.PER_PAGE).takeIf { it.isNotEmpty() }?.let {
                 sections += SymPagedLayer.Section(SymPagedLayer.SECTION_RECENTS, SymPagedLayer.Kind.SYMBOLS, it)
             }
             sections += SymPagedLayer.Section(SECTION_SYMBOLS, SymPagedLayer.Kind.SYMBOLS, SymbolPages.ALL)
@@ -122,6 +156,7 @@ class SymLayoutController(
             SymPagedLayer.buildPages(alternateCharacterManager.getSymMappings2(), SymPagedLayer.Kind.SYMBOLS, sections)
         }
         cachedPages = pages
+        cachedPagesSource = source
         return pages
     }
 
@@ -145,11 +180,11 @@ class SymLayoutController(
     }
 
     private fun pagedMappings(layer: SymPage, shiftPressed: Boolean): Map<Int, String> {
+        val page = currentPage(layer) ?: return emptyMap()
         variants?.let { shown ->
             shownPagedKind = SymPagedLayer.Kind.EMOJI
             return SymPagedLayer.variantKeys(shown)
         }
-        val page = currentPage(layer) ?: return emptyMap()
         shownPagedKind = page.kind
         // The layer's own page shows its mapping as Shift has it now
         return SymPagedLayer.keys(if (page.mapping != null) page.copy(mapping = mappingsForPage(layer, shiftPressed)) else page)
@@ -158,8 +193,10 @@ class SymLayoutController(
     /** Q/P: the page before/after; with [section], the previous/next section's first page. */
     fun turnPage(by: Int, section: Boolean = false): Boolean {
         val layer = pagedLayer() ?: return false
-        if (variants != null) {
-            variants = null
+        variants?.let { shown ->
+            // Q and P turn the variants' pages; Q on their first page goes back to the layer
+            val next = shown.page + by
+            variants = if (next < 0 || shown.pageCount <= 1 && by > 0) null else shown.copy(page = next.mod(shown.pageCount))
             return true
         }
         // The recents stay as they were when the page opened, so pages don't shift under you
@@ -173,11 +210,38 @@ class SymLayoutController(
         return (listOf(entry.base) + entry.variants).distinct().takeIf { it.size > 1 }.orEmpty()
     }
 
-    /** Holding an emoji on the emoji pages: its variants on a page of their own. */
-    private fun showVariants(emoji: String): Boolean {
+    /**
+     * Holding an emoji: its variants on pages of their own, all of them. [mappedKey] is the key
+     * whose own mapping holds the emoji: its variants offer that key's customization.
+     */
+    private fun showVariants(emoji: String, mappedKey: Int? = null): Boolean {
         val shown = variantsOf(emoji).takeIf { it.isNotEmpty() } ?: return false
-        variants = shown.take(SymPagedLayer.PER_PAGE)
+        variants = SymPagedLayer.Variants(shown, customizableKey = mappedKey)
         return true
+    }
+
+    /** The page number of [layer] for the customization screen (1 emoji, 2 symbols). */
+    private fun customizationPage(layer: SymPage): Int = if (layer == SymPage.EMOJI) 1 else 2
+
+    /** The item [keyCode] types on [page]: its own mapping (as Shift has it) or a generated item. */
+    private fun itemOnKey(layer: SymPage, page: SymPagedLayer.Page, keyCode: Int, shiftPressed: Boolean): String? =
+        if (page.mapping != null) {
+            mappingsForPage(layer, shiftPressed)[keyCode]?.takeUnless { SymPagedLayer.isNavigationKey(page, keyCode) }
+        } else {
+            SymPagedLayer.keys(page)[keyCode]?.takeUnless { SymPagedLayer.isNavigationKey(page, keyCode) }
+        }
+
+    /** Types the pressed emoji still waiting for its key to come up, when another key goes down. */
+    private fun resolvePending(
+        keyCode: Int,
+        inputConnection: InputConnection?,
+        updateStatusBar: () -> Unit,
+        onSymbolCommitted: () -> Unit
+    ) {
+        val waiting = pending ?: return
+        if (waiting.keyCode == keyCode) return
+        pending = null
+        commitPaged(waiting.emoji, waiting.kind, inputConnection, updateStatusBar, onSymbolCommitted, waiting.recorded)
     }
 
     private fun recordTyped(kind: SymPagedLayer.Kind, text: String) {
@@ -193,11 +257,12 @@ class SymLayoutController(
         kind: SymPagedLayer.Kind,
         inputConnection: InputConnection?,
         updateStatusBar: () -> Unit,
-        onSymbolCommitted: () -> Unit
+        onSymbolCommitted: () -> Unit,
+        record: Boolean = true
     ) {
         val committed = inputConnection?.commitText(text, 1) == true
         if (committed) {
-            recordTyped(kind, text)
+            if (record) recordTyped(kind, text)
             onSymbolCommitted()
         }
         if (variants != null) variants = null
@@ -210,7 +275,7 @@ class SymLayoutController(
 
     /**
      * A key on a paged layer: the arrows, search, an emoji's variants, or the item on the key.
-     * Returns null when the current page isn't paged.
+     * Returns NOT_HANDLED for what the layer's own page types as before.
      */
     private fun handlePagedKey(
         layer: SymPage,
@@ -222,21 +287,29 @@ class SymLayoutController(
         onSymbolCommitted: () -> Unit
     ): SymKeyResult {
         val repeat = event?.repeatCount ?: 0
+        val page = currentPage(layer) ?: return SymKeyResult.NOT_HANDLED
         variants?.let { shown ->
-            if (keyCode == SymPagedLayer.PREVIOUS_KEY) {
-                if (repeat == 0) {
-                    variants = null
-                    updateStatusBar()
-                }
-                return SymKeyResult.CONSUME
-            }
             if (keyCode == variantsHeldKey) return SymKeyResult.CONSUME
-            val slot = SymPagedLayer.SLOTS.indexOf(keyCode)
-            val chosen = shown.getOrNull(slot) ?: return SymKeyResult.CONSUME
+            when (keyCode) {
+                SymPagedLayer.PREVIOUS_KEY, SymPagedLayer.NEXT_KEY -> {
+                    if (repeat == 0 && turnPage(if (keyCode == SymPagedLayer.NEXT_KEY) 1 else -1)) updateStatusBar()
+                    return SymKeyResult.CONSUME
+                }
+                SymPagedLayer.EDIT_KEY -> {
+                    val mappedKey = shown.customizableKey
+                    if (repeat == 0 && mappedKey != null) {
+                        variants = null
+                        updateStatusBar()
+                        onKeyCustomizationRequested?.invoke(customizationPage(layer), mappedKey)
+                    }
+                    return SymKeyResult.CONSUME
+                }
+            }
+            val chosen = SymPagedLayer.variantKeys(shown)[keyCode]?.takeIf { keyCode in SymPagedLayer.SLOTS }
+                ?: return SymKeyResult.CONSUME
             if (repeat == 0) commitPaged(chosen, SymPagedLayer.Kind.EMOJI, inputConnection, updateStatusBar, onSymbolCommitted)
             return SymKeyResult.CONSUME
         }
-        val page = currentPage(layer) ?: return SymKeyResult.NOT_HANDLED
         when {
             keyCode == SymPagedLayer.PREVIOUS_KEY || keyCode == SymPagedLayer.NEXT_KEY -> {
                 val by = if (keyCode == SymPagedLayer.NEXT_KEY) 1 else -1
@@ -248,28 +321,30 @@ class SymLayoutController(
                 return SymKeyResult.CONSUME
             }
         }
-        if (page.mapping != null) return SymKeyResult.NOT_HANDLED // the layer's own page: as before
-        val text = SymPagedLayer.keys(page)[keyCode] ?: return if (
-            keyCode in SymPagedLayer.SLOTS || mappingsForPage(layer, shiftPressed).containsKey(keyCode)
+        val ownPage = page.mapping != null
+        val text = itemOnKey(layer, page, keyCode, shiftPressed) ?: return if (
+            !ownPage && (keyCode in SymPagedLayer.SLOTS || mappingsForPage(layer, shiftPressed).containsKey(keyCode))
         ) {
             SymKeyResult.CONSUME // a free key on a generated page types nothing
         } else {
             SymKeyResult.NOT_HANDLED
         }
-        if (page.kind == SymPagedLayer.Kind.EMOJI && variantsOf(text).isNotEmpty()) {
+        // An emoji with variants, on a generated page or mapped on the layer's own page: typed
+        // when its key comes up, its variants when held. Everything else types as before.
+        if (variantsOf(text).isNotEmpty()) {
+            val waiting = pending
             if (repeat == 0) {
-                pendingEmoji = text
-                pendingEmojiKey = keyCode
-            } else if (pendingEmojiKey == keyCode && pendingEmoji != null) {
-                pendingEmoji = null
-                pendingEmojiKey = KeyEvent.KEYCODE_UNKNOWN
-                if (showVariants(text)) {
+                pending = PendingEmoji(keyCode, text, SymPagedLayer.Kind.EMOJI, recorded = !ownPage)
+            } else if (waiting != null && waiting.keyCode == keyCode) {
+                pending = null
+                if (showVariants(waiting.emoji, mappedKey = keyCode.takeIf { ownPage })) {
                     variantsHeldKey = keyCode
                     updateStatusBar()
                 }
             }
             return SymKeyResult.CONSUME
         }
+        if (ownPage) return SymKeyResult.NOT_HANDLED // the layer's own page: as before
         if (repeat == 0) commitPaged(text, page.kind, inputConnection, updateStatusBar, onSymbolCommitted)
         return SymKeyResult.CONSUME
     }
@@ -288,24 +363,22 @@ class SymLayoutController(
             variantsHeldKey = KeyEvent.KEYCODE_UNKNOWN
             return true
         }
-        val emoji = pendingEmoji ?: return false
-        if (keyCode != pendingEmojiKey) return false
-        pendingEmoji = null
-        pendingEmojiKey = KeyEvent.KEYCODE_UNKNOWN
-        commitPaged(emoji, SymPagedLayer.Kind.EMOJI, inputConnection, updateStatusBar, onSymbolCommitted)
+        val waiting = pending?.takeIf { it.keyCode == keyCode } ?: return false
+        pending = null
+        commitPaged(waiting.emoji, waiting.kind, inputConnection, updateStatusBar, onSymbolCommitted, waiting.recorded)
         return true
     }
 
     /**
-     * A key of a paged layer tapped on screen: the arrows, search or an emoji variant are
-     * handled here (true); anything else is typed by the caller.
+     * A key of a paged layer tapped on screen: the arrows, search, the variants' keys and the
+     * edit key are handled here (true); anything else is typed by the caller.
      */
     fun handlePagedTouchTap(keyCode: Int, inputConnection: InputConnection?, updateStatusBar: () -> Unit): Boolean {
         val layer = pagedLayer() ?: return false
+        val page = currentPage(layer) ?: return false
         if (variants != null) {
             return handlePagedKey(layer, keyCode, null, inputConnection, false, updateStatusBar, {}) == SymKeyResult.CONSUME
         }
-        val page = currentPage(layer) ?: return false
         if (!SymPagedLayer.isNavigationKey(page, keyCode)) {
             val text = SymPagedLayer.keys(page)[keyCode]
             if (page.mapping == null && text != null) recordTyped(page.kind, text)
@@ -314,17 +387,25 @@ class SymLayoutController(
         return handlePagedKey(layer, keyCode, null, inputConnection, false, updateStatusBar, {}) == SymKeyResult.CONSUME
     }
 
-    /** A key of a paged layer held on screen: an emoji's variants, or a section jump on the arrows. */
+    /**
+     * A key of a paged layer held on screen: an emoji's variants (also of an emoji mapped on the
+     * layer's own page), or a section jump on the arrows. True when the layer used the hold;
+     * false leaves it to the caller (the customization of a key on the layer's own page).
+     */
     fun handlePagedTouchLongPress(keyCode: Int): Boolean {
         val layer = pagedLayer() ?: return false
-        if (variants != null) return false
         val page = currentPage(layer) ?: return false
+        // On the variants and the generated pages a hold never opens the customization of
+        // the key's own mapping, which those pages don't show.
+        if (variants != null) return true
         return when (keyCode) {
             SymPagedLayer.PREVIOUS_KEY -> turnPage(-1, section = true)
             SymPagedLayer.NEXT_KEY -> turnPage(1, section = true)
             else -> {
-                val text = SymPagedLayer.keys(page)[keyCode] ?: return false
-                page.mapping == null && page.kind == SymPagedLayer.Kind.EMOJI && showVariants(text)
+                val ownPage = page.mapping != null
+                val text = itemOnKey(layer, page, keyCode, shiftPressed = false)
+                val shown = text != null && showVariants(text, mappedKey = keyCode.takeIf { ownPage })
+                shown || !ownPage
             }
         }
     }
@@ -581,6 +662,9 @@ class SymLayoutController(
     ): SymKeyResult {
         val autoCloseEnabled = SettingsManager.getSymAutoClose(context)
         val page = currentPageType()
+        if ((event?.repeatCount ?: 0) == 0 && !KeyEvent.isModifierKey(keyCode)) {
+            resolvePending(keyCode, inputConnection, updateStatusBar, onSymbolCommitted)
+        }
 
         when (keyCode) {
             KeyEvent.KEYCODE_BACK -> {

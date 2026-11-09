@@ -117,6 +117,8 @@ class EmojiPickerView(
     private var symbolIndex: SymbolSearch.Index? = null
     private var kaomojiEntries: List<Kaomoji.Entry> = emptyList()
     private var skinTone = 0
+    /** The emoji categories shown; null while loading. */
+    private var shownEmojiCategories: List<EmojiRepository.EmojiCategory>? = null
     var onSearchPanelVisibilityChanged: ((Boolean) -> Unit)? = null
     var themeOverride: KeyboardThemeColors? = null
         set(value) {
@@ -761,6 +763,15 @@ class EmojiPickerView(
         }
     }
 
+    /**
+     * Whether the emoji shown are no longer the ones offered: the emoji font or the default
+     * skin tone changed since they loaded, while this view stayed around.
+     */
+    fun showsOutdatedEmoji(): Boolean {
+        val shown = shownEmojiCategories ?: return false
+        return shown !== EmojiRepository.cachedCategoriesOrNull() || skinTone != EmojiSkinTone.get(context)
+    }
+
     private fun loadCategories() {
         // Cancel any previous loading job to avoid race conditions
         loadingJob?.cancel()
@@ -769,13 +780,15 @@ class EmojiPickerView(
         emptyView.visibility = View.GONE
         recyclerView.visibility = View.GONE
 
+        shownEmojiCategories = null
         loadingJob = coroutineScope.launch {
             try {
-                val recentCategory = withContext(Dispatchers.IO) { RecentEmojiManager.getRecentEmojiCategory(context) }
                 val regularCategories = withContext(Dispatchers.IO) { EmojiRepository.getEmojiCategories(context) }
+                val recentCategory = withContext(Dispatchers.IO) { RecentEmojiManager.getRecentEmojiCategory(context) }
                 val loadedSearchIndex = withContext(Dispatchers.IO) { EmojiSearchRepository.getSearchIndex(context) }
                 val extras = withContext(Dispatchers.IO) { loadSymbolAndKaomojiCategories() }
                 skinTone = EmojiSkinTone.get(context)
+                shownEmojiCategories = regularCategories
                 this@EmojiPickerView.regularCategories = regularCategories + extras
                 this@EmojiPickerView.searchIndex = loadedSearchIndex
 

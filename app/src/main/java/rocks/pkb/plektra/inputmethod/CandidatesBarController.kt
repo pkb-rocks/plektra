@@ -74,6 +74,11 @@ class CandidatesBarController(
             candidatesStatusBar.onSymPageKeyLongPressed = value
         }
 
+    /** Opens the customization of [keyCode] on SYM [page] with its picker. */
+    fun openSymKeyCustomization(page: Int, keyCode: Int) {
+        inputStatusBar.openSymKeyCustomization(page, keyCode)
+    }
+
     /** The emoji picker opens with its search shown the next time it appears. */
     fun requestEmojiPickerSearch() {
         inputStatusBar.requestEmojiPickerSearch()

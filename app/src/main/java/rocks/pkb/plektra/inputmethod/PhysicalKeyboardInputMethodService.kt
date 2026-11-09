@@ -2283,6 +2283,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             symLayoutController.openEmojiPickerPage()
             updateStatusBarText()
         }
+        symLayoutController.onKeyCustomizationRequested = { page, keyCode ->
+            candidatesBarController.openSymKeyCustomization(page, keyCode)
+        }
         candidatesBarController.onSymPageKeyTapped = { keyCode ->
             symLayoutController.handlePagedTouchTap(keyCode, currentInputConnection) { updateStatusBarText() }
         }

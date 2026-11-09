@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
+import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 
 /**
@@ -73,6 +74,18 @@ object RecentEmojiManager {
     }
 
     /**
+     * The recent emoji the picker offers now, newest first: switching the emoji font (bundled or
+     * system) changes which emoji are offered, and recents typed before must follow.
+     * Loads the emoji categories when they aren't yet; not for the main thread then.
+     */
+    fun getOfferedRecentEmojis(context: Context, maxCount: Int = MAX_RECENT_EMOJIS): List<String> {
+        if (EmojiRepository.cachedCategoriesOrNull() == null) {
+            runCatching { runBlocking { EmojiRepository.getEmojiCategories(context) } }
+        }
+        return getRecentEmojis(context).filter { EmojiRepository.findEntry(it) != null }.take(maxCount)
+    }
+
+    /**
      * Clears all recent emojis.
      */
     fun clearRecentEmojis(context: Context) {
@@ -83,10 +96,10 @@ object RecentEmojiManager {
     /**
      * Creates an EmojiCategory for the recent emojis.
      * Returns null if there are no recent emojis.
-     * Looks up variants from the emoji repository cache.
+     * Looks up variants from the emoji repository cache; only offered emoji, see [getOfferedRecentEmojis].
      */
     fun getRecentEmojiCategory(context: Context): EmojiRepository.EmojiCategory? {
-        val recentEmojis = getRecentEmojis(context)
+        val recentEmojis = getOfferedRecentEmojis(context)
         if (recentEmojis.isEmpty()) {
             return null
         }

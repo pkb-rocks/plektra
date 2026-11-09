@@ -1289,8 +1289,8 @@ class StatusBarController(
 
         // Only scroll to top when view is just added (first open or switching pages)
         // Don't scroll if view is already in container (user is browsing)
-        if (lastSymPageRendered != 4) {
-            view.refresh() // First time or switching from another page
+        if (lastSymPageRendered != 4 || view.showsOutdatedEmoji()) {
+            view.refresh() // First time, switching from another page, or the offered emoji changed
         } else if (wasDetachedFromHost) {
             view.scrollToTop() // View was just added (happens when reopening after being removed)
         }
@@ -1779,6 +1779,12 @@ class StatusBarController(
                 }
                 onSoftwareKeyboardPageChoice?.invoke(id)
             }
+
+            override fun onSymbolKey(keyCode: Int): Boolean =
+                onSymPageKeyTapped?.invoke(keyCode) == true
+
+            override fun onSymbolKeyLongPress(keyCode: Int): Boolean =
+                onSymPageKeyLongPressed?.invoke(keyCode) == true
 
             override fun onSymbolLongPress(keyCode: Int): Boolean {
                 val page = snapshot.symPage
@@ -2402,6 +2408,11 @@ class StatusBarController(
             openSymCustomization(page = page, keyCode = null, openPicker = false)
         }
         return button
+    }
+
+    /** Opens the customization of [keyCode] on SYM [page] with its picker, as holding the key does. */
+    fun openSymKeyCustomization(page: Int, keyCode: Int) {
+        openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
     }
 
     private fun openSymCustomization(page: Int, keyCode: Int?, openPicker: Boolean) {

@@ -52,10 +52,23 @@ class SymPagedLayerTest {
 
     @Test
     fun variantsGoOnePerKeyWithQBack() {
-        val keys = SymPagedLayer.variantKeys(listOf("👍", "👍🏻", "👍🏼"))
+        val keys = SymPagedLayer.variantKeys(SymPagedLayer.Variants(listOf("👍", "👍🏻", "👍🏼")))
         assertEquals("👍", keys[KeyEvent.KEYCODE_W])
         assertEquals("👍🏼", keys[KeyEvent.KEYCODE_R])
         assertEquals(SymPagedLayer.PREVIOUS_LABEL, keys[KeyEvent.KEYCODE_Q])
         assertNull(keys[KeyEvent.KEYCODE_P])
+        assertNull(keys[KeyEvent.KEYCODE_A])
+    }
+
+    @Test
+    fun manyVariantsGoOnFurtherPagesAndMappedEmojiOfferTheirCustomization() {
+        val items = (1..26).map { "v$it" }
+        val first = SymPagedLayer.variantKeys(SymPagedLayer.Variants(items, customizableKey = KeyEvent.KEYCODE_D))
+        assertEquals(2, SymPagedLayer.Variants(items).pageCount)
+        assertEquals("v23", first[KeyEvent.KEYCODE_M])
+        assertEquals(SymPagedLayer.NEXT_LABEL, first[KeyEvent.KEYCODE_P])
+        assertEquals(SymPagedLayer.EDIT_LABEL, first[KeyEvent.KEYCODE_A])
+        val second = SymPagedLayer.variantKeys(SymPagedLayer.Variants(items, page = 1))
+        assertEquals(listOf("v24", "v25", "v26"), SymPagedLayer.SLOTS.mapNotNull { second[it] })
     }
 }

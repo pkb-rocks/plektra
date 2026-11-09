@@ -4,8 +4,8 @@ import android.content.Context
 import org.json.JSONArray
 
 /**
- * Recently typed symbols and kaomoji, newest first. Kept beside the recent emoji (same
- * preferences file, so backups include them).
+ * Recently typed symbols and kaomoji, newest first. Kept beside the recent emoji in the same
+ * preferences file, which backups leave out like the recent emoji.
  */
 class RecentItems(private val key: String, private val max: Int) {
 

@@ -8,16 +8,22 @@ import android.view.KeyEvent
  * kaomoji). Each page puts one item on every key from W along the rows (23 per page; A opens
  * the search). The layer's own key mapping stays its first page.
  *
+ * Holding an emoji shows its variants (skin tones) the same way, as many pages as they need:
+ * Q and P turn them, Q on their first page goes back. For an emoji of the layer's own mapping,
+ * A opens that key's customization, which the hold would otherwise open.
+ *
  * Pure model: the [SymLayoutController] keeps the page index and supplies the items.
  */
 object SymPagedLayer {
     const val PREVIOUS_KEY = KeyEvent.KEYCODE_Q
     const val NEXT_KEY = KeyEvent.KEYCODE_P
     const val SEARCH_KEY = KeyEvent.KEYCODE_A
+    const val EDIT_KEY = KeyEvent.KEYCODE_A
 
     const val PREVIOUS_LABEL = "‹" // ‹
     const val NEXT_LABEL = "›" // ›
     const val SEARCH_LABEL = "⌕" // ⌕
+    const val EDIT_LABEL = "✎" // ✎
 
     /** Every letter key but Q, P and A, in reading order. */
     val SLOTS: List<Int> = listOf(
@@ -75,11 +81,21 @@ object SymPagedLayer {
         return keys
     }
 
-    /** An emoji's skin tones (and other variants), one per key; Q goes back to its page. */
-    fun variantKeys(variants: List<String>): Map<Int, String> {
+    /**
+     * An emoji's variants shown on [page] of their pages. [customizableKey] is the key whose own
+     * mapping holds the emoji, or null for an emoji of a generated page.
+     */
+    data class Variants(val items: List<String>, val page: Int = 0, val customizableKey: Int? = null) {
+        val pageCount: Int get() = (items.size + PER_PAGE - 1) / PER_PAGE
+    }
+
+    /** An emoji's skin tones (and other variants), one per key; Q goes back, P on when they need more pages. */
+    fun variantKeys(variants: Variants): Map<Int, String> {
         val keys = LinkedHashMap<Int, String>()
-        SLOTS.zip(variants).forEach { (key, item) -> keys[key] = item }
+        SLOTS.zip(variants.items.drop(variants.page * PER_PAGE)).forEach { (key, item) -> keys[key] = item }
         keys[PREVIOUS_KEY] = PREVIOUS_LABEL
+        if (variants.pageCount > 1) keys[NEXT_KEY] = NEXT_LABEL
+        if (variants.customizableKey != null) keys[EDIT_KEY] = EDIT_LABEL
         return keys
     }
 

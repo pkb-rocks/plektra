@@ -178,6 +178,38 @@ class ThemeTextureRenderingTest {
             assertSavedColoursRendered(theme)
         } finally { ThemeTextureStore.removeAvailabilityListener(listener) }
     }
+    @Test fun narrowEmojiPickerAndPhoneKeypadShowThePhotoAndRedrawColoursAfterFallback() {
+        val missing="texture-${"1".repeat(64)}.png"
+        val theme=photoTheme(missing)
+        val picker=rocks.pkb.plektra.inputmethod.ui.EmojiPickerView(context)
+        picker.configureSoftwareKeyboardMode(700,{})
+        fun layoutNarrow() {
+            picker.measure(View.MeasureSpec.makeMeasureSpec(840,View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(350,View.MeasureSpec.AT_MOST))
+            picker.layout(0,0,picker.measuredWidth,picker.measuredHeight)
+        }
+        fun inner(name:String)=org.robolectric.util.ReflectionHelpers.getField<View>(picker,name)
+        fun innerColour(name:String)=(inner(name).background as android.graphics.drawable.ColorDrawable).color
+        val keypad=AospKeyboardView(context).apply { keypad=rocks.pkb.plektra.inputmethod.SoftwareKeypad.PHONE }
+        val fills=mutableListOf<Int>()
+        val canvas=object:Canvas() { override fun drawColor(color:Int) { fills+=color } }
+        fun drawKeypad() = org.robolectric.util.ReflectionHelpers.callInstanceMethod<Unit>(keypad,"onDraw",
+            org.robolectric.util.ReflectionHelpers.ClassParameter.from(Canvas::class.java,canvas))
+
+        picker.themeOverride=theme.toKeyboardThemeColors();layoutNarrow()
+        keypad.themeOverride=theme.toAospThemeOverride();drawKeypad()
+        assertTrue(picker.background is ThemeTextureDrawable)
+        for (name in listOf("vertical","recyclerView")) assertEquals(name,android.graphics.Color.TRANSPARENT,innerColour(name))
+        assertTrue("The keypad must not cover the photo",fills.isEmpty())
+
+        awaitUnavailable(View(context),missing)
+        picker.themeOverride=theme.toKeyboardThemeColors();layoutNarrow()
+        keypad.themeOverride=theme.toAospThemeOverride();drawKeypad()
+        assertEquals(theme.background,(picker.background as android.graphics.drawable.ColorDrawable).color)
+        for (name in listOf("vertical","recyclerView")) assertEquals(name,theme.background,innerColour(name))
+        assertFalse(keypad.background is ThemeTextureDrawable)
+        assertEquals(listOf(theme.background),fills)
+    }
     @Test fun damagedPhotoFallsBackToSavedSurfaceColours() {
         ThemeTextureStore.file(context,texture.asset).writeBytes(byteArrayOf(1,2,3))
         awaitUnavailable(View(context),texture.asset)

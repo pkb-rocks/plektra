@@ -56,6 +56,25 @@ class ThemePhotoBackgroundBackupTest {
         assertArrayEquals(bytes,ThemeTextureStore.file(context,photo.asset).readBytes())
         assertArrayEquals(bytes,ThemeTextureStore.file(context,photo.sourceAsset!!).readBytes())
     }
+    @Test fun photoThemeAndKeypadEmojiAndHiddenAppSettingsRestoreFromOneZip()=runBlocking {
+        val photo=image();val value=theme(photo)
+        SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,value)
+        SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.SOFTWARE,value)
+        SettingsManager.setHardwareKeypadAutoOpen(context,true)
+        SettingsManager.setSoftwareKeyboardEmojiPageInCycle(context,true)
+        SettingsManager.setKeyboardBarHiddenInApp(context,"com.example.banking",true)
+        val zip=File(context.cacheDir,"photo-and-settings.zip")
+        val backup=BackupManager.createBackup(context,Uri.fromFile(zip));assertTrue(backup.toString(),backup is BackupResult.Success)
+        SettingsManager.getPreferences(context).edit().clear().commit();File(context.filesDir,"theme-images").deleteRecursively()
+        ThemeTextureStore.invalidate()
+        val result=RestoreManager.restore(context,Uri.fromFile(zip));assertTrue(result.toString(),result is RestoreResult.Success)
+        assertEquals(value,SettingsManager.getKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE))
+        assertEquals(value,SettingsManager.getKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.SOFTWARE))
+        assertArrayEquals(bytes,ThemeTextureStore.file(context,photo.asset).readBytes())
+        assertTrue(SettingsManager.getHardwareKeypadAutoOpen(context))
+        assertTrue(SettingsManager.getSoftwareKeyboardEmojiPageInCycle(context))
+        assertEquals(setOf("com.example.banking"),SettingsManager.getKeyboardBarHiddenPackages(context))
+    }
     @Test fun abandonedSelectionsAreNotExported() {
         val photo=image();SettingsManager.setKeyboardTheme(context,SettingsManager.KeyboardThemeTarget.HARDWARE,theme(photo))
         val abandoned="texture-${"f".repeat(64)}.png";ThemeTextureStore.file(context,abandoned).writeBytes(bytes)

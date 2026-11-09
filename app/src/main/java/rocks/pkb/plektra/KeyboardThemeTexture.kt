@@ -107,6 +107,14 @@ internal object ThemeTextureModel {
     }
 }
 
+/**
+ * The textures a renderer may draw. A backdrop whose image finally failed to load (missing after a
+ * restore, damaged) is dropped, so every saved surface colour applies again.
+ */
+internal fun Map<String, KeyboardThemeTexture>.renderable(): Map<String, KeyboardThemeTexture> {
+    val backdrop = get("background") ?: return this
+    return if (ThemeTextureStore.isUnavailable(backdrop.asset)) this - "background" else this
+}
 internal fun Map<String, KeyboardThemeTexture>.hasWholeBackdrop() = get("background")?.wholeKeyboard == true
 internal fun Map<String, KeyboardThemeTexture>.surfaceColour(colour: Int) = if (hasWholeBackdrop()) android.graphics.Color.TRANSPARENT else colour
 

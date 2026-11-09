@@ -21,8 +21,14 @@ internal object ThemeTextureStore {
         override fun sizeOf(key: String, value: Bitmap) = value.allocationByteCount
     }
     private val pending = mutableMapOf<String, MutableList<WeakReference<View>>>()
+    /** Asset names are content hashes in the app's single files directory, so failures are tracked by name. */
     private val failed = linkedSetOf<String>()
     private var generation = 0L
+    private val listeners = java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
+    private val mainHandler by lazy { android.os.Handler(android.os.Looper.getMainLooper()) }
+    /** Increases whenever an image becomes unusable or usable again; renderers re-apply their theme then. */
+    @Volatile var revision = 0L
+        private set
     fun file(context: Context, asset: String): File {
         require(ThemeTextureModel.assetPattern.matches(asset) || ThemeTextureModel.sourcePattern.matches(asset))
         return File(File(context.filesDir, DIRECTORY), asset)
@@ -31,13 +37,34 @@ internal object ThemeTextureStore {
         .joinToString("") { "%02x".format(it.toInt() and 255) }
     private fun key(context: Context, asset: String) = context.filesDir.path + "/" + asset
     fun peek(context: Context, asset: String): Bitmap? = cache.get(key(context, asset))
-    fun invalidate() = synchronized(lock) { generation++; cache.evictAll(); failed.clear() }
+    fun isUnavailable(asset: String): Boolean = synchronized(lock) { asset in failed }
+    /** Listeners run on the main thread. */
+    fun addAvailabilityListener(listener: () -> Unit) { listeners.add(listener) }
+    fun removeAvailabilityListener(listener: () -> Unit) { listeners.remove(listener) }
+    private fun availabilityChanged() {
+        synchronized(lock) { revision++ }
+        mainHandler.post { listeners.forEach { it() } }
+    }
+    fun invalidate() {
+        synchronized(lock) { generation++; cache.evictAll(); failed.clear() }
+        availabilityChanged()
+    }
+    /** A freshly written file supersedes an earlier failure for the same content hash. */
+    private fun markWritten(context: Context, asset: String) {
+        val changed = synchronized(lock) {
+            val wasFailed = failed.remove(asset)
+            // A decode that started before this write must not record a stale failure.
+            if (wasFailed || pending.containsKey(key(context, asset))) generation++
+            wasFailed
+        }
+        if (changed) availabilityChanged()
+    }
     fun request(view: View, asset: String) {
         if (!ThemeTextureModel.assetPattern.matches(asset)) return
         val app = view.context.applicationContext
         val key = key(app, asset)
         val epoch = synchronized(lock) {
-            if (cache.get(key) != null || key in failed) return
+            if (cache.get(key) != null || asset in failed) return
             pending[key]?.let { if (it.size < 96) it.add(WeakReference(view)); return }
             pending[key] = mutableListOf(WeakReference(view))
             generation
@@ -46,14 +73,17 @@ internal object ThemeTextureStore {
             val bitmap = try {
                 decodeAsset(app, asset)
             } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }
+            var newlyFailed = false
             val views = synchronized(lock) {
                 if (generation == epoch) {
                     if (bitmap != null) cache.put(key, bitmap) else {
-                        failed.add(key); if (failed.size > 128) failed.remove(failed.first())
+                        newlyFailed = failed.add(asset); if (failed.size > 128) failed.remove(failed.first())
                     }
                 }
                 pending.remove(key).orEmpty()
             }
+            // Themes drop a failed image and show all saved surface colours again.
+            if (newlyFailed) availabilityChanged()
             withContext(Dispatchers.Main) { views.forEach { it.get()?.invalidate() } }
         }
     }
@@ -85,6 +115,7 @@ internal object ThemeTextureStore {
             require(temporary.length() <= if (source) 8_388_608 else 2_097_152)
             val name = (if (source) "source-" else "texture-") + hash(temporary.readBytes()) + ".png"
             Files.move(temporary.toPath(), File(directory, name).toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+            markWritten(context, name)
             return name
         } finally { temporary.delete() }
     }

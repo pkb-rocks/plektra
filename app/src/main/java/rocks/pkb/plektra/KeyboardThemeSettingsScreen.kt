@@ -59,6 +59,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -126,7 +127,9 @@ fun KeyboardThemeScreen(
         }
     }
     val previewPagerState = rememberPagerState(initialPage = initialPreviewPage, pageCount = { 2 })
-    var customizationTab by remember {
+    // Saved with the draft name below: together with the pager page they identify the editor,
+    // whose photo picker registration must survive activity recreation.
+    var customizationTab by rememberSaveable {
         mutableStateOf(if (initialTab == KeyboardThemeEditorTab.Keys) 1 else 0)
     }
     val initialHardwarePreset = remember {
@@ -191,7 +194,7 @@ fun KeyboardThemeScreen(
     var showSaveAsDialog by remember { mutableStateOf(false) }
     var pendingImportedTheme by remember { mutableStateOf<KeyboardThemePreset?>(null) }
     var showNewDraftDialog by remember { mutableStateOf(false) }
-    var draftEditorName by remember { mutableStateOf<String?>(null) }
+    var draftEditorName by rememberSaveable { mutableStateOf<String?>(null) }
     val draftEditingGuard = remember { mutableStateOf(false) }
     var draftListFocusName by remember { mutableStateOf<String?>(null) }
     var deleteThemeRequest by remember { mutableStateOf<String?>(null) }

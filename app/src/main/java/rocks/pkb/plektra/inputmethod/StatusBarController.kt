@@ -31,6 +31,8 @@ import rocks.pkb.plektra.R
 import rocks.pkb.plektra.MainActivity
 import rocks.pkb.plektra.SymCustomizationActivity
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.renderable
+import rocks.pkb.plektra.surfaceColour
 import rocks.pkb.plektra.SymPagesConfig
 import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
@@ -576,32 +578,34 @@ class StatusBarController(
     }
 
     private fun SettingsManager.KeyboardThemeSettings.toAospThemeOverride(): AospKeyboardView.ThemeOverride =
-        AospKeyboardView.ThemeOverride(
-            background = background,
-            divider = divider,
-            normalKey = if (textures["background"]?.wholeKeyboard == true) Color.TRANSPARENT else normalKey,
-            specialKey = if (textures["background"]?.wholeKeyboard == true) Color.TRANSPARENT else specialKey,
-            textAndIcons = textAndIcons,
-            ledInactive = ledInactive,
-            ledActive = ledActive,
-            ledLocked = ledLocked,
-            accent = accent,
-            keyPopup = keyPopup,
-            keyPopupSelected = keyPopupSelected,
-            keyPopupStyle = keyPopupStyle,
-            keyPopupAttached = keyPopupAttached,
-            keyPopupTailEnabled = keyPopupTailEnabled,
-            keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-            keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
-            keyCornerRadiusRatio = keyCornerRadiusRatio,
-            keyHeightScale = keyHeightScale,
-            numberRowHeightScale = numberRowHeightScale,
-            keyWidthScale = keyWidthScale,
-            rowGapScale = rowGapScale,
-            distributeHorizontalSpacing = distributeHorizontalSpacing,
-            ortholinear = ortholinear,
-            textures = textures
-        )
+        textures.renderable().let { shown ->
+            AospKeyboardView.ThemeOverride(
+                background = background,
+                divider = divider,
+                normalKey = shown.surfaceColour(normalKey),
+                specialKey = shown.surfaceColour(specialKey),
+                textAndIcons = textAndIcons,
+                ledInactive = ledInactive,
+                ledActive = ledActive,
+                ledLocked = ledLocked,
+                accent = accent,
+                keyPopup = keyPopup,
+                keyPopupSelected = keyPopupSelected,
+                keyPopupStyle = keyPopupStyle,
+                keyPopupAttached = keyPopupAttached,
+                keyPopupTailEnabled = keyPopupTailEnabled,
+                keyPreviewAfterLongPress = keyPreviewAfterLongPress,
+                keyAlternatesPopupEnabled = keyAlternatesPopupEnabled,
+                keyCornerRadiusRatio = keyCornerRadiusRatio,
+                keyHeightScale = keyHeightScale,
+                numberRowHeightScale = numberRowHeightScale,
+                keyWidthScale = keyWidthScale,
+                rowGapScale = rowGapScale,
+                distributeHorizontalSpacing = distributeHorizontalSpacing,
+                ortholinear = ortholinear,
+                textures = shown
+            )
+        }
 
     fun setSlimModeActive(active: Boolean) {
         if (slimModeActive == active) {
@@ -3221,7 +3225,7 @@ class StatusBarController(
         layout.visibility = View.VISIBLE
         applyAccessibilityLiveRegionPreference(layout)
         
-        rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeTheme.background, activeTheme.textures["background"])
+        rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
         
         modifiersContainerView.visibility = View.GONE
         val showHardwareBottomIndicators = barPresentation.bottomIndicators
@@ -3395,7 +3399,7 @@ class StatusBarController(
             val measured = measureSoftwareKeyboardDesiredHeight(emojiKeyboardView, layout)
             val keyboardHeight = if (measured > 0) measured else defaultSymHeightPx
             lastSoftwareKeyboardHeight = keyboardHeight
-            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, softwareThemeSettings.background, softwareThemeSettings.textures["background"])
+            rocks.pkb.plektra.ThemeTextureBackground.set(emojiKeyboardView, softwareThemeSettings.background, softwareThemeSettings.textures.renderable()["background"])
             emojiKeyboardView.visibility = View.VISIBLE
             applySymSurfaceLayout(
                 symSurfaceView,

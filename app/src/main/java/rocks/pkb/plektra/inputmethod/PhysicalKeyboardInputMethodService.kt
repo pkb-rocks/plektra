@@ -132,6 +132,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // SharedPreferences for settings
     private lateinit var prefs: SharedPreferences
     private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+    // A theme photo that cannot load falls back to the saved colours; re-apply like a theme change.
+    private val themeImageAvailabilityListener: () -> Unit = { updateStatusBarText() }
     private var lastSystemLocalesSignature: String = ""
     private var lastImeConfiguration: Configuration? = null
 
@@ -2606,6 +2608,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         Log.d(TRACKPAD_DEBUG_TAG, "onCreate: SharedPreferences listener registered")
+        rocks.pkb.plektra.ThemeTextureStore.addAvailabilityListener(themeImageAvailabilityListener)
         
         // Register broadcast receiver for permission request result
         permissionResultReceiver = object : BroadcastReceiver() {
@@ -3010,6 +3013,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         prefsListener?.let {
             prefs.unregisterOnSharedPreferenceChangeListener(it)
         }
+        rocks.pkb.plektra.ThemeTextureStore.removeAvailabilityListener(themeImageAvailabilityListener)
         
         cancelSpeechRecognition()
         speechScope.cancel()

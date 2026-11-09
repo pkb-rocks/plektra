@@ -513,27 +513,29 @@ object SettingsManager {
         val textures: Map<String, KeyboardThemeTexture> = emptyMap()
     ) {
         fun toKeyboardThemeColors(): KeyboardThemeColors =
-            KeyboardThemeColors(
-                background = background,
-                divider = divider,
-                normalKey = textures.surfaceColour(normalKey),
-                specialKey = textures.surfaceColour(specialKey),
-                textAndIcons = textAndIcons,
-                ledInactive = ledInactive,
-                ledActive = ledActive,
-                ledLocked = ledLocked,
-                accent = accent,
-                cursorSwipe = cursorSwipe,
-                keyPopup = keyPopup,
-                keyPopupSelected = keyPopupSelected,
-                suggestion = textures.surfaceColour(suggestion),
-                statusBarButton = textures.surfaceColour(statusBarButton),
-                keyCornerRadiusRatio = keyCornerRadiusRatio,
-                chromeCornerRadiusRatio = chromeCornerRadiusRatio,
-                suggestionsHeightScale = suggestionsHeightScale,
-                variationsHeightScale = variationsHeightScale,
-                textures = textures
-            )
+            textures.renderable().let { shown ->
+                KeyboardThemeColors(
+                    background = background,
+                    divider = divider,
+                    normalKey = shown.surfaceColour(normalKey),
+                    specialKey = shown.surfaceColour(specialKey),
+                    textAndIcons = textAndIcons,
+                    ledInactive = ledInactive,
+                    ledActive = ledActive,
+                    ledLocked = ledLocked,
+                    accent = accent,
+                    cursorSwipe = cursorSwipe,
+                    keyPopup = keyPopup,
+                    keyPopupSelected = keyPopupSelected,
+                    suggestion = shown.surfaceColour(suggestion),
+                    statusBarButton = shown.surfaceColour(statusBarButton),
+                    keyCornerRadiusRatio = keyCornerRadiusRatio,
+                    chromeCornerRadiusRatio = chromeCornerRadiusRatio,
+                    suggestionsHeightScale = suggestionsHeightScale,
+                    variationsHeightScale = variationsHeightScale,
+                    textures = shown
+                )
+            }
     }
 
     data class NamedKeyboardTheme(

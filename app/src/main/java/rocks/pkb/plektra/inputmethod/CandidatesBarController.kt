@@ -58,6 +58,28 @@ class CandidatesBarController(
             candidatesStatusBar.onAddUserWordSubstitutionRequested = value
         }
 
+    /** A key of a paged SYM layer was tapped on screen; true when the layer handled it. */
+    var onSymPageKeyTapped: ((Int) -> Boolean)? = null
+        set(value) {
+            field = value
+            inputStatusBar.onSymPageKeyTapped = value
+            candidatesStatusBar.onSymPageKeyTapped = value
+        }
+
+    /** A key of a paged SYM layer was held on screen; true when the layer handled it. */
+    var onSymPageKeyLongPressed: ((Int) -> Boolean)? = null
+        set(value) {
+            field = value
+            inputStatusBar.onSymPageKeyLongPressed = value
+            candidatesStatusBar.onSymPageKeyLongPressed = value
+        }
+
+    /** The emoji picker opens with its search shown the next time it appears. */
+    fun requestEmojiPickerSearch() {
+        inputStatusBar.requestEmojiPickerSearch()
+        candidatesStatusBar.requestEmojiPickerSearch()
+    }
+
     var onSymTextCommitted: (() -> Unit)? = null
         set(value) {
             field = value

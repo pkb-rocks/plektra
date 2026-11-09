@@ -911,4 +911,19 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">Այստեղ ընտրված հավելվածներում Plektra-ն երբեք չի ցուցադրում իր պանելը կամ էկրանային ստեղնաշարը՝ անկախ տեսանելիության մյուս կարգավորումներից, և նույնիսկ եթե փորձեք այն բացել ստեղնով, դյուրանցմամբ կամ համակարգի ստեղնաշարի կոճակով։ Ֆիզիկական ստեղնաշարով մուտքագրումը շարունակում է աշխատել, ներառյալ SYM շերտերը, դյուրանցումները, մոդիֆիկատորները և emoji-ների կամ հատվածների ճշգրիտ կոդերը։ Սեղմատախտակը և emoji ընտրիչը այս հավելվածներում մնում են փակ։</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Վեբ հավելված՝ աշխատում է %1$s-ի ներսում, ուստի պանելն այնտեղ նույնպես թաքնված է</string>
+    <string name="emoji_category_unicode_symbols">Տեքստային նշաններ</string>
+    <string name="emoji_category_kaomoji">Կաոմոջի</string>
+    <string name="emoji_style_title">Էմոջիների տեսքը</string>
+    <string name="emoji_style_noto">Noto Color Emoji (ներկառուցված)</string>
+    <string name="emoji_style_system">Համակարգային տառատեսակ</string>
+    <string name="emoji_style_description">Plektra-ն տեղադրում է ստանդարտ Unicode էմոջիներ․ հավելվածը, որում գրում եք, դրանք ցուցադրում է իր տառատեսակով։</string>
+    <string name="emoji_skin_tone_title">Մաշկի լռելյայն երանգ</string>
+    <string name="emoji_pages_emoji_title">Էմոջիների էջը թերթել Q-ով և P-ով</string>
+    <string name="emoji_pages_symbols_title">Նշանների էջը թերթել Q-ով և P-ով</string>
+    <string name="emoji_pages_description">Q-ն և P-ն թերթում են էջերը, Shift+Q-ն և Shift+P-ն անցնում են կատեգորիաների միջև, A-ն բացում է որոնումը։ Պահեք էմոջին՝ մաշկի երանգների համար։</string>
+    <string name="kaomoji_placement_title">Կաոմոջիի էջեր</string>
+    <string name="kaomoji_placement_symbols">Նշաններից հետո</string>
+    <string name="kaomoji_placement_emoji">Էմոջիներից հետո</string>
+    <string name="kaomoji_placement_off">Անջատված</string>
+    <string name="emoji_picker_extras_title">Տեքստային նշաններ և կաոմոջի էմոջիների ընտրիչում</string>
 </resources>

@@ -17,6 +17,10 @@ class EmojiAvailability internal constructor(
     companion object {
         private const val MIN_API_ASSET = "common/emoji/minApi.txt"
 
+        /** Availability by the bundled emoji font rather than the system font. */
+        fun bundledFont(draws: (String) -> Boolean): EmojiAvailability =
+            EmojiAvailability(minApiByEmoji = emptyMap(), hasGlyph = draws)
+
         fun fromAssets(assets: AssetManager): EmojiAvailability = EmojiAvailability(
             minApiByEmoji = runCatching {
                 assets.open(MIN_API_ASSET).bufferedReader().useLines { lines ->

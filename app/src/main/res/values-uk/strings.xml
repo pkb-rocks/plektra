@@ -913,4 +913,19 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">У вибраних тут застосунках Plektra ніколи не показує панель і екранну клавіатуру: незалежно від інших налаштувань видимості й навіть тоді, коли ви намагаєтеся відкрити її клавішею, комбінацією клавіш або системною кнопкою клавіатури. Введення з фізичної клавіатури працює далі, зокрема шари SYM, комбінації клавіш, модифікатори й точні коди емодзі або фрагментів. Буфер обміну й вибір емодзі в цих застосунках лишаються закритими.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Вебзастосунок — працює всередині %1$s, тож панель прихована й там</string>
+    <string name="emoji_category_unicode_symbols">Текстові символи</string>
+    <string name="emoji_category_kaomoji">Каомодзі</string>
+    <string name="emoji_style_title">Вигляд емодзі</string>
+    <string name="emoji_style_noto">Noto Color Emoji (вбудований)</string>
+    <string name="emoji_style_system">Системний шрифт</string>
+    <string name="emoji_style_description">Plektra вставляє стандартні емодзі Unicode; застосунок, у якому ви пишете, показує їх власним шрифтом.</string>
+    <string name="emoji_skin_tone_title">Тон шкіри за замовчуванням</string>
+    <string name="emoji_pages_emoji_title">Гортати сторінку емодзі клавішами Q і P</string>
+    <string name="emoji_pages_symbols_title">Гортати сторінку символів клавішами Q і P</string>
+    <string name="emoji_pages_description">Q і P гортають сторінки, Shift+Q і Shift+P переходять між категоріями, A відкриває пошук. Утримуйте емодзі, щоб вибрати тон шкіри.</string>
+    <string name="kaomoji_placement_title">Сторінки каомодзі</string>
+    <string name="kaomoji_placement_symbols">Після символів</string>
+    <string name="kaomoji_placement_emoji">Після емодзі</string>
+    <string name="kaomoji_placement_off">Вимк.</string>
+    <string name="emoji_picker_extras_title">Текстові символи й каомодзі у виборі емодзі</string>
 </resources>

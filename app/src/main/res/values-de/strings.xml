@@ -1670,4 +1670,19 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="caret_badge_custom_colors_description">Farben des Keyboard-Themes ersetzen.</string>
     <string name="alt_latch_stays_on_space_title">Alt eingerastet lassen</string>
     <string name="alt_latch_stays_on_space_description">Leertaste und Enter deaktivieren einmaliges Alt, lassen eingerastetes Alt aber aktiv.</string>
+    <string name="emoji_category_unicode_symbols">Textsymbole</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Emoji-Darstellung</string>
+    <string name="emoji_style_noto">Noto Color Emoji (integriert)</string>
+    <string name="emoji_style_system">Systemschrift</string>
+    <string name="emoji_style_description">Plektra fügt Unicode-Standard-Emoji ein; die App, in der du schreibst, zeigt sie mit ihrer eigenen Schrift an.</string>
+    <string name="emoji_skin_tone_title">Standard-Hautton</string>
+    <string name="emoji_pages_emoji_title">Emoji-Seite mit Q und P blättern</string>
+    <string name="emoji_pages_symbols_title">Symbolseite mit Q und P blättern</string>
+    <string name="emoji_pages_description">Q und P blättern, Umschalt+Q und Umschalt+P springen zwischen Kategorien, A öffnet die Suche. Halte ein Emoji für seine Hauttöne.</string>
+    <string name="kaomoji_placement_title">Kaomoji-Seiten</string>
+    <string name="kaomoji_placement_symbols">Nach den Symbolen</string>
+    <string name="kaomoji_placement_emoji">Nach den Emoji</string>
+    <string name="kaomoji_placement_off">Aus</string>
+    <string name="emoji_picker_extras_title">Textsymbole und Kaomoji im Emoji-Picker</string>
 </resources>

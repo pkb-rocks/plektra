@@ -52,6 +52,7 @@ class PlektraApplication : Application() {
             if (key == null || key in DirectBootKeyboardConfig.KEYS) config.refresh(source)
         }.also { preferences.registerOnSharedPreferenceChangeListener(it) }
         SettingsManager.initializeAltShiftLayoutSwitchDefault(this)
+        rocks.pkb.plektra.data.emoji.EmojiRendering.ensureInitialized(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
         SettingsManager.migrateCompactSoftwareKeyHeightOnce(this)
         AppPackageChangeMonitor.register(this)

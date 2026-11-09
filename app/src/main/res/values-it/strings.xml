@@ -1090,4 +1090,19 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">Nelle app scelte qui, Plektra non mostra mai la sua barra né la tastiera su schermo: indipendentemente dalle altre impostazioni di visibilità, e anche se provi ad aprirla con un tasto, una scorciatoia o il pulsante tastiera del sistema. La digitazione con la tastiera fisica continua a funzionare, inclusi i livelli SYM, le scorciatoie, i modificatori e i codici esatti di emoji o snippet. Gli appunti e il selettore emoji restano chiusi in queste app.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Web app: funziona dentro %1$s, quindi la barra è nascosta anche lì</string>
+    <string name="emoji_category_unicode_symbols">Simboli di testo</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Aspetto delle emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (integrato)</string>
+    <string name="emoji_style_system">Carattere di sistema</string>
+    <string name="emoji_style_description">Plektra inserisce emoji Unicode standard; l’app in cui scrivi le mostra con il proprio carattere.</string>
+    <string name="emoji_skin_tone_title">Tonalità della pelle predefinita</string>
+    <string name="emoji_pages_emoji_title">Sfoglia la pagina emoji con Q e P</string>
+    <string name="emoji_pages_symbols_title">Sfoglia la pagina simboli con Q e P</string>
+    <string name="emoji_pages_description">Q e P sfogliano le pagine, Maiusc+Q e Maiusc+P saltano tra le categorie, A apre la ricerca. Tieni premuta un’emoji per le sue tonalità della pelle.</string>
+    <string name="kaomoji_placement_title">Pagine kaomoji</string>
+    <string name="kaomoji_placement_symbols">Dopo i simboli</string>
+    <string name="kaomoji_placement_emoji">Dopo le emoji</string>
+    <string name="kaomoji_placement_off">Disattivato</string>
+    <string name="emoji_picker_extras_title">Simboli di testo e kaomoji nel selettore emoji</string>
 </resources>

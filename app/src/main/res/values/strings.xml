@@ -1986,4 +1986,19 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_auto_correction_exact_typing">exact typing, raw, per app, terminal, termux, ssh, disable autocorrect, auto-capitalization</string>
     <string name="caret_badge_custom_colors_title">Use custom colours</string>
     <string name="caret_badge_custom_colors_description">Override the keyboard theme colours.</string>
+    <string name="emoji_category_unicode_symbols">Text symbols</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Emoji appearance</string>
+    <string name="emoji_style_noto">Noto Color Emoji (built in)</string>
+    <string name="emoji_style_system">System font</string>
+    <string name="emoji_style_description">Plektra inserts standard Unicode emoji; the app you type in draws them with its own font.</string>
+    <string name="emoji_skin_tone_title">Default skin tone</string>
+    <string name="emoji_pages_emoji_title">Turn the emoji page with Q and P</string>
+    <string name="emoji_pages_symbols_title">Turn the symbols page with Q and P</string>
+    <string name="emoji_pages_description">Q and P turn the pages, Shift+Q and Shift+P jump between categories, A opens the search. Hold an emoji for its skin tones.</string>
+    <string name="kaomoji_placement_title">Kaomoji pages</string>
+    <string name="kaomoji_placement_symbols">After the symbols</string>
+    <string name="kaomoji_placement_emoji">After the emoji</string>
+    <string name="kaomoji_placement_off">Off</string>
+    <string name="emoji_picker_extras_title">Text symbols and kaomoji in the emoji picker</string>
 </resources>

@@ -113,6 +113,14 @@ class StatusBarController(
         }
 
     var onSymTextCommitted: (() -> Unit)? = null
+    var onSymPageKeyTapped: ((Int) -> Boolean)? = null
+    var onSymPageKeyLongPressed: ((Int) -> Boolean)? = null
+    private var emojiPickerSearchRequested = false
+
+    /** The emoji picker opens with its search shown the next time it appears. */
+    fun requestEmojiPickerSearch() {
+        emojiPickerSearchRequested = true
+    }
 
     var onSuggestionCommitted: (() -> Unit)? = null
 
@@ -1287,6 +1295,10 @@ class StatusBarController(
             view.scrollToTop() // View was just added (happens when reopening after being removed)
         }
         lastSymPageRendered = 4
+        if (emojiPickerSearchRequested) {
+            emojiPickerSearchRequested = false
+            view.post { view.showSearch() }
+        }
     }
 
     private fun showEmojiPickerSearchPopup(
@@ -1531,11 +1543,13 @@ class StatusBarController(
                 val label = keyLabels[keyCode] ?: ""
                 val content = symMappings[keyCode] ?: ""
                 
-                val keyButton = createEmojiKeyButton(label, content, keyHeight, page)
+                val keyButton = createEmojiKeyButton(label, content, keyHeight, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
                 emojiKeyButtons.add(keyButton)
                 keyButton.isLongClickable = true
                 keyButton.setOnLongClickListener {
-                    openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+                    if (onSymPageKeyLongPressed?.invoke(keyCode) != true) {
+                        openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+                    }
                     true
                 }
                 
@@ -1544,6 +1558,7 @@ class StatusBarController(
                     keyButton.isClickable = true
                     keyButton.isFocusable = true
                     keyButton.setOnClickListener {
+                        if (onSymPageKeyTapped?.invoke(keyCode) == true) return@setOnClickListener
                         commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
                     }
                 }
@@ -2038,12 +2053,17 @@ class StatusBarController(
             row.forEachIndexed { index, labelChar ->
                 val label = labelChar.toString().uppercase()
                 val content = softwareSymContentByChar[labelChar] ?: softwareSymbolFallback(labelChar)
-                val keyButton = createEmojiKeyButton(label, content, keyHeight, page)
+                val keyButton = createEmojiKeyButton(label, content, keyHeight, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
+                val letterKeyCode = SoftwareKeyboardSymLabels.keyCodeForChar(labelChar, layoutName)
                 if (content.isNotEmpty() && inputConnection != null) {
                     keyButton.isClickable = true
                     keyButton.isFocusable = true
                     keyButton.setOnClickListener {
+                        if (letterKeyCode != null && onSymPageKeyTapped?.invoke(letterKeyCode) == true) return@setOnClickListener
                         commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
+                    }
+                    if (letterKeyCode != null) {
+                        keyButton.setOnLongClickListener { onSymPageKeyLongPressed?.invoke(letterKeyCode) == true }
                     }
                 }
                 rowLayout.addView(keyButton, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
@@ -2420,7 +2440,13 @@ class StatusBarController(
      * @param height L'altezza del tasto
      * @param page La pagina attiva (1=emoji, 2=caratteri)
      */
-    private fun createEmojiKeyButton(label: String, content: String, height: Int, page: Int): View {
+    private fun createEmojiKeyButton(
+        label: String,
+        content: String,
+        height: Int,
+        page: Int,
+        pagedKind: rocks.pkb.plektra.core.SymPagedLayer.Kind? = null
+    ): View {
         val theme = activeThemeColors()
         val keyLayout = FrameLayout(context).apply {
             setPadding(0, 0, 0, 0) // Nessun padding per permettere all'emoji di occupare tutto lo spazio
@@ -2455,10 +2481,21 @@ class StatusBarController(
             (heightInDp * 0.75f)
         }
         
+        val textLike = pagedKind == rocks.pkb.plektra.core.SymPagedLayer.Kind.KAOMOJI ||
+            content.codePointCount(0, content.length) > 3 && !content.any { Character.isSurrogate(it) }
         val contentText = TextView(context).apply {
-            text = content
+            text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(context, content)
             textSize = contentTextSize // textSize è in sp
             gravity = Gravity.CENTER
+            if (textLike) {
+                // Kaomoji and other long text: one line, shrunk to fit the key
+                maxLines = 1
+                setPadding(dpToPx(2f), 0, dpToPx(2f), dpToPx(8f))
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this, 6, contentTextSize.toInt().coerceAtLeast(7), 1, TypedValue.COMPLEX_UNIT_SP
+                )
+                setTextColor(theme.textAndIcons)
+            }
             if (roundedCorners) setTextColor(theme.textAndIcons)
             // Per pagina 2 (caratteri), rendi bianco e in grassetto
             if (page == 2) {
@@ -2705,10 +2742,12 @@ class StatusBarController(
         )
         val label = keyLabels[keyCode] ?: ""
         val content = symMappings[keyCode] ?: ""
-        val keyButton = createEmojiKeyButton(label, content, height, page)
+        val keyButton = createEmojiKeyButton(label, content, height, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
         keyButton.isLongClickable = true
         keyButton.setOnLongClickListener {
-            openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+            if (onSymPageKeyLongPressed?.invoke(keyCode) != true) {
+                openSymCustomization(page = page, keyCode = keyCode, openPicker = true)
+            }
             true
         }
         
@@ -2716,6 +2755,7 @@ class StatusBarController(
             keyButton.isClickable = true
             keyButton.isFocusable = true
             keyButton.setOnClickListener {
+                if (onSymPageKeyTapped?.invoke(keyCode) == true) return@setOnClickListener
                 commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
             }
         }

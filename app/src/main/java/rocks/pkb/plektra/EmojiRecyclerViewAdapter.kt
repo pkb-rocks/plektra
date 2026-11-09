@@ -45,7 +45,7 @@ class EmojiRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: EmojiViewHolder, position: Int) {
-        holder.emojiText.text = emojis[position]
+        holder.emojiText.text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(holder.emojiText.context, emojis[position])
     }
 
     override fun getItemCount(): Int = emojis.size

@@ -912,4 +912,19 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">En las apps que elijas aquí, Plektra nunca muestra su barra ni el teclado en pantalla: sin importar los demás ajustes de visibilidad, e incluso si intentas abrirla con una tecla, un atajo o el botón de teclado del sistema. La escritura con el teclado físico sigue funcionando, incluidas las capas SYM, los atajos, los modificadores y los códigos exactos de emoji o fragmentos. El portapapeles y el selector de emoji permanecen cerrados en estas apps.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Aplicación web: se ejecuta dentro de %1$s, así que la barra también queda oculta allí</string>
+    <string name="emoji_category_unicode_symbols">Símbolos de texto</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Apariencia de los emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (integrada)</string>
+    <string name="emoji_style_system">Fuente del sistema</string>
+    <string name="emoji_style_description">Plektra inserta emoji Unicode estándar; la app en la que escribes los muestra con su propia fuente.</string>
+    <string name="emoji_skin_tone_title">Tono de piel predeterminado</string>
+    <string name="emoji_pages_emoji_title">Pasar la página de emoji con Q y P</string>
+    <string name="emoji_pages_symbols_title">Pasar la página de símbolos con Q y P</string>
+    <string name="emoji_pages_description">Q y P pasan las páginas, Mayús+Q y Mayús+P saltan entre categorías, A abre la búsqueda. Mantén pulsado un emoji para ver sus tonos de piel.</string>
+    <string name="kaomoji_placement_title">Páginas de kaomoji</string>
+    <string name="kaomoji_placement_symbols">Después de los símbolos</string>
+    <string name="kaomoji_placement_emoji">Después de los emoji</string>
+    <string name="kaomoji_placement_off">Desactivado</string>
+    <string name="emoji_picker_extras_title">Símbolos de texto y kaomoji en el selector de emoji</string>
 </resources>

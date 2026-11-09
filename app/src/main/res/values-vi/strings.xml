@@ -910,4 +910,19 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">Trong các ứng dụng bạn chọn ở đây, Plektra không bao giờ hiện thanh của nó hay bàn phím ảo: bất kể các cài đặt hiển thị khác, và kể cả khi bạn thử mở bằng phím, phím tắt hoặc nút bàn phím của hệ thống. Gõ bằng bàn phím vật lý vẫn hoạt động, bao gồm các lớp SYM, phím tắt, phím bổ trợ và mã emoji hoặc đoạn mẫu chính xác. Bảng nhớ tạm và bộ chọn emoji luôn đóng trong các ứng dụng này.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Ứng dụng web — chạy bên trong %1$s, nên thanh cũng bị ẩn ở đó</string>
+    <string name="emoji_category_unicode_symbols">Ký hiệu văn bản</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Giao diện emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (tích hợp)</string>
+    <string name="emoji_style_system">Phông chữ hệ thống</string>
+    <string name="emoji_style_description">Plektra chèn emoji Unicode chuẩn; ứng dụng bạn đang gõ hiển thị chúng bằng phông chữ riêng.</string>
+    <string name="emoji_skin_tone_title">Tông da mặc định</string>
+    <string name="emoji_pages_emoji_title">Lật trang emoji bằng Q và P</string>
+    <string name="emoji_pages_symbols_title">Lật trang ký hiệu bằng Q và P</string>
+    <string name="emoji_pages_description">Q và P lật trang, Shift+Q và Shift+P chuyển giữa các danh mục, A mở tìm kiếm. Giữ một emoji để chọn tông da.</string>
+    <string name="kaomoji_placement_title">Trang kaomoji</string>
+    <string name="kaomoji_placement_symbols">Sau ký hiệu</string>
+    <string name="kaomoji_placement_emoji">Sau emoji</string>
+    <string name="kaomoji_placement_off">Tắt</string>
+    <string name="emoji_picker_extras_title">Ký hiệu văn bản và kaomoji trong bộ chọn emoji</string>
 </resources>

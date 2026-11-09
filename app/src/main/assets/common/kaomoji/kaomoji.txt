@@ -1,0 +1,420 @@
+## Kaomoji for Plektra's kaomoji pages and search, one per line, grouped by mood, expression,
+## action and animal. "## <Section> · <Group> | <search words>" starts a group; a tab after a
+## kaomoji gives its own names (lenny face, table flip). Blank lines are skipped. Search words
+## are English and German.
+## Collection from Flux Keyboard (https://github.com/Flux-Sniffer-Mods/Flux-Keyboard, GPL-3.0),
+## release 2.0.0; German search words added for Plektra.
+## Mood · Joy | happy joy glad smile cheerful excited yay grin laugh fröhlich freude froh lächeln lachen glücklich juhu grinsen
+(˶˃ ᵕ ˂˶)
+(˶˃𐃷˂˶)
+◝(ᵔᗜᵔ)◜
+(◕‿◕)
+(✿◠‿◠)	flower
+(＾▽＾)
+(•‿•)
+( ˶ˆᗜˆ˵ )
+(ᵔᴥᵔ)	bear
+(◍•ᴗ•◍)
+٩(◕‿◕)۶
+(≧▽≦)
+＼(^o^)／	yay cheer
+(๑˃ᴗ˂)ﻭ
+ヽ(・∀・)ﾉ
+(*^▽^*)
+(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧	sparkles magic throw
+(☆▽☆)
+(•̀ᴗ•́)و
+ᕕ( ᐛ )ᕗ	happy walk strut
+(⌒‿⌒)
+(￣▽￣)
+(o^▽^o)
+( ´ ▽ ` )
+(ㅅ´ ˘ `)
+(*≧ω≦*)
+(ﾉ´ヮ`)ﾉ*: ･ﾟ	sparkles throw
+\(★ω★)/
+(o˘◡˘o)
+(◠‿◠)
+(⁀ᗢ⁀)
+٩(｡•́‿•̀｡)۶
+ヽ(>∀<☆)ノ
+(＾▽＾)／
+(´｡• ω •｡`)
+(*¯︶¯*)
+(✯◡✯)
+☆*:.｡.o(≧▽≦)o.｡.:*☆
+(^_^)
+(^-^)
+(^ω^)
+(^▽^)
+(≧◡≦)
+ヾ(＾∇＾)
+(o´▽`o)
+(*´▽`*)
+＼(＾▽＾)／
+(ﾉ^ヮ^)ﾉ*:・ﾟ✧
+ᕦ(ò_óˇ)ᕤ	flex strong muscles
+(ง •̀_•́)ง	fight me fists
+(๑•̀ㅂ•́)و✧
+(•̀ω•́)✧
+\(^o^)/	yay cheer
+(ノ^∇^)
+(ﾉ≧∀≦)ﾉ
+## Mood · Love | love heart kiss affection crush cute adore liebe herz kuss verliebt süß zuneigung
+(♡˙︶˙♡)
+(っ˘з(˘⌣˘ )	kiss
+(´｡• ᵕ •｡`) ♡
+(˘³˘)♥	kiss
+(｡♥‿♥｡)	heart eyes
+♡(ӦｖӦ｡)
+(灬º‿º灬)♡
+(˘∀˘)/(μ‿μ) ❤
+(*˘︶˘*).｡*♡
+(ღ˘⌣˘ღ)
+♡⸜(˶˃ ᵕ ˂˶)⸝♡
+(๑♡⌓♡๑)
+(ˊ˘ˋ*)♡
+(˶ᵔ ᵕ ᵔ˶)
+ʚ♡ɞ
+(♡μ_μ)
+(•ө•)♡
+(´ ε ` )♡
+(◕‿◕)♡
+(≧◡≦) ♡
+(♥ω♥*)
+(´♡‿♡`)
+♡( ◡‿◡ )
+(*♡∀♡)
+(⺣◡⺣)♡*
+(´,,•ω•,,)♡
+♡＼(￣▽￣)／♡
+( ˘ ³˘)♥
+(っ´▽`)っ♡
+(人◕ω◕)
+(◍•ᴗ•◍)❤
+## Mood · Sad | sad cry crying tears upset unhappy depressed traurig weinen tränen unglücklich deprimiert
+(╥﹏╥)	crying
+(ಥ﹏ಥ)	crying
+(T_T)
+(;_;)
+(｡•́︿•̀｡)
+( ´•︵•` )
+(ᗒᗣᗕ)՞
+(ToT)
+(╯︵╰,)
+(っ- ‸ – ς)
+(｡╯︵╰｡)
+(ಥ_ಥ)
+(｡T ω T｡)
+(個_個)
+(つ﹏<。)
+(-_-)	unimpressed
+(´；ω；`)
+(｡ŏ﹏ŏ)
+(っ˘̩╭╮˘̩)っ
+(ノ_<。)
+(´°̥̥̥̥̥̥̥̥ω°̥̥̥̥̥̥̥̥｀)
+(T▽T)
+## Mood · Angry and annoyed | angry mad annoyed rage furious grumpy wütend sauer genervt wut zornig grummelig
+(ㆆ_ㆆ)
+(¬_¬)
+(눈_눈)
+(╯°□°）╯︵ ┻━┻	table flip flipping tableflip rage
+┬─┬ノ( º _ ºノ)	table back put table back unflip calm
+(ノಠ益ಠ)ノ	rage disapproval
+ಠ_ಠ	look of disapproval disapprove stare
+(￣︿￣)
+(-_-;)
+(＃`Д´)
+(╬ Ò﹏Ó)
+(ᗒᗣᗕ)
+(҂ `з´ )
+(¬_¬")
+(ꐦ°᷄д°᷅)
+(｀へ´)
+ヽ(`⌒´メ)ノ
+(ﾉ｀Д´)ﾉ
+(`Д´)
+(ಠ益ಠ)	rage disapproval
+(╬≖_≖)
+(⩺_⩹)
+(ー_ー)!!
+(︶︹︺)
+## Mood · Confused and doubtful | confused doubt unsure huh what puzzled verwirrt zweifel unsicher hä was ratlos
+¯\_(ツ)_/¯	shrug shruggie
+(・_・;)
+(⊙_⊙)	stare wide eyes
+(・・?)
+(￣ω￣;)
+(・∧‐)ゞ
+(゜-゜)
+(´･_･`)
+(⊙_☉)
+(•ิ_•ิ)?
+(•ˋ _ ˊ•)
+(¯ . ¯٥)
+┐(￣ヘ￣)┌
+ლ(ಠ_ಠ ლ)	why disapproval
+(◎ ◎)ゞ
+(ᗒ.ᗕ)
+(￢_￢;)
+╮(￣ω￣;)╭
+(⇀_⇀)
+## Mood · Surprise | surprise surprised shocked shock wow gasp omg überrascht überraschung schock erstaunt staunen
+(°ロ°) !	shocked
+(°o°)
+Σ(°△°|||)	shocked
+(ﾟДﾟ;)
+(⊙ω⊙)
+(O_O)
+(ﾟﾛﾟ)
+w(°ｏ°)w
+Σ(O_O)
+(*ﾟﾛﾟ)
+(〇o〇)
+(□_□)
+(ʘᗩʘ')
+ヽ(°〇°)ﾉ
+Σ(ﾟロﾟ)
+(⊙０⊙)
+## Mood · Fear and worry | fear scared worried nervous panic anxious angst ängstlich besorgt nervös panik sorge
+(ノωヽ)	hide covering eyes
+(;;;*_*)
+(〒﹏〒)
+(;°Д°)
+ヽ(ﾟДﾟ)ﾉ
+(ﾉ´･д･)ﾉ
+＼(〇_ｏ)／
+(＞﹏＜)
+(｡>﹏<｡)
+(>_<)
+(×_×)
+(x_x)
+(;ﾟДﾟ)
+(゜▽゜;)
+## Mood · Tired and sleepy | tired sleepy sleep zzz bored exhausted müde schläfrig schlafen gelangweilt erschöpft
+(－_－) zzZ	sleep
+(￣o￣) zzZZzzZZ
+(＿ ＿*) Z z z
+(ᴗ˳ᴗ)ᶻ𝗓𐰁
+(︶｡︶✽)
+(-.-)Zzz…
+(∪｡∪)｡｡｡zzZ
+( ˘ω˘ )ｽﾔｧ…
+(=_=)
+(￣ρ￣)..zzZZ
+(ᵕ—ᴗ—)
+## Mood · Shrugs and indifference | shrug whatever meh indifferent bored schulterzucken egal gleichgültig
+┐(￣～￣)┌
+╮(︶▽︶)╭
+ヽ(ー_ー )ノ
+┐('～`;)┌
+╮( ˘ ､ ˘ )╭
+┐(￣ヮ￣)┌
+(　･ω･)
+(￣_￣)
+(-_-)	unimpressed
+(¬ ¬)
+(・_・)
+( ´_ゝ`)
+## Expression · Shy and blushing | shy blush blushing embarrassed flustered schüchtern erröten verlegen rot
+(⁄ ⁄•⁄ω⁄•⁄ ⁄)
+(〃▽〃)
+(*/ω＼)	hide covering face
+(⸝⸝⸝• ω •⸝⸝⸝)
+(/▽＼*)｡o○♡
+(〃＞＿＜;〃)
+(*ﾉωﾉ)
+(⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)
+(„ಡωಡ„)
+(*/▽＼*)
+(///_ಥ)
+(o-_-o)
+(*μ_μ)
+(〃ω〃)
+(*^.^*)
+(///▽///)
+## Expression · Winks and play | wink playful smug cool tease flirt zwinkern verspielt frech cool necken flirten
+(｡•̀ᴗ-)✧
+(^_~)
+(・ω<)
+(>ω^)
+(^_-)≡☆
+(￣ω￣)
+(-‿◦☀)
+(￣ー￣)ｂ
+(¬‿¬)	smirk
+(￢‿￢ )	smirk
+( ͡° ͜ʖ ͡°)	lenny face
+( ͡~ ͜ʖ ͡°)	lenny face wink
+(⌐■_■)	deal with it sunglasses cool
+(▀̿Ĺ̯▀̿ ̿)	sunglasses cool deal with it
+(•_•) ( •_•)>⌐■-■ (⌐■_■)	deal with it sunglasses cool
+(^人^)
+(ᵔ◡ᵔ)
+(･ω<)☆
+(๑˃̵ᴗ˂̵)و
+(✧ω✧)
+(☞ﾟヮﾟ)☞	finger guns
+☜(ﾟヮﾟ☜)	finger guns
+(ง'̀-'́)ง	fight me fists
+ᕙ(⇀‸↼‶)ᕗ
+## Expression · Faces | face smile cute neutral gesicht lächeln süß neutral
+(・ω・)
+(ᐛ)
+(ㆁωㆁ)
+( ˙꒳˙ )
+(｡◕‿◕｡)
+(◡ ω ◡)
+(ᵔ ᵕ ᵔ)
+(ʘ‿ʘ)	creepy stare
+(ᗒᗨᗕ)
+(⊙ᗜ⊙)
+(°ᴗ°)
+(•ᴗ•)
+( ꈍᴗꈍ)
+(ꈍᴗꈍ)
+( ・ั﹏・ั)
+(˶ᵔᗜᵔ˶)
+(๑ᵔ⤙ᵔ๑)
+(¯▿¯)
+(˵ ͡° ͜ʖ ͡°˵)	lenny face
+## Action · Hugs | hug hugs cuddle embrace umarmung umarmen kuscheln drücken
+(づ｡◕‿‿◕｡)づ	hug
+(つ≧▽≦)つ
+(っ´▽`)っ
+⊂(・▽・⊂)
+(⊃｡•́‿•̀｡)⊃
+(づ￣ ³￣)づ
+(っಠ‿ಠ)っ
+⊂(￣▽￣)⊃
+(つ✧ω✧)つ
+(ノ°∀°)ノ⌒
+(づ◡﹏◡)づ
+(っ˘̩╭╮˘̩)っ
+ʕっ•ᴥ•ʔっ	bear hug
+(つ . •́ _ʖ •̀ .)つ
+⊂(´・ω・｀⊂)
+(つ˵•́ω•̀˵)つ
+## Action · Music and dancing | music dance dancing sing song party musik tanzen tanz singen lied feier party
+( ˘ ɜ˘) ♬♪♫
+♪(´ε` )
+ヾ(⌐■_■)ノ♪	sunglasses cool dance
+(〜￣▽￣)〜
+〜(￣▽￣〜)
+┏(＾0＾)┛┗(＾0＾)┓	dance
+♪ ٩(ˊᗜˋ*)و ♪
+ヽ(o´∀`)ﾉ♪♬
+(ﾉ≧∀≦)ﾉ ♪
+♪♪ ヽ(ˇ∀ˇ )ゞ
+(っ˘ڡ˘ς)	yum delicious
+(ノ´ з `)ノ ♪
+## Action · Greetings and goodbyes | hello hi wave bye goodbye greeting salute hallo winken tschüss abschied gruß grüßen salutieren
+(￣▽￣)ノ
+(°▽°)/
+( ´ ∀ ` )ﾉ
+(^-^*)/
+(＠´ー`)ﾉﾞ
+(´• ω •`)ﾉ
+(￣∇￣)ゞ
+ヾ(☆▽☆)
+(*・ω・)ﾉ
+(o´ω`o)ﾉ
+ヾ(＾-＾)ノ
+(ﾉ´∀｀*)
+ヾ(・ω・)ﾉ
+(^０^)ノ
+(｡･∀･)ﾉﾞ
+## Action · Thanks and sorry | thanks thank you sorry apologise bow please danke entschuldigung sorry verbeugen bitte
+m(_ _)m	bow sorry thanks
+(シ_ _)シ
+<(_ _)>
+(人´∀`)
+(ᴗᴗ)
+(´∩｀。)
+m(._.)m
+(_ _ヾ
+(￣^￣)ゞ
+(ㅅ˘˘)
+(*_ _)人
+## Action · Food and drink | food eat eating drink tea hungry yum cake essen trinken tee hunger lecker kuchen
+(っ˘ڡ˘ς)	yum delicious
+( o˘◡˘o) ┌iii┐
+(＾▽＾)っ🍰
+(￣﹃￣)	drool hungry
+(*´ڡ`●)
+(〜^∇^)〜🍕
+( ˘▽˘)っ♨
+旦~~(￣▽￣)	tea
+(*￣▽￣)旦 且_(・_・ )
+(っ˘ω˘ς )
+## Action · Doing things | writing running run peek hiding busy schreiben rennen laufen spähen verstecken beschäftigt
+φ(．．)	writing notes
+φ(゜▽゜*)♪
+_φ(°-°=)
+ヾ(￣□￣;)ﾉ
+ε=ε=ε=┌(;￣▽￣)┘	run running away escape
+C= C= C= ┌( `ー´)┘	run running
+ε===(っ≧ω≦)っ
+┬┴┬┴┤(･_├┬┴┬┴	peek wall hiding
+|･ω･)	peek
+(／。＼)
+|ω･)	peek
+ヾ(´･ω･｀)
+(っ•̀ω•́)っ✎⁾⁾	writing notes
+(˘︶˘).｡*♡ zzZ
+## Action · Magic, sparkles and weapons | magic sparkles sparkle wand fight weapon sword gun magie zauber glitzer zauberstab kampf waffe schwert
+(ﾉ>ω<)ﾉ :｡･:*:･ﾟ’★,｡･:*:･ﾟ’☆
+(∩ᄑ_ᄑ)⊃━☆ﾟ*･｡*･:≡( ε:)	magic wand wizard spell
+(つ✧ω✧)つ✨
+(ノ°∀°)ノ⌒･*:.｡. .｡.:*･゜ﾟ･*☆	throw sparkles
+╰( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ	lenny face wizard
+(　-_･) ︻デ═一	gun sniper
+(ง ͠° ͟ل͜ ͡°)ง	lenny face fight
+⚔(ಠ益ಠ)⚔	swords
+(☞ﾟ∀ﾟ)☞	finger guns
+## Animal · Cats | cat cats kitty meow neko katze katzen miau
+(=^･ω･^=)
+ฅ^•ﻌ•^ฅ	cat paws
+(=^･ｪ･^=)
+(=①ω①=)
+( =ω=)..nyaa
+(^･o･^)ﾉ"
+(=ↀωↀ=)
+(=^‥^=)
+ฅ(^◕ᴥ◕^)ฅ
+(ↀДↀ)
+(=ＴェＴ=)
+(^=◕ᴥ◕=^)
+ଲ(ⓛ ω ⓛ)ଲ
+(=^-ω-^=)
+## Animal · Dogs and bears | dog dogs puppy bear bears hund hunde welpe bär bären
+U・ᴥ・U	dog
+∪＾ェ＾∪
+∪･ω･∪
+U^ｪ^U
+ʕ•ᴥ•ʔ	bear
+ʕ •́؈•̀ ₎
+ʕ ·(エ)· ʔ
+ʕ ᵔᴥᵔ ʔ
+ʕ￫ᴥ￩ʔ
+(´(ｴ)｀)
+ʕ ꈍᴥꈍʔ
+ʕ•̀ω•́ʔ✧
+## Animal · Rabbits and other animals | rabbit bunny bird fish crab animal hase kaninchen vogel fisch krebs tier
+／(≧ x ≦)＼
+／(･ × ･)＼
+／(=´x`=)＼
+(・θ・)
+(｀・Θ・´)
+(°)#))<<
+>゜))))彡
+ーーー＞゜))))彡
+(V) (°,,,,°) (V)
+／(^ x ^)＼
+(ﾟ∀ﾟ)ﾉ🐾
+૮ ˶ᵔ ᵕ ᵔ˶ ა
+૮₍ ˶•⤙•˶ ₎ა
+૮ ･ﻌ･ა
+૮₍´˶• . • ⑅ ₎ა
+(•ᴗ•)ﾉ

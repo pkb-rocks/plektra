@@ -2274,6 +2274,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager) {
             !keyboardBarHiddenInEditor
         }
+        // The emoji pages read the emoji categories synchronously: load them ahead.
+        expansionAssetScope.launch {
+            runCatching { rocks.pkb.plektra.data.emoji.EmojiRepository.getEmojiCategories(this@PhysicalKeyboardInputMethodService) }
+        }
+        symLayoutController.onPagedSearchRequested = {
+            candidatesBarController.requestEmojiPickerSearch()
+            symLayoutController.openEmojiPickerPage()
+            updateStatusBarText()
+        }
+        candidatesBarController.onSymPageKeyTapped = { keyCode ->
+            symLayoutController.handlePagedTouchTap(keyCode, currentInputConnection) { updateStatusBarText() }
+        }
+        candidatesBarController.onSymPageKeyLongPressed = { keyCode ->
+            symLayoutController.handlePagedTouchLongPress(keyCode).also { handled ->
+                if (handled) updateStatusBarText()
+            }
+        }
         keyboardVisibilityController = KeyboardVisibilityController(
             context = this,
             candidatesBarController = candidatesBarController,
@@ -5766,6 +5783,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         
+        if (symLayoutController.handlePagedKeyUp(
+                keyCode,
+                currentInputConnection,
+                updateStatusBar = { updateStatusBarText() },
+                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+            )
+        ) {
+            return true
+        }
         if (symLayoutController.handleKeyUp(keyCode, shiftPressed)) {
             return true
         }

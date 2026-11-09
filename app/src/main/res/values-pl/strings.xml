@@ -913,4 +913,19 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">W wybranych tutaj aplikacjach Plektra nigdy nie pokazuje paska ani klawiatury ekranowej: niezależnie od innych ustawień widoczności, a także wtedy, gdy próbujesz otworzyć go klawiszem, skrótem lub systemowym przyciskiem klawiatury. Pisanie na klawiaturze fizycznej działa dalej, w tym warstwy SYM, skróty, modyfikatory i dokładne kody emoji lub fragmentów. Schowek i selektor emoji pozostają w tych aplikacjach zamknięte.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Aplikacja webowa — działa wewnątrz %1$s, więc pasek jest ukryty także tam</string>
+    <string name="emoji_category_unicode_symbols">Symbole tekstowe</string>
+    <string name="emoji_category_kaomoji">Kaomoji</string>
+    <string name="emoji_style_title">Wygląd emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (wbudowana)</string>
+    <string name="emoji_style_system">Czcionka systemowa</string>
+    <string name="emoji_style_description">Plektra wstawia standardowe emoji Unicode; aplikacja, w której piszesz, wyświetla je własną czcionką.</string>
+    <string name="emoji_skin_tone_title">Domyślny odcień skóry</string>
+    <string name="emoji_pages_emoji_title">Przewijaj stronę emoji klawiszami Q i P</string>
+    <string name="emoji_pages_symbols_title">Przewijaj stronę symboli klawiszami Q i P</string>
+    <string name="emoji_pages_description">Q i P przewracają strony, Shift+Q i Shift+P przeskakują między kategoriami, A otwiera wyszukiwanie. Przytrzymaj emoji, aby zobaczyć odcienie skóry.</string>
+    <string name="kaomoji_placement_title">Strony kaomoji</string>
+    <string name="kaomoji_placement_symbols">Po symbolach</string>
+    <string name="kaomoji_placement_emoji">Po emoji</string>
+    <string name="kaomoji_placement_off">Wyłączone</string>
+    <string name="emoji_picker_extras_title">Symbole tekstowe i kaomoji w selektorze emoji</string>
 </resources>

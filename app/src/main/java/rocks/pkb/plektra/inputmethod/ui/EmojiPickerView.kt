@@ -37,6 +37,13 @@ import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.emoji.EmojiRepository
 import rocks.pkb.plektra.data.emoji.RecentEmojiManager
 import rocks.pkb.plektra.data.emoji.EmojiSearchRepository
+import rocks.pkb.plektra.data.emoji.EmojiRendering
+import rocks.pkb.plektra.data.emoji.EmojiSkinTone
+import rocks.pkb.plektra.data.symbols.Kaomoji
+import rocks.pkb.plektra.data.symbols.SymbolPages
+import rocks.pkb.plektra.data.symbols.SymbolSearch
+import rocks.pkb.plektra.EmojiPagesSettings
+import androidx.core.widget.TextViewCompat
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -107,6 +114,9 @@ class EmojiPickerView(
     private var pendingSearchReplacementRange: IntRange? = null
     private var tabCategoryIds: List<String> = emptyList()
     private var lastSearchResults: List<EmojiSearchRepository.EmojiSearchResult> = emptyList()
+    private var symbolIndex: SymbolSearch.Index? = null
+    private var kaomojiEntries: List<Kaomoji.Entry> = emptyList()
+    private var skinTone = 0
     var onSearchPanelVisibilityChanged: ((Boolean) -> Unit)? = null
     var themeOverride: KeyboardThemeColors? = null
         set(value) {
@@ -449,6 +459,11 @@ class EmojiPickerView(
         loadCategories()
     }
 
+    /** Shows the search field, ready for typing (the search key of the emoji/symbol pages). */
+    fun showSearch() {
+        if (!isSearchPanelVisible) setSearchPanelVisible(true)
+    }
+
     fun isSearchInputActive(): Boolean {
         return isSearchPanelVisible && searchInputCaptureEnabled
     }
@@ -486,7 +501,7 @@ class EmojiPickerView(
     fun commitTopSearchResultAndClose() {
         if (!isSearchInputActive()) return
         val top = lastSearchResults.firstOrNull() ?: return
-        onEmojiSelected(top.entry.base, top.categoryId, closeAfterCommit = true)
+        onEmojiSelected(shownText(top.entry), top.categoryId, closeAfterCommit = true)
     }
 
     private fun deleteSearchTextBackwards() {
@@ -759,12 +774,14 @@ class EmojiPickerView(
                 val recentCategory = withContext(Dispatchers.IO) { RecentEmojiManager.getRecentEmojiCategory(context) }
                 val regularCategories = withContext(Dispatchers.IO) { EmojiRepository.getEmojiCategories(context) }
                 val loadedSearchIndex = withContext(Dispatchers.IO) { EmojiSearchRepository.getSearchIndex(context) }
-                this@EmojiPickerView.regularCategories = regularCategories
+                val extras = withContext(Dispatchers.IO) { loadSymbolAndKaomojiCategories() }
+                skinTone = EmojiSkinTone.get(context)
+                this@EmojiPickerView.regularCategories = regularCategories + extras
                 this@EmojiPickerView.searchIndex = loadedSearchIndex
 
                 val allCategories = mutableListOf<EmojiRepository.EmojiCategory>()
                 if (recentCategory != null) allCategories.add(recentCategory)
-                allCategories.addAll(regularCategories)
+                allCategories.addAll(this@EmojiPickerView.regularCategories)
 
                 // Always reset to first category when loading
                 selectedCategoryId = allCategories.firstOrNull()?.id
@@ -796,6 +813,81 @@ class EmojiPickerView(
                 recyclerView.visibility = View.GONE
             }
         }
+    }
+
+    /** The text symbols and kaomoji as picker categories (recent ones first), when enabled. */
+    private fun loadSymbolAndKaomojiCategories(): List<EmojiRepository.EmojiCategory> {
+        if (!EmojiPagesSettings.pickerSymbolsAndKaomoji(context)) {
+            symbolIndex = null
+            kaomojiEntries = emptyList()
+            return emptyList()
+        }
+        symbolIndex = SymbolSearch.index(context)
+        kaomojiEntries = Kaomoji.entries(context)
+        val symbols = (SymbolSearch.recents.get(context) + SymbolPages.ALL).distinct().filter(SymbolSearch::canRender)
+        val kaomoji = (Kaomoji.recents.get(context) + kaomojiEntries.map { it.kaomoji }).distinct()
+        return listOf(
+            EmojiRepository.EmojiCategory(
+                id = EmojiRepository.SYMBOLS_CATEGORY_ID,
+                displayNameRes = EmojiRepository.categoryNameRes(EmojiRepository.SYMBOLS_CATEGORY_ID),
+                emojis = symbols.map { EmojiRepository.EmojiEntry(it, emptyList()) }
+            ),
+            EmojiRepository.EmojiCategory(
+                id = EmojiRepository.KAOMOJI_CATEGORY_ID,
+                displayNameRes = EmojiRepository.categoryNameRes(EmojiRepository.KAOMOJI_CATEGORY_ID),
+                emojis = kaomoji.map { EmojiRepository.EmojiEntry(it, emptyList()) }
+            )
+        ).filter { it.emojis.isNotEmpty() }
+    }
+
+    /** Matching text symbols, then kaomoji, after the emoji results. */
+    private fun symbolAndKaomojiResults(query: String): List<EmojiSearchRepository.EmojiSearchResult> {
+        val symbols = symbolIndex?.let { index ->
+            SymbolSearch.search(index, query, SymbolSearch.recents.get(context), limit = MAX_EXTRA_RESULTS)
+        }.orEmpty().map {
+            EmojiSearchRepository.EmojiSearchResult(
+                EmojiRepository.EmojiEntry(it.symbol, emptyList()), EmojiRepository.SYMBOLS_CATEGORY_ID, 0
+            )
+        }
+        val kaomoji = Kaomoji.search(kaomojiEntries, query, Kaomoji.recents.get(context))
+            .take(MAX_EXTRA_RESULTS)
+            .map {
+                EmojiSearchRepository.EmojiSearchResult(
+                    EmojiRepository.EmojiEntry(it.kaomoji, emptyList()), EmojiRepository.KAOMOJI_CATEGORY_ID, 0
+                )
+            }
+        return symbols + kaomoji
+    }
+
+    private fun spanFor(categoryId: String): Int =
+        if (categoryId == EmojiRepository.KAOMOJI_CATEGORY_ID) (columns / 3).coerceAtLeast(2) else 1
+
+    /** What a cell shows and types: emoji in the default skin tone, symbols and kaomoji as they are. */
+    private fun shownText(entry: EmojiRepository.EmojiEntry): String = EmojiSkinTone.preferred(entry, skinTone)
+
+    private fun bindCell(textView: TextView, entry: EmojiRepository.EmojiEntry, categoryId: String) {
+        val text = shownText(entry)
+        when (categoryId) {
+            EmojiRepository.KAOMOJI_CATEGORY_ID -> {
+                textView.maxLines = 1
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(textView, 8, 18, 1, TypedValue.COMPLEX_UNIT_SP)
+                textView.text = text
+            }
+            EmojiRepository.SYMBOLS_CATEGORY_ID -> {
+                TextViewCompat.setAutoSizeTextTypeWithDefaults(textView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE)
+                textView.maxLines = 1
+                textView.textSize = 24f
+                textView.text = text
+            }
+            else -> {
+                TextViewCompat.setAutoSizeTextTypeWithDefaults(textView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE)
+                textView.maxLines = 1
+                textView.textSize = 28.8f
+                textView.text = EmojiRendering.forDisplay(context, text)
+            }
+        }
+        textView.setTextColor(themeOverride?.textAndIcons ?: Color.WHITE)
+        textView.contentDescription = text
     }
 
     private fun scheduleSearch() {
@@ -887,7 +979,7 @@ class EmojiPickerView(
             return
         }
 
-        val results = EmojiSearchRepository.search(index, query)
+        val results = EmojiSearchRepository.search(index, query) + symbolAndKaomojiResults(query)
         lastSearchResults = results
         setSearchMode(true)
         searchAdapter.submitList(results)
@@ -1013,7 +1105,15 @@ class EmojiPickerView(
         // Recents persistence must survive the SYM auto-close: closing the picker evicts this
         // view from its container, which cancels coroutineScope; ATOMIC guarantees the write
         // still runs even when cancellation lands before the coroutine body starts.
-        coroutineScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
+        if (categoryId == EmojiRepository.SYMBOLS_CATEGORY_ID || categoryId == EmojiRepository.KAOMOJI_CATEGORY_ID) {
+            coroutineScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
+                if (categoryId == EmojiRepository.KAOMOJI_CATEGORY_ID) {
+                    Kaomoji.recents.add(context, emoji)
+                } else {
+                    SymbolSearch.recents.add(context, emoji)
+                }
+            }
+        } else coroutineScope.launch(Dispatchers.IO, start = CoroutineStart.ATOMIC) {
             val changed = RecentEmojiManager.addRecentEmoji(
                 context,
                 emoji,
@@ -1234,16 +1334,26 @@ class EmojiPickerView(
         val itemVerticalPadding = (8 * density).toInt()
 
         val container = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
             gravity = Gravity.CENTER
         }
 
         var popup: PopupWindow? = null
         val options = listOf(entry.base) + entry.variants
-        options.forEach { emoji ->
+        // One row per six: the plain emoji and its five skin tones; two-person emoji wrap.
+        val rows = options.chunked(VARIANTS_PER_ROW).map { _ ->
+            LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+                container.addView(this)
+            }
+        }
+        options.forEachIndexed { index, emoji ->
+            val row = rows[index / VARIANTS_PER_ROW]
             val textView = TextView(context).apply {
-                text = emoji
+                text = EmojiRendering.forDisplay(context, emoji)
+                contentDescription = emoji
                 textSize = 24f
                 gravity = Gravity.CENTER
                 setPadding(itemHorizontalPadding, itemVerticalPadding, itemHorizontalPadding, itemVerticalPadding)
@@ -1253,7 +1363,7 @@ class EmojiPickerView(
                 onEmojiSelected(emoji, categoryId)
                 popup?.dismiss()
             }
-            container.addView(textView)
+            row.addView(textView)
         }
 
         container.measure(
@@ -1354,9 +1464,9 @@ class EmojiPickerView(
         ListAdapter<SectionItem, RecyclerView.ViewHolder>(SectionItemDiffCallback()) {
         val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (getItemViewType(position)) {
-                    VIEW_TYPE_HEADER -> columns
-                    else -> 1
+                return when (val item = getItem(position)) {
+                    is SectionItem.Header -> columns
+                    is SectionItem.Emoji -> spanFor(item.categoryId)
                 }
             }
         }
@@ -1399,10 +1509,9 @@ class EmojiPickerView(
                     // Nothing to bind - it's just a spacer
                 }
                 is SectionItem.Emoji -> {
-                    (holder as EmojiViewHolder).textView.text = item.entry.base
-                    holder.textView.setTextColor(themeOverride?.textAndIcons ?: Color.WHITE)
+                    bindCell((holder as EmojiViewHolder).textView, item.entry, item.categoryId)
                     holder.textView.setOnClickListener {
-                        onEmojiSelected(item.entry.base, item.categoryId)
+                        onEmojiSelected(shownText(item.entry), item.categoryId)
                     }
                     holder.textView.setOnLongClickListener {
                         if (item.entry.variants.isEmpty()) return@setOnLongClickListener false
@@ -1421,7 +1530,7 @@ class EmojiPickerView(
     private inner class SearchAdapter :
         ListAdapter<EmojiSearchRepository.EmojiSearchResult, SearchEmojiViewHolder>(SearchResultDiffCallback()) {
         val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int = 1
+            override fun getSpanSize(position: Int): Int = spanFor(getItem(position).categoryId)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchEmojiViewHolder {
@@ -1440,10 +1549,9 @@ class EmojiPickerView(
 
         override fun onBindViewHolder(holder: SearchEmojiViewHolder, position: Int) {
             val item = getItem(position)
-            holder.textView.text = item.entry.base
-            holder.textView.setTextColor(themeOverride?.textAndIcons ?: Color.WHITE)
+            bindCell(holder.textView, item.entry, item.categoryId)
             holder.textView.setOnClickListener {
-                onEmojiSelected(item.entry.base, item.categoryId)
+                onEmojiSelected(shownText(item.entry), item.categoryId)
             }
             holder.textView.setOnLongClickListener {
                 if (item.entry.variants.isEmpty()) return@setOnLongClickListener false
@@ -1600,6 +1708,8 @@ class EmojiPickerView(
         private const val COMPACT_HEIGHT_DP = 177f
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_EMOJI = 1
+        private const val MAX_EXTRA_RESULTS = 60
+        private const val VARIANTS_PER_ROW = 6
 
         fun configuredHeightPx(context: Context): Int {
             val compactHeight = TypedValue.applyDimension(

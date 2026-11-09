@@ -913,4 +913,19 @@ Nav Mode использует физическое положение клави
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">В выбранных здесь приложениях Plektra никогда не показывает панель и экранную клавиатуру: независимо от остальных настроек видимости и даже при попытке открыть её клавишей, сочетанием клавиш или системной кнопкой клавиатуры. Ввод с физической клавиатуры продолжает работать, включая слои SYM, сочетания клавиш, модификаторы и точные коды эмодзи или фрагментов. Буфер обмена и выбор эмодзи в этих приложениях остаются закрытыми.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Веб-приложение — работает внутри %1$s, поэтому панель скрыта и там</string>
+    <string name="emoji_category_unicode_symbols">Текстовые символы</string>
+    <string name="emoji_category_kaomoji">Каомодзи</string>
+    <string name="emoji_style_title">Вид эмодзи</string>
+    <string name="emoji_style_noto">Noto Color Emoji (встроенный)</string>
+    <string name="emoji_style_system">Системный шрифт</string>
+    <string name="emoji_style_description">Plektra вставляет стандартные эмодзи Unicode; приложение, в котором вы пишете, показывает их своим шрифтом.</string>
+    <string name="emoji_skin_tone_title">Тон кожи по умолчанию</string>
+    <string name="emoji_pages_emoji_title">Листать страницу эмодзи клавишами Q и P</string>
+    <string name="emoji_pages_symbols_title">Листать страницу символов клавишами Q и P</string>
+    <string name="emoji_pages_description">Q и P листают страницы, Shift+Q и Shift+P переходят между категориями, A открывает поиск. Удерживайте эмодзи, чтобы выбрать тон кожи.</string>
+    <string name="kaomoji_placement_title">Страницы каомодзи</string>
+    <string name="kaomoji_placement_symbols">После символов</string>
+    <string name="kaomoji_placement_emoji">После эмодзи</string>
+    <string name="kaomoji_placement_off">Выкл.</string>
+    <string name="emoji_picker_extras_title">Текстовые символы и каомодзи в выборе эмодзи</string>
 </resources>

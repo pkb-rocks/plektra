@@ -1754,4 +1754,19 @@ QWERTZ σε φυσικό QWERTY
     </plurals>
     <string name="keyboard_bar_hidden_apps_description">Στις εφαρμογές που επιλέγετε εδώ, το Plektra δεν εμφανίζει ποτέ τη γραμμή του ούτε το πληκτρολόγιο οθόνης: ανεξάρτητα από τις υπόλοιπες ρυθμίσεις ορατότητας, ακόμη και αν προσπαθήσετε να την ανοίξετε με πλήκτρο, συντόμευση ή το κουμπί πληκτρολογίου του συστήματος. Η πληκτρολόγηση με το φυσικό πληκτρολόγιο συνεχίζει να λειτουργεί, μαζί με τα επίπεδα SYM, τις συντομεύσεις, τους τροποποιητές και τους ακριβείς κωδικούς emoji ή αποσπασμάτων. Το πρόχειρο και η επιλογή emoji παραμένουν κλειστά σε αυτές τις εφαρμογές.</string>
     <string name="keyboard_bar_hidden_apps_webapk_note">Εφαρμογή ιστού — εκτελείται μέσα στο %1$s, άρα η γραμμή είναι κρυφή κι εκεί</string>
+    <string name="emoji_category_unicode_symbols">Σύμβολα κειμένου</string>
+    <string name="emoji_category_kaomoji">Καομότζι</string>
+    <string name="emoji_style_title">Εμφάνιση emoji</string>
+    <string name="emoji_style_noto">Noto Color Emoji (ενσωματωμένη)</string>
+    <string name="emoji_style_system">Γραμματοσειρά συστήματος</string>
+    <string name="emoji_style_description">Το Plektra εισάγει τυπικά emoji Unicode· η εφαρμογή στην οποία γράφεις τα εμφανίζει με τη δική της γραμματοσειρά.</string>
+    <string name="emoji_skin_tone_title">Προεπιλεγμένος τόνος δέρματος</string>
+    <string name="emoji_pages_emoji_title">Ξεφύλλισμα σελίδας emoji με Q και P</string>
+    <string name="emoji_pages_symbols_title">Ξεφύλλισμα σελίδας συμβόλων με Q και P</string>
+    <string name="emoji_pages_description">Τα Q και P αλλάζουν σελίδα, Shift+Q και Shift+P μεταβαίνουν μεταξύ κατηγοριών, το A ανοίγει την αναζήτηση. Κράτησε πατημένο ένα emoji για τους τόνους δέρματος.</string>
+    <string name="kaomoji_placement_title">Σελίδες καομότζι</string>
+    <string name="kaomoji_placement_symbols">Μετά τα σύμβολα</string>
+    <string name="kaomoji_placement_emoji">Μετά τα emoji</string>
+    <string name="kaomoji_placement_off">Ανενεργό</string>
+    <string name="emoji_picker_extras_title">Σύμβολα κειμένου και καομότζι στον επιλογέα emoji</string>
 </resources>

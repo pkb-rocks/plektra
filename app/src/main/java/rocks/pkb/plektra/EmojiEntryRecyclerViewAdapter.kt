@@ -65,7 +65,7 @@ class EmojiEntryRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: EmojiEntryViewHolder, position: Int) {
         val entry = entries[position]
-        holder.emojiText.text = entry.base
+        holder.emojiText.text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(holder.emojiText.context, entry.base)
     }
 
     override fun getItemCount(): Int = entries.size
@@ -88,7 +88,7 @@ class EmojiEntryRecyclerViewAdapter(
         val options = listOf(entry.base) + entry.variants
         options.forEach { emoji ->
             val textView = TextView(context).apply {
-                text = emoji
+                text = rocks.pkb.plektra.data.emoji.EmojiRendering.forDisplay(context, emoji)
                 gravity = Gravity.CENTER
                 textSize = 24f
                 setPadding(itemHorizontalPadding, itemVerticalPadding, itemHorizontalPadding, itemVerticalPadding)

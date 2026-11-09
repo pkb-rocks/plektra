@@ -152,6 +152,7 @@
     ],
     "keys-modifiers": [
       "rocks.pkb.plektra.core.ModifierStateControllerTest",
+      "rocks.pkb.plektra.core.SymPageCycleTest",
       "rocks.pkb.plektra.core.SymShiftPortTest",
       "rocks.pkb.plektra.inputmethod.AccidentalKeyPressFilterTest",
       "rocks.pkb.plektra.inputmethod.AccidentalKeyPressPolicyTest",
@@ -179,7 +180,9 @@
       "rocks.pkb.plektra.inputmethod.DisabledSmartFeaturesRegressionTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterModifierE2ETest",
       "rocks.pkb.plektra.inputmethod.LanguageSwitchServiceE2ETest",
-      "rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodServiceDeviceBehaviorTest"
+      "rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodServiceDeviceBehaviorTest",
+      "rocks.pkb.plektra.inputmethod.SoftwareKeypadPolicyTest",
+      "rocks.pkb.plektra.inputmethod.SoftwareKeypadServiceIntegrationTest"
     ]
   },
   "instrumented": {

@@ -1,7 +1,6 @@
 package rocks.pkb.plektra.inputmethod
 
 import android.content.Context
-import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputConnection
@@ -33,8 +32,7 @@ class KeyboardVisibilityController(
     private val requestShowInputView: () -> Unit,
     private val refreshStatusBar: () -> Unit,
     private val trace: (String) -> Unit = {},
-    private val allowsPersistentSurface: () -> Boolean = { true },
-    private val uptimeMillis: () -> Long = SystemClock::uptimeMillis
+    private val allowsPersistentSurface: () -> Boolean = { true }
 ) {
     enum class RenderedSurface { HIDDEN, FULL_INPUT_VIEW, CANDIDATES_VIEW }
 
@@ -47,8 +45,6 @@ class KeyboardVisibilityController(
     private var waitingForBackendHide = false
     private var hardwareConnectionRecovery = false
     private var hardwareConnectionTicket = 0
-    /** Uptime of Plektra's last [requestShowInputView] that Android has not answered yet. */
-    private var ownShowRequestedAt: Long? = null
 
     fun usesCandidatesView(): Boolean =
         SettingsManager.getExperimentalCandidatesViewEnabled(context) &&
@@ -154,11 +150,11 @@ class KeyboardVisibilityController(
                 synchronizeCandidatesContainerVisibility()
                 // Direct child/window repair does not restore IMMS's show request after Back.
                 // Issue one server request for this explicit recovery, never one per retry/key.
-                if (attempt == 0) requestOwnShow()
+                if (attempt == 0) requestShowInputView()
             } else {
                 setCandidatesViewShown(false)
                 attachInputView(onCreateInputView())
-                if (attempt == 0) requestOwnShow()
+                if (attempt == 0) requestShowInputView()
                 else showInputWindow(true)
             }
             refreshStatusBar()
@@ -172,7 +168,8 @@ class KeyboardVisibilityController(
     }
 
     /**
-     * The hardware bar always follows the editor. The on-screen keyboard shows itself on input start
+     * The hardware bar always follows the editor (the service holds it back only while a
+     * [HardwareKeypadAutoOpen] decision waits for Android). The on-screen keyboard shows itself on input start
      * only when automatic showing is on and app/Android display defaults are not respected: Android
      * does not tell an IME the window's soft-input state, so respecting them means waiting for
      * Android's show request (forward navigation, STATE_VISIBLE, a tap) instead of forcing a show.
@@ -247,7 +244,6 @@ class KeyboardVisibilityController(
     fun onInputStarted(restarting: Boolean) {
         cancelPendingSurfaceTransition()
         if (!restarting) {
-            ownShowRequestedAt = null
             dismissed = false
             hardwareConnectionRecovery = false
             hardwareConnectionTicket++
@@ -261,7 +257,7 @@ class KeyboardVisibilityController(
         // Some devices request HIDE_HW_KEYBOARD_CONNECTED independently of the IME's mode.
         postToUi {
             if (ticket == hardwareConnectionTicket && hardwareConnectionRecovery && canShow()) {
-                requestOwnShow()
+                requestShowInputView()
                 trace("preserve_hardware_connection_input")
             }
         }
@@ -316,23 +312,6 @@ class KeyboardVisibilityController(
     }
 
     fun isCandidatesOnlySurface() = usesCandidatesView()
-
-    private fun requestOwnShow() {
-        requestShowInputView()
-        ownShowRequestedAt = uptimeMillis()
-    }
-
-    /**
-     * Whether a non-configuration show request answers Plektra's own [requestShowInputView]
-     * rather than coming from the app or Android. Each own request is answered at most once, and
-     * only shortly after it was issued: a pending presentation that has not reached Android yet
-     * proves nothing about the origin of a request.
-     */
-    fun consumeOwnShowEcho(): Boolean {
-        val requestedAt = ownShowRequestedAt ?: return false
-        ownShowRequestedAt = null
-        return uptimeMillis() - requestedAt <= OWN_SHOW_ECHO_WINDOW_MS
-    }
     fun isExpectedSurfaceRequestedOrShown(): Boolean = windowShown && renderedSurface() == expectedSurface() &&
         (usesCandidatesView() || isInputViewShown())
     fun shouldRecoverSurfaceOnHardwareKey() = !isExpectedSurfaceRequestedOrShown()
@@ -361,6 +340,5 @@ class KeyboardVisibilityController(
         const val BACKEND_HIDE_TIMEOUT_MS = 1000L
         const val MAX_ATTEMPTS = 3
         const val RETRY_DELAY_MS = 150L
-        const val OWN_SHOW_ECHO_WINDOW_MS = 1000L
     }
 }

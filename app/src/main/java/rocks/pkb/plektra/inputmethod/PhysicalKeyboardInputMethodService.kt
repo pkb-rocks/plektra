@@ -286,8 +286,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var skipNextSelectionUpdateAfterCommit: Boolean = false
     private var editorHasActiveSelection: Boolean = false
     private val softwareKeypadSession = SoftwareKeypadSession()
-    /** Hardware keypad auto-open that waits for Android's show request (app display defaults). */
-    private var pendingKeypadAutoOpen = false
+    private val hardwareKeypadAutoOpen = HardwareKeypadAutoOpen()
     private lateinit var keyboardVisibilityController: KeyboardVisibilityController
     private lateinit var launcherShortcutController: LauncherShortcutController
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
@@ -918,7 +917,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Use Android's keyboard hand-off, as in HeliBoard. The voice IME commits
         // directly to the current editor and returns via switchToPreviousInputMethod.
         // Do not open FUTO's singleInstance recognition Activity for a result.
-        ExternalSpeechProvider.handOff(this, voiceInput)
+        ExternalSpeechProvider.handOff(this, voiceInput) { requestOwnShow(InputMethodManager.SHOW_IMPLICIT) }
     }
 
     private fun updateSpeechPreview(text: String) {
@@ -2302,7 +2301,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             showInputWindow = { showInput -> showWindow(showInput) },
             hideInputWindow = { hideWindow() },
             requestHideInputView = { requestHideSelf(0) },
-            requestShowInputView = ::requestKeyboardInputView,
+            requestShowInputView = { requestOwnShow() },
             trace = ::traceImeVisibility,
             refreshStatusBar = {
                 invalidateRenderedStatusSnapshot()
@@ -3052,18 +3051,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     override fun onShowInputRequested(flags: Int, configChange: Boolean): Boolean {
         if (!keyboardVisibilityController.allowsSurface()) return false
-        // The hardware bar shows itself on input start; Android answers that with a show request too.
-        // Only a new request from Android or the app (e.g. a tap) may open the keypad automatically;
-        // a configuration change merely restores the window that was already shown.
-        val newShowRequest = !configChange && !keyboardVisibilityController.consumeOwnShowEcho()
+        // Decide before Plektra answers with its own show request, which settles an open decision.
+        val openKeypad = hardwareKeypadAutoOpen.onShowRequested(configChange)
         val accepted = super.onShowInputRequested(flags, configChange)
         if (::keyboardVisibilityController.isInitialized) {
             keyboardVisibilityController.onExplicitShowRequested()
         }
-        if (pendingKeypadAutoOpen && newShowRequest) {
-            pendingKeypadAutoOpen = false
-            openKeypadForCurrentField()
-        }
+        if (openKeypad) openKeypadForCurrentField()
         traceImeVisibility("onShowInputRequested accepted=$accepted flags=$flags")
         return !keyboardVisibilityController.usesCandidatesView()
     }
@@ -3100,7 +3094,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         setExtractViewShown(true)
     }
 
-    private fun requestKeyboardInputView() = requestShowSelf(0)
+    /** Every show request of Plektra's own goes through here. */
+    private fun requestOwnShow(flags: Int = 0) {
+        // Android cannot tell this request's answer from an app request; see HardwareKeypadAutoOpen.
+        hardwareKeypadAutoOpen.settle()
+        requestShowSelf(flags)
+    }
 
     /**
      * Evaluates whether the IME should run in fullscreen mode.
@@ -3708,7 +3707,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val isReallyEditable = state.isReallyEditable
         isInputViewActive = isEditable
         softwareKeypadSession.onFieldStarted(state.inputType, restarting)
-        if (!restarting) pendingKeypadAutoOpen = false
+        if (!restarting) hardwareKeypadAutoOpen.settle()
         keyboardVisibilityController.onInputStarted(restarting)
         if (!keyboardVisibilityController.allowsSurface()) {
             keyboardVisibilityController.onKeyboardBarConfigurationChanged()
@@ -3729,18 +3728,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this),
                 respectAppVisibility = respectAppVisibility
             )
-            if (shouldShowSurface) {
-                ensureImeSurfaceVisible()
-            }
-            if (
-                SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
-                    SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
+            val autoOpenKeypad = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+                SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
                 SoftwareKeypadPolicy.shouldAutoOpenOnHardware(
                     state.inputType,
                     SettingsManager.getHardwareKeypadAutoOpen(this)
                 )
-            ) {
-                if (respectAppVisibility) pendingKeypadAutoOpen = true else openKeypadForCurrentField()
+            when {
+                // No own show while the decision is open: the next show request is the app's.
+                autoOpenKeypad && respectAppVisibility -> hardwareKeypadAutoOpen.begin()
+                autoOpenKeypad -> openKeypadForCurrentField()
+                shouldShowSurface -> ensureImeSurfaceVisible()
             }
         }
         
@@ -3871,7 +3869,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         caretBadgeController.onEditorGone()
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         keyboardVisibilityController.cancelPendingSurfaceTransition()
-        pendingKeypadAutoOpen = false
+        hardwareKeypadAutoOpen.settle()
         endTemporaryKeypad()
         softwareKeypadSession.onFieldFinished()
         accidentalKeyPressFilter.reset()
@@ -5109,6 +5107,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
         }
         
+        // The first hardware key shows only the bar and settles an open keypad decision.
+        if (keyCode != KeyEvent.KEYCODE_BACK && event != null && event.flags and KeyEvent.FLAG_SOFT_KEYBOARD == 0) {
+            hardwareKeypadAutoOpen.settle()
+        }
         val routingResult = inputEventRouter.handleEditableFieldKeyDownPrelude(
             keyCode = keyCode,
             params = InputEventRouter.EditableFieldKeyDownParams(

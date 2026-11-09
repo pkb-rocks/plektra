@@ -10,7 +10,8 @@ import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethod
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,8 +53,10 @@ class SoftwareKeypadServiceIntegrationTest {
         SettingsManager.getPreferences(context).edit().clear().commit()
     }
 
-    private fun startInput(inputType: Int, restarting: Boolean = false): EditorInfo {
-        val info = EditorInfo().apply { this.inputType = inputType; packageName = "keypad.test" }
+    private var ownShows = 0
+
+    private fun startInput(inputType: Int, restarting: Boolean = false, packageName: String = "keypad.test"): EditorInfo {
+        val info = EditorInfo().apply { this.inputType = inputType; this.packageName = packageName }
         val ic = mock(InputConnection::class.java)
         setField(service, "mInputConnection", ic)
         setField(service, "mStartedInputConnection", ic)
@@ -68,83 +71,176 @@ class SoftwareKeypadServiceIntegrationTest {
 
     private fun mode() = SettingsManager.resolveEffectiveSoftwareKeyboardMode(context)
 
-    // --- Hardware keypad auto-open: order of own and external show requests ---
+    private fun awaiting() = (getField(service, "hardwareKeypadAutoOpen") as HardwareKeypadAutoOpen).awaitingShowRequest
 
-    @Test
-    fun externalShowBeforePostedOwnShow_opensKeypad() {
-        startInput(InputType.TYPE_CLASS_NUMBER)
-        // Plektra's hardware-bar presentation is pending but has not asked Android yet.
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
-        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+    /** Counts Plektra's own show requests; they still pass through the service's central hook. */
+    private fun countOwnShows() {
+        @Suppress("UNCHECKED_CAST")
+        val original = getField(visibility(), "requestShowInputView") as () -> Unit
+        setField(visibility(), "requestShowInputView", { ownShows++; original() })
     }
 
-    @Test
-    fun echoOfOwnHardwareBarShow_keepsHardwareBar_untilExternalShow() {
+    private fun appShowRequest(flags: Int = InputMethod.SHOW_EXPLICIT) = service.onShowInputRequested(flags, false)
+
+    private fun pressHardwareKey(keyCode: Int = KeyEvent.KEYCODE_1) {
+        service.onKeyDown(keyCode, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, 0))
+        service.onKeyUp(keyCode, KeyEvent(0L, 50L, KeyEvent.ACTION_UP, keyCode, 0))
+    }
+
+    private fun pressKeypadButton() =
+        (getField(service, "candidatesBarController") as CandidatesBarController).onKeypadRequested!!.invoke()
+
+    // --- Hardware keypad auto-open while app display defaults are respected ---
+
+    private fun assertFieldStartWaitsForTheApp(candidatesBackend: Boolean) {
+        SettingsManager.setExperimentalCandidatesViewEnabled(context, candidatesBackend)
+        countOwnShows()
         startInput(InputType.TYPE_CLASS_NUMBER)
         idle()
-        assertNotNull("own show request must have been issued", getField(visibility(), "ownShowRequestedAt"))
-        service.onShowInputRequested(0, false)
-        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
-        assertEquals(true, getField(service, "pendingKeypadAutoOpen"))
+        assertEquals("no own show while the decision is open", 0, ownShows)
+        assertTrue(awaiting())
+        // Without an own request, even an unflagged request is the app's or Android's.
+        appShowRequest(flags = 0)
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+        idle()
+        assertTrue("the keypad itself is shown by own requests", ownShows > 0)
+    }
 
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
+    @Test
+    fun fieldStart_requestsNoOwnShowUntilTheAppAsks_inputViewBackend() = assertFieldStartWaitsForTheApp(false)
+
+    @Test
+    fun fieldStart_requestsNoOwnShowUntilTheAppAsks_candidatesBackend() = assertFieldStartWaitsForTheApp(true)
+
+    @Test
+    fun appFirst_opensKeypad_andTheEchoOfItsShowChangesNothing() {
+        countOwnShows()
+        startInput(InputType.TYPE_CLASS_PHONE)
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+        idle()
+        appShowRequest(flags = 0)
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+        assertFalse(awaiting())
+        service.onFinishInput()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+    }
+
+    @Test
+    fun hardwareFirst_showsOnlyTheBar_lateEchoAndLaterRequestsKeepIt_keypadButtonStays() {
+        countOwnShows()
+        startInput(InputType.TYPE_CLASS_NUMBER)
+        pressHardwareKey()
+        assertFalse(awaiting())
+        idle()
+        assertEquals(1, ownShows)
+        // Echo of the bar request at any time, with or without flags: no timer decides.
+        appShowRequest(flags = 0)
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+
+        pressKeypadButton()
         assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
     }
 
     @Test
-    fun configurationReshowAfterRestart_doesNotOpenKeypad() {
+    fun backKeyAndOnScreenKeys_doNotSettleTheDecision() {
+        startInput(InputType.TYPE_CLASS_NUMBER)
+        service.onKeyDown(KeyEvent.KEYCODE_BACK, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 0))
+        service.onKeyDown(KeyEvent.KEYCODE_1, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_1, 0, 0,
+            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_SOFT_KEYBOARD, InputDevice.SOURCE_KEYBOARD))
+        assertTrue(awaiting())
+    }
+
+    @Test
+    fun hardwareConnectionRecovery_settlesTheDecisionBeforeItsOwnShow() {
+        countOwnShows()
+        startInput(InputType.TYPE_CLASS_NUMBER)
+        // The bar of the previous field is still on screen.
+        service.onWindowShown()
+        visibility().onHardwareKeyboardConnected()
+        idle()
+        assertEquals(1, ownShows)
+        assertFalse(awaiting())
+        appShowRequest(flags = 0)
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+    }
+
+    @Test
+    fun configurationReshowAndRestart_neitherDecideNorStartADecision() {
         val info = startInput(InputType.TYPE_CLASS_PHONE)
-        service.onStartInput(info, true)
         service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, true)
+        service.onStartInput(info, true)
         assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
-
-        // The decision still waits for a new request from the app or Android.
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
+        assertTrue(awaiting())
+        appShowRequest()
         assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
-    }
 
-    @Test
-    fun configurationReshowOfOwnShow_doesNotConsumeTheEchoMarker() {
-        startInput(InputType.TYPE_CLASS_NUMBER)
-        idle()
+        service.onFinishInput()
+        val settled = startInput(InputType.TYPE_CLASS_NUMBER)
+        pressHardwareKey()
+        service.onStartInput(settled, true)
         service.onShowInputRequested(0, true)
-        service.onShowInputRequested(0, false)
+        assertFalse(awaiting())
+        appShowRequest()
         assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
     }
 
     @Test
-    fun withoutRespectingAppDefaults_keypadOpensOnInputStart() {
+    fun appSwitch_startsAFreshDecision_textFieldDropsIt() {
+        startInput(InputType.TYPE_CLASS_NUMBER, packageName = "first.app")
+        pressHardwareKey()
+        service.onFinishInput()
+        startInput(InputType.TYPE_CLASS_NUMBER, packageName = "second.app")
+        assertTrue(awaiting())
+        startInput(InputType.TYPE_CLASS_TEXT, packageName = "second.app")
+        assertFalse(awaiting())
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+
+        startInput(InputType.TYPE_CLASS_NUMBER, packageName = "first.app")
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+        service.onFinishInput()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+    }
+
+    @Test
+    fun settingsChange_appliesFromTheNextField() {
+        startInput(InputType.TYPE_CLASS_NUMBER)
         SettingsManager.setAutoShowRespectAppVisibility(context, false)
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        assertTrue(awaiting())
+        service.onFinishInput()
+
         startInput(InputType.TYPE_CLASS_PHONE)
         assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
-    }
+        assertFalse(awaiting())
+        service.onFinishInput()
 
-    @Test
-    fun autoOpenOffOrTextField_neverOpensKeypad() {
         SettingsManager.setHardwareKeypadAutoOpen(context, false)
+        SettingsManager.setAutoShowRespectAppVisibility(context, true)
         startInput(InputType.TYPE_CLASS_NUMBER)
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
-        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
-
-        service.onFinishInput()
-        SettingsManager.setHardwareKeypadAutoOpen(context, true)
-        startInput(InputType.TYPE_CLASS_TEXT)
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
+        assertFalse(awaiting())
+        appShowRequest()
         assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
     }
 
     @Test
-    fun newEditorDropsPendingAutoOpenAndFinishRestoresHardware() {
+    fun hardwareBarShowsItselfInEveryOtherField_autoOpenIsOffByDefault() {
+        SettingsManager.getPreferences(context).edit().clear().commit()
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SoftwareKeyboardMode.FORCE_HARDWARE)
+        countOwnShows()
         startInput(InputType.TYPE_CLASS_NUMBER)
-        startInput(InputType.TYPE_CLASS_TEXT)
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
-        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        idle()
+        assertFalse(awaiting())
+        assertEquals(1, ownShows)
 
-        startInput(InputType.TYPE_CLASS_NUMBER)
-        service.onShowInputRequested(InputMethod.SHOW_EXPLICIT, false)
-        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
-        service.onFinishInput()
-        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        SettingsManager.setHardwareKeypadAutoOpen(context, true)
+        SettingsManager.setAutoShowRespectAppVisibility(context, true)
+        startInput(InputType.TYPE_CLASS_TEXT)
+        idle()
+        assertEquals(2, ownShows)
     }
 
     // --- SYM cycle: physical key versus on-screen key ---

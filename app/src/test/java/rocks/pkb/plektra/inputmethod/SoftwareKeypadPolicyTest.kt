@@ -36,6 +36,21 @@ class SoftwareKeypadPolicyTest {
     }
 
     @Test
+    fun hardwareAutoOpenDecidesOnTheFirstNewShowRequestOnly() {
+        val decision = HardwareKeypadAutoOpen()
+        assertFalse(decision.onShowRequested(configChange = false))
+        decision.begin()
+        assertFalse(decision.onShowRequested(configChange = true))
+        assertTrue(decision.onShowRequested(configChange = false))
+        assertFalse(decision.onShowRequested(configChange = false))
+
+        decision.begin()
+        decision.settle()
+        assertFalse(decision.awaitingShowRequest)
+        assertFalse(decision.onShowRequested(configChange = false))
+    }
+
+    @Test
     fun manualChoiceLastsUntilTheFieldChanges() {
         val session = SoftwareKeypadSession()
         session.onFieldStarted(pin, restarting = false)

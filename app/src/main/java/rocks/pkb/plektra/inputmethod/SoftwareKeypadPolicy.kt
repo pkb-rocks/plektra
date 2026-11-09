@@ -18,6 +18,35 @@ object SoftwareKeypadPolicy {
         autoOpenEnabled && autoKeypadFor(inputType) != SoftwareKeypad.FULL
 }
 
+/**
+ * Automatic keypad on a hardware keyboard while app/Android display defaults are respected.
+ *
+ * Android does not tell an IME whether a show request answers its own requestShowSelf. Plektra
+ * therefore requests no own display while the decision is open, so every new show request comes
+ * from the app or Android and opens the keypad. Plektra's own show requests, the first hardware
+ * key and the end of the field settle the decision without a keypad; a configuration reshow and an
+ * input restart leave it as it is.
+ */
+class HardwareKeypadAutoOpen {
+    var awaitingShowRequest = false
+        private set
+
+    fun begin() {
+        awaitingShowRequest = true
+    }
+
+    fun settle() {
+        awaitingShowRequest = false
+    }
+
+    /** Whether this show request opens the keypad. */
+    fun onShowRequested(configChange: Boolean): Boolean {
+        if (!awaitingShowRequest || configChange) return false
+        awaitingShowRequest = false
+        return true
+    }
+}
+
 /** Field-scoped keypad choice: a manual layout lasts until the editor changes; a restart keeps it. */
 class SoftwareKeypadSession {
     var fieldInputType: Int = InputType.TYPE_NULL

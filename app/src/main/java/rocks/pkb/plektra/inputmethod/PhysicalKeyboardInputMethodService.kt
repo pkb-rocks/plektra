@@ -132,8 +132,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // SharedPreferences for settings
     private lateinit var prefs: SharedPreferences
     private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
-    // A theme photo that cannot load falls back to the saved colours; re-apply like a theme change.
-    private val themeImageAvailabilityListener: () -> Unit = { updateStatusBarText() }
+    // A theme photo that cannot load falls back to the saved colours. Nothing in the status
+    // snapshot changes then, so the rendered state must be invalidated to re-apply the theme.
+    private val themeImageAvailabilityListener: () -> Unit = {
+        invalidateRenderedStatusSnapshot()
+        updateStatusBarText()
+    }
     private var lastSystemLocalesSignature: String = ""
     private var lastImeConfiguration: Configuration? = null
 

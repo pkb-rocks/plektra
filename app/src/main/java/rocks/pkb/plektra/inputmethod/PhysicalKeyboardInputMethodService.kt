@@ -2553,8 +2553,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     )
                     // Closes an open clipboard or emoji picker page and drops invisible candidates.
                     symLayoutController.currentSymPage()
-                    if (keyboardBarHiddenInEditor && ::textExpansionController.isInitialized) {
-                        textExpansionController.clear()
+                    if (keyboardBarHiddenInEditor) {
+                        if (::textExpansionController.isInitialized) textExpansionController.clear()
+                        // Back to the hardware surface: no open keypad decision or field-scoped keypad.
+                        hardwareKeypadAutoOpen.settle()
+                        endTemporaryKeypad()
                     }
                     invalidateRenderedStatusSnapshot()
                     updateStatusBarText()
@@ -3752,7 +3755,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this),
                 respectAppVisibility = respectAppVisibility
             )
-            val autoOpenKeypad = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+            // A blocked surface opens no keypad and leaves no decision waiting for a later unblock.
+            val autoOpenKeypad = keyboardVisibilityController.allowsSurface() &&
+                SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
                 SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
                 SoftwareKeypadPolicy.shouldAutoOpenOnHardware(
                     state.inputType,

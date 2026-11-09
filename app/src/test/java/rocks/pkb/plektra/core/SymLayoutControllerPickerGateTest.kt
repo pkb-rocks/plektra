@@ -56,4 +56,23 @@ class SymLayoutControllerPickerGateTest {
         assertTrue(sym.openClipboardPage())
         assertEquals(3, sym.currentSymPage())
     }
+
+    @Test
+    fun blockedPickersStayClosedForTheChooserAndThePeekedCycle() {
+        SettingsManager.setSymPagesConfig(
+            context,
+            SymPagesConfig(deviceEnabled = false, emojiEnabled = false, symbolsEnabled = true,
+                clipboardEnabled = true, emojiPickerEnabled = false)
+        )
+        val sym = controller()
+        pickersAllowed = false
+        assertFalse(sym.openPage(3))
+        assertFalse(sym.openPage(4))
+        assertTrue(sym.openPage(5))
+        sym.closeSymPage()
+        assertEquals(2, sym.peekNextSymPage())
+        assertTrue(sym.openPage(2))
+        // Unblocked, the clipboard would follow the symbols page.
+        assertEquals(0, sym.peekNextSymPage())
+    }
 }

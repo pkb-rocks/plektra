@@ -255,6 +255,82 @@ class SoftwareKeypadServiceIntegrationTest {
         assertEquals(2, ownShows)
     }
 
+    // --- Per-app "never show the bar" outranks every keypad policy ---
+
+    private fun symPage() = (getField(service, "symLayoutController") as SymLayoutController).currentSymPage()
+
+    private fun chooseOnScreenPage(id: String) {
+        (getField(service, "candidatesBarController") as CandidatesBarController).onSoftwareKeyboardPageChoice!!.invoke(id)
+        idle()
+    }
+
+    @Test
+    fun blockedApp_autoKeypadNeitherWaitsNorOpens_appRequestsAreRefused() {
+        SettingsManager.setKeyboardBarHiddenInApp(context, "blocked.app", true)
+        countOwnShows()
+        startInput(InputType.TYPE_CLASS_NUMBER, packageName = "blocked.app")
+        idle()
+        assertFalse("no decision may wait for a later unblock", awaiting())
+        assertFalse(appShowRequest())
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+
+        SettingsManager.setAutoShowRespectAppVisibility(context, false)
+        service.onFinishInput()
+        startInput(InputType.TYPE_CLASS_PHONE, packageName = "blocked.app")
+        idle()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        assertEquals(0, ownShows)
+    }
+
+    @Test
+    fun blockedApp_keypadButtonAndPageChooserOpenNothing() {
+        SettingsManager.setSymPagesConfig(context, SymPagesConfig(clipboardEnabled = true, emojiPickerEnabled = true))
+        SettingsManager.setKeyboardBarHiddenInApp(context, "blocked.app", true)
+        startInput(InputType.TYPE_CLASS_TEXT, packageName = "blocked.app")
+        pressKeypadButton()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        chooseOnScreenPage(SoftwareKeyboardPageChoices.pageId(4))
+        chooseOnScreenPage(SoftwareKeyboardPageChoices.pageId(2))
+        assertEquals(0, symPage())
+        chooseOnScreenPage(SoftwareKeyboardPageChoices.NUMBER)
+        assertEquals(null, (getField(service, "softwareKeypadSession") as SoftwareKeypadSession).manualKeypad)
+    }
+
+    @Test
+    fun blockingTheCurrentApp_settlesAnOpenDecisionAndEndsTheFieldKeypad() {
+        startInput(InputType.TYPE_CLASS_NUMBER, packageName = "later.blocked")
+        assertTrue(awaiting())
+        SettingsManager.setKeyboardBarHiddenInApp(context, "later.blocked", true)
+        idle()
+        assertFalse(awaiting())
+        SettingsManager.setKeyboardBarHiddenInApp(context, "later.blocked", false)
+        idle()
+        appShowRequest()
+        assertEquals("the app's request after the unblock belongs to no decision", SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+
+        service.onFinishInput()
+        startInput(InputType.TYPE_CLASS_PHONE, packageName = "later.blocked")
+        appShowRequest()
+        assertEquals(SoftwareKeyboardMode.FORCE_VIRTUAL, mode())
+        SettingsManager.setKeyboardBarHiddenInApp(context, "later.blocked", true)
+        idle()
+        assertEquals(SoftwareKeyboardMode.FORCE_HARDWARE, mode())
+        assertFalse(visibility().allowsSurface())
+    }
+
+    @Test
+    fun blockedApp_physicalSymCycleSkipsOnlyThePickers() {
+        SettingsManager.setSymPagesConfig(context,
+            SymPagesConfig(deviceEnabled = false, emojiEnabled = true, symbolsEnabled = true,
+                clipboardEnabled = true, emojiPickerEnabled = true))
+        SettingsManager.setKeyboardBarHiddenInApp(context, "sym.test", true)
+        prepareSymField()
+        setField(service, "keyboardBarHiddenInEditor", true)
+        assertEquals(1, tapSym(onScreen = false, at = 1_000L))
+        assertEquals(2, tapSym(onScreen = false, at = 2_000L))
+        assertEquals(0, tapSym(onScreen = false, at = 3_000L))
+    }
+
     // --- SYM cycle: physical key versus on-screen key ---
 
     private fun prepareSymField() {

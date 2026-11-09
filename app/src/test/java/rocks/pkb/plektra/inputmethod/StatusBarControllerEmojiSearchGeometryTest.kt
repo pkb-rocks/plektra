@@ -56,6 +56,30 @@ class StatusBarControllerEmojiSearchGeometryTest {
         if (host.isAttachedToWindow) windowManager.removeViewImmediate(host)
     }
 
+    @Test
+    @Config(sdk = [29])
+    fun legacyWindowFrameKeepsSearchBelowTheStatusBar() {
+        val frameView = object : View(activity) {
+            override fun getWindowVisibleDisplayFrame(frame: android.graphics.Rect) {
+                frame.set(95, 79, 2376, 968)
+            }
+            override fun getRootWindowInsets(): android.view.WindowInsets? = null
+        }
+        assertEquals(statusBarHeight, legacyEmojiSearchSafeTop(frameView))
+        val insetView = object : View(activity) {
+            override fun getWindowVisibleDisplayFrame(frame: android.graphics.Rect) { frame.setEmpty() }
+            override fun getRootWindowInsets(): android.view.WindowInsets = android.view.WindowInsets.Builder()
+                .setStableInsets(android.graphics.Insets.of(0, 79, 0, 0))
+                .setDisplayCutout(android.view.DisplayCutout(android.graphics.Rect(0, 90, 0, 0), emptyList()))
+                .build()
+        }
+        assertEquals(90, legacyEmojiSearchSafeTop(insetView))
+        controller.screenSafeTopPx = { legacyEmojiSearchSafeTop(frameView) }
+        attachImeWindow(2281, 889)
+        openSearch()
+        assertUsableSearch("legacy visible frame")
+    }
+
     /** Adds the IME root in its own window, like the input method window, of the given bounds. */
     private fun attachImeWindow(width: Int, height: Int) {
         val params = WindowManager.LayoutParams(

@@ -65,6 +65,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import rocks.pkb.plektra.SettingsActivity
 
+@Suppress("DEPRECATION")
+internal fun legacyEmojiSearchSafeTop(view: View?): Int {
+    val frame = android.graphics.Rect()
+    view?.getWindowVisibleDisplayFrame(frame)
+    val insets = view?.rootWindowInsets
+    return maxOf(frame.top, insets?.stableInsetTop ?: 0, insets?.systemWindowInsetTop ?: 0,
+        insets?.displayCutout?.safeInsetTop ?: 0)
+}
+
 /**
  * Manages the status bar shown by the IME, handling view creation
  * and updating text/style based on modifier states.
@@ -369,7 +378,7 @@ class StatusBarController(
                 android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.displayCutout()
             ).top
         } else {
-            0
+            legacyEmojiSearchSafeTop(statusBarLayout)
         }
     }
     private var softwareKeyboardView: AospKeyboardView? = null

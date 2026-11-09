@@ -1003,6 +1003,7 @@ object SettingLinkRegistry {
      * assert that every assignment targets a registered entry.
      */
     internal val keywordsById: Map<String, Int> = mapOf(
+        "status_bar.presentation" to R.string.kw_status_bar_presentation,
         SettingLinkIds.MAIN_KEYBOARDS_DEVICES to R.string.kw_main_keyboards_devices,
         SettingLinkIds.MAIN_MODIFIERS to R.string.kw_main_modifiers,
         SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES to R.string.kw_main_custom_input_styles,
@@ -1141,6 +1142,35 @@ object SettingLinkRegistry {
             R.string.main_background_title
     ) + customizationSettingSubtitles()
 
+    // These pages use the customization host but are reached from the main screen.
+    internal val customizationBreadcrumbParents: Map<String, String?> = mapOf(
+        "status_bar_buttons" to null,
+        "keyboard_theme" to null,
+        "display_geometry" to null,
+        "launcher_shortcuts" to null,
+        "app_enter_behavior" to null,
+        "keyboard_bar_buttons" to "status_bar_buttons",
+        "keyboard_bar_variations" to "status_bar_buttons",
+        "keyboard_theme_assignment" to "keyboard_theme",
+        "launcher_shortcut_behavior" to "launcher_shortcuts",
+        "launcher_shortcut_cosmetic" to "launcher_shortcuts",
+        "launcher_shortcut_assignments" to "launcher_shortcuts"
+    )
+
+    internal fun breadcrumbTitles(route: SettingRoute): List<Int> = buildList {
+        add(R.string.settings_title)
+        val sub = route.customizationDestination
+        if (route.destination == SettingsDestination.Customization &&
+            customizationBreadcrumbParents.containsKey(sub)
+        ) {
+            customizationBreadcrumbParents[sub]?.let(customizationSubtitles::get)?.let(::add)
+        } else {
+            destinationTitles[route.destination]?.let(::add)
+        }
+        sub?.let(customizationSubtitles::get)?.let(::add)
+        keyboardsDevicesSubtitles[route.keyboardsDevicesDestination]?.let(::add)
+    }
+
     /**
      * Search across all registered entries. The query is split into tokens;
      * an entry matches only when every token matches, and ranks by the summed
@@ -1160,9 +1190,8 @@ object SettingLinkRegistry {
             val summary = entry.summaryRes?.let { normalizeForSearch(context.getString(it)) }
             val keywords = normalizeForSearch(listOfNotNull(
                 keywordsById[entry.id]?.let(context::getString),
-                destinationTitles[entry.route.destination]?.let(context::getString),
-                entry.route.customizationDestination?.let(customizationSubtitles::get)?.let(context::getString),
-                keyboardsDevicesSubtitles[entry.route.keyboardsDevicesDestination]?.let(context::getString),
+                breadcrumbTitles(entry.route).drop(1)
+                    .joinToString(" ", transform = context::getString),
                 entry.id.replace('.', ' ').replace('_', ' ')
             ).joinToString(" "))
             var score = 0

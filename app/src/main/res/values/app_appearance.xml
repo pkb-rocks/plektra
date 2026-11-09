@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">App appearance</string>
+    <string name="app_appearance_hint">Choose the main colour and the selected-item colour. Text contrast adjusts automatically. Keyboard themes have their own settings.</string>
+    <string name="app_appearance_enabled">Custom colours</string>
+    <string name="app_appearance_palette">Palettes</string>
+    <string name="app_appearance_main">Main colour</string>
+    <string name="app_appearance_selection">Selected-item colour</string>
+    <string name="app_appearance_preview">Preview</string>
+    <string name="app_appearance_normal">Unselected button</string>
+    <string name="app_appearance_reset">Use system colours</string>
+    <string name="app_appearance_selected">Selected button</string>
+</resources>

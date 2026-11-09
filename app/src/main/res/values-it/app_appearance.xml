@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Aspetto dell’app</string>
+    <string name="app_appearance_hint">Scegli il colore principale e quello degli elementi selezionati. Il contrasto del testo si adatta automaticamente. I temi della tastiera hanno impostazioni separate.</string>
+    <string name="app_appearance_enabled">Colori personalizzati</string>
+    <string name="app_appearance_palette">Tavolozze</string>
+    <string name="app_appearance_main">Colore principale</string>
+    <string name="app_appearance_selection">Colore degli elementi selezionati</string>
+    <string name="app_appearance_preview">Anteprima</string>
+    <string name="app_appearance_normal">Pulsante non selezionato</string>
+    <string name="app_appearance_reset">Usa i colori di sistema</string>
+    <string name="app_appearance_selected">Pulsante selezionato</string>
+</resources>

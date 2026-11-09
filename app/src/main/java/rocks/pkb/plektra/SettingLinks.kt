@@ -89,6 +89,7 @@ object SettingLinkIds {
     const val ACCESSIBILITY_OVERLAPPING_KEYS = "accessibility.overlapping_keys"
 
     // Advanced screen
+    const val ADVANCED_APP_APPEARANCE = "advanced.appearance"
     const val ADVANCED_TRACKPAD_GESTURES = "advanced.trackpad_gestures"
     const val ADVANCED_BACKUP = "advanced.backup"
     const val ADVANCED_RESTORE = "advanced.restore"
@@ -641,6 +642,12 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Accessibility
         ),
 
+        entry(
+            SettingLinkIds.ADVANCED_APP_APPEARANCE,
+            R.string.app_appearance_title,
+            R.string.app_appearance_hint,
+            destination = SettingsDestination.Advanced
+        ),
         entry(
             SettingLinkIds.ADVANCED_TRACKPAD_GESTURES,
             R.string.trackpad_gestures_title,

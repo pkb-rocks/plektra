@@ -40,7 +40,7 @@ fun PlektraTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val baseColorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -49,6 +49,10 @@ fun PlektraTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
+    val colorScheme = rocks.pkb.plektra.AppAppearance.palette(
+        baseColorScheme, darkTheme, rocks.pkb.plektra.rememberAppAppearance()
+    )
 
     MaterialTheme(
         colorScheme = colorScheme.copy(background = colorScheme.surface),

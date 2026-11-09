@@ -108,9 +108,14 @@ fun AdvancedSettingsScreen(
         mutableStateOf<Pair<Uri, RestoreManager.DeviceChange>?>(null)
     }
     val currentDestination = remember { when (settingsChild(context, "advanced")) {
+        "Appearance" -> AdvancedDestination.Appearance
         "ImeTest" -> AdvancedDestination.ImeTest
         "TrackpadGestures" -> AdvancedDestination.TrackpadGestures
-        else -> if (context.settingsActivity().intent.data?.let(SettingLinkRegistry::parseSettingLinkUri) in TRACKPAD_SETTING_LINK_IDS) AdvancedDestination.TrackpadGestures else AdvancedDestination.Main
+        else -> when (context.settingsActivity().intent.data?.let(SettingLinkRegistry::parseSettingLinkUri)) {
+            SettingLinkIds.ADVANCED_APP_APPEARANCE -> AdvancedDestination.Appearance
+            in TRACKPAD_SETTING_LINK_IDS -> AdvancedDestination.TrackpadGestures
+            else -> AdvancedDestination.Main
+        }
     } }
     val highlightedSettingId = LocalSettingHighlightId.current
     // Listen to SharedPreferences changes to update UI when values are restored
@@ -149,7 +154,13 @@ fun AdvancedSettingsScreen(
     }
 
     fun navigateTo(destination: AdvancedDestination) {
-        openSettingsChild(context, "advanced", when (destination) { AdvancedDestination.Main -> "Main"; AdvancedDestination.ImeTest -> "ImeTest"; AdvancedDestination.TrackpadGestures -> "TrackpadGestures" })
+        val child = when (destination) {
+            AdvancedDestination.Appearance -> "Appearance"
+            AdvancedDestination.Main -> "Main"
+            AdvancedDestination.ImeTest -> "ImeTest"
+            AdvancedDestination.TrackpadGestures -> "TrackpadGestures"
+        }
+        openSettingsChild(context, "advanced", child)
     }
     fun navigateBack() { context.settingsActivity().finish() }
 
@@ -302,6 +313,24 @@ fun AdvancedSettingsScreen(
                             .padding(paddingValues)
                             .verticalScroll(rememberScrollState())
                     ) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth()
+                                .settingRow(SettingLinkIds.ADVANCED_APP_APPEARANCE) {
+                                    navigateTo(AdvancedDestination.Appearance)
+                                }
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(stringResource(R.string.app_appearance_title),
+                                    style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.app_appearance_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+
                         // Trackpad Gesture Settings
                         Surface(
                             modifier = Modifier
@@ -760,6 +789,10 @@ fun AdvancedSettingsScreen(
                 }
             }
 
+            AdvancedDestination.Appearance -> {
+                AppAppearanceSettingsScreen(onBack = { navigateBack() })
+            }
+
             AdvancedDestination.ImeTest -> {
                 ImeTestScreen(
                     modifier = modifier,
@@ -779,6 +812,7 @@ fun AdvancedSettingsScreen(
 }
 
 private sealed class AdvancedDestination {
+    object Appearance : AdvancedDestination()
     object Main : AdvancedDestination()
     object ImeTest : AdvancedDestination()
     object TrackpadGestures : AdvancedDestination()

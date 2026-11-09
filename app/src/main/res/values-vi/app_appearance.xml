@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Giao diện ứng dụng</string>
+    <string name="app_appearance_hint">Chọn màu chính và màu mục được chọn. Độ tương phản chữ tự điều chỉnh. Chủ đề bàn phím có cài đặt riêng.</string>
+    <string name="app_appearance_enabled">Màu tùy chỉnh</string>
+    <string name="app_appearance_palette">Bảng màu</string>
+    <string name="app_appearance_main">Màu chính</string>
+    <string name="app_appearance_selection">Màu mục được chọn</string>
+    <string name="app_appearance_preview">Xem trước</string>
+    <string name="app_appearance_normal">Nút chưa chọn</string>
+    <string name="app_appearance_reset">Dùng màu hệ thống</string>
+    <string name="app_appearance_selected">Nút được chọn</string>
+</resources>

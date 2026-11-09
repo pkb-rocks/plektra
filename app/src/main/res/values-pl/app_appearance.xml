@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Wygląd aplikacji</string>
+    <string name="app_appearance_hint">Wybierz kolor główny i kolor zaznaczonych elementów. Kontrast tekstu dopasuje się automatycznie. Motywy klawiatury mają własne ustawienia.</string>
+    <string name="app_appearance_enabled">Własne kolory</string>
+    <string name="app_appearance_palette">Palety</string>
+    <string name="app_appearance_main">Kolor główny</string>
+    <string name="app_appearance_selection">Kolor zaznaczonych elementów</string>
+    <string name="app_appearance_preview">Podgląd</string>
+    <string name="app_appearance_normal">Niezaznaczony przycisk</string>
+    <string name="app_appearance_reset">Użyj kolorów systemowych</string>
+    <string name="app_appearance_selected">Wybrany przycisk</string>
+</resources>

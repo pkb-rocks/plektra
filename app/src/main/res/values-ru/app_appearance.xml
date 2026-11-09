@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Оформление приложения</string>
+    <string name="app_appearance_hint">Выберите основной цвет и цвет выбранных элементов. Контраст текста настраивается автоматически. Темы клавиатуры имеют отдельные настройки.</string>
+    <string name="app_appearance_enabled">Свои цвета</string>
+    <string name="app_appearance_palette">Палитры</string>
+    <string name="app_appearance_main">Основной цвет</string>
+    <string name="app_appearance_selection">Цвет выбранных элементов</string>
+    <string name="app_appearance_preview">Предпросмотр</string>
+    <string name="app_appearance_normal">Невыбранная кнопка</string>
+    <string name="app_appearance_reset">Использовать системные цвета</string>
+    <string name="app_appearance_selected">Выбранная кнопка</string>
+</resources>

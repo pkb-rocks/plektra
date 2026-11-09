@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_appearance_title">Apariencia de la aplicación</string>
+    <string name="app_appearance_hint">Elige el color principal y el de los elementos seleccionados. El contraste del texto se ajusta automáticamente. Los temas del teclado tienen sus propios ajustes.</string>
+    <string name="app_appearance_enabled">Colores personalizados</string>
+    <string name="app_appearance_palette">Paletas</string>
+    <string name="app_appearance_main">Color principal</string>
+    <string name="app_appearance_selection">Color de los elementos seleccionados</string>
+    <string name="app_appearance_preview">Vista previa</string>
+    <string name="app_appearance_normal">Botón sin seleccionar</string>
+    <string name="app_appearance_reset">Usar los colores del sistema</string>
+    <string name="app_appearance_selected">Botón seleccionado</string>
+</resources>

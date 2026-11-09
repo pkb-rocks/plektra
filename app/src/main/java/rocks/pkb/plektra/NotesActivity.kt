@@ -323,6 +323,12 @@ open class NotesActivity : Activity() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // A note removed while this editor was stopped must not leave an editable orphan.
+        if (notes.all().none { it.id == selectedNote.id }) finish()
+    }
+
     override fun onPause() {
         saveNote()
         super.onPause()
@@ -341,7 +347,7 @@ open class NotesActivity : Activity() {
     }
 
     private fun saveNote() {
-        if (loadingNote) return
+        if (loadingNote || notes.all().none { it.id == selectedNote.id }) return
         val target = if (heading.hasFocus() || (viewMode == ViewMode.PREVIEW && restoreHeadingFocus)) heading else editor
         notePrefs.edit().putString("heading", heading.text.toString()).putString("body", editor.text.toString())
             .putInt("focus", target.id).putInt("cursor", target.selectionStart.coerceAtLeast(0))

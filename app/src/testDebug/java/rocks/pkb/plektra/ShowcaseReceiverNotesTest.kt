@@ -43,6 +43,28 @@ class ShowcaseReceiverNotesTest {
         reopened.pause().stop().destroy()
     }
 
+    @Test fun restoredCaptureClosesStoppedEditorAndPreservesPersonalNote() {
+        val personal = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        personal.get().findViewById<EditText>(R.id.notes_body).setText("Personal note")
+        personal.pause().stop().destroy()
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        val original = NotesRepository(prefs).all()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic capture").toString())))
+        val capture = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        capture.pause().stop()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        val restored = prefs.all.toMap()
+        capture.restart().start().resume().visible()
+        org.junit.Assert.assertTrue(capture.get().isFinishing)
+        capture.pause().stop().destroy()
+        assertEquals(restored, prefs.all)
+        assertEquals(original, NotesRepository(prefs).all())
+        val reopened = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        assertEquals("Personal note", reopened.get().findViewById<EditText>(R.id.notes_body).text.toString())
+        reopened.pause().stop().destroy()
+    }
+
     private fun broadcast(intent: Intent): Int {
         var result: Int? = null
         context.sendOrderedBroadcast(intent.setClass(context, ShowcaseReceiver::class.java), null,

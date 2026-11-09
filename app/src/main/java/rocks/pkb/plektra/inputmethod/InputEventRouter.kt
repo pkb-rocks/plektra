@@ -870,6 +870,9 @@ class InputEventRouter(
             typedChar in boundarySet &&
             typedChar != '\''
 
+        if (keyCode == KeyEvent.KEYCODE_DEL) suggestionController?.onTypingStatisticsBackspace()
+        if (isBoundaryKey || isPunctuation) suggestionController?.onTypingStatisticsBoundary()
+
         // Keep suggestions alive for in-word apostrophes (e.g., "we'" → "we'll").
         if (isWordApostrophe && !shouldDisableSuggestions) {
             handleInWordApostrophe(inputConnection, pendingApostrophe = true)

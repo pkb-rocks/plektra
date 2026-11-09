@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="typing_statistics_title">Estadísticas de escritura</string>
+    <string name="typing_statistics_total_words">Número total de palabras introducidas</string>
+    <string name="typing_statistics_manual_words">Palabras introducidas manualmente</string>
+    <string name="typing_statistics_suggested_words">Palabras introducidas mediante sugerencias</string>
+    <string name="typing_statistics_since_installation">Uso desde el %1$s</string>
+</resources>

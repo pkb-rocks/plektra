@@ -1951,7 +1951,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         candidatesBarController.onAddUserWordSubstitutionRequested = { word ->
             showAddSubstitutionDialog(word)
         }
-        candidatesBarController.onSuggestionCommitted = {
+        candidatesBarController.onSuggestionCommitted = { suggestion ->
+            suggestionController.onSuggestionCommitted(suggestion)
             if (shiftLayerLatched || altModifierLayerLatched) {
                 shiftLayerLatched = false
                 altModifierLayerLatched = false
@@ -2189,6 +2190,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Register callback to be notified when an Alt character is inserted after long press.
         // Variations are updated automatically by updateStatusBarText().
+        alternateCharacterManager.onStatisticsTextCommitted = { text ->
+            suggestionController.onTypingStatisticsTextCommitted(text)
+        }
+        alternateCharacterManager.onStatisticsCharactersDeleted = { count ->
+            repeat(count) { suggestionController.onTypingStatisticsBackspace() }
+        }
         alternateCharacterManager.onAltCharInserted = { char ->
             DeferredPunctuationSpaceTracker.onTextCommitted(this, char.toString())
             updateStatusBarText()
@@ -2201,7 +2208,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             } else if (normalizedChar.isLetter()) {
                 // Variations-mode long-press replaces a letter: keep suggestion context in sync.
                 markSelectionUpdateSkipAfterCommit()
-                suggestionController.onCharacterCommitted(normalizedChar.toString(), ic)
+                suggestionController.onCharacterCommitted(normalizedChar.toString(), ic, trackTypingStatistics = false)
             } else if (normalizedChar !in punctuationSet) {
                 // Non-boundary Alt long-press (e.g., numbers/symbols) resets current word tracking
                 suggestionController.onContextReset()
@@ -2216,7 +2223,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 if (shouldTrack) {
                     // Avoid double suggestion dispatch: skip the immediate selection update after commit.
                     markSelectionUpdateSkipAfterCommit()
-                    suggestionController.onCharacterCommitted(text, currentInputConnection)
+                    suggestionController.onCharacterCommitted(text, currentInputConnection, trackTypingStatistics = false)
                 }
             }
         }
@@ -3611,6 +3618,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        if (!restarting && ::suggestionController.isInitialized) suggestionController.finishTypingStatistics()
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         if (!restarting) {
@@ -3687,6 +3695,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
 
         initializeInputContext(restarting)
+        if (!restarting) suggestionController.onTypingStatisticsEditorStarted(currentInputConnection)
         suggestionController.onContextReset()
 
         // Always reset shift one-shot when entering a field (both restarting and new field)
@@ -3788,6 +3797,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onFinishInput() {
+        if (::suggestionController.isInitialized) suggestionController.finishTypingStatistics()
         cancelSpeechRecognition()
         ++speechEditorSession
         disableSmoothCaretExperiment()
@@ -3828,6 +3838,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Retention cleanup continues while the IME service lives, including on the lock screen.
         if (finishingInput) {
+            suggestionController.finishTypingStatistics()
             multiTapController.cancelAll()
             resetModifierStates(preserveNavMode = true)
             suggestionController.onContextReset()
@@ -6197,7 +6208,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
             ic.deleteSurroundingText(deleteBefore, deleteAfter)
             val textToCommit = if (shouldAppendSpace) "$replacement " else replacement
-            ic.commitText(textToCommit, 1)
+            val committed = ic.commitText(textToCommit, 1)
             if (shiftOneShot) {
                 modifierStateController.consumeShiftOneShot()
             }
@@ -6211,6 +6222,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             if (shouldAppendSpace) {
                 rocks.pkb.plektra.core.AutoSpaceTracker.markAutoSpace()
             }
+
+            if (committed) suggestionController.onSuggestionCommitted(replacement)
 
             // CRITICAL FIX: Reset tracker after accepting suggestion to prevent duplicate letters
             // The cursor debounce can cause tracker to be out of sync when user types quickly after accepting

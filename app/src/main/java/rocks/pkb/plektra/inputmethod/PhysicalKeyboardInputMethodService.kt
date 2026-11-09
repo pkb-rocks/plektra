@@ -43,7 +43,6 @@ import rocks.pkb.plektra.core.AutoCorrectionManager
 import rocks.pkb.plektra.core.DeferredPunctuationSpaceTracker
 import rocks.pkb.plektra.core.InputContextState
 import rocks.pkb.plektra.core.ModifierStateController
-import rocks.pkb.plektra.core.ShiftState
 import rocks.pkb.plektra.core.NavModeController
 import rocks.pkb.plektra.core.SymLayoutController
 import rocks.pkb.plektra.core.TextInputController
@@ -175,8 +174,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var lastLayoutToastText: String? = null
     private var lastLayoutToastTime: Long = 0
     private var suppressNextLayoutReload: Boolean = false
-    // The field asked for Caps Lock while an uncased layout was active; restore it on a cased one.
-    private var fieldCapsLockSuspended: Boolean = false
     private var activeKeyboardLayoutName: String = "qwerty"
     private var consumeAltEnterUntilKeyUp: Boolean = false
     private val consumedLanguageSwitchKeys = mutableSetOf<Int>()
@@ -1671,31 +1668,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         return char?.toString() ?: ""
     }
 
-    private fun enableFieldCapsLock() {
-        if (LayoutMappingRepository.supportsAutoCapitalization) {
-            modifierStateController.enableAutomaticCapsLock()
-        } else {
-            fieldCapsLockSuspended = true
-        }
-    }
-
     private fun switchToLayout(layoutName: String, showToast: Boolean) {
         activeKeyboardLayoutName = layoutName
         LayoutMappingRepository.loadLayout(assets, layoutName, this)
-        if (!LayoutMappingRepository.supportsAutoCapitalization) {
-            modifierStateController.consumeShiftOneShot()
-            // The field's Caps Lock would select the shift layer, which holds other
-            // letters in uncased scripts; Caps Lock the user set stays.
-            if (modifierStateController.capsLockAutomatic) {
-                modifierStateController.capsLockEnabled = false
-                fieldCapsLockSuspended = true
-            }
-        } else if (fieldCapsLockSuspended) {
-            fieldCapsLockSuspended = false
-            if (modifierStateController.shiftState == ShiftState.OFF) {
-                modifierStateController.enableAutomaticCapsLock()
-            }
-        }
+        modifierStateController.onLayoutChanged()
         variationStateController = VariationStateController(
             VariationRepository.loadVariations(assets, this, activeKeyboardLayoutName)
         )
@@ -1908,7 +1884,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Clear legacy nav mode notification since we now rely on the status icon only.
         NotificationHelper.cancelNavModeNotification(this)
 
-        modifierStateController = ModifierStateController(DOUBLE_TAP_THRESHOLD)
+        modifierStateController = ModifierStateController(DOUBLE_TAP_THRESHOLD) {
+            LayoutMappingRepository.supportsAutoCapitalization
+        }
         updateModifierTapLatchSettings()
         navModeController = NavModeController(this, modifierStateController)
         navModeController.setOnNavModeChangedListener { isActive ->
@@ -3819,7 +3797,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
         // Always reset shift one-shot when entering a field (both restarting and new field)
         // Then let auto-cap logic decide if it should be enabled
-        fieldCapsLockSuspended = false
+        modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
             
@@ -3828,7 +3806,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { enableFieldCapsLock() },
+                enableCapsLock = { modifierStateController.requestFieldCapsLock() },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
@@ -3868,7 +3846,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         // Always reset shift one-shot when entering a field (both restarting and new field)
         // Then let auto-cap logic decide if it should be enabled
-        fieldCapsLockSuspended = false
+        modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
             
@@ -3877,7 +3855,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 context = this,
                 state = state,
                 inputConnection = currentInputConnection,
-                enableCapsLock = { enableFieldCapsLock() },
+                enableCapsLock = { modifierStateController.requestFieldCapsLock() },
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )

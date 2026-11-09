@@ -22,7 +22,7 @@ class ModifierStateControllerTest {
     fun automaticCapsLock_becomesUserOwnedAfterAnyShiftChange() {
         val controller = ModifierStateController(doubleTapThreshold)
 
-        controller.enableAutomaticCapsLock()
+        controller.requestFieldCapsLock()
         assertTrue(controller.capsLockEnabled)
         assertTrue(controller.capsLockAutomatic)
 
@@ -35,6 +35,78 @@ class ModifierStateControllerTest {
         controller.capsLockEnabled = true
         assertTrue(controller.capsLockEnabled)
         assertFalse(controller.capsLockAutomatic)
+    }
+
+    @Test
+    fun fieldCapsLock_keepsUserCapsLockUserOwned() {
+        val controller = ModifierStateController(doubleTapThreshold)
+        controller.capsLockEnabled = true
+
+        controller.requestFieldCapsLock()
+
+        assertTrue(controller.capsLockEnabled)
+        assertFalse(controller.capsLockAutomatic)
+    }
+
+    @Test
+    fun fieldCapsLock_waitsForCasedLayoutAndUserCapsLockStays() {
+        var cased = false
+        val controller = ModifierStateController(doubleTapThreshold) { cased }
+
+        controller.requestFieldCapsLock()
+        assertFalse(controller.capsLockEnabled)
+
+        cased = true
+        controller.onLayoutChanged()
+        assertTrue(controller.capsLockAutomatic)
+
+        cased = false
+        controller.onLayoutChanged()
+        assertFalse(controller.capsLockEnabled)
+
+        controller.capsLockEnabled = true
+        cased = true
+        controller.onLayoutChanged()
+        cased = false
+        controller.onLayoutChanged()
+        assertTrue(controller.capsLockEnabled)
+        assertFalse(controller.capsLockAutomatic)
+    }
+
+    @Test
+    fun restoreAfterLayoutChange_appliesFieldCapsLockToCurrentLayout() {
+        var cased = true
+        val controller = ModifierStateController(doubleTapThreshold) { cased }
+        controller.requestFieldCapsLock()
+
+        val held = controller.captureLogicalState()
+        controller.capsLockEnabled = false
+        cased = false
+        controller.onLayoutChanged()
+        controller.restoreLogicalState(held)
+        assertFalse(controller.capsLockEnabled)
+
+        val heldOnUncased = controller.captureLogicalState()
+        controller.shiftOneShot = true
+        cased = true
+        controller.onLayoutChanged()
+        controller.restoreLogicalState(heldOnUncased)
+        assertTrue(controller.capsLockAutomatic)
+    }
+
+    @Test
+    fun restoreAfterLayoutChange_dropsOneShotOnUncasedLayout() {
+        var cased = true
+        val controller = ModifierStateController(doubleTapThreshold) { cased }
+        controller.requestShiftOneShotFromAutoCap()
+
+        val held = controller.captureLogicalState()
+        controller.shiftOneShot = false
+        cased = false
+        controller.onLayoutChanged()
+        controller.restoreLogicalState(held)
+
+        assertEquals(ShiftState.OFF, controller.shiftState)
     }
 
     @Test

@@ -11,7 +11,9 @@ enum class ShiftState { OFF, ONE_SHOT, CAPS }
  * bookkeeping in sync with the UI and auto-capitalization helpers.
  */
 class ModifierStateController(
-    private val doubleTapThreshold: Long
+    private val doubleTapThreshold: Long,
+    /** Whether the active layout has letter case, so field capitalization may select its shift layer. */
+    private val layoutSupportsAutomaticShift: () -> Boolean = { true }
 ) {
     private val modifierKeyHandler = ModifierKeyHandler(doubleTapThreshold)
     private var lastKeyWasModifier = false
@@ -89,6 +91,11 @@ class ModifierStateController(
     }
 
     private val shiftStateMachine = ShiftStateMachine(doubleTapThreshold)
+
+    // The field asked for Caps Lock while an uncased layout was active; it returns on a cased one.
+    private var fieldCapsLockSuspended = false
+    // Counts layout changes so a state captured before one can be re-applied to the new layout.
+    private var layoutGeneration = 0
     private var shiftPressedFlag = false
     private var shiftPhysicallyPressedFlag = false
 
@@ -131,7 +138,9 @@ class ModifierStateController(
         val ctrlLatchFromNavMode: Boolean,
         val altOneShot: Boolean,
         val altLatchActive: Boolean,
-        val automaticCapsLock: Boolean = false
+        val automaticCapsLock: Boolean = false,
+        val fieldCapsLockSuspended: Boolean = false,
+        val layoutGeneration: Int = 0
     )
 
     fun captureLogicalState(): LogicalState {
@@ -142,12 +151,22 @@ class ModifierStateController(
             ctrlLatchFromNavMode = ctrlState.latchFromNavMode,
             altOneShot = altState.oneShot,
             altLatchActive = altState.latchActive,
-            automaticCapsLock = shiftStateMachine.automaticCapsLock
+            automaticCapsLock = shiftStateMachine.automaticCapsLock,
+            fieldCapsLockSuspended = fieldCapsLockSuspended,
+            layoutGeneration = layoutGeneration
         )
     }
 
+    /**
+     * Restores a state captured before a modifier hold. A layout change during the hold
+     * is applied again to the restored state, so field Caps Lock follows the current layout.
+     */
     fun restoreLogicalState(captured: LogicalState) {
         shiftStateMachine.restore(captured.shiftState, captured.automaticCapsLock)
+        fieldCapsLockSuspended = captured.fieldCapsLockSuspended
+        if (captured.layoutGeneration != layoutGeneration) {
+            applyLayoutCasing()
+        }
         ctrlState.oneShot = captured.ctrlOneShot
         ctrlState.latchActive = captured.ctrlLatchActive
         ctrlState.latchFromNavMode = captured.ctrlLatchFromNavMode
@@ -169,8 +188,48 @@ class ModifierStateController(
     val capsLockAutomatic: Boolean
         get() = shiftStateMachine.automaticCapsLock
 
-    fun enableAutomaticCapsLock() {
-        shiftStateMachine.setAutomaticCapsLock()
+    /**
+     * Applies a field's Caps Lock request (CAP_CHARACTERS). Caps Lock that is already on
+     * keeps its origin, so a user's Caps Lock stays user-owned across field restarts.
+     * On an uncased layout the request waits until a cased layout becomes active.
+     */
+    fun requestFieldCapsLock() {
+        if (shiftStateMachine.state == ShiftState.CAPS) return
+        if (layoutSupportsAutomaticShift()) {
+            shiftStateMachine.setAutomaticCapsLock()
+        } else {
+            fieldCapsLockSuspended = true
+        }
+    }
+
+    /** Forgets the previous field's Caps Lock request before the field flags are applied again. */
+    fun clearFieldCapsLockRequest() {
+        fieldCapsLockSuspended = false
+    }
+
+    /**
+     * Call after the active layout changed. On an uncased layout the shift layer holds
+     * other letters, so automatic Shift state is dropped (field Caps Lock is suspended);
+     * a cased layout gets the suspended field Caps Lock back. User Caps Lock stays.
+     */
+    fun onLayoutChanged() {
+        layoutGeneration++
+        applyLayoutCasing()
+    }
+
+    private fun applyLayoutCasing() {
+        if (!layoutSupportsAutomaticShift()) {
+            shiftStateMachine.consumeOneShot()
+            if (shiftStateMachine.automaticCapsLock) {
+                shiftStateMachine.setCapsLock(false)
+                fieldCapsLockSuspended = true
+            }
+        } else if (fieldCapsLockSuspended) {
+            fieldCapsLockSuspended = false
+            if (shiftStateMachine.state == ShiftState.OFF) {
+                shiftStateMachine.setAutomaticCapsLock()
+            }
+        }
     }
 
     var shiftPressed: Boolean
@@ -409,6 +468,7 @@ class ModifierStateController(
         }
 
         shiftStateMachine.reset()
+        fieldCapsLockSuspended = false
         shiftPressedFlag = false
         shiftPhysicallyPressedFlag = false
         lastKeyWasModifier = false

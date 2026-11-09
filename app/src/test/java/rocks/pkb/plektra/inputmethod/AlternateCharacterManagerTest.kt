@@ -132,6 +132,175 @@ class AlternateCharacterManagerTest {
     }
 
     @Test
+    fun shiftLongPress_afterLaterText_replacesAtInsertionInOneEdit() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب")
+        recorder.asProxy().commitText("د", 1)
+        recorder.editsOutsideBatch = 0
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("بلد", recorder.text)
+        assertEquals(3, recorder.selectionStart)
+        assertEquals(3, recorder.selectionEnd)
+        assertEquals(0, recorder.editsOutsideBatch)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_afterLaterText_replacesAtInsertion() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "😀")
+        }
+        recorder.asProxy().commitText("د", 1)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("😀د", recorder.text)
+        assertEquals(3, recorder.selectionStart)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun shiftLongPress_withCursorMovedBeforeInsertion_changesNothing() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val committedNormally = mutableListOf<String>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "😀") {
+            onNormalCharCommitted = { committedNormally += it }
+        }
+        recorder.asProxy().setSelection(2, 2)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("😀لا", recorder.text)
+        assertEquals(2, recorder.selectionStart)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+        assertEquals(listOf("لا"), committedNormally)
+    }
+
+    @Test
+    fun altLongPress_withChangedInsertion_changesNothing() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        recorder.replaceTextDirectly(1, 3, "دد")
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("بدد", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_withoutExtractedText_usesTextBeforeCursor() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب", extractedTextAvailable = false) {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        recorder.textBeforeCursorAvailable = true
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertEquals("بx", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_withoutExtractedText_keepsTextWhenCursorTextDiffers() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "😀", extractedTextAvailable = false) {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        recorder.textBeforeCursorAvailable = true
+        recorder.asProxy().setSelection(2, 2)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("😀لا", recorder.text)
+        assertTrue(recorder.deleteCalls.isEmpty())
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun shiftLongPress_whenEditorRejectsReplacement_insertsNothing() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val committedNormally = mutableListOf<String>()
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
+            onNormalCharCommitted = { committedNormally += it }
+        }
+        recorder.asProxy().commitText("د", 1)
+        recorder.composingRegionResult = false
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("بلاد", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+        assertEquals(listOf("لا"), committedNormally)
+    }
+
+    @Test
+    fun altLongPress_whenEditorRejectsDeletion_insertsNothing() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب") {
+            addAltKeyMapping(KeyEvent.KEYCODE_L, "x")
+        }
+        recorder.deleteResult = false
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("بلا", recorder.text)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+    }
+
+    @Test
+    fun altLongPress_replacesSurrogatePairBeforeLaterText() {
+        SettingsManager.setLongPressModifier(context, "alt")
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = AlternateCharacterManager(context.assets, prefs, context).apply {
+            addAltKeyMapping(KeyEvent.KEYCODE_E, "x")
+        }
+        inputConnection.commitText("a😀", 1)
+        manager.scheduleLongPressOnly(KeyEvent.KEYCODE_E, inputConnection, "😀")
+        inputConnection.commitText("b", 1)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("axb", recorder.text)
+        assertEquals(3, recorder.selectionStart)
+        manager.handleKeyUp(KeyEvent.KEYCODE_E, symKeyActive = false)
+    }
+
+    @Test
+    fun shiftLongPress_onOverlappingKeys_replacesEachInsertion() {
+        SettingsManager.setLongPressModifier(context, "shift")
+        LayoutMappingRepository.loadLayout(context.assets, "uyghur", context)
+        val (recorder, manager) = pressShiftedUyghurL(prefix = "ب")
+        manager.handleKeyWithAltMapping(
+            KeyEvent.KEYCODE_D, KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_D), false, recorder.asProxy()
+        )
+        assertEquals("بلاد", recorder.text)
+
+        shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+
+        assertEquals("بلژ", recorder.text)
+        assertEquals(3, recorder.selectionStart)
+        manager.handleKeyUp(KeyEvent.KEYCODE_L, symKeyActive = false)
+        manager.handleKeyUp(KeyEvent.KEYCODE_D, symKeyActive = false)
+    }
+
+    @Test
     fun variationsLongPress_replacesFirstCharacterUsingComposingRegion() {
         val recorder = RecordingInputConnection()
         val inputConnection = recorder.asProxy()
@@ -393,8 +562,15 @@ class AlternateCharacterManagerTest {
     }
 
     private class RecordingInputConnection(
-        var extractedTextAvailable: Boolean = true
+        var extractedTextAvailable: Boolean = true,
+        var textBeforeCursorAvailable: Boolean = false
     ) {
+        var composingRegionResult = true
+        var deleteResult = true
+        private var batchDepth = 0
+        /** Text edits made while no batch edit was open. */
+        var editsOutsideBatch = 0
+
         var text: String = ""
         var selectionStart: Int = 0
             private set
@@ -412,11 +588,21 @@ class AlternateCharacterManagerTest {
             selectionEnd += lengthDelta
         }
 
-        fun asProxy(): InputConnection {
+        // One editor, one connection: the manager tells editors apart by connection identity.
+        private val proxy: InputConnection by lazy { createProxy() }
+
+        fun asProxy(): InputConnection = proxy
+
+        private fun createProxy(): InputConnection {
             return Proxy.newProxyInstance(
                 InputConnection::class.java.classLoader,
                 arrayOf(InputConnection::class.java)
             ) { _, method, args ->
+                if (method.name in setOf("commitText", "deleteSurroundingText", "setComposingRegion", "setSelection") &&
+                    batchDepth == 0
+                ) {
+                    editsOutsideBatch++
+                }
                 when (method.name) {
                     "commitText" -> {
                         val committed = args?.getOrNull(0)?.toString().orEmpty()
@@ -435,13 +621,13 @@ class AlternateCharacterManagerTest {
                         }
                         true
                     }
-                    "setComposingRegion" -> {
+                    "setComposingRegion" -> if (!composingRegionResult) false else {
                         composingStart = args?.getOrNull(0) as Int
                         composingEnd = args.getOrNull(1) as Int
                         composingRegions += composingStart to composingEnd
                         true
                     }
-                    "deleteSurroundingText" -> {
+                    "deleteSurroundingText" -> if (!deleteResult) false else {
                         val before = args?.getOrNull(0) as Int
                         val after = args.getOrNull(1) as Int
                         deleteCalls += before to after
@@ -462,7 +648,20 @@ class AlternateCharacterManagerTest {
                         selectionEnd = args.getOrNull(1) as Int
                         true
                     }
-                    "beginBatchEdit", "endBatchEdit" -> true
+                    "beginBatchEdit" -> {
+                        batchDepth++
+                        true
+                    }
+                    "endBatchEdit" -> {
+                        batchDepth--
+                        true
+                    }
+                    "getTextBeforeCursor" -> if (textBeforeCursorAvailable) {
+                        val length = args?.getOrNull(0) as Int
+                        text.substring((selectionStart - length).coerceAtLeast(0), selectionStart)
+                    } else {
+                        null
+                    }
                     "getExtractedText" -> if (extractedTextAvailable) {
                         ExtractedText().apply {
                             this.text = this@RecordingInputConnection.text

@@ -567,6 +567,78 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun fieldRestartOnUyghur_keepsFieldCapsLockSuspendedForLatin() {
+        startCapCharactersFieldOnQwerty()
+        switchSubtype("ug:uyghur")
+        service.onStartInput(editorInfo, true)
+        service.onStartInputView(editorInfo, true)
+        assertFalse(modifierController().capsLockEnabled)
+
+        switchSubtype("en_US:qwertz")
+        assertTrue(modifierController().capsLockAutomatic)
+    }
+
+    @Test
+    fun manualCapsLock_staysUserOwnedAcrossFieldRestartAndUyghurSwitch() {
+        SettingsManager.setStaticVariationBarLayerStickyEnabled(service, false)
+        startCapCharactersFieldOnQwerty()
+        assertTrue(modifierController().capsLockAutomatic)
+        tapShift(10_000L)
+        tapShift(10_050L)
+        assertTrue(modifierController().capsLockEnabled)
+        assertFalse(modifierController().capsLockAutomatic)
+
+        service.onStartInput(editorInfo, true)
+        service.onStartInputView(editorInfo, true)
+        assertFalse(modifierController().capsLockAutomatic)
+
+        switchSubtype("ug:uyghur")
+        assertTrue(modifierController().capsLockEnabled)
+        switchSubtype("en_US:qwertz")
+        assertTrue(modifierController().capsLockEnabled)
+        assertFalse(modifierController().capsLockAutomatic)
+    }
+
+    @Test
+    fun shiftHeldAcrossSwitchToUyghur_doesNotRestoreFieldCapsLock() {
+        SettingsManager.setAutoCorrectEnabled(service, false)
+        startCapCharactersFieldOnQwerty()
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        switchSubtype("ug:uyghur")
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+        assertFalse(modifierController().capsLockEnabled)
+
+        service.onKeyDown(KeyEvent.KEYCODE_D, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_D, 11_000L, 11_000L))
+        service.onKeyUp(KeyEvent.KEYCODE_D, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_D, 11_000L, 11_030L))
+        assertEquals("د", recorder.committedTexts.joinToString(""))
+
+        switchSubtype("en_US:qwertz")
+        assertTrue(modifierController().capsLockAutomatic)
+    }
+
+    @Test
+    fun shiftHeldAcrossSwitchToLatin_restoresSuspendedFieldCapsLock() {
+        startCapCharactersFieldOnQwerty()
+        switchSubtype("ug:uyghur")
+        assertFalse(modifierController().capsLockEnabled)
+
+        service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_000L))
+        switchSubtype("en_US:qwertz")
+        service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, 10_000L, 10_400L))
+
+        assertTrue(modifierController().capsLockAutomatic)
+    }
+
+    private fun startCapCharactersFieldOnQwerty() {
+        SettingsManager.setKeyboardLayoutAutoByLocale(service, false)
+        SettingsManager.setKeyboardLayout(service, "qwerty")
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+        service.onStartInput(editorInfo, false)
+        assertTrue(modifierController().capsLockAutomatic)
+    }
+
+    @Test
     fun midWordQuoteToApostrophe_keepsTheLayoutOutputOfTheNextKey() {
         val shift = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
         assertEquals("ب'د", typeAfterMidWordQuote("uyghur", "ب", KeyEvent.KEYCODE_D))

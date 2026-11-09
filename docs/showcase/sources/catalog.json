@@ -26,6 +26,16 @@
         }
       ],
       [
+        "clicks-communicator",
+        "hero-full",
+        "Clicks Communicator",
+        {
+          "captureDevice": "titan-2-elite",
+          "nativeKeyboard": "r6-full",
+          "upcoming": true
+        }
+      ],
+      [
         "pixel-7a",
         "gallery-cloud-tap",
         "Pixel 7a"

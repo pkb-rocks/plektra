@@ -4,7 +4,7 @@ Advanced (hardware) keyboard control on Android. Free software under GPLv3.
 
 Explore 21 presentations in the [Stable gallery](#stable-gallery) or [Nightly gallery](#nightly-gallery).
 
-The galleries use real Titan 2, Titan 2 Elite and Pixel 7a captures from October 2026. Both palettes show Nightly debug UI; native screenshot colors and contents are preserved. The Notes editor contains synthetic example text. Processed photographs frame the actual app captures.
+The galleries use real Titan 2, Titan 2 Elite and Pixel 7a captures from October 2026. Both palettes show Nightly debug UI; native screenshot colors and contents are preserved. The Notes editor contains synthetic example text. Processed photographs frame the actual app captures. The device comparison also includes an upcoming Clicks Communicator preview, using an official frontal product render and the same original screen composition as the Titan 2 Elite.
 
 ## Reproduce the images
 
@@ -325,6 +325,6 @@ Exports draw the native keyboard children, including both LED rails, on an ARGB 
 
 ## Device comparison scale
 
-The opening device comparison uses one physical width scale: Titan 2 88.7 mm, Titan 2 Elite 75 mm and Pixel 7a 72.9 mm. Manufacturer dimensions and source links are recorded in [device-dimensions.json](sources/device-dimensions.json). Transparent photograph margins are excluded when measuring the frame widths; each photograph keeps its aspect ratio.
+The opening device comparison uses one physical width scale: Titan 2 88.7 mm, Titan 2 Elite 75 mm, Clicks Communicator 78.6 mm and Pixel 7a 72.9 mm. Manufacturer dimensions and source links are recorded in [device-dimensions.json](sources/device-dimensions.json). Transparent photograph margins are excluded when measuring the frame widths; each photograph keeps its aspect ratio.
 
 The upper edge of each keyboard bar is measured in its capture and mapped into its device frame. These edges share one horizontal reference. Device labels share one baseline, with a 16 px gap below the lowest device silhouette.

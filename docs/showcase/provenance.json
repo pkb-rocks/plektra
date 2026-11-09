@@ -942,5 +942,14 @@
         "gallery-classic-midnight-ime.json"
       ]
     }
-  ]
+  ],
+  "upcoming_device_preview": {
+    "device": "clicks-communicator",
+    "source": "sources/clicks-communicator/communicator-smoke-front.png",
+    "source_url": "https://cdn.shopify.com/s/files/1/0768/8362/4251/files/communicator-smoke-2.png?v=1789058029",
+    "source_sha256": "ab2fc48e45a9b19605d0b19035cd6e7b96a45947f6de05ba8bf0ba867c0244cd",
+    "screen": "Same original Notes backdrop, physical status bar and complete native r6-full-ime.png used by the Titan 2 Elite in 01-devices; no pixels from the user screenshot.",
+    "permission": "Maintainer confirmed display and screen-edit permission in the implementation conversation.",
+    "width_mm": 78.6
+  }
 }

@@ -1,5 +1,22 @@
 {
-  "titan-2": {"width_mm": 88.7, "height_mm": 137.8, "source": "https://www.unihertz.com/products/titan-2"},
-  "titan-2-elite": {"width_mm": 75, "height_mm": 117.8, "source": "https://www.unihertz.com/products/titan-2-elite"},
-  "pixel-7a": {"width_mm": 72.9, "height_mm": 152, "source": "https://support.google.com/pixelphone/answer/7158570?hl=en"}
+  "titan-2": {
+    "width_mm": 88.7,
+    "height_mm": 137.8,
+    "source": "https://www.unihertz.com/products/titan-2"
+  },
+  "titan-2-elite": {
+    "width_mm": 75,
+    "height_mm": 117.8,
+    "source": "https://www.unihertz.com/products/titan-2-elite"
+  },
+  "pixel-7a": {
+    "width_mm": 72.9,
+    "height_mm": 152,
+    "source": "https://support.google.com/pixelphone/answer/7158570?hl=en"
+  },
+  "clicks-communicator": {
+    "width_mm": 78.6,
+    "height_mm": 130.5,
+    "source": "https://www.clicksphone.com/communicator"
+  }
 }

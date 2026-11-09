@@ -26,12 +26,12 @@ async function wrapText(lines,size,maxWidth,bold=false){
 }
 async function dimensions(p){return metas[p]||(metas[p]=await sharp(p).metadata());}
 async function fit(p,x,y,w,h){let m=await dimensions(p),scale=Math.min(w/m.width,h/m.height);let rw=m.width*scale,rh=m.height*scale;return image(p,x+(w-rw)/2,y+(h-rh)/2,rw,rh);}
-function raw(item){return path.join(root,'raw',item[0],item[1]+'.png');}
+function raw(item){return path.join(root,'raw',item[3]?.captureDevice||item[0],item[1]+'.png');}
 async function presentedScreen(item){
  const nativeState=item[3]?.nativeKeyboard;
  if(!nativeState)return raw(item);
- const native=path.join(root,'raw',item[0],nativeState+'-ime.png');
- const reference=path.join(root,'raw',item[0],nativeState+'.png');
+ const native=path.join(root,'raw',item[3]?.captureDevice||item[0],nativeState+'-ime.png');
+ const reference=path.join(root,'raw',item[3]?.captureDevice||item[0],nativeState+'.png');
  const source=raw(item),stamp=digest(source,native,reference,__filename);
  const out=path.join(root,'composed',item[0]+'-'+item[1]+'-screen-'+stamp+'.png');
  if(!fs.existsSync(out)){
@@ -121,8 +121,8 @@ async function deviceComparison(items,box,portrait){
   const capture=await rgba(await presentedScreen(item)),W=capture.width,H=capture.height,d=capture.data,center=(Math.floor(H*.5)*W+Math.floor(W*.5))*4;
   const bg=[d[center],d[center+1],d[center+2]];
   let barTop=-1;
-  if(id==='titan-2-elite'){
-   const bar=await dimensions(await crop(item[3]?.nativeKeyboard?[item[0],item[3].nativeKeyboard,item[2]]:item));
+  if(id==='titan-2-elite'||id==='clicks-communicator'){
+   const bar=await dimensions(await crop(item[3]?.nativeKeyboard?[item[3].captureDevice||item[0],item[3].nativeKeyboard,item[2]]:item));
    barTop=H-bar.height+BAR_MARGIN;
   }
   for(let row=Math.floor(H*.5);barTop<0&&row<H;row++){
@@ -145,7 +145,9 @@ async function deviceComparison(items,box,portrait){
   const {item,p,m,bounds,anchor,mmPerPixel,width}=device,s=scale*mmPerPixel;
   out+=`<g data-device="${item[0]}" data-width-mm="${width}" data-visible-width="${width*scale}" data-bar-y="${anchorY}" data-label-y="${labelY}">`;
   out+=image(p,xx-bounds.x*s,anchorY-anchor*s,m.width*s,m.height*s);
-  out+=text(item[2],xx+width*scale/2,labelY,labelSize,'#565B60',400,'middle')+'</g>';
+  out+=text(item[2],xx+width*scale/2,labelY,labelSize,'#565B60',400,'middle');
+  if(item[3]?.upcoming)out+=text('Upcoming',xx+width*scale/2,labelY+labelSize*1.25,labelSize*.72,'#565B60',400,'middle');
+  out+='</g>';
   xx+=width*scale+gap;
  }
  return out;
@@ -197,6 +199,7 @@ async function contents(card,box,portrait){
 }
 (async()=>{
  for(const folder of ['composed','crops','exports','previews'])fs.mkdirSync(path.join(root,folder),{recursive:true});
+ await require('./render-clicks-preview.cjs')();
  for(const channel of ['stable','nightly']){
    const accent=channel==='stable'?'#FC7A0F':'#2F80ED';const logo=path.join(repo,'docs/branding',channel==='stable'?'plektra-open-color.svg':'plektra-nightly-open-color.svg');
    for(const format of ['landscape','portrait']){

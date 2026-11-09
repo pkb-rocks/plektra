@@ -1,0 +1,45 @@
+{
+  "id": "clicks-communicator",
+  "width": 698,
+  "height": 1152,
+  "screen": {
+    "bounds": {
+      "x": 51,
+      "y": 51,
+      "width": 596,
+      "height": 663
+    },
+    "corners": [
+      [
+        51,
+        51
+      ],
+      [
+        647,
+        51
+      ],
+      [
+        647,
+        714
+      ],
+      [
+        51,
+        714
+      ]
+    ],
+    "mask": "clicks-communicator-screen-mask.png",
+    "radius": 55,
+    "camera": [
+      95,
+      94,
+      23
+    ]
+  },
+  "source_crop": {
+    "left": 611,
+    "top": 384,
+    "width": 698,
+    "height": 1152
+  },
+  "presentation": "Upcoming-device preview using the same original Notes capture and complete native T2E keyboard export as the Titan 2 Elite in the device comparison."
+}

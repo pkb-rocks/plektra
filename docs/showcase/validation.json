@@ -3,6 +3,10 @@
   "dimensions_and_channel_backgrounds": true,
   "protected_pixels": [
     {
+      "capture": "clicks-communicator",
+      "identical_to_original_T2E_composition": true
+    },
+    {
       "capture": "r6-config-full",
       "native_alpha_pixels_retained": 164182,
       "transparent_pixels": 32726

@@ -9,6 +9,13 @@ const {createHash}=require('node:crypto');
   assert.equal(createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex'),hash,'Changed canonical file: '+file);
  }
  const assets=JSON.parse(fs.readFileSync(path.join(root,'assets.json'))),checks=[];
+ const compositionHash=createHash('sha256');
+ for(const file of ['raw/titan-2-elite/hero-full.png','raw/titan-2-elite/r6-full-ime.png','raw/titan-2-elite/r6-full.png','sources/render.cjs'])compositionHash.update(fs.readFileSync(path.join(root,file)));
+ const compositionStamp=compositionHash.digest('hex').slice(0,10);
+ const eliteScreen=await sharp(path.join(root,'composed/titan-2-elite-hero-full-screen-'+compositionStamp+'.png')).raw().toBuffer();
+ const clicksScreen=await sharp(path.join(root,'composed/clicks-communicator-screen.png')).raw().toBuffer();
+ assert.deepEqual(clicksScreen,eliteScreen,'Communicator must use the identical original T2E screen composition');
+ checks.push({capture:'clicks-communicator',identical_to_original_T2E_composition:true});
  for(const channel of ['stable','nightly'])for(const format of ['landscape','portrait']){
   const dir=path.join(root,'exports',channel,format),files=fs.readdirSync(dir).filter(n=>n.endsWith('.png'));assert.equal(files.length,21);
   for(const file of files){const p=path.join(dir,file),m=await sharp(p).metadata();assert.equal(m.width,format==='landscape'?1920:1080);assert.equal(m.height,format==='landscape'?1080:1920);const rgb=await sharp(p).extract({left:0,top:0,width:1,height:1}).removeAlpha().raw().toBuffer();assert.deepEqual([...rgb],channel==='nightly'?[207,221,231]:[244,241,233]);}
@@ -41,8 +48,11 @@ const {createHash}=require('node:crypto');
  for(const channel of ['stable','nightly'])for(const format of ['landscape','portrait']){
   const svg=fs.readFileSync(path.join(root,'exports',channel,format,'01-devices.svg'),'utf8');
   const devices=[...svg.matchAll(/<g data-device="([^"]+)" data-width-mm="([^"]+)" data-visible-width="([^"]+)" data-bar-y="([^"]+)" data-label-y="([^"]+)">/g)].map(m=>({id:m[1],mm:+m[2],width:+m[3],bar:+m[4],label:+m[5]}));
-  assert.equal(devices.length,3);
-  const [titan,elite,pixel]=devices;
+  assert.equal(devices.length,4);
+  const [titan,elite,clicks,pixel]=devices;
+  assert.equal(clicks.id,'clicks-communicator');
+  assert(Math.abs(clicks.width/elite.width-78.6/75)<1e-8);
+  assert(svg.includes('>Upcoming</text>'));
   assert(titan.width>elite.width);
   assert(Math.abs(titan.width/elite.width-88.7/75)<1e-8);
   assert(Math.abs(pixel.width/elite.width-72.9/75)<1e-8);

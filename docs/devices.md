@@ -11,6 +11,10 @@ The maintainer owns these devices and uses them for development and testing.
 - **Google Pixel 7a + Clicks Power Keyboard** — a directly tested physical keyboard combination.
 - **Samsung Galaxy Z Fold6** — standalone software keyboard and folding behaviour; also used with the Clicks Power Keyboard. Further improvements for foldables are planned.
 
+## Upcoming
+
+- **[Clicks Communicator](https://www.clicksphone.com/communicator)** — Plektra support planned. The website shows a composed Plektra preview using the manufacturer's device render and a Titan 2 Elite capture.
+
 ## Community support
 
 - **BlackBerry KEY2**

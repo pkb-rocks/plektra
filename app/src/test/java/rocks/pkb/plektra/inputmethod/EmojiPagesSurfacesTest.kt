@@ -390,6 +390,23 @@ class EmojiPagesSurfacesTest {
     }
 
     @Test
+    fun pickerFitsTheContentHeightOfALandscapeOuterDisplay() {
+        val content = ImeContentLayout(activity).apply { orientation = android.widget.LinearLayout.VERTICAL }
+        val picker = EmojiPickerView(activity)
+        picker.configureSoftwareKeyboardMode(701, {})
+        picker.configureControls(147)
+        content.addView(picker)
+        content.measure(View.MeasureSpec.makeMeasureSpec(2281, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(573, View.MeasureSpec.EXACTLY))
+        content.layout(0, 0, 2281, 573)
+        val vertical = field(picker, "vertical") as View
+        val controls = (field(picker, "closeButton") as View).parent as View
+        assertTrue("picker fits bounded IME content", picker.bottom <= content.height)
+        assertTrue("controls visible inside content", picker.top + vertical.top + controls.bottom <= content.height)
+        assertEquals(147, controls.height)
+    }
+
+    @Test
     fun abcLabelFitsItsKeyAtLargeFontScale() {
         val metrics = activity.resources.displayMetrics
         @Suppress("DEPRECATION")

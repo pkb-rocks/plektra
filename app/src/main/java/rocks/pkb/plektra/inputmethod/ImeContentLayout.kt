@@ -3,12 +3,29 @@ package rocks.pkb.plektra.inputmethod
 import android.content.Context
 import android.graphics.Canvas
 import android.view.MotionEvent
+import android.view.View
+import rocks.pkb.plektra.inputmethod.ui.EmojiPickerView
 import android.widget.LinearLayout
 
 /** All expanded panels share the chrome's content boundary, including canvas-based keyboards. */
 internal class ImeContentLayout(context: Context) : LinearLayout(context) {
     private val position = IntArray(2)
     private val chromePosition = IntArray(2)
+
+    override fun measureChildWithMargins(child: View, parentWidthMeasureSpec: Int, widthUsed: Int,
+                                         parentHeightMeasureSpec: Int, heightUsed: Int) {
+        if (child is EmojiPickerView && MeasureSpec.getMode(parentHeightMeasureSpec) != MeasureSpec.UNSPECIFIED) {
+            val params = child.layoutParams as MarginLayoutParams
+            val available = (MeasureSpec.getSize(parentHeightMeasureSpec) - paddingTop - paddingBottom -
+                params.topMargin - params.bottomMargin - heightUsed).coerceAtLeast(0)
+            val height = if (params.height >= 0) minOf(params.height, available) else available
+            child.measure(getChildMeasureSpec(parentWidthMeasureSpec,
+                paddingLeft + paddingRight + params.leftMargin + params.rightMargin + widthUsed, params.width),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST))
+        } else {
+            super.measureChildWithMargins(child, parentWidthMeasureSpec, widthUsed, parentHeightMeasureSpec, heightUsed)
+        }
+    }
 
     private fun chrome(): ImeChromeLayout? {
         var ancestor = parent

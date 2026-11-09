@@ -2287,7 +2287,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             candidatesBarController.openSymKeyCustomization(page, keyCode)
         }
         candidatesBarController.onSymPageKeyTapped = { keyCode ->
-            symLayoutController.handlePagedTouchTap(keyCode, currentInputConnection) { updateStatusBarText() }
+            symLayoutController.handlePagedTouchTap(
+                keyCode,
+                currentInputConnection,
+                updateStatusBar = { updateStatusBarText() },
+                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+            )
         }
         candidatesBarController.onSymPageKeyLongPressed = { keyCode ->
             symLayoutController.handlePagedTouchLongPress(keyCode).also { handled ->

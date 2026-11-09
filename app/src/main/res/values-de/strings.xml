@@ -1680,6 +1680,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="emoji_pages_emoji_title">Emoji-Seite mit Q und P blättern</string>
     <string name="emoji_pages_symbols_title">Symbolseite mit Q und P blättern</string>
     <string name="emoji_pages_description">Q und P blättern, Umschalt+Q und Umschalt+P springen zwischen Kategorien, A öffnet die Suche. Halte ein Emoji für seine Hauttöne. Bei den Hauttönen blättert P zu weiteren; bei einem Emoji deiner eigenen Belegung öffnet ✎ auf A die Anpassung der Taste.</string>
+    <string name="sym_paged_navigation_note">Mit eingeschalteten Seiten blättern Q (‹) und P (›). Deine eigenen Belegungen von Q und P bleiben gespeichert und lassen sich hier bearbeiten: Bei geöffneter Seite tippst du sie mit gehaltener SYM-Taste und Q oder P; ohne Seiten gelten sie wieder direkt.</string>
+    <string name="sym_navigation_key_content_description">%1$s blättert (%2$s). Deine Belegung: %3$s</string>
     <string name="kaomoji_placement_title">Kaomoji-Seiten</string>
     <string name="kaomoji_placement_symbols">Nach den Symbolen</string>
     <string name="kaomoji_placement_emoji">Nach den Emoji</string>

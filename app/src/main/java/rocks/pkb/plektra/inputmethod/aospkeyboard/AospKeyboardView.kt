@@ -188,7 +188,9 @@ class AospKeyboardView @JvmOverloads constructor(
     private data class PreviewPopupState(
         val label: String,
         val rect: RectF,
-        val hasMoreKeys: Boolean
+        val hasMoreKeys: Boolean,
+        /** The label comes from a SYM page, whose emoji the bundled font draws. */
+        val symPageLabel: Boolean = false
     )
 
     var listener: Listener? = null
@@ -549,7 +551,7 @@ class AospKeyboardView @JvmOverloads constructor(
     private var surfaceFrameKey: List<Any>? = null
     private val preparedKeySurfaces = mutableMapOf<RectF, rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.CanvasSurface>()
     private val inkOffsets = mutableMapOf<List<Any>, android.graphics.PointF>()
-    /** Laid-out labels with emoji drawn by the bundled font, by label, size, colour and width. */
+    /** Laid-out labels with emoji drawn by the bundled font, by label, size, colour and space. */
     private val emojiLabelLayouts = HashMap<List<Any>, android.text.StaticLayout?>()
 
     private fun prepareKeySurfaces() {
@@ -694,11 +696,18 @@ class AospKeyboardView @JvmOverloads constructor(
             if (layerLabel == null && drawFunctionalIcon(canvas, key, center)) {
                 return@forEach
             }
-            val emojiLayout = layerLabel?.let { emojiLabelLayout(label, key.visualRect) }
+            val labelWidth = key.visualRect.width() - dp(8f)
+            val labelHeight = key.visualRect.height() - dp(4f)
+            val emojiLayout = layerLabel?.let { emojiLabelLayout(label, labelWidth, labelHeight) }
             if (emojiLayout == null && activeSymLabel != null && previewLabel == null) {
                 // Kaomoji and other long text of a SYM page: shrunk to fit the key
-                while (textPaint.textSize > sp(8f) && textPaint.measureText(label) > key.visualRect.width() - dp(8f)) {
-                    textPaint.textSize -= sp(1f)
+                repeat(4) {
+                    val scale = minOf(
+                        labelWidth / textPaint.measureText(label),
+                        labelHeight / textPaint.fontMetrics.let { it.descent - it.ascent }
+                    )
+                    if (scale >= 1f) return@repeat
+                    textPaint.textSize = kotlin.math.floor(textPaint.textSize * scale).coerceAtLeast(1f)
                 }
             }
             if (emojiLayout != null) {
@@ -740,24 +749,36 @@ class AospKeyboardView @JvmOverloads constructor(
      * [label] laid out with its emoji drawn by the bundled emoji font, when that is in use and
      * draws some of it; null for plain text. EmojiCompat draws its emoji as spans, which only a
      * text layout draws: Canvas.drawText would use the system font (boxes for newer emoji, and
-     * sequences it doesn't know split into their parts).
+     * sequences it doesn't know split into their parts). The text is made smaller until the
+     * laid-out line fits [maxWidth] by [maxHeight] px.
      */
-    private fun emojiLabelLayout(label: String, rect: RectF): android.text.StaticLayout? {
-        val width = (rect.width() - dp(4f)).toInt().coerceAtLeast(1)
+    private fun emojiLabelLayout(label: String, maxWidth: Float, maxHeight: Float): android.text.StaticLayout? {
+        val width = maxWidth.toInt().coerceAtLeast(1)
+        val height = maxHeight.toInt().coerceAtLeast(1)
         val rendering = rocks.pkb.plektra.data.emoji.EmojiRendering
         // Until the bundled font has loaded, labels are plain text; laid out again once it has
-        return emojiLabelLayouts.getOrPut(listOf(label, textPaint.textSize, textPaint.color, width, rendering.isReady(context))) {
+        return emojiLabelLayouts.getOrPut(listOf(label, textPaint.textSize, textPaint.color, width, height, rendering.isReady(context))) {
             val display = rendering.forDisplay(context, label)
             val drawnByFont = display is android.text.Spanned &&
                 display.getSpans(0, display.length, android.text.style.ReplacementSpan::class.java).isNotEmpty()
             if (!drawnByFont) return@getOrPut null
             if (emojiLabelLayouts.size > 256) emojiLabelLayouts.clear()
             val paint = android.text.TextPaint(textPaint).apply { textAlign = Paint.Align.LEFT }
-            android.text.StaticLayout.Builder.obtain(display, 0, display.length, paint, width)
+            fun layOut() = android.text.StaticLayout.Builder.obtain(display, 0, display.length, paint, width)
                 .setAlignment(android.text.Layout.Alignment.ALIGN_CENTER)
                 .setIncludePad(false)
                 .setMaxLines(1)
                 .build()
+            // An emoji span takes the width its glyph needs at the text size, whatever the
+            // layout's width: what is drawn is measured and the text size scaled down to fit
+            var layout = layOut()
+            repeat(4) {
+                val scale = minOf(width / layout.getLineWidth(0), height / layout.height.toFloat())
+                if (scale >= 1f || paint.textSize <= 1f) return@getOrPut layout
+                paint.textSize = kotlin.math.floor(paint.textSize * scale).coerceAtLeast(1f)
+                layout = layOut()
+            }
+            layout
         }
     }
 
@@ -1854,10 +1875,12 @@ class AospKeyboardView @JvmOverloads constructor(
         val previewHeight = dp(72f).toFloat()
         val popupLeft = (key.visualRect.centerX() - previewWidth / 2f).coerceIn(0f, width - previewWidth)
         val popupTop = key.visualRect.top - previewHeight - popupVerticalOffset(themeOverride)
+        val symLabel = symPageLabelFor(key)
         previewPopupState = PreviewPopupState(
-            label = SoftwareKeyboardActionLabels.display(symPageLabelFor(key) ?: displayLabel(key.spec)),
+            label = SoftwareKeyboardActionLabels.display(symLabel ?: displayLabel(key.spec)),
             rect = RectF(popupLeft, popupTop, popupLeft + previewWidth, popupTop + previewHeight),
-            hasMoreKeys = longPressAlternatesFor(key).isNotEmpty()
+            hasMoreKeys = longPressAlternatesFor(key).isNotEmpty(),
+            symPageLabel = symLabel != null
         )
         moreKeysPanelState = null
         updatePopupOverlay()
@@ -2119,6 +2142,19 @@ class AospKeyboardView @JvmOverloads constructor(
         textPaint.textSize = sp(30f)
         textPaint.typeface = Typeface.DEFAULT
         textPaint.color = themeOverride?.textAndIcons ?: Color.rgb(238, 238, 238)
+        // Emoji in the preview are drawn by the bundled font too, as on the key
+        val emojiLayout = if (popup.symPageLabel) {
+            emojiLabelLayout(popup.label, rect.width() - dp(8f), rect.height() - dp(8f))
+        } else {
+            null
+        }
+        if (emojiLayout != null) {
+            val save = canvas.save()
+            canvas.translate(rect.centerX() - emojiLayout.width / 2f, rect.centerY() - emojiLayout.height / 2f)
+            emojiLayout.draw(canvas)
+            canvas.restoreToCount(save)
+            return
+        }
         val baselineOffset = -(textPaint.ascent() + textPaint.descent()) / 2f
         canvas.drawText(popup.label, rect.centerX(), rect.centerY() + baselineOffset, textPaint)
     }

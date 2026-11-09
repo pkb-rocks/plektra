@@ -923,6 +923,8 @@ Nav Mode использует физическое положение клави
     <string name="emoji_pages_emoji_title">Листать страницу эмодзи клавишами Q и P</string>
     <string name="emoji_pages_symbols_title">Листать страницу символов клавишами Q и P</string>
     <string name="emoji_pages_description">Q и P листают страницы, Shift+Q и Shift+P переходят между категориями, A открывает поиск. Удерживайте эмодзи, чтобы выбрать тон кожи. Среди тонов кожи P листает дальше; для эмодзи из вашей собственной раскладки ✎ на A открывает настройку клавиши.</string>
+    <string name="sym_paged_navigation_note">Когда страницы включены, Q (‹) и P (›) листают их. Ваши собственные назначения Q и P сохраняются, и их можно изменить здесь: при открытой странице удерживайте SYM и нажмите Q или P, чтобы ввести их; без страниц они снова работают напрямую.</string>
+    <string name="sym_navigation_key_content_description">%1$s листает страницы (%2$s). Ваше назначение: %3$s</string>
     <string name="kaomoji_placement_title">Страницы каомодзи</string>
     <string name="kaomoji_placement_symbols">После символов</string>
     <string name="kaomoji_placement_emoji">После эмодзи</string>

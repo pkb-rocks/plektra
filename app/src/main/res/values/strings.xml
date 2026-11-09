@@ -1996,6 +1996,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="emoji_pages_emoji_title">Turn the emoji page with Q and P</string>
     <string name="emoji_pages_symbols_title">Turn the symbols page with Q and P</string>
     <string name="emoji_pages_description">Q and P turn the pages, Shift+Q and Shift+P jump between categories, A opens the search. Hold an emoji for its skin tones. Among an emoji’s skin tones, P turns to more of them and, for an emoji of your own key mapping, ✎ on A opens the key’s customization.</string>
+    <string name="sym_paged_navigation_note">With the pages on, Q (‹) and P (›) turn them. Your own mappings of Q and P stay saved and can be edited here: while the page is open, hold SYM and press Q or P to type them; with the pages off they type again on their own.</string>
+    <string name="sym_navigation_key_content_description">%1$s turns the pages (%2$s). Your mapping: %3$s</string>
     <string name="kaomoji_placement_title">Kaomoji pages</string>
     <string name="kaomoji_placement_symbols">After the symbols</string>
     <string name="kaomoji_placement_emoji">After the emoji</string>

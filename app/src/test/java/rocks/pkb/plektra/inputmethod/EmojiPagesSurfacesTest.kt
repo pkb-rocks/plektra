@@ -234,4 +234,134 @@ class EmojiPagesSurfacesTest {
             assertTrue(system.indices.count { system[it] != pixels[it] } > 40)
         }
     }
+
+    private fun colourful(pixel: Int): Boolean {
+        val channels = listOf(Color.red(pixel), Color.green(pixel), Color.blue(pixel))
+        return channels.max() - channels.min() > 60
+    }
+
+    /** The bounds of the pixels that differ between two drawings of the same size. */
+    private fun changedBounds(before: Bitmap, after: Bitmap): android.graphics.Rect? {
+        var bounds: android.graphics.Rect? = null
+        for (y in 0 until after.height) for (x in 0 until after.width) {
+            if (before.getPixel(x, y) != after.getPixel(x, y)) {
+                bounds = (bounds ?: android.graphics.Rect(x, y, x + 1, y + 1)).apply { union(x, y) }
+            }
+        }
+        return bounds
+    }
+
+    @Test
+    fun theKeyPreviewOfATouchedEmojiIsDrawnWithTheBundledFont() {
+        // The keyboard at the bottom of the window, its previews drawn above it in the window
+        val parent = android.widget.FrameLayout(activity)
+        val view = AospKeyboardView(activity)
+        parent.addView(view, android.widget.FrameLayout.LayoutParams(1000, 240).apply { topMargin = 360 })
+        activity.setContentView(parent, ViewGroup.LayoutParams(1000, 600))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        view.symPageActive = true
+        view.symPageLabels = mapOf(KeyEvent.KEYCODE_W to "🫹") // 🫹: no system emoji font has it yet
+        val root = view.rootView
+
+        fun previewAfterTouchDown(): Pair<Bitmap, RectF> {
+            val rect = keyRect(view, "w")
+            view.dispatchTouchEvent(MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_DOWN, rect.centerX(), rect.centerY(), 0))
+            Shadows.shadowOf(Looper.getMainLooper()).idle()
+            val popup = field(view, "previewPopupState")!!
+            assertEquals("🫹", field(popup, "label"))
+            val location = IntArray(2).also { view.getLocationInWindow(it) }
+            val popupRect = RectF(field(popup, "rect") as RectF).apply { offset(location[0].toFloat(), location[1].toFloat()) }
+            val bitmap = Bitmap.createBitmap(root.width, root.height, Bitmap.Config.ARGB_8888)
+            root.draw(Canvas(bitmap))
+            view.dispatchTouchEvent(MotionEvent.obtain(0L, 10L, MotionEvent.ACTION_CANCEL, rect.centerX(), rect.centerY(), 0))
+            Shadows.shadowOf(Looper.getMainLooper()).idle()
+            return bitmap to popupRect
+        }
+
+        val (noto, popupRect) = previewAfterTouchDown()
+        val inPreview = android.graphics.Rect().also { RectF(popupRect).roundOut(it) }
+        var colour = 0
+        var ink: android.graphics.Rect? = null
+        for (y in 0 until noto.height) for (x in 0 until noto.width) {
+            if (y >= inPreview.bottom || !colourful(noto.getPixel(x, y))) continue
+            // Above the key row: only the preview draws there
+            colour++
+            ink = (ink ?: android.graphics.Rect(x, y, x + 1, y + 1)).apply { union(x, y) }
+        }
+        assertTrue("the preview shows the emoji in colour: $colour", colour > 200)
+        // The emoji sits inside the preview, about its middle
+        assertTrue("$ink in $inPreview", inPreview.contains(ink!!))
+        assertTrue(kotlin.math.abs(ink.exactCenterX() - popupRect.centerX()) < popupRect.width() * 0.1f)
+        assertTrue(kotlin.math.abs(ink.exactCenterY() - popupRect.centerY()) < popupRect.height() * 0.15f)
+        assertTrue("a preview-sized emoji: ${ink.height()}", ink.height() > popupRect.height() * 0.35f)
+
+        // With the system font the same touch draws a different preview
+        EmojiRendering.setStyle(activity, EmojiRendering.Style.SYSTEM)
+        val (system, _) = previewAfterTouchDown()
+        var differing = 0
+        for (y in inPreview.top.coerceAtLeast(0) until inPreview.bottom) for (x in inPreview.left.coerceAtLeast(0) until inPreview.right.coerceAtMost(system.width)) {
+            if (system.getPixel(x, y) != noto.getPixel(x, y)) differing++
+        }
+        assertTrue("system and bundled previews differ: $differing", differing > 200)
+    }
+
+    @Test
+    fun keyLabelsFitTheirKeysOnANarrowKeyboardAtLargeFontScale() {
+        val metrics = activity.resources.displayMetrics
+        @Suppress("DEPRECATION")
+        val scaled = metrics.scaledDensity
+        try {
+            @Suppress("DEPRECATION")
+            metrics.scaledDensity = metrics.density * 1.5f
+            // 320dp wide at 420dpi
+            val width = 840
+            val view = AospKeyboardView(activity)
+            val parent = android.widget.FrameLayout(activity)
+            parent.addView(view, android.widget.FrameLayout.LayoutParams(width, 500))
+            parent.measure(
+                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(500, View.MeasureSpec.EXACTLY)
+            )
+            parent.layout(0, 0, width, 500)
+            view.symPageActive = true
+            fun drawn(): Bitmap = Bitmap.createBitmap(width, 500, Bitmap.Config.ARGB_8888).also { view.draw(Canvas(it)) }
+            @Suppress("UNCHECKED_CAST")
+            val visual = (field(view, "keys") as List<Any>).first { field(field(it, "spec")!!, "label") == "w" }
+                .let { field(it, "visualRect") as RectF }
+            val inKey = android.graphics.Rect().also { visual.round(it) }
+
+            for (label in listOf(
+                "🫹", // a new emoji
+                "🧑‍🩰", // a ZWJ sequence
+                "👋🏽", // a skin-toned emoji
+                "🫹🫹🫹", // several emoji
+                "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧" // a kaomoji
+            )) {
+                view.symPageLabels = mapOf(KeyEvent.KEYCODE_W to "")
+                val blank = drawn()
+                view.symPageLabels = mapOf(KeyEvent.KEYCODE_W to label)
+                val withLabel = drawn()
+                val changed = changedBounds(blank, withLabel)
+                assertTrue("$label drawn", changed != null)
+                assertTrue("$label: drawn $changed, key $inKey", inKey.contains(changed!!))
+                if (label.startsWith("(")) continue
+                var colour = 0
+                for (y in changed.top until changed.bottom) for (x in changed.left until changed.right) {
+                    if (colourful(withLabel.getPixel(x, y))) colour++
+                }
+                assertTrue("$label in colour: $colour", colour > 100)
+            }
+            // A single emoji still fills most of the key's width
+            view.symPageLabels = mapOf(KeyEvent.KEYCODE_W to "🫹")
+            val single = drawn()
+            var ink: android.graphics.Rect? = null
+            for (y in inKey.top until inKey.bottom) for (x in inKey.left until inKey.right) {
+                if (colourful(single.getPixel(x, y))) ink = (ink ?: android.graphics.Rect(x, y, x + 1, y + 1)).apply { union(x, y) }
+            }
+            assertTrue("$ink in $inKey", ink!!.width() > inKey.width() * 0.5f)
+        } finally {
+            @Suppress("DEPRECATION")
+            metrics.scaledDensity = scaled
+        }
+    }
 }

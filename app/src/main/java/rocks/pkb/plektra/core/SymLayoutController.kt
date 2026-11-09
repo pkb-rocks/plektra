@@ -258,7 +258,8 @@ class SymLayoutController(
         inputConnection: InputConnection?,
         updateStatusBar: () -> Unit,
         onSymbolCommitted: () -> Unit,
-        record: Boolean = true
+        record: Boolean = true,
+        touch: Boolean = false
     ) {
         val committed = inputConnection?.commitText(text, 1) == true
         if (committed) {
@@ -266,7 +267,7 @@ class SymLayoutController(
             onSymbolCommitted()
         }
         if (variants != null) variants = null
-        if (SettingsManager.getSymAutoClose(context)) {
+        if (SettingsManager.symAutoClosesAfterCommit(context, touch)) {
             closeSymAndUpdate(updateStatusBar)
         } else {
             updateStatusBar()
@@ -284,7 +285,8 @@ class SymLayoutController(
         inputConnection: InputConnection?,
         shiftPressed: Boolean,
         updateStatusBar: () -> Unit,
-        onSymbolCommitted: () -> Unit
+        onSymbolCommitted: () -> Unit,
+        touch: Boolean = false
     ): SymKeyResult {
         val repeat = event?.repeatCount ?: 0
         val page = currentPage(layer) ?: return SymKeyResult.NOT_HANDLED
@@ -307,7 +309,7 @@ class SymLayoutController(
             }
             val chosen = SymPagedLayer.variantKeys(shown)[keyCode]?.takeIf { keyCode in SymPagedLayer.SLOTS }
                 ?: return SymKeyResult.CONSUME
-            if (repeat == 0) commitPaged(chosen, SymPagedLayer.Kind.EMOJI, inputConnection, updateStatusBar, onSymbolCommitted)
+            if (repeat == 0) commitPaged(chosen, SymPagedLayer.Kind.EMOJI, inputConnection, updateStatusBar, onSymbolCommitted, touch = touch)
             return SymKeyResult.CONSUME
         }
         when {
@@ -345,7 +347,7 @@ class SymLayoutController(
             return SymKeyResult.CONSUME
         }
         if (ownPage) return SymKeyResult.NOT_HANDLED // the layer's own page: as before
-        if (repeat == 0) commitPaged(text, page.kind, inputConnection, updateStatusBar, onSymbolCommitted)
+        if (repeat == 0) commitPaged(text, page.kind, inputConnection, updateStatusBar, onSymbolCommitted, touch = touch)
         return SymKeyResult.CONSUME
     }
 
@@ -371,20 +373,32 @@ class SymLayoutController(
 
     /**
      * A key of a paged layer tapped on screen: the arrows, search, the variants' keys and the
-     * edit key are handled here (true); anything else is typed by the caller.
+     * edit key are handled here (true); anything else is typed by the caller. A variant typed
+     * here closes SYM by the same touch rule as the caller's typing.
      */
-    fun handlePagedTouchTap(keyCode: Int, inputConnection: InputConnection?, updateStatusBar: () -> Unit): Boolean {
+    fun handlePagedTouchTap(keyCode: Int, inputConnection: InputConnection?, updateStatusBar: () -> Unit): Boolean =
+        handlePagedTouchTap(keyCode, inputConnection, updateStatusBar, onSymbolCommitted = {})
+
+    fun handlePagedTouchTap(
+        keyCode: Int,
+        inputConnection: InputConnection?,
+        updateStatusBar: () -> Unit,
+        onSymbolCommitted: () -> Unit
+    ): Boolean {
         val layer = pagedLayer() ?: return false
         val page = currentPage(layer) ?: return false
         if (variants != null) {
-            return handlePagedKey(layer, keyCode, null, inputConnection, false, updateStatusBar, {}) == SymKeyResult.CONSUME
+            return handlePagedKey(
+                layer, keyCode, null, inputConnection, false, updateStatusBar, onSymbolCommitted, touch = true
+            ) == SymKeyResult.CONSUME
         }
         if (!SymPagedLayer.isNavigationKey(page, keyCode)) {
             val text = SymPagedLayer.keys(page)[keyCode]
             if (page.mapping == null && text != null) recordTyped(page.kind, text)
             return false
         }
-        return handlePagedKey(layer, keyCode, null, inputConnection, false, updateStatusBar, {}) == SymKeyResult.CONSUME
+        return handlePagedKey(layer, keyCode, null, inputConnection, false, updateStatusBar, onSymbolCommitted, touch = true) ==
+            SymKeyResult.CONSUME
     }
 
     /**
@@ -661,10 +675,13 @@ class SymLayoutController(
         onSymbolCommitted: () -> Unit = {}
     ): SymKeyResult {
         val autoCloseEnabled = SettingsManager.getSymAutoClose(context)
-        val page = currentPageType()
         if ((event?.repeatCount ?: 0) == 0 && !KeyEvent.isModifierKey(keyCode)) {
             resolvePending(keyCode, inputConnection, updateStatusBar, onSymbolCommitted)
+            // Typing the waiting emoji can close SYM (auto-close): this key then types as
+            // the keyboard without SYM does.
+            if (!isSymActive()) return SymKeyResult.NOT_HANDLED
         }
+        val page = currentPageType()
 
         when (keyCode) {
             KeyEvent.KEYCODE_BACK -> {

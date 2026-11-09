@@ -921,6 +921,8 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="emoji_pages_emoji_title">Էմոջիների էջը թերթել Q-ով և P-ով</string>
     <string name="emoji_pages_symbols_title">Նշանների էջը թերթել Q-ով և P-ով</string>
     <string name="emoji_pages_description">Q-ն և P-ն թերթում են էջերը, Shift+Q-ն և Shift+P-ն անցնում են կատեգորիաների միջև, A-ն բացում է որոնումը։ Պահեք էմոջին՝ մաշկի երանգների համար։ Մաշկի երանգների մեջ P-ն ցույց է տալիս մյուսները. ձեր սեփական դասավորության էմոջիի համար A-ի ✎-ը բացում է ստեղնի կարգավորումը։</string>
+    <string name="sym_paged_navigation_note">Երբ էջերը միացված են, Q-ն (‹) և P-ն (›) թերթում են դրանք։ Q-ի և P-ի ձեր սեփական նշանակումները պահպանվում են և կարող են խմբագրվել այստեղ. բաց էջի դեպքում պահեք SYM-ը և սեղմեք Q կամ P՝ դրանք մուտքագրելու համար, իսկ առանց էջերի դրանք կրկին գործում են ուղղակիորեն։</string>
+    <string name="sym_navigation_key_content_description">%1$s-ը թերթում է էջերը (%2$s)։ Ձեր նշանակումը՝ %3$s</string>
     <string name="kaomoji_placement_title">Կաոմոջիի էջեր</string>
     <string name="kaomoji_placement_symbols">Նշաններից հետո</string>
     <string name="kaomoji_placement_emoji">Էմոջիներից հետո</string>

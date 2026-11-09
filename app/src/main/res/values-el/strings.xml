@@ -1764,6 +1764,8 @@ QWERTZ σε φυσικό QWERTY
     <string name="emoji_pages_emoji_title">Ξεφύλλισμα σελίδας emoji με Q και P</string>
     <string name="emoji_pages_symbols_title">Ξεφύλλισμα σελίδας συμβόλων με Q και P</string>
     <string name="emoji_pages_description">Τα Q και P αλλάζουν σελίδα, Shift+Q και Shift+P μεταβαίνουν μεταξύ κατηγοριών, το A ανοίγει την αναζήτηση. Κράτησε πατημένο ένα emoji για τους τόνους δέρματος. Στους τόνους δέρματος, το P δείχνει περισσότερους· για ένα emoji της δικής σου αντιστοίχισης, το ✎ στο A ανοίγει την προσαρμογή του πλήκτρου.</string>
+    <string name="sym_paged_navigation_note">Με ενεργές τις σελίδες, τα Q (‹) και P (›) αλλάζουν σελίδα. Οι δικές σου αντιστοιχίσεις των Q και P παραμένουν αποθηκευμένες και επεξεργάζονται εδώ: με ανοιχτή τη σελίδα, κράτησε πατημένο το SYM και πάτησε Q ή P για να τις πληκτρολογήσεις· χωρίς τις σελίδες ισχύουν ξανά απευθείας.</string>
+    <string name="sym_navigation_key_content_description">Το %1$s αλλάζει σελίδα (%2$s). Η αντιστοίχισή σου: %3$s</string>
     <string name="kaomoji_placement_title">Σελίδες καομότζι</string>
     <string name="kaomoji_placement_symbols">Μετά τα σύμβολα</string>
     <string name="kaomoji_placement_emoji">Μετά τα emoji</string>

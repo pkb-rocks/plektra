@@ -923,6 +923,8 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="emoji_pages_emoji_title">Przewijaj stronę emoji klawiszami Q i P</string>
     <string name="emoji_pages_symbols_title">Przewijaj stronę symboli klawiszami Q i P</string>
     <string name="emoji_pages_description">Q i P przewracają strony, Shift+Q i Shift+P przeskakują między kategoriami, A otwiera wyszukiwanie. Przytrzymaj emoji, aby zobaczyć odcienie skóry. Wśród odcieni skóry P przechodzi do kolejnych; dla emoji z własnego układu ✎ na A otwiera dostosowanie klawisza.</string>
+    <string name="sym_paged_navigation_note">Gdy strony są włączone, Q (‹) i P (›) je przewracają. Twoje własne przypisania Q i P pozostają zapisane i można je tu edytować: przy otwartej stronie przytrzymaj SYM i naciśnij Q lub P, aby je wpisać; bez stron działają znowu bezpośrednio.</string>
+    <string name="sym_navigation_key_content_description">%1$s przewraca strony (%2$s). Twoje przypisanie: %3$s</string>
     <string name="kaomoji_placement_title">Strony kaomoji</string>
     <string name="kaomoji_placement_symbols">Po symbolach</string>
     <string name="kaomoji_placement_emoji">Po emoji</string>

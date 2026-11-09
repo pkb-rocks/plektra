@@ -109,6 +109,59 @@ class SymPagedLayerVariantsTest {
     }
 
     @Test
+    fun withAutoCloseTheSecondPressedKeyTypesAsWithoutSym() {
+        openPeoplePage()
+        SettingsManager.setSymAutoClose(context, true)
+        val keys = mappings()
+        down(KeyEvent.KEYCODE_W)
+        // E going down types the waiting 👋, which closes SYM: E is no SYM key any more
+        assertEquals(SymLayoutController.SymKeyResult.NOT_HANDLED, down(KeyEvent.KEYCODE_E))
+        assertEquals(listOf(keys[KeyEvent.KEYCODE_W]), commits)
+        assertFalse(controller.isSymActive())
+        // Neither release types anything more
+        assertFalse(up(KeyEvent.KEYCODE_W))
+        assertFalse(up(KeyEvent.KEYCODE_E))
+        assertEquals(listOf(keys[KeyEvent.KEYCODE_W]), commits)
+    }
+
+    @Test
+    fun aSkinToneTappedOnScreenClosesSymOnlyByTheTouchRule() {
+        fun tapTone(autoClose: Boolean, onTouch: Boolean): Boolean {
+            commits.clear()
+            controller.closeSymPage()
+            RecentEmojiManager.clearRecentEmojis(context)
+            SettingsManager.setSymAutoClose(context, false)
+            openPeoplePage()
+            SettingsManager.setSymAutoClose(context, autoClose)
+            SettingsManager.setSymAutoCloseOnTouch(context, onTouch)
+            assertTrue(controller.handlePagedTouchLongPress(KeyEvent.KEYCODE_W))
+            var committed = 0
+            assertTrue(controller.handlePagedTouchTap(KeyEvent.KEYCODE_E, connection, {}, onSymbolCommitted = { committed++ }))
+            assertEquals(listOf("👋🏻"), commits)
+            assertEquals(1, committed)
+            return controller.isSymActive()
+        }
+        assertTrue("touch auto-close off keeps the page", tapTone(autoClose = true, onTouch = false))
+        assertFalse(tapTone(autoClose = true, onTouch = true))
+        assertTrue(tapTone(autoClose = false, onTouch = true))
+
+        // A tone chosen with the hardware keys follows the general option alone
+        commits.clear()
+        controller.closeSymPage()
+        RecentEmojiManager.clearRecentEmojis(context)
+        SettingsManager.setSymAutoClose(context, false)
+        openPeoplePage()
+        SettingsManager.setSymAutoClose(context, true)
+        SettingsManager.setSymAutoCloseOnTouch(context, false)
+        down(KeyEvent.KEYCODE_W)
+        down(KeyEvent.KEYCODE_W, repeat = 1)
+        up(KeyEvent.KEYCODE_W)
+        down(KeyEvent.KEYCODE_E)
+        assertEquals(listOf("👋🏻"), commits)
+        assertFalse(controller.isSymActive())
+    }
+
+    @Test
     fun aMappedEmojiWithSkinTonesShowsThemWhenHeldAndOffersItsCustomization() {
         controller.openEmojiPage()
         val home = mappings()

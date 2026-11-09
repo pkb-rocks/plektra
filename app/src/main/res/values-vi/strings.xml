@@ -920,6 +920,8 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="emoji_pages_emoji_title">Lật trang emoji bằng Q và P</string>
     <string name="emoji_pages_symbols_title">Lật trang ký hiệu bằng Q và P</string>
     <string name="emoji_pages_description">Q và P lật trang, Shift+Q và Shift+P chuyển giữa các danh mục, A mở tìm kiếm. Giữ một emoji để chọn tông da. Trong các tông da, P chuyển sang các tông khác; với emoji trong bố cục phím của bạn, ✎ trên A mở phần tùy chỉnh phím.</string>
+    <string name="sym_paged_navigation_note">Khi bật các trang, Q (‹) và P (›) dùng để lật trang. Gán phím riêng của bạn cho Q và P vẫn được lưu và có thể chỉnh sửa tại đây: khi trang đang mở, giữ SYM và nhấn Q hoặc P để nhập chúng; khi tắt các trang, chúng lại hoạt động trực tiếp.</string>
+    <string name="sym_navigation_key_content_description">%1$s lật trang (%2$s). Gán phím của bạn: %3$s</string>
     <string name="kaomoji_placement_title">Trang kaomoji</string>
     <string name="kaomoji_placement_symbols">Sau ký hiệu</string>
     <string name="kaomoji_placement_emoji">Sau emoji</string>

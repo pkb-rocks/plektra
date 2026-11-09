@@ -1265,6 +1265,75 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertTrue("commits=${recorder.committedTexts}", recorder.committedTexts.contains("="))
     }
 
+    /** The emoji page's first People & Body page, opened as the service has it (no recents). */
+    private fun openPeopleEmojiPage(): rocks.pkb.plektra.core.SymLayoutController {
+        val context = RuntimeEnvironment.getApplication()
+        context.getSharedPreferences("recent_emojis_prefs", 0).edit().clear().commit()
+        rocks.pkb.plektra.data.emoji.TestEmojiFont.install(context)
+        val sym: rocks.pkb.plektra.core.SymLayoutController = getField(service, "symLayoutController")
+        sym.openEmojiPage()
+        sym.turnPage(1, section = true)
+        sym.turnPage(1, section = true)
+        assertEquals("👋", sym.currentSymMappings()!![KeyEvent.KEYCODE_W])
+        return sym
+    }
+
+    private fun rollOverWAndE(t0: Long) {
+        service.onKeyDown(KeyEvent.KEYCODE_W, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W, t0, t0))
+        service.onKeyDown(KeyEvent.KEYCODE_E, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_E, t0 + 30L, t0 + 30L))
+        service.onKeyUp(KeyEvent.KEYCODE_W, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_W, t0, t0 + 60L))
+        service.onKeyUp(KeyEvent.KEYCODE_E, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_E, t0 + 30L, t0 + 90L))
+    }
+
+    @Test
+    fun emojiPageRolloverWithAutoCloseTypesTheSecondKeyAsALetterOnce() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, false)
+        SettingsManager.setSymAutoClose(context, true)
+        val sym = openPeopleEmojiPage()
+
+        rollOverWAndE(5_000L)
+
+        assertEquals(listOf("👋", "e"), recorder.committedTexts)
+        assertFalse(sym.isSymActive())
+    }
+
+    @Test
+    fun emojiPageRolloverWithoutAutoCloseTypesBothEmojiOnce() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setSymAutoClose(context, false)
+        val sym = openPeopleEmojiPage()
+        val keys = sym.currentSymMappings()!!
+
+        rollOverWAndE(5_200L)
+
+        assertEquals(listOf(keys[KeyEvent.KEYCODE_W], keys[KeyEvent.KEYCODE_E]), recorder.committedTexts)
+        assertTrue(sym.isSymActive())
+    }
+
+    @Test
+    fun heldSymTypesTheOwnMappingOfQAndPThatThePagesTurnWith() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setSymAutoClose(context, false)
+        rocks.pkb.plektra.data.emoji.TestEmojiFont.install(context)
+        val sym: rocks.pkb.plektra.core.SymLayoutController = getField(service, "symLayoutController")
+        val own: AlternateCharacterManager = getField(service, "alternateCharacterManager")
+        val ownQ = own.getSymMappings()[KeyEvent.KEYCODE_Q]
+        sym.openEmojiPage()
+        assertEquals(rocks.pkb.plektra.core.SymPagedLayer.PREVIOUS_LABEL, sym.currentSymMappings()!![KeyEvent.KEYCODE_Q])
+        assertTrue(!ownQ.isNullOrEmpty())
+
+        val t0 = 5_400L
+        service.onKeyDown(KeyEvent.KEYCODE_SYM, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SYM, t0, t0))
+        service.onKeyDown(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q, t0 + 30L, t0 + 30L))
+        service.onKeyUp(KeyEvent.KEYCODE_Q, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_Q, t0 + 30L, t0 + 60L))
+        service.onKeyUp(KeyEvent.KEYCODE_SYM, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SYM, t0, t0 + 90L))
+
+        assertEquals(listOf(ownQ), recorder.committedTexts)
+        assertTrue("the chord leaves the page open", sym.isSymActive())
+    }
+
     @Test
     fun heldSymBoundaryConsumesTappedShiftBeforeNextLetter() {
         val context = RuntimeEnvironment.getApplication()

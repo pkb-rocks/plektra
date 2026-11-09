@@ -5373,6 +5373,10 @@ object SettingsManager {
             .apply()
     }
 
+    /** Whether SYM closes after typing a symbol: a [touch] on screen also needs the touch option. */
+    fun symAutoClosesAfterCommit(context: Context, touch: Boolean): Boolean =
+        getSymAutoClose(context) && (!touch || getSymAutoCloseOnTouch(context))
+
     fun getEmojiPickerExpandedHeight(context: Context): Boolean {
         return getPreferences(context).getBoolean(
             KEY_EMOJI_PICKER_EXPANDED_HEIGHT,

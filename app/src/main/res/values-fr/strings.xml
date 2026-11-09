@@ -922,6 +922,8 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="emoji_pages_emoji_title">Feuilleter la page emoji avec Q et P</string>
     <string name="emoji_pages_symbols_title">Feuilleter la page symboles avec Q et P</string>
     <string name="emoji_pages_description">Q et P tournent les pages, Maj+Q et Maj+P passent d’une catégorie à l’autre, A ouvre la recherche. Maintenez un emoji pour ses teintes de peau. Parmi les teintes, P passe aux suivantes ; pour un emoji de votre propre disposition, ✎ sur A ouvre la personnalisation de la touche.</string>
+    <string name="sym_paged_navigation_note">Avec les pages activées, Q (‹) et P (›) les tournent. Vos propres attributions de Q et P restent enregistrées et modifiables ici : page ouverte, maintenez SYM et appuyez sur Q ou P pour les saisir ; sans les pages, elles s’appliquent de nouveau directement.</string>
+    <string name="sym_navigation_key_content_description">%1$s tourne les pages (%2$s). Votre attribution : %3$s</string>
     <string name="kaomoji_placement_title">Pages kaomoji</string>
     <string name="kaomoji_placement_symbols">Après les symboles</string>
     <string name="kaomoji_placement_emoji">Après les emoji</string>

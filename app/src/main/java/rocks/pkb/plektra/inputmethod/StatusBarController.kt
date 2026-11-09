@@ -2559,6 +2559,37 @@ class StatusBarController(
         return keyLayout
     }
 
+    /**
+     * A key of the customization grid that the layer's pages use to turn ([arrow]): the arrow
+     * in its corner, its own mapping dimmed but still shown and editable, as it types again
+     * without the pages and with SYM held.
+     */
+    private fun markNavigationKey(keyButton: View, label: String, content: String, arrow: String) {
+        val key = keyButton as? FrameLayout ?: return
+        key.getChildAt(0)?.let { contentGroup ->
+            (contentGroup as? ViewGroup)?.getChildAt(0)?.alpha = 0.4f
+        }
+        key.addView(TextView(context).apply {
+            text = arrow
+            textSize = 16f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(activeThemeColors().accent)
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.START
+                leftMargin = dpToPx(4f)
+            }
+        })
+        key.contentDescription = context.getString(
+            R.string.sym_navigation_key_content_description,
+            label,
+            arrow,
+            content.ifBlank { "—" }
+        )
+    }
+
     private fun buildSymKeyContentDescription(label: String, content: String): String {
         if (content.isBlank()) {
             return label
@@ -2702,9 +2733,7 @@ class StatusBarController(
     }
 
     private fun closeSymAfterTouchKeyIfNeeded(): Boolean {
-        val shouldClose =
-            SettingsManager.getSymAutoClose(context) &&
-            SettingsManager.getSymAutoCloseOnTouch(context)
+        val shouldClose = SettingsManager.symAutoClosesAfterCommit(context, touch = true)
         if (shouldClose) {
             onSymCloseRequested?.invoke()
         }
@@ -2787,7 +2816,8 @@ class StatusBarController(
     fun createCustomizableEmojiKeyboard(
         symMappings: Map<Int, String>,
         onKeyClick: (Int, String) -> Unit,
-        page: Int = 1 // Default a pagina 1 (emoji)
+        page: Int = 1, // Default a pagina 1 (emoji)
+        navigationKeys: Map<Int, String> = emptyMap()
     ): View {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
         val container = LinearLayout(context).apply {
@@ -2907,19 +2937,19 @@ class StatusBarController(
                 when (rowIndex) {
                     0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
                         for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, index == row.size - 1)
+                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, index == row.size - 1)
                         }
                     }
                     1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
                         for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                     }
                     2 -> { // Row 3: Z X C V [Close Placeholder] [Globe Placeholder] B N M [Gap]
                         // Z X C V (4 keys)
                         for (i in 0..3) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
                         
                         // Close Button Placeholder (no icon in customization preview)
@@ -2932,7 +2962,7 @@ class StatusBarController(
                         
                         // B N M (3 keys)
                         for (i in 4..6) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
 
                         // Right Gap (placeholder for the physical cutout/space at the end of row 3)
@@ -2957,6 +2987,7 @@ class StatusBarController(
                 
                 // Usa la stessa funzione createEmojiKeyButton della tastiera reale
                 val keyButton = createEmojiKeyButton(label, emoji, keyHeight, page)
+                navigationKeys[keyCode]?.let { markNavigationKey(keyButton, label, emoji, it) }
                 
                 // Aggiungi click listener
                 keyButton.setOnClickListener {
@@ -2995,6 +3026,7 @@ class StatusBarController(
         spacing: Int,
         page: Int,
         onKeyClick: (Int, String) -> Unit,
+        navigationKeys: Map<Int, String>,
         isLast: Boolean
     ) {
         val keyLabels = mapOf(
@@ -3011,6 +3043,7 @@ class StatusBarController(
         val label = keyLabels[keyCode] ?: ""
         val emoji = symMappings[keyCode] ?: ""
         val keyButton = createEmojiKeyButton(label, emoji, height, page)
+        navigationKeys[keyCode]?.let { markNavigationKey(keyButton, label, emoji, it) }
         keyButton.setOnClickListener {
             onKeyClick(keyCode, emoji)
         }

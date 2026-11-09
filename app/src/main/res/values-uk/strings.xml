@@ -923,6 +923,8 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="emoji_pages_emoji_title">Гортати сторінку емодзі клавішами Q і P</string>
     <string name="emoji_pages_symbols_title">Гортати сторінку символів клавішами Q і P</string>
     <string name="emoji_pages_description">Q і P гортають сторінки, Shift+Q і Shift+P переходять між категоріями, A відкриває пошук. Утримуйте емодзі, щоб вибрати тон шкіри. Серед тонів шкіри P гортає далі; для емодзі з вашої власної розкладки ✎ на A відкриває налаштування клавіші.</string>
+    <string name="sym_paged_navigation_note">Коли сторінки ввімкнено, Q (‹) і P (›) гортають їх. Ваші власні призначення Q і P зберігаються, і їх можна змінити тут: при відкритій сторінці утримуйте SYM і натисніть Q або P, щоб ввести їх; без сторінок вони знову працюють напряму.</string>
+    <string name="sym_navigation_key_content_description">%1$s гортає сторінки (%2$s). Ваше призначення: %3$s</string>
     <string name="kaomoji_placement_title">Сторінки каомодзі</string>
     <string name="kaomoji_placement_symbols">Після символів</string>
     <string name="kaomoji_placement_emoji">Після емодзі</string>

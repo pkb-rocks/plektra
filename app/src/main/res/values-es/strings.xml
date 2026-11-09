@@ -922,6 +922,8 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="emoji_pages_emoji_title">Pasar la página de emoji con Q y P</string>
     <string name="emoji_pages_symbols_title">Pasar la página de símbolos con Q y P</string>
     <string name="emoji_pages_description">Q y P pasan las páginas, Mayús+Q y Mayús+P saltan entre categorías, A abre la búsqueda. Mantén pulsado un emoji para ver sus tonos de piel. Entre los tonos de piel, P pasa a más; en un emoji de tu propia asignación, ✎ en A abre la personalización de la tecla.</string>
+    <string name="sym_paged_navigation_note">Con las páginas activadas, Q (‹) y P (›) las pasan. Tus propias asignaciones de Q y P se conservan y puedes editarlas aquí: con la página abierta, mantén SYM y pulsa Q o P para escribirlas; sin las páginas vuelven a funcionar directamente.</string>
+    <string name="sym_navigation_key_content_description">%1$s pasa las páginas (%2$s). Tu asignación: %3$s</string>
     <string name="kaomoji_placement_title">Páginas de kaomoji</string>
     <string name="kaomoji_placement_symbols">Después de los símbolos</string>
     <string name="kaomoji_placement_emoji">Después de los emoji</string>

@@ -713,8 +713,8 @@ class AospKeyboardView @JvmOverloads constructor(
             val labelWidth = key.visualRect.width() - dp(8f)
             val labelHeight = key.visualRect.height() - dp(4f)
             val emojiLayout = layerLabel?.let { emojiLabelLayout(label, labelWidth, labelHeight) }
-            if (emojiLayout == null && activeSymLabel != null && previewLabel == null) {
-                // Kaomoji and other long text of a SYM page: shrunk to fit the key
+            if (emojiLayout == null) {
+                // Fit every text label, including functional labels at large font scales.
                 repeat(4) {
                     val scale = minOf(
                         labelWidth / textPaint.measureText(label),

@@ -99,7 +99,7 @@ class EmojiPickerView(
     // Adapter
     private val sectionAdapter: SectionAdapter
     private val searchAdapter: SearchAdapter
-    private val columns: Int
+    private var columns: Int
     private var regularCategories: List<EmojiRepository.EmojiCategory> = emptyList()
     private var searchIndex: EmojiSearchRepository.EmojiSearchIndex? = null
     private var searchQuery: String = ""
@@ -141,7 +141,7 @@ class EmojiPickerView(
         // Layout container: vertical stack (recycler + bottom tabs)
         vertical = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, compactHeight)
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         }
 
         searchField = EditText(context).apply {
@@ -226,7 +226,7 @@ class EmojiPickerView(
         }
 
         val gridLayoutManager = GridLayoutManager(context, columns, RecyclerView.VERTICAL, false)
-        sectionAdapter = SectionAdapter(columns)
+        sectionAdapter = SectionAdapter()
         searchAdapter = SearchAdapter()
         gridLayoutManager.spanSizeLookup = sectionAdapter.spanSizeLookup
         recyclerView.layoutManager = gridLayoutManager
@@ -386,6 +386,18 @@ class EmojiPickerView(
         loadCategories()
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val availableWidth = (View.MeasureSpec.getSize(widthMeasureSpec) - smallPadding * 2).coerceAtLeast(1)
+        val newColumns = ((availableWidth + spacing) / (emojiSize + spacing)).coerceIn(4, 10)
+        if (columns != newColumns) {
+            columns = newColumns
+            (recyclerView.layoutManager as GridLayoutManager).spanCount = columns
+            sectionAdapter.notifyDataSetChanged()
+            searchAdapter.notifyDataSetChanged()
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
     fun setInputConnection(connection: InputConnection?) {
         currentInputConnection = connection
     }
@@ -450,10 +462,6 @@ class EmojiPickerView(
         (layoutParams ?: LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)).also {
             it.height = heightPx
             layoutParams = it
-        }
-        (vertical.layoutParams ?: LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)).also {
-            it.height = heightPx
-            vertical.layoutParams = it
         }
     }
 
@@ -870,6 +878,7 @@ class EmojiPickerView(
                 textView.maxLines = 1
                 textView.textSize = 28.8f
                 textView.text = EmojiRendering.forDisplay(context, text)
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(textView, 8, 29, 1, TypedValue.COMPLEX_UNIT_SP)
             }
         }
         textView.setTextColor(themeOverride?.textAndIcons ?: Color.WHITE)
@@ -1468,7 +1477,7 @@ class EmojiPickerView(
         searchField.setText("")
     }
 
-    private inner class SectionAdapter(private val columns: Int) :
+    private inner class SectionAdapter :
         ListAdapter<SectionItem, RecyclerView.ViewHolder>(SectionItemDiffCallback()) {
         val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -1501,7 +1510,7 @@ class EmojiPickerView(
                     gravity = Gravity.CENTER
                     textSize = 28.8f
                     minHeight = emojiSize
-                    minWidth = emojiSize
+                    minWidth = 0
                     layoutParams = RecyclerView.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -1546,7 +1555,7 @@ class EmojiPickerView(
                 gravity = Gravity.CENTER
                 textSize = 28.8f
                 minHeight = emojiSize
-                minWidth = emojiSize
+                minWidth = 0
                 layoutParams = RecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT

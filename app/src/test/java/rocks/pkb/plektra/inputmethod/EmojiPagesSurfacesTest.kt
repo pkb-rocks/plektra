@@ -366,6 +366,60 @@ class EmojiPagesSurfacesTest {
         }
     }
 
+    @Test
+    fun pickerAdaptsColumnsAndKeepsControlsInsideConstrainedHeight() {
+        val picker = EmojiPickerView(activity)
+        picker.configureSoftwareKeyboardMode(700, {})
+        fun measure(width: Int) {
+            picker.measure(
+                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(350, View.MeasureSpec.AT_MOST)
+            )
+            picker.layout(0, 0, picker.measuredWidth, picker.measuredHeight)
+        }
+        measure(1856)
+        val wide = field(picker, "columns") as Int
+        measure(840)
+        assertTrue("column count follows actual view width", (field(picker, "columns") as Int) < wide)
+        val vertical = field(picker, "vertical") as View
+        val close = field(picker, "closeButton") as View
+        val controls = close.parent as View
+        assertTrue("stack stays inside measured picker", vertical.bottom <= picker.measuredHeight)
+        assertTrue("bottom controls remain visible", controls.bottom <= vertical.height)
+        assertTrue("controls have height", controls.height > 0)
+    }
+
+    @Test
+    fun abcLabelFitsItsKeyAtLargeFontScale() {
+        val metrics = activity.resources.displayMetrics
+        @Suppress("DEPRECATION")
+        val previous = metrics.scaledDensity
+        try {
+            @Suppress("DEPRECATION")
+            metrics.scaledDensity = metrics.density * 1.5f
+            val view = AospKeyboardView(activity).apply { keypad = SoftwareKeypad.PHONE }
+            view.measure(View.MeasureSpec.makeMeasureSpec(840, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(500, View.MeasureSpec.EXACTLY))
+            view.layout(0, 0, 840, 500)
+            @Suppress("UNCHECKED_CAST")
+            val visual = (field(view, "keys") as List<Any>).first {
+                field(field(it, "spec")!!, "type").toString() == "LAYOUT"
+            }.let { field(it, "visualRect") as RectF }
+            fun draw() = Bitmap.createBitmap(840, 500, Bitmap.Config.ARGB_8888).also { view.draw(Canvas(it)) }
+            view.layoutKeyLabel = "\u200B"
+            val blank = draw()
+            view.layoutKeyLabel = "ABC"
+            val label = draw()
+            val bounds = android.graphics.Rect().also { visual.round(it) }
+            val changed = changedBounds(blank, label)
+            assertTrue("label draws", changed != null)
+            assertTrue("ABC $changed fits $bounds", bounds.contains(changed!!))
+        } finally {
+            @Suppress("DEPRECATION")
+            metrics.scaledDensity = previous
+        }
+    }
+
     private fun idleUntil(what: String, condition: () -> Boolean) {
         val deadline = System.currentTimeMillis() + 10_000
         while (!condition()) {

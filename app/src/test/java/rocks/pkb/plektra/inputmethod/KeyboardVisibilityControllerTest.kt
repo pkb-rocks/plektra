@@ -52,6 +52,47 @@ class KeyboardVisibilityControllerTest {
     }
 
     @Test
+    fun inputStartShowRespectsAppDefaultsOnlyForTheOnScreenKeyboard() {
+        val h = Harness()
+        // Hardware bar follows every editor; neither setting removes it.
+        for (auto in listOf(false, true)) for (respect in listOf(false, true)) {
+            assertTrue(h.controller.shouldShowSurfaceOnInputStart(auto, respect))
+        }
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        assertTrue(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true, respectAppVisibility = false))
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true, respectAppVisibility = true))
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = false, respectAppVisibility = false))
+        assertTrue(h.controller.shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled = true))
+    }
+
+    @Test
+    fun respectingAppDefaultsStillHonorsAndroidShowRequestAndManualKey() {
+        SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)
+        val h = Harness()
+        h.controller.onInputStarted(restarting = false)
+        assertFalse(h.controller.shouldShowSurfaceOnInputStart(true, respectAppVisibility = true))
+        assertTrue(h.actions.isEmpty())
+        h.controller.onExplicitShowRequested()
+        h.runNext()
+        assertEquals(1, h.showRequests)
+
+        val manual = Harness()
+        manual.controller.onInputStarted(restarting = false)
+        manual.controller.onHardwareInputRequested()
+        manual.runNext()
+        assertEquals(1, manual.showRequests)
+    }
+
+    @Test
+    fun blockedSurfaceIgnoresManualShowRequests() {
+        val h = Harness().apply { allowPersistent = false }
+        // allowsSurface stays the gate for explicit requests as well.
+        h.controller.onExplicitShowRequested()
+        assertTrue(h.actions.isEmpty())
+        assertEquals(0, h.showRequests)
+    }
+
+    @Test
     fun evaluationDoesNotShowAttachOrScheduleAnySurface() {
         val h = Harness()
         for (experimental in listOf(false, true)) {

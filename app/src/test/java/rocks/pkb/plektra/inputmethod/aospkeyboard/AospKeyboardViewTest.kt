@@ -12,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.inputmethod.SoftwareKeyboardPageChoices
+import rocks.pkb.plektra.inputmethod.SoftwareKeypad
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -48,6 +50,9 @@ class AospKeyboardViewTest {
         val symbolTexts = mutableListOf<String>()
         val modifierDownKeyCodes = mutableListOf<Int>()
         val modifierUpKeyCodes = mutableListOf<Int>()
+        val pageChoices = mutableListOf<String>()
+
+        override fun onPageChoice(id: String) { pageChoices += id }
 
         override fun onText(text: String) { texts += text }
         override fun onBackspace() { backspaceCount++ }
@@ -720,6 +725,145 @@ class AospKeyboardViewTest {
         }
         assertEquals("ю", listener.texts.last())
     }
+
+    @Test
+    fun numberKeypad_replacesLettersAndLayoutKeyTapReturnsToFullKeyboard() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            includeNumberRow = true
+            keypad = SoftwareKeypad.NUMBER
+            this.listener = listener
+        }
+        val rendered = labels(view)
+        assertTrue(rendered.containsAll(listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "-", "ABC")))
+        assertFalse(rendered.contains("q"))
+        assertEquals(4, keys(view).map { field<RectF>(it, "hitRect").top }.distinct().size)
+        val (zx, zy) = centerOfLabel(view, "0")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, zx, zy, 0L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, zx, zy, 20L))
+        val (x, y) = centerOfLabel(view, "ABC")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 30L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 50L))
+        assertEquals(listOf("0"), listener.texts)
+        assertEquals(listOf(SoftwareKeyboardPageChoices.LETTERS), listener.pageChoices)
+        assertTrue(listener.modifierDownKeyCodes.isEmpty())
+
+        view.keypad = SoftwareKeypad.FULL
+        assertTrue(labels(view).contains("q"))
+    }
+
+    @Test
+    fun phoneKeypad_offersPlusStarHashAndKeepsBottomLeftLayoutKey() {
+        val view = measuredKeyboard().apply { keypad = SoftwareKeypad.PHONE }
+        val rendered = labels(view)
+        assertTrue(rendered.containsAll(listOf("+", "*", "#", "0", "ABC")))
+        val abcLeft = leftOfLabel(view, "ABC")
+        assertTrue(keys(view).all { field<RectF>(it, "hitRect").left >= abcLeft })
+        assertTrue(centerOfLabel(view, "ABC").second >= centerOfLabel(view, "7").second)
+    }
+
+    @Test
+    fun keypadLongPressUsesOnlyItsOwnAlternates() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            keypad = SoftwareKeypad.PHONE
+            longPressTimeoutMs = 50L
+            longPressAlternatesProvider = { listOf("x") }
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "0")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 70L))
+        assertEquals(listOf("+"), listener.texts)
+    }
+
+    @Test
+    fun layoutKeyHold_opensChooserAndSlidingSelectsChoiceOnRelease() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            keypad = SoftwareKeypad.NUMBER
+            longPressTimeoutMs = 50L
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "ABC")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        val panel = requireNotNull(field<Any?>(view, "moreKeysPanelState"))
+        assertTrue(field<Boolean>(panel, "pageChooser"))
+        val rect = field<RectF>(panel, "popupRectInView")
+        assertTrue(rect.bottom <= field<RectF>(keyForLabel(view, "ABC"), "visualRect").top)
+        val keyWidth = field<Float>(panel, "keyWidth")
+        val padding = field<Float>(panel, "padding")
+        val targetX = rect.left + padding + keyWidth * 2.5f
+        val targetY = rect.centerY()
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_MOVE, targetX, targetY, 70L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, targetX, targetY, 80L))
+        assertEquals(listOf(SoftwareKeyboardPageChoices.PHONE), listener.pageChoices)
+        assertTrue(listener.texts.isEmpty())
+    }
+
+    @Test
+    fun layoutKeyHold_releasedWithoutSliding_keepsCurrentPage() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            keypad = SoftwareKeypad.NUMBER
+            longPressTimeoutMs = 50L
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "ABC")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 70L))
+        assertTrue(listener.pageChoices.isEmpty())
+        assertTrue(listener.texts.isEmpty())
+    }
+
+    @Test
+    fun symPageLayoutKey_tapCyclesAndHoldOpensChooser() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            symPageActive = true
+            symbolsLabel = "ABC"
+            longPressTimeoutMs = 50L
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "SYM")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 20L))
+        assertEquals(1, listener.symbolCount)
+        assertTrue(listener.modifierDownKeyCodes.isEmpty())
+
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 30L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        assertTrue(field<Boolean>(requireNotNull(field<Any?>(view, "moreKeysPanelState")), "pageChooser"))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 100L))
+        assertEquals(1, listener.symbolCount)
+    }
+
+    @Test
+    fun lettersPageSymKeyHoldStaysSymModifier() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            pageChoices = chooserChoices()
+            this.listener = listener
+        }
+        val (x, y) = centerOfLabel(view, "SYM")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 20L))
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierDownKeyCodes)
+        assertEquals(listOf(KeyEvent.KEYCODE_SYM), listener.modifierUpKeyCodes)
+    }
+
+    private fun chooserChoices() = listOf(
+        SoftwareKeyboardPageChoices.Choice(SoftwareKeyboardPageChoices.LETTERS, "ABC"),
+        SoftwareKeyboardPageChoices.Choice(SoftwareKeyboardPageChoices.NUMBER, "123"),
+        SoftwareKeyboardPageChoices.Choice(SoftwareKeyboardPageChoices.PHONE, "+*#"),
+        SoftwareKeyboardPageChoices.Choice(SoftwareKeyboardPageChoices.pageId(2), "#+=")
+    )
 
     private fun measuredKeyboard(): AospKeyboardView {
         val context = RuntimeEnvironment.getApplication()

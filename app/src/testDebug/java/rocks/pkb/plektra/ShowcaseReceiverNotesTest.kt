@@ -109,6 +109,33 @@ class ShowcaseReceiverNotesTest {
         org.junit.Assert.assertFalse(prefs.contains("heading"))
     }
 
+    @Test fun legacyFlatBackupWithAPreferencesKeyRestoresWithoutAFormatCollision() {
+        context.deleteSharedPreferences("notes")
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        prefs.edit().putString("preferences", "personal preference").commit()
+        val original = prefs.all.toMap()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic body").toString())))
+        val flat = JSONObject().put("preferences", JSONObject().put("type", "string").put("value", "personal preference"))
+        listOf("collection", "active_note", "heading", "body", "cursor", "focus", "view_mode").forEach {
+            flat.put(it, JSONObject().put("type", "absent"))
+        }
+        java.io.File(context.filesDir, "showcase-notes-backup.json").writeText(flat.toString())
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        assertEquals(original, prefs.all)
+    }
+
+    @Test fun precedingUnversionedWrapperStillRestoresAnAbsentNotesFile() {
+        context.deleteSharedPreferences("notes")
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic body").toString())))
+        val backup = java.io.File(context.filesDir, "showcase-notes-backup.json")
+        val document = JSONObject(backup.readText()).apply { remove("captureFormat") }
+        backup.writeText(document.toString())
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        org.junit.Assert.assertTrue(context.getSharedPreferences("notes", Context.MODE_PRIVATE).all.isEmpty())
+    }
+
     private fun broadcast(intent: Intent): Int {
         var result: Int? = null
         context.sendOrderedBroadcast(intent.setClass(context, ShowcaseReceiver::class.java), null,

@@ -128,7 +128,7 @@ class ShowcaseReceiver : BroadcastReceiver() {
             val saved = JSONObject()
             (prefs.all.keys + NOTE_CAPTURE_KEYS).forEach { key -> saved.put(key, encodePref(prefs.all[key])) }
             val fileExisted = java.io.File(context.applicationInfo.dataDir, "shared_prefs/$NOTES_PREFS.xml").exists()
-            backup.writeText(JSONObject().put("preferences", saved).put("fileExisted", fileExisted).toString())
+            backup.writeText(JSONObject().put("captureFormat", 1).put("preferences", saved).put("fileExisted", fileExisted).toString())
         }
         // Moves legacy single-note data into the collection, as the editor does on first start.
         if (prefs.contains("collection") || prefs.contains("heading") || prefs.contains("body")) {
@@ -153,7 +153,13 @@ class ShowcaseReceiver : BroadcastReceiver() {
         val backup = java.io.File(context.filesDir, NOTES_BACKUP)
         if (!backup.exists()) return false
         val document = JSONObject(backup.readText())
-        val saved = document.optJSONObject("preferences") ?: document
+        val versioned = document.opt("captureFormat") is Number
+        val wrapped = versioned || (document.opt("fileExisted") is Boolean && document.optJSONObject("preferences") != null)
+        if (versioned) require(document.getInt("captureFormat") == 1) { "Unsupported capture backup format" }
+        val saved = if (wrapped) {
+            require(document.opt("fileExisted") is Boolean) { "Invalid capture backup structure" }
+            document.getJSONObject("preferences")
+        } else document
         val prefs = context.getSharedPreferences(NOTES_PREFS, Context.MODE_PRIVATE)
         val editor = prefs.edit()
         // The collection is never restored from the backup; it only loses the synthetic note.
@@ -165,7 +171,7 @@ class ShowcaseReceiver : BroadcastReceiver() {
             editor.remove("collection")
         }
         require(editor.commit()) { "Notes restore failed" }
-        if (!document.optBoolean("fileExisted", true) && prefs.all.isEmpty()) {
+        if (wrapped && !document.getBoolean("fileExisted") && prefs.all.isEmpty()) {
             require(context.deleteSharedPreferences(NOTES_PREFS)) { "Could not remove capture-only notes preferences" }
         }
         require(backup.delete()) { "Could not remove notes backup" }

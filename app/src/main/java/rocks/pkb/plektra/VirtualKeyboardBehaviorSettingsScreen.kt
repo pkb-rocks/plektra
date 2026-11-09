@@ -46,6 +46,12 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
     var numberRowEnabled by remember {
         mutableStateOf(SettingsManager.getSoftwareKeyboardNumberRowEnabled(context))
     }
+    var emojiPageInCycle by remember {
+        mutableStateOf(SettingsManager.getSoftwareKeyboardEmojiPageInCycle(context))
+    }
+    var hardwareKeypadAutoOpen by remember {
+        mutableStateOf(SettingsManager.getHardwareKeypadAutoOpen(context))
+    }
     var leftModifierKey by remember {
         mutableStateOf(SettingsManager.getSoftwareKeyboardLeftModifierKey(context))
     }
@@ -250,6 +256,28 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
                 onCheckedChange = { enabled ->
                     numberRowEnabled = enabled
                     SettingsManager.setSoftwareKeyboardNumberRowEnabled(context, enabled)
+                }
+            )
+
+            ModifierTapLatchRow(
+                title = stringResource(R.string.software_keyboard_emoji_page_in_cycle_title),
+                linkId = "on_screen.emoji_page_in_cycle",
+                description = stringResource(R.string.software_keyboard_emoji_page_in_cycle_description),
+                checked = emojiPageInCycle,
+                onCheckedChange = { enabled ->
+                    emojiPageInCycle = enabled
+                    SettingsManager.setSoftwareKeyboardEmojiPageInCycle(context, enabled)
+                }
+            )
+
+            ModifierTapLatchRow(
+                title = stringResource(R.string.hardware_keypad_auto_open_title),
+                linkId = "on_screen.hardware_keypad_auto_open",
+                description = stringResource(R.string.hardware_keypad_auto_open_description),
+                checked = hardwareKeypadAutoOpen,
+                onCheckedChange = { enabled ->
+                    hardwareKeypadAutoOpen = enabled
+                    SettingsManager.setHardwareKeypadAutoOpen(context, enabled)
                 }
             )
 

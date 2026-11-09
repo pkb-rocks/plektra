@@ -65,6 +65,14 @@
     <string name="swipe_incremental_threshold_title">Wischleisten-Empfindlichkeit</string>
     <string name="auto_show_keyboard_title">Tastatur automatisch anzeigen</string>
     <string name="auto_show_keyboard_description">Zeigt die Bildschirmtastatur automatisch in Textfeldern.</string>
+    <string name="auto_show_respect_app_visibility_title">Anzeigevorgaben der App beachten</string>
+    <string name="auto_show_respect_app_visibility_description">Android und die App entscheiden, ob die Tastatur beim Betreten eines Felds erscheint. Antippen des Felds oder ein Tastendruck öffnet sie weiterhin.</string>
+    <string name="hardware_keypad_auto_open_title">Ziffernblock bei Hardwaretastatur automatisch öffnen</string>
+    <string name="hardware_keypad_auto_open_description">Zeigt in PIN-, Zahlen- und Telefonfeldern den Ziffern- oder Telefonblock auf dem Bildschirm. Sonst öffnet ihn die Tastaturtaste in der Tastaturleiste.</string>
+    <string name="software_keyboard_emoji_page_in_cycle_title">Emoji-Belegung im Seitenwechsel</string>
+    <string name="software_keyboard_emoji_page_in_cycle_description">Nimmt die Emoji-Belegungsseite in den Seitenwechsel der Bildschirmtastatur auf. Die Emoji-Auswahl bleibt davon unberührt.</string>
+    <string name="software_keyboard_accessibility_full_keyboard">Volle Tastatur</string>
+    <string name="software_keyboard_keypad_button_description">Bildschirm-Ziffernblock öffnen</string>
     <string name="info_title">Informationen</string>
     <string name="info_description">Einstellungen werden automatisch gespeichert und sofort auf die Eingabemethode angewendet.</string>
     <string name="keyboard_title">Plektra Tastatur</string>

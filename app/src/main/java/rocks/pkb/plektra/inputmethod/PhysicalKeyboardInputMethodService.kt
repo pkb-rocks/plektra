@@ -285,6 +285,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private lateinit var typingSoundPlayer: TypingSoundPlayer
     private var skipNextSelectionUpdateAfterCommit: Boolean = false
     private var editorHasActiveSelection: Boolean = false
+    private val softwareKeypadSession = SoftwareKeypadSession()
+    /** Hardware keypad auto-open that waits for Android's show request (app display defaults). */
+    private var pendingKeypadAutoOpen = false
     private lateinit var keyboardVisibilityController: KeyboardVisibilityController
     private lateinit var launcherShortcutController: LauncherShortcutController
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
@@ -623,6 +626,42 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun applySoftwareKeyboardPageChoice(id: String) {
+        if (!inputContextState.isEditable || !keyboardVisibilityController.allowsSurface()) return
+        SoftwareKeyboardPageChoices.keypadFromId(id)?.let { keypad ->
+            softwareKeypadSession.select(keypad)
+            symLayoutController.closeSymPage()
+            updateStatusBarText()
+            return
+        }
+        val page = SoftwareKeyboardPageChoices.pageFromId(id) ?: return
+        ensureImeSurfaceVisible()
+        symLayoutController.openPage(page)
+        updateStatusBarText()
+    }
+
+    /**
+     * Opens the on-screen keypad for the current field. On a hardware keyboard this switches to the
+     * virtual surface only until the editor changes.
+     */
+    private fun openKeypadForCurrentField() {
+        // App blocking and other surface policies take precedence over every manual entry.
+        if (!inputContextState.isEditable || currentInputConnection == null ||
+            !keyboardVisibilityController.allowsSurface()
+        ) return
+        if (SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
+        ) {
+            SettingsManager.beginFieldScopedVirtualKeyboard(this)
+        }
+        ensureImeSurfaceVisible()
+        updateStatusBarText()
+    }
+
+    private fun endTemporaryKeypad() {
+        SettingsManager.endFieldScopedVirtualKeyboard(this)
     }
 
     private fun scheduleStatusBarTextUpdate(delayMs: Long = CURSOR_UPDATE_DELAY) {
@@ -1831,6 +1870,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         lastSystemLocalesSignature = resources.configuration.locales.toLanguageTags()
         lastImeConfiguration = Configuration(resources.configuration)
         prefs = getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
+        // A keypad opened on a hardware keyboard is field-scoped and must not survive a restart.
+        SettingsManager.endFieldScopedVirtualKeyboard(this)
         clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
         physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
 
@@ -2167,6 +2208,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         candidatesBarController.onSoftwareKeyboardModeToggleRequested = {
             toggleSoftwareKeyboardModeFromStatusBar()
+        }
+        candidatesBarController.onKeypadRequested = {
+            openKeypadForCurrentField()
+        }
+        candidatesBarController.onSoftwareKeyboardPageChoice = { id ->
+            // Chosen on touch release; overlay pages replace the touched view, so leave dispatch first.
+            uiHandler.post { applySoftwareKeyboardPageChoice(id) }
         }
         clipboardHistoryManager.addHistoryChangeListener {
             candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
@@ -3008,6 +3056,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (::keyboardVisibilityController.isInitialized) {
             keyboardVisibilityController.onExplicitShowRequested()
         }
+        if (pendingKeypadAutoOpen) {
+            pendingKeypadAutoOpen = false
+            openKeypadForCurrentField()
+        }
         traceImeVisibility("onShowInputRequested accepted=$accepted flags=$flags")
         return !keyboardVisibilityController.usesCandidatesView()
     }
@@ -3326,6 +3378,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             softwareCtrlPreviewActive = shouldShowSoftwareCtrlPreview(modifierSnapshot),
             softwareAltPreviewLabels = buildSoftwareAltPreviewLabels(modifierSnapshot),
             softwareAltPreviewActive = shouldShowSoftwareAltPreview(modifierSnapshot),
+            softwareKeypad = softwareKeypadSession.resolved(),
+            keypadAccessAvailable = state.isEditable &&
+                effectiveSoftwareKeyboardMode != SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
+                SoftwareKeypadPolicy.autoKeypadFor(state.inputType) != SoftwareKeypad.FULL,
             // Legacy flag for backward compatibility
             shouldDisableSmartFeatures = shouldDisableSmartFeatures
         )
@@ -3647,6 +3703,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val isEditable = state.isEditable
         val isReallyEditable = state.isReallyEditable
         isInputViewActive = isEditable
+        softwareKeypadSession.onFieldStarted(state.inputType, restarting)
+        if (!restarting) pendingKeypadAutoOpen = false
         keyboardVisibilityController.onInputStarted(restarting)
         if (!keyboardVisibilityController.allowsSurface()) {
             keyboardVisibilityController.onKeyboardBarConfigurationChanged()
@@ -3662,11 +3720,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         
         if (isEditable && isReallyEditable && !restarting && isInputViewActive) {
+            val respectAppVisibility = SettingsManager.getAutoShowRespectAppVisibility(this)
             val shouldShowSurface = keyboardVisibilityController.shouldShowSurfaceOnInputStart(
-                autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this)
+                autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this),
+                respectAppVisibility = respectAppVisibility
             )
             if (shouldShowSurface) {
                 ensureImeSurfaceVisible()
+            }
+            if (
+                SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) !=
+                    SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
+                SoftwareKeypadPolicy.shouldAutoOpenOnHardware(
+                    state.inputType,
+                    SettingsManager.getHardwareKeypadAutoOpen(this)
+                )
+            ) {
+                if (respectAppVisibility) pendingKeypadAutoOpen = true else openKeypadForCurrentField()
             }
         }
         
@@ -3797,6 +3867,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         caretBadgeController.onEditorGone()
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         keyboardVisibilityController.cancelPendingSurfaceTransition()
+        pendingKeypadAutoOpen = false
+        endTemporaryKeypad()
+        softwareKeypadSession.onFieldFinished()
         accidentalKeyPressFilter.reset()
         isInputViewActive = false
         if (::candidatesBarController.isInitialized) {

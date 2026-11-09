@@ -19,6 +19,8 @@ sealed class StatusBarButtonId(val key: String) {
     object Symbols : StatusBarButtonId("symbols")
     object Undo : StatusBarButtonId("undo")
     object Redo : StatusBarButtonId("redo")
+    /** Contextual: shown by Plektra in number and phone fields, not user-configurable. */
+    object Keypad : StatusBarButtonId("keypad")
     data class Custom(val customKey: String) : StatusBarButtonId(customKey)
 
     override fun equals(other: Any?): Boolean {
@@ -90,6 +92,9 @@ data class StatusBarCallbacks(
     /** Called when the hardware/virtual keyboard mode override is requested */
     val onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null,
     
+    /** Called when the contextual keypad button is clicked */
+    val onKeypadRequested: (() -> Unit)? = null,
+
     /** Called when language button is long-pressed (opens settings) */
     val onOpenSettings: (() -> Unit)? = null,
     

@@ -83,6 +83,7 @@ class VariationBarView(
     var onHamburgerMenuRequested: (() -> Unit)? = null
     var onMinimalUiToggleRequested: (() -> Unit)? = null
     var onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null
+    var onKeypadRequested: (() -> Unit)? = null
     
     /**
      * Sets the microphone button active state (red pulsing background) during speech recognition.
@@ -511,7 +512,8 @@ class VariationBarView(
             availableWidth, verticalPaddingPx(), roundedCorners, KeyboardBarTypography.scale(context),
             SettingsManager.getDynamicVariationBarSlotCount(context),
             SettingsManager.getDynamicVariationBarResizeToContent(context),
-            SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context)
+            SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context),
+            buttonRegistry?.keypadAccessAvailable == true
         )
         val hasExistingRow = currentVariationsRow != null &&
             currentVariationsRow?.parent == containerView &&
@@ -661,6 +663,7 @@ class VariationBarView(
             onHamburgerMenuRequested = onHamburgerMenuRequested,
             onMinimalUiToggleRequested = onMinimalUiToggleRequested,
             onSoftwareKeyboardModeToggleRequested = onSoftwareKeyboardModeToggleRequested,
+            onKeypadRequested = onKeypadRequested,
             onOpenSettings = { openSettings() },
             onSymbolsPageRequested = onSymbolsPageRequested,
             onUndoRequested = onUndoRequested,

@@ -257,6 +257,9 @@ internal object BackupPreferenceContract {
             "caret_badge_locked_color" to PreferenceValueType.INT,
             "caret_badge_custom_colors" to PreferenceValueType.BOOLEAN,
             "auto_show_keyboard" to PreferenceValueType.BOOLEAN,
+            "auto_show_respect_app_visibility" to PreferenceValueType.BOOLEAN,
+            "hardware_keypad_auto_open" to PreferenceValueType.BOOLEAN,
+            "software_keyboard_emoji_page_in_cycle" to PreferenceValueType.BOOLEAN,
             "keyboard_bar_show_on_launcher" to PreferenceValueType.BOOLEAN,
             "accessibility_live_announcements_enabled" to PreferenceValueType.BOOLEAN,
             "accessibility_read_second_row_enabled" to PreferenceValueType.BOOLEAN,
@@ -479,6 +482,7 @@ internal object BackupPreferenceContract {
         "variations_updated" to "runtime refresh marker",
         "slim_mode_active" to "runtime-derived state",
         "software_keyboard_mode_runtime_override" to "runtime-derived state",
+        "field_scoped_virtual_previous_override" to "runtime-derived state",
         "typing_sound_updated_at" to "runtime refresh marker",
         "clicks_bluetooth_permission_explained" to "permission UI state",
         "clicks_manual_charging_until" to "transient runtime state"
@@ -538,6 +542,7 @@ object PreferenceSchemas {
         "nav_mode_mappings_updated" to PreferenceValueType.LONG,
         "slim_mode_active" to PreferenceValueType.BOOLEAN,
         "software_keyboard_mode_runtime_override" to PreferenceValueType.STRING,
+        "field_scoped_virtual_previous_override" to PreferenceValueType.STRING,
         // Accepted only when importing backups written before the Slim mode rename.
         "pastierina_mode_override" to PreferenceValueType.STRING,
         "pastierina_status_bar_slots_left" to PreferenceValueType.STRING,

@@ -204,6 +204,16 @@ class StatusBarController(
             field = value
             variationBarView?.onSoftwareKeyboardModeToggleRequested = value
         }
+
+    /** Opens the on-screen keypad for the current field from the hardware keyboard bar. */
+    var onKeypadRequested: (() -> Unit)? = null
+        set(value) {
+            field = value
+            variationBarView?.onKeypadRequested = value
+        }
+
+    /** A layout or SYM page picked from the on-screen layout key; see [SoftwareKeyboardPageChoices]. */
+    var onSoftwareKeyboardPageChoice: ((String) -> Unit)? = null
     
     // Callback for speech recognition state changes (active/inactive)
     var onSpeechRecognitionStateChanged: ((Boolean) -> Unit)? = null
@@ -311,6 +321,10 @@ class StatusBarController(
         val softwareCtrlPreviewActive: Boolean = false,
         val softwareAltPreviewLabels: Map<Int, String> = emptyMap(),
         val softwareAltPreviewActive: Boolean = false,
+        /** Layout family for the current field; SYM pages always render over the full layout. */
+        val softwareKeypad: SoftwareKeypad = SoftwareKeypad.FULL,
+        /** Shows the contextual keypad button in the hardware keyboard bar. */
+        val keypadAccessAvailable: Boolean = false,
         // Legacy flag for backward compatibility
         val shouldDisableSmartFeatures: Boolean = false
     ) {
@@ -501,6 +515,7 @@ class StatusBarController(
             onHamburgerMenuRequested = onHamburgerMenuRequested,
             onMinimalUiToggleRequested = { handleMinimalUiToggleFromMenu() },
             onSoftwareKeyboardModeToggleRequested = onSoftwareKeyboardModeToggleRequested,
+            onKeypadRequested = onKeypadRequested,
             onOpenSettings = { openSettings() },
             onSymbolsPageRequested = onSymbolsPageRequested,
             onUndoRequested = onUndoRequested,
@@ -1741,6 +1756,15 @@ class StatusBarController(
                 return true
             }
 
+            override fun onPageChoice(id: String) {
+                onSoftwareKeyboardNonShiftInteraction?.invoke()
+                val page = SoftwareKeyboardPageChoices.pageFromId(id)
+                if (page in 3..4 || (page == null && snapshot.symPage in 3..4)) {
+                    prepareSoftwareKeyboardForSymbolTransition()
+                }
+                onSoftwareKeyboardPageChoice?.invoke(id)
+            }
+
             override fun onSymbolLongPress(keyCode: Int): Boolean {
                 val page = snapshot.symPage
                 if (page !in 1..2) {
@@ -1751,6 +1775,12 @@ class StatusBarController(
             }
         }
         keyboardView.layoutName = layoutName
+        keyboardView.keypad = if (snapshot.symPage == 0) snapshot.softwareKeypad else SoftwareKeypad.FULL
+        keyboardView.layoutKeyLabel = context.getString(R.string.software_keyboard_choice_letters)
+        keyboardView.pageChoices = SoftwareKeyboardPageChoices.build(
+            SettingsManager.getSymPageCycleConfig(context),
+            softwareKeyboardPageChoiceLabels()
+        )
         keyboardView.layoutStyle = softwareKeyboardLayoutStyle()
         keyboardView.includeNumberRow = SettingsManager.getSoftwareKeyboardNumberRowEnabled(context)
         keyboardView.nearestKeyTouchEnabled =
@@ -1784,7 +1814,7 @@ class StatusBarController(
         keyboardView.ctrlPreviewIconRes = snapshot.softwareCtrlPreviewIconRes
         keyboardView.ctrlShortcutDisplay = SettingsManager.getSoftwareCtrlShortcutDisplay(context)
         keyboardView.altPreviewLabels = snapshot.softwareAltPreviewLabels
-        val symKeySpec = nextSoftwareSymKeySpec(snapshot.symPage)
+        val symKeySpec = nextSoftwareSymKeySpec(snapshot.symPage, snapshot.softwareKeypad)
         keyboardView.symbolsLabel = symKeySpec.label
         keyboardView.symbolsIconRes = symKeySpec.iconRes
         keyboardView.spacebarLabel = buildSoftwareKeyboardSpacebarLabel(snapshot)
@@ -1826,8 +1856,19 @@ class StatusBarController(
         val iconRes: Int? = null
     )
 
-    private fun nextSoftwareSymKeySpec(currentPage: Int): SoftwareSymKeySpec {
-        val pageValues = SettingsManager.getSymPagesConfig(context).enabledOrderedPages().mapNotNull { page ->
+    private fun softwareKeyboardPageChoiceLabels() = SoftwareKeyboardPageChoices.Labels(
+        letters = context.getString(R.string.software_keyboard_choice_letters),
+        number = context.getString(R.string.software_keyboard_choice_number),
+        phone = context.getString(R.string.software_keyboard_choice_phone),
+        emojiLayer = "☺",
+        symbols = context.getString(R.string.software_keyboard_choice_symbols),
+        device = context.getString(R.string.software_keyboard_choice_device),
+        clipboard = "📋",
+        emojiPicker = "😀"
+    )
+
+    private fun nextSoftwareSymKeySpec(currentPage: Int, keypad: SoftwareKeypad = SoftwareKeypad.FULL): SoftwareSymKeySpec {
+        val pageValues = SettingsManager.getSymPageCycleConfig(context).enabledOrderedPages().mapNotNull { page ->
             when (page) {
                 rocks.pkb.plektra.SymPagesConfig.PAGE_EMOJI -> 1
                 rocks.pkb.plektra.SymPagesConfig.PAGE_SYMBOLS -> 2
@@ -1855,7 +1896,13 @@ class StatusBarController(
             2 -> SoftwareSymKeySpec("", R.drawable.ic_emoji_symbols_24)
             3 -> SoftwareSymKeySpec("", R.drawable.ic_content_paste_24)
             4 -> SoftwareSymKeySpec("", R.drawable.ic_emoji_emotions_24)
-            else -> SoftwareSymKeySpec("ABC")
+            // Returning from a SYM page lands on the field's keypad when one is active.
+            else -> SoftwareSymKeySpec(
+                context.getString(
+                    if (keypad == SoftwareKeypad.FULL) R.string.software_keyboard_choice_letters
+                    else R.string.software_keyboard_choice_number
+                )
+            )
         }
     }
 
@@ -3019,6 +3066,7 @@ class StatusBarController(
 
     fun update(snapshot: StatusSnapshot, emojiMapText: String = "", inputConnection: android.view.inputmethod.InputConnection? = null, symMappings: Map<Int, String>? = null) {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
+        buttonRegistry.keypadAccessAvailable = snapshot.keypadAccessAvailable
         val isFullSoftwareKeyboardMode =
             mode == Mode.INPUT_VIEW &&
                 SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL

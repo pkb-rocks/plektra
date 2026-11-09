@@ -66,6 +66,7 @@ object SettingsManager {
     private const val KEY_SWIPE_TO_DELETE = "swipe_to_delete"
     private const val KEY_SWIPE_TO_DELETE_PROVIDER = "swipe_to_delete_provider"
     private const val KEY_AUTO_SHOW_KEYBOARD = "auto_show_keyboard"
+    private const val KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY = "auto_show_respect_app_visibility"
     const val KEY_EXPERIMENTAL_SMOOTH_CARET = "experimental_smooth_caret"
     private const val KEY_CLEAR_ALT_ON_SPACE = "clear_alt_on_space"
     private const val KEY_ALT_CTRL_SPEECH_SHORTCUT = "alt_ctrl_speech_shortcut"
@@ -175,6 +176,9 @@ object SettingsManager {
     const val KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE = "software_keyboard_mode_runtime_override"
     private const val KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE = "software_keyboard_layout_style" // compact | extended_iso | full_ansi | full_iso
     private const val KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED = "software_keyboard_number_row_enabled"
+    const val KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE = "software_keyboard_emoji_page_in_cycle"
+    const val KEY_HARDWARE_KEYPAD_AUTO_OPEN = "hardware_keypad_auto_open"
+    private const val KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE = "field_scoped_virtual_previous_override"
     private const val KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED = "software_keyboard_nearest_key_touch_enabled"
     private const val KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY = "software_keyboard_left_modifier_key"
     private const val KEY_SOFTWARE_KEYBOARD_RIGHT_MODIFIER_KEY = "software_keyboard_right_modifier_key"
@@ -665,6 +669,72 @@ object SettingsManager {
         getPreferences(context).edit()
             .putBoolean(KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED, enabled)
             .apply()
+    }
+
+    /** The emoji key-layer page is reachable directly but stays out of the on-screen SYM cycle by default. */
+    fun getSoftwareKeyboardEmojiPageInCycle(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE, false)
+
+    fun setSoftwareKeyboardEmojiPageInCycle(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE, enabled)
+            .apply()
+    }
+
+    /** Opens the compact keypad automatically in number and phone fields on hardware keyboards. */
+    fun getHardwareKeypadAutoOpen(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_HARDWARE_KEYPAD_AUTO_OPEN, false)
+
+    fun setHardwareKeypadAutoOpen(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_HARDWARE_KEYPAD_AUTO_OPEN, enabled)
+            .apply()
+    }
+
+    /**
+     * Switches a hardware-keyboard device to the on-screen surface for the current editor. The
+     * previous runtime override is persisted so that it is restored even after a process restart.
+     */
+    fun beginFieldScopedVirtualKeyboard(context: Context) {
+        val prefs = getPreferences(context)
+        if (!prefs.contains(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE)) {
+            prefs.edit().putString(
+                KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE,
+                getSoftwareKeyboardModeRuntimeOverride(context)?.storageValue.orEmpty()
+            ).apply()
+        }
+        setSoftwareKeyboardModeRuntimeOverride(context, SoftwareKeyboardMode.FORCE_VIRTUAL)
+    }
+
+    /** Restores the override from before [beginFieldScopedVirtualKeyboard]; true if one was active. */
+    fun endFieldScopedVirtualKeyboard(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        val previous = prefs.getString(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE, null) ?: return false
+        prefs.edit().remove(KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE).apply()
+        // A mode the user switched in the meantime stays.
+        if (getSoftwareKeyboardModeRuntimeOverride(context) == SoftwareKeyboardMode.FORCE_VIRTUAL) {
+            setSoftwareKeyboardModeRuntimeOverride(
+                context,
+                SoftwareKeyboardMode.values().firstOrNull { it.storageValue == previous && it != SoftwareKeyboardMode.AUTO }
+            )
+        }
+        return true
+    }
+
+    /**
+     * Pages that SYM cycles through. The on-screen keyboard leaves out the emoji key layer unless
+     * enabled; direct access to every page is unaffected.
+     */
+    fun getSymPageCycleConfig(context: Context): SymPagesConfig {
+        val config = getSymPagesConfig(context)
+        return if (
+            resolveEffectiveSoftwareKeyboardMode(context) == SoftwareKeyboardMode.FORCE_VIRTUAL &&
+            !getSoftwareKeyboardEmojiPageInCycle(context)
+        ) {
+            config.copy(emojiEnabled = false)
+        } else {
+            config
+        }
     }
 
     fun getSoftwareKeyboardNearestKeyTouchEnabled(context: Context): Boolean =
@@ -2243,6 +2313,19 @@ object SettingsManager {
         return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
     }
     
+    /**
+     * With automatic showing enabled, Plektra still leaves the decision to Android and the app at
+     * input start; their show requests, a tap or a key press open the keyboard.
+     */
+    fun getAutoShowRespectAppVisibility(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY, true)
+
+    fun setAutoShowRespectAppVisibility(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_AUTO_SHOW_RESPECT_APP_VISIBILITY, enabled)
+            .apply()
+    }
+
     /**
      * Sets the state of automatically showing the keyboard when a field gains focus.
      */

@@ -167,9 +167,18 @@ class KeyboardVisibilityController(
         postToUiDelayed(RETRY_DELAY_MS) { present(ticket, attempt + 1) }
     }
 
-    fun shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled: Boolean): Boolean =
+    /**
+     * The hardware bar always follows the editor. The on-screen keyboard shows itself on input start
+     * only when automatic showing is on and app/Android display defaults are not respected: Android
+     * does not tell an IME the window's soft-input state, so respecting them means waiting for
+     * Android's show request (forward navigation, STATE_VISIBLE, a tap) instead of forcing a show.
+     */
+    fun shouldShowSurfaceOnInputStart(
+        autoShowKeyboardEnabled: Boolean,
+        respectAppVisibility: Boolean = false
+    ): Boolean =
         SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) !=
-            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL || autoShowKeyboardEnabled
+            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL || (autoShowKeyboardEnabled && !respectAppVisibility)
 
     fun onImeWindowVisibilityChanged(shown: Boolean) {
         windowShown = shown

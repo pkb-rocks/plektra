@@ -48,18 +48,16 @@ class SymLayoutController(
     fun isSymActive(): Boolean = currentSymPage() > 0
 
     fun toggleSymPage(): Int {
-        val config = SettingsManager.getSymPagesConfig(context)
-        alignSymPageToConfig(config)
-        val pages = buildActivePages(config)
+        alignSymPageToConfig()
+        val pages = buildActivePages(SettingsManager.getSymPageCycleConfig(context))
         symPage = nextSymPageValue(pages)
         persistSymPage()
         return symPage
     }
 
     fun peekNextSymPage(): Int {
-        val config = SettingsManager.getSymPagesConfig(context)
-        alignSymPageToConfig(config)
-        return nextSymPageValue(buildActivePages(config))
+        alignSymPageToConfig()
+        return nextSymPageValue(buildActivePages(SettingsManager.getSymPageCycleConfig(context)))
     }
 
     fun closeSymPage(): Boolean {
@@ -125,6 +123,14 @@ class SymLayoutController(
         return true
     }
 
+    /** Opens a page directly, e.g. from the on-screen page chooser; unlike the toggles it never closes. */
+    fun openPage(page: Int): Boolean {
+        if (page !in 1..5 || symPage == page) return false
+        symPage = page
+        persistSymPage()
+        return true
+    }
+
     fun reset() {
         symPage = 0
         persistSymPage()
@@ -184,9 +190,8 @@ class SymLayoutController(
     }
 
     private fun nextSoftwareTextPageType(): SymPage? {
-        val config = SettingsManager.getSymPagesConfig(context)
-        alignSymPageToConfig(config)
-        val pages = buildActivePages(config)
+        alignSymPageToConfig()
+        val pages = buildActivePages(SettingsManager.getSymPageCycleConfig(context))
         if (pages.isEmpty()) {
             return null
         }

@@ -10,6 +10,7 @@ import rocks.pkb.plektra.inputmethod.statusbar.button.LanguageButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.MinimalUiButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.MicrophoneButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.KeyboardPickerButtonFactory
+import rocks.pkb.plektra.inputmethod.statusbar.button.KeypadButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.SettingsButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.SoftwareKeyboardModeButtonFactory
 import rocks.pkb.plektra.inputmethod.statusbar.button.SymbolsButtonFactory
@@ -65,6 +66,7 @@ class StatusBarButtonRegistry {
         factories[StatusBarButtonId.Symbols] = symbolsFactory
         factories[StatusBarButtonId.Undo] = undoFactory
         factories[StatusBarButtonId.Redo] = redoFactory
+        factories[StatusBarButtonId.Keypad] = KeypadButtonFactory()
     }
     
     /**
@@ -154,18 +156,26 @@ class StatusBarButtonRegistry {
      * @param context Android context (for reading settings)
      * @return List of enabled button configurations, sorted for display
      */
+    /** Adds the contextual keypad button in front of the right-hand buttons while set. */
+    var keypadAccessAvailable: Boolean = false
+
     fun getEnabledButtons(context: Context): List<StatusBarButtonConfig> {
-        return getEnabledButtons(
+        return withContextualButtons(getEnabledButtons(
             leftSlots = SettingsManager.getStatusBarSlotsLeft(context),
             rightSlots = SettingsManager.getStatusBarSlotsRight(context)
-        )
+        ))
     }
 
     fun getEnabledSlimButtons(context: Context): List<StatusBarButtonConfig> {
-        return getEnabledButtons(
+        return withContextualButtons(getEnabledButtons(
             leftSlots = SettingsManager.getSlimStatusBarSlotsLeft(context),
             rightSlots = SettingsManager.getSlimStatusBarSlotsRight(context)
-        )
+        ))
+    }
+
+    private fun withContextualButtons(buttons: List<StatusBarButtonConfig>): List<StatusBarButtonConfig> {
+        if (!keypadAccessAvailable) return buttons
+        return listOf(StatusBarButtonConfig(StatusBarButtonId.Keypad, StatusBarButtonPosition.RIGHT, order = Int.MIN_VALUE)) + buttons
     }
 
     fun getEnabledButtons(

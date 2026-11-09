@@ -233,6 +233,20 @@ class CandidatesBarController(
             candidatesStatusBar.onSoftwareKeyboardModeToggleRequested = value
         }
 
+    var onKeypadRequested: (() -> Unit)? = null
+        set(value) {
+            field = value
+            inputStatusBar.onKeypadRequested = value
+            candidatesStatusBar.onKeypadRequested = value
+        }
+
+    var onSoftwareKeyboardPageChoice: ((String) -> Unit)? = null
+        set(value) {
+            field = value
+            inputStatusBar.onSoftwareKeyboardPageChoice = value
+            candidatesStatusBar.onSoftwareKeyboardPageChoice = value
+        }
+
     fun getInputView(emojiMapText: String = ""): LinearLayout {
         return inputStatusBar.getOrCreateLayout(emojiMapText)
     }

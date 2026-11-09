@@ -65,6 +65,22 @@ class ShowcaseReceiverNotesTest {
         reopened.pause().stop().destroy()
     }
 
+    @Test fun restoredCaptureClosesVisibleEditorWithoutChangingRestoredPreferences() {
+        val personal = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        personal.get().findViewById<EditText>(R.id.notes_body).setText("Personal note")
+        personal.pause().stop().destroy()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("note",
+            JSONObject().put("body", "Synthetic capture").toString())))
+        val capture = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        assertEquals(Activity.RESULT_OK, broadcast(Intent().putExtra("restore", true)))
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        val restored = prefs.all.toMap()
+        org.junit.Assert.assertTrue("visible orphan closes immediately", capture.get().isFinishing)
+        capture.pause().stop().destroy()
+        assertEquals(restored, prefs.all)
+        assertEquals(listOf("Personal note"), NotesRepository(prefs).all().map { it.body })
+    }
+
     private fun broadcast(intent: Intent): Int {
         var result: Int? = null
         context.sendOrderedBroadcast(intent.setClass(context, ShowcaseReceiver::class.java), null,

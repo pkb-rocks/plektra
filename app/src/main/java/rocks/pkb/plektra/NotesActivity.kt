@@ -43,6 +43,9 @@ open class NotesActivity : Activity() {
     private val notePrefs by lazy { getSharedPreferences(notesPreferencesName, MODE_PRIVATE) }
     private val notes by lazy { NotesRepository(notePrefs) }
     private lateinit var selectedNote: NotesRepository.Note
+    private val noteCollectionListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "collection") closeRemovedNote()
+    }
     private var loadingNote = false
     private val undo = ArrayDeque<String>()
     private val redo = ArrayDeque<String>()
@@ -323,10 +326,23 @@ open class NotesActivity : Activity() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onStart() {
+        super.onStart()
+        notePrefs.registerOnSharedPreferenceChangeListener(noteCollectionListener)
+    }
+
+    override fun onStop() {
+        notePrefs.unregisterOnSharedPreferenceChangeListener(noteCollectionListener)
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
-        // A note removed while this editor was stopped must not leave an editable orphan.
-        if (notes.all().none { it.id == selectedNote.id }) finish()
+        closeRemovedNote()
+    }
+
+    private fun closeRemovedNote() {
+        if (!isFinishing && notes.all().none { it.id == selectedNote.id }) finish()
     }
 
     override fun onPause() {

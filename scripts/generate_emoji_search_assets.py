@@ -14,7 +14,7 @@ import urllib.request
 from pathlib import Path
 
 
-CLDR_JSON_VERSION = "48.2.1"
+CLDR_JSON_VERSION = "49.0.0"
 CLDR_BASE = (
     "https://raw.githubusercontent.com/unicode-org/cldr-json/"
     f"{CLDR_JSON_VERSION}/cldr-json/cldr-annotations-full/annotations"

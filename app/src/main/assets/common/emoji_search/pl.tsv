@@ -837,6 +837,7 @@
 🛖	chata	chata|chatka|dom|domek|jurta|okrągły|przytulny|schronienie|strzecha
 🛗	winda	dostępność|dźwig osobowy|podnośnik|winda|wyciąg pionowy
 🛘	osuwisko	góra|katastrofa|lawina|lawina błotna|niebezpieczeństwo|skały|trzęsienie ziemi
+🛙	latarnia morska	kierować|latarnia morska|morska|morze|nadzieja|nawigacja|oświecenie|światło|sygnał
 🛜	bezprzewodowy	bezprzewodowe|bezprzewodowy|hotspot|internet|komputer|łączność|router|sieć|szerokopasmowe|wi-fi|wifi|wlan
 🛝	zjeżdżalnia	park rozrywki|plac zabaw|ślizgawka|wesołe miasteczko|zabawa|zjeżdżalnia
 🛞	koło pojazdu	koło|koło pojazdu|kręcić|opona|samochód
@@ -1151,6 +1152,9 @@
 🪈	flet	dęty|drewniany|flet|fujarka|grać|gwizdać|instrument|muzyka|na flecie|orkiestra|piccolo|pikolo|piszczałka|prosty
 🪉	harfa	amorek|harfa|instrument|miłość|muzyka|orkiestra
 🪊	puzon	instrument|instrument dęty blaszany|jazz|muzyka|smutek|suwak
+🪋	meteor	apokalipsa|grawitacja|gwiazda|kula ognia|przestrzeń|skała|spadać
+🪌	gumka	błąd|cofnąć|kasować|pisanie|pomyłka|poprawka|rysunek|usuwać|wycierać|zmazać
+🪍	siatka z rączką	łapać|pułapka|siatka|zbierać
 🪎	skrzynia skarbów	bogactwo|kamień szlachetny|klejnot|kosztowności|łup|nagroda|pieniądze|srebro|złoto
 🪏	łopata	dziura|kopać|łopata|szpadel
 🪐	planeta z pierścieniami	pierścienie|planeta|planeta z pierścieniami|saturn|saturnowy
@@ -1209,6 +1213,7 @@
 🫅	osoba w koronie	korona|król|królewski|monarcha|osoba w koronie|szlachta
 🫆	odcisk palca	bezpieczeństwo|odcisk palca|tożsamość
 🫈	włochate stworzenie	człowiek z lasu|gigant|kryptyda|las|sasquatch|wielka stopa|włochate|yeti
+🫌	monarcha	delikatność|gąsienica|metamorfoza|migracja|motyl|nadzieja|owad|transformacja|zmiana
 🫍	orka	morski|ocean|wieloryb
 🫎	łoś	łoś|poroże|ssak|zwierzę
 🫏	osioł	muł|osioł|osiołek|ssak|uparty|zwierzę
@@ -1225,6 +1230,7 @@
 🫚	korzeń imbiru	imbir|imbiru|korzeń|naturalne|przyprawa|zdrowie|zioła|zioło
 🫛	strąk grochu	edamame|fasola|groch|grochu|łuskać|roślina|soja|sojowa|strączek|strączkowa|strąk|warzywo
 🫜	warzywo korzeniowe	burak|korzeń|ogród|rzepa|warzywo
+🫝	ogórek kiszony	fermentacja|korniszon|ogórek|przyprawa|przyprawiać|sezon ogórkowy|solanka
 🫟	rozbryzg	farba|holi|plama|rozbryzg|rozlanie
 🫠	roztapiająca się twarz	gorąco|płynna twarz|rozpuszczająca się twarz|rozpuszczanie się|roztapiająca się twarz|roztapianie się|sarkazm|zawstydzenie|znikająca twarz
 🫡	salutująca twarz	ok|pogodna twarz|powodzenia|salutowanie|salutująca twarz|tak jest|wojsko
@@ -1237,6 +1243,7 @@
 🫨	wstrząśnięta twarz	drganie|łał|niespodzianka|omg|oszołomienie|szaleństwo|szok|trzęsienie ziemi|twarz|wibracje|wow|wstrząs|wstrząśnięta twarz
 🫩	twarz z workami pod oczami	podkrążone oczy|senność|worki pod oczami|zmęczenie
 🫪	wykrzywiona twarz	bezradność|niepokój|opuchlizna|panika|szok|zaskoczenie
+🫫	popękana twarz	maskowanie|napięcie|odporność|pokruszona|połamana|transformacja|ujawniać
 🫯	chmura walki	awantura|dyskusja|kłótnia|raban|różnica zdań|walka
 🫰	dłoń ze skrzyżowanym palcem wskazującym i kciukiem	dłoń ze skrzyżowanym palcem wskazującym i kciukiem|drogie|miłość|pieniądze|pstryknięcie palcami|serce
 🫱	dłoń skierowana w prawo	dłoń|dłoń skierowana w prawo|prawa|uścisk dłoni|w prawo|wyciągnięta dłoń
@@ -1247,3 +1254,5 @@
 🫶	dłonie tworzące serce	<3|dłonie tworzące serce|miłość|serce
 🫷	dłoń pchająca w lewo	blokować|czekać|dłoń|dłoń pchająca w lewo|odmawiać|pchać|piątka|stop|w lewo|wstrzymać
 🫸	dłoń pchająca w prawo	blokować|czekać|dłoń|dłoń pchająca w prawo|odmawiać|pchać|piątka|stop|w prawo|wstrzymać
+🫹	gest kciuka w lewo	chwyt|lewo|neutralny|punkt|ten|to
+🫺	gest kciuka w prawo	chwyt|neutralny|prawo|punkt|ten|to

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Update Plektra's generated emoji assets from pinned Unicode sources.
+"""Update Plektra's generated emoji, symbol and emoji font assets from pinned sources.
 
-The generator intentionally pins both Unicode Emoji and CLDR. ``--check`` runs
-the complete generation in a temporary tree and fails when committed assets are
-stale, without modifying the checkout.
+The generator intentionally pins Unicode Emoji, the Unicode Character Database,
+CLDR and the bundled Noto Color Emoji font. ``--check`` runs the complete
+generation in a temporary tree and fails when committed assets are stale,
+without modifying the checkout. ``scripts/verify_emoji_font_coverage.py``
+verifies that the bundled font draws every emoji the picker offers.
 """
 
 from __future__ import annotations
 
 import argparse
 import filecmp
+import hashlib
 import json
 import re
 import shutil
@@ -21,11 +24,24 @@ from collections import OrderedDict
 from pathlib import Path
 
 
-UNICODE_EMOJI_VERSION = "17.0"
-CLDR_JSON_VERSION = "48.2.1"
+UNICODE_EMOJI_VERSION = "18.0"
+CLDR_JSON_VERSION = "49.0.0"
 EMOJI_TEST_URL = (
     f"https://www.unicode.org/Public/{UNICODE_EMOJI_VERSION}.0/emoji/emoji-test.txt"
 )
+UNICODE_DATA_URL = f"https://www.unicode.org/Public/{UNICODE_EMOJI_VERSION}.0/ucd/UnicodeData.txt"
+EMOJI_DATA_URL = f"https://www.unicode.org/Public/{UNICODE_EMOJI_VERSION}.0/ucd/emoji/emoji-data.txt"
+# Noto Color Emoji 2.057 (Unicode 18.0), CBDT bitmaps with EmojiCompat metadata: CBDT renders on
+# every supported Android version (COLRv1 would need Android 12).
+NOTO_EMOJI_TAG = "v2026-09-24-unicode18_0"
+NOTO_EMOJI_FONT_URL = (
+    "https://raw.githubusercontent.com/googlefonts/noto-emoji/"
+    f"{NOTO_EMOJI_TAG}/2D/fonts/NotoColorEmoji-emojicompat.ttf"
+)
+NOTO_EMOJI_FONT_SHA256 = "c7e2931d6bd9e0a78e3f7e50d6a9dad2217f4bb4b83b4ef2c0d34aeb88bbecf0"
+NOTO_EMOJI_FONT_ASSET = "app/src/main/assets/fonts/NotoColorEmoji-emojicompat.ttf"
+# Symbols offered by the symbol search: symbols, punctuation and numeric symbols.
+SYMBOL_CATEGORIES = {"Sm", "Sc", "Sk", "So", "Pc", "Pd", "Ps", "Pe", "Pi", "Pf", "Po", "No"}
 CLDR_ANNOTATIONS_BASE_URL = (
     "https://raw.githubusercontent.com/unicode-org/cldr-json/"
     f"{CLDR_JSON_VERSION}/cldr-json/cldr-annotations-full/annotations"
@@ -57,6 +73,8 @@ VERSION_TO_MIN_API = {
     "E15.1": 34,
     "E16.0": 35,
 }
+# Emoji versions newer than the last known system font mapping: runtime-gated.
+RUNTIME_GATED_VERSIONS = {"E17.0", "E18.0"}
 
 SKIN_TONES = {chr(codepoint) for codepoint in range(0x1F3FB, 0x1F400)}
 
@@ -158,7 +176,7 @@ def min_api_for_version(version: str) -> int | None:
     # Android system emoji fonts can update independently of the OS. Unknown
     # versions are therefore runtime-gated with Paint.hasGlyph instead of being
     # exposed through an invented API level.
-    if version == "E17.0":
+    if version in RUNTIME_GATED_VERSIONS:
         return 0
     return VERSION_TO_MIN_API.get(version)
 
@@ -222,6 +240,61 @@ def update_categories(emoji_dir: Path, records: list[dict[str, str]]) -> int:
         encoding="utf-8",
     )
     return len(added_records)
+
+
+def repair_non_rgi_heads(emoji_dir: Path, records: list[dict[str, str]]) -> int:
+    """Merges lines headed by a sequence that is not an emoji into the emoji it tones.
+
+    Skin-toned multi-person sequences (🫱🏻‍🫲🏼, 👩🏻‍🤝‍👩🏼) have no untoned sequence of their own:
+    their untoned form is a different emoji (🤝, 👭) that shares their name.
+    """
+    qualified = {record["emoji"] for record in records}
+    by_name = {
+        record["name"]: record["emoji"]
+        for record in records
+        if strip_skin_tones(record["emoji"]) == record["emoji"]
+    }
+    name_of = {record["emoji"]: record["name"] for record in records}
+    files, token_locations = load_category_files(emoji_dir)
+    removed: set[str] = set()
+    for file_name, lines in files.items():
+        for tokens in list(lines):
+            head = tokens[0]
+            if head in qualified:
+                continue
+            variants = tokens[1:]
+            base = next(
+                (
+                    by_name.get(name_of[variant].split(":", 1)[0])
+                    for variant in variants
+                    if variant in name_of
+                ),
+                None,
+            )
+            location = token_locations.get(base) if base else None
+            if location is None:
+                continue
+            target = files[location[0]][location[1]]
+            target.extend(variant for variant in variants if variant not in target)
+            lines.remove(tokens)
+            removed.add(head)
+    if not removed:
+        return 0
+    for file_name, lines in files.items():
+        (emoji_dir / file_name).write_text(
+            "".join(" ".join(tokens) + "\n" for tokens in lines),
+            encoding="utf-8",
+        )
+    min_api_path = emoji_dir / "minApi.txt"
+    min_api = load_min_api(min_api_path)
+    min_api_path.write_text(
+        "".join(
+            f"{api} {' '.join(emoji for emoji in emojis if emoji not in removed)}\n"
+            for api, emojis in sorted(min_api.items())
+        ),
+        encoding="utf-8",
+    )
+    return len(removed)
 
 
 def load_project_emojis(emoji_dir: Path) -> set[str]:
@@ -328,12 +401,75 @@ def rebuild_shortcodes_from_committed_search(root: Path) -> None:
     )
 
 
+def parse_emoji_presentation(text: str) -> set[int]:
+    codepoints: set[int] = set()
+    for line in text.splitlines():
+        data = line.split("#", 1)[0].strip()
+        if not data or "Emoji_Presentation" not in data.split(";", 1)[1]:
+            continue
+        span = data.split(";", 1)[0].strip()
+        start, _, end = span.partition("..")
+        codepoints.update(range(int(start, 16), int(end or start, 16) + 1))
+    return codepoints
+
+
+def build_symbol_rows(unicode_data: str, emoji_presentation: set[int]) -> list[tuple[int, str]]:
+    rows: list[tuple[int, str]] = []
+    for line in unicode_data.splitlines():
+        fields = line.split(";")
+        if len(fields) < 3 or fields[2] not in SYMBOL_CATEGORIES:
+            continue
+        codepoint = int(fields[0], 16)
+        name = fields[1]
+        if name.startswith("<") or codepoint in emoji_presentation:
+            continue
+        # Regional indicators and skin tone modifiers only form emoji.
+        if 0x1F1E6 <= codepoint <= 0x1F1FF or 0x1F3FB <= codepoint <= 0x1F3FF:
+            continue
+        rows.append((codepoint, name.lower()))
+    return rows
+
+
+def write_symbol_tsv(path: Path, rows: list[tuple[int, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        f"# Plektra symbol search: code point (hex) and Unicode name. Unicode {UNICODE_EMOJI_VERSION}.0.\n"
+        "# Symbols, punctuation and numeric symbols, except those with emoji presentation.\n"
+        + "".join(f"{codepoint:X}\t{name}\n" for codepoint, name in rows),
+        encoding="utf-8",
+    )
+
+
+def build_symbol_search_rows(
+    annotations: dict[str, dict], symbols: set[str]
+) -> list[tuple[str, str, list[str]]]:
+    # CLDR annotates many text symbols too (→, €, ±): their localized names make the symbol
+    # search work in every search language.
+    return build_search_rows(annotations, symbols)
+
+
+def ensure_noto_font(root: Path) -> None:
+    path = root / NOTO_EMOJI_FONT_ASSET
+    if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == NOTO_EMOJI_FONT_SHA256:
+        return
+    with urllib.request.urlopen(NOTO_EMOJI_FONT_URL, timeout=120) as response:
+        payload = response.read()
+    digest = hashlib.sha256(payload).hexdigest()
+    if digest != NOTO_EMOJI_FONT_SHA256:
+        raise SystemExit(f"Noto Color Emoji checksum mismatch: {digest}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+
+
 def generate(root: Path) -> tuple[str, int]:
     emoji_dir = root / "app/src/main/assets/common/emoji"
     search_dir = root / "app/src/main/assets/common/emoji_search"
     shortcode_path = root / "app/src/main/assets/common/emoji_shortcodes.json"
+    symbols_path = root / "app/src/main/assets/common/symbols/symbols.tsv"
+    symbol_search_dir = root / "app/src/main/assets/common/symbol_search"
     emoji_version, records = parse_emoji_test(fetch_text(EMOJI_TEST_URL))
     added_count = update_categories(emoji_dir, records)
+    repair_non_rgi_heads(emoji_dir, records)
     allowed_emojis = load_project_emojis(emoji_dir)
     annotations_by_locale = {locale: fetch_annotations(locale) for locale in SEARCH_LOCALES}
     for locale, annotations in annotations_by_locale.items():
@@ -344,6 +480,16 @@ def generate(root: Path) -> tuple[str, int]:
         allowed_emojis,
         emoji_categories(emoji_dir),
     )
+    symbol_rows = build_symbol_rows(
+        fetch_text(UNICODE_DATA_URL), parse_emoji_presentation(fetch_text(EMOJI_DATA_URL))
+    )
+    write_symbol_tsv(symbols_path, symbol_rows)
+    symbol_set = {chr(codepoint) for codepoint, _ in symbol_rows} - allowed_emojis
+    for locale, annotations in annotations_by_locale.items():
+        write_search_tsv(
+            symbol_search_dir / f"{locale}.tsv", build_symbol_search_rows(annotations, symbol_set)
+        )
+    ensure_noto_font(root)
     return emoji_version, added_count
 
 
@@ -351,7 +497,11 @@ def generated_files(root: Path) -> list[Path]:
     common = root / "app/src/main/assets/common"
     return sorted((common / "emoji").glob("*.txt")) + sorted(
         (common / "emoji_search").glob("*.tsv")
-    ) + [common / "emoji_shortcodes.json"]
+    ) + sorted((common / "symbol_search").glob("*.tsv")) + [
+        common / "emoji_shortcodes.json",
+        common / "symbols" / "symbols.tsv",
+        root / NOTO_EMOJI_FONT_ASSET,
+    ]
 
 
 def check(root: Path) -> int:
@@ -364,6 +514,10 @@ def check(root: Path) -> int:
         shortcode_source = source_common / "emoji_shortcodes.json"
         if shortcode_source.exists():
             shutil.copy2(shortcode_source, target_common / shortcode_source.name)
+        font_source = root / NOTO_EMOJI_FONT_ASSET
+        if font_source.exists():
+            (temp_root / NOTO_EMOJI_FONT_ASSET).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(font_source, temp_root / NOTO_EMOJI_FONT_ASSET)
         generate(temp_root)
         stale: list[str] = []
         for generated in generated_files(temp_root):

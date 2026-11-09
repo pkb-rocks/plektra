@@ -18,7 +18,7 @@
 ♍	Segno zodiacale della Vergine	oroscopo|segno zodiacale|Segno zodiacale della Vergine|Vergine|zodiaco
 ♎	Segno zodiacale della Bilancia	Bilancia|oroscopo|segno zodiacale|Segno zodiacale della Bilancia|zodiaco
 ♏	Segno zodiacale dello Scorpione	oroscopo|Scorpione|segno zodiacale|Segno zodiacale dello Scorpione|zodiaco
-♐	Segno zodiacale del Saggitario	oroscopo|Sagittario|segno zodiacale|Segno zodiacale del Saggitario|zodiaco
+♐	Segno zodiacale del Sagittario	oroscopo|Sagittario|segno zodiacale|Segno zodiacale del Saggitario|zodiaco
 ♑	Segno zodiacale del Capricorno	Capricorno|oroscopo|segno zodiacale|Segno zodiacale del Capricorno|zodiaco
 ♒	Segno zodiacale dell’Acquario	Acquario|segno zodiacale|Segno zodiacale dell’Acquario|zodiaco
 ♓	Segno zodiacale dei Pesci	oroscopo|Pesci|segno zodiacale|Segno zodiacale dei Pesci|zodiaco
@@ -71,7 +71,7 @@
 🆘	pulsante SOS	aiuto|pulsante SOS|Segnale di SOS|simbolo di SOS|simbolo SOS|soccorsi|soccorso|SOS
 🆙	pulsante UP!	alto|in alto|pulsante|simbolo UP!|sù|tasto UP!|UP!
 🆚	pulsante VS	contro|pulsante|simbolo contro|tasto|versus|vs
-🈁	ideogramma giapponese per “Qui”	giapponese|katakana|parola|pulsante|qui|simbolo|tabelloni|tasto|ココ
+🈁	ideogramma giapponese per “Qui”	giapponese|katakana|parola|pulsante|qui|simbolo|tabelloni|tasto
 🈚	ideogramma giapponese di “Gratis”	giapponese|gratis|ideogramma|ideogramma giapponese di “Gratis”|negazione
 🈯	ideogramma giapponese di “Riservato”	direzione|dito|giapponese|ideogramma|ideogramma giapponese di “Riservato”|indicare|riservato
 🈲	ideogramma giapponese di “Proibito”	giapponese|ideogramma|ideogramma giapponese di “Proibito”|proibito
@@ -144,7 +144,7 @@
 🍅	pomodoro	cibo|pomodoro|rosso|verdura
 🍆	melanzana	cibo|melanzana|verdura
 🍇	uva	cibo|dioniso|frutta|frutto|grappolo|grappolo d’uva|uva|vino|viola
-🍈	melone	cantaloupe|cibo|frutta|frutto|melone|oliva
+🍈	melone	cibo|frutta|frutto|melone
 🍉	anguria	anguria|cibo|frutta|frutto
 🍊	mandarino	agrume|agrumi|arancia|cibo|frutta|frutto|mandarino|vitamina C
 🍋	limone	agrume|aspro|cibo|estate|frutta|frutto|giallo|limone
@@ -182,9 +182,9 @@
 🍪	biscotto	biscottino|biscotto|cibo|cioccolato|cookie|dessert|dolce|gocce di cioccolato|ristorante|zucchero
 🍫	cioccolato	barretta di cioccolato|break|cibo|cioccolata|cioccolato|dolce|dolcetto|felicità|goloso|halloween|ristorante|snack
 🍬	caramella	caramella|caramelle|dolce|dolcetti|dolcetto|dolci|dolciume|halloween|zucchero
-🍭	lecca lecca	caramella|chupa chups|dolce|dolcetti|dolcetto|dolci|lecca lecca|ristorante|willi wonka|zucchero
+🍭	lecca lecca	caramella|dolce|dolcetto|lecca lecca|ristorante|zucchero
 🍮	budino	budino|cibo|creme caramel|dessert|dolce|dolci|pudding|ristorante|zucchero
-🍯	barattolo di miele	api|barattolo|barattolo di miele|cibo|dolce|miele|ristorante|vaso|vaso di miele|winnie the pooh|zucchero
+🍯	barattolo di miele	api|barattolo|cibo|dolce|miele|ristorante|vaso di miele|zucchero
 🍰	fetta di torta	dessert|dolce|fetta|fetta di torta|ristorante|torta|zucchero
 🍱	bento box	bento box|lunch box|monoporzione|piatto pronto|ristorante
 🍲	pentola di cibo	cibo|ciotola di cibo|minestra|pentola di cibo|ristorante|stufato|zuppa
@@ -200,7 +200,7 @@
 🍼	biberon	bambina|bambino|bebé|bere|biberon|bimba|bimbo|fame|latte|neonata|neonato|tenero
 🍾	bottiglia stappata	auguri|bar|bere|brindisi|celebrare|champagne|congratulazioni|festeggiare|spumante|stappare|tappo
 🍿	popcorn	cibo|cinema|mais|popcorn
-🎀	fiocco	auguri|bambina|bebé|festa|fiocco|fiocco rosa|neonata
+🎀	fiocco	auguri|festa|fiocco
 🎁	regalo	dono|festa|fiocco|Natale|pacchetto|regalino|regalo|sorpresa
 🎂	torta di compleanno	auguri di compleanno|buon compleanno|candeline|cibo|compleanno|dolce|festa|festeggiare|pasticceria|tanti auguri|torta di compleanno|zucchero
 🎃	zucca di Halloween	festa|Halloween|lanterna|zucca|zucca di Halloween
@@ -229,9 +229,9 @@
 🎦	simbolo del cinema	cinema|cinepresa|film|filmare|hollywood|intrattenimento|simbolo del cinema|simbolo film
 🎧	cuffie	ascoltare|auricolari|cuffie|intrattenimento|musica|suono
 🎨	tavolozza	arte|artista|colori|creativo|dipingere|palette|pittore|pittura|tavolozza|tavolozza dei colori
-🎩	cilindro	abbigliamento|bombetta|cappello|cilindro|elegante|inglese|intrattenimento|lincoln|mago
-🎪	circo	circo|festa|fiera|intrattenimento|orfei|spettacolo|tenda|tenda da circo|tendone
-🎫	biglietto	ammissione|biglietto|cartellino|giallo|ingresso
+🎩	cilindro	abbigliamento|cappello|cilindro|elegante|inglese|intrattenimento|lincoln|mago
+🎪	circo	circo|festa|fiera|intrattenimento|spettacolo|tenda|tenda da circo|tendone
+🎫	biglietto	ammissione|biglietto|cartellino|ingresso
 🎬	ciak	ciak|ciak si gira|cinema|film|filmare|intrattenimento|lavagna|regista|scena|tavoletta
 🎭	maschere	arte|arti performative|carnevale|dietro le quinte|intrattenimento|maschere|palco|performance|recitare|scena|shakespeare|teatro
 🎮	gamepad	console|gamepad|giocare|gioco|joystick|videogioco
@@ -246,7 +246,7 @@
 🎷	sassofono	blues|jazz|musica|sassofono|sax|strumento|strumento musicale|suonare
 🎸	chitarra	band|basso|chitarra|corde|elettrica|musica|rock|strumento|strumento musicale|suonare
 🎹	piano	classica|comporre|jazz|musica|piano|pianoforte|strumento|strumento musicale|suonare|tastiera
-🎺	tromba	band|banda|blues|concerto|gruppo|jazz|musica|strumento|strumento musicale|tromba|trombone
+🎺	tromba	band|banda|blues|concerto|gruppo|jazz|musica|strumento|strumento musicale
 🎻	violino	musica|orchestra|strumento|strumento musicale|suonare|violino
 🎼	pentagramma	chiave|chiave di violino|musica|partitura|pentagramma
 🎽	maglia da corsa	abbigliamento|correre|corsa|fascia|maglia|maglia da corsa|maglia da corsa con fascia|sport
@@ -270,7 +270,7 @@
 🏓	ping pong	giocare|gioco|pallina|ping pong|racchetta|rete|sport|tennis da tavolo|tennis tavolo
 🏠	casa	abitazione|casa|casa di campagna|casetta|edificio|fattoria|villetta
 🏡	casa con giardino	abitazione|casa|casa con giardino|casa di campagna|casetta|edificio|giardino|nido|villa|villetta
-🏢	edificio	edificio|edificio di uffici|edifico di uffici|palazzo|ufficio
+🏢	edificio	edificio|edificio di uffici|lavoro|palazzo|ufficio
 🏣	ufficio postale giapponese	edificio|giapponese|palazzo|posta|ufficio postale|ufficio postale giapponese
 🏤	ufficio postale	edificio|europeo|posta|ufficio postale|ufficio postale europeo
 🏥	ospedale	clinica|COVID|edificio|emergenza|infermiera|infermiere|malattia|medici|medicina|ospedale|pronto soccorso
@@ -314,7 +314,7 @@
 🐕	cane	abbaiare|animale|animale domestico|animali|cagnolino|cane|cucciolo
 🐕‍🦺	cane da assistenza	accessibilità|animale|cane|cane d’assistenza|cane da assistenza|cane da salvataggio|cane di servizio|cane guida
 🐖	maiale	animale|animali|fattoria|maiale|scrofa
-🐗	cinghiale	animale|animali|bosco|cinghiale|faccina cinghiale|game of thones|maiale selvatico
+🐗	cinghiale	animale|bosco|cinghiale|maiale selvatico
 🐘	elefante	animale|elefante|savana|selvatico
 🐙	polpo	animale|animali|mare|oceano|polipo|polpo
 🐚	conchiglia	animale|conchiglia|conchiglia a spirale|mare|oceano|spiaggia
@@ -361,7 +361,7 @@
 👃	naso	annusare|corpo|faccia|ficcanaso|fiutare|naso|odore|profumo
 👄	bocca	bacio|bocca|corpo|faccia|labbra|rossetto|sexy|smack
 👅	lingua	corpo|faccia|lingua|linguaccia|slurp
-👆	indice alzato	dito|dito alzato|dito in su|dito indice|in alto|indice alzato|indice in su|mano|sù
+👆	indice alzato	dito|dito alzato|dito in su|dito indice|in alto|indice alzato|indice in su|mano|su
 👇	indice abbassato	dito|dito abbassato|dito in giù|dito indice|indicare|indice abbassato|indice in giù|mano|qui|sotto
 👈	indice verso sinistra	direzione|dito|dito verso sinistra|indicare|indice|indice verso sinistra|là|mano|sinistra
 👉	indice verso destra	a destra|destra|di là|dito|dito indice|dito verso destra|indicare|indice verso destra|mano
@@ -375,13 +375,13 @@
 👑	corona	abbigliamento|corona|famiglia reale|medioevo|principe|principessa|re|regale|regina|vincere
 👒	cappello da donna	abbigliamento|abbigliamento donna|accessori|cappellino di paglia|cappello|cappello da donna|fiocco
 👓	occhiali da vista	abbigliamento|nerd|occhiali|occhiali da vista
-👔	cravatta	abbigliamento|abbigliamento uomo|camicia|camicia a righe|colletto|cravatta|vestiti da uomo
-👕	t-shirt	abbigliamento|abbigliamento informale|casual|colletto|maglia|maglietta|maniche corte|polo|shopping|t-shirt
+👔	cravatta	abbigliamento|abbigliamento uomo|camicia|colletto|cravatta|cravatta a righe|vestiti da uomo
+👕	t-shirt	abbigliamento|abbigliamento informale|casual|colletto|maglia|maglietta|maniche corte|shopping|t-shirt
 👖	jeans	abbigliamento|blu|casual|denim|jeans|pantaloni|vestiti
 👗	vestito	abbigliamento|abito|donna|elegante|vestiti|vestito
 👘	kimono	abbigliamento|giappone|kimono|vestito
 👙	bikini	abbigliamento|bikini|costume|costume da bagno|costume due pezzi|estate|mare|piscina|spiaggia
-👚	maglietta da donna	abbigliamento|donna|maglietta|maglietta da donna|maglietta rosa|polo|t-shirt|vestiti|vestiti da donna
+👚	maglietta da donna	abbigliamento|blusa|camicetta|camicia|colletto|donna|shopping|vestiti
 👛	borsellino	abbigliamento|accessori|borsellino|borsetta|denaro|elegante|moneta|porta monete|portafogli|shopping|soldi
 👜	borsa	abbigliamento|borsa|borsetta|shopping|valigia
 👝	pochette	abbigliamento|accessori|borsa|borsetta|elegante|pochette
@@ -455,7 +455,7 @@
 👿	faccina arrabbiata con corna	arrabbiato|diavoletto|diavolo|diavolo viola|faccina|faccina arrabbiata con corna|scontento
 💀	teschio	cranio|favola|morte|mostro|ossa|pericolo|stanco morto|teschio|umorismo nero|yolo
 💁	persona con mano capovolta	aiuto|capovolgere la mano|gesto con i capelli|gossip|informazioni|mano|mano all’insù|pettegolezzo|sarcasmo|sfacciataggine|sul serio
-💂	guardia	buckingham palace|guardia|guardia reale|lavoro|londra|sentinella|turno di guardia|uomo
+💂	guardia	buckingham palace|guardia|guardia reale|lavoro|londra|sentinella|turno di guardia
 💃	donna che balla	ballare|ballerina|ballo|donna|donna che balla|flamenco|lavoro|olé|salsa|tango
 💄	rossetto	appuntamento|bellezza|cosmetici|make up|makeup|rossetto|rosso|serata|trucco
 💅	smalto per unghie	cosmetici|make up|manicure|noia|smalto|smalto per unghie|spa|unghie|unghie con smalto
@@ -463,7 +463,7 @@
 💇	taglio di capelli	acconciatura|bellezza|capelli|parrucchiera|parrucchiere|persona|salone|salone di bellezza|tagliare|taglio|taglio di capelli
 💈	barbiere	barbiere|insegna
 💉	siringa	ago|dottore|iniezione|malato|medicina|medico|ospedale|puntura|sangue|siringa|vaccinazione|vaccino
-💊	pillola	dottore|farmaco|malato|malattia|medicina|pillola|pillole|vitaminca
+💊	pillola	dottore|farmaco|malato|malattia|medicina|pillola|pillole|vitamina
 💋	impronta della bocca	bacio|impronta della bocca|labbra|romanticismo|romantico|rossetto|segno delle labbra|sexy
 💌	lettera d’amore	busta|busta con cuore|c’è posta per te|cuore|inviare|lettera|lettera d’amore|posta|ricevere|romanticismo|san valentino
 💍	anello	brillante|diamante|fidanzamento|fidanzarsi|fidanzata|fidanzato|gioielli|gioiello|matrimonio|romanticismo undefined
@@ -507,7 +507,7 @@
 💳	carta di credito	addebito|banca|carta|carta di credito|credito|denaro|pagare|soldi
 💴	banconota Yen	banca|banconota|denaro|Giappone|soldi|valuta|Yen
 💵	banconota Dollaro	banca|banconota|banconote|contanti|denaro|Dollaro|moneta|soldi|valuta
-💶	banconota Euro	banca|banconota|cash|crisi|denaro|Euro|millionario|soldi|valuta
+💶	banconota Euro	banca|banconota|cash|crisi|denaro|Euro|milionario|soldi|valuta
 💷	banconota Sterlina	banconote|brexit|cash|denaro|Gran Bretagna|millionario|pound|ricco|soldi|Sterlina|UK|valuta
 💸	soldi con le ali	banconota|banconota con le ali|soldi|soldi che volano|soldi con le ali
 💹	grafico ascendente	ascendente|banca|crescita|finanza|grafico yen in rialzo|in rialzo|mercati|mercato in salita|rialzo|trend|valute|yen
@@ -522,7 +522,7 @@
 📂	cartella aperta	aperta|cartella|file
 📃	pagina con piega	carta|documento|lettera|pagina|pagina arricciata|pagina con piega|ufficio
 📄	pagina	carta|di fronte|documento|fronte|lettera|pagina|pagina di fronte|ufficio
-📅	calendario	17|calendario|data|diciasette|giorno|ricorrenza|sfortuna|venerdì 17
+📅	calendario	17|calendario|data|diciassette|giorno|ricorrenza|sfortuna|venerdì 17
 📆	calendario a strappo	calendario|calendario a strappo|quando|tempo|venerdì 17
 📇	schedario	contatti|rolodex|Rolodex|schedario|schedario girevole|schedario rotante|ufficio|vintage
 📈	grafico con andamento positivo	andamento ascendente|ascendente|aumentare|aumento|crescere|crescita|finanza|grafico|grafico con andamento positivo|linea|trend
@@ -581,7 +581,7 @@
 📿	collana da preghiera	grani|perle|pregare|religione
 🔀	pulsante di riproduzione casuale	frecce|frecce incrociate|frecce incrociate verso destra|pulsante di riproduzione casuale|shuffle
 🔁	pulsante di ripetizione della riproduzione	frecce|frecce a cerchio|frecce senso orario|freccia|orario|pulsante|pulsante di ripetizione della riproduzione|senso orario|simbolo|tasto
-🔂	pulsante di ripetizione della riproduzione di una traccia	frecce|frecce a cerchio numero 1|frecce senso orario|frecce senso orario numero 1|pulsante di ripetizione della riproduzione di una traccia|ripeti|ripetizione|senso orario
+🔂	pulsante di ripetizione di una traccia	frecce|frecce a cerchio numero 1|frecce senso orario|frecce senso orario numero 1|pulsante di ripetizione della riproduzione di una traccia|ripeti|ripetizione|senso orario
 🔃	frecce verticali che ruotano in senso orario	ciclo|circolo|frecce|frecce a cerchio verticali|frecce verticali che ruotano in senso orario|frecce verticali senso orario|orario|processo|ricarica|ricaricare|senso orario|simbolo
 🔄	frecce che ruotano in senso antiorario	antiorario|circolo|di nuovo|frecce|frecce a cerchio aperto|frecce che ruotano in senso antiorario|frecce senso antiorario|ricarica|ricaricare|simbolo
 🔅	luminosità bassa	bassa|faretto|faro|luce|luminosità|simbolo luminosità|sole|tenue
@@ -748,16 +748,16 @@
 🙂	faccina con sorriso accennato	contento|faccina|faccina che sorride|faccina con sorriso accennato|felice|mezzo sorriso|ok|sorrisetto|sorriso|sorriso a bocca chiusa|sorriso accennato|va bene
 🙃	faccina sottosopra	ah ah|ah ah ah|ahah|ahahah|arrabbiato|capovolto|faccina|sarcastico|scombussolata|sottosopra|triste
 🙄	faccina con occhi al cielo	evabbé|faccina con occhi al cielo|guardare altrove|noia|occhi al cielo|pazienza|roteare gli occhi|ruotare gli occhi|sollevare gli occhi al cielo|uffa|vabbè
-🙅	persona che fa segno di no	donna|escluso|faccina|gesto|gesto di rifiuto|no|non bene|persona|persona che fa segno di no|rifiuto|stop|vietato
-🙆	persona con gesto OK	donna|donna con braccia alzate|esercizio|fitness|gesto|mani|OK|persona|persona con gesto OK|tutto bene|yoga
+🙅	persona che fa segno di no	escluso|gesto|no|non bene|persona|persona che fa segno di no|rifiuto|stop|vietato
+🙆	persona con gesto OK	braccia alzate|esercizio|fitness|gesto|mani|OK|persona|persona con gesto OK|tutto bene|yoga
 🙇	persona che fa un inchino profondo	chiedere perdono|gesto|grazie|inchino|meditare|mi dispiace|perdono|persona|persona che fa un inchino profondo|pietà|scusarsi
 🙈	non vedo	faccina|faccina della scimmietta|gesto|non guardo|non posso guardare|non vedo|proibito|scimmia|scimmietta|scimmietta non vedo|segreto|vietato
 🙉	non sento	animale|animali|faccina|non sentire|non sento|orecchie da mercante|scimmia|scimmietta|scimmietta non sento|segreto|vietato
 🙊	non parlo	animale|animali|faccina|in silenzio|monello|non parlo|proibito|scimmia|scimmietta non parlo|segreto|vietato
-🙋	persona con mano alzata	ciao|donna|eccomi|felice|gesto|mano alzata|persona|persona con mano alzata|salutare|saluto|sono qui
+🙋	persona con mano alzata	ciao|eccomi|felice|gesto|mano alzata|persona|persona con mano alzata|salutare|saluto|sono qui
 🙌	mani alzate	celebrare|due mani|evvai|evviva|gesto|grazie|innocente|mani alzate|mano|urrà|vittoria
-🙍	persona corrucciata	arrabbiata|corrucciata|delusa|donna|faccia|frustrata|gesto|infelice|persona|triste
-🙎	persona imbronciata	arrabbiata|broncio|delusa|donna|gesto|imbronciata|persona|seccata|sguardo arrabbiato
+🙍	persona corrucciata	arrabbiata|corrucciata|delusa|faccia|frustrata|gesto|infelice|persona|triste
+🙎	persona imbronciata	arrabbiata|broncio|delusa|gesto|imbronciata|persona|seccata|sguardo arrabbiato
 🙏	mani giunte	gesto|grazie|mani|mani giunte|mano|per favore|pregare|preghiera|ti prego
 🚀	razzo	astronauta|astronave|razzo|spazio|trasporti|universo|veicolo|viaggiare|viaggio
 🚁	elicottero	elicottero|trasporti|veicolo|velivolo|viaggiare|volare
@@ -822,7 +822,7 @@
 🚼	simbolo con immagine di bambino	bambino a bordo|cartello neonato|fasciatoio|neonato|simbolo con immagine di bambino|simbolo neonato
 🚽	toilette	bagno|toilette|trono|water
 🚾	simbolo del WC	bagni|bagno|gabinetto|segnale|servizi|simbolo del WC|toilette|WC
-🚿	doccia	aqua|doccia|fare la doccia|lavare|lavarsi
+🚿	doccia	acqua|doccia|fare la doccia|lavare|lavarsi
 🛀	persona che fa il bagno	bagno|doccia|fare il bagno|lavarsi|persona che fa il bagno|relax|vasca da bagno
 🛁	vasca	bagno|doccia|lavare|lavarsi|relax|vasca|vasca da bagno
 🛂	simbolo del controllo passaporti	aeroporto|controllo|dogana|immigrazione|passaporti|passaporto|segnale|simbolo del controllo passaporti
@@ -837,6 +837,7 @@
 🛖	capanna	capanna|capanno|casa|iurta|rifugio
 🛗	ascensore	accessibilità|ascensore|montacarichi
 🛘	frana	disastro|montagna|pericolo|rocce|smottamento|terremoto|valanga
+🛙	faro	faro|guida|illuminazione|luce|mare|marittimo|navigazione|segnale|speranza
 🛜	wireless	computer|connessione|internet|rete|trasmissione|wi-fi|wifi|wireless
 🛝	scivolo	area divertimento|area giochi|giocare|giochi per bambini|parco giochi|scivolata|scivolo
 🛞	ruota	auto|cerchio|cerchione|girare|gomma|pneumatico|ruota|veicolo
@@ -900,7 +901,7 @@
 🤬	faccina con simboli sulla bocca	arrabbiato|bestemmiare|censura|faccina|faccina che bestemmia|faccina che impreca|faccina con simboli sulla bocca|imprecare|incavolato|insultare|molto arrabbiato
 🤭	faccina con mano sulla bocca	faccina che sogghigna|imbarazzato|imbarazzo|mano davanti alla bocca|non ci credo|oddio|oops|ridacchiare|ridere|segreto|sogghignare|sorpresa
 🤮	faccina che vomita	faccina|faccina che vomita|malato|male|nausea|sputare|sto male|verde|vomitare|vomito
-🤯	testa che esplode	cervello|faccina sorpresa|mindblown|non ci credo|sbalordito|scioccato|sconcertato|sorpesa|sorpreso|stupore|testa che esplode
+🤯	testa che esplode	cervello|faccina sorpresa|non ci credo|sbalordito|scioccato|sconcertato|sorpresa|stupore|testa che esplode
 🤰	donna incinta	donna|gravidanza|incinta|mamma|pancione
 🤱	allattare	allattamento|allattare|allattare al seno|bebé|donna|donna che allatta|mamma|mamma che allatta|persona
 🤲	mani unite in alto	desiderare|mani|mani a coppa|mani in preghiera|mani unite|mani unite in alto|mano|offrire|palmi|palmo della mano|pregare|preghiera
@@ -944,7 +945,7 @@
 🥚	uovo	cibo|uova|uovo
 🥛	bicchiere di latte	bevanda|bicchiere|bicchiere di latte|latte
 🥜	arachidi	arachide|arachidi|cibo|frutta secca|nocciolina|noccioline
-🥝	kiwi	cibo|frutt|frutta|frutto|kiwi
+🥝	kiwi	cibo|frutta|frutto|kiwi
 🥞	pancake	america|brunch|burro|cibo|colazione|crêpe|dolce|francia|frittelle|pancake|sciroppo d’acero|zucchero
 🥟	raviolo	cibo|dumpling|empanada|fagottino|gyoza|jiaozi|pierogi|ravioli|raviolo
 🥠	biscotto della fortuna	biscotto|biscotto della fortuna|cibo|cinese|consiglio|profezia|suggerimento
@@ -979,7 +980,7 @@
 🥽	maschera	immersioni|maschera|nuotare|nuoto|occhiali di protezione|occhiali protettivi|occhialini|protezione per gli occhi|saldare|saldatura|sub
 🥾	stivale da trekking	campeggio|escursionismo|passeggiata|scarpa|scarponcino|scarpone|scarponi|stivale da trekking|trekking
 🥿	ballerina	ballerine|comfort|scarpa bassa|scarpa senza lacci|scarpe da ballerina
-🦀	granchio	cancro|granchio|mare|mollusco|oceano|segno zodiacale
+🦀	granchio	cancro|crostaceo|granchio|mare|oceano|segno zodiacale
 🦁	leone	alpha|animale|criniera|forte|forza|muso di leone|oroscopo|roar|ruggito|segno zodiacale|selvaggio|selvatico
 🦂	scorpione	animale|scorpione|segno zodiacale
 🦃	tacchino	animale|giorno del ringraziamento|ringraziamento|tacchino|Thanksgiving
@@ -1004,7 +1005,7 @@
 🦖	T-Rex	animale|animali|dinosauro|T-Rex|tirannosauro|Tirannosauro Rex|Tyrannosaurus Rex
 🦗	grillo	animale|cavalletta|insetto|ortottero
 🦘	canguro	animale|animale che salta|Australia|canguro|cucciolo di canguro|marsupiale|saltare
-🦙	lama	alpaca|animale|guanaco|lama|lana|lana di alpaca|vicuña|vigogna
+🦙	lama	alpaca|animale|guanaco|lama|lana|vigogna
 🦚	pavone	animale|appariscente|colorato|esibizionista|orgoglioso|pavone|pavoneggiarsi|uccello|vistoso|volatile
 🦛	ippopotamo	animale|ippo|ippopotamo
 🦜	pappagallo	animale|pappagallo|parlare|pirata|pirati|uccello|uccello parlante
@@ -1100,7 +1101,7 @@
 🧢	cappello con visiera	abbigliamento|baseball|cappellino|cappellino da baseball|cappello|cappello con visiera|cappello da baseball|indumenti|vestiti
 🧣	sciarpa	abbigliamento|collo|freddo|inverno|sciarpa|sciarpetta|sciarpina
 🧤	guanti	blu|guanti|guanto|mano
-🧥	cappotto	abbigliamento|cappotto|freddo|giacca|giaccone|giubbotto|inverno|rosso
+🧥	cappotto	abbigliamento|cappotto|freddo|giacca|giaccone|giubbotto|inverno
 🧦	calzini	abbigliamento|calze|calzette|calzini
 🧧	busta hongbao	buona fortuna|buono auspicio|busta rossa|busta soldi|denaro|hóngbāo|lai see|regalo|soldi
 🧨	petardo	botto|dinamite|esplodere|esplosivo|far esplodere|fuochi artificiali|fuochi d’artificio|petardo|scintilla|scoppiare|scoppio
@@ -1117,7 +1118,7 @@
 🧳	valigia	bagagli|bagaglio|partenza|partiamo|preparare il bagaglio|preparazione dei bagagli|si parte|trolley|valigia|viaggiare|viaggio
 🧴	flacone	bottiglia di crema|bottiglia di lozione|crema|crema idratante|crema solare|filtro solare|flacone|lozione|lozione solare|shampoo
 🧵	filo	ago|bobina|corda|cucire|filo|rocchetto|rotolo
-🧶	gomitolo	fare a maglia|filo|gomitolo|lavorare a maglia|palla|sferruzzare|uncinetto
+🧶	gomitolo	fare la maglia|filo|gomitolo|lavorare a maglia|palla|sferruzzare|uncinetto
 🧷	spilla da balia	pannolone|punk rock|spilla da balia|spilla di sicurezza
 🧸	orsetto	giocattolo|imbottito|orsacchiotto|orsacchiotto di peluche|orsetto|orsetto di peluche|orso|peluche|soffice|teddy bear
 🧹	scopa	pulire|scopa|scopare|spazzare|strega
@@ -1151,9 +1152,12 @@
 🪈	flauto	fiati|fiato|flautista|flauto|legno|musica|pifferaio|piffero|strumento|zufolo
 🪉	arpa	amore|arpa|cupido|musica|orchestra|strumento
 🪊	trombone	coulisse|jazz|musica|ottone|strumento|tiro
+🪋	meteora	apocalisse|caduta|gravità|palla di fuoco|roccia|spazio|stella
+🪌	gomma per cancellare	annullare|cancellare|correzione|disegno|eliminare|errore|rimuovere|sbaglio|scrittura|strofinare
+🪍	retino	catturare|raccogliere|rete|trappola
 🪎	forziere	argento|bottino|denaro|gemme|gioielli|oro|premio|ricchezza|valori
 🪏	vanga	buco|pala|scavare|spalare|vanga
-🪐	pianeta con satellite	corpo celeste|pianeta con anelli|pianeta con satellite|satellite|Saturno|spazio
+🪐	pianeta con anelli	anelli|corpo celeste|pianeta|Saturno|spazio
 🪑	sedia	mettersi seduti|mobile|sedersi|sedia|seduti|seggiola
 🪒	rasoio	farsi la barba|lama da barba|lama da barbiere|lametta da barba|radersi|rasoio|rasoio da barbiere
 🪓	ascia	accetta|ascia|boscaiolo|taglialegna
@@ -1189,7 +1193,7 @@
 🪱	verme	anellide|animale|lombrico|parassita|strisciare|verme
 🪲	coleottero	animale|cimice|coleottero|insetto|scarabeo
 🪳	scarafaggio	animale|blatta|disgustoso|infestante|insetto|scarafaggio
-🪴	pianta in vaso	casa|coltivare|curare|decorare|inutile|noioso|pianta|pianta in vaso|vaso|verde
+🪴	pianta in vaso	casa|coltivare|curare|decorare|pianta|vaso|verde
 🪵	legna	ceppo|ciocco|legna|legname|legno|tronco
 🪶	piuma	leggero|penna|piuma|piumaggio|uccello|volo
 🪷	loto	bellezza|buddhismo|fior di loto|fiore|India|induismo|loto|purezza|serenità|Vietnam|yoga
@@ -1209,6 +1213,7 @@
 🫅	persona con corona	monarca|nobile|persona con corona|re|reale|regale|regina
 🫆	impronta digitale	identità|impronta digitale|indizio|riconoscimento biometrico|scienza forense|sicurezza|traccia
 🫈	creatura pelosa	bigfoot|criptide|foresta|gigante|peloso|sasquatch|scimmione|yeti
+🫌	farfalla monarca	bruco|cambiamento|fragile|insetto|metamorfosi|migrazione|speranza|trasformazione
 🫍	orca	animale|cetaceo|marino|oceano
 🫎	alce	alce|animale|corna|mammifero
 🫏	asino	animale|asino|mammifero|mulo|somaro|testardo
@@ -1225,6 +1230,7 @@
 🫚	radice di zenzero	birra|radice|radice di zenzero|salute|spezia|zenzero
 🫛	baccello di piselli	baccello|baccello di piselli|cibo|edamame|legume|pisello|vegetale|verdura
 🫜	ortaggio da radice	barbabietola|orto|radice|rapa|vegetale
+🫝	sottaceto	cetriolino|cetriolo|condimento|fermentare|salamoia|salsa
 🫟	spruzzo	chiazza|holi|pittura|rovesciare|schizzo|vernice
 🫠	faccina che si scioglie	afa|caldo|dissolversi|faccina che si scioglie|liquefarsi|liquido|sciogliendo|sciogliersi|sciolto|sparire|squagliando|squagliarsi
 🫡	faccina che fa il saluto	agli ordini|d’accordo|faccina che fa il saluto militare|militare|obbedisco|ok|saluto|signorsì|sissignora|sissignore|truppe|va bene
@@ -1237,6 +1243,7 @@
 🫨	faccina tremante	faccina|faccina che trema|faccina scossa|scombussolato|scosso|scossone|shock|terremoto|tremante|tremare|vibrazione
 🫩	faccina con borse sotto gli occhi	assonnato|borse|esausto|occhiaie|sfinito|sonno|stanchezza|stanco
 🫪	faccina stravolta	ansia|panico|scioccato|sconvolto|sorpresa|vulnerabile
+🫫	faccia screpolata	maschera|resilienza|rivelare|rottura|sgretolamento|tensione|trasformazione
 🫯	nuvoletta di zuffa	confusione|dibattito|disaccordo|discussione|lotta|rissa|zuffa
 🫰	mano con indice e pollice incrociati	amore|caro|costa|costoso|cuore|denaro|mano|mano con indice e pollice incrociati|schioccare|soldi
 🫱	mano rivolta a destra	dare la mano|destra|mano|mano rivolta a destra|verso destra
@@ -1247,3 +1254,5 @@
 🫶	mani a cuore	amore|cuore|mani a cuore|mano|ti amo|ti voglio bene
 🫷	mano che spinge a sinistra	alt|aspettare|batti cinque|fermare|indietro|mano che spinge verso sinistra|palmo|rifiutare|sinistra|spingere|spinta|stop
 🫸	mano che spinge a destra	alt|aspettare|batti cinque|destra|fermare|indietro|mano che spinge verso destra|palmo|rifiutare|spingere|spinta|stop
+🫹	segno del pollice a sinistra	indicare|neutro|presa|quello|questo|sinistra
+🫺	segno del pollice a destra	destra|indicare|neutro|presa|quello|questo

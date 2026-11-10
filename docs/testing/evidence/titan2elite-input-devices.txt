@@ -1,0 +1,58 @@
+# input_flow.py devices, 2026-11-10 01:55 CET
+# ro.product.model=Titan 2, ro.product.board=G72BoardV1, ro.build.display.id=Titan 2 Elite_EEA_V02.00.02, ro.build.version.release=16
+# package=rocks.pkb.plektra.nightly
+= plektra.name: built-in='TitanKey' clone='TitanKey'
+= plektra.vendorId: built-in=9523 clone=9523
+= plektra.productId: built-in=9523 clone=9523
+= plektra.isExternal: built-in=False clone=False
+= plektra.isVirtual: built-in=False clone=False
+= plektra.keyboardType: built-in=2 clone=2
+= plektra.sources: built-in=257 clone=257
+= plektra.kcmType: built-in=3 clone=3
+= plektra.profile: built-in='titan2elite_qwerty' clone='titan2elite_qwerty'
+= plektra.profileKind: built-in='BUILT_IN' clone='BUILT_IN'
+= plektra.profileAutoDetected: built-in=True clone=True
+~ eventhub.Classes: built-in='KEYBOARD | ALPHAKEY' clone='KEYBOARD | ALPHAKEY | BATTERY'  [additional BATTERY class of the uinput node; battery state is not part of key mapping]
+~ eventhub.Identifier: built-in='bus=0x0000, vendor=0x2533, product=0x2533, version=0x0000, bluetoothAddress=<not set>' clone='bus=0x0019, vendor=0x2533, product=0x2533, version=0x0000, bluetoothAddress=<not set>'  [uinput accepts only named buses; HOST (0x19) keeps the device internal]
+= eventhub.KeyLayoutFile: built-in='/system/usr/keylayout/TitanKey.kl' clone='/system/usr/keylayout/TitanKey.kl'
+= eventhub.KeyCharacterMapFile: built-in='/system/usr/keychars/TitanKey.kcm' clone='/system/usr/keychars/TitanKey.kcm'
+= eventhub.ConfigurationFile: built-in='' clone=''
+= kernel.keyBits: built-in=[14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48, 49, 50, 54, 56, 57, 59, 68, 87, 102, 103, 105, 106, 108, 115, 116, 128, 129, 131, 132, 133, 134, 135, 136, 137, 158, 183, 222, 251, 253, 580] clone=[14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48, 49, 50, 54, 56, 57, 59, 68, 87, 102, 103, 105, 106, 108, 115, 116, 128, 129, 131, 132, 133, 134, 135, 136, 137, 158, 183, 222, 251, 253, 580]
+= android.keyCharacterMap: built-in='34 keys' clone='34 keys'
+0 unexplained differences
+
+# built-in key character map
+KEYCODE_A: {"alt": "*", "base": "a", "label": "A", "shift": "A", "shift+alt": ""}
+KEYCODE_ALT_LEFT: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_APP_SWITCH: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_B: {"alt": "!", "base": "b", "label": "B", "shift": "B", "shift+alt": ""}
+KEYCODE_BACK: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_C: {"alt": "9", "base": "c", "label": "C", "shift": "C", "shift+alt": ""}
+KEYCODE_D: {"alt": "5", "base": "d", "label": "D", "shift": "D", "shift+alt": ""}
+KEYCODE_DEL: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_E: {"alt": "2", "base": "e", "label": "E", "shift": "E", "shift+alt": ""}
+KEYCODE_ENTER: {"alt": "\n", "base": "\n", "label": "\n", "shift": "\n", "shift+alt": "\n"}
+KEYCODE_F: {"alt": "6", "base": "f", "label": "F", "shift": "F", "shift+alt": ""}
+KEYCODE_G: {"alt": "/", "base": "g", "label": "G", "shift": "G", "shift+alt": ""}
+KEYCODE_H: {"alt": ":", "base": "h", "label": "H", "shift": "H", "shift+alt": ""}
+KEYCODE_HOME: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_I: {"alt": "-", "base": "i", "label": "I", "shift": "I", "shift+alt": ""}
+KEYCODE_J: {"alt": "#", "base": "j", "label": "J", "shift": "J", "shift+alt": ""}
+KEYCODE_K: {"alt": "'", "base": "k", "label": "K", "shift": "K", "shift+alt": ""}
+KEYCODE_L: {"alt": "\"", "base": "l", "label": "L", "shift": "L", "shift+alt": ""}
+KEYCODE_M: {"alt": ".", "base": "m", "label": "M", "shift": "M", "shift+alt": ""}
+KEYCODE_N: {"alt": ",", "base": "n", "label": "N", "shift": "N", "shift+alt": ""}
+KEYCODE_O: {"alt": "+", "base": "o", "label": "O", "shift": "O", "shift+alt": ""}
+KEYCODE_P: {"alt": "@", "base": "p", "label": "P", "shift": "P", "shift+alt": ""}
+KEYCODE_Q: {"alt": "0", "base": "q", "label": "Q", "shift": "Q", "shift+alt": ""}
+KEYCODE_R: {"alt": "3", "base": "r", "label": "R", "shift": "R", "shift+alt": ""}
+KEYCODE_S: {"alt": "4", "base": "s", "label": "S", "shift": "S", "shift+alt": ""}
+KEYCODE_SHIFT_RIGHT: {"alt": "", "base": "", "label": "", "shift": "", "shift+alt": ""}
+KEYCODE_SPACE: {"alt": "", "base": " ", "label": " ", "shift": " ", "shift+alt": ""}
+KEYCODE_T: {"alt": "(", "base": "t", "label": "T", "shift": "T", "shift+alt": ""}
+KEYCODE_U: {"alt": "_", "base": "u", "label": "U", "shift": "U", "shift+alt": ""}
+KEYCODE_V: {"alt": "?", "base": "v", "label": "V", "shift": "V", "shift+alt": ""}
+KEYCODE_W: {"alt": "1", "base": "w", "label": "W", "shift": "W", "shift+alt": ""}
+KEYCODE_X: {"alt": "8", "base": "x", "label": "X", "shift": "X", "shift+alt": ""}
+KEYCODE_Y: {"alt": ")", "base": "y", "label": "Y", "shift": "Y", "shift+alt": ""}
+KEYCODE_Z: {"alt": "7", "base": "z", "label": "Z", "shift": "Z", "shift+alt": ""}

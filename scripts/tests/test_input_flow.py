@@ -7,7 +7,7 @@ flow = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(flow)
 
 # Like the Titan 2 Elite: the kernel device reports only the right Shift key.
-KEY_CODES = {'Q': 16, 'W': 17, 'A': 30, 'N': 49, 'SPACE': 57, 'ENTER': 28, 'SHIFT_RIGHT': 54, 'ALT_LEFT': 56}
+KEY_CODES = {'Q': 16, 'W': 17, 'E': 18, 'A': 30, 'N': 49, 'SPACE': 57, 'ENTER': 28, 'SHIFT_RIGHT': 54, 'ALT_LEFT': 56}
 KEYMAP = {
     'layoutSetting': 'qwerty',
     'layout': {
@@ -82,6 +82,156 @@ class PlanTest(unittest.TestCase):
         ops = self.plan('screen hold plektra_key_shift\nscreen press plektra_key_a\nscreen release plektra_key_shift')
         self.assertEqual([('plektra_key_shift', True), ('plektra_key_a', True), ('plektra_key_a', False),
                           ('plektra_key_shift', False)], edges(ops))
+
+
+class RepeatedKeyTest(unittest.TestCase):
+    def down_times(self, ops, key):
+        clock, times = 0, []
+        for op in ops:
+            if op['op'] == 'wait':
+                clock += op['ms']
+            elif op['op'] == 'key' and op['down'] and op['key'] == key:
+                times.append(clock)
+        return times
+
+    def test_type_waits_out_multi_tap_cycle(self):
+        greek = {'layoutSetting': 'greek', 'multiTapTimeoutMs': 400, 'alt': {},
+                 'layout': {'KEYCODE_E': {'lowercase': 'ε', 'uppercase': 'Ε', 'multiTap': True},
+                            'KEYCODE_Q': {'lowercase': ';', 'uppercase': ':', 'multiTap': False}}}
+        ops = flow.plan(flow.parse_flow('hw type εε;;\nexpect x'), greek, KEY_CODES)
+        first, second = self.down_times(ops, 'E')
+        self.assertGreater(second - first, 400)
+        first, second = self.down_times(ops, 'Q')
+        self.assertLess(second - first, 400)
+
+    def test_explicit_presses_keep_multi_tap_timing(self):
+        greek = {'multiTapTimeoutMs': 400, 'alt': {},
+                 'layout': {'KEYCODE_E': {'lowercase': 'ε', 'uppercase': 'Ε', 'multiTap': True}}}
+        ops = flow.plan(flow.parse_flow('hw press E\nhw press E\nexpect έ'), greek, KEY_CODES)
+        first, second = self.down_times(ops, 'E')
+        self.assertLess(second - first, 400)
+
+    def test_type_waits_out_bounce_keys(self):
+        keymap = dict(KEYMAP, bounceKeysDelayMs=300)
+        ops = flow.plan(flow.parse_flow('hw type aa\nexpect x'), keymap, KEY_CODES)
+        first, second = self.down_times(ops, 'A')
+        self.assertGreater(second - first, 300)
+
+
+REAL = {'id': 3, 'name': 'TitanKey', 'vendorId': 9523, 'productId': 9523, 'isExternal': False,
+        'keys': {'KEYCODE_Q': {'base': 'q'}}}
+HUB = {'Classes': 'KEYBOARD | ALPHAKEY',
+       'Identifier': 'bus=0x0000, vendor=0x2533, product=0x2533, version=0x0000, bluetoothAddress=<not set>',
+       'KeyLayoutFile': '/system/usr/keylayout/TitanKey.kl', 'Path': '/dev/input/event5'}
+
+
+class CompareKeyboardsTest(unittest.TestCase):
+    def compare(self, clone_hub=None, clone=None, bits=(16, 54)):
+        hub = dict(HUB, Classes='KEYBOARD | ALPHAKEY | BATTERY',
+                   Identifier=HUB['Identifier'].replace('bus=0x0000', 'bus=0x0019'), Path='/dev/input/event8')
+        hub.update(clone_hub or {})
+        return flow.compare_keyboards(REAL, dict(REAL, id=10, **(clone or {})), HUB, hub, [16, 54], list(bits))
+
+    def test_accepts_exactly_the_known_uinput_differences(self):
+        lines, unexplained = self.compare()
+        self.assertEqual(0, unexplained)
+        self.assertEqual(2, sum(line.startswith('~') for line in lines))
+
+    def test_rejects_other_class_and_identifier_differences(self):
+        cases = [{'Classes': 'KEYBOARD | BATTERY'},
+                 {'Classes': 'KEYBOARD | ALPHAKEY | BATTERY | SENSOR'},
+                 {'Identifier': HUB['Identifier'].replace('bus=0x0000', 'bus=0x0003')},
+                 {'Identifier': HUB['Identifier'].replace('bus=0x0000', 'bus=0x0019').replace('version=0x0000', 'version=0x0001')},
+                 {'Identifier': HUB['Identifier'].replace('bus=0x0000', 'bus=0x0019').replace('product=0x2533', 'product=0x2534')},
+                 {'KeyLayoutFile': '/system/usr/keylayout/Generic.kl'}]
+        for case in cases:
+            self.assertGreater(self.compare(clone_hub=case)[1], 0, case)
+        self.assertGreater(self.compare(clone={'isExternal': True})[1], 0)
+        self.assertGreater(self.compare(clone={'keys': {'KEYCODE_Q': {'base': 'Q'}}})[1], 0)
+        self.assertGreater(self.compare(bits=(16, 42))[1], 0)
+
+
+class FakeAdb:
+    package = 'rocks.pkb.plektra.nightly'
+
+    def __init__(self, responses=None):
+        self.calls, self.responses = [], responses or {}
+
+    def broadcast(self, extra):
+        self.calls.append(extra)
+        response = self.responses.get(extra, '')
+        return response.pop(0) if isinstance(response, list) else response
+
+    def shell(self, command, check=True, timeout=30):
+        self.calls.append(command)
+        return ''
+
+    def node(self, resource_id):
+        return {'bounds': '[0,0][10,10]'}
+
+
+class BrokenPipe:
+    closed = False
+
+    def write(self, data):
+        raise BrokenPipeError(32, 'Broken pipe')
+
+    def flush(self):
+        pass
+
+    def close(self):
+        raise BrokenPipeError(32, 'Broken pipe')
+
+
+class FinishedProcess:
+    stdin = BrokenPipe()
+
+    def poll(self):
+        return None
+
+    def wait(self, timeout=None):
+        return 0
+
+
+class CleanupTest(unittest.TestCase):
+    def session_with_broken_pipe(self):
+        session = flow.Session(FakeAdb())
+        session.uinput = flow.Uinput.__new__(flow.Uinput)
+        session.uinput.process = FinishedProcess()
+        session.uinput.slots, session.uinput.keys_down = {'plektra_key_shift': 0}, {42}
+        session.forced_software = True
+        return session
+
+    def test_broken_pipe_still_clears_software_mode(self):
+        session = self.session_with_broken_pipe()
+        errors = session.close()
+        self.assertIn('clearSoftwareOverride', session.adb.calls)
+        self.assertFalse(session.forced_software)
+        self.assertEqual(1, len(errors))
+        self.assertIn('release held input', errors[0])
+
+    def test_cleanup_failure_does_not_hide_the_flow_error(self):
+        flow.finish(self.session_with_broken_pipe(), RuntimeError('flow failed'))
+        with self.assertRaisesRegex(flow.FlowError, 'cleanup failed: release held input'):
+            flow.finish(self.session_with_broken_pipe(), None)
+
+
+class NoteBodyTest(unittest.TestCase):
+    def test_reads_real_text_even_if_it_equals_the_hint(self):
+        session = flow.Session(FakeAdb({'noteBody': '{"text":"Write a note…","focused":true}'}))
+        self.assertEqual('Write a note…', session.body_text())
+        session = flow.Session(FakeAdb({'noteBody': '{"text":"","focused":true}'}))
+        self.assertEqual('', session.body_text())
+
+    def test_refuses_to_type_into_an_existing_note(self):
+        # The new-note tap was lost: the previously active note stays selected.
+        notes = '{"ids":["old"],"active":"old"}'
+        session = flow.Session(FakeAdb({'notes': [notes] * 20, 'noteBody': '{"text":"","focused":true}'}))
+        session.timeout = 0.5
+        session.adb.shell = lambda command, check=True, timeout=30: (
+            'mCurrentFocus=Window{1 u0 rocks.pkb.plektra.nightly/rocks.pkb.plektra.NotesActivity}')
+        with self.assertRaisesRegex(flow.FlowError, 'new note'):
+            session.open_new_note(False)
 
 
 class DeviceHelpersTest(unittest.TestCase):

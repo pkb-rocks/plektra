@@ -29,7 +29,7 @@ One step per line; `#` starts a comment.
 
 TEXT is either the rest of the line or a JSON string such as `"a\nb "` for newlines and surrounding spaces. Every flow needs at least one `expect`, and every `hold` needs a matching `release`.
 
-`type` uses only real keys. The runner asks the debug app for the mapping Plektra resolves per key code (layout letters, Shift, Alt binding including user SYM settings) and picks the chord with the fewest modifiers. A character no key produces fails before the first key event, naming the character and its code point. Multi-tap layers, long-press alternatives and SYM pages are not typed implicitly; write them with `press`, `hold`, `wait` and `release`. `screen type` maps characters to accessibility ids the way `AospKeyboardView` names them and fails when a key is not on the visible page.
+`type` uses only real keys. The runner asks the debug app for the mapping Plektra resolves per key code (layout letters, Shift, Alt binding including user SYM settings) and picks the chord with the fewest modifiers. A character no key produces fails before the first key event, naming the character and its code point. When `type` repeats a multi-tap key (Greek `εε`), it waits out Plektra's multi-tap timeout (400 ms) so the second press starts a new character; with Bounce Keys enabled it also waits out the bounce delay for any repeated key. Explicit `press` steps keep the runner's timing, so `hw press E` twice produces the second multi-tap character. Multi-tap layers, long-press alternatives and SYM pages are not typed implicitly; write them with `press`, `hold`, `wait` and `release`. `screen type` maps characters to accessibility ids the way `AospKeyboardView` names them and fails when a key is not on the visible page.
 
 `plan` prints the intermediate operations as JSON lines: key edges with Linux scan codes, touch edges with accessibility ids, waits and expectations. It reads the mapping the input method has currently loaded, so focus a text field first. `run` plans again after it focused the new note.
 
@@ -37,22 +37,28 @@ TEXT is either the rest of the line or a JSON string such as `"a\nb "` for newli
 
 1. Checks the device identity, the selected input method, the lock screen and the screen state.
 2. Registers the virtual devices with the `uinput` shell command. They disappear when the flow ends or fails; held keys and fingers are released first.
-3. Opens `NotesActivity` through `NotesEditorAlias`, taps the new-note button and focuses the empty body. Existing notes stay untouched. Test notes remain in the note list.
+3. Opens `NotesActivity` through `NotesEditorAlias` and taps the new-note button. It continues only when the active note id is new and the note count grew by one, so a missed tap never types into an existing note. It then focuses the empty body. Test notes remain in the note list.
 4. For screen steps, sets the temporary software-keyboard mode only if no temporary mode is active, and clears it afterwards.
-5. Executes the operations and compares the note body read from the UI hierarchy.
+5. Executes the operations and compares the note body. The body text and focus come from the editor view inside the app (`KeyboardBarTestReceiver noteBody`): the UI hierarchy reports an empty field's hint as its text.
+
+Cleanup releases held keys and fingers, removes the virtual devices and clears the temporary software-keyboard mode as independent steps. A failing step, such as a closed `uinput` pipe, does not skip the others. Cleanup failures are printed and fail the command only if the flow itself succeeded.
 
 The runner changes no other settings. `require` steps fail with an explanation instead of switching layouts or profiles.
 
 ## Hardware keys
 
-The virtual keyboard clones the built-in keyboard: name, vendor and product id, and exactly the key bits the kernel device reports. Android therefore selects the same key layout and key character map files, and the events carry the same scan codes, key codes and meta states. `devices` shows the comparison:
+The virtual keyboard clones the built-in keyboard: name, vendor and product id, and exactly the key bits the kernel device reports. `devices` compares both devices:
 
 - Plektra's view through `InputDevice`: name, ids, `isExternal`, `isVirtual`, keyboard type, sources and the resolved Plektra input profile.
 - EventHub: classes, bus, key layout, key character map and configuration file.
 - Kernel key bits, read with `getevent -p`.
 - The key character map for every key code the device has, without modifiers, with Shift, Alt and Shift+Alt.
 
-On the Titan 2 Elite (`G72BoardV1`, `Titan 2 Elite_EEA_V02.00.02`, Android 16) all of these match. The only differences are the bus (`0x19` instead of `0x00`, because the `uinput` command accepts only named buses) and an additional EventHub `BATTERY` class on the virtual node; neither enters key mapping. Plektra resolves both keyboards to `titan2elite_qwerty`, `BUILT_IN`. The built-in keyboard reports Shift as scan code 54 (`SHIFT_RIGHT`); scan code 42 appears in `TitanKey.kl` but not in the kernel key bits, so flows must use `SHIFT_RIGHT`.
+Only two differences are accepted, and only in their exact form: an additional `BATTERY` class with all other classes equal, and bus `0x0019` instead of `0x0000` with vendor, product and version equal (the `uinput` command accepts only named buses; `HOST` keeps the device internal). Any other difference fails the command. `devices --output FILE` stores the comparison and the built-in key character map.
+
+[`evidence/titan2elite-input-devices.txt`](evidence/titan2elite-input-devices.txt) is the comparison for the Titan 2 Elite (`G72BoardV1`, `Titan 2 Elite_EEA_V02.00.02`, Android 16): Plektra resolves both keyboards to `titan2elite_qwerty`, `BUILT_IN`; both use `TitanKey.kl` and `TitanKey.kcm`; kernel key bits and the key character map for all 34 key codes match. Android derives key code and meta state from the scan code through the key layout file, and the Unicode character from the key character map, so equal files, key bits and maps give equal mappings. The built-in keyboard reports Shift as scan code 54 (`SHIFT_RIGHT`); scan code 42 appears in `TitanKey.kl` but not in the kernel key bits, so flows use `SHIFT_RIGHT`.
+
+Not yet recorded: `KeyEvent`s of physical presses next to the corresponding virtual ones (scan code, key code, meta state, Unicode character and Plektra's output, especially for `SHIFT_RIGHT`, `ALT_LEFT` and `AGUI_SYM`). Physical presses need a person at the device.
 
 The clone is not the same device instance: it has its own device id and descriptor, and Android tracks meta state per device. Mixing a real key press with a virtual one in one chord is not covered. Keyboards whose layout differs per device or that are resolved through Bluetooth or USB identity (Clicks) need an equivalent `devices` comparison before flows count as evidence for them.
 

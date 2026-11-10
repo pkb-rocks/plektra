@@ -28,6 +28,20 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
             resultData = InputFlowProbe.devices(context).toString()
             return
         }
+        if (intent.getBooleanExtra("notes", false)) {
+            resultData = InputFlowProbe.notes(context).toString()
+            return
+        }
+        if (intent.getBooleanExtra("noteBody", false)) {
+            val body = InputFlowProbe.noteBody()
+            if (body == null) {
+                resultCode = 1
+                resultData = "No single visible Notes body"
+                return
+            }
+            resultData = body.toString()
+            return
+        }
         if (intent.getBooleanExtra("keymap", false)) {
             resultData = InputFlowProbe.keymap(context).toString()
             return

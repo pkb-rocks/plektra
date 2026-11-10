@@ -8,7 +8,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import rocks.pkb.plektra.data.mappings.AltModifierMappingResolver
+import rocks.pkb.plektra.inputmethod.BounceKeyFilter
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
+import rocks.pkb.plektra.inputmethod.MultiTapController
 
 /** Read-only device and mapping facts for `scripts/input_flow.py`. */
 object InputFlowProbe {
@@ -59,6 +61,34 @@ object InputFlowProbe {
         return result
     }
 
+    /** Note ids and the active id, read without NotesRepository's migration write; no note content. */
+    fun notes(context: Context): JSONObject {
+        val prefs = context.getSharedPreferences("notes", Context.MODE_PRIVATE)
+        val collection = prefs.getString("collection", null)?.let(::JSONArray) ?: JSONArray()
+        return JSONObject().apply {
+            put("ids", JSONArray((0 until collection.length()).map { collection.getJSONObject(it).getString("id") }))
+            put("active", prefs.getString("active_note", null) ?: JSONObject.NULL)
+        }
+    }
+
+    /**
+     * The real Notes editor's body; the UI hierarchy reports an empty field's hint as its text.
+     */
+    fun noteBody(): JSONObject? {
+        val bodies = mutableListOf<android.widget.EditText>()
+        fun find(view: android.view.View) {
+            if (view is android.widget.EditText && view.id == R.id.notes_body && view.isShown &&
+                view.context.javaClass == NotesActivity::class.java) bodies += view
+            if (view is android.view.ViewGroup) for (index in 0 until view.childCount) find(view.getChildAt(index))
+        }
+        android.view.inspector.WindowInspector.getGlobalWindowViews().forEach(::find)
+        val body = bodies.singleOrNull() ?: return null
+        return JSONObject().apply {
+            put("text", body.text.toString())
+            put("focused", body.hasFocus())
+        }
+    }
+
     private fun describe(unicode: Int): String {
         val codePoint = unicode and KeyCharacterMap.COMBINING_ACCENT_MASK
         val text = if (codePoint == 0) "" else String(Character.toChars(codePoint))
@@ -79,7 +109,11 @@ object InputFlowProbe {
         AltModifierMappingResolver.resolve(context.assets, context).forEach { (code, text) ->
             alt.put(KeyEvent.keyCodeToString(code), text)
         }
+        val bounceKeys = SettingsManager.getBounceKeysEnabled(context) &&
+            SettingsManager.getBounceKeysCategoryEnabled(context, BounceKeyFilter.Category.CHARACTER)
         return JSONObject().apply {
+            put("multiTapTimeoutMs", MultiTapController.TIMEOUT_MS)
+            put("bounceKeysDelayMs", if (bounceKeys) SettingsManager.getBounceKeysDelayMs(context) else 0L)
             put("layoutSetting", SettingsManager.getKeyboardLayout(context))
             put("physicalProfileOverride", SettingsManager.getPhysicalKeyboardProfileOverride(context))
             put("layout", layout)

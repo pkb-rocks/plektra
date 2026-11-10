@@ -47,13 +47,8 @@ SCREEN_TOKENS = {
 }
 
 
-# Differences that uinput cannot avoid and that do not reach key mapping.
-KNOWN_CLONE_DIFFERENCES = {
-    'eventhub.Identifier': 'uinput accepts only named buses; HOST keeps the device internal',
-    'eventhub.Classes': 'observed BATTERY class of the uinput node; battery state is not part of key mapping',
-}
-
-
+MODIFIER_KEYS = {'SHIFT_LEFT', 'SHIFT_RIGHT', 'ALT_LEFT', 'ALT_RIGHT', 'CTRL_LEFT', 'CTRL_RIGHT'}
+REPEAT_MARGIN_MS = 100
 class FlowError(Exception):
     pass
 
@@ -163,20 +158,40 @@ def screen_chords(char):
 def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
     """Expand steps into the intermediate operation list that `run` executes."""
     ops, held = [], {}
+    clock, last_down, last_character_key = 0, {}, None
 
     def wait(line, ms):
+        nonlocal clock
         if ms:
             ops.append({'line': line, 'op': 'wait', 'ms': ms})
+            clock += ms
 
     def edge(line, surface, key, down):
+        nonlocal last_character_key
         if surface == 'hw':
             if key not in key_codes:
                 raise FlowError(f'line {line}: the hardware keyboard has no key {key!r}')
             ops.append({'line': line, 'op': 'key', 'down': down, 'key': key, 'scan': key_codes[key]})
+            if down:
+                last_down[key] = clock
+                if key not in MODIFIER_KEYS:
+                    last_character_key = key
         else:
             if not key.startswith('plektra_key_'):
                 raise FlowError(f'line {line}: screen keys are accessibility ids such as plektra_key_q')
             ops.append({'line': line, 'op': 'touch', 'down': down, 'target': key})
+
+    def separate_repeat(line, keys):
+        """Keep `type` from merging repeated keys into a multi-tap cycle or a bounce."""
+        key = keys[-1]
+        if key not in last_down:
+            return
+        needed = keymap.get('bounceKeysDelayMs', 0)
+        if key == last_character_key and multi_tap_keys and key in multi_tap_keys:
+            needed = max(needed, keymap['multiTapTimeoutMs'])
+        if needed:
+            arrival = clock + gap_ms * (len(keys) - 1)
+            wait(line, max(0, last_down[key] + needed + REPEAT_MARGIN_MS - arrival))
 
     def chord(line, surface, keys):
         for key in keys:
@@ -189,6 +204,8 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
         wait(line, gap_ms)
 
     inventory = None
+    multi_tap_keys = {code.removeprefix('KEYCODE_') for code, mapping in (keymap or {}).get('layout', {}).items()
+                      if mapping.get('multiTap')}
     for step in steps:
         if step.action == 'wait':
             wait(step.line, int(step.value))
@@ -223,6 +240,7 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
                     char = text[index]
                     raise FlowError(f'line {step.line}: no hardware key produces {char!r} '
                                     f'(U+{ord(char):04X}) in the active layout and Alt binding')
+                separate_repeat(step.line, inventory[match])
                 chord(step.line, 'hw', inventory[match])
                 index += len(match)
     if held:
@@ -286,8 +304,11 @@ class Uinput:
         if self.process.poll() is not None:
             self.log.seek(0)
             raise FlowError(f'uinput exited: {self.log.read().decode(errors="replace").strip()}')
-        self.process.stdin.write((json.dumps(payload) + '\n').encode())
-        self.process.stdin.flush()
+        try:
+            self.process.stdin.write((json.dumps(payload) + '\n').encode())
+            self.process.stdin.flush()
+        except OSError as error:
+            raise FlowError(f'uinput input closed: {error}') from None
 
     def register_keyboard(self, reference, key_bits):
         self.send({'id': KEYBOARD_ID, 'command': 'register', 'name': reference['name'],
@@ -337,12 +358,17 @@ class Uinput:
                            (logical[i + 2] - logical[i])) for i in (0, 1))
 
     def close(self):
-        if self.process.stdin and not self.process.stdin.closed:
-            self.process.stdin.close()
+        """End the shell command, which removes its virtual devices."""
+        try:
+            if self.process.stdin and not self.process.stdin.closed:
+                self.process.stdin.close()
+        except OSError:
+            pass  # The command already exited; waiting below still reaps it.
         try:
             self.process.wait(timeout=10)
         except subprocess.TimeoutExpired:
             self.process.kill()
+            self.process.wait(timeout=10)
 
 
 def layout_mismatches(keymap, name):
@@ -398,6 +424,7 @@ class Session:
         self.uinput = None
         self.reference = None
         self.forced_software = False
+        self.timeout = 8
 
     def log(self, message):
         print(message, flush=True)
@@ -463,8 +490,8 @@ class Session:
         if self.uinput is None:
             self.uinput = Uinput(self.adb)
 
-    def wait_for(self, probe, what, timeout=8):
-        deadline = time.monotonic() + timeout
+    def wait_for(self, probe, what, timeout=None):
+        deadline = time.monotonic() + (self.timeout if timeout is None else timeout)
         while time.monotonic() < deadline:
             value = probe()
             if value:
@@ -482,12 +509,15 @@ class Session:
         if self.verbose:
             self.log(focus.group(0))
         new = self.wait_for(lambda: self.adb.node('notes_new'), 'new-note button')
+        existing = set(json.loads(self.adb.broadcast('notes'))['ids'])
         self.adb.shell('input tap %d %d' % center(new.get('bounds')))
-        body = self.wait_for(lambda: (n := self.adb.node('notes_body')) is not None and
-                             n.get('text', '') in ('', n.get('hint', '')) and n, 'empty new note')
-        self.adb.shell('input tap %d %d' % center(body.get('bounds')))
-        self.wait_for(lambda: (n := self.adb.node('notes_body')) is not None and n.get('focused') == 'true',
-                      'focused note body')
+        # Never type into a note that existed before the run.
+        self.wait_for(lambda: (notes := json.loads(self.adb.broadcast('notes')))['active'] and
+                      notes['active'] not in existing and len(notes['ids']) == len(existing) + 1, 'new note')
+        if self.note_body()['text']:
+            raise FlowError('the new note is not empty')
+        self.adb.shell('input tap %d %d' % center(self.adb.node('notes_body').get('bounds')))
+        self.wait_for(lambda: self.note_body()['focused'], 'focused note body')
         if software:
             self.wait_for(self.software_keys, 'visible software keyboard')
         self.log('opened a new note in NotesActivity')
@@ -499,12 +529,15 @@ class Session:
             keys.setdefault(match.group(1), (int(match.group(2)), int(match.group(3))))
         return keys
 
+    def note_body(self):
+        """Text and focus of the real editor, read in the app; the UI dump shows the hint when empty."""
+        try:
+            return json.loads(self.adb.broadcast('noteBody'))
+        except FlowError as error:
+            raise FlowError(f'the note body is not visible: {error}') from None
+
     def body_text(self):
-        node = self.adb.node('notes_body')
-        if node is None:
-            raise FlowError('the note body is no longer visible')
-        text = node.get('text', '')
-        return '' if text == node.get('hint') else text
+        return self.note_body()['text']
 
     def execute(self, ops):
         screen_keys = {}
@@ -556,15 +589,31 @@ class Session:
             self.uinput.key(scan, False)
 
     def close(self):
-        try:
-            self.release_all()
-        except FlowError:
-            pass
-        finally:
-            if self.uinput:
-                self.uinput.close()
-            if self.forced_software:
-                self.adb.broadcast('clearSoftwareOverride')
+        """Run every cleanup step even if an earlier one fails; return the failures."""
+        steps = [('release held input', self.release_all)]
+        if self.uinput:
+            steps.append(('remove virtual devices', self.uinput.close))
+        if self.forced_software:
+            steps.append(('clear temporary software-keyboard mode', self.clear_software_keyboard))
+        errors = []
+        for name, action in steps:
+            try:
+                action()
+            except Exception as error:  # noqa: BLE001 - every cleanup step must still run
+                errors.append(f'{name}: {error}')
+                print(f'cleanup failed: {name}: {error}', file=sys.stderr)
+        return errors
+
+    def clear_software_keyboard(self):
+        self.adb.broadcast('clearSoftwareOverride')
+        self.forced_software = False
+
+
+def finish(session, error):
+    """Clean up; a cleanup failure fails the command only when nothing failed before."""
+    failures = session.close()
+    if failures and error is None:
+        raise FlowError('cleanup failed: ' + '; '.join(failures))
 
 
 def command_plan(session, path):
@@ -582,6 +631,7 @@ def command_run(session, path):
     steps = parse_flow(Path(path).read_text(encoding='utf-8'))
     surfaces = {step.surface for step in steps if step.surface}
     session.preflight()
+    error = None
     try:
         session.load_reference()
         if 'hw' in surfaces or any(step.action == 'require-profile' for step in steps):
@@ -595,39 +645,77 @@ def command_run(session, path):
         session.check_requirements(ops, keymap)
         session.execute(ops)
         session.log(f'PASS {path}')
+    except BaseException as caught:
+        error = caught
+        raise
     finally:
-        session.close()
+        finish(session, error)
 
 
-def command_devices(session):
+def compare_keyboards(real, clone, real_hub, clone_hub, real_bits, clone_bits):
+    """Return report lines and the number of differences without an exact known cause."""
+    rows = [(f'plektra.{k}', real[k], clone.get(k)) for k in real if k not in ('id', 'keys')]
+    rows += [(f'eventhub.{k}', real_hub[k], clone_hub[k]) for k in real_hub if k != 'Path']
+    rows.append(('kernel.keyBits', real_bits, clone_bits))
+    key_diff = [code for code in sorted(set(real['keys']) | set(clone['keys']))
+                if real['keys'].get(code) != clone['keys'].get(code)]
+    rows.append(('android.keyCharacterMap', f'{len(real["keys"])} keys',
+                  f'{len(real["keys"])} keys' if not key_diff else f'differs: {", ".join(key_diff)}'))
+    lines, unexplained = [], 0
+    for name, left, right in rows:
+        note = None if left == right else explain_clone_difference(name, left, right)
+        unexplained += left != right and note is None
+        mark = '=' if left == right else '~' if note else '≠'
+        lines.append(f'{mark} {name}: built-in={left!r} clone={right!r}' + (f'  [{note}]' if note else ''))
+    lines.append(f'{unexplained} unexplained differences')
+    return lines, unexplained
+
+
+def explain_clone_difference(name, real, clone):
+    """Accept only the exact differences uinput cannot avoid; anything else stays a failure."""
+    if name == 'eventhub.Classes':
+        real_classes = {c.strip() for c in real.split('|')}
+        if 'BATTERY' not in real_classes and {c.strip() for c in clone.split('|')} == real_classes | {'BATTERY'}:
+            return 'additional BATTERY class of the uinput node; battery state is not part of key mapping'
+    if name == 'eventhub.Identifier':
+        pairs = lambda text: dict(part.strip().split('=', 1) for part in text.split(',') if '=' in part)
+        real_ids, clone_ids = pairs(real), pairs(clone)
+        if real_ids.keys() == clone_ids.keys() and \
+                {k for k in real_ids if real_ids[k] != clone_ids[k]} == {'bus'} and \
+                real_ids['bus'] == '0x0000' and clone_ids['bus'] == '0x0019':
+            return 'uinput accepts only named buses; HOST (0x19) keeps the device internal'
+    return None
+
+
+def command_devices(session, output=None):
     """Compare the built-in keyboard with its uinput clone as Android and Plektra see them."""
-    session.identity()
+    props = session.identity()
+    error = None
     try:
         session.start_hardware()
         real, clone = session.reference, session.virtual_keyboard
         dump = session.adb.shell('dumpsys input')
         real_hub = event_hub_fields(input_dump_block(dump, real['name'], False) or '')
         clone_hub = event_hub_fields(input_dump_block(dump, real['name'], True) or '')
-        rows = [(f'plektra.{k}', real[k], clone[k]) for k in real if k not in ('id', 'keys')]
-        rows += [(f'eventhub.{k}', real_hub[k], clone_hub[k]) for k in real_hub if k != 'Path']
-        rows.append(('kernel.keyBits', key_bits(session.adb, real_hub['Path']),
-                     key_bits(session.adb, clone_hub['Path'])))
-        key_diff = [code for code in sorted(set(real['keys']) | set(clone['keys']))
-                    if real['keys'].get(code) != clone['keys'].get(code)]
-        rows.append(('android.keyCharacterMap', f'{len(real["keys"])} keys',
-                     'identical' if not key_diff else f'differs: {", ".join(key_diff)}'))
-        unexplained = 0
-        for name, left, right in rows:
-            same = left == right or name == 'android.keyCharacterMap' and not key_diff
-            note = '' if same else KNOWN_CLONE_DIFFERENCES.get(name)
-            unexplained += not same and not note
-            print(f'{"=" if same else "~" if note else "≠"} {name}: built-in={left!r} clone={right!r}'
-                  + (f'  [{note}]' if note else ''))
-        print(f'{unexplained} unexplained differences')
+        lines, unexplained = compare_keyboards(real, clone, real_hub, clone_hub,
+                                               key_bits(session.adb, real_hub['Path']),
+                                               key_bits(session.adb, clone_hub['Path']))
+        print('\n'.join(lines))
+        if output:
+            header = [f'# input_flow.py devices, {time.strftime("%Y-%m-%d %H:%M %Z")}',
+                      '# ' + ', '.join(f'{k}={v}' for k, v in props.items()),
+                      f'# package={session.adb.package}']
+            keys = [f'{code}: {json.dumps(real["keys"][code], ensure_ascii=False, sort_keys=True)}'
+                    for code in sorted(real['keys'])]
+            Path(output).write_text('\n'.join(header + lines + ['', '# built-in key character map'] + keys) + '\n',
+                                    encoding='utf-8')
         if unexplained:
             raise FlowError('the virtual keyboard differs from the built-in keyboard')
+    except BaseException as caught:
+        error = caught
+        raise
     finally:
-        session.close()
+        finish(session, error)
 
 
 def main(argv=None):
@@ -636,14 +724,15 @@ def main(argv=None):
     parser.add_argument('--package', default='rocks.pkb.plektra.nightly')
     parser.add_argument('--verbose', action='store_true', help='print each executed operation')
     commands = parser.add_subparsers(dest='command', required=True)
-    commands.add_parser('devices', help='compare the built-in keyboard with the virtual clone')
+    commands.add_parser('devices', help='compare the built-in keyboard with the virtual clone').add_argument(
+        '--output', help='also write the comparison and the key character map to this file')
     for name in ('plan', 'run'):
         commands.add_parser(name).add_argument('flow')
     args = parser.parse_args(argv)
     session = Session(Adb(args.device, args.package), args.verbose)
     try:
         if args.command == 'devices':
-            command_devices(session)
+            command_devices(session, args.output)
         elif args.command == 'plan':
             command_plan(session, args.flow)
         else:

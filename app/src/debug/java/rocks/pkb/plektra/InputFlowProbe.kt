@@ -109,11 +109,24 @@ object InputFlowProbe {
         AltModifierMappingResolver.resolve(context.assets, context).forEach { (code, text) ->
             alt.put(KeyEvent.keyCodeToString(code), text)
         }
-        val bounceKeys = SettingsManager.getBounceKeysEnabled(context) &&
-            SettingsManager.getBounceKeysCategoryEnabled(context, BounceKeyFilter.Category.CHARACTER)
+        // Bounce Keys suppresses a repeated key down per category; list each keyboard key it applies to.
+        val bounce = JSONObject()
+        if (SettingsManager.getBounceKeysEnabled(context)) {
+            val delay = SettingsManager.getBounceKeysDelayMs(context)
+            val allCodes = IntArray(KeyEvent.getMaxKeyCode() + 1) { it }
+            val present = BooleanArray(allCodes.size)
+            for (id in InputDevice.getDeviceIds()) {
+                val device = InputDevice.getDevice(id) ?: continue
+                if (device.keyboardType == InputDevice.KEYBOARD_TYPE_NONE) continue
+                val has = device.hasKeys(*allCodes)
+                for (code in allCodes) if (has[code]) present[code] = true
+            }
+            allCodes.filter { present[it] && SettingsManager.getBounceKeysCategoryEnabled(context, BounceKeyFilter.categoryFor(it)) }
+                .forEach { bounce.put(KeyEvent.keyCodeToString(it), delay) }
+        }
         return JSONObject().apply {
             put("multiTapTimeoutMs", MultiTapController.TIMEOUT_MS)
-            put("bounceKeysDelayMs", if (bounceKeys) SettingsManager.getBounceKeysDelayMs(context) else 0L)
+            put("bounceKeysDelayMs", bounce)
             put("layoutSetting", SettingsManager.getKeyboardLayout(context))
             put("physicalProfileOverride", SettingsManager.getPhysicalKeyboardProfileOverride(context))
             put("layout", layout)

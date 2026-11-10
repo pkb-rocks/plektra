@@ -111,11 +111,48 @@ class RepeatedKeyTest(unittest.TestCase):
         first, second = self.down_times(ops, 'E')
         self.assertLess(second - first, 400)
 
+    def bounce_plan(self, text, keys):
+        keymap = dict(KEYMAP, bounceKeysDelayMs={f'KEYCODE_{key}': 300 for key in keys})
+        return flow.plan(flow.parse_flow(f'hw type {text}\nexpect x'), keymap, KEY_CODES)
+
+    def gaps(self, ops, key):
+        times = self.down_times(ops, key)
+        return [later - earlier for earlier, later in zip(times, times[1:])]
+
     def test_type_waits_out_bounce_keys(self):
-        keymap = dict(KEYMAP, bounceKeysDelayMs=300)
-        ops = flow.plan(flow.parse_flow('hw type aa\nexpect x'), keymap, KEY_CODES)
-        first, second = self.down_times(ops, 'A')
-        self.assertGreater(second - first, 300)
+        self.assertTrue(all(gap > 300 for gap in self.gaps(self.bounce_plan('aa', ['A']), 'A')))
+
+    def test_modifier_bounce_spaces_repeated_alt_chords(self):
+        # Alt+Q, Alt+W = "01": the second Alt down must not fall inside the modifier delay.
+        ops = self.bounce_plan('01', ['ALT_LEFT'])
+        self.assertEqual([('ALT_LEFT', True), ('Q', True), ('Q', False), ('ALT_LEFT', False),
+                          ('ALT_LEFT', True), ('W', True), ('W', False), ('ALT_LEFT', False)], edges(ops))
+        self.assertTrue(all(gap > 300 for gap in self.gaps(ops, 'ALT_LEFT')))
+        # Character keys differ, so only the modifier delay applies.
+        self.assertLess(self.gaps(ops, 'ALT_LEFT')[0], 300 + 100 + 80)
+
+    def test_space_and_enter_bounce_have_their_own_categories(self):
+        ops = self.bounce_plan('a  \n\n', ['SPACE', 'ENTER'])
+        self.assertTrue(all(gap > 300 for gap in self.gaps(ops, 'SPACE')))
+        self.assertTrue(all(gap > 300 for gap in self.gaps(ops, 'ENTER')))
+
+    def test_disabled_categories_keep_fast_typing(self):
+        # Only Space bounces: repeated Alt chords and letters keep the 80 ms rhythm.
+        ops = self.bounce_plan('01aa', ['SPACE'])
+        self.assertEqual([120], self.gaps(ops, 'ALT_LEFT'))  # down, 40 ms, Q, 40 ms press, ups, 40 ms
+        self.assertEqual([80], self.gaps(ops, 'A'))
+        self.assertEqual([], self.gaps(self.bounce_plan('0a1', []), 'Q'))
+
+    def test_bounce_and_multi_tap_combine(self):
+        greek = {'multiTapTimeoutMs': 400, 'alt': {}, 'bounceKeysDelayMs': {'KEYCODE_E': 600},
+                 'layout': {'KEYCODE_E': {'lowercase': 'ε', 'uppercase': 'Ε', 'multiTap': True}}}
+        ops = flow.plan(flow.parse_flow('hw type εε\nexpect x'), greek, KEY_CODES)
+        self.assertGreater(self.gaps(ops, 'E')[0], 600)
+
+    def test_explicit_presses_keep_their_timing_with_bounce(self):
+        keymap = dict(KEYMAP, bounceKeysDelayMs={'KEYCODE_ALT_LEFT': 300})
+        ops = flow.plan(flow.parse_flow('hw press ALT_LEFT\nhw press ALT_LEFT\nexpect x'), keymap, KEY_CODES)
+        self.assertEqual([80], self.gaps(ops, 'ALT_LEFT'))
 
 
 REAL = {'id': 3, 'name': 'TitanKey', 'vendorId': 9523, 'productId': 9523, 'isExternal': False,

@@ -182,16 +182,21 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
             ops.append({'line': line, 'op': 'touch', 'down': down, 'target': key})
 
     def separate_repeat(line, keys):
-        """Keep `type` from merging repeated keys into a multi-tap cycle or a bounce."""
-        key = keys[-1]
-        if key not in last_down:
-            return
-        needed = keymap.get('bounceKeysDelayMs', 0)
-        if key == last_character_key and multi_tap_keys and key in multi_tap_keys:
-            needed = max(needed, keymap['multiTapTimeoutMs'])
-        if needed:
-            arrival = clock + gap_ms * (len(keys) - 1)
-            wait(line, max(0, last_down[key] + needed + REPEAT_MARGIN_MS - arrival))
+        """Keep `type` from merging repeated keys into a multi-tap cycle or a bounce.
+
+        Every key of the chord, modifiers included, goes down `gap_ms` after the previous one and must
+        reach Plektra after its own Bounce Keys delay and, for the character key, the multi-tap timeout."""
+        bounce = keymap.get('bounceKeysDelayMs') or {}
+        delays = [0]
+        for index, key in enumerate(keys):
+            if key not in last_down:
+                continue
+            needed = bounce.get(f'KEYCODE_{key}', 0)
+            if key == keys[-1] and key == last_character_key and key in multi_tap_keys:
+                needed = max(needed, keymap['multiTapTimeoutMs'])
+            if needed:
+                delays.append(last_down[key] + needed + REPEAT_MARGIN_MS - (clock + gap_ms * index))
+        wait(line, max(delays))
 
     def chord(line, surface, keys):
         for key in keys:

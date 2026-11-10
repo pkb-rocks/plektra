@@ -3408,7 +3408,8 @@ class StatusBarController(
             reserveEmptyRow = isFullSoftwareKeyboardMode && suggestionsEnabledSetting,
             displayOnly = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty(),
             continuousPreview = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty() &&
-                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context)
+                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context),
+            alwaysShowSuggestionsBar = SettingsManager.getAlwaysShowSuggestionsBar(context)
         )
         ledStatusView.compactOnly = fullSuggestionsBar?.ensureView()?.visibility != View.VISIBLE && !barPresentation.actions && !hasTransientSurface
         val ledOnly = ledStatusView.compactOnly && showLedStrip

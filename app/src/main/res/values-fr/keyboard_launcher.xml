@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Lanceur Plektra</string>
+    <string name="keyboard_launcher_hint">Gardez la touche choisie enfoncée pendant un appui court ou long sur une lettre. Relâchez-la pour reprendre la frappe. Avec Fn, maintenez jusqu’à la vibration ; deux appuis rapides verrouillent toujours Nav. Une touche Maj affectée aux raccourcis ne fait plus de majuscules ; utilisez l’autre Maj.</string>
+    <string name="keyboard_launcher_left_shift">Maj gauche</string>
+    <string name="keyboard_launcher_right_shift">Maj droite</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Rechercher une action</string>
+    <string name="keyboard_launcher_remove">Retirer l’affectation</string>
+    <string name="keyboard_launcher_selected">Raccourci sélectionné</string>
+    <string name="keyboard_launcher_missing_command">Raccourci indisponible</string>
+    <string name="keyboard_launcher_short">Appui court</string>
+    <string name="keyboard_launcher_long">Appui long</string>
+    <string name="keyboard_launcher_delay">Durée du maintien : %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Raccourcis dans toutes les applications</string>
+    <string name="keyboard_launcher_summary">Ouvrez des applications et des actions avec une touche maintenue et des appuis courts ou longs sur les lettres.</string>
+    <string name="keyboard_launcher_access_hint">Pour utiliser les raccourcis hors des champs de saisie, activez le service d’accessibilité Lanceur Plektra / Clicks. Le mode Nav est indépendant. Si Android bloque l’activation, autorisez d’abord les paramètres restreints dans les informations Android de cette application.</string>
+    <string name="keyboard_launcher_service_description">Gère les raccourcis du lanceur explicitement activés et les affectations des boutons Clicks compatibles. Ne récupère pas le contenu de l’écran.</string>
+    <string name="keyboard_launcher_service_label">Lanceur Plektra / Clicks</string>
+</resources>

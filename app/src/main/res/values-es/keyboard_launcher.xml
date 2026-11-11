@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Lanzador Plektra</string>
+    <string name="keyboard_launcher_hint">Mantén pulsada la tecla elegida mientras pulsas una letra de forma corta o larga. Suéltala para volver a escribir. Con Fn, espera a la vibración; dos pulsaciones rápidas siguen bloqueando Nav. Mayús asignada queda reservada a los atajos; usa la otra para mayúsculas.</string>
+    <string name="keyboard_launcher_left_shift">Mayús izquierda</string>
+    <string name="keyboard_launcher_right_shift">Mayús derecha</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Buscar acciones</string>
+    <string name="keyboard_launcher_remove">Quitar asignación</string>
+    <string name="keyboard_launcher_selected">Atajo seleccionado</string>
+    <string name="keyboard_launcher_missing_command">Atajo no disponible</string>
+    <string name="keyboard_launcher_short">Pulsación corta</string>
+    <string name="keyboard_launcher_long">Pulsación larga</string>
+    <string name="keyboard_launcher_delay">Duración: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Atajos en todas las aplicaciones</string>
+    <string name="keyboard_launcher_summary">Abre aplicaciones y acciones manteniendo una tecla y pulsando letras de forma corta o larga.</string>
+    <string name="keyboard_launcher_access_hint">Para usar atajos fuera de campos de texto, activa el servicio de accesibilidad Plektra Launcher / Clicks. El modo Nav es independiente. Si Android bloquea la activación, permite primero los ajustes restringidos en la información de esta aplicación.</string>
+    <string name="keyboard_launcher_service_description">Gestiona los atajos activados explícitamente y la asignación de botones Clicks compatibles. No obtiene el contenido de la pantalla.</string>
+    <string name="keyboard_launcher_service_label">Lanzador Plektra / Clicks</string>
+</resources>

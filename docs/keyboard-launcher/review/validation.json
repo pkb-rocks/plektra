@@ -1,0 +1,44 @@
+{
+  "base": "3ead4703e335ac7e879074278068d16021020319",
+  "tests": {
+    "targeted": 174,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "testStableDebugUnitTest": "passed selected launcher/settings/modifier/device/Clicks suites",
+    "lintStableDebug": "completed; existing findings remain, not lint clean",
+    "assembleStableDebug": "passed"
+  },
+  "device": {
+    "tested": true,
+    "model": "Titan 2",
+    "androidApi": 36,
+    "sourceCommit": "893b21dfe4add9ff9c6c7eca1bbe0fe27539cc53",
+    "isolatedApplicationId": "rocks.pkb.plektra.review.launcher",
+    "apkSha256": "51105a84c4d18d37d729364ac5ea87d8faf37e157ae77cd67629e5fa81887ccc",
+    "inputMethod": "Ordered ADB-injected key events through Android input dispatch; no direct controller calls",
+    "passed": [
+      "Short Left Shift + A launches Sample One",
+      "Long Left Shift + A launches Sample Two",
+      "Ordinary typing with Shift released",
+      "Typing continues in retained Sample One editor after return",
+      "Left Shift + G opens Android Display settings without changing brightness"
+    ],
+    "recording": "https://github.com/user-attachments/assets/65bf22c5-6eb2-42ff-b368-2d665ca975bb",
+    "recordingSha256": "221dca93c0cff829e19b0dcd1dc23fd0f14a0c99903d67ff20ae5a53f2d56487",
+    "publicationApprovedByDeviceOwner": true,
+    "originalKeyboardAndAccessibilityRestored": true,
+    "limitations": [
+      "Physical hardware key matrix and long-session endurance were not established by this injected-event demonstration",
+      "Fn double-tap/opposite Shift/lock cancellation remain automated-test evidence, not scenes in this video",
+      "Sample One editor was focused before recording; arbitrary-app ready-to-type behavior is not demonstrated",
+      "Only a neutral Android settings submenu is shown; no third-party shortcut-provider discovery or privileged system toggle is tested"
+    ]
+  },
+  "defaultEnabled": false,
+  "navMappingsMigrated": false,
+  "newScreenContentCapability": false,
+  "fullUnitSuiteRun": false
+}

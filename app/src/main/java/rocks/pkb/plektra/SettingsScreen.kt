@@ -70,6 +70,7 @@ enum class SettingsDestination {
     Accessibility,
     AutoCorrection,
     Customization,
+    PersonalLauncher,
     NavMode,
     Advanced,
     About,
@@ -227,6 +228,7 @@ fun SettingsScreen(
                     onQuickLauncherClick = {
                         openCustomization(SettingsActivity.CUSTOMIZATION_DESTINATION_LAUNCHER_SHORTCUTS)
                     },
+                    onPersonalLauncherClick = { navigateTo(SettingsDestination.PersonalLauncher) },
                     onNavModeClick = {
                         navigateToNavMode(null)
                     },
@@ -291,6 +293,9 @@ fun SettingsScreen(
                     initialKeyboardThemeTab = entry.keyboardThemeTab,
                     onOpenModifiers = { navigateTo(SettingsDestination.Modifiers) }
                 )
+            }
+            SettingsDestination.PersonalLauncher -> {
+                KeyboardLauncherScreen(onBack={navigateBack()})
             }
             SettingsDestination.NavMode -> {
                 NavModeSettingsScreen(
@@ -372,6 +377,7 @@ private fun SettingsMainScreen(
     onStatusBarButtonsClick: () -> Unit,
     onKeyboardThemeClick: () -> Unit,
     onQuickLauncherClick: () -> Unit,
+    onPersonalLauncherClick: () -> Unit,
     onNavModeClick: () -> Unit,
     onEnterBehaviorClick: () -> Unit,
     onAdvancedClick: () -> Unit,
@@ -547,6 +553,13 @@ private fun SettingsMainScreen(
                 description = stringResource(R.string.starter_launcher_shortcuts_description),
                 linkId = SettingLinkIds.MAIN_LAUNCHER_SHORTCUTS,
                 onClick = onQuickLauncherClick
+            )
+            SettingsCategoryRow(
+                icon = Icons.Filled.Keyboard,
+                title = stringResource(R.string.keyboard_launcher_title),
+                description = stringResource(R.string.keyboard_launcher_summary),
+                linkId = SettingLinkIds.MAIN_PERSONAL_LAUNCHER,
+                onClick = onPersonalLauncherClick
             )
             SettingsCategoryRow(
                 icon = ImageVector.vectorResource(R.drawable.navigation_24),

@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Plektra-Launcher</string>
+    <string name="keyboard_launcher_hint">Halten Sie die gewählte Taste gedrückt und drücken Sie einen Buchstaben kurz oder lang. Lassen Sie die Taste zum Schreiben los. Fn bis zur Vibration halten; zweimaliges kurzes Drücken sperrt weiterhin Nav. Eine zugewiesene Umschalttaste ist für Kurzbefehle reserviert; die andere bleibt für Großbuchstaben.</string>
+    <string name="keyboard_launcher_left_shift">Linke Umschalttaste</string>
+    <string name="keyboard_launcher_right_shift">Rechte Umschalttaste</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Aktionen suchen</string>
+    <string name="keyboard_launcher_remove">Zuweisung entfernen</string>
+    <string name="keyboard_launcher_selected">Ausgewählter Kurzbefehl</string>
+    <string name="keyboard_launcher_missing_command">Kurzbefehl nicht verfügbar</string>
+    <string name="keyboard_launcher_short">Kurz drücken</string>
+    <string name="keyboard_launcher_long">Lange drücken</string>
+    <string name="keyboard_launcher_delay">Haltedauer: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Tastenkürzel in allen Apps</string>
+    <string name="keyboard_launcher_summary">Apps und Aktionen mit einer gehaltenen Taste und kurzen oder langen Buchstabendrücken öffnen.</string>
+    <string name="keyboard_launcher_access_hint">Für Kürzel außerhalb von Textfeldern den Bedienungshilfedienst Plektra Launcher / Clicks aktivieren. Der Nav-Modus ist unabhängig. Blockiert Android die Aktivierung, zuerst eingeschränkte Einstellungen in den Android-App-Informationen erlauben.</string>
+    <string name="keyboard_launcher_service_description">Verarbeitet ausdrücklich aktivierte Launcher-Kürzel und unterstützte Clicks-Tastenbelegungen. Ruft keine Bildschirminhalte ab.</string>
+    <string name="keyboard_launcher_service_label">Plektra-Launcher / Clicks</string>
+</resources>

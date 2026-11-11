@@ -211,6 +211,10 @@ internal object BackupPreferenceContract {
     private val plektraPrefsSchema = PreferenceFileSchema(
         prefName = "plektra_prefs",
         fixedKeys = mapOf(
+            "shortcut_layer_enabled" to PreferenceValueType.BOOLEAN,
+            "shortcut_layer_trigger" to PreferenceValueType.INT,
+            "shortcut_layer_delay_ms" to PreferenceValueType.INT,
+            "shortcut_layer_mappings" to PreferenceValueType.STRING,
             "long_press_threshold" to PreferenceValueType.LONG,
             "auto_capitalize_first_letter" to PreferenceValueType.BOOLEAN,
             "auto_capitalize_respect_manual_shift_off" to PreferenceValueType.BOOLEAN,

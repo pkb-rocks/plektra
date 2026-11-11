@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_photo_pick">Chọn từ ảnh</string>
+    <string name="theme_photo_loading">Đang tải ảnh…</string>
+    <string name="theme_photo_failed">Không thể mở ảnh này. Hãy chọn ảnh khác nhỏ hơn 16 MB.</string>
+    <string name="theme_photo_title">Chọn màu</string>
+    <string name="theme_photo_hint">Chạm vào ảnh để chọn màu. Chỉ màu đã chọn được lưu.</string>
+    <string name="theme_photo_change">Chọn ảnh khác</string>
+    <string name="theme_photo_use">Dùng màu</string>
+</resources>

@@ -1,0 +1,85 @@
+{
+  "base": "3ead4703e335ac7e879074278068d16021020319",
+  "tests": {
+    "tests": 57,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "rocks.pkb.plektra.backup.BackupPreferenceContractIntegrationTest",
+      "tests": "18",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "rocks.pkb.plektra.KeyboardThemeColorTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "rocks.pkb.plektra.KeyboardThemeImportTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "rocks.pkb.plektra.KeyboardThemeModelTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "rocks.pkb.plektra.SettingsManagerKeyboardThemeAssignmentTest",
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "rocks.pkb.plektra.ThemePhotoColorsTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "lint": {
+    "task": ":app:lintStableDebug",
+    "passed": true,
+    "newSamplerFindings": [
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "meaning": "Prefer Bitmap.get extension; style suggestion only"
+      }
+    ]
+  },
+  "reviewApk": {
+    "filename": "plektra-theme-photo-colors-review-20261027.apk",
+    "sha256": "4863875fc69be93390a068b273c171d8c4e809a2bb1b9f76a0263e61889da6dc",
+    "package": "rocks.pkb.plektra.review.photo",
+    "label": "Plektra Photo Colours Test",
+    "signatureVerified": true
+  },
+  "deviceVerified": true,
+  "videoApproved": true,
+  "deviceCodeCommit": "c8b7b1f",
+  "video": {
+    "filename": "plektra-theme-photo-colors-demo-en-20261027.mp4",
+    "sha256": "268a92c1bba8c8ac1b6589a4b5db062655e676c12a7fbac3b78754ef04cfe2c6",
+    "durationSeconds": 24.92,
+    "dimensions": "808x916",
+    "audioStreams": 0,
+    "nativeFramesReviewed": 116,
+    "statusBarRemoved": true,
+    "approvedForPublication": true,
+    "uploaded": false
+  }
+}

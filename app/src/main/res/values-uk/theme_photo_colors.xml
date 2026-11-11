@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_photo_pick">Вибрати на фото</string>
+    <string name="theme_photo_loading">Завантаження фото…</string>
+    <string name="theme_photo_failed">Не вдалося відкрити фото. Виберіть інше зображення розміром менше 16 МБ.</string>
+    <string name="theme_photo_title">Вибрати колір</string>
+    <string name="theme_photo_hint">Торкніться фото, щоб вибрати колір. Зберігається лише вибраний колір.</string>
+    <string name="theme_photo_change">Вибрати інше фото</string>
+    <string name="theme_photo_use">Використати колір</string>
+</resources>

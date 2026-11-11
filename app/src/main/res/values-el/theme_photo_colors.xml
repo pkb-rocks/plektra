@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="theme_photo_pick">Επιλογή από φωτογραφία</string>
+    <string name="theme_photo_loading">Φόρτωση φωτογραφίας…</string>
+    <string name="theme_photo_failed">Δεν είναι δυνατό το άνοιγμα. Επιλέξτε άλλη εικόνα μικρότερη από 16 MB.</string>
+    <string name="theme_photo_title">Επιλογή χρώματος</string>
+    <string name="theme_photo_hint">Αγγίξτε τη φωτογραφία για να επιλέξετε χρώμα. Αποθηκεύεται μόνο το επιλεγμένο χρώμα.</string>
+    <string name="theme_photo_change">Επιλογή άλλης φωτογραφίας</string>
+    <string name="theme_photo_use">Χρήση χρώματος</string>
+</resources>

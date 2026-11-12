@@ -575,9 +575,11 @@
     <string name="speech_recognition_error_not_available">Reconocimiento de voz no disponible.</string>
     <string name="nav_mode_warning_icon">⚠</string>
     <string name="emoji_category_emoticons">Emoticonos</string>
-    <string name="emoji_picker_search_label">Search</string>
-    <string name="emoji_picker_search_placeholder">Search emoji...</string>
+    <string name="emoji_picker_search_label">Buscar o código Unicode</string>
+    <string name="emoji_picker_search_placeholder">Buscar emoji...</string>
     <string name="emoji_picker_no_results">No emoji found</string>
+    <string name="emoji_picker_use_code">Usar</string>
+    <string name="emoji_picker_invalid_unicode">Código Unicode no válido</string>
     <string name="variation_global_layout_override_title">Global Variation Mapping</string>
     <string name="variation_global_layout_override_description">Force variation ordering from one layout across all layouts. Default is current IME layout (%1$s).</string>
     <string name="variation_global_layout_override_none">None (use current layout)</string>

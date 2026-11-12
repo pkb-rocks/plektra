@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Mostra sempre la barra dei suggerimenti</string>
+    <string name="always_show_suggestions_bar_summary">Impedisce che la striscia dei suggerimenti si nasconda automaticamente (dopo simboli Alt, punteggiatura, ecc.) per mantenere costante la dimensione della finestra dell’app.</string>
+</resources>

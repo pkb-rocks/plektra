@@ -77,6 +77,7 @@ object SettingsManager {
     private const val KEY_AUTO_CORRECT_ENABLED_LANGUAGES = "auto_correct_enabled_languages"
     private const val KEY_SUGGESTIONS_ENABLED = "suggestions_enabled"
     private const val KEY_SUGGESTIONS_BOLD = "suggestions_bold"
+    private const val KEY_ALWAYS_SHOW_SUGGESTIONS_BAR = "always_show_suggestions_bar"
     private const val KEY_SNIPPETS_ENABLED = "snippets_enabled"
     private const val KEY_SNIPPETS_PREFIX = "snippets_prefix"
     private const val KEY_SNIPPETS = "snippets_v1"
@@ -3198,6 +3199,13 @@ object SettingsManager {
 
     fun setSuggestionsBold(context: Context, enabled: Boolean) {
         getPreferences(context).edit().putBoolean(KEY_SUGGESTIONS_BOLD, enabled).apply()
+    }
+
+    fun getAlwaysShowSuggestionsBar(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_ALWAYS_SHOW_SUGGESTIONS_BAR, false)
+
+    fun setAlwaysShowSuggestionsBar(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_ALWAYS_SHOW_SUGGESTIONS_BAR, enabled).apply()
     }
 
     /**

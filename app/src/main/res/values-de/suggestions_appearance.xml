@@ -2,4 +2,6 @@
 <resources>
     <string name="suggestions_bold_title">Fette Wortvorschläge</string>
     <string name="suggestions_bold_summary">Wortvorschläge in Normal- und Slim-Modus fett anzeigen.</string>
+    <string name="always_show_suggestions_bar_title">Vorschlagsleiste immer anzeigen</string>
+    <string name="always_show_suggestions_bar_summary">Verhindert das automatische Ausblenden der Vorschlagsleiste (z. B. nach Alt-Symbolen oder Satzzeichen), damit die App-Fenstergröße konstant bleibt.</string>
 </resources>

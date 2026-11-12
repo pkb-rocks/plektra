@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Toujours afficher la barre de suggestions</string>
+    <string name="always_show_suggestions_bar_summary">Empêche la barre de suggestions de se masquer automatiquement (après des symboles Alt, de la ponctuation, etc.) afin de garder une taille de fenêtre constante.</string>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Завжди показувати панель підказок</string>
+    <string name="always_show_suggestions_bar_summary">Не дає панелі підказок автоматично ховатися (наприклад, після символів Alt або розділових знаків), щоб розмір вікна програми залишався сталим.</string>
+</resources>

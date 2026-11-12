@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Luôn hiện thanh gợi ý</string>
+    <string name="always_show_suggestions_bar_summary">Ngăn thanh gợi ý tự ẩn (ví dụ sau ký hiệu Alt hoặc dấu câu) để kích thước cửa sổ ứng dụng không đổi.</string>
+</resources>

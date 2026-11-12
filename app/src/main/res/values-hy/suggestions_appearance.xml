@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Միշտ ցուցադրել առաջարկների գոտին</string>
+    <string name="always_show_suggestions_bar_summary">Կանխում է առաջարկների գոտու ավտոմատ թաքցումը (օր.՝ Alt նշաններից կամ կետադրությունից հետո), որպեսզի հավելվածի պատուհանի չափը մնա կայուն.</string>
+</resources>

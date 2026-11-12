@@ -395,7 +395,19 @@ class EmojiPickerView(
             sectionAdapter.notifyDataSetChanged()
             searchAdapter.notifyDataSetChanged()
         }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        // Hosts often measure with UNSPECIFIED height (SYM surface sizing). Floor at the
+        // configured panel height so few/empty search results cannot shrink the picker.
+        // AT_MOST must still respect the host bound (landscape / outer display).
+        val preferredHeight = layoutParams?.height?.takeIf { it > 0 } ?: configuredHeightPx(context)
+        val resolvedHeightSpec = when (View.MeasureSpec.getMode(heightMeasureSpec)) {
+            View.MeasureSpec.EXACTLY -> heightMeasureSpec
+            View.MeasureSpec.AT_MOST -> View.MeasureSpec.makeMeasureSpec(
+                minOf(preferredHeight, View.MeasureSpec.getSize(heightMeasureSpec)),
+                View.MeasureSpec.EXACTLY
+            )
+            else -> View.MeasureSpec.makeMeasureSpec(preferredHeight, View.MeasureSpec.EXACTLY)
+        }
+        super.onMeasure(widthMeasureSpec, resolvedHeightSpec)
     }
 
     fun setInputConnection(connection: InputConnection?) {
@@ -1156,9 +1168,41 @@ class EmojiPickerView(
                 SettingsManager.getSymAutoClose(context) &&
                     SettingsManager.getSymAutoCloseOnTouch(context)
                 )
+        // Clear search when this commit closes the picker. Keeping the query while the panel
+        // stays open preserves multi-pick search and category filtering.
         if (shouldClose) {
+            resetBrowseState()
             onCloseRequested?.invoke()
         }
+    }
+
+    /**
+     * Returns to the default category grid: clears the query, closes the search field, and
+     * shows the browse adapter from the top. Safe to call when the panel is reused across SYM opens.
+     */
+    fun resetBrowseState() {
+        searchJob?.cancel()
+        searchCategoryFilter = null
+        if (isSearchPanelVisible) {
+            // Quiet: callers may close/hide the host immediately after.
+            isSearchPanelVisible = false
+            recyclerView.setPadding(smallPadding, smallPadding, smallPadding, smallPadding)
+            searchPanel.visibility = View.GONE
+            searchToggleButton.background = createSearchToggleBackground(false)
+            setSearchInputCaptureEnabled(false)
+            applyEdgeControlAppearance()
+        } else {
+            setSearchInputCaptureEnabled(false)
+        }
+        if (searchQuery.isNotEmpty() || searchField.text?.isNotEmpty() == true) {
+            searchQuery = ""
+            lastSearchResults = emptyList()
+            searchField.setText("")
+        }
+        setSearchMode(false)
+        emptyView.visibility = View.GONE
+        recyclerView.visibility = if (sectionAdapter.itemCount > 0) View.VISIBLE else View.GONE
+        recyclerView.scrollToPosition(0)
     }
 
     /**
@@ -1465,23 +1509,8 @@ class EmojiPickerView(
     }
 
     private fun resetSearchStateQuietly() {
-        if (!isSearchPanelVisible) {
-            if (searchQuery.isNotEmpty()) {
-                searchQuery = ""
-                lastSearchResults = emptyList()
-                searchField.setText("")
-            }
-            return
-        }
         // Quiet: no onSearchPanelVisibilityChanged notification, the view is off-screen.
-        isSearchPanelVisible = false
-        recyclerView.setPadding(smallPadding, smallPadding, smallPadding, smallPadding)
-        searchPanel.visibility = View.GONE
-        searchToggleButton.background = createSearchToggleBackground(false)
-        setSearchInputCaptureEnabled(false)
-        searchQuery = ""
-        lastSearchResults = emptyList()
-        searchField.setText("")
+        resetBrowseState()
     }
 
     private inner class SectionAdapter :

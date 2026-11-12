@@ -271,6 +271,60 @@ class EmojiPickerOnScreenSearchTest {
     }
 
     @Test
+    fun emojiCommitClearsSearchAndReturnsToBrowseGrid() {
+        var closed = false
+        val view = EmojiPickerView(RuntimeEnvironment.getApplication()) { closed = true }
+        view.setPrivateField("isSearchPanelVisible", true)
+        view.setPrivateField("searchInputCaptureEnabled", true)
+        view.setPrivateField("isSearchMode", true)
+        view.searchField().setText("rocket")
+        view.setPrivateField("searchQuery", "rocket")
+        view.setPrivateField(
+            "lastSearchResults",
+            listOf(
+                EmojiSearchRepository.EmojiSearchResult(
+                    EmojiRepository.EmojiEntry("\uD83D\uDE80", emptyList()),
+                    "smileys",
+                    1,
+                    matched = "\uD83D\uDE80"
+                )
+            )
+        )
+        view.setInputConnection(RecordingInputConnection())
+
+        // Closing commits (Enter / auto-close) reset search; in-place picks keep it.
+        invokeOnEmojiSelected(view, "\uD83D\uDE80", "smileys", closeAfterCommit = true)
+
+        assertTrue(closed)
+        assertEquals("", view.searchText())
+        assertEquals(false, view.privateField("isSearchPanelVisible").get(view))
+        assertEquals(false, view.privateField("isSearchMode").get(view) as Boolean)
+        assertEquals(false, view.isSearchInputActive())
+    }
+
+    @Test
+    fun unspecifiedMeasureKeepsConfiguredPickerHeightWithEmptySearch() {
+        val view = EmojiPickerView(RuntimeEnvironment.getApplication())
+        val expected = EmojiPickerView.configuredHeightPx(view.context)
+        view.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, expected)
+        view.setPrivateField("searchQuery", "definitely-not-an-emoji")
+        view.setPrivateField(
+            "searchIndex",
+            EmojiSearchRepository.EmojiSearchIndex(emptyList())
+        )
+        invokeSetSearchPanelVisible(view, true)
+        invokeApplySearchNow(view)
+
+        val width = View.MeasureSpec.makeMeasureSpec(800, View.MeasureSpec.EXACTLY)
+        val height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        view.measure(width, height)
+
+        assertEquals(expected, view.measuredHeight)
+        assertEquals(View.VISIBLE, (view.privateField("emptyView").get(view) as View).visibility)
+        assertEquals(View.VISIBLE, (view.privateField("searchPanel").get(view) as View).visibility)
+    }
+
+    @Test
     fun detachDuringContainerReorderKeepsSearchState() {
         val view = EmojiPickerView(RuntimeEnvironment.getApplication())
         view.setPrivateField("isSearchPanelVisible", true)
@@ -301,7 +355,12 @@ class EmojiPickerOnScreenSearchTest {
         method.invoke(view)
     }
 
-    private fun invokeOnEmojiSelected(view: EmojiPickerView, emoji: String, categoryId: String) {
+    private fun invokeOnEmojiSelected(
+        view: EmojiPickerView,
+        emoji: String,
+        categoryId: String,
+        closeAfterCommit: Boolean? = null
+    ) {
         val method = EmojiPickerView::class.java.getDeclaredMethod(
             "onEmojiSelected",
             String::class.java,
@@ -309,7 +368,7 @@ class EmojiPickerOnScreenSearchTest {
             Boolean::class.javaObjectType
         )
         method.isAccessible = true
-        method.invoke(view, emoji, categoryId, null)
+        method.invoke(view, emoji, categoryId, closeAfterCommit)
     }
 
     private fun invokeSetSearchPanelVisible(view: EmojiPickerView, visible: Boolean) {

@@ -533,9 +533,11 @@
     <string name="keyboard_profile_option_key2">BlackBerry Key2</string>
     <string name="keyboard_profile_option_q25">BlackBerry Q25</string>
     <string name="keyboard_profile_option_titan2">Unihertz Titan 2</string>
-    <string name="emoji_picker_search_label">Search</string>
-    <string name="emoji_picker_search_placeholder">Search emoji...</string>
+    <string name="emoji_picker_search_label">Search or Unicode code</string>
+    <string name="emoji_picker_search_placeholder">Search emoji or U+XXXX...</string>
     <string name="emoji_picker_no_results">No emoji found</string>
+    <string name="emoji_picker_use_code">Use</string>
+    <string name="emoji_picker_invalid_unicode">Invalid Unicode code</string>
     <string name="custom_variation_input">Custom character</string>
     <string name="add">Add</string>
     <string name="variation_global_layout_override_title">Global Variation Mapping</string>

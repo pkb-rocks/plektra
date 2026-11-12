@@ -121,7 +121,17 @@ class AlternateCharacterManager(
                 symKeyMap.clear()
                 symKeyMap.putAll(customMappings)
                 symKeyMapUppercase.clear()
-                Log.d(TAG, "Loaded custom SYM mappings: ${customMappings.size} entries")
+                
+                // Generate uppercase mappings with Turkish locale support
+                val isTurkish = context.resources.configuration.locales[0]?.language == "tr"
+                customMappings.forEach { (key, value) ->
+                    val uppercase = toUppercaseWithLocale(value, isTurkish)
+                    if (uppercase != value) {
+                        symKeyMapUppercase[key] = uppercase
+                    }
+                }
+                
+                Log.d(TAG, "Loaded custom SYM mappings: ${customMappings.size} entries, ${symKeyMapUppercase.size} uppercase")
             } else {
                 // Use default mappings from JSON
                 symKeyMap.clear()
@@ -130,6 +140,22 @@ class AlternateCharacterManager(
                 symKeyMapUppercase.putAll(KeyMappingLoader.loadSymKeyMappingsUppercase(assets))
                 Log.d(TAG, "Loaded default SYM mappings")
             }
+        }
+    }
+    
+    /**
+     * Convert string to uppercase with Turkish locale support.
+     * Turkish: ı→I, i→İ
+     * Others: standard Unicode uppercase (including ß→SS)
+     */
+    private fun toUppercaseWithLocale(text: String, isTurkish: Boolean): String {
+        if (text.isEmpty()) return text
+        
+        return if (isTurkish) {
+            val locale = java.util.Locale("tr", "TR")
+            text.uppercase(locale)
+        } else {
+            text.uppercase()
         }
     }
     
@@ -144,8 +170,16 @@ class AlternateCharacterManager(
                 symKeyMap2.putAll(customMappings)
                 symKeyMap2Uppercase.clear()
                 // Mircea Horea IONICĂ (mionica), pastiera 38be1cfb53.
-                symKeyMap2.forEach { (key, value) -> symKeyMap2Uppercase[key] = value.uppercase() }
-                Log.d(TAG, "Loaded custom SYM page 2 mappings: ${customMappings.size} entries")
+                // Generate uppercase mappings with Turkish locale support
+                val isTurkish = context.resources.configuration.locales[0]?.language == "tr"
+                customMappings.forEach { (key, value) ->
+                    val uppercase = toUppercaseWithLocale(value, isTurkish)
+                    if (uppercase != value) {
+                        symKeyMap2Uppercase[key] = uppercase
+                    }
+                }
+                
+                Log.d(TAG, "Loaded custom SYM page 2 mappings: ${customMappings.size} entries, ${symKeyMap2Uppercase.size} uppercase")
             } else {
                 // Use default mappings from JSON
                 symKeyMap2.clear()

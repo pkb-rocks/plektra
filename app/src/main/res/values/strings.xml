@@ -999,9 +999,11 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="emoji_category_recents">Recents</string>
     <string name="emoji_category_emoticons">Emoticons</string>
     <string name="emoji_picker_error">Unable to load emoji</string>
-    <string name="emoji_picker_search_label">Search</string>
-    <string name="emoji_picker_search_placeholder">Search emoji...</string>
+    <string name="emoji_picker_search_label">Search or Unicode code</string>
+    <string name="emoji_picker_search_placeholder">Search emoji or U+XXXX...</string>
     <string name="emoji_picker_no_results">No emoji found</string>
+    <string name="emoji_picker_invalid_unicode">Invalid Unicode code</string>
+    <string name="emoji_picker_use_code">Use</string>
     
     <!-- Variation Customization -->
     <string name="variation_customize_title">Customize Variations</string>

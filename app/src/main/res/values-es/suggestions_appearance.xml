@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Mostrar siempre la barra de sugerencias</string>
+    <string name="always_show_suggestions_bar_summary">Evita que la franja de sugerencias se oculte automáticamente (tras símbolos Alt, puntuación, etc.) para mantener constante el tamaño de la ventana de la app.</string>
+</resources>

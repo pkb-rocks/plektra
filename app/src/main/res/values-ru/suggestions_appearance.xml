@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Всегда показывать панель подсказок</string>
+    <string name="always_show_suggestions_bar_summary">Не даёт панели подсказок автоматически скрываться (например, после символов Alt или знаков препинания), чтобы размер окна приложения оставался постоянным.</string>
+</resources>

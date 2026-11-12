@@ -2181,8 +2181,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     SettingsManager.isStaticVariationBarLayerStickyEnabled(this@PhysicalKeyboardInputMethodService)
                 val hasLatchedLayer = shiftLayerLatched || altModifierLayerLatched
                 if (hasLatchedLayer && !keepLayerLatchedAfterVariation) {
-                shiftLayerLatched = false
-                altModifierLayerLatched = false
+                    shiftLayerLatched = false
+                    altModifierLayerLatched = false
                     modifierStateBeforeHold?.let { modifierStateController.restoreLogicalState(it) }
                     modifierStateBeforeHold = null
                 }

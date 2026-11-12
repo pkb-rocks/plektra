@@ -496,11 +496,11 @@
     <string name="speech_recognition_error_not_available">Խոսքի ճանաչումը հասանելի չէ։</string>
     <string name="nav_mode_warning_icon">⚠</string>
     <string name="emoji_category_emoticons">Էմոտիկոններ</string>
-    <string name="emoji_picker_search_label">Search or Unicode code</string>
-    <string name="emoji_picker_search_placeholder">Search emoji or U+XXXX...</string>
+    <string name="emoji_picker_search_label">Որոնել կամ Unicode կոդ</string>
+    <string name="emoji_picker_search_placeholder">Որոնել էմոջի...</string>
     <string name="emoji_picker_no_results">No emoji found</string>
-    <string name="emoji_picker_use_code">Use</string>
-    <string name="emoji_picker_invalid_unicode">Invalid Unicode code</string>
+    <string name="emoji_picker_use_code">Օգտագործել</string>
+    <string name="emoji_picker_invalid_unicode">Սխալ Unicode կոդ</string>
     <string name="variation_global_layout_override_title">Global Variation Mapping</string>
     <string name="variation_global_layout_override_description">Force variation ordering from one layout across all layouts. Default is current IME layout (%1$s).</string>
     <string name="variation_global_layout_override_none">None (use current layout)</string>

@@ -33,8 +33,6 @@ class ModifierKeyHandler(
         val shouldRefreshStatusBar: Boolean = false
     )
 
-    private fun isDoubleTap(now: Long, lastReleaseTime: Long): Boolean =
-        isWithinDoubleTap(now, lastReleaseTime, doubleTapThreshold)
 
     companion object {
         /** The event's own time, or the current uptime when it has none (eventTime <= 0). */
@@ -48,7 +46,7 @@ class ModifierKeyHandler(
          * [android.os.SystemClock.uptimeMillis], the base of [KeyEvent.getEventTime].
          */
         fun isWithinDoubleTap(now: Long, lastReleaseTime: Long, threshold: Long): Boolean =
-            lastReleaseTime > 0 && now - lastReleaseTime in 0 until threshold
+            lastReleaseTime > 0 && now - lastReleaseTime in 0..threshold
     }
 
     // ========== Ctrl Handling ==========
@@ -71,37 +69,32 @@ class ModifierKeyHandler(
         }
 
         state.physicallyPressed = true
-        val allowDoubleTap = isConsecutiveTap
-        if (!allowDoubleTap) {
-            state.lastReleaseTime = 0
-        }
-
+        val wasDoubleTap = isConsecutiveTap && isWithinDoubleTap(now, state.lastReleaseTime, doubleTapThreshold)
+        
         when {
             state.latchActive -> {
                 // Latch active: single tap disables it
+                state.lastReleaseTime = 0
                 // Special handling for nav mode
                 if (state.latchFromNavMode && !isInputViewActive) {
                     state.latchActive = false
                     state.latchFromNavMode = false
                     onNavModeDeactivated?.invoke()
-                    state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldConsume = true)
                 } else if (!state.latchFromNavMode) {
                     state.latchActive = false
-                    state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 } else {
                     // Nav mode in text field (should not happen)
                     state.latchActive = false
                     state.latchFromNavMode = false
                     onNavModeDeactivated?.invoke()
-                    state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
             }
             state.oneShot -> {
-                // One-shot active: check for double-tap
-                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
+                // One-shot active: check for double-tap (must be consecutive AND within timing)
+                if (wasDoubleTap) {
                     state.oneShot = false
                     state.latchActive = true
                     state.lastReleaseTime = 0
@@ -114,18 +107,20 @@ class ModifierKeyHandler(
                 }
             }
             else -> {
-                if (singleTapLatches) {
-                    state.latchActive = true
+                // Clear timing if non-consecutive to prevent tap-letter-tap from locking
+                if (!isConsecutiveTap) {
                     state.lastReleaseTime = 0
-                    return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
-                // Check for double-tap to enable latch
-                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
+                
+                // Ignore obsolete singleTapLatches preference: unified tap model is always
+                // single tap → one-shot, double-tap → latch (same as Alt/Shift).
+                // Check for double-tap to enable latch (must be consecutive AND within timing)
+                if (wasDoubleTap) {
                     state.latchActive = true
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 } else {
-                    // Single tap: enable one-shot
+                    // Single tap from OFF: enable one-shot
                     state.oneShot = true
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
@@ -169,45 +164,44 @@ class ModifierKeyHandler(
         }
 
         state.physicallyPressed = true
-        val allowDoubleTap = isConsecutiveTap
-        if (!allowDoubleTap) {
-            state.lastReleaseTime = 0
-        }
+        val wasDoubleTap = isConsecutiveTap && isWithinDoubleTap(now, state.lastReleaseTime, doubleTapThreshold)
 
         when {
             state.latchActive -> {
-                // Latch active: single tap disables it
+                // Latch active: single tap disables it (toggle behavior)
                 state.latchActive = false
                 state.lastReleaseTime = 0
                 return ModifierKeyResult(shouldUpdateStatusBar = true)
             }
             state.oneShot -> {
-                // One-shot active: check for double-tap
-                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
+                // One-shot active: check for double-tap (must be consecutive AND within timing)
+                if (wasDoubleTap) {
                     state.oneShot = false
                     state.latchActive = true
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 } else {
-                    // Single tap: disable one-shot
+                    // Non-consecutive or slow: disable one-shot without locking
                     state.oneShot = false
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
             }
             else -> {
-                if (singleTapLatches) {
-                    state.latchActive = true
+                // Clear timing if non-consecutive to prevent tap-letter-tap from locking
+                if (!isConsecutiveTap) {
                     state.lastReleaseTime = 0
-                    return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }
-                // Check for double-tap to enable latch
-                if (allowDoubleTap && isDoubleTap(now, state.lastReleaseTime)) {
+                
+                // Ignore obsolete singleTapLatches preference: new tap model is always
+                // single tap → one-shot, double-tap → latch (same as Ctrl/Shift).
+                // Check for double-tap to enable latch (must be consecutive AND within timing)
+                if (wasDoubleTap) {
                     state.latchActive = true
                     state.lastReleaseTime = 0
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 } else {
-                    // Single tap: enable one-shot
+                    // Single tap from OFF: enable one-shot
                     state.oneShot = true
                     return ModifierKeyResult(shouldUpdateStatusBar = true)
                 }

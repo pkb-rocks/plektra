@@ -395,14 +395,17 @@ class EmojiPickerView(
             sectionAdapter.notifyDataSetChanged()
             searchAdapter.notifyDataSetChanged()
         }
-        // Hosts often measure this view with UNSPECIFIED height (SYM surface sizing). Keep the
-        // configured panel height so few/empty search results cannot shrink the whole picker.
-        val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
-        val fixedHeight = (layoutParams?.height?.takeIf { it > 0 } ?: configuredHeightPx(context))
-        val resolvedHeightSpec = if (heightMode == View.MeasureSpec.EXACTLY) {
-            heightMeasureSpec
-        } else {
-            View.MeasureSpec.makeMeasureSpec(fixedHeight, View.MeasureSpec.EXACTLY)
+        // Hosts often measure with UNSPECIFIED height (SYM surface sizing). Floor at the
+        // configured panel height so few/empty search results cannot shrink the picker.
+        // AT_MOST must still respect the host bound (landscape / outer display).
+        val preferredHeight = layoutParams?.height?.takeIf { it > 0 } ?: configuredHeightPx(context)
+        val resolvedHeightSpec = when (View.MeasureSpec.getMode(heightMeasureSpec)) {
+            View.MeasureSpec.EXACTLY -> heightMeasureSpec
+            View.MeasureSpec.AT_MOST -> View.MeasureSpec.makeMeasureSpec(
+                minOf(preferredHeight, View.MeasureSpec.getSize(heightMeasureSpec)),
+                View.MeasureSpec.EXACTLY
+            )
+            else -> View.MeasureSpec.makeMeasureSpec(preferredHeight, View.MeasureSpec.EXACTLY)
         }
         super.onMeasure(widthMeasureSpec, resolvedHeightSpec)
     }
@@ -1160,14 +1163,15 @@ class EmojiPickerView(
         // Commit synchronously before closing: a post{} on a view that the close detaches
         // would only run again when the picker is re-attached (i.e. the next time it opens).
         inputConnection?.commitText(emoji, 1)
-        // Clear search so the next open (or continued browsing) shows the default category grid.
-        resetBrowseState()
         val shouldClose = closeAfterCommit
             ?: (
                 SettingsManager.getSymAutoClose(context) &&
                     SettingsManager.getSymAutoCloseOnTouch(context)
                 )
+        // Clear search when this commit closes the picker. Keeping the query while the panel
+        // stays open preserves multi-pick search and category filtering.
         if (shouldClose) {
+            resetBrowseState()
             onCloseRequested?.invoke()
         }
     }

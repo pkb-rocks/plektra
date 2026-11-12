@@ -272,7 +272,8 @@ class EmojiPickerOnScreenSearchTest {
 
     @Test
     fun emojiCommitClearsSearchAndReturnsToBrowseGrid() {
-        val view = EmojiPickerView(RuntimeEnvironment.getApplication())
+        var closed = false
+        val view = EmojiPickerView(RuntimeEnvironment.getApplication()) { closed = true }
         view.setPrivateField("isSearchPanelVisible", true)
         view.setPrivateField("searchInputCaptureEnabled", true)
         view.setPrivateField("isSearchMode", true)
@@ -291,8 +292,10 @@ class EmojiPickerOnScreenSearchTest {
         )
         view.setInputConnection(RecordingInputConnection())
 
-        invokeOnEmojiSelected(view, "\uD83D\uDE80", "smileys")
+        // Closing commits (Enter / auto-close) reset search; in-place picks keep it.
+        invokeOnEmojiSelected(view, "\uD83D\uDE80", "smileys", closeAfterCommit = true)
 
+        assertTrue(closed)
         assertEquals("", view.searchText())
         assertEquals(false, view.privateField("isSearchPanelVisible").get(view))
         assertEquals(false, view.privateField("isSearchMode").get(view) as Boolean)
@@ -352,7 +355,12 @@ class EmojiPickerOnScreenSearchTest {
         method.invoke(view)
     }
 
-    private fun invokeOnEmojiSelected(view: EmojiPickerView, emoji: String, categoryId: String) {
+    private fun invokeOnEmojiSelected(
+        view: EmojiPickerView,
+        emoji: String,
+        categoryId: String,
+        closeAfterCommit: Boolean? = null
+    ) {
         val method = EmojiPickerView::class.java.getDeclaredMethod(
             "onEmojiSelected",
             String::class.java,
@@ -360,7 +368,7 @@ class EmojiPickerOnScreenSearchTest {
             Boolean::class.javaObjectType
         )
         method.isAccessible = true
-        method.invoke(view, emoji, categoryId, null)
+        method.invoke(view, emoji, categoryId, closeAfterCommit)
     }
 
     private fun invokeSetSearchPanelVisible(view: EmojiPickerView, visible: Boolean) {

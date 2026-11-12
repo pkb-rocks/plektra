@@ -1247,6 +1247,7 @@ class StatusBarController(
             lastClipboardCountRendered = count
             lastClipboardAccessibleRendered = accessible
         }
+        leaveEmojiPickerBrowseStateIfNeeded(nextPage = 3)
         lastSymPageRendered = 3
     }
 
@@ -1325,13 +1326,12 @@ class StatusBarController(
         view.configureControls(if (pickerShownAboveSoftwareKeyboard) dpToPx(32f) else hardwareSymKeyHeightPx(colors))
         view.setInputConnection(inputConnection)
 
-        // Opening the picker from another page / after close must start from the default grid.
-        // The view is reused across SYM sessions, so a previous search would otherwise linger.
-        if (lastSymPageRendered != 4) {
-            view.resetBrowseState()
-            view.refresh()
-        } else if (view.showsOutdatedEmoji()) {
-            view.refresh()
+        // Only scroll to top when view is just added (first open or switching pages)
+        // Don't scroll if view is already in container (user is browsing).
+        // Search reset happens when leaving page 4 / closing SYM, not on every re-render —
+        // otherwise typing/pasting into an already-open search field is wiped.
+        if (lastSymPageRendered != 4 || view.showsOutdatedEmoji()) {
+            view.refresh() // First time, switching from another page, or the offered emoji changed
         } else if (wasDetachedFromHost) {
             view.scrollToTop() // View was just added (happens when reopening after being removed)
         }
@@ -1691,6 +1691,7 @@ class StatusBarController(
 
         // Cache the effective colours too: an asynchronous photo failure changes them.
         lastHardwareSymThemeRendered = theme
+        leaveEmojiPickerBrowseStateIfNeeded(nextPage = page)
         lastSymPageRendered = page
         lastSymMappingsRendered = HashMap(symMappings)
         lastInputConnectionUsed = inputConnection
@@ -1730,6 +1731,7 @@ class StatusBarController(
             }
         }
         softwareKeyboardShown = true
+        leaveEmojiPickerBrowseStateIfNeeded(nextPage = 0)
         lastSymPageRendered = 0
         lastInputConnectionUsed = inputConnection
     }
@@ -2222,12 +2224,23 @@ class StatusBarController(
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
         container.addView(row4)
 
+        leaveEmojiPickerBrowseStateIfNeeded(nextPage = page)
         lastSymPageRendered = page
         lastSoftwareKeyboardSymPageRendered = page
         lastSoftwareKeyboardSymLayoutRendered = layoutName
         lastSoftwareKeyboardSymStyleRendered = layoutStyle
         lastSymMappingsRendered = HashMap(symMappings)
         lastInputConnectionUsed = inputConnection
+    }
+
+    /**
+     * Leaving the emoji picker page (or closing SYM) must clear search so the next open
+     * starts from the default category grid. Do not call this when staying on page 4.
+     */
+    private fun leaveEmojiPickerBrowseStateIfNeeded(nextPage: Int) {
+        if (lastSymPageRendered == 4 && nextPage != 4) {
+            emojiPickerView?.resetBrowseState()
+        }
     }
 
     private fun softwareSymbolFallback(char: Char): String =
@@ -3902,10 +3915,10 @@ class StatusBarController(
             val gap = dpToPx(4f)
             return 3 * hardwareSymKeyHeightPx() + 2 * gap
         }
-        if (snapshot.symPage == 4) {
-            // Keep the emoji picker at its configured height. Measuring with UNSPECIFIED
-            // height shrinks the surface when search returns few or no results.
-            return EmojiPickerView.configuredHeightPx(context)
+        if (snapshot.symPage == 4 && measuredHeight > 0) {
+            // Measured height floors at the configured size under UNSPECIFIED measure
+            // (sparse search) and still respects AT_MOST host bounds (landscape).
+            return measuredHeight
         }
         if (isFullSoftwareKeyboardMode && lastSoftwareKeyboardHeight > 0) {
             return lastSoftwareKeyboardHeight

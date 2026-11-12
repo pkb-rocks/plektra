@@ -1325,10 +1325,13 @@ class StatusBarController(
         view.configureControls(if (pickerShownAboveSoftwareKeyboard) dpToPx(32f) else hardwareSymKeyHeightPx(colors))
         view.setInputConnection(inputConnection)
 
-        // Only scroll to top when view is just added (first open or switching pages)
-        // Don't scroll if view is already in container (user is browsing)
-        if (lastSymPageRendered != 4 || view.showsOutdatedEmoji()) {
-            view.refresh() // First time, switching from another page, or the offered emoji changed
+        // Opening the picker from another page / after close must start from the default grid.
+        // The view is reused across SYM sessions, so a previous search would otherwise linger.
+        if (lastSymPageRendered != 4) {
+            view.resetBrowseState()
+            view.refresh()
+        } else if (view.showsOutdatedEmoji()) {
+            view.refresh()
         } else if (wasDetachedFromHost) {
             view.scrollToTop() // View was just added (happens when reopening after being removed)
         }
@@ -3591,6 +3594,7 @@ class StatusBarController(
         }
         
         if (emojiKeyboardView.visibility == View.VISIBLE) {
+            emojiPickerView?.resetBrowseState()
             animateEmojiKeyboardOut(emojiKeyboardView, layout) {
                 variationsWrapperView?.apply {
                     visibility = View.VISIBLE
@@ -3608,6 +3612,7 @@ class StatusBarController(
             wasSymActive = false
             lastSymPageRendered = 0 // Reset when closing SYM page
         } else {
+            emojiPickerView?.resetBrowseState()
             emojiKeyboardView.visibility = View.GONE
             variationsWrapperView?.apply {
                 visibility = View.VISIBLE
@@ -3897,8 +3902,10 @@ class StatusBarController(
             val gap = dpToPx(4f)
             return 3 * hardwareSymKeyHeightPx() + 2 * gap
         }
-        if (snapshot.symPage == 4 && measuredHeight > 0) {
-            return measuredHeight
+        if (snapshot.symPage == 4) {
+            // Keep the emoji picker at its configured height. Measuring with UNSPECIFIED
+            // height shrinks the surface when search returns few or no results.
+            return EmojiPickerView.configuredHeightPx(context)
         }
         if (isFullSoftwareKeyboardMode && lastSoftwareKeyboardHeight > 0) {
             return lastSoftwareKeyboardHeight

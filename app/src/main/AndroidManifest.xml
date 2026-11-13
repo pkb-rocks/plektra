@@ -24,6 +24,19 @@
     <!-- Permesso per mostrare finestre overlay (per debug trackpad) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- Embedded wireless-ADB broker. WRITE_SECURE_SETTINGS can only be granted over adb. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
+    <!-- write Settings.System (Fn -> Ctrl on the Titan 2 Elite). The user grants it on the
+         "Modify system settings" screen; without it the paired broker is used instead. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
+
     <!-- Query per vedere tutte le app installate che possono essere avviate -->
     <queries>
         <package android:name="org.futo.voiceinput" />
@@ -43,6 +56,38 @@
         <package android:name="net.dinglisch.android.taskerm" />
         <package android:name="io.homeassistant.companion.android" />
         <package android:name="com.clicks.companionapp" />
+
+        <!-- the bloat catalog's packages (BloatCatalog.kt), so the app can read back through
+             PackageManager whether a disable/uninstall/restore really happened. Kept in step by
+             BloatCatalogTest. -->
+        <package android:name="com.bhpme.AgingTest" />
+        <package android:name="com.agui.factorytest" />
+        <package android:name="com.agui.calibration" />
+        <package android:name="com.agui.app.memtester" />
+        <package android:name="com.agui.app.imei" />
+        <package android:name="com.agui.batterystatsdumper" />
+        <package android:name="com.agui.app.apninfocollector" />
+        <package android:name="com.debug.loggerui" />
+        <package android:name="com.devices116" />
+        <package android:name="com.swatch.gps" />
+        <package android:name="com.example.feedback" />
+        <package android:name="com.agui.systemmanager" />
+        <package android:name="com.agui.aguigrabageclear" />
+        <package android:name="com.agui.frozen" />
+        <package android:name="com.agui.appblock" />
+        <package android:name="com.agui.applock" />
+        <package android:name="com.agui.privatespace" />
+        <package android:name="com.agui.studentmodel" />
+        <package android:name="com.agui.game" />
+        <package android:name="com.agui.toolbox" />
+        <package android:name="com.agui.bedtimesetting" />
+        <package android:name="com.agui.callrecord" />
+        <package android:name="com.agui.providers.pedometer" />
+        <package android:name="com.agui.rotationcontrol" />
+        <package android:name="com.agold.autopoweronoff" />
+        <package android:name="com.agui.nfc" />
+        <package android:name="com.agold.cyclocomputer" />
+        <package android:name="com.tiqiaa.icontrol" />
     </queries>
 
     <application
@@ -281,6 +326,24 @@
             android:taskAffinity=""
             android:noHistory="true"
             android:finishOnTaskLaunch="true" />
+
+        <!-- vendored Shizuku ADB pairing foreground service -->
+        <service
+            android:name="moe.shizuku.manager.adb.AdbPairingService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+        <!-- Quick Settings tile for the Titan 2 Elite keyboard backlight -->
+        <service
+            android:name="rocks.pkb.plektra.KeyboardBacklightTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_lightbulb_24"
+            android:label="@string/backlight_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <!-- Shizuku provider -->
         <provider

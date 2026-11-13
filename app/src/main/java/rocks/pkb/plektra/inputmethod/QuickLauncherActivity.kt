@@ -73,8 +73,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import rocks.pkb.plektra.AppListHelper
@@ -102,6 +105,9 @@ import kotlinx.coroutines.withContext
 class QuickLauncherActivity : LocalizedComponentActivity() {
     private var commands: List<CommandTarget> = emptyList()
     private var query by mutableStateOf("")
+    /** Inclusive start / exclusive end of the search-field selection (collapsed = caret). */
+    private var querySelectionStart by mutableStateOf(0)
+    private var querySelectionEnd by mutableStateOf(0)
     private var autoStartSingle by mutableStateOf(false)
     private var limitResults by mutableStateOf(false)
     private var widthPercent by mutableStateOf(100)
@@ -169,6 +175,8 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
                 ) {
                     QuickLauncherSheet(
                         query = query,
+                        querySelectionStart = querySelectionStart,
+                        querySelectionEnd = querySelectionEnd,
                         commands = filteredCommands,
                         loadingApps = loadingApps,
                         limitResults = limitResults,
@@ -247,6 +255,39 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
             return handleDismissKeyDown(keyCode, event)
         }
 
+        // Remapped Q25/Titan Ctrl arrives as KEYCODE_CTRL_* (often deviceId=-1,
+        // scanCode=0) with META_CTRL_ON. Consume the modifier key itself; letter
+        // shortcuts use isCtrlPressed on the following key. No IME bridge needed.
+        if (keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT) {
+            return true
+        }
+
+        if (event?.isCtrlPressed == true) {
+            return when (keyCode) {
+                KeyEvent.KEYCODE_A -> {
+                    selectAllQuery()
+                    true
+                }
+                KeyEvent.KEYCODE_C -> {
+                    copyQueryToClipboard()
+                    true
+                }
+                KeyEvent.KEYCODE_X -> {
+                    copyQueryToClipboard()
+                    query = ""
+                    collapseQuerySelectionToEnd()
+                    launchedAutomatically = false
+                    refreshFilteredCommands()
+                    true
+                }
+                KeyEvent.KEYCODE_V -> {
+                    pasteFromClipboard()
+                    true
+                }
+                else -> false
+            }
+        }
+
         when (keyCode) {
             KeyEvent.KEYCODE_ENTER -> {
                 enterHandledOnKeyDown = true
@@ -256,8 +297,13 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
             KeyEvent.KEYCODE_BACK,
             KeyEvent.KEYCODE_ESCAPE -> return handleDismissKeyDown(keyCode, event)
             KeyEvent.KEYCODE_DEL -> {
+                if (hasQuerySelection()) {
+                    replaceQuerySelection("")
+                    return true
+                }
                 if (query.isNotEmpty()) {
                     query = query.dropLast(1)
+                    collapseQuerySelectionToEnd()
                     launchedAutomatically = false
                     refreshFilteredCommands()
                 }
@@ -265,17 +311,87 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
             }
         }
 
-        if (event?.isCtrlPressed != true) {
-            val text = resolveTypedText(keyCode, event)
-            if (!text.isNullOrEmpty()) {
+        val text = resolveTypedText(keyCode, event)
+        if (!text.isNullOrEmpty()) {
+            if (hasQuerySelection()) {
+                replaceQuerySelection(text)
+            } else {
                 query += text
+                collapseQuerySelectionToEnd()
                 launchedAutomatically = false
                 refreshFilteredCommands()
-                return true
             }
+            return true
         }
 
         return false
+    }
+
+    internal fun debugQueryText(): String = query
+
+    internal fun debugQuerySelectionStart(): Int = querySelectionStart
+
+    internal fun debugQuerySelectionEnd(): Int = querySelectionEnd
+
+    private fun hasQuerySelection(): Boolean =
+        querySelectionEnd > querySelectionStart
+
+    private fun collapseQuerySelectionToEnd() {
+        querySelectionStart = query.length
+        querySelectionEnd = query.length
+    }
+
+    private fun selectAllQuery() {
+        querySelectionStart = 0
+        querySelectionEnd = query.length
+    }
+
+    private fun replaceQuerySelection(replacement: String) {
+        val start = querySelectionStart.coerceIn(0, query.length)
+        val end = querySelectionEnd.coerceIn(0, query.length)
+        if (end > start) {
+            query = query.substring(0, start) + replacement + query.substring(end)
+            querySelectionStart = start + replacement.length
+            querySelectionEnd = querySelectionStart
+        } else {
+            query += replacement
+            collapseQuerySelectionToEnd()
+        }
+        launchedAutomatically = false
+        refreshFilteredCommands()
+    }
+
+    private fun copyQueryToClipboard() {
+        if (query.isEmpty()) return
+        try {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("query", query)
+            clipboard?.setPrimaryClip(clip)
+        } catch (_: Exception) {
+            // Clipboard not available (e.g., in tests)
+        }
+    }
+
+    private fun pasteFromClipboard() {
+        try {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+            val clip = clipboard?.primaryClip
+            if (clip != null && clip.itemCount > 0) {
+                val text = clip.getItemAt(0).text
+                if (text != null) {
+                    if (hasQuerySelection()) {
+                        replaceQuerySelection(text.toString())
+                    } else {
+                        query += text.toString()
+                        collapseQuerySelectionToEnd()
+                        launchedAutomatically = false
+                        refreshFilteredCommands()
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            // Clipboard not available (e.g., in tests)
+        }
     }
 
     private fun handleQuickLauncherKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
@@ -284,6 +400,10 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
         }
 
         if (isSymQuickLauncherToggle(keyCode, event)) {
+            return true
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT) {
             return true
         }
 
@@ -513,6 +633,8 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
 @Composable
 private fun QuickLauncherSheet(
     query: String,
+    querySelectionStart: Int = 0,
+    querySelectionEnd: Int = 0,
     commands: List<CommandTarget>,
     loadingApps: Boolean,
     limitResults: Boolean,
@@ -665,17 +787,43 @@ private fun QuickLauncherSheet(
                                     .padding(start = 10.dp)
                                     .weight(1f)
                             ) {
-                                Text(
-                                    text = query.ifBlank { stringResource(R.string.quick_launcher_search_placeholder) },
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = if (query.isBlank()) {
-                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f)
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                if (query.isBlank()) {
+                                    Text(
+                                        text = stringResource(R.string.quick_launcher_search_placeholder),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                } else {
+                                    val selectionHighlight = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                    val textColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    val start = querySelectionStart.coerceIn(0, query.length)
+                                    val end = querySelectionEnd.coerceIn(0, query.length)
+                                    val annotated = buildAnnotatedString {
+                                        if (end > start) {
+                                            append(query.substring(0, start))
+                                            withStyle(
+                                                SpanStyle(
+                                                    background = selectionHighlight,
+                                                    color = textColor
+                                                )
+                                            ) {
+                                                append(query.substring(start, end))
+                                            }
+                                            append(query.substring(end))
+                                        } else {
+                                            append(query)
+                                        }
+                                    }
+                                    Text(
+                                        text = annotated,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = textColor,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
                             IconButton(onClick = onDismiss) {
                                 Icon(

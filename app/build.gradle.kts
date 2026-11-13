@@ -376,6 +376,15 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        // the Shizuku UserService interface (src/main/aidl).
+        aidl = true
+    }
+    packaging {
+        resources {
+            // BouncyCastle (bcpkix/bcutil/bcprov) and jspecify ship duplicate OSGI metadata.
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            excludes += "META-INF/versions/**/OSGI-INF/**"
+        }
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
@@ -441,7 +450,8 @@ listOf("stable", "stableNoAccessibility", "nightly", "nightlyNoAccessibility", "
                 bundled("Unicode Emoji and Character Database data", "vendored:unicode-ucd-emoji:18.0", "https://www.unicode.org/Public/18.0.0/", "Unicode-3.0"),
                 bundled("Noto Color Emoji font", "vendored:noto-emoji:v2026-09-24-unicode18_0", "https://github.com/googlefonts/noto-emoji", "OFL-1.1"),
                 bundled("Flux Keyboard kaomoji collection", "vendored:flux-keyboard-kaomoji:2.0.0", "https://github.com/Flux-Sniffer-Mods/Flux-Keyboard", "GPL-3.0-or-later"),
-                bundled("Leipzig Corpora frequency data", "vendored:leipzig-corpora", "https://corpora.uni-leipzig.de/", "CC-BY-3.0")
+                bundled("Leipzig Corpora frequency data", "vendored:leipzig-corpora", "https://corpora.uni-leipzig.de/", "CC-BY-3.0"),
+                bundled("Shizuku wireless-ADB sources and libadb.so", "vendored:shizuku-wireless-adb", "https://github.com/RikkaApps/Shizuku", "Apache-2.0")
             )
             val components = libraries + bundledAssets
             val bom = linkedMapOf<String, Any>(
@@ -513,6 +523,13 @@ dependencies {
     // Shizuku for ADB shell access
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
+    // Embedded wireless-ADB broker (vendored moe.shizuku.manager.adb). BouncyCastle only builds test
+    // certificates now: the ADB key and its certificate come from AndroidKeyStore.
+    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.80")
+    implementation("org.lsposed.hiddenapibypass:hiddenapibypass:6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.2")
     testImplementation(libs.junit)
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
     testImplementation(libs.robolectric)

@@ -114,6 +114,8 @@ class CommandExecutor(
             DeviceControlCommandSource.ACTION_VOLUME_MUTE -> adjustVolume(AudioManager.ADJUST_TOGGLE_MUTE)
             DeviceControlCommandSource.ACTION_BRIGHTNESS_UP -> sendShellKeyEvent(KeyEvent.KEYCODE_BRIGHTNESS_UP)
             DeviceControlCommandSource.ACTION_BRIGHTNESS_DOWN -> sendShellKeyEvent(KeyEvent.KEYCODE_BRIGHTNESS_DOWN)
+            DeviceControlCommandSource.ACTION_EXPAND_NOTIFICATIONS -> expandShade(quickSettings = false)
+            DeviceControlCommandSource.ACTION_EXPAND_QUICK_SETTINGS -> expandShade(quickSettings = true)
             else -> fail("Unknown action")
         }
     }
@@ -165,18 +167,44 @@ class CommandExecutor(
     }
 
     /**
-     * Sends `input keyevent` through Shizuku. The process is spawned and awaited off the
-     * calling thread, so Success only means the key event was dispatched; a non-zero exit
-     * is logged rather than reported to the caller.
+     * Pull the shade down from a key. StatusBarManager's expand calls are hidden but reachable
+     * with the EXPAND_STATUS_BAR permission, which is a normal one; when the platform refuses
+     * the reflection, Shizuku's `cmd statusbar` does the same thing.
      */
+    private fun expandShade(quickSettings: Boolean): CommandExecutionResult {
+        val method = if (quickSettings) "expandSettingsPanel" else "expandNotificationsPanel"
+        val direct = runCatching {
+            val manager = context.getSystemService("statusbar") ?: return@runCatching false
+            manager.javaClass.getMethod(method).invoke(manager)
+            true
+        }.getOrDefault(false)
+        if (direct) return CommandExecutionResult.Success
+        val verb = if (quickSettings) "expand-settings" else "expand-notifications"
+        return runShizukuCommand(arrayOf("cmd", "statusbar", verb), unavailableReason = "Shade unavailable")
+    }
+
     private fun sendShellKeyEvent(keyCode: Int): CommandExecutionResult {
+        return runShizukuCommand(
+            arrayOf("input", "keyevent", keyCode.toString()),
+            unavailableReason = "Shizuku required"
+        )
+    }
+
+    /**
+     * Runs a command through Shizuku. The process is spawned and awaited off the calling
+     * thread (5 s limit, then the process is destroyed and its streams closed), so Success
+     * only means the command was dispatched; a timeout or non-zero exit is logged rather
+     * than reported to the caller.
+     */
+    private fun runShizukuCommand(command: Array<String>, unavailableReason: String): CommandExecutionResult {
         val shizukuAvailable = runCatching {
             Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
         }.getOrDefault(false)
         if (!shizukuAvailable) {
-            return fail("Shizuku required")
+            return fail(unavailableReason)
         }
         shellExecutor.execute {
+            val description = command.joinToString(" ")
             try {
                 val newProcessMethod = Shizuku::class.java.getDeclaredMethod(
                     "newProcess",
@@ -185,21 +213,16 @@ class CommandExecutor(
                     String::class.java
                 )
                 newProcessMethod.isAccessible = true
-                val process = newProcessMethod.invoke(
-                    null,
-                    arrayOf("input", "keyevent", keyCode.toString()),
-                    null,
-                    null
-                ) as ShizukuRemoteProcess
+                val process = newProcessMethod.invoke(null, command, null, null) as ShizukuRemoteProcess
                 try {
-                    // A hung process must not block every later event queued behind it.
+                    // A hung process must not block every later command queued behind it.
                     if (process.waitForTimeout(SHELL_TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS)) {
                         val exitCode = process.exitValue()
                         if (exitCode != 0) {
-                            Log.w(TAG, "Shell keyevent $keyCode exited with $exitCode")
+                            Log.w(TAG, "Shizuku command '$description' exited with $exitCode")
                         }
                     } else {
-                        Log.w(TAG, "Shell keyevent $keyCode timed out after ${SHELL_TIMEOUT_SECONDS}s")
+                        Log.w(TAG, "Shizuku command '$description' timed out after ${SHELL_TIMEOUT_SECONDS}s")
                     }
                 } finally {
                     process.destroy()
@@ -208,7 +231,7 @@ class CommandExecutor(
                     runCatching { process.outputStream.close() }
                 }
             } catch (error: Exception) {
-                Log.e(TAG, "Failed to send shell keyevent $keyCode", error)
+                Log.e(TAG, "Failed to run '$description' through Shizuku", error)
             }
         }
         return CommandExecutionResult.Success

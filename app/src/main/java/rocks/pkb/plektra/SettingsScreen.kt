@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.VolunteerActivism
+import androidx.compose.material.icons.filled.Build
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -77,7 +78,8 @@ enum class SettingsDestination {
     AppLanguage,
     DeviceSymLayerEditor,
     Modifiers,
-    ModifierIndicators
+    ModifierIndicators,
+    Titan2EliteTools
 }
 
 /** The destination payload of one SettingsActivity, also used by deep links. */
@@ -234,6 +236,7 @@ fun SettingsScreen(
                         openCustomization(SettingsActivity.CUSTOMIZATION_DESTINATION_APP_ENTER_BEHAVIOR)
                     },
                     onAdvancedClick = { navigateTo(SettingsDestination.Advanced) },
+                    onTitan2EliteToolsClick = { navigateTo(SettingsDestination.Titan2EliteTools) },
                     onAboutClick = { navigateTo(SettingsDestination.About) },
                     onBackClick = { navigateBack() },
                     onCustomInputStylesClick = { navigateTo(SettingsDestination.CustomInputStyles) },
@@ -323,6 +326,9 @@ fun SettingsScreen(
             SettingsDestination.DeviceSymLayerEditor -> {
                 DeviceSymLayerEditorStubScreen(modifier = modifier, onBack = { navigateBack() })
             }
+            SettingsDestination.Titan2EliteTools -> {
+                Titan2EliteToolsScreen(modifier = modifier, onBack = { navigateBack() })
+            }
             SettingsDestination.ModifierIndicators -> {
                 KeyboardBarSettingsScreen(modifier = modifier, onBack = { navigateBack() },
                     onCustomizeVariations = {}, page = KeyboardBarSettingsPage.Indicators)
@@ -375,6 +381,7 @@ private fun SettingsMainScreen(
     onNavModeClick: () -> Unit,
     onEnterBehaviorClick: () -> Unit,
     onAdvancedClick: () -> Unit,
+    onTitan2EliteToolsClick: () -> Unit,
     onAboutClick: () -> Unit,
     onBackClick: () -> Unit,
     onCustomInputStylesClick: () -> Unit,
@@ -577,6 +584,15 @@ private fun SettingsMainScreen(
                 linkId = SettingLinkIds.MAIN_ACCESSIBILITY,
                 onClick = onAccessibilityClick
             )
+            if (DeviceSpecific.isTitan2EliteDevice()) {
+                SettingsCategoryRow(
+                    icon = Icons.Filled.Build,
+                    title = stringResource(R.string.titan2_elite_tools_title),
+                    description = stringResource(R.string.titan2_elite_tools_description),
+                    linkId = SettingLinkIds.MAIN_TITAN2_ELITE_TOOLS,
+                    onClick = onTitan2EliteToolsClick
+                )
+            }
 
             SettingsGroupDivider(stringResource(R.string.settings_group_plektra))
 

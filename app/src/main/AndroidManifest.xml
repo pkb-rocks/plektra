@@ -24,6 +24,11 @@
     <!-- Permesso per mostrare finestre overlay (per debug trackpad) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- Embedded wireless-ADB broker -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- Query per vedere tutte le app installate che possono essere avviate -->
     <queries>
         <package android:name="org.futo.voiceinput" />
@@ -43,6 +48,7 @@
         <package android:name="net.dinglisch.android.taskerm" />
         <package android:name="io.homeassistant.companion.android" />
         <package android:name="com.clicks.companionapp" />
+
     </queries>
 
     <application
@@ -281,6 +287,12 @@
             android:taskAffinity=""
             android:noHistory="true"
             android:finishOnTaskLaunch="true" />
+
+        <!-- vendored Shizuku ADB pairing foreground service -->
+        <service
+            android:name="moe.shizuku.manager.adb.AdbPairingService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
         <!-- Shizuku provider -->
         <provider

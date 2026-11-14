@@ -269,15 +269,13 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
                     true
                 }
                 KeyEvent.KEYCODE_C -> {
-                    copyQueryToClipboard()
+                    copyQuerySelectionToClipboard()
                     true
                 }
                 KeyEvent.KEYCODE_X -> {
-                    copyQueryToClipboard()
-                    query = ""
-                    collapseQuerySelectionToEnd()
-                    launchedAutomatically = false
-                    refreshFilteredCommands()
+                    if (copyQuerySelectionToClipboard()) {
+                        replaceQuerySelection("")
+                    }
                     true
                 }
                 KeyEvent.KEYCODE_V -> {
@@ -361,14 +359,19 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
         refreshFilteredCommands()
     }
 
-    private fun copyQueryToClipboard() {
-        if (query.isEmpty()) return
-        try {
+    /** Copies only the active selection; returns false (clipboard untouched) without one. */
+    private fun copyQuerySelectionToClipboard(): Boolean {
+        val start = querySelectionStart.coerceIn(0, query.length)
+        val end = querySelectionEnd.coerceIn(0, query.length)
+        if (end <= start) return false
+        return try {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("query", query)
-            clipboard?.setPrimaryClip(clip)
+                ?: return false
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("query", query.substring(start, end)))
+            true
         } catch (_: Exception) {
             // Clipboard not available (e.g., in tests)
+            false
         }
     }
 
@@ -379,14 +382,7 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
             if (clip != null && clip.itemCount > 0) {
                 val text = clip.getItemAt(0).text
                 if (text != null) {
-                    if (hasQuerySelection()) {
-                        replaceQuerySelection(text.toString())
-                    } else {
-                        query += text.toString()
-                        collapseQuerySelectionToEnd()
-                        launchedAutomatically = false
-                        refreshFilteredCommands()
-                    }
+                    replaceQuerySelection(text.toString())
                 }
             }
         } catch (_: Exception) {

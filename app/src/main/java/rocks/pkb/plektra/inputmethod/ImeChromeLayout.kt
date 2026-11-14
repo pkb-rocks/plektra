@@ -165,11 +165,22 @@ internal class ImeChromeLayout(context: Context) : LinearLayout(context) {
             invalidate()
         }
     var onLedGeometryChanged: (() -> Unit)? = null
+    /**
+     * Keeps the nested suggestions row at its own height. The LED band below it keeps
+     * the themed fill instead of the row being stretched to meet the contour.
+     */
+    var compactNestedRow: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            requestLayout()
+        }
     private var nestedRow: View? = null
     private var originalRowMargins = intArrayOf(0, 0, 0)
     private var originalRowOutline: ViewOutlineProvider? = null
     private var originalRowClip = false
     private var originalRowMinHeight = 0
+    private var nestedRowMinHeight = 0
     private var originalRowPaddingBottom = 0
 
     private fun updateNestedStatusRow() {
@@ -184,7 +195,8 @@ internal class ImeChromeLayout(context: Context) : LinearLayout(context) {
             }
             row.outlineProvider = originalRowOutline
             row.clipToOutline = originalRowClip
-            row.minimumHeight = originalRowMinHeight
+            // The row owner may have resized the row since; keep its value over the saved one.
+            if (row.minimumHeight == nestedRowMinHeight) row.minimumHeight = originalRowMinHeight
             row.setPadding(row.paddingLeft, row.paddingTop, row.paddingRight, originalRowPaddingBottom)
         }
         nestedRow = null
@@ -234,6 +246,7 @@ internal class ImeChromeLayout(context: Context) : LinearLayout(context) {
             else (radius + stripTop - inset).coerceAtLeast(0)
         params.bottomMargin -= overlap
         row.minimumHeight = maxOf(originalRowMinHeight, overlap)
+        nestedRowMinHeight = row.minimumHeight
         // Each outer button draws against the calibrated contour; the chrome clips the display edge.
         row.outlineProvider = originalRowOutline
         row.clipToOutline = false
@@ -291,7 +304,8 @@ internal class ImeChromeLayout(context: Context) : LinearLayout(context) {
                     }
                 }
             }
-            if (extraHeight > 0 || contourIntegratedIndicators) extendContent(row)
+            val compact = compactNestedRow && row === compactStatusRow
+            if (!compact && (extraHeight > 0 || contourIntegratedIndicators)) extendContent(row)
         }
         if (contourIntegratedIndicators) {
             updateLedConstraintTop()

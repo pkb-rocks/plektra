@@ -27,7 +27,7 @@ YYYY-MM-DD-<gerät>-<firmware>-<layout-kontext>.json
 
 The file name should make the comparison context recognizable, but should not contain all metadata. Details such as Android build, app version, input devices and settings are in the snapshot itself.
 
-English versions are named `NAME.en.md` and sit next to the German file (German in German, English in English).
+English versions are named `NAME.en.md` and sit next to the German file; each links the other in its first line.
 
 ## Known devices
 

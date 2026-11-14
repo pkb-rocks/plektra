@@ -27,7 +27,7 @@ YYYY-MM-DD-<gerät>-<firmware>-<layout-kontext>.json
 
 Der Dateiname soll den Vergleichskontext erkennbar machen, aber nicht alle Metadaten enthalten. Details wie Android-Build, App-Version, Eingabegeräte und Settings stehen im Snapshot selbst.
 
-Englische Fassungen heißen `NAME.en.md` und liegen neben der deutschen Datei (Deutsch auf Deutsch, Englisch auf Englisch).
+Englische Fassungen heißen `NAME.en.md` und liegen neben der deutschen Datei; beide verlinken sich gegenseitig in der ersten Zeile.
 
 ## Bekannte Geräte
 

@@ -58,8 +58,6 @@ fun ModifierSettingsScreen(
     var longPressModifier by remember { mutableStateOf(SettingsManager.getLongPressModifier(context)) }
     var longPressThreshold by remember { mutableStateOf(SettingsManager.getLongPressThreshold(context)) }
     var altBinding by remember { mutableStateOf(SettingsManager.getAltModifierBinding(context)) }
-    var shiftTapLatches by remember { mutableStateOf(SettingsManager.getShiftTapLatches(context)) }
-    var altTapLatches by remember { mutableStateOf(SettingsManager.getAltTapLatches(context)) }
     var clearAltOnSpace by remember { mutableStateOf(SettingsManager.getClearAltOnSpace(context)) }
     var altLatchStaysOnSpace by remember { mutableStateOf(SettingsManager.getAltLatchStaysOnSpace(context)) }
     var ctrlTapLatches by remember { mutableStateOf(SettingsManager.getCtrlTapLatches(context)) }
@@ -226,25 +224,6 @@ fun ModifierSettingsScreen(
                 onClick = onOpenNavMode
             )
 
-            SettingsSectionDivider(stringResource(R.string.modifier_tap_behaviour_title))
-            ModifierSwitchRow(
-                title = stringResource(R.string.shift_tap_latches_title),
-                description = stringResource(R.string.shift_tap_latches_description),
-                checked = shiftTapLatches,
-                linkId = SettingLinkIds.MODIFIERS_SHIFT_TAP_LATCHES
-            ) {
-                shiftTapLatches = it
-                SettingsManager.setShiftTapLatches(context, it)
-            }
-            ModifierSwitchRow(
-                title = stringResource(R.string.alt_tap_latches_title),
-                description = stringResource(R.string.alt_tap_latches_description),
-                checked = altTapLatches,
-                linkId = SettingLinkIds.MODIFIERS_ALT_TAP_LATCHES
-            ) {
-                altTapLatches = it
-                SettingsManager.setAltTapLatches(context, it)
-            }
             ModifierSwitchRow(
                 title = stringResource(R.string.ctrl_tap_latches_title),
                 description = stringResource(R.string.ctrl_tap_latches_description),

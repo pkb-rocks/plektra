@@ -32,18 +32,21 @@ class ModifierStateController(
         var automaticCapsLock: Boolean = false
             private set
 
-        private var lastTapTime: Long = 0
+        private var lastDownTime: Long = 0
 
         fun tap(
             now: Long = System.currentTimeMillis(),
             isConsecutiveTap: Boolean,
             singleTapLatches: Boolean = false
         ): ShiftState {
-            val doubleTap = isConsecutiveTap && now - lastTapTime < doubleTapThreshold
-            lastTapTime = now
+            // Use same timing logic as Ctrl/Alt: check against last DOWN time
+            // to handle fast overlapping taps where second DOWN arrives before first UP
+            val doubleTap = isConsecutiveTap && now - lastDownTime <= doubleTapThreshold
+            lastDownTime = now
+            // Ignore obsolete singleTapLatches: unified tap model is always
+            // single tap → one-shot, double-tap → CAPS (same as Ctrl/Alt).
             state = when {
                 doubleTap -> if (state == ShiftState.CAPS) ShiftState.OFF else ShiftState.CAPS
-                singleTapLatches -> if (state == ShiftState.CAPS) ShiftState.OFF else ShiftState.CAPS
                 state == ShiftState.OFF -> ShiftState.ONE_SHOT
                 else -> ShiftState.OFF
             }
@@ -86,7 +89,7 @@ class ModifierStateController(
 
         fun reset() {
             state = ShiftState.OFF
-            lastTapTime = 0
+            lastDownTime = 0
         }
     }
 
@@ -106,9 +109,6 @@ class ModifierStateController(
     private val ctrlState = ModifierKeyHandler.CtrlState()
     private val altState = ModifierKeyHandler.AltState()
 
-    var shiftTapLatches: Boolean = false
-    var ctrlTapLatches: Boolean = false
-    var altTapLatches: Boolean = false
 
     fun registerModifierTap(keyCode: Int): Boolean {
         val isConsecutive = lastKeyWasModifier && lastModifierKeyCode == keyCode
@@ -120,6 +120,9 @@ class ModifierStateController(
     fun registerNonModifierKey() {
         lastKeyWasModifier = false
         lastModifierKeyCode = 0
+        // Clear double-tap timing window for all modifiers to prevent tap-letter-tap from locking
+        ctrlState.lastReleaseTime = 0
+        altState.lastReleaseTime = 0
     }
 
     data class Snapshot(
@@ -333,7 +336,7 @@ class ModifierStateController(
         )
     }
 
-    fun handleShiftKeyDown(keyCode: Int): ModifierKeyHandler.ModifierKeyResult {
+    fun handleShiftKeyDown(keyCode: Int, now: Long = System.currentTimeMillis()): ModifierKeyHandler.ModifierKeyResult {
         if (keyCode != KeyEvent.KEYCODE_SHIFT_LEFT &&
             keyCode != KeyEvent.KEYCODE_SHIFT_RIGHT
         ) {
@@ -349,8 +352,8 @@ class ModifierStateController(
         val previous = shiftStateMachine.state
         val isConsecutiveTap = registerModifierTap(keyCode)
         val current = shiftStateMachine.tap(
-            isConsecutiveTap = isConsecutiveTap,
-            singleTapLatches = shiftTapLatches
+            now = now,
+            isConsecutiveTap = isConsecutiveTap
         )
         val changed = previous != current
         return ModifierKeyHandler.ModifierKeyResult(
@@ -386,7 +389,6 @@ class ModifierStateController(
             ctrlState,
             isInputViewActive,
             isConsecutiveTap = isConsecutiveTap,
-            singleTapLatches = ctrlTapLatches,
             now = now,
             onNavModeDeactivated = onNavModeDeactivated
         )
@@ -415,7 +417,6 @@ class ModifierStateController(
             keyCode,
             altState,
             isConsecutiveTap = isConsecutiveTap,
-            singleTapLatches = altTapLatches,
             now = now
         )
         altPressed = true
@@ -514,4 +515,5 @@ class ModifierStateController(
         }
         modifierKeyHandler.resetAltState(altState)
     }
+
 }

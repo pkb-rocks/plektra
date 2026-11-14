@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.AltModifierBinding
 import rocks.pkb.plektra.core.NavModeController
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
 import android.os.Handler
@@ -42,6 +43,26 @@ class InputEventRouter(
 
     var suggestionController: rocks.pkb.plektra.core.suggestions.SuggestionController? = null
     var onCommitText: (() -> Unit)? = null
+
+    /**
+     * Single source of truth for Alt modifier state.
+     * Returns true if Alt is active (held, one-shot, or locked).
+     * 
+     * Checks state machine variables AND event metastate. With DeviceSym binding,
+     * event.isAltPressed is still honored (for software keyboard and tests).
+     */
+    private fun altActive(
+        event: KeyEvent?,
+        altPressed: Boolean,
+        altPhysicallyPressed: Boolean,
+        altLatchActive: Boolean,
+        altOneShot: Boolean
+    ): Boolean {
+        // Check both state machine AND event metastate.
+        // State machine tracks remapped Alt (e.g., Q25 SYM key).
+        // Event metastate is set on letter keys pressed while Alt is physically held.
+        return event?.isAltPressed == true || altPressed || altPhysicallyPressed || altLatchActive || altOneShot
+    }
 
     private fun isSuggestionDebugLoggingEnabled(): Boolean =
         SettingsManager.isSuggestionDebugLoggingEnabled(context)
@@ -158,6 +179,8 @@ class InputEventRouter(
             }
         }
 
+        // For no-editable-field context, we don't have full alt state params.
+        // Just check event metastate. DeviceSym binding's single-source-of-truth applies to editable fields.
         if (
             !ctrlLatchActive &&
             event?.isAltPressed == true &&
@@ -270,7 +293,8 @@ class InputEventRouter(
         val capsLockEnabled: Boolean,
         val cursorUpdateDelayMs: Long,
         val altMappingsOverride: Map<Int, String>? = null,
-        val shouldDisableSmartFeatures: Boolean = false
+        val shouldDisableSmartFeatures: Boolean = false,
+        val physicalProfileOverride: String? = null
     )
 
     data class EditableFieldKeyDownControllers(
@@ -286,7 +310,9 @@ class InputEventRouter(
         val refreshStatusBar: () -> Unit,
         val disableShiftOneShot: () -> Unit,
         val clearAltOneShot: () -> Unit,
+        val clearAltOneShotAndSymToggle: () -> Unit,
         val clearCtrlOneShot: () -> Unit,
+        val resetOtherKeyInteracted: () -> Unit,
         val getCharacterFromLayout: (Int, KeyEvent?, Boolean) -> Char?,
         val isAlphabeticKey: (Int) -> Boolean,
         val callSuper: () -> Boolean,
@@ -306,9 +332,12 @@ class InputEventRouter(
         modifiers: ModifierStateController,
         symLayout: SymLayoutController,
         updateStatusBar: () -> Unit,
-        startSpeechRecognition: () -> Unit
+        startSpeechRecognition: () -> Unit,
+        ctrlPressed: Boolean = false,
+        resetOtherKeyInteractedFlag: (() -> Unit)? = null
     ) {
-        if (event?.isCtrlPressed == true && !modifiers.altPressed &&
+        resetOtherKeyInteractedFlag?.invoke()
+        if (event?.isCtrlPressed == true || ctrlPressed && !modifiers.altPressed &&
             SettingsManager.getAltCtrlSpeechShortcutEnabled(context)) {
             startSpeechRecognition()
             return
@@ -330,6 +359,36 @@ class InputEventRouter(
         var shiftOneShotActive = params.shiftOneShot
         var altLatchActive = params.altLatchActive
         var altOneShotActive = params.altOneShot
+        
+        // Define modifier keys
+        val isShiftKey = keyCode == KeyEvent.KEYCODE_SHIFT_LEFT || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT
+        val isCtrlKey = keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT
+        val isAltKey = keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+        val isModifierKey = isShiftKey || isCtrlKey || isAltKey
+        
+        // Alt one-shot is consumed by non-modifier keys only (letters, space, etc.)
+        // Pressing Shift/Ctrl should not consume Alt one-shot
+        val hadAltOneShot = altOneShotActive
+        if (!isModifierKey && altOneShotActive) {
+            callbacks.clearAltOneShotAndSymToggle()
+            callbacks.refreshStatusBar()
+            altOneShotActive = false
+        }
+        
+        // Save original Shift one-shot state before clearing controller state
+        // The local variable will be used later to apply shift to letters
+        if (!isShiftKey && shiftOneShotActive) {
+            callbacks.disableShiftOneShot()
+            callbacks.refreshStatusBar()
+            // Don't set shiftOneShotActive = false here - keep it true so letter
+            // handling code can check it and apply the shift
+        }
+        
+        // Register non-modifier keys to clear double-tap timing windows
+        if (!isModifierKey) {
+            controllers.modifierStateController.registerNonModifierKey()
+        }
+        
         val ic = params.inputConnection
         val effectiveCtrlActive = event?.isCtrlPressed == true ||
             params.ctrlPressed ||
@@ -341,7 +400,10 @@ class InputEventRouter(
         if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT) {
             if (!params.shiftPressed) {
                 val wasShiftOneShot = controllers.modifierStateController.shiftOneShot
-                val result = controllers.modifierStateController.handleShiftKeyDown(keyCode)
+                val result = controllers.modifierStateController.handleShiftKeyDown(
+                    keyCode,
+                    ModifierKeyHandler.eventTimeOrUptime(event)
+                )
                 if (wasShiftOneShot && !controllers.modifierStateController.shiftOneShot) {
                     callbacks.onShiftOneShotToggledOff()
                 }
@@ -351,13 +413,16 @@ class InputEventRouter(
                     callbacks.refreshStatusBar()
                 }
             }
-            return EditableFieldRoutingResult.CallSuper
+            // MUST consume Shift events to prevent Android's MetaKeyKeyListener sticky state
+            // from interfering with our state machine. Framework tracks META_SHIFT_ON/LOCKED.
+            return EditableFieldRoutingResult.Consume
         }
 
         if (keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT) {
             // Check if Alt is physically pressed (not latch) - if so, trigger speech recognition (if enabled)
             // Only trigger if both keys are physically pressed simultaneously, not if one is in latch
-            if (event?.isAltPressed == true && 
+            // Note: altPhysicallyPressed not in params, so we approximate with altPressed
+            if (altActive(event, params.altPressed, params.altPressed, params.altLatchActive, params.altOneShot) && 
                 !params.ctrlPressed &&
                 SettingsManager.getAltCtrlSpeechShortcutEnabled(context)) {
                 callbacks.startSpeechRecognition()
@@ -397,7 +462,8 @@ class InputEventRouter(
             // Reset Alt state if physically pressed when Sym is pressed.
             // Alt+Sym is Android's language switch shortcut, so we reset Alt to prevent
             // the one-shot state from being applied after the user switches languages.
-            if (event?.isAltPressed == true) {
+            // Note: altPhysicallyPressed not in params, so we approximate with altPressed
+            if (altActive(event, params.altPressed, params.altPressed, params.altLatchActive, params.altOneShot)) {
                 controllers.modifierStateController.clearAltState(resetPressedState = true)
                 callbacks.updateStatusBar()
             }
@@ -482,33 +548,8 @@ class InputEventRouter(
             return EditableFieldRoutingResult.Consume
         }
 
-        if (!passThroughAltBoundary && (event?.isAltPressed == true || altLatchActive || altOneShotActive)) {
-            controllers.alternateCharacterManager.cancelPendingLongPress(keyCode)
-            if (altOneShotActive) {
-                callbacks.clearAltOneShot()
-                callbacks.refreshStatusBar()
-                altOneShotActive = false
-            }
-
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                return EditableFieldRoutingResult.CallSuper
-            }
-
-            if (
-                handleAltModifiedKey(
-                    keyCode = keyCode,
-                    event = event,
-                    inputConnection = ic,
-                    alternateCharacterManager = controllers.alternateCharacterManager,
-                    altMappingsOverride = params.altMappingsOverride,
-                    updateStatusBar = callbacks.updateStatusBar,
-                    callSuperWithKey = callbacks.callSuperWithKey
-                )
-            ) {
-                return EditableFieldRoutingResult.Consume
-            }
-        }
-
+        // Bug fix: Ctrl shortcuts must take precedence over Alt symbol mappings.
+        // Check Ctrl BEFORE Alt so Ctrl+A/C/V/X/Z run their shortcuts instead of committing Alt symbols.
         if (event?.isCtrlPressed == true || params.ctrlLatchActive || params.ctrlOneShot || (params.isNumericField && effectiveCtrlActive)) {
             if (
                 handleCtrlModifiedKey(
@@ -526,7 +567,34 @@ class InputEventRouter(
                     },
                     updateStatusBar = callbacks.updateStatusBar,
                     callSuper = callbacks.callSuper,
-                    toggleMinimalUi = callbacks.toggleMinimalUi
+                    toggleMinimalUi = callbacks.toggleMinimalUi,
+                    alternateCharacterManager = controllers.alternateCharacterManager,
+                    altMappingsOverride = params.altMappingsOverride,
+                    physicalProfileOverride = params.physicalProfileOverride
+                )
+            ) {
+                return EditableFieldRoutingResult.Consume
+            }
+        }
+
+        if (!passThroughAltBoundary && (altActive(event, params.altPressed, params.altPressed, altLatchActive, hadAltOneShot))) {
+            controllers.alternateCharacterManager.cancelPendingLongPress(keyCode)
+            // Alt one-shot is cleared immediately at function start (hadAltOneShot flag tracks it).
+            // This block handles Alt-modified key mappings. Alt latch persists until manually cancelled.
+
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                return EditableFieldRoutingResult.CallSuper
+            }
+
+            if (
+                handleAltModifiedKey(
+                    keyCode = keyCode,
+                    event = event,
+                    inputConnection = ic,
+                    alternateCharacterManager = controllers.alternateCharacterManager,
+                    altMappingsOverride = params.altMappingsOverride,
+                    updateStatusBar = callbacks.updateStatusBar,
+                    callSuperWithKey = callbacks.callSuperWithKey
                 )
             ) {
                 return EditableFieldRoutingResult.Consume
@@ -803,7 +871,27 @@ class InputEventRouter(
             }
         }
 
+        // Before calling super, consume shift one-shot for non-modifier keys.
+        // Since we now consume Shift events (to prevent Android's MetaKeyKeyListener interference),
+        // we must manually consume shift one-shot for keys that reach the framework path.
+        if (shiftOneShotActive && !isModifierKey(keyCode)) {
+            callbacks.disableShiftOneShot()
+            callbacks.updateStatusBar()
+        }
+
         return EditableFieldRoutingResult.CallSuper
+    }
+
+    private fun isModifierKey(keyCode: Int): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.KEYCODE_SHIFT_RIGHT,
+            KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT,
+            KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT,
+            KeyEvent.KEYCODE_META_LEFT, KeyEvent.KEYCODE_META_RIGHT,
+            KeyEvent.KEYCODE_SYM, KeyEvent.KEYCODE_FUNCTION
+            -> true
+            else -> false
+        }
     }
 
     fun handleConfiguredForwardDeleteAlternatives(
@@ -1287,8 +1375,11 @@ class InputEventRouter(
         altMappingsOverride: Map<Int, String>? = null,
         updateStatusBar: () -> Unit,
         textOutput: ((String) -> Boolean)? = null,
-        callSuperWithKey: (Int, KeyEvent?) -> Boolean
+        callSuperWithKey: (Int, KeyEvent?) -> Boolean,
+        consumeAltOneShot: (() -> Unit)? = null
     ): Boolean {
+        // Consume Alt one-shot FIRST - this is where Alt mappings are applied
+        consumeAltOneShot?.invoke()
         val ic = inputConnection ?: return false
 
         if (textOutput != null) {
@@ -1346,7 +1437,10 @@ class InputEventRouter(
         clearCtrlOneShot: () -> Unit,
         updateStatusBar: () -> Unit,
         callSuper: () -> Boolean,
-        toggleMinimalUi: () -> Unit
+        toggleMinimalUi: () -> Unit,
+        alternateCharacterManager: AlternateCharacterManager? = null,
+        altMappingsOverride: Map<Int, String>? = null,
+        physicalProfileOverride: String? = null
     ): Boolean {
         // Software Ctrl uses the same meta-state, but invokes the displayed Plektra mapping.
         // Only physical chords should prefer the editor's native shortcuts.
@@ -1382,7 +1476,13 @@ class InputEventRouter(
 
         // When Ctrl is physically held, prefer native app shortcuts (rich-text editors, IDEs, etc.).
         // This must take precedence over one-shot, because a physical press sets one-shot internally.
-        if (isPhysicalCtrlCombo && !ctrlLatchFromNavMode && !useNavModeForHeldCtrl && !shouldForceContextMenuAction) {
+        // EXCEPTION: On BlackBerry keyboards (Q25, KEY2) with device-specific Alt mappings, handle
+        // in Plektra to ensure Ctrl shortcuts work reliably and Ctrl beats Alt.
+        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard(physicalProfileOverride)
+        val keyHasAltMapping = isBlackberry && alternateCharacterManager?.let {
+            (altMappingsOverride ?: it.getAltModifierMappings())[keyCode] != null
+        } ?: false
+        if (isPhysicalCtrlCombo && !ctrlLatchFromNavMode && !useNavModeForHeldCtrl && !shouldForceContextMenuAction && !keyHasAltMapping) {
             return passThroughCtrlCombo()
         }
 

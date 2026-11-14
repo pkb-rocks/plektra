@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import rocks.pkb.plektra.AppBroadcastActions
+import rocks.pkb.plektra.AltModifierBinding
 import rocks.pkb.plektra.ClicksPowerKeyboardController
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.inputmethod.speech.*
@@ -96,6 +97,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         private const val NATIVE_TRACKPAD_MIN_SWIPE_VELOCITY_PX_PER_MS = 2f
         private const val KEYBOARD_SURFACE_TRANSITION_DELAY_MS = 32L
         private const val KEYBOARD_DEVICE_SURFACE_TRANSITION_DELAY_MS = 250L
+        private const val SYNTHETIC_DUPLICATE_WINDOW_MS = 60L
         private const val MODIFIER_ICON_OFF = 0
         private const val MODIFIER_ICON_ACTIVE = 1
         private const val MODIFIER_ICON_LOCKED = 2
@@ -279,7 +281,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var keyboardBarHiddenInEditor = false
     
     // Constants
-    private val DOUBLE_TAP_THRESHOLD = 500L
+    private val DOUBLE_TAP_THRESHOLD = 300L  // 80-250ms locks, 600ms doesn't
     private val CURSOR_UPDATE_DELAY = 50L
     private val MULTI_TAP_TIMEOUT_MS = 400L
 
@@ -327,6 +329,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var altModifierLayerLatched: Boolean = false
     private var lastShiftTapUpTime: Long = 0L
     private var lastAltTapUpTime: Long = 0L
+    // Track recent real modifier events to filter synthetic duplicates (deviceId=-1, flags=0, zero-duration)
+    private val recentRealModifierEvents = mutableMapOf<Int, Long>() // keyCode -> eventTime
     private var symTogglePendingOnKeyUp: Boolean = false
     private var symChordUsedSinceKeyDown: Boolean = false
     private var symPhysicallyPressed: Boolean = false
@@ -350,6 +354,21 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val clicksPowerButtonEventMapper = ClicksPowerButtonEventMapper()
     private var dispatchingClicksAccessibilityKeyEvent = false
     private var replayingProtectedNumberKey = false
+
+    /**
+     * Single source of truth for Alt modifier state.
+     * Returns true if Alt is active (held, one-shot, or locked).
+     * 
+     * When AltModifierBinding is DeviceSym, relies exclusively on the state machine.
+     * For other bindings, falls back to event.isAltPressed.
+     */
+    private fun altActive(event: KeyEvent?): Boolean {
+        // Check both state machine AND event metastate.
+        // State machine tracks remapped Alt (e.g., Q25 SYM key).
+        // Event metastate is set on letter keys pressed while Alt is physically held.
+        return event?.isAltPressed == true || altPressed || altPhysicallyPressed || altLatchActive || altOneShot
+    }
+
     private val uiHandler = Handler(Looper.getMainLooper())
     // Modifier badge beside the text cursor, and the state of its cursor-update request
     private val caretBadgeController by lazy {
@@ -756,6 +775,48 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             keyCode == KeyEvent.KEYCODE_ALT_LEFT ||
             keyCode == KeyEvent.KEYCODE_ALT_RIGHT ||
             keyCode == KEYCODE_SYM
+    }
+
+    /**
+     * Filters synthetic duplicate modifier key events that arrive as echoes from the framework.
+     * 
+     * Root cause: Unknown source (possibly Android framework echoing events back through IME).
+     * Synthetic events have: deviceId=-1, flags=0, eventTime==downTime (zero duration),
+     * and arrive within ~13-60ms of the real hardware event.
+     * 
+     * Returns true if the event should be dropped as a synthetic duplicate.
+     */
+    private fun isSyntheticModifierDuplicate(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event == null) return false
+        
+        // Only filter Alt and Shift (Ctrl works correctly without filtering)
+        if (keyCode != KeyEvent.KEYCODE_ALT_LEFT && keyCode != KeyEvent.KEYCODE_ALT_RIGHT &&
+            keyCode != KeyEvent.KEYCODE_SHIFT_LEFT && keyCode != KeyEvent.KEYCODE_SHIFT_RIGHT) {
+            return false
+        }
+        
+        val isRealEvent = event.deviceId >= 0 || (event.flags and KeyEvent.FLAG_FROM_SYSTEM) != 0
+        val isSyntheticEvent = event.deviceId == -1 && event.flags == 0 && event.eventTime == event.downTime
+        
+        if (isRealEvent) {
+            // Track real events for duplicate detection
+            recentRealModifierEvents[keyCode] = event.eventTime
+            return false
+        }
+        
+        if (isSyntheticEvent) {
+            // Check if this is a duplicate of a recent real event
+            val lastRealEventTime = recentRealModifierEvents[keyCode]
+            if (lastRealEventTime != null) {
+                val timeSinceReal = Math.abs(event.eventTime - lastRealEventTime)
+                if (timeSinceReal <= SYNTHETIC_DUPLICATE_WINDOW_MS) {
+                    // This is a synthetic duplicate, drop it
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
 
     private fun isMinimalPhoneHardwareActive(): Boolean {
@@ -1455,9 +1516,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val keyEventTextOutput = KeyEventTextOutput()
 
     private fun handleKeyEventInput(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
+        val isAltKey = keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT || 
+            keyCode == KEYCODE_SYM  // On Q25, remapped from physical Alt
+        if (isAltKey) {
+            // Normalize to ALT_LEFT for consistent double-tap tracking
+            // ModifierKeyHandler only recognizes ALT_LEFT/ALT_RIGHT
+            val normalizedKeyCode = KeyEvent.KEYCODE_ALT_LEFT
             inputEventRouter.handleAltModifierKeyDown(
-                keyCode, event, modifierStateController, symLayoutController,
+                normalizedKeyCode, event, modifierStateController, symLayoutController,
                 { updateStatusBarText() }, { startSpeechRecognition() }
             )
             return true
@@ -1466,10 +1532,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ctrlPressed || ctrlLatchActive || ctrlOneShot || navModeController.isNavModeActive()) return false
         val ic = currentInputConnection ?: return false
         keyEventTextOutput.textForRepeat(keyCode, event)?.let {
+            // Consume Alt one-shot HERE - this is where letter keys get Alt-mapped!
+            altOneShot = false
             return keyEventTextOutput.sendText(keyCode, it, ic)
         }
         clearAltOnBoundaryIfNeeded(keyCode) { updateStatusBarText() }
-        if (!event.isAltPressed && !altPressed && !altLatchActive && !altOneShot) return false
+        if (!altActive(event)) return false
         val handled = inputEventRouter.handleAltModifiedKey(
             keyCode = keyCode,
             event = event,
@@ -1477,7 +1545,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             alternateCharacterManager = alternateCharacterManager,
             updateStatusBar = { updateStatusBarText() },
             textOutput = { keyEventTextOutput.sendText(keyCode, it, ic) },
-            callSuperWithKey = { _, _ -> false }
+            callSuperWithKey = { _, _ -> false },
+            consumeAltOneShot = { altOneShot = false }
         )
         if (handled) {
             altOneShot = false
@@ -1597,8 +1666,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (isAutoCapSuppressedAtCursor()) return false
         return modifierStateController.requestShiftOneShotFromAutoCap()
     }
-    
-    
+
 
     /**
      * Initializes the input context for a field.
@@ -1899,13 +1967,22 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 keyCode == KeyEvent.KEYCODE_DEL ||
                 keyCode == KeyEvent.KEYCODE_SPACE
 
+    private fun isModifierKey(keyCode: Int): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.KEYCODE_SHIFT_RIGHT,
+            KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT,
+            KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT,
+            KeyEvent.KEYCODE_META_LEFT, KeyEvent.KEYCODE_META_RIGHT,
+            KeyEvent.KEYCODE_SYM, KeyEvent.KEYCODE_FUNCTION
+            -> true
+            else -> false
+        }
+    }
+
     private fun updateModifierTapLatchSettings() {
         if (!::modifierStateController.isInitialized) {
             return
         }
-        modifierStateController.shiftTapLatches = SettingsManager.getShiftTapLatches(this)
-        modifierStateController.altTapLatches = SettingsManager.getAltTapLatches(this)
-        modifierStateController.ctrlTapLatches = SettingsManager.getCtrlTapLatches(this)
     }
 
     override fun onCreate() {
@@ -4666,7 +4743,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         InputDevice.getDevice(inputEvent.deviceId)
                             ?.let(DeviceSpecific::isClicksPowerKeyboard) == true
                 } == true)
-        return clicksPowerButtonEventMapper.map(
+        val result = clicksPowerButtonEventMapper.map(
             keyCode = remapped.keyCode,
             event = remapped.event,
             isClicksPowerKeyboard = isClicksPowerKeyboard,
@@ -4675,6 +4752,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             altButtonMode = SettingsManager.getClicksAltButtonMode(this),
             microphoneButtonMode = SettingsManager.getClicksMicrophoneButtonMode(this)
         )
+        return result
     }
 
     override fun dispatchClicksAccessibilityKeyEvent(event: KeyEvent): Boolean {
@@ -4865,6 +4943,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         val keyCode = remapped.keyCode
         val event = remapped.event
+        
+        // Filter synthetic duplicate modifier events (deviceId=-1, flags=0, zero-duration echoes)
+        if (isSyntheticModifierDuplicate(keyCode, event)) {
+            return true
+        }
+        
         clicksPowerShiftTapFilter.shouldConsumeKeyDown(
             isClicksPowerKeyboard = DeviceSpecific.resolveInputProfile(
                 event,
@@ -4907,7 +4991,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         else if (keyCode_ in consumedLanguageSwitchKeys) return true
         val languageCtrl = event?.isCtrlPressed == true || ctrlPressed || ctrlPhysicallyPressed ||
             ctrlLatchActive || ctrlOneShot || ctrlLatchFromNavMode
-        val languageAlt = event?.isAltPressed == true || altPressed || altPhysicallyPressed || altLatchActive || altOneShot
+        val languageAlt = altActive(event)
         val reverseAltSpace = keyCode == KeyEvent.KEYCODE_SPACE && languageAlt && !languageCtrl &&
             event?.isSymPressed != true && !symPhysicallyPressed &&
             SettingsManager.isAltSpacePreviousLanguageEnabled(this)
@@ -5001,7 +5085,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 clearCtrlOneShot = { ctrlOneShot = false },
                 updateStatusBar = { updateStatusBarText() },
                 callSuper = { false },
-                toggleMinimalUi = { keyboardVisibilityController.toggleSlimMode() }
+                toggleMinimalUi = { keyboardVisibilityController.toggleSlimMode() },
+                physicalProfileOverride = physicalKeyboardProfileOverride
             )
             if (handled) {
                 // The router used up a Ctrl one-shot itself
@@ -5013,11 +5098,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
 
         val expansionShortcutModifierActive = event?.isCtrlPressed == true ||
-            event?.isAltPressed == true || event?.isMetaPressed == true || event?.isShiftPressed == true ||
+            altActive(event) || event?.isMetaPressed == true || event?.isShiftPressed == true ||
             ctrlPressed || ctrlPhysicallyPressed || ctrlLatchActive || ctrlOneShot || ctrlLatchFromNavMode ||
             altPressed || altPhysicallyPressed || altLatchActive || altOneShot ||
             shiftPressed || modifierStateController.shiftPhysicallyPressed || shiftLayerLatched || shiftOneShot
-        if (hasEditableField && !expansionShortcutModifierActive &&
+        val shouldCheckTextExpansion = hasEditableField && !expansionShortcutModifierActive
+        if (shouldCheckTextExpansion &&
             ::textExpansionController.isInitialized &&
             textExpansionController.handleKeyDown(keyCode)
         ) {
@@ -5032,11 +5118,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
 
         // Adapted from Mircea Horea IONICĂ (mionica), pastiera 12ce0a35c1.
-        if (hasEditableField && event?.repeatCount == 0 && keyCode == KeyEvent.KEYCODE_0 &&
-            DeviceSpecific.hasBlackberryKeyboard(DeviceSpecific.resolveInputProfile(event, physicalKeyboardProfileOverride).profileId) &&
-            (event.isAltPressed || altPhysicallyPressed || altLatchActive || altOneShot) &&
+        // Skip this check when processing Alt keys to avoid clearing one-shot
+        val isAltKey = keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard(DeviceSpecific.resolveInputProfile(event, physicalKeyboardProfileOverride).profileId)
+        if (!isAltKey &&
+            hasEditableField && event?.repeatCount == 0 && keyCode == KeyEvent.KEYCODE_0 &&
+            isBlackberry &&
+            altActive(event) &&
             !event.isCtrlPressed && !ctrlPressed && !ctrlLatchActive && !ctrlOneShot &&
             SettingsManager.getAltCtrlSpeechShortcutEnabled(this)) {
+            // BUG FIX: consume Alt one-shot AND clear symTogglePendingOnKeyUp!
+            altOneShot = false
+            symTogglePendingOnKeyUp = false
             modifierStateController.clearAltState(resetPressedState = true)
             updateStatusBarText()
             startSpeechRecognition()
@@ -5045,7 +5138,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
         // Minimal Phone dedicated keys (skip while Alt is active so its configured mapping can run)
         // Gate this behavior to Minimal Phone devices only.
-        val altActiveForDedicatedKeys = event?.isAltPressed == true || altLatchActive || altOneShot
+        val altActiveForDedicatedKeys = altActive(event)
         if (
             hasEditableField &&
             isMinimalPhoneHardwareActive() &&
@@ -5082,8 +5175,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             SettingsManager.getLauncherShortcut(this, keyCode) != null &&
             event?.repeatCount == 0
         ) {
+            // BUG FIX: consume Alt one-shot AND clear symTogglePendingOnKeyUp!
+            altOneShot = false
+            symTogglePendingOnKeyUp = false
             symChordUsedSinceKeyDown = true
-            if (launcherShortcutController.handleLauncherShortcut(keyCode)) {
+            val handled = launcherShortcutController.handleLauncherShortcut(keyCode)
+            if (handled) {
                 return true
             }
         }
@@ -5095,11 +5192,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             SettingsManager.getQuickLauncherAltShortcutsInTextFields(this) &&
             (keyCode != KeyEvent.KEYCODE_SPACE || SettingsManager.getQuickLauncherAltSpaceInTextFields(this)) &&
             SettingsManager.getLauncherShortcut(this, keyCode) != null &&
-            (event.isAltPressed || altPressed || altPhysicallyPressed || altLatchActive || altOneShot)
+            altActive(event)
         ) {
+            // BUG FIX: consume Alt one-shot BEFORE clearing Alt state!
+            altOneShot = false
             modifierStateController.clearAltState()
             updateStatusBarText()
-            if (launcherShortcutController.handleLauncherShortcut(keyCode)) {
+            val handled = launcherShortcutController.handleLauncherShortcut(keyCode)
+            if (handled) {
                 return true
             }
         }
@@ -5112,11 +5212,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             !isPureModifierKey(keyCode)
         ) {
             symChordUsedSinceKeyDown = true
+            // BUG FIX: Clear symTogglePendingOnKeyUp if NOT latched
+            // When Alt tap latches, symTogglePendingOnKeyUp should persist for next keys
+            if (!altLatchActive) {
+                symTogglePendingOnKeyUp = false
+            }
             val symChar = symLayoutController.resolveChordSymbol(
                 keyCode = keyCode,
                 shiftPressed = event.isShiftPressed || shiftOneShot || capsLockEnabled
             )
             if (!symChar.isNullOrEmpty()) {
+                // BUG FIX: consume Alt one-shot!
+                altOneShot = false
+                // Register non-modifier key to clear double-tap timing windows
+                modifierStateController.registerNonModifierKey()
                 val inputConnection = currentInputConnection
                 val committed = handleBoundaryTextBeforeCommit(symChar, inputConnection) ||
                     inputConnection?.commitText(symChar, 1) == true
@@ -5185,6 +5294,28 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             variationInteractedDuringHold = false
             otherKeyInteractedDuringHold = false
             modifierDownTimes[keyCode] = event.eventTime
+            
+            // Call ModifierStateController handlers to set pressed state
+            when (keyCode) {
+                KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT -> {
+                    modifierStateController.handleAltKeyDown(
+                        keyCode,
+                        now = ModifierKeyHandler.eventTimeOrUptime(event)
+                    )
+
+                }
+                KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.KEYCODE_SHIFT_RIGHT -> {
+                    val wasShiftOneShot = modifierStateController.shiftOneShot
+                    modifierStateController.handleShiftKeyDown(
+                        keyCode,
+                        now = ModifierKeyHandler.eventTimeOrUptime(event)
+                    )
+
+                    if (wasShiftOneShot && !modifierStateController.shiftOneShot) {
+                        suppressAutoCapRenderingAtCursorIfNeeded()
+                    }
+                }
+            }
         } else if (!isModifierKey && event?.repeatCount == 0) {
             if (
                 CompatibilityWorkarounds.isClicksPowerSyntheticShiftChord(
@@ -5214,9 +5345,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         // If NO editable field is active, handle ONLY nav mode
         if (!hasEditableField) {
+            val isAltKeyForInput = keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
             if (KeyEventInputPolicy.appliesTo(info) && !navModeController.isNavModeActive() &&
-                (languageAlt || keyEventTextOutput.hasPressedKey(keyCode) ||
-                    keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT)) {
+                (languageAlt || keyEventTextOutput.hasPressedKey(keyCode) || isAltKeyForInput)) {
                 return handleKeyEventInput(keyCode, event) || super.onKeyDown(keyCode, event)
             }
             val powerShortcutsEnabled = SettingsManager.getPowerShortcutsEnabled(this)
@@ -5411,7 +5542,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
         
-        val altActiveNow = event?.isAltPressed == true || altLatchActive || altOneShot
+        val altActiveNow = altActive(event)
         val debugUnicodeOverride = resolveAltMappedUnicodeForDebug(
             keyCode = keyCode,
             altActive = altActiveNow
@@ -5475,6 +5606,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
+
+        // Consume shift one-shot for non-modifier, non-letter keys before routing.
+        // Letters consume shift themselves in InputEventRouter after applying it.
+        // This ensures Space/Comma/Period and other non-letter keys consume shift.
+        if (shiftOneShot && !isModifierKey(keyCode) && !isAlphabeticKey(keyCode)) {
+            modifierStateController.consumeShiftOneShot()
+            updateStatusBarText()
+        }
+
         if (!altActiveNow) {
             if (
                 inputEventRouter.handleTextInputPipeline(
@@ -5543,7 +5683,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 } else {
                     null
                 },
-                shouldDisableSmartFeatures = shouldDisableSmartFeatures
+                shouldDisableSmartFeatures = shouldDisableSmartFeatures,
+                physicalProfileOverride = physicalKeyboardProfileOverride
             ),
             controllers = InputEventRouter.EditableFieldKeyDownControllers(
                 modifierStateController = modifierStateController,
@@ -5559,6 +5700,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     modifierStateController.consumeShiftOneShot()
                 },
                 clearAltOneShot = { altOneShot = false },
+                clearAltOneShotAndSymToggle = { 
+                    altOneShot = false
+                    symTogglePendingOnKeyUp = false
+                },
                 clearCtrlOneShot = { ctrlOneShot = false },
                 getCharacterFromLayout = { code, keyEvent, isShiftPressed ->
                     getCharacterFromLayout(code, keyEvent, isShiftPressed)
@@ -5580,7 +5725,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 handleBoundaryText = { text, inputConnection ->
                     handleBoundaryTextBeforeCommit(text, inputConnection)
                 },
-                onShiftOneShotToggledOff = { suppressAutoCapRenderingAtCursorIfNeeded() }
+                onShiftOneShotToggledOff = { suppressAutoCapRenderingAtCursorIfNeeded() },
+                resetOtherKeyInteracted = { otherKeyInteractedDuringHold = false }
             )
         )
 
@@ -5638,19 +5784,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 if (result.shouldUpdateStatusBar) {
                     updateStatusBarText()
                 }
-                val isQuickTap = holdDuration < 300L && !variationInteractedDuringHold && !otherKeyInteractedDuringHold
-                if (stickyEnabled && isQuickTap) {
-                    val now = event?.eventTime ?: System.currentTimeMillis()
-                    if (lastAltTapUpTime > 0L && now - lastAltTapUpTime <= DOUBLE_TAP_THRESHOLD) {
-                        altModifierLayerLatched = true
-                        lastAltTapUpTime = 0L
-                        updateStatusBarText()
-                    } else {
-                        lastAltTapUpTime = now
-                    }
-                } else {
-                    lastAltTapUpTime = 0L
-                }
+
+                // Visual layer follows ModifierStateController latch state
+                altModifierLayerLatched = modifierStateController.altLatchActive
             }
             if (otherKeyInteractedDuringHold) altOneShot = false
             variationInteractedDuringHold = false
@@ -5684,6 +5820,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (remapped.consume) return true
         val keyCode = remapped.keyCode
         val event = remapped.event
+        
+        // Filter synthetic duplicate modifier events (deviceId=-1, flags=0, zero-duration echoes)
+        if (isSyntheticModifierDuplicate(keyCode, event)) {
+            return true
+        }
+        
         if (keyCode == KeyEvent.KEYCODE_ENTER && consumeAltEnterUntilKeyUp) {
             consumeAltEnterUntilKeyUp = false
             return true
@@ -5789,7 +5931,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 if (isIntentionalHold) {
                     modifierStateBeforeHold?.let { modifierStateController.restoreLogicalState(it) }
                     // Sticky layer activation is handled via double-tap, not hold.
-                    shiftLayerLatched = false
+                shiftLayerLatched = false
                     lastShiftTapUpTime = 0L
                     variationInteractedDuringHold = false
                     otherKeyInteractedDuringHold = false
@@ -5802,25 +5944,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     if (result.shouldUpdateStatusBar) {
                         updateStatusBarText()
                     }
-                    val isQuickTap = holdDuration < 300L && !variationInteractedDuringHold && !otherKeyInteractedDuringHold
-                    if (stickyEnabled && isQuickTap) {
-                        val now = event?.eventTime ?: System.currentTimeMillis()
-                        if (lastShiftTapUpTime > 0L && now - lastShiftTapUpTime <= DOUBLE_TAP_THRESHOLD) {
-                            shiftLayerLatched = true
-                            lastShiftTapUpTime = 0L
-                            updateStatusBarText()
-                        } else {
-                            lastShiftTapUpTime = now
-                        }
-                    } else {
-                        lastShiftTapUpTime = 0L
-                    }
+
+                    // Visual layer follows ModifierStateController caps state
+                    shiftLayerLatched = modifierStateController.capsLockEnabled
                 }
                 variationInteractedDuringHold = false
                 otherKeyInteractedDuringHold = false
                 modifierDownTimes.remove(keyCode)
             }
-            return super.onKeyUp(keyCode, event)
+            // MUST consume Shift UP to prevent Android's MetaKeyKeyListener from
+            // managing META_SHIFT_ON/LOCKED sticky state alongside our state machine
+            return true
         }
         
         // Handle Ctrl release for double-tap
@@ -5863,7 +5997,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Handle Alt release for double-tap
         if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
             handleAltModifierKeyUp(keyCode, event, allowVisualLayer = true)
-            return super.onKeyUp(keyCode, event)
+            // MUST consume Alt UP to prevent Android's MetaKeyKeyListener from
+            // managing META_ALT_ON/LOCKED sticky state alongside our state machine
+            return true
         }
 
         // Toggle SYM layout on key release only when SYM was tapped alone.

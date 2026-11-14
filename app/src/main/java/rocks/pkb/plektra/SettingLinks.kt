@@ -118,8 +118,6 @@ object SettingLinkIds {
     const val MODIFIERS_ALT_BINDING = "modifiers.alt_binding"
     const val MODIFIERS_ALT_KEY_SHORTCUTS = "modifiers.alt_key_shortcuts"
     const val MODIFIERS_CONTROL_NAV_MODE = "modifiers.control_nav_mode"
-    const val MODIFIERS_SHIFT_TAP_LATCHES = "modifiers.shift_tap_latches"
-    const val MODIFIERS_ALT_TAP_LATCHES = "modifiers.alt_tap_latches"
     const val MODIFIERS_ALT_LATCH_STAYS_ON_SPACE = "modifiers.alt_latch_stays_on_space"
     const val MODIFIERS_CTRL_TAP_LATCHES = "modifiers.ctrl_tap_latches"
     const val MODIFIERS_CTRL_LATCH_STAYS_ON_SPACE = "modifiers.ctrl_latch_stays_on_space"
@@ -791,18 +789,6 @@ object SettingLinkRegistry {
             SettingLinkIds.MODIFIERS_CONTROL_NAV_MODE,
             R.string.modifier_control_nav_mode_title,
             R.string.modifier_control_nav_mode_description,
-            destination = SettingsDestination.Modifiers
-        ),
-        entry(
-            SettingLinkIds.MODIFIERS_SHIFT_TAP_LATCHES,
-            R.string.shift_tap_latches_title,
-            R.string.shift_tap_latches_description,
-            destination = SettingsDestination.Modifiers
-        ),
-        entry(
-            SettingLinkIds.MODIFIERS_ALT_TAP_LATCHES,
-            R.string.alt_tap_latches_title,
-            R.string.alt_tap_latches_description,
             destination = SettingsDestination.Modifiers
         ),
         entry(

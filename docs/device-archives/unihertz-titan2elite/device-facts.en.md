@@ -7,7 +7,7 @@ This page collects concrete facts about the Unihertz Titan 2 Elite that were obs
 ## Provenance
 
 - All observations come from one retail Titan 2 Elite with a QWERTY layout, tested on 2026-11-14 with logcat, `getevent -lt`, `dumpsys`, `getprop` and `settings`, plus a small key-probe test app and the app's own debug logging.
-- The firmware build was not recorded with these observations. The README names `Titan 2 Elite_V02.00.04` for a final retail unit; this page assumes a build of that generation but does not confirm it. Vendor behavior can change with firmware, so treat every fact as "seen on this unit on this date".
+- Firmware: `Titan 2 Elite_V02.00.06` (`ro.build.display.id`), Android 16, security patch 2026-09-05. Vendor behavior can change with firmware, so treat every fact as "seen on this build on this date".
 - Each fact says how it was established. "Inferred" means derived from paired observations, not read from a specification.
 
 ## 1. Physical keys and input devices

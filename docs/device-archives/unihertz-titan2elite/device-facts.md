@@ -7,7 +7,7 @@ Diese Seite sammelt konkrete Fakten zum Unihertz Titan 2 Elite, die beim Testen 
 ## Herkunft
 
 - Alle Beobachtungen stammen von einem Serien-Titan-2-Elite mit QWERTY-Layout und wurden am 14.11.2026 mit logcat, `getevent -lt`, `dumpsys`, `getprop` und `settings` sowie einer kleinen Key-Probe-Testapp und dem Debug-Logging der App gemacht.
-- Der Firmwarestand wurde zu diesen Beobachtungen nicht festgehalten. Das README nennt `Titan 2 Elite_V02.00.04` für ein final ausgeliefertes Gerät; diese Seite geht von einem Stand dieser Generation aus, bestätigt es aber nicht. Herstellerverhalten kann sich mit der Firmware ändern, deshalb gilt jeder Fakt als „an diesem Gerät an diesem Datum gesehen“.
+- Firmware: `Titan 2 Elite_V02.00.06` (`ro.build.display.id`), Android 16, Sicherheitspatch 2026-09-05. Herstellerverhalten kann sich mit der Firmware ändern, deshalb gilt jeder Fakt als „auf diesem Stand an diesem Datum gesehen“.
 - Zu jedem Fakt steht, wie er ermittelt wurde. „Abgeleitet“ heißt: aus gepaarten Beobachtungen geschlossen, nicht aus einer Spezifikation gelesen.
 
 ## 1. Physische Tasten und Eingabegeräte

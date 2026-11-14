@@ -48,4 +48,5 @@ Das finale Titan 2 Elite meldet wie ein Titan 2 unter anderem `model=Titan 2`, `
 ## Referenzen
 
 - [Pastiera-Statusleiste auf einem Titan 2 Elite](2026-07-20-pastiera-statusbar-reference.png), zugesandtes Foto vom 20. Juli 2026, 1176 × 1416 Pixel, SHA-256 `4278b3599317acc733f532eb2f572602de49410f1eb6a759280e1ce764c7ea21`
+- [Gerätefakten für Entwickler: Tasten, Herstellerschicht, Logging, Speicher](device-facts.md) ([English](device-facts.en.md))
 - [Herstellerseite mit technischen Daten](https://www.unihertz.com/en-de/products/titan-2-elite)

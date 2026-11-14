@@ -26,3 +26,15 @@
 
 # Keep BuildConfig for runtime checks if needed
 -keep class rocks.pkb.plektra.BuildConfig { *; }
+
+# embedded wireless-ADB.
+# libadb.so binds JNI to the hardcoded class moe/shizuku/manager/adb/PairingContext, and the
+# vendored ADB stack uses reflection and crypto, so keep it all clear of R8 stripping and renaming.
+-keep class moe.shizuku.manager.adb.** { *; }
+-keepclasseswithmembernames class * { native <methods>; }
+-keep class org.lsposed.hiddenapibypass.** { *; }
+
+# Shizuku starts the UserService by class name in its own process.
+-keep class rocks.pkb.plektra.shizuku.PrivilegedShellService { <init>(...); }
+-dontwarn org.conscrypt.**
+-dontwarn com.android.org.conscrypt.**

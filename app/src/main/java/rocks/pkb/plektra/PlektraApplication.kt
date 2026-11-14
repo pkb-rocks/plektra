@@ -55,6 +55,8 @@ class PlektraApplication : Application() {
         rocks.pkb.plektra.data.emoji.EmojiRendering.ensureInitialized(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
         SettingsManager.migrateCompactSoftwareKeyHeightOnce(this)
+        // Restore the vendor keyboard switch if a ring process ended while it was darkened.
+        rocks.pkb.plektra.ring.RingBacklight.restoreLater(this)
         AppPackageChangeMonitor.register(this)
         ClicksPowerKeyboardController.initialize(this)
         publishSoftwareKeyboardModeShortcut()

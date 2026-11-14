@@ -1,3 +1,5 @@
+[English](README.en.md) | Deutsch
+
 # Unihertz Titan 2 Elite
 
 Dieses Verzeichnis sammelt Referenzmaterial zum Unihertz Titan 2 Elite. Solange noch kein Testgerät verfügbar ist, sind Fotos und daraus abgeleitete Maße ausdrücklich nur Näherungen und keine Messungen am Gerät. Ein Debug-Export eines final ausgelieferten Geräts liegt für die Geräteerkennung vor.

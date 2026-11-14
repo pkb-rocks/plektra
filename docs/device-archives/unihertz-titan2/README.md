@@ -1,3 +1,5 @@
+[English](README.en.md) | Deutsch
+
 # Unihertz Titan 2
 
 Dieses Verzeichnis archiviert beobachtetes Tastaturverhalten des Unihertz Titan 2 auf echter Hardware.

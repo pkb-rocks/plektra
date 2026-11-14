@@ -3,13 +3,17 @@ package rocks.pkb.plektra.dictionaries
 import android.util.JsonReader
 import android.util.JsonToken
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import java.io.BufferedInputStream
+import java.io.FilterInputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.PushbackInputStream
 
 /** Validate legacy CBOR/JSON without expanding prefix and SymSpell indexes.
  * Only normalized keys matching personal entries are retained for deduplication.
+ * Every accepted file must also decode in DictionaryRepository (kotlinx 1.6.3),
+ * so format detection, numbers and escapes follow its stricter rules.
  */
 internal object StreamingDictionaryValidator {
     data class Entry(val key: String, val word: String, val frequency: Int, val source: Int)
@@ -17,8 +21,8 @@ internal object StreamingDictionaryValidator {
         onEntry: ((Entry) -> Unit)? = null, checkpoint: () -> Unit = {}): Set<String> {
         try {
             val input = PushbackInputStream(BufferedInputStream(source), 1)
-            var first = input.read()
-            while (first in listOf(9, 10, 13, 32)) first = input.read()
+            // DictionaryRepository detects JSON only by a leading '{'.
+            val first = input.read()
             require(first >= 0) { "Empty dictionary" }
             input.unread(first)
             return if (first == '{'.code) json(input, personalKeys, onEntry, checkpoint) else CborReader(input, personalKeys, onEntry, checkpoint).read()
@@ -34,7 +38,7 @@ internal object StreamingDictionaryValidator {
     private fun json(input: InputStream, keys: Set<String>, onEntry: ((Entry) -> Unit)?, checkpoint: () -> Unit): Set<String> {
         val found = mutableSetOf<String>()
         val fields = mutableSetOf<String>()
-        val reader = JsonReader(InputStreamReader(input, Charsets.UTF_8))
+        val reader = JsonReader(InputStreamReader(JsonEscapeValidator(input), Charsets.UTF_8))
         reader.beginObject()
         while (reader.hasNext()) {
             val field = reader.nextName()
@@ -57,8 +61,8 @@ internal object StreamingDictionaryValidator {
                                 require(entryFields.add(name))
                                 when (name) {
                                     "word" -> { require(reader.peek() == JsonToken.STRING); if (emit) word = reader.nextString() else reader.skipValue(); entryFields.add(name) }
-                                    "frequency" -> { require(reader.peek() == JsonToken.NUMBER); frequency = reader.nextInt(); entryFields.add(name) }
-                                    "source" -> { require(reader.peek() == JsonToken.NUMBER); source = reader.nextInt(); require(source in 0..2); entryFields.add(name) }
+                                    "frequency" -> { frequency = jsonInt(reader); entryFields.add(name) }
+                                    "source" -> { source = jsonInt(reader); require(source in 0..2); entryFields.add(name) }
                                     else -> reader.skipValue()
                                 }
                             }
@@ -87,7 +91,7 @@ internal object StreamingDictionaryValidator {
                         reader.beginObject()
                         while (reader.hasNext()) {
                             val name = reader.nextName()
-                            if (name == "maxEditDistance" || name == "prefixLength") { require(reader.peek() == JsonToken.NUMBER); reader.nextInt(); metadata.add(name) }
+                            if (name == "maxEditDistance" || name == "prefixLength") { jsonInt(reader); metadata.add(name) }
                             else reader.skipValue()
                         }
                         reader.endObject()
@@ -103,9 +107,52 @@ internal object StreamingDictionaryValidator {
         return found
     }
 
+    /** Decode one numeric token with the runtime parser; JsonReader.nextInt also
+     * accepts decimal notation such as 1.0, which kotlinx rejects.
+     */
+    private fun jsonInt(reader: JsonReader): Int {
+        require(reader.peek() == JsonToken.NUMBER)
+        return Json.decodeFromString<Int>(reader.nextString())
+    }
+
+    /** Android's JsonReader accepts unknown escapes such as \q; kotlinx rejects them. */
+    private class JsonEscapeValidator(input: InputStream) : FilterInputStream(input) {
+        private var inString = false
+        private var escaped = false
+        private var hexDigits = 0
+        private fun check(byte: Int) {
+            when {
+                byte < 0 -> Unit
+                hexDigits > 0 -> {
+                    require(byte.toChar().let { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) { "Invalid JSON escape" }
+                    hexDigits--
+                }
+                escaped -> {
+                    escaped = false
+                    if (byte == 'u'.code) hexDigits = 4
+                    else require(byte.toChar() in "\"\\/bfnrt") { "Invalid JSON escape" }
+                }
+                inString && byte == '\\'.code -> escaped = true
+                byte == '"'.code -> inString = !inString
+            }
+        }
+        override fun read(): Int = super.read().also(::check)
+        override fun read(b: ByteArray, off: Int, len: Int): Int =
+            super.read(b, off, len).also { count -> for (i in off until off + count) check(b[i].toInt() and 0xff) }
+    }
+
     private class CborReader(val input: PushbackInputStream, val keys: Set<String>, val onEntry: ((Entry) -> Unit)?, val checkpoint: () -> Unit) {
         private fun byte(): Int = input.read().also { require(it >= 0) { "Truncated CBOR" } }
-        private fun header(expected: Int): Long {
+        /** kotlinx skips tags before maps, arrays, strings and numbers. */
+        private fun skipTags() {
+            while (true) {
+                val first = byte(); input.unread(first)
+                if (first ushr 5 != 6) return
+                header(6, allowTags = false)
+            }
+        }
+        private fun header(expected: Int, allowTags: Boolean = true): Long {
+            if (allowTags) skipTags()
             val first = byte()
             require(first ushr 5 == expected)
             return when (val additional = first and 31) {
@@ -136,21 +183,35 @@ internal object StreamingDictionaryValidator {
                 }
             }
         }
-        private fun text(): String {
+        /** Visit the definite chunk lengths of a text string. kotlinx concatenates
+         * indefinite chunks before UTF-8 decoding and needs at least one chunk.
+         */
+        private fun textChunks(chunk: (Long) -> Unit) {
             val size = header(3)
-            require(size in 0..65536) { "Invalid dictionary key length" }
-            val bytes = ByteArray(size.toInt())
-            var offset = 0
-            while (offset < bytes.size) {
-                val count = input.read(bytes, offset, bytes.size - offset)
-                require(count > 0)
-                offset += count
-            }
-            return bytes.toString(Charsets.UTF_8)
+            if (size >= 0) { chunk(size); return }
+            do {
+                checkpoint()
+                chunk(header(3, allowTags = false).also { require(it >= 0) { "Nested indefinite CBOR text" } })
+                val next = byte()
+                if (next != 255) input.unread(next)
+            } while (next != 255)
         }
-        private fun skipText() {
-            val size = header(3)
-            require(size >= 0)
+        private fun text(): String {
+            val bytes = java.io.ByteArrayOutputStream()
+            textChunks { size ->
+                require(size <= 65536 - bytes.size()) { "Invalid dictionary key length" }
+                val chunk = ByteArray(size.toInt())
+                var offset = 0
+                while (offset < chunk.size) {
+                    val count = input.read(chunk, offset, chunk.size - offset)
+                    require(count > 0)
+                    offset += count
+                }
+                bytes.write(chunk)
+            }
+            return bytes.toByteArray().toString(Charsets.UTF_8)
+        }
+        private fun skipText() = textChunks { size ->
             var remaining = size
             while (remaining > 0) {
                 val count = input.skip(remaining)
@@ -158,6 +219,7 @@ internal object StreamingDictionaryValidator {
             }
         }
         private fun integer(): Long {
+            skipTags()
             val first = byte(); input.unread(first)
             val type = first ushr 5
             require(type == 0 || type == 1)

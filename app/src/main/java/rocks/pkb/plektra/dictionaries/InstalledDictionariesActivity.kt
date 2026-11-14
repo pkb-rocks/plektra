@@ -158,7 +158,6 @@ fun InstalledDictionariesScreen(
                 val result = importDictionaryFromSaf(context, uri)
                 val message = when (result) {
                     is ImportResult.Success -> {
-                        DictionaryRepositoryManager.notifyDictionariesChanged(context)
                         installedDictionaries = loadSerializedDictionaries(context)
                         context.getString(
                             R.string.installed_dictionaries_import_success,
@@ -624,8 +623,13 @@ private suspend fun importDictionaryFromSaf(context: Context, uri: android.net.U
         require(destFile.canonicalFile.parentFile == destDir.canonicalFile) { "Invalid dictionary name" }
         withContext(Dispatchers.IO) {
             val importContext = currentCoroutineContext()
+            val appContext = context.applicationContext
             context.contentResolver.openInputStream(uri)?.use { input ->
-                DictionaryFileInstaller.install(input, destFile, emptySet(), checkpoint = { importContext.ensureActive() })
+                // Notify inside the commit: a later cancellation (e.g. a configuration
+                // change) must not leave a replaced file unannounced.
+                DictionaryFileInstaller.install(input, destFile, emptySet(),
+                    checkpoint = { importContext.ensureActive() },
+                    onReplaced = { DictionaryRepositoryManager.notifyDictionariesChanged(appContext) })
             } ?: return@withContext null
         } ?: return ImportResult.CopyError
 

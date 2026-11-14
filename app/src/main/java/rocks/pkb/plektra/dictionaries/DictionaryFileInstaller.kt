@@ -8,9 +8,12 @@ import java.io.InputStream
 
 /** Stage and validate before replacing a working file. Validation retains only
  * relevant personal-word keys, never a full expanded dictionary index.
+ * [onReplaced] runs synchronously right after the replacement, without a
+ * cancellation checkpoint in between, so the IME learns about every swap.
  */
 internal object DictionaryFileInstaller {
-    fun install(input: InputStream, target: File, personalKeys: Set<String>, checkpoint: () -> Unit = {}): Set<String> {
+    fun install(input: InputStream, target: File, personalKeys: Set<String>,
+        checkpoint: () -> Unit = {}, onReplaced: () -> Unit = {}): Set<String> {
         val staged = File.createTempFile("dictionary-import-", ".tmp", target.parentFile)
         try {
             FileOutputStream(staged).use { output ->
@@ -29,6 +32,7 @@ internal object DictionaryFileInstaller {
             checkpoint()
             Files.move(staged.toPath(), target.toPath(),
                 StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+            onReplaced()
             return found
         } finally {
             staged.delete()

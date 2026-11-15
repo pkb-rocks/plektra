@@ -930,4 +930,7 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="kaomoji_placement_emoji">Sau emoji</string>
     <string name="kaomoji_placement_off">Tắt</string>
     <string name="emoji_picker_extras_title">Ký hiệu văn bản và kaomoji trong bộ chọn emoji</string>
+    <string name="software_keyboard_key_hints_title">Hiện nhãn phụ</string>
+    <string name="software_keyboard_key_hints_description">Hiện ký tự thay thế khi nhấn giữ ở góc trên bên phải và ký tự Alt hoặc SYM ở góc dưới bên trái phím.</string>
+    <string name="kw_on_screen_key_hints">gợi ý phím, nhãn góc, nhấn giữ, Alt, SYM, ký tự phụ</string>
 </resources>

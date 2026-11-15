@@ -931,4 +931,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="kaomoji_placement_emoji">Էմոջիներից հետո</string>
     <string name="kaomoji_placement_off">Անջատված</string>
     <string name="emoji_picker_extras_title">Տեքստային նշաններ և կաոմոջի էմոջիների ընտրիչում</string>
+    <string name="software_keyboard_key_hints_title">Ցույց տալ լրացուցիչ նշագրերը</string>
+    <string name="software_keyboard_key_hints_description">Ստեղների վերին աջ անկյունում ցույց է տալիս երկար սեղմման այլընտրանքը, իսկ ներքևի ձախում՝ Alt կամ SYM նիշը։</string>
+    <string name="kw_on_screen_key_hints">ստեղների հուշումներ, անկյունային նշագրեր, երկար սեղմում, Alt, SYM, լրացուցիչ նիշեր</string>
 </resources>

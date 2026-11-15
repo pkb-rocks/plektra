@@ -1953,6 +1953,7 @@ class StatusBarController(
         keyboardView.longPressHintProvider = { output ->
             resolveSoftwareKeyboardAltLongPressHint(output, snapshot)
         }
+        keyboardView.showKeyHints = SettingsManager.getSoftwareKeyboardKeyHintsEnabled(context)
         keyboardView.longPressLayerAlternatesProvider = { output ->
             resolveSoftwareKeyboardLongPressLayerAlternates(output, snapshot)
         }

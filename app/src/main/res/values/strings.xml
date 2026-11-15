@@ -1417,6 +1417,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="software_keyboard_layout_style_full_iso">Full ISO</string>
     <string name="virtual_keyboard_behaviour_title">On-screen Keyboard</string>
     <string name="virtual_keyboard_behaviour_description">Layout, touch behaviour, and appearance of the on-screen keyboard.</string>
+    <string name="software_keyboard_key_hints_title">Show secondary labels</string>
+    <string name="software_keyboard_key_hints_description">Show the long-press alternative at the top right and the Alt or SYM character at the bottom left of keys.</string>
     <string name="software_keyboard_theme_link_title">Software keyboard theme</string>
     <string name="software_keyboard_theme_link_description">Open the theme editor on the virtual keyboard page.</string>
     <string name="software_keyboard_number_row_title">Number row</string>
@@ -1804,6 +1806,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_text_input_alt_backspace">alt, backspace, delete word</string>
     <string name="kw_text_input_backspace_start">backspace, delete line, start of text</string>
     <string name="kw_keyboards_devices_on_screen">on-screen keyboard, software keyboard, virtual keyboard</string>
+    <string name="kw_on_screen_key_hints">key hints, corner labels, long press, Alt, SYM, secondary characters</string>
     <string name="kw_keyboards_devices_built_in">built-in keyboards, layouts, hardware, profiles</string>
     <string name="kw_keyboards_devices_accessories">accessories, clicks, cover</string>
     <string name="kw_auto_correction_languages">keyboard layout, input languages, layouts, dictionaries, per language</string>

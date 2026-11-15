@@ -1041,6 +1041,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_text_input_alt_backspace">alt, backspace, cancella parola</string>
     <string name="kw_text_input_backspace_start">backspace, cancella riga, inizio testo</string>
     <string name="kw_keyboards_devices_on_screen">tastiera a schermo, tastiera virtuale, tastiera software</string>
+    <string name="kw_on_screen_key_hints">suggerimenti tasti, etichette d\'angolo, pressione prolungata, Alt, SYM, caratteri secondari</string>
     <string name="kw_keyboards_devices_built_in">tastiere integrate, layout, hardware, profili</string>
     <string name="kw_keyboards_devices_accessories">accessori, clicks, cover</string>
     <string name="kw_auto_correction_languages">layout tastiera, lingue di input, layout, dizionari, per lingua</string>
@@ -1110,4 +1111,6 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kaomoji_placement_emoji">Dopo le emoji</string>
     <string name="kaomoji_placement_off">Disattivato</string>
     <string name="emoji_picker_extras_title">Simboli di testo e kaomoji nel selettore emoji</string>
+    <string name="software_keyboard_key_hints_title">Mostra etichette secondarie</string>
+    <string name="software_keyboard_key_hints_description">Mostra in alto a destra l\'alternativa della pressione prolungata e in basso a sinistra il carattere Alt o SYM dei tasti.</string>
 </resources>

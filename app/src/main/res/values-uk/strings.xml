@@ -933,4 +933,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="kaomoji_placement_emoji">Після емодзі</string>
     <string name="kaomoji_placement_off">Вимк.</string>
     <string name="emoji_picker_extras_title">Текстові символи й каомодзі у виборі емодзі</string>
+    <string name="software_keyboard_key_hints_title">Показувати додаткові підписи</string>
+    <string name="software_keyboard_key_hints_description">Показує праворуч угорі альтернативу довгого натискання, а ліворуч унизу — символ Alt або SYM клавіші.</string>
+    <string name="kw_on_screen_key_hints">підказки клавіш, кутові підписи, довге натискання, Alt, SYM, додаткові символи</string>
 </resources>

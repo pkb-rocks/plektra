@@ -1355,6 +1355,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="software_keyboard_layout_style_full_iso">Vollständig ISO</string>
     <string name="virtual_keyboard_behaviour_title">Bildschirmtastatur</string>
     <string name="virtual_keyboard_behaviour_description">Anordnung, Touch-Verhalten und Darstellung der Bildschirmtastatur.</string>
+    <string name="software_keyboard_key_hints_title">Zusatzbeschriftungen anzeigen</string>
+    <string name="software_keyboard_key_hints_description">Zeigt oben rechts die Long-Press-Alternative und unten links das Alt- bzw. SYM-Zeichen der Tasten.</string>
     <string name="software_keyboard_theme_link_title">Theme der Software-Tastatur</string>
     <string name="software_keyboard_theme_link_description">Öffnet den Theme-Editor direkt auf der Seite für die virtuelle Tastatur.</string>
     <string name="keyboard_theme_tab_colors">Farben</string>
@@ -1465,6 +1467,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kw_text_input_alt_backspace">Alt, Rücktaste, Wort löschen</string>
     <string name="kw_text_input_backspace_start">Rücktaste, Zeile löschen, Textanfang</string>
     <string name="kw_keyboards_devices_on_screen">Bildschirmtastatur, On-Screen-Tastatur, virtuelle Tastatur</string>
+    <string name="kw_on_screen_key_hints">Tastenhinweise, Eckbeschriftungen, Long Press, langes Drücken, Alt, SYM, Zweitzeichen</string>
     <string name="kw_keyboards_devices_built_in">eingebaute Tastaturen, Layouts, Hardware, Profile</string>
     <string name="kw_keyboards_devices_accessories">Zubehör, Clicks, Cover</string>
     <string name="kw_auto_correction_languages">Tastaturlayout, Eingabesprachen, Layouts, Wörterbücher, pro Sprache</string>

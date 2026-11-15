@@ -244,6 +244,7 @@ private fun createVirtualKeyboardThemePreviewView(
         longPressHintProvider = { output ->
             resolveVirtualPreviewAltHint(context, output)
         }
+        showKeyHints = SettingsManager.getSoftwareKeyboardKeyHintsEnabled(context)
         longPressLayerAlternatesProvider = { output ->
             resolveVirtualPreviewLongPressLayerAlternates(context, output)
         }
@@ -335,6 +336,7 @@ private fun updateVirtualKeyboardThemePreviewView(view: android.view.View, theme
         longPressHintProvider = { output ->
             resolveVirtualPreviewAltHint(context, output)
         }
+        showKeyHints = SettingsManager.getSoftwareKeyboardKeyHintsEnabled(context)
         longPressLayerAlternatesProvider = { output ->
             resolveVirtualPreviewLongPressLayerAlternates(context, output)
         }

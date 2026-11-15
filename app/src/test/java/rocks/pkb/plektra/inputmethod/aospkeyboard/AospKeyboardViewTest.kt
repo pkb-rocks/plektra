@@ -345,6 +345,37 @@ class AospKeyboardViewTest {
     }
 
     @Test
+    fun keyHintsSwitch_hidesBothCornerHints_butKeepsCtrlReferencesAndLongPress() {
+        val listener = RecordingListener()
+        val view = measuredKeyboard().apply {
+            longPressTimeoutMs = 50L
+            longPressAlternatesProvider = { output -> if (output == "u") listOf("ü") else emptyList() }
+            longPressHintProvider = { output -> if (output == "u") "§" else null }
+            this.listener = listener
+        }
+        assertTrue(drawnTexts(view).containsAll(listOf("ü", "§")))
+
+        view.showKeyHints = false
+        val hidden = drawnTexts(view)
+        assertFalse(hidden.contains("ü"))
+        assertFalse(hidden.contains("§"))
+        assertTrue(hidden.contains("u"))
+
+        view.ctrlShortcutDisplay = SettingsManager.SoftwareCtrlShortcutDisplay.ICONS_WITH_CORNER_LETTERS
+        view.ctrlPreviewActive = true
+        view.ctrlPreviewLabels = mapOf(KeyEvent.KEYCODE_U to "Undo")
+        val ctrl = drawnTexts(view)
+        assertTrue(ctrl.containsAll(listOf("Undo", "u")))
+        view.ctrlPreviewActive = false
+
+        val (x, y) = centerOfLabel(view, "u")
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(60, TimeUnit.MILLISECONDS)
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_UP, x, y, 80L))
+        assertEquals(listOf("ü"), listener.texts)
+    }
+
+    @Test
     fun touchDown_emitsKeyPressSoundImmediately() {
         val listener = RecordingListener()
         val view = measuredKeyboard().apply {
@@ -1073,6 +1104,16 @@ class AospKeyboardViewTest {
     }
 
     private fun keys(view: AospKeyboardView): List<Any> = field(view, "keys")
+
+    private fun drawnTexts(view: AospKeyboardView): List<String> {
+        val texts = mutableListOf<String>()
+        view.draw(object : android.graphics.Canvas(android.graphics.Bitmap.createBitmap(1000, 240, android.graphics.Bitmap.Config.ARGB_8888)) {
+            override fun drawText(text: String, x: Float, y: Float, paint: android.graphics.Paint) {
+                texts += text
+            }
+        })
+        return texts
+    }
 
     private fun displayHint(view: AospKeyboardView, key: Any): String {
         val method = AospKeyboardView::class.java.getDeclaredMethod("displayHint", key.javaClass)

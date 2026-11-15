@@ -176,6 +176,7 @@ object SettingsManager {
     const val KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE = "software_keyboard_mode_runtime_override"
     private const val KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE = "software_keyboard_layout_style" // compact | extended_iso | full_ansi | full_iso
     private const val KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED = "software_keyboard_number_row_enabled"
+    const val KEY_SOFTWARE_KEYBOARD_KEY_HINTS_ENABLED = "software_keyboard_key_hints_enabled"
     const val KEY_SOFTWARE_KEYBOARD_EMOJI_PAGE_IN_CYCLE = "software_keyboard_emoji_page_in_cycle"
     const val KEY_HARDWARE_KEYPAD_AUTO_OPEN = "hardware_keypad_auto_open"
     private const val KEY_FIELD_SCOPED_VIRTUAL_PREVIOUS_OVERRIDE = "field_scoped_virtual_previous_override"
@@ -672,6 +673,16 @@ object SettingsManager {
     fun setSoftwareKeyboardNumberRowEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED, enabled)
+            .apply()
+    }
+
+    /** Corner hints on regular keys: long-press alternative top right, Alt/SYM output bottom left. */
+    fun getSoftwareKeyboardKeyHintsEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_KEY_HINTS_ENABLED, true)
+
+    fun setSoftwareKeyboardKeyHintsEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SOFTWARE_KEYBOARD_KEY_HINTS_ENABLED, enabled)
             .apply()
     }
 

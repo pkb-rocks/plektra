@@ -146,6 +146,7 @@ object SettingsManager {
     private const val KEY_ALT_LATCH_STAYS_ON_SPACE = "alt_latch_stays_on_space"
     private const val KEY_CTRL_LATCH_STAYS_ON_SPACE = "ctrl_latch_stays_on_space"
     private const val KEY_EMOJI_PICKER_EXPANDED_HEIGHT = "emoji_picker_expanded_height"
+    private const val KEY_EMOJI_PICKER_STAYS_OPEN = "emoji_picker_stays_open" // Full emoji picker stays open after an emoji
     private const val KEY_DISMISSED_RELEASES = "dismissed_releases" // Set of release tag_names that were dismissed
     private const val KEY_TUTORIAL_COMPLETED = "tutorial_completed" // Whether the first-run tutorial has been completed
     private const val KEY_LAST_SEEN_WHATS_NEW_VERSION = "last_seen_whats_new_version"
@@ -393,6 +394,7 @@ object SettingsManager {
     private const val DEFAULT_BOUNCE_KEYS_BACKSPACE_ENABLED = true
     private const val DEFAULT_OVERLAPPING_KEYS_ENABLED = false
     private const val DEFAULT_EMOJI_PICKER_EXPANDED_HEIGHT = true
+    private const val DEFAULT_EMOJI_PICKER_STAYS_OPEN = true
     private val DEFAULT_SYM_PAGES_CONFIG = SymPagesConfig()
     private const val SYM_PAGES_SCHEMA_VERSION = 2
     private const val DEFAULT_STATIC_VARIATION_BAR_MODE = false
@@ -5409,6 +5411,16 @@ object SettingsManager {
     fun setEmojiPickerExpandedHeight(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_EMOJI_PICKER_EXPANDED_HEIGHT, enabled)
+            .apply()
+    }
+
+    /** Whether the full emoji picker stays open after an emoji or skin tone is typed; independent of the SYM auto-close settings. */
+    fun getEmojiPickerStaysOpen(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_EMOJI_PICKER_STAYS_OPEN, DEFAULT_EMOJI_PICKER_STAYS_OPEN)
+
+    fun setEmojiPickerStaysOpen(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_EMOJI_PICKER_STAYS_OPEN, enabled)
             .apply()
     }
 

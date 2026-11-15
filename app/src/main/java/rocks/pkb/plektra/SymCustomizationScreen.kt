@@ -72,6 +72,9 @@ fun SymCustomizationScreen(
     var emojiPickerExpandedHeight by remember {
         mutableStateOf(SettingsManager.getEmojiPickerExpandedHeight(context))
     }
+    var emojiPickerStaysOpen by remember {
+        mutableStateOf(SettingsManager.getEmojiPickerStaysOpen(context))
+    }
 
     val titan2LayoutEnabled = remember {
         SettingsManager.isTitan2LayoutEnabled(context)
@@ -776,6 +779,48 @@ fun SymCustomizationScreen(
                     onCheckedChange = { enabled ->
                         emojiPickerExpandedHeight = enabled
                         SettingsManager.setEmojiPickerExpandedHeight(context, enabled)
+                    }
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        Surface(
+            modifier = Modifier.settingRow("sym.emoji_picker_stays_open")
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Keyboard,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.emoji_picker_stays_open_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.emoji_picker_stays_open_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = emojiPickerStaysOpen,
+                    onCheckedChange = { enabled ->
+                        emojiPickerStaysOpen = enabled
+                        SettingsManager.setEmojiPickerStaysOpen(context, enabled)
                     }
                 )
             }

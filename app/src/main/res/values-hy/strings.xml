@@ -637,6 +637,8 @@
     <string name="static_variation_preset_dev_choice_description">Ընտրված կետադրության շարք։</string>
     <string name="emoji_picker_expanded_height_title">Ավելի մեծ emoji ընտրիչ</string>
     <string name="emoji_picker_expanded_height_description">Emoji որոնման էջի համար օգտագործել մոտ 1,5x բարձրություն. մյուս SYM էջերը պահպանում են սովորական բարձրությունը։</string>
+    <string name="emoji_picker_stays_open_title">Emoji ընտրիչը բաց թողնել emoji մուտքագրելուց հետո</string>
+    <string name="emoji_picker_stays_open_description">Emoji-ից կամ մաշկի երանգից հետո emoji ընտրիչը մնում է բաց հաջորդի համար։ Անկախ SYM դասավորության ավտո-փակումից։</string>
     <string name="typing_sound_title">Մուտքագրման ձայներ</string>
     <string name="typing_sound_off">Անջատված</string>
     <string name="typing_sound_click">Ստեղնաշարի կտտոց</string>

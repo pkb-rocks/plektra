@@ -638,6 +638,8 @@
     <string name="static_variation_preset_dev_choice_description">Подобранная строка пунктуации.</string>
     <string name="emoji_picker_expanded_height_title">Увеличенный выбор эмодзи</string>
     <string name="emoji_picker_expanded_height_description">Использовать примерно 1,5x высоты для страницы поиска эмодзи; остальные страницы SYM сохраняют обычную высоту.</string>
+    <string name="emoji_picker_stays_open_title">Не закрывать выбор эмодзи после ввода эмодзи</string>
+    <string name="emoji_picker_stays_open_description">После эмодзи или оттенка кожи выбор эмодзи остаётся открытым для следующего. Не зависит от автозакрытия раскладки SYM.</string>
     <string name="typing_sound_title">Звуки набора</string>
     <string name="typing_sound_off">Выкл.</string>
     <string name="typing_sound_click">Щелчок клавиатуры</string>

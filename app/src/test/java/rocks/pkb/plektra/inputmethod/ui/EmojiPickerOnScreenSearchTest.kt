@@ -11,6 +11,7 @@ import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputConnection
 import android.widget.EditText
+import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.data.emoji.EmojiRepository
 import rocks.pkb.plektra.data.emoji.EmojiSearchRepository
 import rocks.pkb.plektra.data.emoji.RecentEmojiManager
@@ -68,6 +69,8 @@ class EmojiPickerOnScreenSearchTest {
 
     @Test
     fun emojiCommitRunsSynchronouslyBeforeAutoClose() {
+        // The picker stays open by default; this covers the closing path.
+        SettingsManager.setEmojiPickerStaysOpen(RuntimeEnvironment.getApplication(), false)
         val events = mutableListOf<String>()
         var viewRef: EmojiPickerView? = null
         val view = EmojiPickerView(RuntimeEnvironment.getApplication()) {

@@ -637,6 +637,8 @@
     <string name="static_variation_preset_dev_choice_description">Підібраний рядок пунктуації.</string>
     <string name="emoji_picker_expanded_height_title">Більший вибір emoji</string>
     <string name="emoji_picker_expanded_height_description">Використовувати приблизно 1,5x висоти для сторінки пошуку emoji; інші сторінки SYM зберігають звичайну висоту.</string>
+    <string name="emoji_picker_stays_open_title">Не закривати вибір emoji після введення emoji</string>
+    <string name="emoji_picker_stays_open_description">Після emoji або відтінку шкіри вибір emoji залишається відкритим для наступного. Не залежить від автозакриття розкладки SYM.</string>
     <string name="typing_sound_title">Звуки набору</string>
     <string name="typing_sound_off">Вимкнено</string>
     <string name="typing_sound_click">Клацання клавіатури</string>

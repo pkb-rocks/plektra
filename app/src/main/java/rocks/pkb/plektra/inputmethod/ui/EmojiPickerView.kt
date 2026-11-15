@@ -1151,11 +1151,7 @@ class EmojiPickerView(
         // Commit synchronously before closing: a post{} on a view that the close detaches
         // would only run again when the picker is re-attached (i.e. the next time it opens).
         inputConnection?.commitText(emoji, 1)
-        val shouldClose = closeAfterCommit
-            ?: (
-                SettingsManager.getSymAutoClose(context) &&
-                    SettingsManager.getSymAutoCloseOnTouch(context)
-                )
+        val shouldClose = closeAfterCommit ?: !SettingsManager.getEmojiPickerStaysOpen(context)
         if (shouldClose) {
             onCloseRequested?.invoke()
         }

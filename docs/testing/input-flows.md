@@ -24,6 +24,7 @@ One step per line; `#` starts a comment.
 | `screen hold ID` / `screen release ID` | Keeps a finger down, for example for a long press on an emoji cell; further touches use additional fingers |
 | `wait MS` | Pauses, for example inside a hold for a long press |
 | `expect TEXT` | Waits up to 3 s until the note body equals TEXT exactly |
+| `preserve keyboard mode` | Leaves the keyboard mode unchanged when tapping picker or other panel controls; does not verify a hardware surface |
 | `require layout NAME` | Requires the loaded layout to match `app/src/main/assets/common/layouts/NAME.json` |
 | `require profile ID` | Requires Plektra to resolve the virtual keyboard to device profile ID |
 
@@ -38,7 +39,7 @@ TEXT is either the rest of the line or a JSON string such as `"a\nb "` for newli
 1. Checks the device identity, the selected input method, the lock screen and the screen state.
 2. Registers the virtual devices (the keyboard clone only for flows with `hw` steps or `require profile`) with the `uinput` shell command. They disappear when the flow ends or fails; held keys and fingers are released first.
 3. Opens `NotesActivity` through `NotesEditorAlias` and taps the new-note button. It continues only when the active note id is new and the note count grew by one, so a missed tap never types into an existing note. It then focuses the empty body. Test notes remain in the note list.
-4. For screen steps, sets the temporary software-keyboard mode only if no temporary mode is active, and clears it afterwards.
+4. For screen steps, sets the temporary software-keyboard mode only if no temporary mode is active, and clears it afterwards. With `preserve keyboard mode`, it leaves the mode unchanged; this lets hardware flows tap picker cells without opening the software keyboard. Confirm the intended surface separately; this directive does not assert its mode.
 5. Executes the operations and compares the note body. The body text and focus come from the editor view inside the app (`KeyboardBarTestReceiver noteBody`): the UI hierarchy reports an empty field's hint as its text.
 
 Cleanup releases held keys and fingers, removes the virtual devices and clears the temporary software-keyboard mode as independent steps. A failing step, such as a closed `uinput` pipe, does not skip the others. Cleanup failures are printed and fail the command only if the flow itself succeeded.

@@ -389,6 +389,7 @@ internal object BackupPreferenceContract {
             "software_keyboard_layout_style" to PreferenceValueType.STRING,
             "software_ctrl_shortcut_display" to PreferenceValueType.STRING,
             "software_keyboard_number_row_enabled" to PreferenceValueType.BOOLEAN,
+            "software_keyboard_key_hints_enabled" to PreferenceValueType.BOOLEAN,
             "software_keyboard_nearest_key_touch_enabled" to PreferenceValueType.BOOLEAN,
             "software_keyboard_left_modifier_key" to PreferenceValueType.STRING,
             "software_keyboard_right_modifier_key" to PreferenceValueType.STRING,

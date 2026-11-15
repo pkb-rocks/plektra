@@ -2592,6 +2592,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 scheduleKeyboardSurfaceTransition(
                     mode = effectiveMode
                 )
+            } else if (key == SettingsManager.KEY_SOFTWARE_KEYBOARD_KEY_HINTS_ENABLED) {
+                Handler(Looper.getMainLooper()).post {
+                    invalidateRenderedStatusSnapshot()
+                    updateStatusBarText()
+                }
             } else if (
                 key == "software_ctrl_shortcut_display" ||
                 key == "software_keyboard_layout_style" ||

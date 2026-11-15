@@ -409,6 +409,13 @@ class AospKeyboardView @JvmOverloads constructor(
             field = value
             invalidateKeyboard()
         }
+    /** Draws the corner hints of regular keys; input, layers and popups do not depend on it. */
+    var showKeyHints: Boolean = true
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidateKeyboard()
+        }
     var ctrlPreviewIconRes: Map<Int, Int> = emptyMap()
         set(value) {
             if (field == value) {
@@ -1603,13 +1610,13 @@ class AospKeyboardView @JvmOverloads constructor(
     }
 
     private fun displayHint(key: Key): String {
-        if (symPageActive) return ""
+        if (!showKeyHints || symPageActive) return ""
         if (key.spec.type !in listOf(KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD)) return ""
         return longPressAlternatesFor(key).firstOrNull().orEmpty()
     }
 
     private fun displayAltHint(key: Key): String {
-        if (symPageActive || keypad != SoftwareKeypad.FULL) return ""
+        if (!showKeyHints || symPageActive || keypad != SoftwareKeypad.FULL) return ""
         if (key.spec.type !in listOf(KeyType.CHAR, KeyType.COMMA, KeyType.PERIOD)) return ""
         return longPressHintProvider
             ?.invoke(key.spec.output)

@@ -1020,6 +1020,7 @@ object SettingLinkRegistry {
      */
     internal val keywordsById: Map<String, Int> = mapOf(
         "status_bar.presentation" to R.string.kw_status_bar_presentation,
+        "on_screen.key_hints" to R.string.kw_on_screen_key_hints,
         SettingLinkIds.MAIN_KEYBOARDS_DEVICES to R.string.kw_main_keyboards_devices,
         SettingLinkIds.MAIN_MODIFIERS to R.string.kw_main_modifiers,
         SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES to R.string.kw_main_custom_input_styles,

@@ -932,4 +932,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="kaomoji_placement_emoji">Después de los emoji</string>
     <string name="kaomoji_placement_off">Desactivado</string>
     <string name="emoji_picker_extras_title">Símbolos de texto y kaomoji en el selector de emoji</string>
+    <string name="software_keyboard_key_hints_title">Mostrar etiquetas secundarias</string>
+    <string name="software_keyboard_key_hints_description">Muestra arriba a la derecha la alternativa de pulsación larga y abajo a la izquierda el carácter Alt o SYM de las teclas.</string>
+    <string name="kw_on_screen_key_hints">indicaciones de teclas, etiquetas de esquina, pulsación larga, Alt, SYM, caracteres secundarios</string>
 </resources>

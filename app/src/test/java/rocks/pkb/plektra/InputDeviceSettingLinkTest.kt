@@ -43,6 +43,24 @@ class InputDeviceSettingLinkTest {
     }
 
     @Test
+    fun keyHintsSwitchIsFoundByTitleAndKeywordAndOpensTheOnScreenPage() {
+        assertTrue(SettingsManager.getSoftwareKeyboardKeyHintsEnabled(context))
+        val entry = requireNotNull(SettingLinkRegistry.byId("on_screen.key_hints"))
+        listOf(context.getString(R.string.software_keyboard_key_hints_title), "corner labels", "long press SYM").forEach { query ->
+            assertTrue("Search '$query' misses the key hints switch",
+                SettingLinkRegistry.search(context, query).any { it.id == entry.id })
+        }
+        val german = context.createConfigurationContext(Configuration(context.resources.configuration).apply {
+            setLocale(Locale.GERMAN)
+        })
+        assertTrue(SettingLinkRegistry.search(german, "Zusatzbeschriftungen").any { it.id == entry.id })
+        assertEquals(entry.id, SettingLinkRegistry.visibleTarget(context, entry).id)
+        val page = entry.route.toSettingsPage()
+        assertEquals(SettingsDestination.KeyboardsDevices, page.destination)
+        assertEquals(KeyboardsDevicesDestination.OnScreen, page.keyboardsDevicesDestination)
+    }
+
+    @Test
     fun repeatedActivationLabelsAreDisambiguatedByTheirSection() {
         val snippets = SettingLinkRegistry.search(context, "snippets tab").map { it.id }
         val emoji = SettingLinkRegistry.search(context, "emoji tab").map { it.id }

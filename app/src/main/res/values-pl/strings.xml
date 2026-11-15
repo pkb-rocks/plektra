@@ -933,4 +933,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="kaomoji_placement_emoji">Po emoji</string>
     <string name="kaomoji_placement_off">Wyłączone</string>
     <string name="emoji_picker_extras_title">Symbole tekstowe i kaomoji w selektorze emoji</string>
+    <string name="software_keyboard_key_hints_title">Pokazuj dodatkowe oznaczenia</string>
+    <string name="software_keyboard_key_hints_description">Pokazuje w prawym górnym rogu alternatywę długiego naciśnięcia, a w lewym dolnym znak Alt lub SYM klawisza.</string>
+    <string name="kw_on_screen_key_hints">podpowiedzi klawiszy, oznaczenia w rogach, długie naciśnięcie, Alt, SYM, znaki dodatkowe</string>
 </resources>

@@ -933,4 +933,7 @@ Nav Mode использует физическое положение клави
     <string name="kaomoji_placement_emoji">После эмодзи</string>
     <string name="kaomoji_placement_off">Выкл.</string>
     <string name="emoji_picker_extras_title">Текстовые символы и каомодзи в выборе эмодзи</string>
+    <string name="software_keyboard_key_hints_title">Показывать дополнительные подписи</string>
+    <string name="software_keyboard_key_hints_description">Показывает справа вверху альтернативу долгого нажатия, а слева внизу — символ Alt или SYM клавиши.</string>
+    <string name="kw_on_screen_key_hints">подсказки клавиш, угловые подписи, долгое нажатие, Alt, SYM, дополнительные символы</string>
 </resources>

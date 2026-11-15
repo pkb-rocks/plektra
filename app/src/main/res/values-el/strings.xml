@@ -1343,6 +1343,8 @@ QWERTZ σε φυσικό QWERTY
     <string name="software_keyboard_layout_style_full_iso">Πλήρες ISO</string>
     <string name="virtual_keyboard_behaviour_title">Πληκτρολόγιο οθόνης</string>
     <string name="virtual_keyboard_behaviour_description">Διάταξη, συμπεριφορά αφής και εμφάνιση του πληκτρολογίου οθόνης.</string>
+    <string name="software_keyboard_key_hints_title">Εμφάνιση δευτερευουσών ενδείξεων</string>
+    <string name="software_keyboard_key_hints_description">Εμφανίζει πάνω δεξιά την εναλλακτική παρατεταμένου πατήματος και κάτω αριστερά τον χαρακτήρα Alt ή SYM των πλήκτρων.</string>
     <string name="software_keyboard_theme_link_title">Θέμα software πληκτρολογίου</string>
     <string name="software_keyboard_theme_link_description">Άνοιγμα επεξεργαστή θέματος στη σελίδα εικονικού πληκτρολογίου.</string>
     <string name="software_keyboard_number_row_title">Γραμμή αριθμών</string>
@@ -1709,6 +1711,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_text_input_alt_backspace">alt, backspace, διαγραφή λέξης, delete word</string>
     <string name="kw_text_input_backspace_start">backspace, διαγραφή γραμμής, αρχή κειμένου, delete line, start of text</string>
     <string name="kw_keyboards_devices_on_screen">πληκτρολόγιο οθόνης, software πληκτρολόγιο, virtual πληκτρολόγιο, on-screen keyboard, virtual keyboard</string>
+    <string name="kw_on_screen_key_hints">ενδείξεις πλήκτρων, γωνιακές ετικέτες, παρατεταμένο πάτημα, Alt, SYM, δευτερεύοντες χαρακτήρες</string>
     <string name="kw_keyboards_devices_built_in">ενσωματωμένα πληκτρολόγια, διατάξεις, hardware, προφίλ, built-in keyboards, layouts, profiles</string>
     <string name="kw_keyboards_devices_accessories">αξεσουάρ, clicks, θήκη, accessories, cover</string>
     <string name="kw_auto_correction_languages">διάταξη πληκτρολογίου, γλώσσες εισαγωγής, διατάξεις, λεξικά, ανά γλώσσα, keyboard layout, input languages, dictionaries</string>

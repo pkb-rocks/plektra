@@ -67,6 +67,26 @@ object KeyMappingLoader {
         "KEYCODE_MIC" to 667  // Mic key
     )
 
+    private val specialKeyCodeMap = mapOf(
+        "DPAD_UP" to KeyEvent.KEYCODE_DPAD_UP,
+        "DPAD_DOWN" to KeyEvent.KEYCODE_DPAD_DOWN,
+        "DPAD_LEFT" to KeyEvent.KEYCODE_DPAD_LEFT,
+        "DPAD_RIGHT" to KeyEvent.KEYCODE_DPAD_RIGHT,
+        "DPAD_CENTER" to KeyEvent.KEYCODE_DPAD_CENTER,
+        "TAB" to KeyEvent.KEYCODE_TAB,
+        "MOVE_HOME" to KeyEvent.KEYCODE_MOVE_HOME,
+        "MOVE_END" to KeyEvent.KEYCODE_MOVE_END,
+        "PAGE_UP" to KeyEvent.KEYCODE_PAGE_UP,
+        "PAGE_DOWN" to KeyEvent.KEYCODE_PAGE_DOWN,
+        "ESCAPE" to KeyEvent.KEYCODE_ESCAPE,
+        "FORWARD_DEL" to KeyEvent.KEYCODE_FORWARD_DEL
+    )
+
+    /** Key names and target keycodes that [loadCtrlKeyMappings] accepts. */
+    internal fun isCtrlKeyName(name: String): Boolean = name in keyCodeMap
+
+    internal fun isCtrlTargetKeycode(name: String): Boolean = name in specialKeyCodeMap
+
     internal fun loadStringMappings(assets: AssetManager, filePath: String): Map<Int, String> {
         val jsonString = assets.open(filePath).bufferedReader().use { it.readText() }
         val mappingsObject = JSONObject(jsonString).getJSONObject("mappings")
@@ -240,21 +260,6 @@ object KeyMappingLoader {
 
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
-
-            val specialKeyCodeMap = mapOf(
-                "DPAD_UP" to KeyEvent.KEYCODE_DPAD_UP,
-                "DPAD_DOWN" to KeyEvent.KEYCODE_DPAD_DOWN,
-                "DPAD_LEFT" to KeyEvent.KEYCODE_DPAD_LEFT,
-                "DPAD_RIGHT" to KeyEvent.KEYCODE_DPAD_RIGHT,
-                "DPAD_CENTER" to KeyEvent.KEYCODE_DPAD_CENTER,
-                "TAB" to KeyEvent.KEYCODE_TAB,
-                "MOVE_HOME" to KeyEvent.KEYCODE_MOVE_HOME,
-                "MOVE_END" to KeyEvent.KEYCODE_MOVE_END,
-                "PAGE_UP" to KeyEvent.KEYCODE_PAGE_UP,
-                "PAGE_DOWN" to KeyEvent.KEYCODE_PAGE_DOWN,
-                "ESCAPE" to KeyEvent.KEYCODE_ESCAPE,
-                "FORWARD_DEL" to KeyEvent.KEYCODE_FORWARD_DEL
-            )
 
             val keys = mappingsObject.keys()
             while (keys.hasNext()) {

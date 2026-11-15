@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.util.Log
 import android.view.KeyEvent
 import org.json.JSONObject
+import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
 import org.json.JSONArray
 import java.io.File
 import java.io.FileOutputStream
@@ -322,8 +323,8 @@ object LayoutFileStore {
         layoutName: String,
         jsonString: String,
         conflictPolicy: LayoutConflictPolicy = LayoutConflictPolicy.FAIL
-    ): LayoutImportResult {
-        return try {
+    ): LayoutImportResult = DirectBootKeyboardConfig.changeSources(context) {
+        try {
             if (!isValidLayoutName(layoutName)) {
                 return LayoutImportResult.Failure(LayoutImportError.INVALID_NAME)
             }
@@ -422,8 +423,8 @@ object LayoutFileStore {
         }
     }
 
-    fun deleteLayout(context: Context, layoutName: String): Boolean {
-        return try {
+    fun deleteLayout(context: Context, layoutName: String): Boolean = DirectBootKeyboardConfig.changeSources(context) {
+        try {
             val layoutFile = getLayoutFile(context, layoutName)
             if (layoutFile.exists()) {
                 val deleted = layoutFile.delete()
@@ -526,12 +527,37 @@ object LayoutFileStore {
         return "$STORAGE_ID_PREFIX$digest"
     }
 
-    private fun isSafeStorageFile(file: File): Boolean {
+    internal fun isSafeStorageFile(file: File): Boolean {
         val baseName = file.name.removeSuffix(".json")
         return baseName.startsWith(STORAGE_ID_PREFIX) &&
             baseName.length == STORAGE_ID_PREFIX.length + 64 &&
             baseName.drop(STORAGE_ID_PREFIX.length).all { it in '0'..'9' || it in 'a'..'f' }
     }
+
+    /** The Direct Boot copy of a stored layout: storage file name, the id that selects it, and its JSON. */
+    internal data class DirectBootLayout(val fileName: String, val layoutId: String, val json: String)
+
+    /**
+     * Projects a stored layout read as [text] to the validated mappings plus the ids and display
+     * name used to select it. Descriptions and unknown fields stay behind; null for an invalid layout.
+     */
+    internal fun directBootProjection(file: File, text: String): DirectBootLayout? = runCatching {
+        val layout = (validateLayoutJson(text) as? LayoutParseResult.Success)?.layout ?: return null
+        val stored = JSONObject(text)
+        val name = (stored.opt("name") as? String)?.takeIf { it.isNotBlank() }
+        val safe = isSafeStorageFile(file)
+        val layoutId = if (safe) {
+            (stored.opt(LAYOUT_ID_FIELD) as? String)?.takeIf { it.isNotBlank() } ?: name
+        } else {
+            file.nameWithoutExtension
+        } ?: return null
+        val storageId = if (safe) file.nameWithoutExtension else storageIdFor(layoutId)
+        val projected = JSONObject(buildLayoutJsonString(layoutId, layout, name, description = null)).apply {
+            put(LAYOUT_ID_FIELD, layoutId)
+            put(STORAGE_ID_FIELD, storageId)
+        }
+        DirectBootLayout("$storageId.json", layoutId, projected.toString(2))
+    }.getOrNull()
 
     private fun findLegacyLayoutFile(context: Context, layoutName: String): File? {
         val root = getLayoutsDirectory(context).canonicalFile
@@ -612,6 +638,7 @@ object LayoutFileStore {
                 Log.w(TAG, "Migrated legacy layout but could not delete old file: ${legacyFile.name}")
             }
             Log.i(TAG, "Migrated legacy layout to safe storage: $layoutName")
+            DirectBootKeyboardConfig.requestRefresh(context)
             safeFile
         } catch (e: Exception) {
             Log.e(TAG, "Could not migrate legacy layout without data loss: $layoutName", e)

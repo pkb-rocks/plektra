@@ -8,6 +8,7 @@ import rocks.pkb.plektra.DeviceIdentitySnapshot
 import rocks.pkb.plektra.AppBroadcastActions
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
+import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -94,51 +95,59 @@ object RestoreManager {
             val (metadata, prefsData) = readAndValidateBackup(extractedDir)
             val filesDir = File(extractedDir, "files")
 
-            val snapshot = RestoreSnapshot(context, File(workingDir, "rollback"))
-            try {
-                val ordinaryFiles = FileBackupHelper.restoreFiles(context, filesDir)
-                val imageFiles = ThemeImageBackup.restore(context, File(extractedDir, "theme-images"))
-                val fileSummary = ordinaryFiles.copy(restoredFiles = ordinaryFiles.restoredFiles + imageFiles)
-                val excludedKeys = BackupPreferencePolicy.runtimeDerivedKeys +
-                    if (importMode == ImportMode.ADAPT_TO_CURRENT_DEVICE) {
-                        BackupPreferencePolicy.targetDeviceDerivedKeys
-                    } else {
-                        emptySet()
-                    }
-                val prefsSummary = PreferencesBackupHelper.restorePreferences(
-                    context,
-                    prefsData,
-                    excludedKeys = excludedKeys,
-                    hasRestoredTypingSoundPack = fileSummary.restoredFiles.any { path ->
-                        path.startsWith(
-                            "${SettingsManager.TYPING_SOUND_CUSTOM_DIR}/" +
-                                "${SettingsManager.TYPING_SOUND_CUSTOM_PACK_DIR}/"
-                        )
-                    }
-                )
-                val postRestoreActions = collectTriggeredPostRestoreActions(prefsSummary, fileSummary)
-                notifyPostRestoreEffects(context, postRestoreActions)
-                if (fileSummary.restoredFiles.any { it.startsWith("dictionaries_serialized/") }) {
-                    rocks.pkb.plektra.dictionaries.DictionaryRepositoryManager.notifyDictionariesChanged(context)
-                }
-
-                RestoreResult.Success(
-                    metadata = metadata,
-                    preferencesSummary = prefsSummary,
-                    fileSummary = fileSummary,
-                    postActionsTriggered = postRestoreActions
-                )
-            } catch (failure: Exception) {
+            // Rollback state, import, publication and any rollback form one transaction: no other change
+            // of the keyboard sources falls in between, and no half-restored state is published.
+            val (fileSummary, prefsSummary) = DirectBootKeyboardConfig.sourceTransaction(context) { publish ->
+                val snapshot = RestoreSnapshot(context, File(workingDir, "rollback"))
                 try {
-                    snapshot.rollback()
-                } catch (rollbackFailure: Exception) {
-                    failure.addSuppressed(rollbackFailure)
-                    retainRecoveryData = true
-                    throw IOException("Import failed and recovery is incomplete. Recovery data retained in " +
-                        "cache/${workingDir.name}/rollback", failure)
+                    val ordinaryFiles = FileBackupHelper.restoreFiles(context, filesDir)
+                    val imageFiles = ThemeImageBackup.restore(context, File(extractedDir, "theme-images"))
+                    val fileSummary = ordinaryFiles.copy(restoredFiles = ordinaryFiles.restoredFiles + imageFiles)
+                    val excludedKeys = BackupPreferencePolicy.runtimeDerivedKeys +
+                        if (importMode == ImportMode.ADAPT_TO_CURRENT_DEVICE) {
+                            BackupPreferencePolicy.targetDeviceDerivedKeys
+                        } else {
+                            emptySet()
+                        }
+                    val prefsSummary = PreferencesBackupHelper.restorePreferences(
+                        context,
+                        prefsData,
+                        excludedKeys = excludedKeys,
+                        hasRestoredTypingSoundPack = fileSummary.restoredFiles.any { path ->
+                            path.startsWith(
+                                "${SettingsManager.TYPING_SOUND_CUSTOM_DIR}/" +
+                                    "${SettingsManager.TYPING_SOUND_CUSTOM_PACK_DIR}/"
+                            )
+                        }
+                    )
+                    // Restored layout files bypass LayoutFileStore; the keyboard used before unlock must match.
+                    if (!publish()) throw IOException("The keyboard copy for use before unlock could not be updated")
+                    fileSummary to prefsSummary
+                } catch (failure: Exception) {
+                    try {
+                        snapshot.rollback()
+                        if (!publish()) throw IOException("The keyboard copy for use before unlock could not be rolled back")
+                    } catch (rollbackFailure: Exception) {
+                        failure.addSuppressed(rollbackFailure)
+                        retainRecoveryData = true
+                        throw IOException("Import failed and recovery is incomplete. Recovery data retained in " +
+                            "cache/${workingDir.name}/rollback", failure)
+                    }
+                    throw failure
                 }
-                throw failure
             }
+            val postRestoreActions = collectTriggeredPostRestoreActions(prefsSummary, fileSummary)
+            notifyPostRestoreEffects(context, postRestoreActions)
+            if (fileSummary.restoredFiles.any { it.startsWith("dictionaries_serialized/") }) {
+                rocks.pkb.plektra.dictionaries.DictionaryRepositoryManager.notifyDictionariesChanged(context)
+            }
+
+            RestoreResult.Success(
+                metadata = metadata,
+                preferencesSummary = prefsSummary,
+                fileSummary = fileSummary,
+                postActionsTriggered = postRestoreActions
+            )
         } catch (e: Exception) {
             Log.e(TAG, "Restore failed", e)
             RestoreResult.Failure(e.message ?: "Restore failed")

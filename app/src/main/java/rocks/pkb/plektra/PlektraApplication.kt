@@ -10,49 +10,62 @@ import android.os.Handler
 import android.os.Looper
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
-import android.content.BroadcastReceiver
+import rocks.pkb.plektra.inputmethod.DirectBootStorage
+import rocks.pkb.plektra.inputmethod.DirectBootStorageContext
 import android.content.Context
-import android.content.IntentFilter
-import androidx.core.content.ContextCompat
 import android.content.SharedPreferences
 
 class PlektraApplication : Application() {
     private var unlockedInitialized = false
     private var directBootConfigListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
+    // ActivityThread casts Application.baseContext to ContextImpl when dispatching receivers.
+    // Keep that framework context intact and route only the application's storage APIs.
+    private val storageContext by lazy { DirectBootStorageContext(baseContext) }
+
+    override fun getSharedPreferences(name: String, mode: Int) = storageContext.getSharedPreferences(name, mode)
+    override fun deleteSharedPreferences(name: String) = storageContext.deleteSharedPreferences(name)
+    override fun getFilesDir() = storageContext.filesDir
+    override fun getCacheDir() = storageContext.cacheDir
+    override fun getNoBackupFilesDir() = storageContext.noBackupFilesDir
+    override fun getDataDir() = storageContext.dataDir
+    override fun getDir(name: String, mode: Int) = storageContext.getDir(name, mode)
+    override fun getDatabasePath(name: String) = storageContext.getDatabasePath(name)
+    override fun openOrCreateDatabase(name: String, mode: Int, factory: android.database.sqlite.SQLiteDatabase.CursorFactory?) =
+        storageContext.openOrCreateDatabase(name, mode, factory)
+    override fun openOrCreateDatabase(name: String, mode: Int, factory: android.database.sqlite.SQLiteDatabase.CursorFactory?, errorHandler: android.database.DatabaseErrorHandler?) =
+        storageContext.openOrCreateDatabase(name, mode, factory, errorHandler)
+    override fun deleteDatabase(name: String) = storageContext.deleteDatabase(name)
+    override fun databaseList() = storageContext.databaseList()
+    override fun getFileStreamPath(name: String) = storageContext.getFileStreamPath(name)
+    override fun openFileInput(name: String) = storageContext.openFileInput(name)
+    override fun openFileOutput(name: String, mode: Int) = storageContext.openFileOutput(name, mode)
+    override fun deleteFile(name: String) = storageContext.deleteFile(name)
+    override fun fileList() = storageContext.fileList()
+
     override fun onCreate() {
         super.onCreate()
-        if (!DirectBootKeyboardConfig.isUserUnlocked(this)) {
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    if (!unlockedInitialized && intent.action == Intent.ACTION_USER_UNLOCKED && DirectBootKeyboardConfig.isUserUnlocked(context)) {
-                        unregisterReceiver(this)
-                        initializeUnlockedApplication()
-                    }
-                }
-            }
-            ContextCompat.registerReceiver(this, receiver, IntentFilter(Intent.ACTION_USER_UNLOCKED), ContextCompat.RECEIVER_NOT_EXPORTED)
-            // Close the race where unlock occurred between the initial check and registration.
-            if (DirectBootKeyboardConfig.isUserUnlocked(this)) {
-                unregisterReceiver(receiver)
-                initializeUnlockedApplication()
-            }
-            return
+        // The bundled emoji font comes from the APK assets and is usable before unlock.
+        rocks.pkb.plektra.data.emoji.EmojiRendering.ensureInitialized(this)
+        // Before unlock only the device-protected keyboard snapshot is readable.
+        if (!DirectBootStorage.runAfterUnlock(this, ::initializeUnlockedApplication)) {
+            initializeUnlockedApplication()
         }
-        initializeUnlockedApplication()
     }
 
+    /** Every step is idempotent: a failed run is repeated on the next unlock signal. */
     private fun initializeUnlockedApplication() {
         if (unlockedInitialized) return
-        unlockedInitialized = true
         val preferences = SettingsManager.getPreferences(this)
-        val config = DirectBootKeyboardConfig(this)
-        config.refresh(preferences)
-        directBootConfigListener = SharedPreferences.OnSharedPreferenceChangeListener { source, key ->
-            if (key == null || key in DirectBootKeyboardConfig.KEYS) config.refresh(source)
-        }.also { preferences.registerOnSharedPreferenceChangeListener(it) }
+        DirectBootKeyboardConfig.requestRefresh(this)
+        if (directBootConfigListener == null) {
+            directBootConfigListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == null || DirectBootKeyboardConfig.isSnapshotKey(key)) DirectBootKeyboardConfig.requestRefresh(this)
+            }.also { preferences.registerOnSharedPreferenceChangeListener(it) }
+        }
         SettingsManager.initializeAltShiftLayoutSwitchDefault(this)
-        rocks.pkb.plektra.data.emoji.EmojiRendering.ensureInitialized(this)
+        // Re-read in case the snapshot predates the persisted style.
+        rocks.pkb.plektra.data.emoji.EmojiRendering.reloadStyle(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
         SettingsManager.migrateCompactSoftwareKeyHeightOnce(this)
         AppPackageChangeMonitor.register(this)
@@ -61,6 +74,7 @@ class PlektraApplication : Application() {
         Handler(Looper.getMainLooper()).post {
             AdditionalSubtypeUtils.registerAdditionalSubtypes(this)
         }
+        unlockedInitialized = true
     }
 
     private fun publishSoftwareKeyboardModeShortcut() {

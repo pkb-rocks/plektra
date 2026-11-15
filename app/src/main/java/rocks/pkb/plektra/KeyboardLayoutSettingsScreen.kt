@@ -30,6 +30,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import rocks.pkb.plektra.data.layout.BundledLayoutAssets
 import rocks.pkb.plektra.data.layout.LayoutFileStore
+import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
 import rocks.pkb.plektra.data.layout.LayoutFileStore.LayoutImportError
 import rocks.pkb.plektra.data.layout.LayoutFileStore.LayoutImportResult
 import rocks.pkb.plektra.data.layout.LayoutMappingRepository
@@ -244,11 +245,14 @@ fun KeyboardLayoutSettingsScreen(
                     if (!pickerMode) {
                         IconButton(
                             onClick = {
-                                SettingsManager.setKeyboardLayoutAutoByLocale(context, automaticLayoutMode)
-                                if (!automaticLayoutMode) {
-                                    SettingsManager.setKeyboardLayout(context, selectedLayout)
+                                // One Direct Boot snapshot for the whole selection.
+                                DirectBootKeyboardConfig.changeSources(context) {
+                                    SettingsManager.setKeyboardLayoutAutoByLocale(context, automaticLayoutMode)
+                                    if (!automaticLayoutMode) {
+                                        SettingsManager.setKeyboardLayout(context, selectedLayout)
+                                    }
+                                    onLayoutSelected(locale, selectedLayout)
                                 }
-                                onLayoutSelected(locale, selectedLayout)
                                 onBack()
                             }
                         ) {
@@ -487,19 +491,25 @@ fun KeyboardLayoutSettingsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val success = LayoutFileStore.deleteLayout(context, layoutName)
+                        // The Direct Boot snapshot never holds the deleted layout as the selection.
+                        val success = DirectBootKeyboardConfig.changeSources(context) {
+                            LayoutFileStore.deleteLayout(context, layoutName).also { deleted ->
+                                // If deleted layout was selected, switch to qwerty
+                                if (deleted && selectedLayout == layoutName) {
+                                    if (!pickerMode && !automaticLayoutMode) {
+                                        SettingsManager.setKeyboardLayout(context, "qwerty")
+                                    }
+                                    if (!pickerMode) {
+                                        onLayoutSelected(locale, "qwerty")
+                                    }
+                                }
+                            }
+                        }
                         layoutToDelete = null
 
                         if (success) {
-                            // If deleted layout was selected, switch to qwerty
                             if (selectedLayout == layoutName) {
                                 selectedLayout = "qwerty"
-                                if (!pickerMode && !automaticLayoutMode) {
-                                    SettingsManager.setKeyboardLayout(context, "qwerty")
-                                }
-                                if (!pickerMode) {
-                                    onLayoutSelected(locale, "qwerty")
-                                }
                             }
 
                             refreshTrigger++

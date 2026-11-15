@@ -132,6 +132,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     // SharedPreferences for settings
     private lateinit var prefs: SharedPreferences
+    // Before the user unlocks, deferred features stay idle; see completeDirectBootHandoff().
+    private val directBootLocked: Boolean get() = DirectBootStorage.isLocked(this)
+    private val directBootUnlockListener: () -> Unit = { completeDirectBootHandoff() }
+    private var clipboardHistoryStarted = false
+    // The keyboard surface in use before unlock; the handoff switches it if the credential settings differ.
+    private var directBootSurfaceMode: SettingsManager.SoftwareKeyboardMode? = null
     private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     // A theme photo that cannot load falls back to the saved colours. Nothing in the status
     // snapshot changes then, so the rendered state must be invalidated to re-apply the theme.
@@ -781,6 +787,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             stopSpeechRecognition()
             return
         }
+        // Speech providers and their credentials live in credential-protected storage.
+        if (directBootLocked) return
         
         val provider = SpeechSettings.provider(this)
         if (provider == SpeechProvider.FUTO) {
@@ -1916,8 +1924,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         modifierStateController.ctrlTapLatches = SettingsManager.getCtrlTapLatches(this)
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(DirectBootStorageContext(newBase))
+    }
+
     override fun onCreate() {
         super.onCreate()
+        val lockedAtCreate = DirectBootStorage.runAfterUnlock(this, directBootUnlockListener)
         smoothCaretOverlayController = SmoothCaretOverlayController(this)
         ClicksAccessibilityKeyBridge.register(this)
         lastSystemLocalesSignature = resources.configuration.locales.toLanguageTags()
@@ -1925,6 +1938,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         prefs = getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
         // A keypad opened on a hardware keyboard is field-scoped and must not survive a restart.
         SettingsManager.endFieldScopedVirtualKeyboard(this)
+        if (lockedAtCreate) directBootSurfaceMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this)
         clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
         physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
 
@@ -1963,16 +1977,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             onSuggestionsUpdated = { suggestions -> handleSuggestionsUpdated(suggestions) },
             currentLocale = initialLocale,
             keyboardLayoutProvider = { SettingsManager.getKeyboardLayout(this) },
-            activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() }
+            activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() },
+            isStorageAvailable = { !directBootLocked }
         )
         inputEventRouter.suggestionController = suggestionController
         
         // Preload dictionary in background so it's ready when user focuses a field
-        suggestionController.preloadDictionary()
+        if (!lockedAtCreate) suggestionController.preloadDictionary()
 
         // Initialize clipboard history manager first (needed by candidatesBarController)
         clipboardHistoryManager = ClipboardHistoryManager(this)
-        clipboardHistoryManager.onCreate()
+        if (!lockedAtCreate) startClipboardHistory()
 
         candidatesBarController = CandidatesBarController(this, clipboardHistoryManager, assets, PhysicalKeyboardInputMethodService::class.java)
         val snippetExpansionSource = SnippetExpansionSource {
@@ -2149,7 +2164,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             startSpeechRecognition()
         }
         // Register listener for clipboard page
-        candidatesBarController.onClipboardRequested = {
+        candidatesBarController.onClipboardRequested = clipboard@{
+            if (directBootLocked) return@clipboard
             if (shiftLayerLatched || altModifierLayerLatched) {
                 shiftLayerLatched = false
                 altModifierLayerLatched = false
@@ -2439,11 +2455,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
         keyboardVisibilityController.syncStatusBarPresentationModeFromSettings()
         
-        // Load auto-correction rules
-        AutoCorrector.loadCorrections(assets, this)
-        
-        // Register additional subtypes (custom input styles)
-        registerAdditionalSubtypes()
+        if (!lockedAtCreate) {
+            // Load auto-correction rules
+            AutoCorrector.loadCorrections(assets, this)
+            // Register additional subtypes (custom input styles); the system keeps them before unlock.
+            registerAdditionalSubtypes()
+        }
         
         // Trackpad gestures detector (instantiated early to avoid late-init issues in listener)
         Log.d(TRACKPAD_DEBUG_TAG, "onCreate: Building initial trackpad gesture detector...")
@@ -2620,6 +2637,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ) {
                 invalidateRenderedStatusSnapshot()
                 val effectiveMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this)
+                if (directBootSurfaceMode != null) directBootSurfaceMode = effectiveMode
                 scheduleKeyboardSurfaceTransition(
                     mode = effectiveMode
                 )
@@ -2765,7 +2783,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         Log.d(TAG, "Broadcast receiver registered for additional subtypes updates")
 
         // Start trackpad gesture detection
-        if (shouldStartShizukuTrackpadDetector()) {
+        if (!lockedAtCreate && shouldStartShizukuTrackpadDetector()) {
             Log.d(TRACKPAD_DEBUG_TAG, "onCreate: Calling initial Shizuku trackpadGestureDetector.start()...")
             trackpadGestureDetector.start()
             Log.d(TRACKPAD_DEBUG_TAG, "onCreate: Initial Shizuku start() call completed")
@@ -3100,7 +3118,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (::suggestionController.isInitialized) {
             suggestionController.destroy()
         }
-        clipboardHistoryManager.onDestroy()
+        if (clipboardHistoryStarted) clipboardHistoryManager.onDestroy()
+        DirectBootStorage.removeUnlockListener(directBootUnlockListener)
         typingSoundPlayer.release()
 
         // Unregister permission result receiver
@@ -3135,6 +3154,69 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Stop trackpad gesture detection
         trackpadGestureDetector.stop()
         trackpadScope.cancel()
+    }
+
+    private fun startClipboardHistory() {
+        if (clipboardHistoryStarted) return
+        clipboardHistoryStarted = true
+        clipboardHistoryManager.onCreate()
+    }
+
+    /**
+     * Runs once after the user unlocks: everything read from the device-protected snapshot is
+     * reloaded from credential-protected storage and the deferred features start.
+     */
+    private fun completeDirectBootHandoff() {
+        // onCreate wrote these to memory only.
+        SettingsManager.endFieldScopedVirtualKeyboard(this)
+        // Switching the storage notifies no listener; the surface follows the credential settings here.
+        val surfaceMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this)
+        if (directBootSurfaceMode != null && surfaceMode != directBootSurfaceMode) scheduleKeyboardSurfaceTransition(surfaceMode)
+        directBootSurfaceMode = null
+        SettingsManager.initializeNavModeMappingsFile(this)
+        clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
+        physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
+        updateModifierTapLatchSettings()
+        typingSoundPlayer.reload()
+        alternateCharacterManager.reloadSymMappings()
+        alternateCharacterManager.reloadSymMappings2()
+        alternateCharacterManager.reloadModifierAndDeviceSymMappings()
+        alternateCharacterManager.reloadLongPressThreshold()
+        reloadNavModeMappings()
+        AutoCorrector.loadCorrections(assets, this)
+        loadKeyboardLayout()
+        switchToLayout(activeKeyboardLayoutName, showToast = false)
+        // The bar caches static and email variations read from the snapshot; as on variations_updated.
+        candidatesBarController.invalidateStaticVariations()
+        keyboardVisibilityController.syncStatusBarPresentationModeFromSettings()
+        registerAdditionalSubtypes()
+        suggestionController.updateLocale(getLocaleFromSubtype(), forceReload = true)
+        startClipboardHistory()
+        candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
+        prepareEnabledExpansionAssets()
+        refreshSmoothCaretExperiment()
+        trackpadGestureDetector.stop()
+        trackpadGestureDetector = buildTrackpadGestureDetector()
+        if (shouldStartShizukuTrackpadDetector()) trackpadGestureDetector.start()
+        keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, currentInputEditorInfo?.packageName)
+        if (isInputViewActive) suggestionController.readInitialContext(currentInputConnection)
+        invalidateRenderedStatusSnapshot()
+        updateStatusBarText()
+        keyboardVisibilityController.onKeyboardBarConfigurationChanged()
+    }
+
+    /** Plektra's activities are not available before unlock; a launch must not end the IME. */
+    override fun startActivity(intent: Intent) {
+        startActivity(intent, null)
+    }
+
+    override fun startActivity(intent: Intent, options: Bundle?) {
+        try {
+            super.startActivity(intent, options)
+        } catch (e: android.content.ActivityNotFoundException) {
+            if (!directBootLocked) throw e
+            Log.w(TAG, "Activity unavailable before unlock: ${intent.component ?: intent.action}")
+        }
     }
 
     private fun prepareEnabledExpansionAssets() {
@@ -3855,6 +3937,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        // Runs a pending handoff before this input starts, also after a missed ACTION_USER_UNLOCKED.
+        DirectBootStorage.completeUnlock(this)
         lastEditorSelectionStart = info?.initialSelStart ?: -1
         lastEditorSelectionEnd = info?.initialSelEnd ?: -1
         pendingEmojiSearchCommitCursors.clear()
@@ -4559,7 +4643,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     override fun onCurrentInputMethodSubtypeChanged(newSubtype: android.view.inputmethod.InputMethodSubtype) {
         super.onCurrentInputMethodSubtypeChanged(newSubtype)
         
-        if (::suggestionController.isInitialized) {
+        // Dictionaries load after unlock, for the subtype current at that time.
+        if (::suggestionController.isInitialized && !directBootLocked) {
             val newLocale = getLocaleFromSubtype(newSubtype)
             suggestionController.updateLocale(newLocale)
             if (!inputContextState.shouldDisableSuggestions) {

@@ -1,0 +1,9 @@
+# Unlocked-device smoke check after a Direct Boot build installation or unlock.
+# The actual first-unlock/password check remains manual; this flow uses a new Notes note.
+preserve keyboard mode
+screen press plektra_key_space
+expect " "
+screen press plektra_key_backspace
+expect ""
+screen press plektra_key_enter
+expect "\n"

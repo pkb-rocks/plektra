@@ -3373,7 +3373,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     /** Whether the editor's caret is at [position]; true when the editor cannot tell. */
     private fun editorCaretIsAt(inputConnection: InputConnection?, position: Int): Boolean {
-        // Asked on the connection the pick went through, so the answer includes that pick.
+        // Read the resulting caret position through the connection that received the pick.
         val extracted = inputConnection?.getExtractedText(ExtractedTextRequest(), 0) ?: return true
         return extracted.absoluteSelectionStart == position && extracted.absoluteSelectionEnd == position
     }

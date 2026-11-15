@@ -104,7 +104,7 @@ class ModifierStateControllerTest {
         assertTrue(controller.shiftOneShot)
         assertFalse(controller.shiftOneShotAutomatic)
 
-        // A field restart during the hold restores the one-shot with its origin as before.
+        // A field restart during the hold restores the one-shot with its origin.
         controller.clearFieldCapsLockRequest()
         controller.restoreLogicalState(automatic)
         assertTrue(controller.shiftOneShotAutomatic)

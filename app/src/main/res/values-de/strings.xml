@@ -1693,4 +1693,11 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kaomoji_placement_emoji">Nach den Emoji</string>
     <string name="kaomoji_placement_off">Aus</string>
     <string name="emoji_picker_extras_title">Textsymbole und Kaomoji im Emoji-Picker</string>
+    <string name="number_suggestions_title">Zahlenvorschläge</string>
+    <string name="number_suggestions_description">Buchstaben auf den Alt-Zifferntasten werden auch als Zahlen angeboten: w00 → 100, ed0.000 → 250.000. Echte Wörter haben Vorrang</string>
+    <string name="number_suggestions_excluded_apps_title">Zahlenvorschläge: ausgeschlossene Apps</string>
+    <string name="number_suggestions_excluded_apps_row_description">Apps, in denen getippte Buchstaben nie als Zahlen angeboten werden</string>
+    <string name="number_suggestions_excluded_apps_description">In den hier gewählten Apps schlägt Plektra Buchstaben auf den Alt-Zifferntasten nie als Zahlen vor und korrigiert sie auch nicht automatisch (zum Beispiel w00 zu 100). Normale Wortvorschläge und Autokorrektur bleiben unverändert.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Web-App – tippt innerhalb von %1$s, daher ist %1$s ebenfalls ausgeschlossen</string>
+    <string name="kw_auto_correction_number_suggestions">Zahlen, Ziffern, Alt, w00, 100, umwandeln, pro App, ausschließen</string>
 </resources>

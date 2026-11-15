@@ -76,6 +76,8 @@ object SettingLinkIds {
     const val AUTO_CORRECTION_KEYBOARD_PROXIMITY = "auto_correction.keyboard_proximity"
     const val AUTO_CORRECTION_EDIT_TYPE_RANKING = "auto_correction.edit_type_ranking"
     const val AUTO_CORRECTION_EXACT_TYPING = "auto_correction.exact_typing"
+    const val AUTO_CORRECTION_NUMBER_SUGGESTIONS = "auto_correction.number_suggestions"
+    const val AUTO_CORRECTION_NUMBER_SUGGESTIONS_EXCLUDED_APPS = "auto_correction.number_suggestions_excluded_apps"
 
     // Accessibility screen
     const val ACCESSIBILITY_LIVE_READ = "accessibility.live_read"
@@ -584,6 +586,20 @@ object SettingLinkRegistry {
             destination = SettingsDestination.AutoCorrection
         ),
         entry(
+            SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS,
+            R.string.number_suggestions_title,
+            R.string.number_suggestions_description,
+            destination = SettingsDestination.AutoCorrection
+        ),
+        SettingEntry(
+            id = SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS_EXCLUDED_APPS,
+            titleRes = R.string.number_suggestions_excluded_apps_title,
+            summaryRes = R.string.number_suggestions_excluded_apps_row_description,
+            route = SettingRoute(destination = SettingsDestination.AutoCorrection),
+            unavailableFallbackId = SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS,
+            availabilityCheck = { SettingsManager.getNumberSuggestionsEnabled(it) }
+        ),
+        entry(
             SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING,
             R.string.app_raw_mode_title,
             R.string.app_raw_mode_row_description,
@@ -1046,6 +1062,8 @@ object SettingLinkRegistry {
         SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS to R.string.kw_auto_correction_suggestions,
         SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING to R.string.kw_auto_correction_accent_matching,
         SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING to R.string.kw_auto_correction_exact_typing,
+        SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS to R.string.kw_auto_correction_number_suggestions,
+        SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS_EXCLUDED_APPS to R.string.kw_auto_correction_number_suggestions,
         SettingLinkIds.ACCESSIBILITY_SUGGESTIONS_DELAY to R.string.kw_accessibility_suggestions_delay,
         SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD to R.string.kw_advanced_swipe_threshold,
         SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER to R.string.kw_modifiers_long_press_modifier,

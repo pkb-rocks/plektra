@@ -936,4 +936,11 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="software_keyboard_key_hints_title">Показувати додаткові підписи</string>
     <string name="software_keyboard_key_hints_description">Показує праворуч угорі альтернативу довгого натискання, а ліворуч унизу — символ Alt або SYM клавіші.</string>
     <string name="kw_on_screen_key_hints">підказки клавіш, кутові підписи, довге натискання, Alt, SYM, додаткові символи</string>
+    <string name="number_suggestions_title">Підказки чисел</string>
+    <string name="number_suggestions_description">Літери на цифрових клавішах Alt також пропонуються як числа: w00 → 100, ed0.000 → 250.000. Справжні слова йдуть першими</string>
+    <string name="number_suggestions_excluded_apps_title">Підказки чисел: виключені застосунки</string>
+    <string name="number_suggestions_excluded_apps_row_description">Застосунки, де введені літери ніколи не пропонуються як числа</string>
+    <string name="number_suggestions_excluded_apps_description">У вибраних тут застосунках Plektra ніколи не пропонує й не виправляє автоматично літери з цифрових клавіш Alt на числа (наприклад, w00 на 100). Звичайні підказки слів і автовиправлення не змінюються.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Вебзастосунок — вводить усередині %1$s, тож %1$s також виключено</string>
+    <string name="kw_auto_correction_number_suggestions">числа, цифри, alt, w00, 100, перетворити, для застосунку, виключити</string>
 </resources>

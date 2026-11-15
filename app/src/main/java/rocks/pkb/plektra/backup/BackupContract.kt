@@ -403,6 +403,8 @@ internal object BackupPreferenceContract {
             "ctrl_latch_stays_on_space" to PreferenceValueType.BOOLEAN,
             "use_keyboard_proximity" to PreferenceValueType.BOOLEAN,
             "use_edit_type_ranking" to PreferenceValueType.BOOLEAN,
+            "number_suggestions_enabled" to PreferenceValueType.BOOLEAN,
+            "number_suggestions_excluded_apps" to PreferenceValueType.STRING_SET,
             "custom_input_styles" to PreferenceValueType.STRING,
             "titan2_layout_enabled" to PreferenceValueType.BOOLEAN,
             "titan2_elite_rounded_corner_insets" to PreferenceValueType.BOOLEAN,

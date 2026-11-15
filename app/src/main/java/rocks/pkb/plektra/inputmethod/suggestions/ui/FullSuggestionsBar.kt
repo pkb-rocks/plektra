@@ -67,6 +67,24 @@ class FullSuggestionsBar(
             // The floor never lifts Slim above Normal, which is below it at the smallest scales.
             return if (slim) maxOf(SLIM_BASE_HEIGHT_DP * scale, minOf(SLIM_MIN_HEIGHT_DP, normal)) else normal
         }
+
+        /** Left, center and right slots; an add-word candidate takes the left slot from the third suggestion. */
+        internal fun buildSlots(suggestions: List<String>, addWordCandidate: String?): List<String?> {
+            val s0 = suggestions.getOrNull(0)
+            val s1 = suggestions.getOrNull(1)
+            val addCandidate = addWordCandidate?.takeUnless { candidate ->
+                suggestions.any { it.equals(candidate, ignoreCase = true) }
+            }
+            val s2 = addCandidate ?: suggestions.getOrNull(2)
+            return listOf(
+                // left
+                s2,
+                // center
+                s0,
+                // right
+                if (suggestions.size >= 2) s1 else null
+            )
+        }
     }
 
     private var container: LinearLayout? = null
@@ -918,23 +936,6 @@ class FullSuggestionsBar(
         val iconColor: Int,
         val onClick: () -> Unit
     )
-
-    private fun buildSlots(suggestions: List<String>, addWordCandidate: String?): List<String?> {
-        val s0 = suggestions.getOrNull(0)
-        val s1 = suggestions.getOrNull(1)
-        val addCandidate = addWordCandidate?.takeUnless { candidate ->
-            suggestions.any { it.equals(candidate, ignoreCase = true) }
-        }
-        val s2 = addCandidate ?: suggestions.getOrNull(2)
-        return listOf(
-            // left
-            s2,
-            // center
-            s0,
-            // right
-            if (suggestions.size >= 2) s1 else null
-        )
-    }
 
     private fun applySuggestionsAccessibilityThrottle(slots: List<String?>) {
         val bar = container ?: return

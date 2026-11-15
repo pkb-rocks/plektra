@@ -16,7 +16,8 @@ data class SuggestionResult(
 enum class SuggestionKind {
     CURRENT_WORD,
     NEXT_WORD,
-    STARTER_WORD
+    STARTER_WORD,
+    NUMBER
 }
 
 class SuggestionEngine(

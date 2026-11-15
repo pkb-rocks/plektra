@@ -936,4 +936,11 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="software_keyboard_key_hints_title">Pokazuj dodatkowe oznaczenia</string>
     <string name="software_keyboard_key_hints_description">Pokazuje w prawym górnym rogu alternatywę długiego naciśnięcia, a w lewym dolnym znak Alt lub SYM klawisza.</string>
     <string name="kw_on_screen_key_hints">podpowiedzi klawiszy, oznaczenia w rogach, długie naciśnięcie, Alt, SYM, znaki dodatkowe</string>
+    <string name="number_suggestions_title">Podpowiedzi liczb</string>
+    <string name="number_suggestions_description">Litery na klawiszach cyfr Alt są też proponowane jako liczby: w00 → 100, ed0.000 → 250.000. Prawdziwe słowa są pierwsze</string>
+    <string name="number_suggestions_excluded_apps_title">Podpowiedzi liczb: wykluczone aplikacje</string>
+    <string name="number_suggestions_excluded_apps_row_description">Aplikacje, w których wpisane litery nigdy nie są proponowane jako liczby</string>
+    <string name="number_suggestions_excluded_apps_description">W wybranych tu aplikacjach Plektra nigdy nie proponuje ani nie poprawia automatycznie liter z klawiszy cyfr Alt na liczby (na przykład w00 na 100). Zwykłe podpowiedzi słów i autokorekta pozostają bez zmian.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Aplikacja webowa — pisze wewnątrz %1$s, więc %1$s też jest wykluczona</string>
+    <string name="kw_auto_correction_number_suggestions">liczby, cyfry, alt, w00, 100, konwersja, dla aplikacji, wyklucz</string>
 </resources>

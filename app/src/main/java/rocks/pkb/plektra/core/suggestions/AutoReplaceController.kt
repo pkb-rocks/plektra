@@ -14,7 +14,8 @@ class AutoReplaceController(
     private val suggestionEngine: SuggestionEngine,
     private val settingsProvider: () -> SuggestionSettings,
     private val knownWordProvider: ((String) -> Boolean)? = null,
-    private val exactReplacementProvider: ((String, Char?) -> String?)? = null
+    private val exactReplacementProvider: ((String, Char?) -> String?)? = null,
+    private val numberReplacementProvider: ((String) -> NumberSuggestions.Token?)? = null
 ) {
     private fun triggerFromBoundaryChar(boundaryChar: Char?): DebugCaptureStore.AutoCorrectionTrigger {
         return when (boundaryChar) {
@@ -36,7 +37,8 @@ class AutoReplaceController(
     public data class ReplaceResult(
         val replaced: Boolean,
         val committed: Boolean,
-        val replacement: String? = null
+        val replacement: String? = null,
+        val isNumber: Boolean = false
     )
 
     companion object {
@@ -185,7 +187,8 @@ class AutoReplaceController(
     // Track last replacement for undo
     private data class LastReplacement(
         val originalWord: String,
-        val replacedWord: String
+        val replacedWord: String,
+        val isNumber: Boolean = false
     )
     private var lastReplacement: LastReplacement? = null
     private var lastUndoOriginalWord: String? = null
@@ -271,6 +274,35 @@ class AutoReplaceController(
             return false
         }
 
+        fun commitNumberReplacement(
+            connection: InputConnection,
+            boundary: Char?,
+            settings: SuggestionSettings
+        ): ReplaceResult? {
+            if (!settings.autoReplaceOnSpaceEnter || boundary == null || NumberSuggestions.isSeparator(boundary)) {
+                return null
+            }
+            val before = connection.getTextBeforeCursor(NumberSuggestions.CONTEXT_CHARS, 0)?.toString().orEmpty()
+            val token = numberReplacementProvider?.invoke(before) ?: return null
+            if (token.typed.lowercase() in rejectedWords) return null
+            connection.beginBatchEdit()
+            connection.deleteSurroundingText(token.typed.length, 0)
+            connection.commitText(token.number, 1)
+            lastReplacement = LastReplacement(token.typed, token.number, isNumber = true)
+            tracker.reset()
+            connection.endBatchEdit()
+            commitBoundary(connection, boundary, settings)
+            DebugCaptureStore.recordAutoCorrectionCommit(
+                before = token.typed,
+                after = token.number,
+                trigger = triggerFromBoundaryChar(boundary),
+                source = "NUMBER",
+                distance = 0,
+                kind = SuggestionKind.NUMBER.name
+            )
+            return ReplaceResult(true, true, token.number, isNumber = true)
+        }
+
         val unicodeChar = event?.unicodeChar ?: 0
         val boundaryChar = boundaryCharOverride ?: when {
             unicodeChar != 0 -> unicodeChar.toChar()
@@ -308,6 +340,8 @@ class AutoReplaceController(
 
         val word = tracker.currentWord
         if (word.isBlank()) {
+            // "ed0." + Space: the separator ended the tracked word but the number is still before it.
+            commitNumberReplacement(inputConnection, boundaryChar, settings)?.let { return it }
             val boundaryCommitted = commitBoundaryAndReset(tracker, inputConnection, boundaryChar, settings)
             DebugCaptureStore.recordAutoCorrectionAttempt(
                 before = word,
@@ -540,6 +574,7 @@ class AutoReplaceController(
 
         // Clear last replacement if no replacement happened
         lastReplacement = null
+        commitNumberReplacement(inputConnection, boundaryChar, settings)?.let { return it }
         val boundaryCommitted = commitBoundaryAndReset(tracker, inputConnection, boundaryChar, settings)
         return ReplaceResult(false, boundaryCommitted)
     }
@@ -581,6 +616,12 @@ class AutoReplaceController(
         val charsToDelete = if (lastChars.endsWith(replacement.replacedWord)) {
             // No boundary char after, just delete the word
             replacement.replacedWord.length
+        } else if (replacement.isNumber) {
+            // The number may itself end in a separator ("250."), so strip only what follows it.
+            val text = textBeforeCursor.toString()
+            var trailing = 1
+            while (trailing < text.length && !text.dropLast(trailing).endsWith(replacement.replacedWord)) trailing++
+            replacement.replacedWord.length + trailing
         } else {
             // There's whitespace/punctuation after, include it in deletion
             var deleteCount = replacement.replacedWord.length
@@ -604,7 +645,7 @@ class AutoReplaceController(
         // Mark word as rejected so it won't be auto-corrected again
         rejectedWords.add(replacement.originalWord.lowercase())
         splitApostropheWord(replacement.originalWord)?.root?.lowercase()?.let { rejectedWords.add(it) }
-        lastUndoOriginalWord = replacement.originalWord
+        lastUndoOriginalWord = replacement.originalWord.takeUnless { replacement.isNumber }
         
         // Clear last replacement after undo
         lastReplacement = null

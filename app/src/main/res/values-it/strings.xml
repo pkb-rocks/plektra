@@ -1113,4 +1113,11 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="emoji_picker_extras_title">Simboli di testo e kaomoji nel selettore emoji</string>
     <string name="software_keyboard_key_hints_title">Mostra etichette secondarie</string>
     <string name="software_keyboard_key_hints_description">Mostra in alto a destra l\'alternativa della pressione prolungata e in basso a sinistra il carattere Alt o SYM dei tasti.</string>
+    <string name="number_suggestions_title">Suggerimenti numerici</string>
+    <string name="number_suggestions_description">Le lettere sui tasti numerici Alt vengono proposte anche come numeri: w00 → 100, ed0.000 → 250.000. Le parole vere vengono prima</string>
+    <string name="number_suggestions_excluded_apps_title">Suggerimenti numerici: app escluse</string>
+    <string name="number_suggestions_excluded_apps_row_description">App in cui le lettere digitate non vengono mai proposte come numeri</string>
+    <string name="number_suggestions_excluded_apps_description">Nelle app scelte qui, Plektra non suggerisce né corregge mai automaticamente in numeri le lettere sui tasti numerici Alt (per esempio w00 in 100). I normali suggerimenti di parole e la correzione automatica restano invariati.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Web app: scrive dentro %1$s, quindi anche %1$s è escluso</string>
+    <string name="kw_auto_correction_number_suggestions">numeri, cifre, alt, w00, 100, convertire, per app, escludere</string>
 </resources>

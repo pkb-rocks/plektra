@@ -74,14 +74,18 @@ fun AutoCorrectionCategoryScreen(
     var useEditTypeRanking by remember {
         mutableStateOf(SettingsManager.getUseEditTypeRanking(context))
     }
+    var numberSuggestionsEnabled by remember {
+        mutableStateOf(SettingsManager.getNumberSuggestionsEnabled(context))
+    }
     val currentDestination = when (val page = settingsChild(context, "autocorrection")) {
         "Settings" -> AutoCorrectionDestination.Settings
         "UserDictionary" -> AutoCorrectionDestination.UserDictionary
         "AppExactTyping" -> AutoCorrectionDestination.AppExactTyping
+        "NumberSuggestionsExcludedApps" -> AutoCorrectionDestination.NumberSuggestionsExcludedApps
         else -> if (page?.startsWith("Edit:") == true) AutoCorrectionDestination.Edit(page.removePrefix("Edit:")) else AutoCorrectionDestination.Main
     }
     fun navigateTo(destination: AutoCorrectionDestination) {
-        openSettingsChild(context, "autocorrection", when (destination) { AutoCorrectionDestination.Main -> "Main"; AutoCorrectionDestination.Settings -> "Settings"; AutoCorrectionDestination.UserDictionary -> "UserDictionary"; AutoCorrectionDestination.AppExactTyping -> "AppExactTyping"; is AutoCorrectionDestination.Edit -> "Edit:${destination.languageCode}" })
+        openSettingsChild(context, "autocorrection", when (destination) { AutoCorrectionDestination.Main -> "Main"; AutoCorrectionDestination.Settings -> "Settings"; AutoCorrectionDestination.UserDictionary -> "UserDictionary"; AutoCorrectionDestination.AppExactTyping -> "AppExactTyping"; AutoCorrectionDestination.NumberSuggestionsExcludedApps -> "NumberSuggestionsExcludedApps"; is AutoCorrectionDestination.Edit -> "Edit:${destination.languageCode}" })
     }
     fun navigateBack() { context.settingsActivity().finish() }
 
@@ -588,6 +592,95 @@ fun AutoCorrectionCategoryScreen(
                             }
                         }
 
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .settingRow(SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.TextFields,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.number_suggestions_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Medium,
+                                        maxLines = 1
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.number_suggestions_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 2
+                                    )
+                                }
+                                Switch(
+                                    checked = numberSuggestionsEnabled,
+                                    onCheckedChange = { enabled ->
+                                        numberSuggestionsEnabled = enabled
+                                        SettingsManager.setNumberSuggestionsEnabled(context, enabled)
+                                    },
+                                    enabled = experimentalSuggestionsEnabled
+                                )
+                            }
+                        }
+
+                        if (numberSuggestionsEnabled) {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(80.dp)
+                                    .settingRow(SettingLinkIds.AUTO_CORRECTION_NUMBER_SUGGESTIONS_EXCLUDED_APPS) {
+                                        navigateTo(AutoCorrectionDestination.NumberSuggestionsExcludedApps)
+                                    }
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Apps,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = stringResource(R.string.number_suggestions_excluded_apps_title),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Medium,
+                                            maxLines = 1
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.number_suggestions_excluded_apps_row_description),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 2
+                                        )
+                                    }
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -623,6 +716,13 @@ fun AutoCorrectionCategoryScreen(
                     onBack = { navigateBack() }
                 )
             }
+
+            AutoCorrectionDestination.NumberSuggestionsExcludedApps -> {
+                NumberSuggestionsExcludedAppsScreen(
+                    modifier = modifier,
+                    onBack = { navigateBack() }
+                )
+            }
         }
 
 }
@@ -633,6 +733,7 @@ private sealed class AutoCorrectionDestination {
     data class Edit(val languageCode: String) : AutoCorrectionDestination()
     object UserDictionary : AutoCorrectionDestination()
     object AppExactTyping : AutoCorrectionDestination()
+    object NumberSuggestionsExcludedApps : AutoCorrectionDestination()
 }
 
 private enum class UserDictSource { DEFAULT, USER }

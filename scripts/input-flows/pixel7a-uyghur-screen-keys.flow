@@ -1,0 +1,35 @@
+# Software keyboard on a phone without a built-in keyboard (Pixel 7a), Uyghur layout: the keys
+# type the Uyghur letters, neither the empty note nor ". " selects the Shift layer automatically,
+# each tapped Shift is consumed once, also by the two-letter لا, and the Shift layer types
+# ژ ف گ خ ج ۆ ئ. Requires auto-capitalization of the first letter and after a period enabled
+# (the defaults).
+require layout uyghur
+screen press plektra_key_s
+screen press plektra_key_f
+screen press plektra_key_l
+screen press plektra_key_f
+screen press plektra_key_m
+screen press plektra_key_period
+screen press plektra_key_space
+screen press plektra_key_d
+expect "سالام. د"
+screen press plektra_key_shift
+screen press plektra_key_l
+screen press plektra_key_k
+expect "سالام. دلاك"
+screen press plektra_key_space
+screen press plektra_key_shift
+screen press plektra_key_d
+screen press plektra_key_shift
+screen press plektra_key_f
+screen press plektra_key_shift
+screen press plektra_key_g
+screen press plektra_key_shift
+screen press plektra_key_h
+screen press plektra_key_shift
+screen press plektra_key_j
+screen press plektra_key_shift
+screen press plektra_key_k
+screen press plektra_key_shift
+screen press plektra_key_m
+expect "سالام. دلاك ژفگخجۆئ"

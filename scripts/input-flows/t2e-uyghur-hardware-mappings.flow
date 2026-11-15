@@ -1,0 +1,28 @@
+# Titan 2 Elite, Uyghur layout: base letters, the Shift layer including the two-letter لا, a tapped
+# Shift consumed once by لا, and the Alt punctuation that replaces the device symbols on N, V and J.
+# Uyghur has no letter case: neither the empty note nor ". " selects the Shift layer automatically.
+# Requires auto-capitalization of the first letter and after a period enabled (the defaults).
+require profile titan2elite_qwerty
+require layout uyghur
+hw press D
+hw press B
+hw type ". "
+hw press D
+expect "دب. د"
+hw hold SHIFT_RIGHT
+hw press M
+hw press J
+hw press L
+hw release SHIFT_RIGHT
+hw press L
+expect "دب. دئجلال"
+hw press SHIFT_RIGHT
+hw press L
+hw press L
+expect "دب. دئجلاللال"
+hw hold ALT_LEFT
+hw press N
+hw press V
+hw press J
+hw release ALT_LEFT
+expect "دب. دئجلاللال،؟؛"

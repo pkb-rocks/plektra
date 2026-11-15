@@ -60,6 +60,8 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
             SettingsManager.ENTER_BEHAVIOR_PRESET_ENTER_SEND_SHIFT_NEWLINE
         )
         SettingsManager.setAppEnterBehaviorOverrides(context, emptyList())
+        AutoCorrector.acceptLastCorrection()
+        AutoCorrector.clearRejectedWords()
 
         serviceController = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java).create()
         service = serviceController.get()
@@ -1014,6 +1016,79 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         service.onStartInput(editorInfo, false)
         assertTrue(modifierController().capsLockAutomatic)
     }
+
+    @Test
+    fun cyrillicLetter_acceptsPreviousAutoCorrectionThroughImePath() {
+        SettingsManager.setAutoCorrectEnabled(service, true)
+        LayoutMappingRepository.loadLayout(service.assets, "russian_standard", service)
+        service.onStartInput(editorInfo, false)
+        modifierController().consumeShiftOneShot()
+        AutoCorrector.recordCorrection("превет", "привет")
+        AutoCorrector.undoLastCorrection()
+        AutoCorrector.recordCorrection("првиет", "привет")
+        recorder.textBeforeCursor = "привет "
+
+        pressKey(KeyEvent.KEYCODE_A, 20_000L)
+
+        assertEquals(listOf("ф"), recorder.committedTexts)
+        assertEquals(null, AutoCorrector.getLastCorrection())
+        assertTrue(rejectedAutoCorrections().isEmpty())
+        // The user deletes the letter; Backspace must not undo the accepted correction.
+        recorder.textBeforeCursor = "привет "
+        pressKey(KeyEvent.KEYCODE_DEL, 21_000L)
+        assertFalse(recorder.committedTexts.contains("првиет"))
+    }
+
+    @Test
+    fun capsLockQwertyLetter_acceptsPreviousAutoCorrectionThroughImePath() {
+        SettingsManager.setAutoCorrectEnabled(service, true)
+        LayoutMappingRepository.loadLayout(service.assets, "qwerty", service)
+        service.onStartInput(editorInfo, false)
+        modifierController().capsLockEnabled = true
+        AutoCorrector.recordCorrection("teh", "the")
+        recorder.textBeforeCursor = "the "
+
+        pressKey(KeyEvent.KEYCODE_A, 20_000L)
+
+        assertEquals(listOf("A"), recorder.committedTexts)
+        assertEquals(null, AutoCorrector.getLastCorrection())
+    }
+
+    @Test
+    fun uyghurRemappedSlash_commitsLetterAndPunctuationAndAcceptsAutoCorrection() {
+        SettingsManager.setAutoCorrectEnabled(service, true)
+        LayoutMappingRepository.loadLayout(service.assets, "uyghur", service)
+        service.onStartInput(editorInfo, false)
+        AutoCorrector.recordCorrection("teh", "the")
+        AutoCorrector.undoLastCorrection()
+        AutoCorrector.recordCorrection("teh", "the")
+        recorder.textBeforeCursor = "the "
+        assertEquals(setOf("teh"), rejectedAutoCorrections())
+
+        // `/` is the letter ئ, not an ASCII boundary.
+        pressKey(KeyEvent.KEYCODE_SLASH, 20_000L)
+        assertEquals(null, AutoCorrector.getLastCorrection())
+        assertTrue(rejectedAutoCorrections().isEmpty())
+
+        // Shift+/ is ؟, although the device keymap reports the boundary `?`.
+        AutoCorrector.recordCorrection("teh", "the")
+        AutoCorrector.undoLastCorrection()
+        AutoCorrector.recordCorrection("teh", "the")
+        assertEquals(setOf("teh"), rejectedAutoCorrections())
+        pressKey(KeyEvent.KEYCODE_SLASH, 21_000L, KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON)
+        assertEquals(null, AutoCorrector.getLastCorrection())
+        assertEquals(setOf("teh"), rejectedAutoCorrections())
+        AutoCorrector.clearRejectedWords()
+
+        assertEquals(listOf("ئ", "؟"), recorder.committedTexts)
+        assertEquals("the ئ؟", recorder.textBeforeCursor)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun rejectedAutoCorrections(): Set<String> =
+        AutoCorrector::class.java.getDeclaredField("rejectedWords")
+            .apply { isAccessible = true }
+            .get(AutoCorrector) as Set<String>
 
     @Test
     fun midWordQuoteToApostrophe_keepsTheLayoutOutputOfTheNextKey() {

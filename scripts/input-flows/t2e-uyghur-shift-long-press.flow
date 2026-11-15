@@ -1,0 +1,14 @@
+# Titan 2 Elite, Uyghur layout, long-press modifier Shift with a threshold below 1000 ms.
+# Shift+L types the two letters لا; a long press with Shift held switches to the lower layer and
+# replaces both letters with ل. The next key types a plain letter: no Shift is left over.
+require profile titan2elite_qwerty
+require layout uyghur
+hw press B
+hw hold SHIFT_RIGHT
+hw hold L
+wait 1000
+hw release L
+hw release SHIFT_RIGHT
+expect بل
+hw press D
+expect بلد

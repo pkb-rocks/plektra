@@ -42,9 +42,15 @@ object AutoCapitalizeHelper {
 
     /**
      * Reads the cursor context, ignoring any selected text (treated as removed/replaced).
-     * Prefers ExtractedText; falls back to surrounding text APIs.
+     * Prefers ExtractedText; falls back to surrounding text APIs. [pendingText] is text the
+     * current key is about to insert at the cursor, such as a Space the app has not received yet.
      */
-    private fun readContext(inputConnection: InputConnection): CursorContext? {
+    private fun readContext(inputConnection: InputConnection, pendingText: CharSequence = ""): CursorContext? =
+        readCommittedContext(inputConnection)?.let { context ->
+            if (pendingText.isEmpty()) context else context.copy(before = TextUtils.concat(context.before, pendingText))
+        }
+
+    private fun readCommittedContext(inputConnection: InputConnection): CursorContext? {
         val extracted = inputConnection.getExtractedText(ExtractedTextRequest(), 0)
         if (extracted != null && extracted.text != null) {
             val text = extracted.text
@@ -186,6 +192,7 @@ object AutoCapitalizeHelper {
      * Also considers field-specific capitalization flags (CAP_WORDS, CAP_SENTENCES).
      * User settings take precedence over CAP_WORDS and CAP_SENTENCES.
      * CAP_CHARACTERS remains an explicit caps-lock field requirement.
+     * [pendingText] counts as typed before the cursor (see [readContext]).
      */
     fun maybeEnableSmartShift(
         context: android.content.Context,
@@ -194,7 +201,8 @@ object AutoCapitalizeHelper {
         enableShift: () -> Boolean,
         disableShift: () -> Boolean = { false },
         onUpdateStatusBar: () -> Unit,
-        inputContextState: InputContextState? = null
+        inputContextState: InputContextState? = null,
+        pendingText: CharSequence = ""
     ) {
         if (inputContextState?.isAppRawMode == true) {
             clearSmartShift(disableShift, onUpdateStatusBar)
@@ -241,7 +249,7 @@ object AutoCapitalizeHelper {
                     // (which will also check shouldDisableAutoCapitalize and user settings)
                 } else {
                     // User has at least one setting enabled, proceed with CAP_SENTENCES logic
-                    val cursorContext = readContext(ic)
+                    val cursorContext = readContext(ic, pendingText)
                     if (cursorContext != null) {
                         val before = withoutOpeningPunctuation(cursorContext.before)
                         val isCursorAtStart = before.isEmpty()
@@ -288,7 +296,7 @@ object AutoCapitalizeHelper {
             return
         }
 
-        val cursorContext = readContext(ic) ?: run {
+        val cursorContext = readContext(ic, pendingText) ?: run {
             clearSmartShift(disableShift, onUpdateStatusBar)
             return
         }
@@ -387,7 +395,8 @@ object AutoCapitalizeHelper {
         shouldDisableAutoCapitalize: Boolean,
         onEnableShift: () -> Boolean,
         disableShift: () -> Boolean,
-        onUpdateStatusBar: () -> Unit
+        onUpdateStatusBar: () -> Unit,
+        pendingText: CharSequence = ""
     ) {
         maybeEnableSmartShift(
             context = context,
@@ -395,7 +404,8 @@ object AutoCapitalizeHelper {
             shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
             enableShift = onEnableShift,
             disableShift = disableShift,
-            onUpdateStatusBar = onUpdateStatusBar
+            onUpdateStatusBar = onUpdateStatusBar,
+            pendingText = pendingText
         )
     }
 
@@ -405,7 +415,8 @@ object AutoCapitalizeHelper {
         shouldDisableAutoCapitalize: Boolean,
         onEnableShift: () -> Boolean,
         disableShift: () -> Boolean,
-        onUpdateStatusBar: () -> Unit
+        onUpdateStatusBar: () -> Unit,
+        pendingText: CharSequence = ""
     ) {
         maybeEnableSmartShift(
             context = context,
@@ -413,7 +424,8 @@ object AutoCapitalizeHelper {
             shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
             enableShift = onEnableShift,
             disableShift = disableShift,
-            onUpdateStatusBar = onUpdateStatusBar
+            onUpdateStatusBar = onUpdateStatusBar,
+            pendingText = pendingText
         )
     }
 
@@ -562,7 +574,8 @@ object AutoCapitalizeHelper {
                 return false
             }
             
-            val cursorContext = readContext(inputConnection) ?: return false
+            // The Space reaches the app after this check; count it so Shift is armed before the next key.
+            val cursorContext = readContext(inputConnection, pendingText = if (isSpace) " " else "") ?: return false
             val before = cursorContext.before
             // Use hasSentenceEndingPunctuation to properly check for ". " or "! " or "? "
             return hasSentenceEndingPunctuation(before, requireWhitespaceAfter = true)

@@ -105,7 +105,7 @@ class TextInputController(
             inputConnection = inputConnection,
             shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
             onEnableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
-            disableShift = { modifierStateController.consumeShiftOneShot() },
+            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
             onUpdateStatusBar = onStatusBarUpdate
         )
         lastSpacePressTime = 0
@@ -120,18 +120,23 @@ class TextInputController(
     ) {
         // If user presses Space after punctuation and Shift is not already
         // one-shot (e.g. pressed manually), delegate to AutoCapitalizeHelper.
+        // A one-shot that auto-cap armed itself is evaluated again, as the selection
+        // update after the Space would: a Space at the start of a line clears it.
         // The helper inspects the surrounding text and user settings to decide
         // whether to enable smart Shift for the next character.
+        // This runs on key down, before the Space reaches the app, so the Space counts as
+        // typed: waiting for the app's selection update loses the Shift to a fast next key.
         if (keyCode == KeyEvent.KEYCODE_SPACE &&
-            !modifierStateController.shiftOneShot
+            (!modifierStateController.shiftOneShot || modifierStateController.shiftOneShotAutomatic)
         ) {
             AutoCapitalizeHelper.enableAfterPunctuation(
                 context = context,
                 inputConnection = inputConnection,
                 shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
                 onEnableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
-                onUpdateStatusBar = onStatusBarUpdate
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
+                onUpdateStatusBar = onStatusBarUpdate,
+                pendingText = " "
             )
         }
     }
@@ -290,19 +295,23 @@ class TextInputController(
         keyCode: Int,
         inputConnection: InputConnection?,
         shouldDisableAutoCapitalize: Boolean,
+        insertsNewline: Boolean = false,
         onStatusBarUpdate: () -> Unit
     ) {
         // After Enter, we reuse the same smart auto-cap logic used for
         // "first letter in empty field" by delegating to AutoCapitalizeHelper.
         // This keeps all "start of sentence" detection in a single place.
+        // Like Space after a period, this runs before the newline reaches a multi-line field, so it
+        // counts as typed there; a single-line field's Enter runs its action instead.
         if (keyCode == KeyEvent.KEYCODE_ENTER && !shouldDisableAutoCapitalize) {
             AutoCapitalizeHelper.enableAfterEnter(
                 context,
                 inputConnection,
                 shouldDisableAutoCapitalize,
                 onEnableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
-                onUpdateStatusBar = onStatusBarUpdate
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
+                onUpdateStatusBar = onStatusBarUpdate,
+                pendingText = if (insertsNewline) "\n" else ""
             )
         }
     }

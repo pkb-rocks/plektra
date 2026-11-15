@@ -1002,6 +1002,7 @@ class InputEventRouter(
             keyCode,
             inputConnection,
             shouldDisableAutoCapitalize,
+            insertsNewline = ((editorInfo?.inputType ?: 0) and InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0,
             onStatusBarUpdate = updateStatusBar
         )
 

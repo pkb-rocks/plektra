@@ -1,0 +1,33 @@
+# Titan 2 Elite hardware keyboard: a Shift one-shot the user sets survives the next Space although
+# auto-capitalization armed, and a letter consumed, a one-shot just before (faster than the app
+# reports the new selection; the runner types 40 ms apart). Covers Shift after a capitalized new
+# line, Shift without a pending auto-cap, Shift taking over an armed auto-cap and Caps Lock across
+# Enter and Space. Requires auto-capitalization of the first letter and after a period enabled
+# (the defaults).
+require profile titan2elite_qwerty
+require layout qwerty
+hw type "ok\na"
+expect "Ok\nA"
+hw press SHIFT_RIGHT
+hw type " b"
+expect "Ok\nA B"
+hw type " c"
+hw press SHIFT_RIGHT
+hw type " d"
+expect "Ok\nA B c D"
+# ". " arms Shift; once the app has reported the Space, a tap cancels it and a later tap sets the
+# user's one-shot.
+hw type ". "
+wait 300
+hw press SHIFT_RIGHT
+hw type e
+hw press SHIFT_RIGHT
+hw type " f"
+expect "Ok\nA B c D. e F"
+hw press SHIFT_RIGHT
+hw press SHIFT_RIGHT
+hw type "\n gh"
+expect "Ok\nA B c D. e F\n GH"
+hw press SHIFT_RIGHT
+hw type " ij"
+expect "Ok\nA B c D. e F\n GH ij"

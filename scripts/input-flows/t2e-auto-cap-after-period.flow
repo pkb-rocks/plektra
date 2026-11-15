@@ -1,0 +1,14 @@
+# Titan 2 Elite: the letter right after ". ", "? ", "! " or a new line is capitalized even when it
+# follows the Space or Enter faster than the app reports the new selection (the runner types 40 ms
+# apart). A Space after a word or at the start of a line leaves the next letter lowercase.
+# Requires auto-capitalization of the first letter and after a period enabled (the defaults).
+require profile titan2elite_qwerty
+require layout qwerty
+hw type "hi. ok"
+expect "Hi. Ok"
+hw type "? yes! no"
+expect "Hi. Ok? Yes! No"
+hw type "\nso it"
+expect "Hi. Ok? Yes! No\nSo it"
+hw type "\n ab"
+expect "Hi. Ok? Yes! No\nSo it\n ab"

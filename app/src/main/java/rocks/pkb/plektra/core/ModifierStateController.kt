@@ -26,10 +26,15 @@ class ModifierStateController(
             private set(value) {
                 field = value
                 automaticCapsLock = false
+                automaticOneShot = false
             }
 
         /** True while Caps Lock is the one a field's CAP_CHARACTERS flag turned on. */
         var automaticCapsLock: Boolean = false
+            private set
+
+        /** True while the one-shot is the one auto-capitalization armed, not one the user set. */
+        var automaticOneShot: Boolean = false
             private set
 
         private var lastTapTime: Long = 0
@@ -50,14 +55,16 @@ class ModifierStateController(
             return state
         }
 
-        fun requestOneShot(): Boolean {
+        fun requestOneShot(automatic: Boolean = false): Boolean {
             if (state == ShiftState.CAPS) {
                 return false
             }
             if (state != ShiftState.ONE_SHOT) {
                 state = ShiftState.ONE_SHOT
+                automaticOneShot = automatic
                 return true
             }
+            // A one-shot that is already armed keeps its origin.
             return false
         }
 
@@ -82,6 +89,7 @@ class ModifierStateController(
         fun restore(newState: ShiftState, automatic: Boolean = false) {
             state = newState
             automaticCapsLock = automatic && newState == ShiftState.CAPS
+            automaticOneShot = automatic && newState == ShiftState.ONE_SHOT
         }
 
         fun reset() {
@@ -143,6 +151,7 @@ class ModifierStateController(
         val altOneShot: Boolean,
         val altLatchActive: Boolean,
         val automaticCapsLock: Boolean = false,
+        val automaticOneShot: Boolean = false,
         val fieldCapsLockSuspended: Boolean = false,
         val layoutGeneration: Int = 0,
         val fieldGeneration: Int = 0
@@ -157,6 +166,7 @@ class ModifierStateController(
             altOneShot = altState.oneShot,
             altLatchActive = altState.latchActive,
             automaticCapsLock = shiftStateMachine.automaticCapsLock,
+            automaticOneShot = shiftStateMachine.automaticOneShot,
             fieldCapsLockSuspended = fieldCapsLockSuspended,
             layoutGeneration = layoutGeneration,
             fieldGeneration = fieldGeneration
@@ -171,13 +181,19 @@ class ModifierStateController(
      */
     fun restoreLogicalState(captured: LogicalState) {
         if (captured.fieldGeneration == fieldGeneration) {
-            shiftStateMachine.restore(captured.shiftState, captured.automaticCapsLock)
+            shiftStateMachine.restore(
+                captured.shiftState,
+                captured.automaticCapsLock || captured.automaticOneShot
+            )
             fieldCapsLockSuspended = captured.fieldCapsLockSuspended
             if (captured.layoutGeneration != layoutGeneration) {
                 applyLayoutCasing()
             }
         } else {
-            shiftStateMachine.restore(if (captured.automaticCapsLock) ShiftState.OFF else captured.shiftState)
+            shiftStateMachine.restore(
+                if (captured.automaticCapsLock) ShiftState.OFF else captured.shiftState,
+                automatic = captured.automaticOneShot
+            )
             fieldCapsLockSuspended = false
             if (captured.layoutGeneration != layoutGeneration) {
                 applyLayoutCasing()
@@ -193,6 +209,13 @@ class ModifierStateController(
 
     val shiftState: ShiftState
         get() = shiftStateMachine.state
+
+    /**
+     * The Shift one-shot is the one auto-capitalization armed. Consuming it, a Shift tap,
+     * Caps Lock or a reset makes any later one-shot user-owned unless auto-cap arms it again.
+     */
+    val shiftOneShotAutomatic: Boolean
+        get() = shiftStateMachine.automaticOneShot
 
     var capsLockEnabled: Boolean
         get() = shiftStateMachine.state == ShiftState.CAPS
@@ -473,7 +496,12 @@ class ModifierStateController(
     }
 
     fun requestShiftOneShotFromAutoCap(): Boolean {
-        return shiftStateMachine.requestOneShot()
+        return shiftStateMachine.requestOneShot(automatic = true)
+    }
+
+    /** Withdraws a one-shot auto-capitalization armed; a one-shot the user set stays. */
+    fun clearAutomaticShiftOneShot(): Boolean {
+        return shiftStateMachine.automaticOneShot && shiftStateMachine.consumeOneShot()
     }
 
     fun consumeShiftOneShot(): Boolean {

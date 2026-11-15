@@ -720,7 +720,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 newSelStart,
                 newSelEnd,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -1625,7 +1625,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     currentInputConnection,
                     shouldDisableAutoCapitalize,
                     enableShift = { requestAutoCapShiftOneShot() },
-                    disableShift = { modifierStateController.consumeShiftOneShot() },
+                    disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                     onUpdateStatusBar = { updateStatusBarText() }
                 )
             }
@@ -1648,7 +1648,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             currentInputConnection,
             shouldDisableAutoCapitalize,
             enableShift = { requestAutoCapShiftOneShot() },
-            disableShift = { modifierStateController.consumeShiftOneShot() },
+            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
             onUpdateStatusBar = { updateStatusBarText() }
         )
         
@@ -3901,7 +3901,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 currentInputConnection,
                 shouldDisableAutoCapitalize,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -3950,7 +3950,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 currentInputConnection,
                 shouldDisableAutoCapitalize,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -5489,7 +5489,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                             inputConnection = ic,
                             shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
                             onEnableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
-                            disableShift = { modifierStateController.consumeShiftOneShot() },
+                            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                             onUpdateStatusBar = { updateStatusBarText() }
                         )
                     }

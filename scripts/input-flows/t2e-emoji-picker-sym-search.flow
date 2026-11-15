@@ -1,0 +1,49 @@
+# Titan 2 Elite hardware keyboard: searching the full emoji picker with the hardware keys. The search
+# opens from the picker's search button or from the search key (A) of the paged SYM emoji page and
+# takes the keys from the first one, even though the editor lays out again when the picker opens.
+# A result picked while "Keep the emoji picker open after typing an emoji" is on (the default) keeps
+# the search, Enter types the top result and closes the picker, and the next opening shows the
+# emoji grid again instead of the old results.
+# Needs the setting on, the SYM page "Emoji picker" enabled after the default pages (device, emoji,
+# symbols; SYM four times opens it), 🚀 as the top result for "rocket" and 😀 visible when the
+# picker opens (recents or the first page).
+require profile titan2elite_qwerty
+require layout qwerty
+preserve keyboard mode
+hw type ok
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press picker:search
+wait 500
+hw type rocket
+wait 800
+screen press emoji:🚀
+wait 300
+expect Ok🚀
+hw press ENTER
+expect Ok🚀🚀
+hw type " a"
+expect "Ok🚀🚀 a"
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press emoji:😀
+expect "Ok🚀🚀 a😀"
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 500
+hw press P
+wait 300
+hw press A
+wait 800
+hw type rocket
+wait 800
+hw press ENTER
+hw type b
+expect "Ok🚀🚀 a😀🚀b"

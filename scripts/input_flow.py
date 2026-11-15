@@ -38,8 +38,9 @@ ROOT = Path(__file__).resolve().parents[1]
 RECEIVER = 'rocks.pkb.plektra.KeyboardBarTestReceiver'
 NOTES_ALIAS = 'rocks.pkb.plektra.NotesEditorAlias'
 SURFACES = ('hw', 'screen')
-# Software keys by accessibility id, the bar's emoji button, picker cells and skin-tone variants by text.
-SCREEN_TARGET_PREFIXES = ('plektra_key_', 'bar:', 'emoji:', 'variant:')
+# Software keys by accessibility id, the bar's emoji button, the picker's search button, picker cells
+# and skin-tone variants by text.
+SCREEN_TARGET_PREFIXES = ('plektra_key_', 'bar:', 'emoji:', 'variant:', 'picker:')
 ACTIONS = ('type', 'press', 'hold', 'release')
 # Mirrors AospKeyboardView.accessibilityTextToken for characters typed on screen.
 SCREEN_TOKENS = {
@@ -104,6 +105,8 @@ def parse_flow(text):
             if name not in ('layout', 'profile') or not value.strip():
                 raise FlowError(f'line {number}: use "require layout NAME" or "require profile NAME"')
             steps.append(Step(number, f'require-{name}', value=value.strip()))
+        elif head == 'preserve' and rest.strip() == 'keyboard mode':
+            steps.append(Step(number, 'preserve-keyboard-mode'))
         else:
             raise FlowError(f'line {number}: unknown step {head!r}')
     if not any(step.action == 'expect' for step in steps):
@@ -182,7 +185,7 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
         else:
             if not key.startswith(SCREEN_TARGET_PREFIXES):
                 raise FlowError(f'line {line}: screen targets are accessibility ids such as plektra_key_q, '
-                                'bar:emoji, emoji:TEXT or variant:TEXT')
+                                'bar:emoji, picker:search, emoji:TEXT or variant:TEXT')
             ops.append({'line': line, 'op': 'touch', 'down': down, 'target': key})
 
     def separate_repeat(line, keys):
@@ -220,6 +223,8 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
             wait(step.line, int(step.value))
         elif step.action == 'expect':
             ops.append({'line': step.line, 'op': 'expect', 'text': step.value})
+        elif step.action == 'preserve-keyboard-mode':
+            pass
         elif step.action.startswith('require-'):
             ops.append({'line': step.line, 'op': step.action, 'value': step.value})
         elif step.action == 'press':
@@ -529,7 +534,10 @@ class Session:
                       notes['active'] not in existing and len(notes['ids']) == len(existing) + 1, 'new note')
         if self.note_body()['text']:
             raise FlowError('the new note is not empty')
-        self.adb.shell('input tap %d %d' % center(self.adb.node('notes_body').get('bounds')))
+        # The UI hierarchy leaves out a body without height, for example under a tall software keyboard.
+        body, = self.wait_for(lambda: (node,) if (node := self.adb.node('notes_body')) is not None else None,
+                              'a visible note body (a tall keyboard can leave it no height)')
+        self.adb.shell('input tap %d %d' % center(body.get('bounds')))
         self.wait_for(lambda: self.note_body()['focused'], 'focused note body')
         if software:
             self.wait_for(self.software_keys, 'visible software keyboard')
@@ -540,13 +548,16 @@ class Session:
                 if target.startswith('plektra_key_')}
 
     def screen_targets(self):
-        """Software keys, the bar's emoji button, picker cells and the skin-tone popup with screen centers."""
+        """Software keys, the bar's emoji button, the picker's search button, picker cells and the skin-tone
+        popup with screen centers."""
         data = self.adb.broadcast('inspect')
         targets = {}
         for match in re.finditer(r'SoftwareKey: id=([^,]+), label=.*?, screen=(-?\d+),(-?\d+)', data):
             targets.setdefault(match.group(1), (int(match.group(2)), int(match.group(3))))
         for match in re.finditer(r'BarButton: id=(\w+), screen=(-?\d+),(-?\d+)', data):
             targets.setdefault(f'bar:{match.group(1)}', (int(match.group(2)), int(match.group(3))))
+        for match in re.finditer(r'PickerControl: id=(\w+), screen=(-?\d+),(-?\d+)', data):
+            targets.setdefault(f'picker:{match.group(1)}', (int(match.group(2)), int(match.group(3))))
         for match in re.finditer(r'EmojiTarget: kind=(cell|variant), text=(.*?), screen=(-?\d+),(-?\d+)', data):
             prefix = 'emoji' if match.group(1) == 'cell' else 'variant'
             targets.setdefault(f'{prefix}:{match.group(2)}', (int(match.group(3)), int(match.group(4))))
@@ -644,6 +655,12 @@ def needs_hardware(steps):
     return any(step.surface == 'hw' or step.action == 'require-profile' for step in steps)
 
 
+def forces_software_keyboard(steps):
+    """Screen steps show the software keyboard unless they touch panels over the hardware keyboard."""
+    return (any(step.surface == 'screen' for step in steps)
+            and not any(step.action == 'preserve-keyboard-mode' for step in steps))
+
+
 def command_plan(session, path):
     """Print the intermediate operations without injecting input.
 
@@ -666,7 +683,7 @@ def command_run(session, path):
             session.start_hardware()
         if 'screen' in surfaces:
             session.start_touch()
-        session.open_new_note('screen' in surfaces)
+        session.open_new_note(forces_software_keyboard(steps))
         # The IME loads its layout for the focused editor; plan and check before the first key.
         keymap = json.loads(session.adb.broadcast('keymap'))
         ops = plan(steps, keymap, session.key_layout)

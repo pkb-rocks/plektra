@@ -212,6 +212,8 @@
     <string name="sym_enable_emoji_picker_page_description">Mostra il selettore emoji completo durante il ciclo.</string>
     <string name="emoji_picker_expanded_height_title">Selettore emoji più grande</string>
     <string name="emoji_picker_expanded_height_description">Usa circa 1,5 volte l\'altezza per la pagina di ricerca emoji; le altre pagine SYM mantengono l\'altezza normale.</string>
+    <string name="emoji_picker_stays_open_title">Lascia aperto il selettore emoji dopo un emoji</string>
+    <string name="emoji_picker_stays_open_description">Dopo un emoji o una tonalità della pelle il selettore emoji resta aperto per il successivo. Indipendente dalla chiusura automatica del layout SYM.</string>
     <string name="sym_swap_pages_title">Scambia Ordine Pagine SYM</string>
     <string name="sym_swap_pages_description">Scegli quale pagina SYM appare per prima quando si alterna.</string>
     <string name="sym_order_emoji_first">Emoji prima</string>

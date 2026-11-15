@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.BaseInputConnection
 import android.view.View
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.inputmethod.AutoCapitalizeHelper
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -511,6 +512,238 @@ class TextInputControllerTest {
 
         assertFalse(handled)
         assertEquals("\"Hallo\" ", inputConnection.text)
+    }
+
+    @Test
+    fun autoCapAfterPeriod_armsShiftOnSpaceKeyDownBeforeTheSpaceIsCommitted() {
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, true)
+        val inputConnection = FakeInputConnection(context, "Hi.")
+
+        // The app inserts the Space after this key-down check; the next key can arrive first.
+        controller.handleAutoCapAfterPeriod(
+            keyCode = KeyEvent.KEYCODE_SPACE,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            onStatusBarUpdate = {}
+        )
+
+        assertTrue(modifierStateController.shiftOneShot)
+        assertEquals("Hi.", inputConnection.text)
+    }
+
+    @Test
+    fun autoCapAfterPeriod_spaceAfterWordOrDisabledSetting_leavesShiftOff() {
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, true)
+        controller.handleAutoCapAfterPeriod(
+            keyCode = KeyEvent.KEYCODE_SPACE,
+            inputConnection = FakeInputConnection(context, "Hi"),
+            shouldDisableAutoCapitalize = false,
+            onStatusBarUpdate = {}
+        )
+        assertFalse(modifierStateController.shiftOneShot)
+
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, false)
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        controller.handleAutoCapAfterPeriod(
+            keyCode = KeyEvent.KEYCODE_SPACE,
+            inputConnection = FakeInputConnection(context, "Hi."),
+            shouldDisableAutoCapitalize = false,
+            onStatusBarUpdate = {}
+        )
+        assertFalse(modifierStateController.shiftOneShot)
+    }
+
+    @Test
+    fun autoCapAfterEnter_multiLineField_armsShiftBeforeTheNewlineIsCommitted() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok so")
+
+        controller.handleAutoCapAfterEnter(
+            keyCode = KeyEvent.KEYCODE_ENTER,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            insertsNewline = true,
+            onStatusBarUpdate = {}
+        )
+
+        assertTrue(modifierStateController.shiftOneShot)
+        assertEquals("Ok so", inputConnection.text)
+    }
+
+    @Test
+    fun autoCapAfterEnter_spaceAtStartOfLine_clearsTheArmedShift() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok so")
+        controller.handleAutoCapAfterEnter(
+            keyCode = KeyEvent.KEYCODE_ENTER,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            insertsNewline = true,
+            onStatusBarUpdate = {}
+        )
+        inputConnection.commitText("\n", 1)
+        assertTrue(modifierStateController.shiftOneShot)
+
+        // The selection update after the Space would clear it too; a fast next key must not see it.
+        controller.handleAutoCapAfterPeriod(
+            keyCode = KeyEvent.KEYCODE_SPACE,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            onStatusBarUpdate = {}
+        )
+
+        assertFalse(modifierStateController.shiftOneShot)
+    }
+
+    @Test
+    fun autoCapAfterEnter_singleLineField_doesNotAssumeANewline() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+
+        controller.handleAutoCapAfterEnter(
+            keyCode = KeyEvent.KEYCODE_ENTER,
+            inputConnection = FakeInputConnection(context, "query"),
+            shouldDisableAutoCapitalize = false,
+            insertsNewline = false,
+            onStatusBarUpdate = {}
+        )
+
+        assertFalse(modifierStateController.shiftOneShot)
+    }
+
+    @Test
+    fun manualShift_withoutPriorAutoCap_survivesSpaceAfterWord() {
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, true)
+        val inputConnection = FakeInputConnection(context, "Hi")
+        tapShift()
+        assertTrue(modifierStateController.shiftOneShot)
+
+        pressSpace(inputConnection)
+
+        assertTrue(modifierStateController.shiftOneShot)
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+    }
+
+    @Test
+    fun manualShift_afterConsumedAutoCap_survivesSpaceAfterWord() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok")
+        enterNewline(inputConnection)
+        assertTrue(modifierStateController.shiftOneShotAutomatic)
+        // A letter consumes the automatic one-shot; the selection update that would
+        // re-evaluate auto-cap has not arrived yet.
+        typeLetter(inputConnection, "A")
+        assertFalse(modifierStateController.shiftOneShot)
+
+        tapShift()
+        assertTrue(modifierStateController.shiftOneShot)
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+        pressSpace(inputConnection)
+
+        assertTrue(modifierStateController.shiftOneShot)
+    }
+
+    @Test
+    fun manualShift_takingOverAnArmedAutoCap_survivesSpaceAtStartOfLine() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok")
+        enterNewline(inputConnection)
+        assertTrue(modifierStateController.shiftOneShotAutomatic)
+
+        // First tap cancels the automatic one-shot, a later tap sets a manual one.
+        tapShift()
+        assertFalse(modifierStateController.shiftOneShot)
+        modifierStateController.registerNonModifierKey() // slower than a double tap
+        tapShift()
+        assertTrue(modifierStateController.shiftOneShot)
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+        pressSpace(inputConnection)
+
+        assertTrue(modifierStateController.shiftOneShot)
+    }
+
+    @Test
+    fun capsLock_survivesEnterThenSpace() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        SettingsManager.setAutoCapitalizeAfterPeriod(context, true)
+        val inputConnection = FakeInputConnection(context, "OK.")
+        modifierStateController.capsLockEnabled = true
+
+        enterNewline(inputConnection)
+        pressSpace(inputConnection)
+        typeLetter(inputConnection, "A")
+        pressSpace(inputConnection)
+
+        assertEquals(ShiftState.CAPS, modifierStateController.shiftState)
+    }
+
+    @Test
+    fun selectionUpdateAfterConsumedAutoCap_keepsManualShift() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok")
+        enterNewline(inputConnection)
+        typeLetter(inputConnection, "A")
+        tapShift()
+
+        // The delayed selection update for the letter arrives after the manual Shift.
+        AutoCapitalizeHelper.checkAutoCapitalizeOnSelectionChange(
+            context, inputConnection, false, 4, 4, 4, 4,
+            enableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
+            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
+            onUpdateStatusBar = {}
+        )
+
+        assertTrue(modifierStateController.shiftOneShot)
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+    }
+
+    @Test
+    fun fieldReset_dropsAutomaticOrigin() {
+        SettingsManager.setAutoCapitalizeFirstLetter(context, true)
+        val inputConnection = FakeInputConnection(context, "Ok")
+        enterNewline(inputConnection)
+        assertTrue(modifierStateController.shiftOneShotAutomatic)
+
+        modifierStateController.resetModifiers(preserveNavMode = false, onNavModeCancelled = {})
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+        tapShift()
+        pressSpace(FakeInputConnection(context, "Ab"))
+
+        assertTrue(modifierStateController.shiftOneShot)
+        assertFalse(modifierStateController.shiftOneShotAutomatic)
+    }
+
+    private fun tapShift() {
+        modifierStateController.handleShiftKeyDown(KeyEvent.KEYCODE_SHIFT_RIGHT)
+        modifierStateController.handleShiftKeyUp(KeyEvent.KEYCODE_SHIFT_RIGHT)
+    }
+
+    private fun typeLetter(inputConnection: FakeInputConnection, letter: String) {
+        modifierStateController.registerNonModifierKey()
+        modifierStateController.consumeShiftOneShot()
+        inputConnection.commitText(letter, 1)
+    }
+
+    private fun enterNewline(inputConnection: FakeInputConnection) {
+        modifierStateController.registerNonModifierKey()
+        controller.handleAutoCapAfterEnter(
+            keyCode = KeyEvent.KEYCODE_ENTER,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            insertsNewline = true,
+            onStatusBarUpdate = {}
+        )
+        inputConnection.commitText("\n", 1)
+    }
+
+    private fun pressSpace(inputConnection: FakeInputConnection) {
+        modifierStateController.registerNonModifierKey()
+        controller.handleAutoCapAfterPeriod(
+            keyCode = KeyEvent.KEYCODE_SPACE,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = false,
+            onStatusBarUpdate = {}
+        )
+        inputConnection.commitText(" ", 1)
     }
 
     private class FakeInputConnection(

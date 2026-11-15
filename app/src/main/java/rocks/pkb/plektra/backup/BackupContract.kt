@@ -319,6 +319,7 @@ internal object BackupPreferenceContract {
             "alt_modifier_binding" to PreferenceValueType.STRING,
             "sym_auto_close" to PreferenceValueType.BOOLEAN,
             "emoji_picker_expanded_height" to PreferenceValueType.BOOLEAN,
+            "emoji_picker_stays_open" to PreferenceValueType.BOOLEAN,
             "emoji_style" to PreferenceValueType.STRING,
             "emoji_default_skin_tone" to PreferenceValueType.INT,
             "emoji_layer_pages" to PreferenceValueType.BOOLEAN,

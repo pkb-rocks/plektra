@@ -638,6 +638,8 @@
     <string name="static_variation_preset_dev_choice_description">Ligne de ponctuation sélectionnée.</string>
     <string name="emoji_picker_expanded_height_title">Sélecteur d’emoji plus grand</string>
     <string name="emoji_picker_expanded_height_description">Utiliser environ 1,5 fois la hauteur pour la page de recherche d’emoji ; les autres pages SYM gardent leur hauteur normale.</string>
+    <string name="emoji_picker_stays_open_title">Garder le sélecteur d’emoji ouvert après un emoji</string>
+    <string name="emoji_picker_stays_open_description">Après un emoji ou une teinte de peau, le sélecteur d’emoji reste ouvert pour le suivant. Indépendant de la fermeture automatique du layout SYM.</string>
     <string name="typing_sound_title">Sons de frappe</string>
     <string name="typing_sound_off">Désactivé</string>
     <string name="typing_sound_click">Clic de clavier</string>

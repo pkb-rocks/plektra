@@ -637,6 +637,8 @@
     <string name="static_variation_preset_dev_choice_description">Fila de puntuación seleccionada.</string>
     <string name="emoji_picker_expanded_height_title">Selector de emoji más grande</string>
     <string name="emoji_picker_expanded_height_description">Usa aproximadamente 1,5 veces la altura para la página de búsqueda de emoji; las demás páginas SYM conservan su altura normal.</string>
+    <string name="emoji_picker_stays_open_title">Mantener abierto el selector de emoji tras escribir un emoji</string>
+    <string name="emoji_picker_stays_open_description">Tras un emoji o tono de piel, el selector de emoji sigue abierto para el siguiente. Independiente del cierre automático del layout SYM.</string>
     <string name="typing_sound_title">Sonidos de escritura</string>
     <string name="typing_sound_off">Desactivado</string>
     <string name="typing_sound_click">Clic de teclado</string>

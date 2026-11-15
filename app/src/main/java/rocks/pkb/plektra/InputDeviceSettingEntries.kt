@@ -64,6 +64,7 @@ internal fun inputDeviceSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("sym.auto_close", R.string.sym_auto_close_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.auto_close_touch", R.string.sym_auto_close_touch_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_height", R.string.emoji_picker_expanded_height_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
+    SettingEntry("sym.emoji_picker_stays_open", R.string.emoji_picker_stays_open_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_style", R.string.emoji_style_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_skin_tone", R.string.emoji_skin_tone_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_pages", R.string.emoji_pages_emoji_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),

@@ -1,4 +1,6 @@
 # Titan 2 Elite hardware keyboard: letters, held Shift and Alt chords, Enter.
+# Requires auto-capitalization of the first letter disabled; capitalization after a period
+# (default on) capitalizes the letter after "!" and Enter.
 require profile titan2elite_qwerty
 require layout qwerty
 hw type "hello "
@@ -11,4 +13,4 @@ hw press B
 hw release ALT_LEFT
 expect "hello World!"
 hw type "\nx 1"
-expect "hello World!\nx 1"
+expect "hello World!\nX 1"

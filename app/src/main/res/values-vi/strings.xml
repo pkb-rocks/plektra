@@ -637,6 +637,8 @@
     <string name="static_variation_preset_dev_choice_description">Hàng dấu câu được chọn sẵn.</string>
     <string name="emoji_picker_expanded_height_title">Bộ chọn emoji lớn hơn</string>
     <string name="emoji_picker_expanded_height_description">Dùng chiều cao khoảng 1,5x cho trang tìm kiếm emoji; các trang SYM khác giữ chiều cao bình thường.</string>
+    <string name="emoji_picker_stays_open_title">Giữ bộ chọn emoji mở sau khi nhập emoji</string>
+    <string name="emoji_picker_stays_open_description">Sau một emoji hoặc tông da, bộ chọn emoji vẫn mở cho emoji tiếp theo. Độc lập với việc tự đóng bố cục SYM.</string>
     <string name="typing_sound_title">Âm thanh gõ phím</string>
     <string name="typing_sound_off">Tắt</string>
     <string name="typing_sound_click">Tiếng nhấp bàn phím</string>

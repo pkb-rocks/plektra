@@ -24,6 +24,7 @@ import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.CursorAnchorInfo
@@ -252,6 +253,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var emojiSearchExternalSelectionEnd: Int? = null
     private var emojiSearchCursorAnchorMonitoringRequested: Boolean = false
     private var ignoreNextEmojiSearchCursorAnchorUpdate: Boolean = false
+    // The editor selection the app last reported, to tell a moved caret from a relayout.
+    private var lastEditorSelectionStart: Int = -1
+    private var lastEditorSelectionEnd: Int = -1
+    // Where the picker's own emoji commits leave the caret while its search keeps the keys, oldest
+    // first, until the app reports that selection.
+    private val pendingEmojiSearchCommitCursors = mutableListOf<Int>()
     
     // Snapshot of the current input context (numeric/password/restricted fields, etc.)
     private var inputContextState: InputContextState = InputContextState.EMPTY
@@ -720,7 +727,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 newSelStart,
                 newSelEnd,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -1625,7 +1632,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     currentInputConnection,
                     shouldDisableAutoCapitalize,
                     enableShift = { requestAutoCapShiftOneShot() },
-                    disableShift = { modifierStateController.consumeShiftOneShot() },
+                    disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                     onUpdateStatusBar = { updateStatusBarText() }
                 )
             }
@@ -1648,7 +1655,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             currentInputConnection,
             shouldDisableAutoCapitalize,
             enableShift = { requestAutoCapShiftOneShot() },
-            disableShift = { modifierStateController.consumeShiftOneShot() },
+            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
             onUpdateStatusBar = { updateStatusBarText() }
         )
         
@@ -2191,7 +2198,31 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 updateStatusBarText()
             }
         }
-        candidatesBarController.onEmojiPickerSearchPanelToggled = {
+        candidatesBarController.onEmojiPickerCommittingText = { text, commit ->
+            // A pick while the picker stays open moves the app's caret; that is not the user leaving
+            // the search, so the next keys still type into it. Picks faster than the app reports its
+            // selection follow the previous pick's caret.
+            val caretBefore = pendingEmojiSearchCommitCursors.lastOrNull()
+                ?: minOf(lastEditorSelectionStart, lastEditorSelectionEnd).takeIf { it >= 0 }
+            val expected = if (candidatesBarController.isEmojiPickerSearchInputActive() && caretBefore != null) {
+                (caretBefore + text.length).also(pendingEmojiSearchCommitCursors::add)
+            } else null
+            val committed = commit()
+            if (expected != null && (!committed || !editorCaretIsAt(currentInputConnection, expected))) {
+                // The app rejected the pick or filtered it out, so the caret is not where the pick
+                // would leave it: a later move to that place is the user's.
+                pendingEmojiSearchCommitCursors.lastIndexOf(expected).takeIf { it >= 0 }
+                    ?.let(pendingEmojiSearchCommitCursors::removeAt)
+            }
+        }
+        candidatesBarController.onEmojiPickerSearchPanelToggled = { visible ->
+            pendingEmojiSearchCommitCursors.clear()
+            if (visible) {
+                // A new search compares the app's selection from its first key on, not with the
+                // selection a previous search (closed by Enter or a pick) left behind.
+                emojiSearchExternalSelectionStart = null
+                emojiSearchExternalSelectionEnd = null
+            }
             // The picker's search panel state is not part of the rendered snapshot; force a
             // re-render so the picker moves to its popup surface while searching.
             lastRenderedStatusSnapshot = null
@@ -3236,6 +3267,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ignoreNextEmojiSearchCursorAnchorUpdate = false
             return
         }
+        // With the selection the app last reported, only the caret's place on screen changed, as when
+        // the picker opens over the smaller SYM page and the editor lays out again: typing stays in
+        // the search. A moved caret also reaches onUpdateSelection, which hands typing back there.
+        val anchorStart = cursorAnchorInfo?.selectionStart ?: -1
+        val anchorEnd = cursorAnchorInfo?.selectionEnd ?: -1
+        if (anchorStart >= 0 && (
+                (anchorStart == lastEditorSelectionStart && anchorEnd == lastEditorSelectionEnd) ||
+                    (anchorStart == anchorEnd && anchorStart in pendingEmojiSearchCommitCursors))
+        ) {
+            return
+        }
         disableEmojiSearchInputCapture()
     }
 
@@ -3322,28 +3364,49 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         emojiSearchExternalSelectionStart = null
         emojiSearchExternalSelectionEnd = null
+        pendingEmojiSearchCommitCursors.clear()
         emojiSearchCursorAnchorMonitoringRequested = false
         ignoreNextEmojiSearchCursorAnchorUpdate = false
         // Not requestCursorUpdates(0) - the caret badge may still need updates.
         syncCursorAnchorMonitoring()
     }
 
+    // The editor selection in document positions, like onUpdateSelection and the picks' cursors;
+    // ExtractedText counts from its startOffset.
+    private val ExtractedText.absoluteSelectionStart: Int get() = startOffset + selectionStart
+    private val ExtractedText.absoluteSelectionEnd: Int get() = startOffset + selectionEnd
+
+    /** Whether the editor's caret is at [position]; true when the editor cannot tell. */
+    private fun editorCaretIsAt(inputConnection: InputConnection?, position: Int): Boolean {
+        // Read the resulting caret position through the connection that received the pick.
+        val extracted = inputConnection?.getExtractedText(ExtractedTextRequest(), 0) ?: return true
+        return extracted.absoluteSelectionStart == position && extracted.absoluteSelectionEnd == position
+    }
+
     private fun updateEmojiSearchExternalSelectionSnapshot(inputConnection: InputConnection?) {
         val extracted = inputConnection?.getExtractedText(ExtractedTextRequest(), 0)
-        emojiSearchExternalSelectionStart = extracted?.selectionStart
-        emojiSearchExternalSelectionEnd = extracted?.selectionEnd
+        emojiSearchExternalSelectionStart = extracted?.absoluteSelectionStart
+        emojiSearchExternalSelectionEnd = extracted?.absoluteSelectionEnd
     }
 
     private fun shouldReturnEmojiSearchFocusToApp(inputConnection: InputConnection?): Boolean {
         val extracted = inputConnection?.getExtractedText(ExtractedTextRequest(), 0) ?: return false
+        val start = extracted.absoluteSelectionStart
+        val end = extracted.absoluteSelectionEnd
         val previousStart = emojiSearchExternalSelectionStart
         val previousEnd = emojiSearchExternalSelectionEnd
-        emojiSearchExternalSelectionStart = extracted.selectionStart
-        emojiSearchExternalSelectionEnd = extracted.selectionEnd
+        emojiSearchExternalSelectionStart = start
+        emojiSearchExternalSelectionEnd = end
         if (previousStart == null || previousEnd == null) {
             return false
         }
-        return previousStart != extracted.selectionStart || previousEnd != extracted.selectionEnd
+        // The app has applied every pick before this key. A caret where the last one leaves it is
+        // that pick whose selection report is still on its way; otherwise no report will match.
+        if (start == end && start == pendingEmojiSearchCommitCursors.lastOrNull()) {
+            return false
+        }
+        pendingEmojiSearchCommitCursors.clear()
+        return previousStart != start || previousEnd != end
     }
 
     private fun ensureEmojiSearchCursorAnchorMonitoring(inputConnection: InputConnection?) {
@@ -3792,6 +3855,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        lastEditorSelectionStart = info?.initialSelStart ?: -1
+        lastEditorSelectionEnd = info?.initialSelEnd ?: -1
+        pendingEmojiSearchCommitCursors.clear()
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         if (!restarting) {
@@ -3906,7 +3972,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 currentInputConnection,
                 shouldDisableAutoCapitalize,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -3955,7 +4021,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 currentInputConnection,
                 shouldDisableAutoCapitalize,
                 enableShift = { requestAutoCapShiftOneShot() },
-                disableShift = { modifierStateController.consumeShiftOneShot() },
+                disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() },
                 inputContextState = state
             )
@@ -4579,6 +4645,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     ) {
         val perfStart = ImePerfLogger.mark()
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        lastEditorSelectionStart = newSelStart
+        lastEditorSelectionEnd = newSelEnd
+        val pickerCommitIndex =
+            if (newSelStart == newSelEnd) pendingEmojiSearchCommitCursors.indexOf(newSelStart) else -1
+        val pickerCommitArrived = pickerCommitIndex >= 0
+        // One report may cover several picks; later picks may still be on their way. Any other
+        // selection is not a pick's.
+        if (pickerCommitArrived) {
+            pendingEmojiSearchCommitCursors.subList(0, pickerCommitIndex + 1).clear()
+        } else {
+            pendingEmojiSearchCommitCursors.clear()
+        }
+        if (pickerCommitArrived && emojiSearchExternalSelectionStart != null) {
+            // The search's next key compares the app's selection with this snapshot.
+            emojiSearchExternalSelectionStart = newSelStart
+            emojiSearchExternalSelectionEnd = newSelEnd
+        }
         liveSpeechEditor?.let { editor ->
             val expected = if (candidatesEnd >= 0) candidatesEnd else editor.expectedCursor
             if ((oldSelStart != newSelStart || oldSelEnd != newSelEnd) &&
@@ -4607,7 +4690,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             symPage == 4 &&
             ::candidatesBarController.isInitialized &&
             candidatesBarController.isEmojiPickerSearchInputActive() &&
-            !shouldSkipForCommit
+            !shouldSkipForCommit &&
+            !pickerCommitArrived
         ) {
             // This callback comes from the app editor, not from the internal emoji search EditText.
             // Any external selection/cursor update means hardware typing should return to the app
@@ -5494,7 +5578,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                             inputConnection = ic,
                             shouldDisableAutoCapitalize = shouldDisableAutoCapitalize,
                             onEnableShift = { modifierStateController.requestShiftOneShotFromAutoCap() },
-                            disableShift = { modifierStateController.consumeShiftOneShot() },
+                            disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
                             onUpdateStatusBar = { updateStatusBarText() }
                         )
                     }

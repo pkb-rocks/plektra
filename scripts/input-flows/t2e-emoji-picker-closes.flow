@@ -1,0 +1,20 @@
+# Titan 2 Elite on-screen keyboard: with "Keep the emoji picker open after typing an emoji" off,
+# the full picker closes after an emoji and after a skin tone, whatever the SYM auto-close settings.
+# Needs the setting off (the runner does not change settings), 😀 and 👋🏽 visible when the picker
+# opens and room for the note body above the on-screen keyboard (number row off on the T2E).
+screen press bar:emoji
+wait 800
+screen press emoji:😀
+wait 500
+screen press plektra_key_a
+expect 😀a
+screen press bar:emoji
+wait 800
+screen hold emoji:👋🏽
+wait 1000
+screen release emoji:👋🏽
+wait 300
+screen press variant:👋🏿
+wait 500
+screen press plektra_key_b
+expect 😀a👋🏿b

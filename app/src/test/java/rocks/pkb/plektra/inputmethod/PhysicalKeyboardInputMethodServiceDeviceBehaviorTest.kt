@@ -27,6 +27,9 @@ import org.robolectric.android.controller.ServiceController
 import java.lang.reflect.Field
 import java.lang.reflect.Proxy
 
+/** 🚀, two UTF-16 units: the app caret moves by two when the picker types it. */
+private const val ROCKET = "\uD83D\uDE80"
+
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
@@ -176,6 +179,9 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         val bars: CandidatesBarController = getField(service, "candidatesBarController")
         val picker = rocks.pkb.plektra.inputmethod.ui.EmojiPickerView(context)
         setField(getField<StatusBarController>(bars, "inputStatusBar"), "emojiPickerView", picker)
+        // As StatusBarController wires the picker it shows
+        picker.onCommittingText = { text, commit -> bars.onEmojiPickerCommittingText?.invoke(text, commit) ?: commit() }
+        picker.setInputConnection(inputConnection)
         picker.showSearch()
         assertTrue(bars.isEmojiPickerSearchInputActive())
         val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
@@ -185,6 +191,27 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
 
     private fun searchText(picker: rocks.pkb.plektra.inputmethod.ui.EmojiPickerView): String =
         getField<android.widget.EditText>(picker, "searchField").text.toString()
+
+    /** Taps an emoji in the picker; it stays open by default and types the emoji into the app. */
+    private fun pickEmoji(picker: rocks.pkb.plektra.inputmethod.ui.EmojiPickerView, emoji: String = ROCKET) {
+        val method = rocks.pkb.plektra.inputmethod.ui.EmojiPickerView::class.java.getDeclaredMethod(
+            "onEmojiSelected", String::class.java, String::class.java, Boolean::class.javaObjectType
+        )
+        method.isAccessible = true
+        method.invoke(picker, emoji, "travel", null)
+    }
+
+    /** The emoji search open with "r" typed, the app's caret after "Ok". */
+    private fun searchingAfterOk(): Pair<rocks.pkb.plektra.inputmethod.ui.EmojiPickerView, CandidatesBarController> {
+        recorder.textBeforeCursor = "Ok"
+        service.onUpdateSelection(0, 0, 2, 2, -1, -1)
+        // The selection update re-evaluates auto-cap; its Shift would capitalize the search text.
+        modifierController().consumeShiftOneShot()
+        val picker = openEmojiPickerSearch()
+        pressKey(KeyEvent.KEYCODE_R, 9_000L)
+        assertEquals("r", searchText(picker))
+        return picker to getField(service, "candidatesBarController")
+    }
 
     private fun pressKey(keyCode: Int, start: Long, metaState: Int = 0) {
         service.onKeyDown(keyCode, keyEvent(KeyEvent.ACTION_DOWN, keyCode, start, start, metaState))
@@ -212,6 +239,221 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
             assertEquals("🐱a", searchText(picker))
             assertEquals(emptyList<String>(), recorder.committedTexts)
         }
+    }
+
+    @Test
+    fun editorRelayoutKeepsTypingInTheEmojiSearchButAMovedCaretHandsItBack() {
+        service.onUpdateSelection(0, 0, 2, 2, -1, -1)
+        // The selection update re-evaluates auto-cap at the start of the empty test editor; its Shift
+        // would capitalize the search text, which this test does not look at.
+        modifierController().consumeShiftOneShot()
+        val picker = openEmojiPickerSearch()
+        val bars: CandidatesBarController = getField(service, "candidatesBarController")
+        fun anchor(start: Int, end: Int) = android.view.inputmethod.CursorAnchorInfo.Builder()
+            .setSelectionRange(start, end).build()
+
+        // The picker opening over the smaller SYM page lays the editor out again: same selection.
+        service.onUpdateCursorAnchorInfo(anchor(2, 2))
+        service.onUpdateCursorAnchorInfo(anchor(2, 2))
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_A, 8_000L)
+        assertEquals("a", searchText(picker))
+
+        service.onUpdateCursorAnchorInfo(anchor(0, 0))
+        assertFalse(bars.isEmojiPickerSearchInputActive())
+    }
+
+    @Test
+    fun pickWhileTheEmojiPickerStaysOpenKeepsTypingInTheSearch() {
+        val (picker, bars) = searchingAfterOk()
+
+        // The picker types 🚀 (two UTF-16 units) into the app; the caret moves by exactly that much.
+        pickEmoji(picker)
+        assertEquals("Ok$ROCKET", recorder.textBeforeCursor)
+        service.onUpdateCursorAnchorInfo(
+            android.view.inputmethod.CursorAnchorInfo.Builder().setSelectionRange(4, 4).build()
+        )
+        service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        assertEquals("ro", searchText(picker))
+
+        // Moving the caret afterwards still hands the keys back to the app.
+        service.onUpdateSelection(4, 4, 0, 0, -1, -1)
+        assertFalse(bars.isEmojiPickerSearchInputActive())
+    }
+
+    @Test
+    fun pickWhoseSelectionReportArrivesDuringTheCommitKeepsTypingInTheSearch() {
+        val (picker, bars) = searchingAfterOk()
+        recorder.onCommitted = { service.onUpdateSelection(2, 2, 4, 4, -1, -1) }
+
+        pickEmoji(picker)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        assertEquals("ro", searchText(picker))
+    }
+
+    @Test
+    fun keyBeforeThePicksSelectionReportStaysInTheSearch() {
+        val (picker, bars) = searchingAfterOk()
+
+        pickEmoji(picker)
+        // The app has the emoji; its selection report is still queued when the next key arrives.
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        assertEquals("ro", searchText(picker))
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_C, 9_200L)
+        assertEquals("roc", searchText(picker))
+        assertEquals(listOf(ROCKET), recorder.committedTexts)
+
+        service.onUpdateSelection(4, 4, 0, 0, -1, -1)
+        assertFalse(bars.isEmojiPickerSearchInputActive())
+    }
+
+    @Test
+    fun picksFasterThanTheAppsCombinedSelectionReportKeepTheSearch() {
+        val (picker, bars) = searchingAfterOk()
+
+        pickEmoji(picker)
+        pickEmoji(picker)
+        service.onUpdateSelection(2, 2, 6, 6, -1, -1)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        assertEquals("ro", searchText(picker))
+    }
+
+    @Test
+    fun picksFasterThanTheAppsSeparateSelectionReportsKeepTheSearch() {
+        val (picker, bars) = searchingAfterOk()
+
+        pickEmoji(picker)
+        pickEmoji(picker)
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+        service.onUpdateSelection(4, 4, 6, 6, -1, -1)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        pressKey(KeyEvent.KEYCODE_C, 9_200L)
+        assertEquals("roc", searchText(picker))
+    }
+
+    @Test
+    fun rejectedPickLeavesALaterCaretMoveToTheApp() {
+        for (round in 0..2) {
+            val (picker, bars) = searchingAfterOk()
+            recorder.extractedSelection = 2
+            when (round) {
+                0 -> recorder.commitResult = false
+                1 -> picker.setInputConnection(null)
+                // The editor takes the commit but filters the emoji out.
+                2 -> recorder.dropCommittedText = true
+            }
+            pickEmoji(picker)
+            assertEquals("round $round", "Ok", recorder.textBeforeCursor)
+            if (round == 2) pressKey(KeyEvent.KEYCODE_O, 9_100L)
+            assertTrue("round $round", bars.isEmojiPickerSearchInputActive())
+
+            // The user moves the app caret from 2 to where the emoji would have left it.
+            recorder.extractedSelection = 4
+            service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+            assertFalse("round $round", bars.isEmojiPickerSearchInputActive())
+            recorder.commitResult = true
+            recorder.dropCommittedText = false
+            recorder.extractedSelection = null
+        }
+    }
+
+    @Test
+    fun pickFilteredOutByTheEditorLeavesTheNextCaretMoveToTheApp() {
+        for (filtered in listOf(false, true)) {
+            val (picker, bars) = searchingAfterOk()
+            // Android's own commit into an editor whose length filter has no room for the emoji: the
+            // commit succeeds, but the text and caret stay as they were.
+            val editable = android.text.SpannableStringBuilder("abcdef")
+            android.text.Selection.setSelection(editable, 2)
+            if (filtered) editable.filters = arrayOf(android.text.InputFilter.LengthFilter(6))
+            val connection = object : android.view.inputmethod.BaseInputConnection(
+                android.view.View(RuntimeEnvironment.getApplication()), true
+            ) {
+                override fun getEditable(): android.text.Editable = editable
+                override fun getExtractedText(request: android.view.inputmethod.ExtractedTextRequest?, flags: Int) =
+                    ExtractedText().apply {
+                        text = editable.toString()
+                        selectionStart = android.text.Selection.getSelectionStart(editable)
+                        selectionEnd = android.text.Selection.getSelectionEnd(editable)
+                    }
+            }
+            picker.setInputConnection(connection)
+            setField(service, "mInputConnection", connection)
+            setField(service, "mStartedInputConnection", connection)
+            var committed: Boolean? = null
+            picker.onCommittingText = { text, commit ->
+                bars.onEmojiPickerCommittingText?.invoke(text) { commit().also { committed = it } }
+            }
+
+            pickEmoji(picker)
+            assertEquals("filtered=$filtered", true, committed)
+            assertEquals("filtered=$filtered", if (filtered) "abcdef" else "ab${ROCKET}cdef", editable.toString())
+            if (!filtered) {
+                service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+                assertTrue(bars.isEmojiPickerSearchInputActive())
+                continue
+            }
+            // Without another key first, the user moves the caret where the emoji would have left it.
+            android.text.Selection.setSelection(editable, 4)
+            service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+            assertFalse(bars.isEmojiPickerSearchInputActive())
+        }
+    }
+
+    @Test
+    fun picksInAnEditorThatExtractsPartOfItsTextKeepTypingInTheSearch() {
+        // The editor extracts its text from document position 100 on; the app reports document
+        // positions, the extracted selection counts from that offset.
+        recorder.extractedOffset = 100
+        recorder.textBeforeCursor = "Ok"
+        service.onUpdateSelection(0, 0, 102, 102, -1, -1)
+        modifierController().consumeShiftOneShot()
+        val picker = openEmojiPickerSearch()
+        val bars: CandidatesBarController = getField(service, "candidatesBarController")
+        pressKey(KeyEvent.KEYCODE_R, 9_000L)
+
+        pickEmoji(picker)
+        assertEquals(listOf(104), getField<List<Int>>(service, "pendingEmojiSearchCommitCursors"))
+        // The next key before the pick's selection report, then the report.
+        pressKey(KeyEvent.KEYCODE_O, 9_100L)
+        assertEquals("ro", searchText(picker))
+        service.onUpdateSelection(102, 102, 104, 104, -1, -1)
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        // A second pick reported first, then the next key.
+        pickEmoji(picker)
+        service.onUpdateSelection(104, 104, 106, 106, -1, -1)
+        pressKey(KeyEvent.KEYCODE_C, 9_200L)
+        assertEquals("roc", searchText(picker))
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+
+        // The user moves the caret in the app: the next key types there.
+        recorder.extractedSelection = 0
+        pressKey(KeyEvent.KEYCODE_K, 9_300L)
+        assertEquals("roc", searchText(picker))
+        assertFalse(bars.isEmojiPickerSearchInputActive())
+    }
+
+    @Test
+    fun handingTheKeysBackDropsAPicksPendingSelectionReport() {
+        val (picker, bars) = searchingAfterOk()
+        pickEmoji(picker)
+
+        @Suppress("DEPRECATION")
+        service.onViewClicked(false)
+        assertFalse(bars.isEmojiPickerSearchInputActive())
+        // Tapping the search field takes the keys again; the app's later report is the user's click.
+        getField<android.widget.EditText>(picker, "searchField").performClick()
+        assertTrue(bars.isEmojiPickerSearchInputActive())
+        service.onUpdateSelection(2, 2, 4, 4, -1, -1)
+        assertFalse(bars.isEmojiPickerSearchInputActive())
     }
 
     @Test
@@ -1827,6 +2069,10 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     private class RecordingInputConnection {
         var commitAttempts = 0
         var commitResult = true
+        var dropCommittedText = false
+        var onCommitted: (() -> Unit)? = null
+        var extractedSelection: Int? = null
+        var extractedOffset = 0
         var textBeforeCursor: String = ""
         var sendKeyEventResult: Boolean = true
         var performEditorActionResult: Boolean = false
@@ -1845,10 +2091,11 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
                 when (method.name) {
                     "commitText" -> if (!commitResult) false else {
                         val text = args?.getOrNull(0)?.toString()
-                        if (text != null) {
+                        if (text != null && !dropCommittedText) {
                             committedTexts += text
                             textBeforeCursor += text
                         }
+                        onCommitted?.invoke()
                         true
                     }
                     "deleteSurroundingText" -> {
@@ -1882,8 +2129,9 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
                     }
                     "getExtractedText" -> ExtractedText().apply {
                         text = textBeforeCursor
-                        selectionStart = textBeforeCursor.length
-                        selectionEnd = textBeforeCursor.length
+                        startOffset = extractedOffset
+                        selectionStart = extractedSelection ?: textBeforeCursor.length
+                        selectionEnd = extractedSelection ?: textBeforeCursor.length
                     }
                     "beginBatchEdit", "endBatchEdit", "finishComposingText" -> true
                     else -> defaultValue(method.returnType)

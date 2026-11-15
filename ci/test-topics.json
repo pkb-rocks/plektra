@@ -94,6 +94,9 @@
       "rocks.pkb.plektra.inputmethod.NestedStatusBarGeometryTest",
       "rocks.pkb.plektra.inputmethod.PreparedGeometryPerformanceTest",
       "rocks.pkb.plektra.inputmethod.QuickLauncherActivityTest",
+      "rocks.pkb.plektra.inputmethod.QuickLauncherCtrlASelectAllTest",
+      "rocks.pkb.plektra.inputmethod.QuickLauncherSelectionClipboardTest",
+      "rocks.pkb.plektra.inputmethod.SlimNestedRowLedTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerEmojiSearchGeometryTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerEmojiSearchStackTest",
       "rocks.pkb.plektra.inputmethod.StatusBarControllerHardwareSymGeometryTest",
@@ -103,8 +106,10 @@
       "rocks.pkb.plektra.inputmethod.aospkeyboard.SoftwareKeyboardActionLabelsTest",
       "rocks.pkb.plektra.inputmethod.suggestions.ui.FullSuggestionsBarAppearanceTest",
       "rocks.pkb.plektra.inputmethod.suggestions.ui.FullSuggestionsBarMenuButtonsTest",
+      "rocks.pkb.plektra.inputmethod.suggestions.ui.FullSuggestionsBarRowHeightTest",
       "rocks.pkb.plektra.inputmethod.ui.CursorSwipeLayoutTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiPickerOnScreenSearchTest",
+      "rocks.pkb.plektra.inputmethod.ui.EmojiPickerStaysOpenTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiPickerViewSearchInputTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiVariantsPopupLayoutTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiVariantsPopupTest",
@@ -167,6 +172,7 @@
       "rocks.pkb.plektra.core.suggestions.UserNGramStoreTest",
       "rocks.pkb.plektra.core.suggestions.UserOnlyDictionaryTest",
       "rocks.pkb.plektra.core.suggestions.WordNormalizationTest",
+      "rocks.pkb.plektra.dictionaries.StreamingDictionaryValidatorTest",
       "rocks.pkb.plektra.inputmethod.AddWordCommitHelperTest"
     ],
     "keys-modifiers": [
@@ -181,7 +187,9 @@
       "rocks.pkb.plektra.inputmethod.InputEventRouterCtrlHoldNavModeTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterShortcutKeysTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterSoftwareCtrlTest",
-      "rocks.pkb.plektra.inputmethod.MultiTapControllerTest"
+      "rocks.pkb.plektra.inputmethod.KeyEventTextOutputTest",
+      "rocks.pkb.plektra.inputmethod.MultiTapControllerTest",
+      "rocks.pkb.plektra.inputmethod.SymEditShortcutsTest"
     ],
     "speech": [
       "rocks.pkb.plektra.inputmethod.NotificationHelperTest",

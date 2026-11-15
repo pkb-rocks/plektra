@@ -86,14 +86,26 @@ class PlanTest(unittest.TestCase):
 
     def test_screen_targets_include_the_emoji_picker(self):
         ops = self.plan('screen press bar:emoji\nscreen hold emoji:👋\nwait 1000\nscreen release emoji:👋\n'
-                        'screen press variant:👋🏽')
+                        'screen press variant:👋🏽\nscreen press picker:search')
         self.assertEqual([('bar:emoji', True), ('bar:emoji', False), ('emoji:👋', True), ('emoji:👋', False),
-                          ('variant:👋🏽', True), ('variant:👋🏽', False)], edges(ops))
+                          ('variant:👋🏽', True), ('variant:👋🏽', False),
+                          ('picker:search', True), ('picker:search', False)], edges(ops))
 
     def test_screen_only_flows_need_no_hardware_keyboard(self):
         self.assertFalse(flow.needs_hardware(flow.parse_flow('screen press bar:emoji\nexpect x')))
         self.assertTrue(flow.needs_hardware(flow.parse_flow('screen press bar:emoji\nhw press Q\nexpect x')))
         self.assertTrue(flow.needs_hardware(flow.parse_flow('require profile p\nexpect x')))
+
+    def test_preserve_keyboard_mode_does_not_force_software_keyboard(self):
+        self.assertTrue(flow.forces_software_keyboard(flow.parse_flow('screen press bar:emoji\nexpect x')))
+        self.assertFalse(flow.forces_software_keyboard(flow.parse_flow(
+            'preserve keyboard mode\nhw press AGUI_SYM\nscreen press emoji:😀\nexpect x')))
+        self.assertFalse(flow.forces_software_keyboard(flow.parse_flow('hw press Q\nexpect x')))
+        self.assertFalse(flow.needs_hardware(flow.parse_flow('preserve keyboard mode\nexpect x')))
+        with self.assertRaises(flow.FlowError):
+            flow.parse_flow('require keyboard hardware\nexpect x')
+        with self.assertRaises(flow.FlowError):
+            flow.parse_flow('preserve keyboard hardware\nexpect x')
 
 
 class RepeatedKeyTest(unittest.TestCase):

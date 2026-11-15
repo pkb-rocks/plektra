@@ -154,6 +154,13 @@ class CandidatesBarController(
             inputStatusBar.onEmojiPickerSearchPanelToggled = value
             candidatesStatusBar.onEmojiPickerSearchPanelToggled = value
         }
+
+    var onEmojiPickerCommittingText: ((CharSequence, () -> Boolean) -> Unit)? = null
+        set(value) {
+            field = value
+            inputStatusBar.onEmojiPickerCommittingText = value
+            candidatesStatusBar.onEmojiPickerCommittingText = value
+        }
     
     var onSymbolsPageRequested: (() -> Unit)? = null
         set(value) {

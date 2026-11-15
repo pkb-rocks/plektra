@@ -1,0 +1,42 @@
+# Titan 2 Elite hardware keyboard: the full emoji picker opened with SYM stays open for several emoji
+# and a skin tone while "Keep the emoji picker open after typing an emoji" is on (the default, also
+# when never saved). SYM closes it and the keys type again; after reopening it still stays open.
+# Run with either SYM auto-close setting; the full picker uses only its own setting.
+# Needs the SYM page "Emoji picker" enabled after the default pages (device, emoji, symbols; SYM
+# four times opens it), 😀, 😂 and 👋🏽 visible when the picker opens (recents or the first page).
+require profile titan2elite_qwerty
+require layout qwerty
+preserve keyboard mode
+hw type ok
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press emoji:😀
+wait 300
+screen press emoji:😂
+expect Ok😀😂
+screen hold emoji:👋🏽
+wait 1000
+screen release emoji:👋🏽
+wait 300
+screen press variant:👋🏿
+wait 300
+screen press emoji:😀
+expect Ok😀😂👋🏿😀
+hw press AGUI_SYM
+hw type " a"
+expect "Ok😀😂👋🏿😀 a"
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press emoji:😂
+wait 300
+screen press emoji:😂
+expect "Ok😀😂👋🏿😀 a😂😂"
+hw press AGUI_SYM
+hw type b
+expect "Ok😀😂👋🏿😀 a😂😂b"

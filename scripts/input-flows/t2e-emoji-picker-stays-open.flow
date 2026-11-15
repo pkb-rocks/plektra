@@ -1,0 +1,23 @@
+# Titan 2 Elite on-screen keyboard: with "Keep the emoji picker open after typing an emoji" on (the
+# default), the full picker stays open for several emoji and a skin tone; the bar's emoji button
+# closes it and the keys type again. Independent of the SYM auto-close settings.
+# Needs 😀, 😂 and 👋🏽 visible when the picker opens (recents or the first page) and room for the
+# note body above the on-screen keyboard (number row off on the T2E's scaled display).
+screen press bar:emoji
+wait 800
+screen press emoji:😀
+wait 300
+screen press emoji:😂
+expect 😀😂
+screen hold emoji:👋🏽
+wait 1000
+screen release emoji:👋🏽
+wait 300
+screen press variant:👋🏿
+wait 300
+screen press emoji:😀
+expect 😀😂👋🏿😀
+screen press bar:emoji
+wait 500
+screen press plektra_key_a
+expect 😀😂👋🏿😀a

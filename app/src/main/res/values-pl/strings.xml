@@ -637,6 +637,8 @@
     <string name="static_variation_preset_dev_choice_description">Wybrany wiersz interpunkcji.</string>
     <string name="emoji_picker_expanded_height_title">Większy selektor emoji</string>
     <string name="emoji_picker_expanded_height_description">Użyj około 1,5x wysokości dla strony wyszukiwania emoji; pozostałe strony SYM zachowują normalną wysokość.</string>
+    <string name="emoji_picker_stays_open_title">Pozostaw selektor emoji otwarty po wpisaniu emoji</string>
+    <string name="emoji_picker_stays_open_description">Po emoji lub odcieniu skóry selektor emoji pozostaje otwarty na następne. Niezależnie od automatycznego zamykania layoutu SYM.</string>
     <string name="typing_sound_title">Dźwięki pisania</string>
     <string name="typing_sound_off">Wyłączone</string>
     <string name="typing_sound_click">Klik klawiatury</string>

@@ -20,8 +20,8 @@ One step per line; `#` starts a comment.
 | `hw press KEY` | Presses and releases one key, named by its key layout label (`Q`, `ALT_LEFT`, `SHIFT_RIGHT`, `AGUI_SYM`, `ENTER`, `DEL`) |
 | `hw hold KEY` / `hw release KEY` | Keeps a key down across later steps, for chords and long presses |
 | `screen type TEXT` | Taps the software keys for TEXT; uppercase letters tap `plektra_key_shift` first |
-| `screen press ID` | Taps one software key by accessibility id, for example `plektra_key_q` |
-| `screen hold ID` / `screen release ID` | Keeps a finger down; further touches use additional fingers |
+| `screen press ID` | Taps one target: a software key by accessibility id (`plektra_key_q`), the bar's emoji button (`bar:emoji`), a visible emoji picker cell (`emoji:👋`) or a skin tone in the open long-press popup (`variant:👋🏽`) |
+| `screen hold ID` / `screen release ID` | Keeps a finger down, for example for a long press on an emoji cell; further touches use additional fingers |
 | `wait MS` | Pauses, for example inside a hold for a long press |
 | `expect TEXT` | Waits up to 3 s until the note body equals TEXT exactly |
 | `require layout NAME` | Requires the loaded layout to match `app/src/main/assets/common/layouts/NAME.json` |
@@ -36,7 +36,7 @@ TEXT is either the rest of the line or a JSON string such as `"a\nb "` for newli
 ## What `run` does
 
 1. Checks the device identity, the selected input method, the lock screen and the screen state.
-2. Registers the virtual devices with the `uinput` shell command. They disappear when the flow ends or fails; held keys and fingers are released first.
+2. Registers the virtual devices (the keyboard clone only for flows with `hw` steps or `require profile`) with the `uinput` shell command. They disappear when the flow ends or fails; held keys and fingers are released first.
 3. Opens `NotesActivity` through `NotesEditorAlias` and taps the new-note button. It continues only when the active note id is new and the note count grew by one, so a missed tap never types into an existing note. It then focuses the empty body. Test notes remain in the note list.
 4. For screen steps, sets the temporary software-keyboard mode only if no temporary mode is active, and clears it afterwards.
 5. Executes the operations and compares the note body. The body text and focus come from the editor view inside the app (`KeyboardBarTestReceiver noteBody`): the UI hierarchy reports an empty field's hint as its text.
@@ -64,7 +64,9 @@ The clone is not the same device instance: it has its own device id and descript
 
 ## Software keyboard
 
-Screen steps use a virtual multi-touch screen (`INPUT_PROP_DIRECT`), so touches pass Android's touch pipeline and `AospKeyboardView.onTouchEvent`, including second fingers for chords. Key positions come from Plektra's accessibility key nodes (`plektra_key_*` ids with bounds), queried through `KeyboardBarTestReceiver inspect` before each touch. Coordinates are mapped from the logical display frame to the raw touch range of the internal viewport, which accounts for a `wm size` override.
+Screen steps use a virtual multi-touch screen (`INPUT_PROP_DIRECT`), so touches pass Android's touch pipeline and `AospKeyboardView.onTouchEvent`, including second fingers for chords. Key positions come from Plektra's accessibility key nodes (`plektra_key_*` ids with bounds), queried through `KeyboardBarTestReceiver inspect` before each touch. The same query reports the emoji button of the keyboard bar, the emoji picker's visible cells by their shown text and the cells of the skin-tone popup; a long press is `screen hold`, `wait` and `screen release` on a cell.
+
+Screen-only flows need no built-in keyboard and run on phones and foldables without one, such as the Galaxy Z Fold6 (`SM-F956B`): `devices` stops there because no built-in alphabetic keyboard exists to compare. Screen-only `run` flows do not need that hardware comparison. On a foldable the touches go to the active internal display (`displayId=0`): the outer display when folded, the inner one when unfolded. [`fold6-emoji-skin-tones.flow`](../../scripts/input-flows/fold6-emoji-skin-tones.flow) needs 👋 visible when the picker opens. Coordinates are mapped from the logical display frame to the raw touch range of the internal viewport, which accounts for a `wm size` override.
 
 The accessibility action `ACTION_CLICK` is a separate code path (`performAccessibilityKeyClick`) without holds, gestures or multi-touch; these flows do not exercise it.
 

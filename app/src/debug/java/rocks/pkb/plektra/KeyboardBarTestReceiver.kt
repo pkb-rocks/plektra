@@ -74,7 +74,36 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
                 }
                 if (view is android.view.ViewGroup) for (index in 0 until view.childCount) inspect(view.getChildAt(index))
             }
+            // The bar's emoji button, the picker's cells and the skin-tone popup, a separate window of the IME.
+            fun visibleCenter(view: android.view.View): Pair<Int, Int>? {
+                val visible = android.graphics.Rect()
+                if (!view.getLocalVisibleRect(visible) || visible.isEmpty) return null
+                val position = IntArray(2).also(view::getLocationOnScreen)
+                return (position[0] + visible.centerX()) to (position[1] + visible.centerY())
+            }
+            fun emojiTargets(view: android.view.View, kind: String?) {
+                if (!view.isShown) return
+                val targetKind = when {
+                    view is rocks.pkb.plektra.inputmethod.ui.EmojiPickerView -> "cell"
+                    view.tag == rocks.pkb.plektra.inputmethod.ui.EmojiPickerView.VARIANTS_POPUP_TAG -> "variant"
+                    else -> kind
+                }
+                if (view is android.widget.ImageView && view.hasOnClickListeners() &&
+                    view.contentDescription?.toString() == context.getString(R.string.status_bar_button_emoji_description)) {
+                    visibleCenter(view)?.let { (x, y) ->
+                        lines += "BarButton: id=emoji, screen=$x,$y"
+                    }
+                }
+                if (targetKind != null && view is android.widget.TextView && view !is android.widget.EditText &&
+                    view.hasOnClickListeners() && view.text.isNotEmpty()) {
+                    visibleCenter(view)?.let { (x, y) ->
+                        lines += "EmojiTarget: kind=$targetKind, text=${view.text}, screen=$x,$y"
+                    }
+                }
+                if (view is android.view.ViewGroup) for (index in 0 until view.childCount) emojiTargets(view.getChildAt(index), targetKind)
+            }
             android.view.inspector.WindowInspector.getGlobalWindowViews().forEach(::inspect)
+            android.view.inspector.WindowInspector.getGlobalWindowViews().forEach { emojiTargets(it, null) }
             resultData = lines.joinToString(" | ")
             return
         }

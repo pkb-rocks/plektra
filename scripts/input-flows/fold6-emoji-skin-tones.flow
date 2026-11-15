@@ -1,0 +1,11 @@
+# Skin tones in the emoji picker on the Galaxy Z Fold6: the six tones are wider than the outer
+# display, where the long press crashed the IME. Long press opens the tones, a tap types one.
+# 👋 must be visible when the picker opens (recents or the first page).
+screen press bar:emoji
+wait 800
+screen hold emoji:👋
+wait 1000
+screen release emoji:👋
+wait 300
+screen press variant:👋🏽
+expect 👋🏽

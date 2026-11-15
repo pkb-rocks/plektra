@@ -9,7 +9,8 @@ Examples:
 Hardware steps go through a uinput clone of the built-in keyboard: same name,
 vendor/product, key bits and therefore the same key layout and key character
 map files. Screen steps touch the software keyboard through a virtual uinput
-touchscreen at the bounds of Plektra's accessibility key nodes. Every run opens
+touchscreen at the bounds of Plektra's accessibility key nodes or emoji picker
+cells. Every run opens
 the real NotesActivity, creates a new note and checks the editor text through
 the UI hierarchy. See docs/testing/input-flows.md.
 """
@@ -37,6 +38,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RECEIVER = 'rocks.pkb.plektra.KeyboardBarTestReceiver'
 NOTES_ALIAS = 'rocks.pkb.plektra.NotesEditorAlias'
 SURFACES = ('hw', 'screen')
+# Software keys by accessibility id, the bar's emoji button, picker cells and skin-tone variants by text.
+SCREEN_TARGET_PREFIXES = ('plektra_key_', 'bar:', 'emoji:', 'variant:')
 ACTIONS = ('type', 'press', 'hold', 'release')
 # Mirrors AospKeyboardView.accessibilityTextToken for characters typed on screen.
 SCREEN_TOKENS = {
@@ -177,8 +180,9 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
                 if key not in MODIFIER_KEYS:
                     last_character_key = key
         else:
-            if not key.startswith('plektra_key_'):
-                raise FlowError(f'line {line}: screen keys are accessibility ids such as plektra_key_q')
+            if not key.startswith(SCREEN_TARGET_PREFIXES):
+                raise FlowError(f'line {line}: screen targets are accessibility ids such as plektra_key_q, '
+                                'bar:emoji, emoji:TEXT or variant:TEXT')
             ops.append({'line': line, 'op': 'touch', 'down': down, 'target': key})
 
     def separate_repeat(line, keys):
@@ -428,6 +432,7 @@ class Session:
         self.adb, self.verbose = adb, verbose
         self.uinput = None
         self.reference = None
+        self.key_layout = {}
         self.forced_software = False
         self.timeout = 8
 
@@ -509,11 +514,14 @@ class Session:
             self.adb.broadcast('forceSoftwareKeyboard')
             self.forced_software = True
         self.adb.shell(f'am start -W -n {self.adb.package}/{NOTES_ALIAS}')
-        focus = self.wait_for(lambda: re.search(r'mCurrentFocus=.*NotesActivity', self.adb.shell('dumpsys window')),
-                              'NotesActivity focus')
+        # The window carries the launched component's name: the alias when the activity starts fresh.
+        focus = self.wait_for(lambda: re.search(r'mCurrentFocus=.*(NotesActivity|NotesEditorAlias)',
+                                                self.adb.shell('dumpsys window')), 'NotesActivity focus')
         if self.verbose:
             self.log(focus.group(0))
-        new = self.wait_for(lambda: self.adb.node('notes_new'), 'new-note button')
+        # An element without children is falsy; wrap it so wait_for sees the found button.
+        new, = self.wait_for(lambda: (node,) if (node := self.adb.node('notes_new')) is not None else None,
+                             'new-note button')
         existing = set(json.loads(self.adb.broadcast('notes'))['ids'])
         self.adb.shell('input tap %d %d' % center(new.get('bounds')))
         # Never type into a note that existed before the run.
@@ -528,11 +536,21 @@ class Session:
         self.log('opened a new note in NotesActivity')
 
     def software_keys(self):
+        return {target: point for target, point in self.screen_targets().items()
+                if target.startswith('plektra_key_')}
+
+    def screen_targets(self):
+        """Software keys, the bar's emoji button, picker cells and the skin-tone popup with screen centers."""
         data = self.adb.broadcast('inspect')
-        keys = {}
+        targets = {}
         for match in re.finditer(r'SoftwareKey: id=([^,]+), label=.*?, screen=(-?\d+),(-?\d+)', data):
-            keys.setdefault(match.group(1), (int(match.group(2)), int(match.group(3))))
-        return keys
+            targets.setdefault(match.group(1), (int(match.group(2)), int(match.group(3))))
+        for match in re.finditer(r'BarButton: id=(\w+), screen=(-?\d+),(-?\d+)', data):
+            targets.setdefault(f'bar:{match.group(1)}', (int(match.group(2)), int(match.group(3))))
+        for match in re.finditer(r'EmojiTarget: kind=(cell|variant), text=(.*?), screen=(-?\d+),(-?\d+)', data):
+            prefix = 'emoji' if match.group(1) == 'cell' else 'variant'
+            targets.setdefault(f'{prefix}:{match.group(2)}', (int(match.group(3)), int(match.group(4))))
+        return targets
 
     def note_body(self):
         """Text and focus of the real editor, read in the app; the UI dump shows the hint when empty."""
@@ -556,10 +574,10 @@ class Session:
                 self.uinput.key(op['scan'], op['down'])
             elif kind == 'touch':
                 if op['down']:
-                    screen_keys = self.software_keys()
+                    screen_keys = self.screen_targets()
                     if op['target'] not in screen_keys:
-                        raise FlowError(f'line {op["line"]}: {op["target"]} is not on the visible software '
-                                        f'keyboard (visible: {", ".join(sorted(screen_keys)) or "none"})')
+                        raise FlowError(f'line {op["line"]}: {op["target"]} is not on screen '
+                                        f'(visible: {", ".join(sorted(screen_keys)) or "none"})')
                 self.uinput.touch(op['target'], screen_keys.get(op['target']), op['down'])
             elif kind == 'expect':
                 deadline, text = time.monotonic() + 3, None
@@ -621,12 +639,18 @@ def finish(session, error):
         raise FlowError('cleanup failed: ' + '; '.join(failures))
 
 
+def needs_hardware(steps):
+    """Screen-only flows also run on devices without a built-in keyboard."""
+    return any(step.surface == 'hw' or step.action == 'require-profile' for step in steps)
+
+
 def command_plan(session, path):
     """Print the intermediate operations without injecting input.
 
     The mapping comes from the IME's currently loaded layout; focus a text field first."""
     steps = parse_flow(Path(path).read_text(encoding='utf-8'))
-    session.load_reference()
+    if needs_hardware(steps):
+        session.load_reference()
     keymap = json.loads(session.adb.broadcast('keymap'))
     for op in plan(steps, keymap, session.key_layout):
         print(json.dumps(op, ensure_ascii=False))
@@ -638,8 +662,7 @@ def command_run(session, path):
     session.preflight()
     error = None
     try:
-        session.load_reference()
-        if 'hw' in surfaces or any(step.action == 'require-profile' for step in steps):
+        if needs_hardware(steps):
             session.start_hardware()
         if 'screen' in surfaces:
             session.start_touch()

@@ -1361,33 +1361,46 @@ class EmojiPickerView(
             orientation = LinearLayout.VERTICAL
             setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
             gravity = Gravity.CENTER
+            tag = VARIANTS_POPUP_TAG
         }
 
         var popup: PopupWindow? = null
         val options = listOf(entry.base) + entry.variants
-        // One row per six: the plain emoji and its five skin tones; two-person emoji wrap.
-        val rows = options.chunked(VARIANTS_PER_ROW).map { _ ->
-            LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER
-                container.addView(this)
-            }
-        }
-        options.forEachIndexed { index, emoji ->
-            val row = rows[index / VARIANTS_PER_ROW]
-            val textView = TextView(context).apply {
+        val cells = options.map { emoji ->
+            TextView(context).apply {
                 text = EmojiRendering.forDisplay(context, emoji)
                 contentDescription = emoji
                 textSize = 24f
                 gravity = Gravity.CENTER
                 setPadding(itemHorizontalPadding, itemVerticalPadding, itemHorizontalPadding, itemVerticalPadding)
                 setTextColor(themeOverride?.textAndIcons ?: Color.BLACK)
+                setOnClickListener {
+                    onEmojiSelected(emoji, categoryId)
+                    popup?.dismiss()
+                }
+                measure(
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                )
             }
-            textView.setOnClickListener {
-                onEmojiSelected(emoji, categoryId)
-                popup?.dismiss()
-            }
-            row.addView(textView)
+        }
+        // The popup lives in the IME window; on a narrow one (a foldable's outer display, large
+        // text) six cells per row would be wider than the window.
+        val windowWidth = anchor.rootView.width.takeIf { it > 0 } ?: context.resources.displayMetrics.widthPixels
+        // Up to one row per six: the plain emoji and its five skin tones; two-person emoji wrap.
+        val perRow = EmojiVariantsPopupLayout.perRow(
+            optionCount = cells.size,
+            cellWidth = cells.maxOf { it.measuredWidth },
+            horizontalPadding = 2 * horizontalPadding,
+            windowWidth = windowWidth,
+            maxPerRow = VARIANTS_PER_ROW
+        )
+        cells.chunked(perRow).forEach { rowCells ->
+            container.addView(LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+                rowCells.forEach(::addView)
+            })
         }
 
         container.measure(
@@ -1410,14 +1423,11 @@ class EmojiPickerView(
         // Position popup above the anchor
         val location = IntArray(2)
         anchor.getLocationInWindow(location)
-        val windowWidth = context.resources.displayMetrics.widthPixels
         val popupWidth = container.measuredWidth
         val popupHeight = container.measuredHeight
         val anchorX = location[0]
         val anchorY = location[1]
-        val desiredX = anchorX + (anchor.width - popupWidth) / 2
-        val clampedX = desiredX.coerceIn(0, windowWidth - popupWidth)
-        val xOffset = clampedX - anchorX
+        val xOffset = EmojiVariantsPopupLayout.left(anchorX, anchor.width, popupWidth, windowWidth) - anchorX
         val desiredYOffset = -(popupHeight + anchor.height)
         val minYOffset = -(anchorY + anchor.height)
         val yOffset = maxOf(desiredYOffset, minYOffset)
@@ -1735,6 +1745,8 @@ class EmojiPickerView(
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_EMOJI = 1
         private const val VARIANTS_PER_ROW = 6
+        /** Tag of the skin-tone popup's content, for tests that look for its window. */
+        const val VARIANTS_POPUP_TAG = "emoji_variants_popup"
 
         fun configuredHeightPx(context: Context): Int {
             val compactHeight = TypedValue.applyDimension(

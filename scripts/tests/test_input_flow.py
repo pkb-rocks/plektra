@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import xml.etree.ElementTree as ET
 
 spec = importlib.util.spec_from_file_location('input_flow', Path(__file__).resolve().parents[1] / 'input_flow.py')
 flow = importlib.util.module_from_spec(spec)
@@ -82,6 +83,17 @@ class PlanTest(unittest.TestCase):
         ops = self.plan('screen hold plektra_key_shift\nscreen press plektra_key_a\nscreen release plektra_key_shift')
         self.assertEqual([('plektra_key_shift', True), ('plektra_key_a', True), ('plektra_key_a', False),
                           ('plektra_key_shift', False)], edges(ops))
+
+    def test_screen_targets_include_the_emoji_picker(self):
+        ops = self.plan('screen press bar:emoji\nscreen hold emoji:👋\nwait 1000\nscreen release emoji:👋\n'
+                        'screen press variant:👋🏽')
+        self.assertEqual([('bar:emoji', True), ('bar:emoji', False), ('emoji:👋', True), ('emoji:👋', False),
+                          ('variant:👋🏽', True), ('variant:👋🏽', False)], edges(ops))
+
+    def test_screen_only_flows_need_no_hardware_keyboard(self):
+        self.assertFalse(flow.needs_hardware(flow.parse_flow('screen press bar:emoji\nexpect x')))
+        self.assertTrue(flow.needs_hardware(flow.parse_flow('screen press bar:emoji\nhw press Q\nexpect x')))
+        self.assertTrue(flow.needs_hardware(flow.parse_flow('require profile p\nexpect x')))
 
 
 class RepeatedKeyTest(unittest.TestCase):
@@ -270,8 +282,28 @@ class NoteBodyTest(unittest.TestCase):
         with self.assertRaisesRegex(flow.FlowError, 'new note'):
             session.open_new_note(False)
 
+    def test_finds_a_new_note_button_without_child_nodes(self):
+        # A parsed element without children is falsy; the Fold reports the alias as focused window.
+        notes = ['{"ids":["old"],"active":"old"}', '{"ids":["old"],"active":"old"}',
+                 '{"ids":["old","new"],"active":"new"}']
+        session = flow.Session(FakeAdb({'notes': notes, 'noteBody': '{"text":"","focused":true}'}))
+        session.timeout = 0.5
+        session.adb.node = lambda resource_id: ET.fromstring('<node bounds="[0,0][10,10]"/>')
+        session.adb.shell = lambda command, check=True, timeout=30: (
+            'mCurrentFocus=Window{1 u0 rocks.pkb.plektra.nightly/rocks.pkb.plektra.NotesEditorAlias}')
+        session.open_new_note(False)
+
 
 class DeviceHelpersTest(unittest.TestCase):
+    def test_screen_targets_read_keys_bar_button_cells_and_variants(self):
+        inspect = ('SoftwareKey: id=plektra_key_q, label=q, screen=40,1700 | BarButton: id=emoji, screen=826,1507 | '
+                   'EmojiTarget: kind=cell, text=👋, screen=80,1660 | EmojiTarget: kind=cell, text=👋, screen=700,1660 | '
+                   'EmojiTarget: kind=variant, text=👋🏽, screen=540,1590')
+        session = flow.Session(FakeAdb({'inspect': inspect}))
+        self.assertEqual({'plektra_key_q': (40, 1700), 'bar:emoji': (826, 1507), 'emoji:👋': (80, 1660),
+                          'variant:👋🏽': (540, 1590)}, session.screen_targets())
+        self.assertEqual({'plektra_key_q': (40, 1700)}, session.software_keys())
+
     def test_touch_coordinates_follow_viewport(self):
         uinput = flow.Uinput.__new__(flow.Uinput)
         uinput.transform = {'logical': [0, 0, 1076, 1200], 'physical': [2, 0, 1078, 1200], 'device': [1080, 1200]}

@@ -1,0 +1,38 @@
+# Requires Sym edit shortcuts enabled and first-letter auto-capitalization disabled.
+require profile titan2elite_qwerty
+require layout qwerty
+hw type hello
+expect hello
+hw hold AGUI_SYM
+hw press A
+hw hold C
+wait 1200
+hw release C
+hw release AGUI_SYM
+expect hello
+hw hold AGUI_SYM
+hw press X
+hw release AGUI_SYM
+expect ""
+hw hold AGUI_SYM
+hw hold V
+wait 1200
+hw release AGUI_SYM
+wait 600
+hw release V
+expect hello
+hw hold AGUI_SYM
+hw press V
+hw release AGUI_SYM
+expect hellohello
+hw hold AGUI_SYM
+hw press A
+hw hold X
+wait 1200
+hw release X
+hw release AGUI_SYM
+expect ""
+hw hold AGUI_SYM
+hw press V
+hw release AGUI_SYM
+expect hellohello

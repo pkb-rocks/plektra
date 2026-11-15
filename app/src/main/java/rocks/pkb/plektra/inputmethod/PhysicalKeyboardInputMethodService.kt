@@ -46,6 +46,7 @@ import rocks.pkb.plektra.core.ModifierStateController
 import rocks.pkb.plektra.core.NavModeController
 import rocks.pkb.plektra.core.SymLayoutController
 import rocks.pkb.plektra.core.TextInputController
+import rocks.pkb.plektra.core.suggestions.NumberSuggestions
 import rocks.pkb.plektra.core.suggestions.SuggestionController
 import rocks.pkb.plektra.core.suggestions.SuggestionKind
 import rocks.pkb.plektra.core.suggestions.SuggestionResult
@@ -279,6 +280,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var currentPackageName: String? = null
     /** Per-app "never show the bar"; vetoes every IME surface while hardware input keeps working. */
     private var keyboardBarHiddenInEditor = false
+    private var numberSuggestionsInEditor = false
     
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
@@ -430,6 +432,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
         inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
         keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, info?.packageName)
+        numberSuggestionsInEditor = SettingsManager.isNumberSuggestionsActive(this, info)
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -1008,7 +1011,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             useEditTypeRanking = SettingsManager.getUseEditTypeRanking(this),
             frenchPunctuationSpacing = SettingsManager.shouldApplyFrenchPunctuationSpacing(this),
             commaSpace = SettingsManager.getCommaSpace(this),
-            autoSpacePunctuation = SettingsManager.getAutoSpacePunctuation(this)
+            autoSpacePunctuation = SettingsManager.getAutoSpacePunctuation(this),
+            numberSuggestionsEnabled = numberSuggestionsInEditor
         )
     }
 
@@ -1529,7 +1533,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     forceWordStartCapital,
                     locale
                 )
-                SuggestionKind.CURRENT_WORD -> suggestion.candidate
+                SuggestionKind.CURRENT_WORD,
+                SuggestionKind.NUMBER -> suggestion.candidate
             }
         }
     }
@@ -1956,7 +1961,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             onSuggestionsUpdated = { suggestions -> handleSuggestionsUpdated(suggestions) },
             currentLocale = initialLocale,
             keyboardLayoutProvider = { SettingsManager.getKeyboardLayout(this) },
-            activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() }
+            activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() },
+            numberDigitMapProvider = {
+                if (::alternateCharacterManager.isInitialized) {
+                    NumberSuggestions.digitMap(
+                        alternateCharacterManager.getAltModifierMappings(),
+                        LayoutMappingRepository::getLowercase
+                    )
+                } else {
+                    emptyMap()
+                }
+            }
         )
         inputEventRouter.suggestionController = suggestionController
         

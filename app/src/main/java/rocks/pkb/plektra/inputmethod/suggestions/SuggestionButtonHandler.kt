@@ -6,6 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.core.suggestions.CasingHelper
+import rocks.pkb.plektra.core.suggestions.NumberSuggestions
 import rocks.pkb.plektra.inputmethod.AutoCapitalizeHelper
 import rocks.pkb.plektra.inputmethod.DebugCaptureStore
 import rocks.pkb.plektra.inputmethod.VariationButtonHandler
@@ -105,8 +106,14 @@ object SuggestionButtonHandler {
             break
         }
 
-        val wordBeforeCursor = before.substring(start)
         val wordAfterCursor = after.substring(0, end)
+        // A separator-joined number ("250.000" for "ed0.000") spans several words.
+        val numberTokenLength = if (wordAfterCursor.isEmpty()) {
+            NumberSuggestions.typedLengthForSuggestion(before, suggestion)
+        } else {
+            null
+        }
+        val wordBeforeCursor = numberTokenLength?.let { before.takeLast(it) } ?: before.substring(start)
         val currentWord = wordBeforeCursor + wordAfterCursor
 
         // Delete the full word around the cursor

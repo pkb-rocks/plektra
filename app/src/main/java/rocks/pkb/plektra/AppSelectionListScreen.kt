@@ -72,6 +72,22 @@ fun KeyboardBarHiddenAppsScreen(
     )
 }
 
+@Composable
+fun NumberSuggestionsExcludedAppsScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit
+) {
+    AppSelectionListScreen(
+        modifier = modifier,
+        onBack = onBack,
+        titleRes = R.string.number_suggestions_excluded_apps_title,
+        descriptionRes = R.string.number_suggestions_excluded_apps_description,
+        webApkNoteRes = R.string.number_suggestions_excluded_apps_webapk_note,
+        readPackages = SettingsManager::getNumberSuggestionsExcludedPackages,
+        setSelected = SettingsManager::setNumberSuggestionsExcludedApp
+    )
+}
+
 /** A per-app package list: the apps picked here get one setting switched on. */
 @Composable
 private fun AppSelectionListScreen(

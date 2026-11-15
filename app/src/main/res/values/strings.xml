@@ -270,6 +270,13 @@
     <string name="auto_correct_keyboard_proximity_description">Filter unlikely typos based on key distance (QWERTY/AZERTY/QWERTZ)</string>
     <string name="auto_correct_edit_type_ranking_title">Edit Type Ranking</string>
     <string name="auto_correct_edit_type_ranking_description">Rank suggestions by edit type (insert > substitute > delete)</string>
+    <string name="number_suggestions_title">Number suggestions</string>
+    <string name="number_suggestions_description">Letters on the Alt digit keys are also offered as numbers: w00 → 100, ed0.000 → 250.000. Real words come first</string>
+    <string name="number_suggestions_excluded_apps_title">Number suggestions: excluded apps</string>
+    <string name="number_suggestions_excluded_apps_row_description">Apps where typed letters are never offered as numbers</string>
+    <string name="number_suggestions_excluded_apps_description">In the apps you pick here, Plektra never suggests or auto-corrects letters typed on the Alt digit keys into numbers (for example w00 into 100). Normal word suggestions and auto-correction are unchanged.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Web app — types inside %1$s, so %1$s is excluded too</string>
+    <string name="kw_auto_correction_number_suggestions">numbers, digits, alt, w00, 100, convert, per app, exclude</string>
     <string name="clear">Clear</string>
     <string name="experimental_suggestions_title">Experimental suggestions</string>
     <string name="experimental_suggestions_subtitle">Enable the new dictionary/suggestion engine (beta)</string>

@@ -11,5 +11,6 @@ data class SuggestionSettings(
     val useEditTypeRanking: Boolean = false,
     val frenchPunctuationSpacing: Boolean = false,
     val commaSpace: Boolean = false,
-    val autoSpacePunctuation: String = rocks.pkb.plektra.core.Punctuation.DEFAULT_AUTO_SPACE
+    val autoSpacePunctuation: String = rocks.pkb.plektra.core.Punctuation.DEFAULT_AUTO_SPACE,
+    val numberSuggestionsEnabled: Boolean = false
 )

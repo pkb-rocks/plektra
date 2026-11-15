@@ -60,6 +60,10 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
                         lines += "SoftwareKey: id=${key.resourceName}, label=${key.label}, screen=${position[0] + key.bounds.centerX()},${position[1] + key.bounds.centerY()}"
                     }
                 }
+                if (view is rocks.pkb.plektra.inputmethod.ui.EmojiPickerView) {
+                    val position = IntArray(2).also(view::getLocationOnScreen)
+                    lines += "EmojiPicker: screen=${position[0]},${position[1]}, size=${view.width}x${view.height}, params=${view.layoutParams?.height}, parent=${(view.parent as? android.view.View)?.height}, search=${view.isSearchPanelShowing()}"
+                }
                 if (view is rocks.pkb.plektra.inputmethod.ImeChromeLayout) {
                     lines += "chrome=${view.width}x${view.height}, integrated=${view.contourIntegratedIndicators}, indicator=${view.indicatorView?.height}, rowTop=${rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.bottomRowTop(view)}, rowRadius=${rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.bottomRowRadius(view)}, software=${view.softwareKeyboardModeActive}"
                 }
@@ -92,6 +96,12 @@ class KeyboardBarTestReceiver : BroadcastReceiver() {
                     view.contentDescription?.toString() == context.getString(R.string.status_bar_button_emoji_description)) {
                     visibleCenter(view)?.let { (x, y) ->
                         lines += "BarButton: id=emoji, screen=$x,$y"
+                    }
+                }
+                if (targetKind == "cell" && view is android.widget.ImageView && view.hasOnClickListeners() &&
+                    view.contentDescription?.toString() == context.getString(R.string.emoji_picker_search_label)) {
+                    visibleCenter(view)?.let { (x, y) ->
+                        lines += "PickerControl: id=search, screen=$x,$y"
                     }
                 }
                 if (targetKind != null && view is android.widget.TextView && view !is android.widget.EditText &&

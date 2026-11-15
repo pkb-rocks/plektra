@@ -20,7 +20,7 @@ One step per line; `#` starts a comment.
 | `hw press KEY` | Presses and releases one key, named by its key layout label (`Q`, `ALT_LEFT`, `SHIFT_RIGHT`, `AGUI_SYM`, `ENTER`, `DEL`) |
 | `hw hold KEY` / `hw release KEY` | Keeps a key down across later steps, for chords and long presses |
 | `screen type TEXT` | Taps the software keys for TEXT; uppercase letters tap `plektra_key_shift` first |
-| `screen press ID` | Taps one target: a software key by accessibility id (`plektra_key_q`), the bar's emoji button (`bar:emoji`), a visible emoji picker cell (`emoji:👋`) or a skin tone in the open long-press popup (`variant:👋🏽`) |
+| `screen press ID` | Taps one target: a software key by accessibility id (`plektra_key_q`), the bar's emoji button (`bar:emoji`), the full emoji picker's search button (`picker:search`), a visible emoji picker cell (`emoji:👋`) or a skin tone in the open long-press popup (`variant:👋🏽`) |
 | `screen hold ID` / `screen release ID` | Keeps a finger down, for example for a long press on an emoji cell; further touches use additional fingers |
 | `wait MS` | Pauses, for example inside a hold for a long press |
 | `expect TEXT` | Waits up to 3 s until the note body equals TEXT exactly |

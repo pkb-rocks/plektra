@@ -1,9 +1,10 @@
 # Titan 2 Elite hardware keyboard: with "Keep the emoji picker open after typing an emoji" off, the
-# full emoji picker opened with SYM closes after an emoji and after a skin tone, and the next key
-# types into the editor, whatever the SYM auto-close settings.
+# full emoji picker opened with SYM closes after an emoji, after a skin tone and after a search
+# result, and the next key types into the editor, whatever the SYM auto-close settings. The next
+# opening shows the emoji grid again instead of the old search.
 # Needs the setting off (the runner does not change settings), the SYM page "Emoji picker" enabled
 # after the default pages (device, emoji, symbols; SYM four times opens it), 😀 and 👋🏽 visible when
-# the picker opens (recents or the first page).
+# the picker opens (recents or the first page) and 🚀 among the results for "rocket".
 require profile titan2elite_qwerty
 require layout qwerty
 preserve keyboard mode
@@ -30,3 +31,25 @@ screen press variant:👋🏿
 wait 500
 hw type b
 expect Ok😀a👋🏿b
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press picker:search
+wait 500
+hw type rocket
+wait 800
+screen press emoji:🚀
+wait 500
+hw type c
+expect Ok😀a👋🏿b🚀c
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+hw press AGUI_SYM
+wait 800
+screen press emoji:😀
+wait 500
+hw type d
+expect Ok😀a👋🏿b🚀c😀d

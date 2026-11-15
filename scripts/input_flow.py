@@ -38,8 +38,9 @@ ROOT = Path(__file__).resolve().parents[1]
 RECEIVER = 'rocks.pkb.plektra.KeyboardBarTestReceiver'
 NOTES_ALIAS = 'rocks.pkb.plektra.NotesEditorAlias'
 SURFACES = ('hw', 'screen')
-# Software keys by accessibility id, the bar's emoji button, picker cells and skin-tone variants by text.
-SCREEN_TARGET_PREFIXES = ('plektra_key_', 'bar:', 'emoji:', 'variant:')
+# Software keys by accessibility id, the bar's emoji button, the picker's search button, picker cells
+# and skin-tone variants by text.
+SCREEN_TARGET_PREFIXES = ('plektra_key_', 'bar:', 'emoji:', 'variant:', 'picker:')
 ACTIONS = ('type', 'press', 'hold', 'release')
 # Mirrors AospKeyboardView.accessibilityTextToken for characters typed on screen.
 SCREEN_TOKENS = {
@@ -184,7 +185,7 @@ def plan(steps, keymap=None, key_codes=None, press_ms=40, gap_ms=40):
         else:
             if not key.startswith(SCREEN_TARGET_PREFIXES):
                 raise FlowError(f'line {line}: screen targets are accessibility ids such as plektra_key_q, '
-                                'bar:emoji, emoji:TEXT or variant:TEXT')
+                                'bar:emoji, picker:search, emoji:TEXT or variant:TEXT')
             ops.append({'line': line, 'op': 'touch', 'down': down, 'target': key})
 
     def separate_repeat(line, keys):
@@ -547,13 +548,16 @@ class Session:
                 if target.startswith('plektra_key_')}
 
     def screen_targets(self):
-        """Software keys, the bar's emoji button, picker cells and the skin-tone popup with screen centers."""
+        """Software keys, the bar's emoji button, the picker's search button, picker cells and the skin-tone
+        popup with screen centers."""
         data = self.adb.broadcast('inspect')
         targets = {}
         for match in re.finditer(r'SoftwareKey: id=([^,]+), label=.*?, screen=(-?\d+),(-?\d+)', data):
             targets.setdefault(match.group(1), (int(match.group(2)), int(match.group(3))))
         for match in re.finditer(r'BarButton: id=(\w+), screen=(-?\d+),(-?\d+)', data):
             targets.setdefault(f'bar:{match.group(1)}', (int(match.group(2)), int(match.group(3))))
+        for match in re.finditer(r'PickerControl: id=(\w+), screen=(-?\d+),(-?\d+)', data):
+            targets.setdefault(f'picker:{match.group(1)}', (int(match.group(2)), int(match.group(3))))
         for match in re.finditer(r'EmojiTarget: kind=(cell|variant), text=(.*?), screen=(-?\d+),(-?\d+)', data):
             prefix = 'emoji' if match.group(1) == 'cell' else 'variant'
             targets.setdefault(f'{prefix}:{match.group(2)}', (int(match.group(3)), int(match.group(4))))

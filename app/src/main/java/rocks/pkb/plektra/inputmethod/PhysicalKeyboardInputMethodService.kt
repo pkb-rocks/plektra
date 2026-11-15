@@ -183,6 +183,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var activeKeyboardLayoutName: String = "qwerty"
     private var consumeAltEnterUntilKeyUp: Boolean = false
     private val consumedLanguageSwitchKeys = mutableSetOf<Int>()
+    // Keys whose Sym+C/V/X/A edit action ran: their repeats and release must not type.
+    private val consumedSymEditKeys = mutableSetOf<Int>()
     private var dispatchingSoftwareKeyboardKey: Boolean = false
     
     // Aggiungi per Power Shortcuts
@@ -3276,6 +3278,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         symTogglePendingOnKeyUp = false
         symChordUsedSinceKeyDown = false
         symPhysicallyPressed = false
+        consumedSymEditKeys.clear()
 
         modifierStateController.resetModifiers(
             preserveNavMode = preserveNavMode,
@@ -4905,6 +4908,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         if (event_?.repeatCount == 0) consumedLanguageSwitchKeys.remove(keyCode_)
         else if (keyCode_ in consumedLanguageSwitchKeys) return true
+        // Held after its edit action ran, even once Sym, Alt or the setting changed.
+        if (event_?.repeatCount == 0) consumedSymEditKeys.remove(keyCode_)
+        else if (keyCode_ in consumedSymEditKeys) return true
         val languageCtrl = event?.isCtrlPressed == true || ctrlPressed || ctrlPhysicallyPressed ||
             ctrlLatchActive || ctrlOneShot || ctrlLatchFromNavMode
         val languageAlt = event?.isAltPressed == true || altPressed || altPhysicallyPressed || altLatchActive || altOneShot
@@ -5088,6 +5094,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             val action = SymEditShortcuts.perform(keyCode, altActive, currentInputConnection)
             if (action != null) {
                 symChordUsedSinceKeyDown = true
+                consumedSymEditKeys.add(keyCode_)
                 KeyboardEventTracker.notifyKeyEvent(
                     keyCode = keyCode,
                     event = event,
@@ -5734,6 +5741,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
             return true
         }
+        if (consumedSymEditKeys.remove(keyCode_)) return true
 
         // Check if we have an editable field at the start (same logic as onKeyDown)
         val info = currentInputEditorInfo

@@ -1,0 +1,21 @@
+# Titan 2 Elite: a held Sym+A selects all once; its key repeats, also after Sym is released first,
+# must not replace the selection, and A types again after a full release.
+# Requires auto-capitalization of the first letter disabled.
+# Needs the opt-in setting for the Sym+C/V/X/A edit shortcuts; the runner does not change settings.
+require profile titan2elite_qwerty
+require layout qwerty
+hw type hello
+expect hello
+hw hold AGUI_SYM
+hw hold A
+# Longer than the key repeat delay, so A repeats while Sym is down.
+wait 1200
+hw release AGUI_SYM
+# A keeps repeating without Sym.
+wait 1200
+hw release A
+expect hello
+hw type x
+expect x
+hw type a
+expect xa

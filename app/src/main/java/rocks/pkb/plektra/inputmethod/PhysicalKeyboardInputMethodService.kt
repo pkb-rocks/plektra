@@ -283,7 +283,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
     private val CURSOR_UPDATE_DELAY = 50L
-    private val MULTI_TAP_TIMEOUT_MS = 400L
 
     // Modifier/nav/SYM controllers
     private lateinit var modifierStateController: ModifierStateController
@@ -343,7 +342,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val multiTapHandler = Handler(Looper.getMainLooper())
     private val multiTapController = MultiTapController(
         handler = multiTapHandler,
-        timeoutMs = MULTI_TAP_TIMEOUT_MS
+        timeoutMs = MultiTapController.TIMEOUT_MS
     )
     private val bounceKeyFilter = BounceKeyFilter()
     private val clicksPowerShiftTapFilter = ClicksPowerShiftTapFilter()

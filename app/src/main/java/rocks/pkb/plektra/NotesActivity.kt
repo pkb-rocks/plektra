@@ -149,7 +149,8 @@ open class NotesActivity : Activity() {
             tabs.addView(tab)
         }
         navigation.addView(tabs, LinearLayout.LayoutParams(-2, dp(48)))
-        navigation.addView(iconAction(R.drawable.ic_notes_add, R.string.notes_new) { switchNote(notes.create(), focusHeading = true) })
+        navigation.addView(iconAction(R.drawable.ic_notes_add, R.string.notes_new) { switchNote(notes.create(), focusHeading = true) }
+            .apply { id = R.id.notes_new })
         navigation.addView(iconAction(R.drawable.ic_notes_more, R.string.notes_title) { showNotes() })
         var titleOnSeparateLine = false
         root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->

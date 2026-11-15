@@ -24,6 +24,9 @@ class MultiTapController(
     private val handler: Handler,
     private val timeoutMs: Long
 ) {
+    companion object {
+        const val TIMEOUT_MS = 400L
+    }
 
     val state = MultiTapState()
 

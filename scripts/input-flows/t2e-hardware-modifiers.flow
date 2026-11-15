@@ -1,0 +1,14 @@
+# Titan 2 Elite hardware keyboard: letters, held Shift and Alt chords, Enter.
+require profile titan2elite_qwerty
+require layout qwerty
+hw type "hello "
+hw hold SHIFT_RIGHT
+hw press W
+hw release SHIFT_RIGHT
+hw type orld
+hw hold ALT_LEFT
+hw press B
+hw release ALT_LEFT
+expect "hello World!"
+hw type "\nx 1"
+expect "hello World!\nx 1"

@@ -106,6 +106,8 @@
       "rocks.pkb.plektra.inputmethod.ui.CursorSwipeLayoutTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiPickerOnScreenSearchTest",
       "rocks.pkb.plektra.inputmethod.ui.EmojiPickerViewSearchInputTest",
+      "rocks.pkb.plektra.inputmethod.ui.EmojiVariantsPopupLayoutTest",
+      "rocks.pkb.plektra.inputmethod.ui.EmojiVariantsPopupTest",
       "rocks.pkb.plektra.inputmethod.ui.LedStatusRenderingTest",
       "rocks.pkb.plektra.inputmethod.ui.LedStatusViewTest",
       "rocks.pkb.plektra.inputmethod.ui.ModifierLedLayoutTest"

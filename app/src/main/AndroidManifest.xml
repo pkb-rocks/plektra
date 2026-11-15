@@ -221,6 +221,7 @@
         <!-- Servizio di immissione per tastiera fisica -->
         <service
             android:name=".inputmethod.PhysicalKeyboardInputMethodService"
+            android:directBootAware="true"
             android:label="${imeLabel}"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">

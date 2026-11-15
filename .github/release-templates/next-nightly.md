@@ -1,16 +1,22 @@
-# Plektra Nightly · 26.10
+# Plektra Nightly · 26.11
 
-Changes since `26.10-nightly.09.203552Z`:
+Changes since `26.10-nightly.25.221136Z`:
 
-- **Voice input:** choose the system recognizer, FUTO Voice Input, OpenAI or OpenRouter in [Voice input settings](https://pkb.rocks/settings/speech.provider). FUTO uses its enabled auxiliary voice keyboard and returns through Android's IME handoff; if it is missing, Plektra offers [FUTO's F-Droid repository](https://app.futo.org/fdroid/repo/). Cloud providers require your own API credentials and send audio to the selected service.
-- **Dictation previews and limits:** [continuous preview](https://pkb.rocks/settings/speech.preview), a [pause threshold](https://pkb.rocks/settings/speech.pause), and a [maximum duration](https://pkb.rocks/settings/speech.duration). Duration choices are 1, 3, 5, 10 or 15 minutes, or unlimited. File-backed recording and streaming bound audio buffering. System recognition may handle pause timing differently depending on its provider.
-- **Previous language:** enable [Alt+Space to cycle backwards](https://pkb.rocks/settings/custom_input_styles.alt_space_previous_language) or [Ctrl with the software language key](https://pkb.rocks/settings/custom_input_styles.ctrl_language_previous). Both directions use the visible input languages. The Alt+Space language option and Quick Launcher's Alt+Space action are mutually exclusive.
-- **BlackBerry keyboards:** the SYM and emoji grid includes the zero and currency keys. Shift, caps lock and one-shot Shift select the corresponding symbol mappings. The [voice shortcut](https://pkb.rocks/settings/text_input.alt_ctrl_speech_shortcut) uses Alt+0 on BlackBerry profiles; hardware options follow the selected device. Adapted from [Mircea Horea IONICĂ's work](https://github.com/mionica/pastiera/tree/main-q25), with attribution in the code and [port notes](https://github.com/pkb-rocks/plektra/blob/main/docs/ports/mionica-blackberry.md). Q25 and Key2 hardware acceptance remains outstanding.
-- **Clipboard privacy:** sensitive clipboard entries have a [separate retention period](https://pkb.rocks/settings/advanced.sensitive_clipboard_retention_time); [ordinary history retention](https://pkb.rocks/settings/advanced.clipboard_retention_time) remains independent. History access is blocked while the device is locked or the screen is off.
-- **Input and display fixes:** software Ctrl actions preserve key references; suggestions are more stable and bound processing of very long words. Titan 2 Elite corner controls follow the LED contour. LED-only mode now stops both rails at the outer corner slots. Capture palettes preserve custom variation-key heights. The product showcase and README now describe the current feature set and device coverage.
+- **Emoji, symbols and kaomoji:** new shared picker and search, skin-tone variants, expanded Unicode/CLDR data and bundled Noto emoji rendering. The full picker has its own stay-open setting. Narrow-window layouts, search height, hardware input and multi-character search have been improved.
+- **Uyghur input:** added layout and language support, with layout-aware hardware and software keys, Shift layers and multi-character letters. Long-press replacement preserves complete committed text.
+- **Keyboard modes and visibility:** phone keypads, a layout chooser and per-app visibility choices, including an option to never show the keyboard bar. Software-key secondary labels can be hidden. Hardware-keypad decisions respect app visibility and language shortcuts.
+- **Themes and compact bars:** photo backgrounds shared across keyboard surfaces, fallback colours when a photo is unavailable, and improved narrow-window labels and popups. Slim suggestions rows remain compact while keeping their controls usable.
+- **Typing fixes:** immediate sentence capitalization, manual Shift ownership, opening quotes and brackets, remapped autocorrection input, Alt Lock in calculator fields and optional SYM edit shortcuts. Beeper is included in experimental App Enter behaviour support.
+- **Settings, launcher and dictionaries:** clearer settings-search paths, better Quick Launcher selection and clipboard shortcuts, streamed custom dictionary imports and matching validation. Clipboard-history ownership and expiry scheduling have been hardened.
+- **Before the first unlock after restart:** Plektra can run with the saved layout and configured custom layouts, while dictionaries, clipboard history, text replacements and speech remain unavailable until unlock. A real Pixel 7a cold-boot check passed input-style cycling and continued input after unlock. On the Titan 2 Elite, Android still chose Kika and omitted Plektra from its locked-user IME list; that device limitation remains under investigation. See [Direct Boot behavior and verification](https://github.com/pkb-rocks/plektra/blob/direct-boot-ime/docs/direct-boot.md).
+
+## Known limitations
+
+- On the Pixel 7a, DE QWERTZ selected before unlock returned to an EN QWERTZ label afterwards. Input remained usable. Android's subtype selection and Plektra's stored layout are separate state; their exact transition remains under investigation. This Nightly retains the current layout carry-over behavior.
+- Titan 2 Elite input before the first unlock is not accepted by this release's device check. Q25 and Key2 hardware checks remain outstanding.
 
 ## Installation
 
 Update the existing `rocks.pkb.plektra.nightly` installation to keep its data. Choose **Full** for Clicks launcher-button interception, or **No accessibility** to omit that service. Normal keyboard features and TalkBack remain available in both. The variants share a package and replace each other.
 
-See [getting started](https://github.com/pkb-rocks/plektra/blob/main/docs/getting-started.md), [release channels](https://github.com/pkb-rocks/plektra/blob/main/docs/releasing.md), and [the product page](https://pkb.rocks/).
+See [getting started](https://github.com/pkb-rocks/plektra/blob/main/docs/getting-started.md) and [release channels](https://github.com/pkb-rocks/plektra/blob/main/docs/releasing.md).

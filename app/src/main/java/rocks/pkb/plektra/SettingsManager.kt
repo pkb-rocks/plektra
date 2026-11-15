@@ -3019,7 +3019,7 @@ object SettingsManager {
     /**
      * Saves custom SYM mappings.
      */
-    fun saveSymMappings(context: Context, mappings: Map<Int, String>) {
+    fun saveSymMappings(context: Context, mappings: Map<Int, String>): Unit = keyboardSourceChange(context) {
         try {
             val keyCodeToName = mapOf(
                 KeyEvent.KEYCODE_Q to "KEYCODE_Q", KeyEvent.KEYCODE_W to "KEYCODE_W",
@@ -3059,7 +3059,7 @@ object SettingsManager {
     /**
      * Resets custom SYM mappings back to defaults.
      */
-    fun resetSymMappings(context: Context) {
+    fun resetSymMappings(context: Context): Unit = keyboardSourceChange(context) {
         getPreferences(context).edit()
             .remove(KEY_SYM_MAPPINGS_CUSTOM)
             .apply()
@@ -3120,7 +3120,7 @@ object SettingsManager {
     /**
      * Saves custom SYM mappings for page 2.
      */
-    fun saveSymMappingsPage2(context: Context, mappings: Map<Int, String>) {
+    fun saveSymMappingsPage2(context: Context, mappings: Map<Int, String>): Unit = keyboardSourceChange(context) {
         try {
             val keyCodeToName = mapOf(
                 KeyEvent.KEYCODE_Q to "KEYCODE_Q", KeyEvent.KEYCODE_W to "KEYCODE_W",
@@ -3160,7 +3160,7 @@ object SettingsManager {
     /**
      * Resets custom SYM mappings for page 2 back to defaults.
      */
-    fun resetSymMappingsPage2(context: Context) {
+    fun resetSymMappingsPage2(context: Context): Unit = keyboardSourceChange(context) {
         getPreferences(context).edit()
             .remove(KEY_SYM_MAPPINGS_PAGE2_CUSTOM)
             .apply()
@@ -4508,11 +4508,13 @@ object SettingsManager {
     /**
      * Initializes the nav mode mappings file by copying from assets if it doesn't exist.
      */
-    fun initializeNavModeMappingsFile(context: Context) {
+    fun initializeNavModeMappingsFile(context: Context): Unit = keyboardSourceChange(context) {
+        // Before unlock filesDir is the published Direct Boot snapshot; the loader falls back to assets.
+        if (rocks.pkb.plektra.inputmethod.DirectBootStorage.isLocked(context)) return@keyboardSourceChange
         val mappingsFile = getNavModeMappingsFile(context)
         if (mappingsFile.exists()) {
             migrateNavModeMappingsFileIfNeeded(context)
-            return // File already exists, don't overwrite
+            return@keyboardSourceChange // File already exists, don't overwrite
         }
         
         try {
@@ -4586,7 +4588,7 @@ object SettingsManager {
     /**
      * Saves nav mode key mappings to the JSON file in filesDir.
      */
-    fun saveNavModeKeyMappings(context: Context, mappings: Map<Int, rocks.pkb.plektra.data.mappings.KeyMappingLoader.CtrlMapping>) {
+    fun saveNavModeKeyMappings(context: Context, mappings: Map<Int, rocks.pkb.plektra.data.mappings.KeyMappingLoader.CtrlMapping>): Unit = keyboardSourceChange(context) {
         try {
             val keyCodeToName = mapOf(
                 KeyEvent.KEYCODE_Q to "KEYCODE_Q", KeyEvent.KEYCODE_W to "KEYCODE_W",
@@ -4663,7 +4665,7 @@ object SettingsManager {
     /**
      * Resets nav mode key mappings to default by deleting the custom file.
      */
-    fun resetNavModeKeyMappings(context: Context) {
+    fun resetNavModeKeyMappings(context: Context): Unit = keyboardSourceChange(context) {
         try {
             val mappingsFile = getNavModeMappingsFile(context)
             if (mappingsFile.exists()) {
@@ -4690,6 +4692,10 @@ object SettingsManager {
         return mappingsFile.exists()
     }
     
+    /** Layout, mapping and selection changes reach the Direct Boot snapshot before returning. */
+    private inline fun <T> keyboardSourceChange(context: Context, change: () -> T): T =
+        rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig.changeSources(context, change)
+
     /**
      * Returns the selected keyboard layout name.
      */
@@ -4700,7 +4706,7 @@ object SettingsManager {
     /**
      * Sets the keyboard layout name.
      */
-    fun setKeyboardLayout(context: Context, layoutName: String) {
+    fun setKeyboardLayout(context: Context, layoutName: String): Unit = keyboardSourceChange(context) {
         getPreferences(context).edit()
             .putString(KEY_KEYBOARD_LAYOUT, layoutName)
             .apply()
@@ -4720,7 +4726,7 @@ object SettingsManager {
     /**
      * Enables/disables automatic keyboard layout resolution by locale mapping.
      */
-    fun setKeyboardLayoutAutoByLocale(context: Context, enabled: Boolean) {
+    fun setKeyboardLayoutAutoByLocale(context: Context, enabled: Boolean): Unit = keyboardSourceChange(context) {
         getPreferences(context).edit()
             .putBoolean(KEY_KEYBOARD_LAYOUT_AUTO_BY_LOCALE, enabled)
             .apply()
@@ -5068,31 +5074,25 @@ object SettingsManager {
             .apply()
     }
 
-    private fun normalizePhysicalKeyboardProfileOverride(profile: String?): String {
+    private val physicalKeyboardProfileOverrides = listOf(
+        "auto", "key2", "Q25", "titan", "titan2", "titan2elite_qwerty", "mp01", "clicks_razr", "clicks_pixel", "clicks_power"
+    )
+
+    /** The canonical spelling of a supported profile override; null for an unknown one. */
+    fun canonicalPhysicalKeyboardProfileOverride(profile: String?): String? {
         val normalized = profile?.trim().orEmpty()
-        return when {
-            normalized.equals("auto", ignoreCase = true) -> "auto"
-            normalized.equals("key2", ignoreCase = true) -> "key2"
-            normalized.equals("q25", ignoreCase = true) -> "Q25"
-            normalized.equals("titan", ignoreCase = true) -> "titan"
-            normalized.equals("titan2", ignoreCase = true) -> "titan2"
-            normalized.equals("titan2elite_qwerty", ignoreCase = true) -> "titan2elite_qwerty"
-            normalized.equals("mp01", ignoreCase = true) -> "mp01"
-            normalized.equals("clicks_razr", ignoreCase = true) -> "clicks_razr"
-            normalized.equals("clicks_pixel", ignoreCase = true) -> "clicks_pixel"
-            normalized.equals("clicks_power", ignoreCase = true) -> "clicks_power"
-            else -> DEFAULT_PHYSICAL_KEYBOARD_PROFILE_OVERRIDE
-        }
+        return physicalKeyboardProfileOverrides.firstOrNull { it.equals(normalized, ignoreCase = true) }
     }
 
-    private fun normalizePhysicalKeyboardCurrencySymbol(symbol: String?): String {
-        val normalized = symbol?.trim().orEmpty()
-        return if (normalized in physicalKeyboardCurrencySymbols()) {
-            normalized
-        } else {
-            DEFAULT_PHYSICAL_KEYBOARD_CURRENCY_SYMBOL
-        }
-    }
+    private fun normalizePhysicalKeyboardProfileOverride(profile: String?): String =
+        canonicalPhysicalKeyboardProfileOverride(profile) ?: DEFAULT_PHYSICAL_KEYBOARD_PROFILE_OVERRIDE
+
+    /** The canonical form of a supported currency symbol; null for an unknown one. */
+    fun canonicalPhysicalKeyboardCurrencySymbol(symbol: String?): String? =
+        symbol?.trim()?.takeIf { it in physicalKeyboardCurrencySymbols() }
+
+    private fun normalizePhysicalKeyboardCurrencySymbol(symbol: String?): String =
+        canonicalPhysicalKeyboardCurrencySymbol(symbol) ?: DEFAULT_PHYSICAL_KEYBOARD_CURRENCY_SYMBOL
 
     fun physicalKeyboardCurrencySymbols(): List<String> = listOf("€", "$", "£", "¥", "₹", "₽", "₿", "¤")
 
@@ -5138,14 +5138,14 @@ object SettingsManager {
      * Saves the list of keyboard layouts used for cycling.
      * The caller is responsible for also selecting the active layout via setKeyboardLayout().
      */
-    fun setKeyboardLayoutList(context: Context, layouts: List<String>) {
+    fun setKeyboardLayoutList(context: Context, layouts: List<String>): Unit = keyboardSourceChange(context) {
         val normalized = layouts.map { it.trim() }.filter { it.isNotBlank() }.distinct()
         if (normalized.isEmpty()) {
             // Clear the list to fall back to single-layout behaviour.
             getPreferences(context).edit()
                 .remove(KEY_KEYBOARD_LAYOUT_LIST)
                 .apply()
-            return
+            return@keyboardSourceChange
         }
         val array = org.json.JSONArray()
         normalized.forEach { array.put(it) }
@@ -5752,7 +5752,7 @@ object SettingsManager {
         staticVariations: List<String>,
         staticVariationsShift: List<String>,
         staticVariationsAlt: List<String>
-    ) {
+    ): Unit = keyboardSourceChange(context) {
         try {
             val currentJson = loadCurrentJson(context)
             val jsonObject = if (currentJson != null) {
@@ -5790,7 +5790,7 @@ object SettingsManager {
         staticVariations: List<String>? = null,
         staticVariationsShift: List<String>? = null,
         staticVariationsAlt: List<String>? = null
-    ) {
+    ): Unit = keyboardSourceChange(context) {
         try {
             val variationsObject = JSONObject()
             for ((letter, chars) in variations) {
@@ -5842,7 +5842,7 @@ object SettingsManager {
         }
     }
 
-    fun saveStaticVariationBasePreset(context: Context, staticVariations: List<String>) {
+    fun saveStaticVariationBasePreset(context: Context, staticVariations: List<String>): Unit = keyboardSourceChange(context) {
         try {
             val jsonObject = loadCurrentJson(context) ?: JSONObject()
             val staticArray = org.json.JSONArray()
@@ -5863,7 +5863,7 @@ object SettingsManager {
     /**
      * Resets variations back to defaults by copying defaultvariations.json from assets.
      */
-    fun resetVariationsToDefault(context: Context) {
+    fun resetVariationsToDefault(context: Context): Unit = keyboardSourceChange(context) {
         try {
             val variationsFile = getVariationsFile(context)
             val inputStream = context.assets.open("common/variations/defaultvariations.json")

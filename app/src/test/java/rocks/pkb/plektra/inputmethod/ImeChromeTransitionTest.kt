@@ -69,7 +69,11 @@ class ImeChromeTransitionTest {
         val windowManager = org.mockito.Mockito.mock(android.view.WindowManager::class.java)
         org.mockito.Mockito.`when`(windowManager.maximumWindowMetrics).thenReturn(
             android.view.WindowMetrics(android.graphics.Rect(0, 0, 1400, 2000), android.view.WindowInsets.Builder().build()))
-        org.robolectric.Shadows.shadowOf(context).setSystemService(android.content.Context.WINDOW_SERVICE, windowManager)
+        // The application's base context wraps ContextImpl for Direct Boot storage routing.
+        var impl: android.content.Context = context
+        while (impl is android.content.ContextWrapper) impl = impl.baseContext
+        org.robolectric.shadow.api.Shadow.extract<org.robolectric.shadows.ShadowContextImpl>(impl)
+            .setSystemService(android.content.Context.WINDOW_SERVICE, windowManager)
         val limit = 1000
         val chrome = ImeChromeLayout(context).apply { orientation = LinearLayout.VERTICAL }
         val row = View(context)

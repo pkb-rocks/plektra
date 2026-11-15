@@ -1,0 +1,10 @@
+# Unlocked-device regression through the normal hardware path after a Direct Boot build.
+# The first-unlock/password check remains manual; digits avoid capitalization dependencies.
+require profile titan2elite_qwerty
+hw type "123"
+expect "123"
+hw press DEL
+expect "12"
+hw press ENTER
+hw type "456"
+expect "12\n456"

@@ -16,27 +16,12 @@ Source attribution is retained next to adapted code. The shared symbol JSON entr
 Co-authored-by: Mircea Horea IONICĂ <6553639+mionica@users.noreply.github.com>
 ```
 
-## Direct Boot / before first unlock (BFU)
+## Direct Boot contribution
 
-The [original Direct Boot contribution](https://github.com/mionica/pastiera/commit/5da24e7634) inspired the storage audit and `DirectBootKeyboardConfig`.
-
-Plektra retains its credential-protected preferences and private files. A separate, reconstructible device-protected snapshot contains only:
-
-- A bundled keyboard layout identifier (custom layouts fall back to QWERTY).
-- A known physical keyboard profile.
-- A currency symbol from a fixed allowlist.
-- Shift, Alt and Ctrl tap-latch booleans and the clear-Alt-on-Space boolean.
-
-The snapshot is refreshed only after unlock, including subsequent changes to those settings. Unknown keys are purged when refreshing; the snapshot is excluded from backup and transfer. No snippets, clipboard history, recent emojis, learned words, launcher cache, custom text/mappings, speech credentials or other preferences are copied. Existing user preferences are not moved, replaced or deleted. Application initialization waits for user unlock before accessing them.
-
-**The IME is not marked `directBootAware`; full BFU input is not enabled by this port.** Its current startup initializes suggestion dictionaries, clipboard history, expansion sources, external integrations and multiple credential-protected files. Changing its manifest flag alone would expose those paths to locked storage failures. A subsequent BFU implementation needs an isolated input/lifecycle path, unlock handoff and cold-boot integration tests before enabling that flag.
-
-See [Android's Direct Boot guidance](https://developer.android.com/privacy-and-security/direct-boot): use device-protected storage only for data required before unlock, retain private information in credential-protected storage.
+The [original Direct Boot contribution](https://github.com/mionica/pastiera/commit/5da24e7634) inspired Plektra's storage audit and `DirectBootKeyboardConfig`. Issue #107 covered that preparation and explicitly deferred full before-first-unlock input. The subsequent implementation applies across supported devices; its architecture, device checks and follow-up work are documented in [Direct Boot](../direct-boot.md).
 
 ## Verification and limits
 
-Automated integration tests cover the rendered Q25/Key2 grid and touch commits, symbol case selection and serialization, existing device routing, and snapshot isolation/refresh behavior. The snapshot tests verify that private values never enter the device-protected store and credential-protected preferences remain unchanged.
-
-Q25 and Key2 hardware are unavailable. Their physical scancodes, voice launch and appearance are unverified on those devices. BFU input and a cold-boot unlock handoff are not accepted or claimed by these tests.
+Automated integration tests cover the rendered Q25/Key2 grid and touch commits, symbol case selection and serialization, and existing device routing. Q25 and Key2 hardware are unavailable; their physical scancodes, voice launch and appearance remain unverified.
 
 The speakerphone contribution and Romanian dictionary were not ported.

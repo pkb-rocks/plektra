@@ -37,7 +37,9 @@ class SuggestionController(
         Boolean
     ) -> DictionaryRepository)? = null,
     nextWordPredictorOverride: NextWordPredictor? = null,
-    private val activeSuggestionLocalesProvider: (() -> List<Locale>)? = null
+    private val activeSuggestionLocalesProvider: (() -> List<Locale>)? = null,
+    // False before the user unlocks: dictionaries, learned words and n-grams live in credential storage.
+    private val isStorageAvailable: () -> Boolean = { true }
 ) {
 
     private val appContext = context.applicationContext
@@ -569,7 +571,7 @@ class SuggestionController(
 
     private fun handleCompletedWordBoundary(completedWord: String?, boundaryChar: Char?) {
         val settings = settingsProvider()
-        if (!settings.suggestionsEnabled) {
+        if (!settings.suggestionsEnabled || !isStorageAvailable()) {
             previousCompletedWord = null
             latestSuggestions.set(emptyList())
             suggestionsListener?.invoke(emptyList())
@@ -767,6 +769,7 @@ class SuggestionController(
     }
 
     private fun scheduleRepositoryLoad(repository: DictionaryRepository, refreshAfterLoad: Boolean) {
+        if (!isStorageAvailable()) return
         if (refreshAfterLoad) {
             pendingExtraRefreshAfterLoad = true
         }
@@ -898,6 +901,7 @@ class SuggestionController(
     }
 
     private fun schedulePrimaryDictionaryLoad(refreshAfterLoad: Boolean) {
+        if (!isStorageAvailable()) return
         val repository = dictionaryRepository
         if (refreshAfterLoad) {
             pendingPrimaryRefreshAfterLoad = true

@@ -47,6 +47,16 @@ object EmojiRendering {
         EmojiSearchRepository.clearCache()
     }
 
+    /** Re-reads the persisted style and drops emoji data built for a different one. */
+    fun reloadStyle(context: Context) {
+        val previous = cachedStyle
+        cachedStyle = null
+        if (style(context) == previous) return
+        ensureInitialized(context)
+        EmojiRepository.clearCache()
+        EmojiSearchRepository.clearCache()
+    }
+
     fun usesBundledFont(context: Context): Boolean = style(context) == Style.NOTO
 
     /** Starts loading the bundled font in the background; safe to call repeatedly. */

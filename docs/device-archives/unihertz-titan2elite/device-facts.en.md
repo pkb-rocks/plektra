@@ -113,7 +113,7 @@ adb shell run-as rocks.pkb.plektra sh -c 'cd files && find .'
 
 Use the package name of the build under test (the official application ID is `rocks.pkb.plektra`; the IME service is `rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodService`, see `settings get secure default_input_method`). Never `am force-stop` the app or start its activity with `am start -S` while the IME is selected: that kills the IME and Android switches to another keyboard.
 
-1. `shared_prefs/plektra_prefs.xml` is the main preferences file; `shared_prefs/recent_emojis_prefs.xml` holds recent emoji. The device-protected copy `/data/user_de/0/<package>/shared_prefs/direct_boot_keyboard_config.xml` holds layout, modifier latches, currency symbol and the profile override for direct boot.
+1. `shared_prefs/plektra_prefs.xml` is the main preferences file; `shared_prefs/recent_emojis_prefs.xml` holds recent emoji. The device-protected copy for direct boot lives in `/data/user_de/0/<package>/files/direct_boot_files/`: the file `current` names the published generation, which holds `settings.json` with the allowlisted layout and input settings and `files/` with the functional parts of custom layouts, variations, nav mode and locale-to-layout mappings.
 2. `files/` holds `ctrl_key_mappings.json` (Ctrl navigation mappings), `user_defaults.json` (the user word list), `dictionaries_serialized/custom/`, `keyboard_layouts/` and `theme-images/` (created by a restore; may be empty).
 3. Backups are ZIP files named `plektra-backup-YYYYMMDD-HHMM.zip`. On the test phone they were saved to `/storage/emulated/0/Documents/Plektra/`; the folder is whatever the file picker was given. The ZIP contains `prefs/plektra_prefs.json`, `files/*`, `theme-images/manifest.json` and `backup_meta.json`.
 

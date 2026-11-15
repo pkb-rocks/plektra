@@ -1777,4 +1777,11 @@ QWERTZ σε φυσικό QWERTY
     <!-- Sym+C/V/X/A edit shortcuts toggle -->
     <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: αντιγραφή, επικόλληση, αποκοπή, επιλογή όλων</string>
     <string name="sym_edit_shortcuts_description">Σε πεδίο κειμένου, το Sym με C, V, X ή A επεξεργάζεται το κείμενο αντί να πληκτρολογεί σύμβολο ή να ανοίγει εφαρμογή. Όταν είναι ανενεργό, αυτοί οι τέσσερις συνδυασμοί επιστρέφουν στο επίπεδο SYM.</string>
+    <string name="number_suggestions_title">Προτάσεις αριθμών</string>
+    <string name="number_suggestions_description">Τα γράμματα στα πλήκτρα ψηφίων του Alt προτείνονται και ως αριθμοί: w00 → 100, ed0.000 → 250.000. Οι πραγματικές λέξεις έχουν προτεραιότητα</string>
+    <string name="number_suggestions_excluded_apps_title">Προτάσεις αριθμών: εξαιρούμενες εφαρμογές</string>
+    <string name="number_suggestions_excluded_apps_row_description">Εφαρμογές όπου τα γράμματα δεν προτείνονται ποτέ ως αριθμοί</string>
+    <string name="number_suggestions_excluded_apps_description">Στις εφαρμογές που επιλέγετε εδώ, το Plektra δεν προτείνει ούτε διορθώνει αυτόματα ποτέ σε αριθμούς τα γράμματα των πλήκτρων ψηφίων του Alt (για παράδειγμα w00 σε 100). Οι κανονικές προτάσεις λέξεων και η αυτόματη διόρθωση δεν αλλάζουν.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Εφαρμογή ιστού — πληκτρολογεί μέσα στο %1$s, οπότε εξαιρείται και το %1$s</string>
+    <string name="kw_auto_correction_number_suggestions">αριθμοί, ψηφία, alt, w00, 100, μετατροπή, ανά εφαρμογή, εξαίρεση</string>
 </resources>

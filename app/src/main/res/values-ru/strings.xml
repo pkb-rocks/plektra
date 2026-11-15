@@ -936,4 +936,11 @@ Nav Mode использует физическое положение клави
     <string name="software_keyboard_key_hints_title">Показывать дополнительные подписи</string>
     <string name="software_keyboard_key_hints_description">Показывает справа вверху альтернативу долгого нажатия, а слева внизу — символ Alt или SYM клавиши.</string>
     <string name="kw_on_screen_key_hints">подсказки клавиш, угловые подписи, долгое нажатие, Alt, SYM, дополнительные символы</string>
+    <string name="number_suggestions_title">Подсказки чисел</string>
+    <string name="number_suggestions_description">Буквы на цифровых клавишах Alt также предлагаются как числа: w00 → 100, ed0.000 → 250.000. Настоящие слова идут первыми</string>
+    <string name="number_suggestions_excluded_apps_title">Подсказки чисел: исключённые приложения</string>
+    <string name="number_suggestions_excluded_apps_row_description">Приложения, где введённые буквы никогда не предлагаются как числа</string>
+    <string name="number_suggestions_excluded_apps_description">В выбранных здесь приложениях Plektra никогда не предлагает и не исправляет автоматически буквы с цифровых клавиш Alt на числа (например, w00 на 100). Обычные подсказки слов и автозамена не меняются.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Веб-приложение — вводит внутри %1$s, поэтому %1$s тоже исключено</string>
+    <string name="kw_auto_correction_number_suggestions">числа, цифры, alt, w00, 100, преобразовать, для приложения, исключить</string>
 </resources>

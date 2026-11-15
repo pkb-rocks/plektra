@@ -935,4 +935,11 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="software_keyboard_key_hints_title">Afficher les libellés secondaires</string>
     <string name="software_keyboard_key_hints_description">Affiche en haut à droite l\'alternative d\'appui long et en bas à gauche le caractère Alt ou SYM des touches.</string>
     <string name="kw_on_screen_key_hints">indications des touches, libellés d\'angle, appui long, Alt, SYM, caractères secondaires</string>
+    <string name="number_suggestions_title">Suggestions de nombres</string>
+    <string name="number_suggestions_description">Les lettres des touches chiffres Alt sont aussi proposées comme nombres : w00 → 100, ed0.000 → 250.000. Les vrais mots passent en premier</string>
+    <string name="number_suggestions_excluded_apps_title">Suggestions de nombres : apps exclues</string>
+    <string name="number_suggestions_excluded_apps_row_description">Apps où les lettres tapées ne sont jamais proposées comme nombres</string>
+    <string name="number_suggestions_excluded_apps_description">Dans les apps choisies ici, Plektra ne propose ni ne corrige jamais automatiquement en nombres les lettres des touches chiffres Alt (par exemple w00 en 100). Les suggestions de mots et la correction automatique habituelles ne changent pas.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Application web : tape dans %1$s, donc %1$s est aussi exclu</string>
+    <string name="kw_auto_correction_number_suggestions">nombres, chiffres, alt, w00, 100, convertir, par app, exclure</string>
 </resources>

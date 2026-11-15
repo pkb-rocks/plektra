@@ -933,4 +933,11 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="software_keyboard_key_hints_title">Hiện nhãn phụ</string>
     <string name="software_keyboard_key_hints_description">Hiện ký tự thay thế khi nhấn giữ ở góc trên bên phải và ký tự Alt hoặc SYM ở góc dưới bên trái phím.</string>
     <string name="kw_on_screen_key_hints">gợi ý phím, nhãn góc, nhấn giữ, Alt, SYM, ký tự phụ</string>
+    <string name="number_suggestions_title">Gợi ý số</string>
+    <string name="number_suggestions_description">Các chữ trên phím số Alt cũng được gợi ý thành số: w00 → 100, ed0.000 → 250.000. Từ thật luôn được ưu tiên</string>
+    <string name="number_suggestions_excluded_apps_title">Gợi ý số: ứng dụng bị loại trừ</string>
+    <string name="number_suggestions_excluded_apps_row_description">Các ứng dụng mà chữ đã gõ không bao giờ được gợi ý thành số</string>
+    <string name="number_suggestions_excluded_apps_description">Trong các ứng dụng bạn chọn ở đây, Plektra không bao giờ gợi ý hay tự sửa chữ trên phím số Alt thành số (ví dụ w00 thành 100). Gợi ý từ và tự động sửa thông thường không thay đổi.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Ứng dụng web — gõ bên trong %1$s, nên %1$s cũng được loại trừ</string>
+    <string name="kw_auto_correction_number_suggestions">số, chữ số, alt, w00, 100, chuyển đổi, theo ứng dụng, loại trừ</string>
 </resources>

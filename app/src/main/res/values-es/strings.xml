@@ -935,4 +935,11 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="software_keyboard_key_hints_title">Mostrar etiquetas secundarias</string>
     <string name="software_keyboard_key_hints_description">Muestra arriba a la derecha la alternativa de pulsación larga y abajo a la izquierda el carácter Alt o SYM de las teclas.</string>
     <string name="kw_on_screen_key_hints">indicaciones de teclas, etiquetas de esquina, pulsación larga, Alt, SYM, caracteres secundarios</string>
+    <string name="number_suggestions_title">Sugerencias de números</string>
+    <string name="number_suggestions_description">Las letras de las teclas de dígitos Alt también se ofrecen como números: w00 → 100, ed0.000 → 250.000. Las palabras reales van primero</string>
+    <string name="number_suggestions_excluded_apps_title">Sugerencias de números: apps excluidas</string>
+    <string name="number_suggestions_excluded_apps_row_description">Apps en las que las letras escritas nunca se ofrecen como números</string>
+    <string name="number_suggestions_excluded_apps_description">En las apps que elijas aquí, Plektra nunca sugiere ni corrige automáticamente como números las letras de las teclas de dígitos Alt (por ejemplo w00 a 100). Las sugerencias de palabras y la autocorrección normales no cambian.</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Aplicación web: escribe dentro de %1$s, así que %1$s también queda excluida</string>
+    <string name="kw_auto_correction_number_suggestions">números, dígitos, alt, w00, 100, convertir, por app, excluir</string>
 </resources>

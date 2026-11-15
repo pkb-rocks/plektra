@@ -934,4 +934,11 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="software_keyboard_key_hints_title">Ցույց տալ լրացուցիչ նշագրերը</string>
     <string name="software_keyboard_key_hints_description">Ստեղների վերին աջ անկյունում ցույց է տալիս երկար սեղմման այլընտրանքը, իսկ ներքևի ձախում՝ Alt կամ SYM նիշը։</string>
     <string name="kw_on_screen_key_hints">ստեղների հուշումներ, անկյունային նշագրեր, երկար սեղմում, Alt, SYM, լրացուցիչ նիշեր</string>
+    <string name="number_suggestions_title">Թվերի առաջարկներ</string>
+    <string name="number_suggestions_description">Alt թվային ստեղների տառերը առաջարկվում են նաև որպես թվեր՝ w00 → 100, ed0.000 → 250.000։ Իրական բառերը առաջնային են</string>
+    <string name="number_suggestions_excluded_apps_title">Թվերի առաջարկներ՝ բացառված հավելվածներ</string>
+    <string name="number_suggestions_excluded_apps_row_description">Հավելվածներ, որտեղ մուտքագրված տառերը երբեք չեն առաջարկվում որպես թվեր</string>
+    <string name="number_suggestions_excluded_apps_description">Այստեղ ընտրված հավելվածներում Plektra-ն երբեք չի առաջարկում և ավտոմատ չի ուղղում Alt թվային ստեղների տառերը թվերի (օրինակ՝ w00-ը 100-ի)։ Սովորական բառային առաջարկները և ավտոուղղումը չեն փոխվում։</string>
+    <string name="number_suggestions_excluded_apps_webapk_note">Վեբ հավելված՝ մուտքագրում է %1$s-ի ներսում, ուստի %1$s-ը նույնպես բացառված է</string>
+    <string name="kw_auto_correction_number_suggestions">թվեր, թվանշաններ, alt, w00, 100, փոխարկել, ըստ հավելվածի, բացառել</string>
 </resources>

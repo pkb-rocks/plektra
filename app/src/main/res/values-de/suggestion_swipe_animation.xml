@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Gewischte Vorschläge animieren</string>
+    <string name="suggestion_swipe_animation_description">Beim Annehmen eines Vorschlags per Wischgeste steigt das Wort über die Leiste und blendet aus. Die Eingabe läuft sofort weiter.</string>
+</resources>

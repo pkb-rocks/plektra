@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Анимация подсказок при смахивании</string>
+    <string name="suggestion_swipe_animation_description">При выборе подсказки смахиванием слово поднимается над панелью и исчезает. Ввод продолжается сразу.</string>
+</resources>

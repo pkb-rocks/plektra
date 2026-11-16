@@ -38,6 +38,7 @@ fun TrackpadGestureSettingsScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    var swipeAnimation by remember { mutableStateOf(rocks.pkb.plektra.inputmethod.suggestions.ui.SuggestionSwipeAnimation.enabled(context)) }
     var trackpadGesturesEnabled by remember {
         mutableStateOf(SettingsManager.getTrackpadGesturesEnabled(context))
     }
@@ -84,6 +85,7 @@ fun TrackpadGestureSettingsScreen(
             "trackpad.add_word_full_width",
             "trackpad.swipe_to_delete",
             "trackpad.swipe_to_delete_provider",
+            SettingLinkIds.TRACKPAD_SUGGESTION_ANIMATION,
             SettingLinkIds.TRACKPAD_GESTURES_ENABLED,
             SettingLinkIds.TRACKPAD_PROVIDER,
             SettingLinkIds.TRACKPAD_SHIZUKU_DEVICE,
@@ -223,6 +225,24 @@ fun TrackpadGestureSettingsScreen(
                         }
                     )
                 }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 88.dp)
+                    .settingRow(SettingLinkIds.TRACKPAD_SUGGESTION_ANIMATION).padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(Icons.Filled.SwipeUp, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.suggestion_swipe_animation_title), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.suggestion_swipe_animation_description),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = swipeAnimation, onCheckedChange = { enabled ->
+                    swipeAnimation = enabled
+                    rocks.pkb.plektra.inputmethod.suggestions.ui.SuggestionSwipeAnimation.setEnabled(context, enabled)
+                })
             }
 
             if (DeviceSpecific.isTitan2EliteDevice()) {

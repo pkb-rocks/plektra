@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Κίνηση προτάσεων με σάρωση</string>
+    <string name="suggestion_swipe_animation_description">Όταν επιλέγετε πρόταση με σάρωση, η λέξη ανεβαίνει πάνω από τη γραμμή και σβήνει. Η πληκτρολόγηση συνεχίζεται αμέσως.</string>
+</resources>

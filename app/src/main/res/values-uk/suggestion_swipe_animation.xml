@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Анімація підказок під час гортання</string>
+    <string name="suggestion_swipe_animation_description">Коли ви приймаєте підказку гортанням, слово піднімається над панеллю та зникає. Введення триває одразу.</string>
+</resources>

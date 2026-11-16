@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Envol des suggestions</string>
+    <string name="suggestion_swipe_animation_description">Lorsque vous acceptez une suggestion par balayage, le mot s’élève au-dessus de la barre puis disparaît. La saisie continue immédiatement.</string>
+</resources>

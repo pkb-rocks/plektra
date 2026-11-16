@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Anima i suggerimenti con scorrimento</string>
+    <string name="suggestion_swipe_animation_description">Quando accetti un suggerimento con uno scorrimento, la parola sale sopra la barra e svanisce. La scrittura continua subito.</string>
+</resources>

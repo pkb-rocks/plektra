@@ -101,6 +101,7 @@ object SettingLinkIds {
     const val ADVANCED_SHOW_RELEASE_NOTES_TUTORIAL = "advanced.show_release_notes_tutorial"
 
     // Trackpad gesture screen
+    const val TRACKPAD_SUGGESTION_ANIMATION = "trackpad.suggestion_swipe_animation"
     const val TRACKPAD_GESTURES_ENABLED = "trackpad.gestures_enabled"
     const val TRACKPAD_PROVIDER = "trackpad.provider"
     const val TRACKPAD_SHIZUKU_DEVICE = "trackpad.shizuku_device"
@@ -708,6 +709,12 @@ object SettingLinkRegistry {
             SettingLinkIds.TRACKPAD_GESTURES_ENABLED,
             R.string.trackpad_gestures_enabled_title,
             R.string.trackpad_gestures_enabled_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.TRACKPAD_SUGGESTION_ANIMATION,
+            R.string.suggestion_swipe_animation_title,
+            R.string.suggestion_swipe_animation_description,
             destination = SettingsDestination.Advanced
         ),
         entry(

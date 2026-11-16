@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Zawsze pokazuj pasek sugestii</string>
+    <string name="always_show_suggestions_bar_summary">Zapobiega automatycznemu ukrywaniu paska sugestii (np. po symbolach Alt lub znakach interpunkcyjnych), aby rozmiar okna aplikacji pozostał stały.</string>
+</resources>

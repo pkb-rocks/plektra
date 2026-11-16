@@ -2,4 +2,6 @@
 <resources>
     <string name="suggestions_bold_title">Bold word suggestions</string>
     <string name="suggestions_bold_summary">Use bold text for word suggestions in both Normal and Slim mode.</string>
+    <string name="always_show_suggestions_bar_title">Always show suggestions bar</string>
+    <string name="always_show_suggestions_bar_summary">Prevent the suggestions strip from auto-hiding (after Alt symbols, punctuation, etc.) to keep the app window size constant.</string>
 </resources>

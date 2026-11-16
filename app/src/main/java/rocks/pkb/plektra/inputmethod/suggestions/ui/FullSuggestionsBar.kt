@@ -385,7 +385,8 @@ class FullSuggestionsBar(
         onSuggestionSelectedOverride: ((Int, String) -> Unit)? = null,
         reserveEmptyRow: Boolean = false,
         displayOnly: Boolean = false,
-        continuousPreview: Boolean = false
+        continuousPreview: Boolean = false,
+        alwaysShowSuggestionsBar: Boolean = false
     ) {
         currentInputConnection = inputConnection
         if (previewOnly != displayOnly || continuousSpeechPreview != (displayOnly && continuousPreview)) {
@@ -409,7 +410,8 @@ class FullSuggestionsBar(
         }
         val canShowSuggestions = contentEnabled && shouldShow && !shouldDisableSuggestions &&
             (suggestions.isNotEmpty() || !addWordCandidate.isNullOrBlank())
-        if (!canShowSuggestions && !hasMenuButtons && !reserveEmptyRow) {
+        val shouldKeepBarVisible = reserveEmptyRow || alwaysShowSuggestionsBar
+        if (!canShowSuggestions && !hasMenuButtons && !shouldKeepBarVisible) {
             cancelPendingSuggestionsAccessibilityEnable()
             suggestionButtons.clear()
             frame.visibility = View.GONE
@@ -429,7 +431,7 @@ class FullSuggestionsBar(
         renderMinimalUiButtons()
         applyContainerInsetsForMinimalButtons()
 
-        if (!canShowSuggestions && !reserveEmptyRow) {
+        if (!canShowSuggestions && !shouldKeepBarVisible) {
             cancelPendingSuggestionsAccessibilityEnable()
             suggestionButtons.clear()
             bar.visibility = View.GONE

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="always_show_suggestions_bar_title">Εμφάνιση γραμμής προτάσεων πάντα</string>
+    <string name="always_show_suggestions_bar_summary">Αποτρέπει την αυτόματη απόκρυψη της γραμμής προτάσεων (π.χ. μετά από σύμβολα Alt ή σημεία στίξης) ώστε το μέγεθος του παραθύρου της εφαρμογής να μένει σταθερό.</string>
+</resources>

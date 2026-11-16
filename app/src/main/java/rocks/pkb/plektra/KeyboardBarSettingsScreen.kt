@@ -66,6 +66,7 @@ internal fun KeyboardBarSettingsScreen(
     var rightSlots by remember { mutableStateOf(SettingsManager.getStatusBarSlotsRight(context)) }
     var suggestionsEnabled by remember { mutableStateOf(SettingsManager.getSuggestionsEnabled(context)) }
     var suggestionsBold by remember { mutableStateOf(SettingsManager.getSuggestionsBold(context)) }
+    var alwaysShowSuggestionsBar by remember { mutableStateOf(SettingsManager.getAlwaysShowSuggestionsBar(context)) }
     var showOnLauncher by remember { mutableStateOf(SettingsManager.getShowKeyboardBarOnLauncher(context)) }
     var hiddenAppCount by remember { mutableStateOf(SettingsManager.getKeyboardBarHiddenPackages(context).size) }
     var indicators by remember { mutableStateOf(SettingsManager.getModifierIndicators(context)) }
@@ -215,6 +216,11 @@ internal fun KeyboardBarSettingsScreen(
                 "keyboard_bar.suggestions_bold", stringResource(R.string.suggestions_bold_summary)) {
                 suggestionsBold = it
                 SettingsManager.setSuggestionsBold(context, it)
+            }
+            KeyboardBarCheckRow(stringResource(R.string.always_show_suggestions_bar_title), alwaysShowSuggestionsBar,
+                "keyboard_bar.always_show_suggestions", stringResource(R.string.always_show_suggestions_bar_summary)) {
+                alwaysShowSuggestionsBar = it
+                SettingsManager.setAlwaysShowSuggestionsBar(context, it)
             }
             KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_actions), displayedActions,
                 "status_bar.variations_visible") {

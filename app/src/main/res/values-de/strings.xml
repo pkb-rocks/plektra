@@ -1695,4 +1695,12 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kaomoji_placement_emoji">Nach den Emoji</string>
     <string name="kaomoji_placement_off">Aus</string>
     <string name="emoji_picker_extras_title">Textsymbole und Kaomoji im Emoji-Picker</string>
+    <string name="long_press_cycle_next_title">Weiter gedrückt halten für</string>
+    <string name="long_press_cycle_next_description">Nach dem ersten langen Druck weiter halten, um zu einem zweiten Zeichen zu wechseln (mit Umschalt und Varianten oder SYM danach zu einem dritten, das beides anwendet) – so gehen Großbuchstaben und Symbole mit einer Hand.</string>
+    <string name="long_press_cycle_next_off">Nichts (aus)</string>
+    <string name="long_press_cycle_end_title">Nach dem letzten Schritt</string>
+    <string name="long_press_cycle_end_stop">Letztes Zeichen behalten</string>
+    <string name="long_press_cycle_end_original">Zurück zum getippten Zeichen</string>
+    <string name="long_press_cycle_end_loop">Weiter wechseln, solange gehalten</string>
+    <string name="kw_modifiers_long_press_cycle">langer Druck, halten, wechseln, einhändig, Shift, Symbole</string>
 </resources>

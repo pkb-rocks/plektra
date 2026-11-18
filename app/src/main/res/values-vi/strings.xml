@@ -935,4 +935,12 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="software_keyboard_key_hints_title">Hiện nhãn phụ</string>
     <string name="software_keyboard_key_hints_description">Hiện ký tự thay thế khi nhấn giữ ở góc trên bên phải và ký tự Alt hoặc SYM ở góc dưới bên trái phím.</string>
     <string name="kw_on_screen_key_hints">gợi ý phím, nhãn góc, nhấn giữ, Alt, SYM, ký tự phụ</string>
+    <string name="long_press_cycle_next_title">Tiếp tục giữ để</string>
+    <string name="long_press_cycle_next_description">Giữ tiếp sau lần nhấn giữ đầu tiên để chuyển sang ký tự thứ hai (với Shift và Biến thể hoặc SYM, rồi sang ký tự thứ ba áp dụng cả hai), giúp gõ chữ hoa và ký hiệu chỉ bằng một tay.</string>
+    <string name="long_press_cycle_next_off">Không (tắt)</string>
+    <string name="long_press_cycle_end_title">Sau bước cuối</string>
+    <string name="long_press_cycle_end_stop">Giữ ký tự cuối</string>
+    <string name="long_press_cycle_end_original">Quay lại ký tự đã gõ</string>
+    <string name="long_press_cycle_end_loop">Tiếp tục xoay vòng khi còn giữ</string>
+    <string name="kw_modifiers_long_press_cycle">nhấn giữ, giữ, xoay vòng, một tay, shift, ký hiệu</string>
 </resources>

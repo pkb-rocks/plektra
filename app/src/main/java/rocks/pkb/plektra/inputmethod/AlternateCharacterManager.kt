@@ -39,6 +39,9 @@ class AlternateCharacterManager(
 
     companion object {
         private const val TAG = "AlternateCharacterManager"
+
+        // The final-choice check only needs the text around the cursor, not the whole document.
+        private const val SNAPSHOT_HINT_MAX_CHARS = 512
     }
 
     private fun autoSpacePunctuation(): String {
@@ -73,6 +76,7 @@ class AlternateCharacterManager(
     private val insertedNormalChars = ConcurrentHashMap<Int, String>()
     private val insertedTextAnchors = ConcurrentHashMap<Int, InsertedTextAnchor>()
     private val keyPressWasShifted = ConcurrentHashMap<Int, Boolean>()
+    private val longPressCycles = ConcurrentHashMap<Int, LongPressCycle>()
 
     private var longPressThreshold: Long = 500L
 
@@ -159,8 +163,10 @@ class AlternateCharacterManager(
 
     fun hasAltMapping(keyCode: Int): Boolean = getAltModifierMappings().containsKey(keyCode)
 
-    fun hasSymLongPressMapping(keyCode: Int, shiftPressed: Boolean): Boolean {
-        val page = context?.let(SettingsManager::resolveLongPressSymPage) ?: 1
+    fun hasSymLongPressMapping(keyCode: Int, shiftPressed: Boolean, mode: String? = null): Boolean {
+        val page = context?.let { ctx ->
+            if (mode != null) SettingsManager.resolveLongPressSymPage(ctx, mode) else SettingsManager.resolveLongPressSymPage(ctx)
+        } ?: 1
         return if (page == 1) {
             if (shiftPressed && symKeyMapUppercase.containsKey(keyCode)) {
                 true
@@ -194,6 +200,7 @@ class AlternateCharacterManager(
         insertedNormalChars.clear()
         insertedTextAnchors.clear()
         keyPressWasShifted.clear()
+        longPressCycles.clear()
     }
 
     fun buildEmojiMapText(): String {
@@ -289,7 +296,19 @@ class AlternateCharacterManager(
             SettingsManager.getLongPressModifier(it)
         } ?: "alt"
 
-        val shouldScheduleLongPress = when (longPressMode) {
+        val cycleNext = context?.let(SettingsManager::getLongPressCycleNext)
+        val shouldScheduleLongPress = hasLongPressSupport(longPressMode, keyCode, normalChar) ||
+            (cycleNext != null && hasLongPressSupport(cycleNext, keyCode, normalChar))
+        
+        if (shouldScheduleLongPress) {
+            scheduleLongPress(keyCode, inputConnection)
+        }
+        
+        return true
+    }
+
+    private fun hasLongPressSupport(mode: String, keyCode: Int, normalChar: String): Boolean {
+        return when (mode) {
             "variations" -> {
                 if (normalChar.isEmpty()) {
                     false
@@ -306,17 +325,12 @@ class AlternateCharacterManager(
             }
             "sym", "sym_symbols", "sym_emoji" -> hasSymLongPressMapping(
                 keyCode = keyCode,
-                shiftPressed = keyPressWasShifted[keyCode] == true
+                shiftPressed = keyPressWasShifted[keyCode] == true,
+                mode = mode
             )
             "shift" -> LayoutMappingRepository.isMapped(keyCode) && normalChar.isNotEmpty()
             else -> hasAltMapping(keyCode)
         }
-        
-        if (shouldScheduleLongPress) {
-            scheduleLongPress(keyCode, inputConnection)
-        }
-        
-        return true
     }
 
     fun resolveAltText(keyCode: Int, mappingsOverride: Map<Int, String>? = null): String? =
@@ -373,6 +387,11 @@ class AlternateCharacterManager(
         keyPressWasShifted.remove(keyCode)
         
         longPressRunnables.remove(keyCode)?.let { handler.removeCallbacks(it) }
+
+        longPressCycles.remove(keyCode)?.let { cycle ->
+            finishLongPressCycle(keyCode, cycle)
+            return pressStartTime != null && !symKeyActive
+        }
 
         // If the long press did NOT trigger and we had inserted a normal char, notify tracking
         if (!wasLongPressActivated && insertedChar != null) {
@@ -446,6 +465,13 @@ class AlternateCharacterManager(
             SettingsManager.getLongPressModifier(it)
         } ?: "alt"
 
+        val cycleNext = context?.let(SettingsManager::getLongPressCycleNext)
+        if (cycleNext != null) {
+            val cycleEnd = context?.let(SettingsManager::getLongPressCycleEnd) ?: "stop"
+            scheduleLongPressCycle(keyCode, inputConnection, listOf(longPressMode, cycleNext), cycleEnd)
+            return
+        }
+
         val runnable = Runnable {
             if (pressedKeys.containsKey(keyCode)) {
                 val insertedChar = insertedNormalChars[keyCode]
@@ -479,6 +505,9 @@ class AlternateCharacterManager(
                                     replacement = firstVariation,
                                     commitAtCursor = null
                                 )
+                                if (outcome == ReplacementOutcome.REPLACED) {
+                                    DeferredPunctuationSpaceTracker.onTextReplaced(inputConnection)
+                                }
                                 finishLongPress(keyCode, outcome, firstVariation, "Variations")
                             }
                         }
@@ -631,6 +660,254 @@ class AlternateCharacterManager(
                 context?.let { SettingsManager.shouldApplyFrenchPunctuationSpacing(it) } == true)
     }
 
+    /**
+     * A long press that keeps stepping while the key is held: each further threshold
+     * replaces the shown text with the next step (for example t -> T -> ( -> t).
+     */
+    private class LongPressCycle(
+        val inputConnection: InputConnection,
+        val original: String,
+        val steps: List<String>,
+        val loop: Boolean,
+        var index: Int = -1,
+        var displayed: String = original,
+        var anchor: InsertedTextAnchor? = null
+    )
+
+    private fun scheduleLongPressCycle(
+        keyCode: Int,
+        inputConnection: InputConnection,
+        modes: List<String>,
+        end: String
+    ) {
+        val runnable = object : Runnable {
+            override fun run() {
+                if (!pressedKeys.containsKey(keyCode)) return
+                val cycle = longPressCycles[keyCode]
+                    ?: startLongPressCycle(keyCode, inputConnection, modes, end)
+                if (cycle == null || !advanceLongPressCycle(keyCode, cycle)) {
+                    longPressRunnables.remove(keyCode)
+                    return
+                }
+                if (cycle.loop || cycle.index < cycle.steps.lastIndex) {
+                    handler.postDelayed(this, longPressThreshold)
+                } else {
+                    longPressRunnables.remove(keyCode)
+                }
+            }
+        }
+        longPressRunnables[keyCode] = runnable
+        handler.postDelayed(runnable, longPressThreshold)
+    }
+
+    private fun startLongPressCycle(
+        keyCode: Int,
+        inputConnection: InputConnection,
+        modes: List<String>,
+        end: String
+    ): LongPressCycle? {
+        val original = insertedNormalChars[keyCode]?.takeIf { it.isNotEmpty() } ?: return null
+        val wasShifted = keyPressWasShifted[keyCode] ?: false
+        val singleSteps = modes.map { resolveLongPressCandidate(it, keyCode, original, wasShifted) }
+        // The combined step comes last; distinct() drops it when it repeats an earlier step.
+        val candidates = (singleSteps + resolveCombinedShiftCandidate(modes, keyCode, original))
+            .filterNotNull()
+            .filter { it.isNotEmpty() && it != original }
+            .distinct()
+        if (candidates.isEmpty()) return null
+        val steps = if (end == "stop") candidates else candidates + original
+        val cycle = LongPressCycle(
+            inputConnection = inputConnection,
+            original = original,
+            steps = steps,
+            loop = end == "loop",
+            anchor = insertedTextAnchors[keyCode]
+        )
+        longPressCycles[keyCode] = cycle
+        return cycle
+    }
+
+    /**
+     * When one cycle mode is Shift and the other is Variations or a SYM page, the step
+     * that applies both: the other mode resolved on the Shift-toggled character
+     * (e -> è -> E -> È; an auto-capitalized E gives E -> È -> e -> è). Device SYM
+     * ("alt") has no Shift-specific map, so it never adds a combined step.
+     */
+    private fun resolveCombinedShiftCandidate(
+        modes: List<String>,
+        keyCode: Int,
+        original: String
+    ): String? {
+        if (modes.size != 2 || "shift" !in modes) return null
+        val other = modes.first { it != "shift" }
+        if (other != "variations" && other != "sym" && other != "sym_symbols" && other != "sym_emoji") {
+            return null
+        }
+        val toggled = resolveShiftLongPressText(keyCode, original)?.takeIf { it.isNotEmpty() } ?: return null
+        return resolveLongPressCandidate(other, keyCode, toggled, wasShifted = toggled[0].isUpperCase())
+    }
+
+    private fun advanceLongPressCycle(keyCode: Int, cycle: LongPressCycle): Boolean {
+        var nextIndex = (cycle.index + 1) % cycle.steps.size
+        // Never spend a step on the text already shown: skip to the one after it.
+        if (cycle.steps[nextIndex] == cycle.displayed && cycle.steps.size > 1 &&
+            (cycle.loop || nextIndex < cycle.steps.lastIndex)
+        ) {
+            nextIndex = (nextIndex + 1) % cycle.steps.size
+        }
+        val next = cycle.steps[nextIndex]
+        if (next != cycle.displayed) {
+            val replaced = replaceLongPressCycleText(
+                keyCode = keyCode,
+                inputConnection = cycle.inputConnection,
+                expectedText = cycle.displayed,
+                anchor = cycle.anchor,
+                variation = next
+            )
+            if (!replaced) {
+                Log.d(TAG, "Stopped long press cycle for keyCode $keyCode: shown text changed")
+                return false
+            }
+            cycle.anchor = cycle.anchor?.let { anchor ->
+                anchor.copy(
+                    targetEnd = anchor.targetStart + next.length,
+                    prefixThroughTarget = anchor.prefixThroughTarget.dropLast(anchor.expectedText.length) + next,
+                    expectedText = next
+                )
+            } ?: captureInsertedTextAnchor(cycle.inputConnection, next)
+            cycle.displayed = next
+            // The step may change the text length; the cursor moved with it.
+            DeferredPunctuationSpaceTracker.onTextReplaced(cycle.inputConnection)
+        }
+        cycle.index = nextIndex
+        longPressActivated[keyCode] = true
+        Log.d(TAG, "Long press cycle for keyCode $keyCode -> $next")
+        return true
+    }
+
+    private fun finishLongPressCycle(keyCode: Int, cycle: LongPressCycle) {
+        val text = cycle.displayed
+        val inputConnection = cycle.inputConnection
+        val snapshot = readEditorSnapshot(inputConnection, SNAPSHOT_HINT_MAX_CHARS) ?: return
+        val target = resolveImmediatelyPrecedingTarget(snapshot, text) ?: return
+        cycle.anchor?.let { anchor ->
+            if (anchor.inputConnection !== inputConnection ||
+                target.first != anchor.targetStart || target.second != anchor.targetEnd
+            ) return
+            // A bounded snapshot may start later than the original anchor's text window.
+            val sharedStart = maxOf(snapshot.textStart, anchor.textStart)
+            val currentPrefix = snapshot.text.substring(
+                sharedStart - snapshot.textStart,
+                target.second - snapshot.textStart
+            )
+            if (currentPrefix != anchor.prefixThroughTarget.substring(sharedStart - anchor.textStart)) return
+        }
+        if (text == cycle.original) {
+            onNormalCharCommitted?.invoke(text)
+            return
+        }
+        val isPunctuation = text.length == 1 && !text[0].isLetterOrDigit() && !text[0].isWhitespace()
+        if (isPunctuation) {
+            // Re-commit punctuation through the Alt path so boundary handling,
+            // French spacing and auto-space replacement apply to the final choice.
+            // One batch edit, so editors that honour it report a single selection
+            // change rather than the delete on its own (which would look like a
+            // cursor move and drop a deferred punctuation space).
+            inputConnection.beginBatchEdit()
+            try {
+                // Only re-commit through the Alt path when the deletion was accepted;
+                // otherwise the punctuation is still there and a re-commit would duplicate
+                // it and arm spacing for an edit that never happened.
+                if (!inputConnection.deleteSurroundingText(text.length, 0)) return
+                handleAltCombination(
+                    keyCode = keyCode,
+                    inputConnection = inputConnection,
+                    event = null,
+                    mappingsOverride = mapOf(keyCode to text),
+                    defaultHandler = { _, _ -> false }
+                )
+            } finally {
+                inputConnection.endBatchEdit()
+            }
+            return
+        }
+        text.firstOrNull()?.let { onAltCharInserted?.invoke(it) }
+    }
+
+    private fun resolveLongPressCandidate(
+        mode: String,
+        keyCode: Int,
+        insertedChar: String,
+        wasShifted: Boolean
+    ): String? {
+        return when (mode) {
+            "variations" -> {
+                val baseChar = insertedChar[0]
+                val lookupChar = if (wasShifted && baseChar.isLowerCase()) {
+                    baseChar.uppercaseChar()
+                } else if (!wasShifted && baseChar.isUpperCase()) {
+                    baseChar.lowercaseChar()
+                } else {
+                    baseChar
+                }
+                context?.let { ctx ->
+                    VariationRepository.loadVariations(
+                        assets = ctx.assets,
+                        context = ctx,
+                        activeLayoutName = activeLayoutNameProvider?.invoke()
+                    )[lookupChar]
+                }?.firstOrNull()
+            }
+            "sym", "sym_symbols", "sym_emoji" -> {
+                val page = context?.let { SettingsManager.resolveLongPressSymPage(it, mode) } ?: 1
+                if (page == 1) {
+                    if (wasShifted && symKeyMapUppercase.containsKey(keyCode)) {
+                        symKeyMapUppercase[keyCode]
+                    } else {
+                        symKeyMap[keyCode]
+                    }
+                } else {
+                    if (wasShifted && symKeyMap2Uppercase.containsKey(keyCode)) {
+                        symKeyMap2Uppercase[keyCode]
+                    } else {
+                        symKeyMap2[keyCode]
+                    }
+                }
+            }
+            // Toggles case, so an auto-capitalized T steps to t rather than repeating T.
+            "shift" -> resolveShiftLongPressText(keyCode, insertedChar)
+            else -> getAltModifierMappings()[keyCode]
+        }
+    }
+
+    /**
+     * Replaces the text the cycle currently shows with [variation] at its anchored range.
+     * A cycle step moves both the shown text and its anchor on every step, so it resolves
+     * and replaces the range itself instead of going through [replaceInsertedText].
+     */
+    private fun replaceLongPressCycleText(
+        keyCode: Int,
+        inputConnection: InputConnection,
+        expectedText: String,
+        anchor: InsertedTextAnchor?,
+        variation: String
+    ): Boolean {
+        if (expectedText.isEmpty() || variation.isEmpty()) return false
+        val snapshot = readEditorSnapshot(inputConnection) ?: return false
+        val range = if (anchor != null) {
+            resolveAnchoredTarget(inputConnection, snapshot, anchor)
+        } else {
+            resolveImmediatelyPrecedingTarget(snapshot, expectedText)
+        } ?: return false
+        val outcome = replaceTarget(inputConnection, snapshot, range, variation)
+        when (outcome) {
+            ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, variation, keyCode)
+            ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "", keyCode)
+            ReplacementOutcome.UNCHANGED -> Unit
+        }
+        return outcome == ReplacementOutcome.REPLACED
+    }
+
     private data class EditorSnapshot(
         val text: String,
         val textStart: Int,
@@ -738,8 +1015,8 @@ class AlternateCharacterManager(
                     replaceTarget(inputConnection, target.snapshot, range, replacement)
                 }
                 when (outcome) {
-                    ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, replacement)
-                    ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "")
+                    ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, replacement, keyCode)
+                    ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "", keyCode)
                     ReplacementOutcome.UNCHANGED -> Unit
                 }
                 outcome
@@ -797,7 +1074,8 @@ class AlternateCharacterManager(
     private fun shiftPendingAnchors(
         inputConnection: InputConnection,
         range: Pair<Int, Int>,
-        replacement: String
+        replacement: String,
+        replacingKeyCode: Int? = null
     ) {
         val lengthDelta = replacement.length - (range.second - range.first)
         for ((key, anchor) in insertedTextAnchors) {
@@ -809,6 +1087,26 @@ class AlternateCharacterManager(
                 continue
             }
             insertedTextAnchors[key] = anchor.copy(
+                targetStart = anchor.targetStart + lengthDelta,
+                targetEnd = anchor.targetEnd + lengthDelta,
+                prefixThroughTarget = anchor.prefixThroughTarget.replaceRange(relativeStart, relativeEnd, replacement)
+            )
+        }
+        // A cycle that already started keeps its own anchor copy, so move it with this
+        // edit too; otherwise a further replacement by another held key leaves it stale
+        // and stops the cycle even though its text still exists. The replacing cycle
+        // updates its own anchor after this returns, so it is excluded here.
+        for ((key, cycle) in longPressCycles) {
+            if (key == replacingKeyCode) continue
+            val anchor = cycle.anchor ?: continue
+            if (anchor.inputConnection !== inputConnection || anchor.targetEnd <= range.first) continue
+            val relativeStart = range.first - anchor.textStart
+            val relativeEnd = range.second - anchor.textStart
+            if (anchor.targetStart < range.second || relativeStart < 0) {
+                cycle.anchor = null
+                continue
+            }
+            cycle.anchor = anchor.copy(
                 targetStart = anchor.targetStart + lengthDelta,
                 targetEnd = anchor.targetEnd + lengthDelta,
                 prefixThroughTarget = anchor.prefixThroughTarget.replaceRange(relativeStart, relativeEnd, replacement)
@@ -879,8 +1177,9 @@ class AlternateCharacterManager(
         return targetStart to targetEnd
     }
 
-    private fun readEditorSnapshot(inputConnection: InputConnection): EditorSnapshot? {
-        val extracted = inputConnection.getExtractedText(ExtractedTextRequest(), 0) ?: return null
+    private fun readEditorSnapshot(inputConnection: InputConnection, hintMaxChars: Int = 0): EditorSnapshot? {
+        val request = ExtractedTextRequest().apply { this.hintMaxChars = hintMaxChars }
+        val extracted = inputConnection.getExtractedText(request, 0) ?: return null
         val text = extracted.text?.toString() ?: return null
         if (extracted.selectionStart < 0 || extracted.selectionEnd < 0) return null
         return EditorSnapshot(

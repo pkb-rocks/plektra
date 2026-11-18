@@ -1779,4 +1779,12 @@ QWERTZ σε φυσικό QWERTY
     <!-- Sym+C/V/X/A edit shortcuts toggle -->
     <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: αντιγραφή, επικόλληση, αποκοπή, επιλογή όλων</string>
     <string name="sym_edit_shortcuts_description">Σε πεδίο κειμένου, το Sym με C, V, X ή A επεξεργάζεται το κείμενο αντί να πληκτρολογεί σύμβολο ή να ανοίγει εφαρμογή. Όταν είναι ανενεργό, αυτοί οι τέσσερις συνδυασμοί επιστρέφουν στο επίπεδο SYM.</string>
+    <string name="long_press_cycle_next_title">Συνέχεια κρατήματος για</string>
+    <string name="long_press_cycle_next_description">Κρατήστε μετά το πρώτο παρατεταμένο πάτημα για να περάσετε σε δεύτερο χαρακτήρα (με Shift και Παραλλαγές ή SYM, έπειτα σε τρίτο που εφαρμόζει και τα δύο), ώστε κεφαλαία και σύμβολα να γίνονται με ένα χέρι.</string>
+    <string name="long_press_cycle_next_off">Τίποτα (ανενεργό)</string>
+    <string name="long_press_cycle_end_title">Μετά το τελευταίο βήμα</string>
+    <string name="long_press_cycle_end_stop">Διατήρηση του τελευταίου χαρακτήρα</string>
+    <string name="long_press_cycle_end_original">Επιστροφή στον πληκτρολογημένο χαρακτήρα</string>
+    <string name="long_press_cycle_end_loop">Συνεχής εναλλαγή όσο κρατιέται</string>
+    <string name="kw_modifiers_long_press_cycle">παρατεταμένο πάτημα, κράτημα, εναλλαγή, ένα χέρι, shift, σύμβολα</string>
 </resources>

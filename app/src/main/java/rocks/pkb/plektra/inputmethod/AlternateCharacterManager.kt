@@ -758,6 +758,7 @@ class AlternateCharacterManager(
         val next = cycle.steps[nextIndex]
         if (next != cycle.displayed) {
             val replaced = replaceLongPressCycleText(
+                keyCode = keyCode,
                 inputConnection = cycle.inputConnection,
                 expectedText = cycle.displayed,
                 anchor = cycle.anchor,
@@ -814,7 +815,10 @@ class AlternateCharacterManager(
             // cursor move and drop a deferred punctuation space).
             inputConnection.beginBatchEdit()
             try {
-                inputConnection.deleteSurroundingText(text.length, 0)
+                // Only re-commit through the Alt path when the deletion was accepted;
+                // otherwise the punctuation is still there and a re-commit would duplicate
+                // it and arm spacing for an edit that never happened.
+                if (!inputConnection.deleteSurroundingText(text.length, 0)) return
                 handleAltCombination(
                     keyCode = keyCode,
                     inputConnection = inputConnection,
@@ -882,6 +886,7 @@ class AlternateCharacterManager(
      * and replaces the range itself instead of going through [replaceInsertedText].
      */
     private fun replaceLongPressCycleText(
+        keyCode: Int,
         inputConnection: InputConnection,
         expectedText: String,
         anchor: InsertedTextAnchor?,
@@ -896,8 +901,8 @@ class AlternateCharacterManager(
         } ?: return false
         val outcome = replaceTarget(inputConnection, snapshot, range, variation)
         when (outcome) {
-            ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, variation)
-            ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "")
+            ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, variation, keyCode)
+            ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "", keyCode)
             ReplacementOutcome.UNCHANGED -> Unit
         }
         return outcome == ReplacementOutcome.REPLACED
@@ -1010,8 +1015,8 @@ class AlternateCharacterManager(
                     replaceTarget(inputConnection, target.snapshot, range, replacement)
                 }
                 when (outcome) {
-                    ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, replacement)
-                    ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "")
+                    ReplacementOutcome.REPLACED -> shiftPendingAnchors(inputConnection, range, replacement, keyCode)
+                    ReplacementOutcome.REMOVED -> shiftPendingAnchors(inputConnection, range, "", keyCode)
                     ReplacementOutcome.UNCHANGED -> Unit
                 }
                 outcome
@@ -1069,7 +1074,8 @@ class AlternateCharacterManager(
     private fun shiftPendingAnchors(
         inputConnection: InputConnection,
         range: Pair<Int, Int>,
-        replacement: String
+        replacement: String,
+        replacingKeyCode: Int? = null
     ) {
         val lengthDelta = replacement.length - (range.second - range.first)
         for ((key, anchor) in insertedTextAnchors) {
@@ -1081,6 +1087,26 @@ class AlternateCharacterManager(
                 continue
             }
             insertedTextAnchors[key] = anchor.copy(
+                targetStart = anchor.targetStart + lengthDelta,
+                targetEnd = anchor.targetEnd + lengthDelta,
+                prefixThroughTarget = anchor.prefixThroughTarget.replaceRange(relativeStart, relativeEnd, replacement)
+            )
+        }
+        // A cycle that already started keeps its own anchor copy, so move it with this
+        // edit too; otherwise a further replacement by another held key leaves it stale
+        // and stops the cycle even though its text still exists. The replacing cycle
+        // updates its own anchor after this returns, so it is excluded here.
+        for ((key, cycle) in longPressCycles) {
+            if (key == replacingKeyCode) continue
+            val anchor = cycle.anchor ?: continue
+            if (anchor.inputConnection !== inputConnection || anchor.targetEnd <= range.first) continue
+            val relativeStart = range.first - anchor.textStart
+            val relativeEnd = range.second - anchor.textStart
+            if (anchor.targetStart < range.second || relativeStart < 0) {
+                cycle.anchor = null
+                continue
+            }
+            cycle.anchor = anchor.copy(
                 targetStart = anchor.targetStart + lengthDelta,
                 targetEnd = anchor.targetEnd + lengthDelta,
                 prefixThroughTarget = anchor.prefixThroughTarget.replaceRange(relativeStart, relativeEnd, replacement)

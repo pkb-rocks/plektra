@@ -183,6 +183,34 @@ class AlternateCharacterManagerTest {
     }
 
     @Test
+    fun longPressCycle_earlierHeldKeyReplacementKeepsLaterHeldCycleAnchorValid() {
+        // Two keys held together: when the earlier key's cycle replaces its own text, the
+        // later key's already-started cycle must keep advancing instead of stopping because
+        // its anchor (including the recorded prefix) went stale.
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        val manager = cycleManager(first = "alt", next = "shift", end = "loop").apply {
+            addAltKeyMapping(KeyEvent.KEYCODE_U, ")")
+        }
+
+        pressT(manager, inputConnection)
+        pressU(manager, inputConnection)
+        assertEquals("tu", recorder.text)
+
+        // First round: T -> "(", U -> ")".
+        idle(50)
+        assertEquals("()", recorder.text)
+
+        // Second round: T replaces "(" with "T", rewriting the prefix recorded in U's
+        // anchor; U must still advance ")" -> "U" rather than stopping.
+        idle(50)
+        assertEquals("TU", recorder.text)
+
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+        manager.handleKeyUp(KeyEvent.KEYCODE_U, symKeyActive = false)
+    }
+
+    @Test
     fun longPressCycle_releaseKeepsShownCharacter() {
         val recorder = RecordingInputConnection()
         val inputConnection = recorder.asProxy()
@@ -216,6 +244,31 @@ class AlternateCharacterManagerTest {
         assertEquals("a (", recorder.text)
         assertEquals(listOf(1 to 0), recorder.deleteCalls)
         assertEquals(listOf('('), altInserted)
+    }
+
+    @Test
+    fun longPressCycle_punctuationFinalizationWhenDeletionFailsDoesNotDuplicatePunctuation() {
+        val recorder = RecordingInputConnection()
+        val inputConnection = recorder.asProxy()
+        inputConnection.commitText("a ", 1)
+        val manager = cycleManager(first = "shift", next = "alt", end = "stop")
+        val altInserted = mutableListOf<Char>()
+        manager.onAltCharInserted = { altInserted += it }
+
+        pressT(manager, inputConnection)
+        idle(110)
+        assertEquals("a (", recorder.text)
+        val commitsBeforeRelease = recorder.commitAttempts
+        recorder.deleteResult = false
+        manager.handleKeyUp(KeyEvent.KEYCODE_T, symKeyActive = false)
+
+        assertEquals("a (", recorder.text)
+        assertTrue("rejected deletion must not report the punctuation", altInserted.isEmpty())
+        assertEquals(
+            "rejected deletion must not re-commit punctuation",
+            commitsBeforeRelease,
+            recorder.commitAttempts
+        )
     }
 
     @Test

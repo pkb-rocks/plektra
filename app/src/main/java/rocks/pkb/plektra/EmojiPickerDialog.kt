@@ -104,15 +104,45 @@ fun EmojiPickerDialog(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
+                var unicodeError by remember { mutableStateOf<String?>(null) }
+                
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = { 
+                        searchQuery = it
+                        unicodeError = null
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 4.dp, vertical = 4.dp),
                     label = { Text(stringResource(R.string.emoji_picker_search_label)) },
                     placeholder = { Text(stringResource(R.string.emoji_picker_search_placeholder)) },
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = if (unicodeError != null) {
+                        { Text(unicodeError!!, color = MaterialTheme.colorScheme.error) }
+                    } else null,
+                    isError = unicodeError != null,
+                    trailingIcon = if (searchQuery.trim().matches(Regex("^[Uu]\\+[0-9A-Fa-f]{1,6}$"))) {
+                        {
+                            TextButton(onClick = {
+                                val codeStr = searchQuery.trim().substring(2)
+                                try {
+                                    val codePoint = codeStr.toInt(16)
+                                    if (codePoint !in 0..0x10FFFF || (codePoint in 0xD800..0xDFFF)) {
+                                        unicodeError = context.getString(R.string.emoji_picker_invalid_unicode)
+                                    } else {
+                                        val char = String(Character.toChars(codePoint))
+                                        onEmojiSelected(char)
+                                        onDismiss()
+                                    }
+                                } catch (e: NumberFormatException) {
+                                    unicodeError = context.getString(R.string.emoji_picker_invalid_unicode)
+                                }
+                            }) {
+                                Text(stringResource(R.string.emoji_picker_use_code))
+                            }
+                        }
+                    } else null
                 )
 
                 when {

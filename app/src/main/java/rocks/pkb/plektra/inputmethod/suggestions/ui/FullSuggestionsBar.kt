@@ -27,6 +27,9 @@ import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsActivity
 import rocks.pkb.plektra.inputmethod.NotificationHelper
 import rocks.pkb.plektra.inputmethod.suggestions.SuggestionButtonHandler
+import rocks.pkb.plektra.core.suggestions.CasingHelper
+import rocks.pkb.plektra.core.Punctuation
+import rocks.pkb.plektra.inputmethod.AutoCapitalizeHelper
 import rocks.pkb.plektra.inputmethod.VariationButtonHandler
 import rocks.pkb.plektra.inputmethod.ui.HamburgerMenuView
 import rocks.pkb.plektra.inputmethod.ui.KeyboardThemeColors
@@ -652,6 +655,18 @@ class FullSuggestionsBar(
             themeOverride?.divider, dpToPx(1f), buildSuggestionBackground()))
     }
 
+    private fun currentWordBeforeCursor(inputConnection: android.view.inputmethod.InputConnection?): String {
+        if (inputConnection == null) return ""
+        val before = inputConnection.getTextBeforeCursor(64, 0)?.toString().orEmpty()
+        var start = before.length
+        while (start > 0 && !Punctuation.isWordBoundary(
+                before[start - 1], before.getOrNull(start - 2), before.getOrNull(start)
+            )) {
+            start--
+        }
+        return before.substring(start)
+    }
+
     private fun renderSlots(
         bar: LinearLayout,
         slots: List<String?>,
@@ -698,6 +713,15 @@ class FullSuggestionsBar(
         } else {
             listOf(slots[0], slots[1], slots[2]) // left, center, right
         }
+        // The label must match what tapping inserts. The click path applies
+        // CasingHelper.applyCasing(suggestion, currentWord, forceLeadingCapital),
+        // so the label uses the same casing (the typed word's case + auto-cap).
+        val forceLeadingCapital = AutoCapitalizeHelper.shouldAutoCapitalizeAtCursor(
+            context = context,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = shouldDisableSuggestions
+        ) && SettingsManager.getAutoCapitalizeFirstLetter(context)
+        val currentWord = currentWordBeforeCursor(inputConnection)
         val canReuseButtons = actionCandidate == null && bar.childCount == slotOrder.size &&
             (0 until bar.childCount).all { bar.getChildAt(it) is TextView }
         if (!canReuseButtons) bar.removeAllViews()
@@ -732,7 +756,9 @@ class FullSuggestionsBar(
                 setCompoundDrawables(null, null, null, null)
                 contentDescription = null
                 alpha = 1f
-                text = (suggestion ?: "")
+                text = if (suggestion != null)
+                    CasingHelper.applyCasing(suggestion, currentWord, forceLeadingCapital)
+                else suggestion ?: ""
                 gravity = if (continuousSpeechPreview) Gravity.CENTER_VERTICAL or Gravity.END else Gravity.CENTER
                 KeyboardBarTypography.applyAutoSize(this, minTextSp, maxTextSp)
                 if (continuousSpeechPreview) {

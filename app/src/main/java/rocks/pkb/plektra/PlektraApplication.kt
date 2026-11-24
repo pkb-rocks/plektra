@@ -12,10 +12,12 @@ import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
 import rocks.pkb.plektra.inputmethod.DirectBootStorage
 import rocks.pkb.plektra.inputmethod.DirectBootStorageContext
+import rocks.pkb.plektra.inputmethod.otp.OtpRuntime
 import android.content.Context
 import android.content.SharedPreferences
 
 class PlektraApplication : Application() {
+    internal val otpRuntime by lazy { OtpRuntime(this) }
     private var unlockedInitialized = false
     private var directBootConfigListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 

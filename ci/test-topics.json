@@ -211,7 +211,9 @@
       "rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodServiceDeviceBehaviorTest",
       "rocks.pkb.plektra.inputmethod.SoftwareKeypadPolicyTest",
       "rocks.pkb.plektra.inputmethod.SoftwareKeypadServiceIntegrationTest",
-      "rocks.pkb.plektra.inputmethod.SymEditShortcutsServiceTest"
+      "rocks.pkb.plektra.inputmethod.SymEditShortcutsServiceTest",
+      "rocks.pkb.plektra.inputmethod.otp.OtpAndroidTest",
+      "rocks.pkb.plektra.inputmethod.otp.OtpInboxTest"
     ]
   },
   "instrumented": {

@@ -8,6 +8,8 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.edit
+import rocks.pkb.plektra.inputmethod.otp.OtpSource
 import rocks.pkb.plektra.commands.CommandJson
 import rocks.pkb.plektra.commands.CommandLaunchSpec
 import rocks.pkb.plektra.commands.CommandSourceId
@@ -405,6 +407,11 @@ object SettingsManager {
     private const val KEY_EXPERIMENTAL_SUGGESTIONS_ENABLED = "experimental_suggestions_enabled"
     private const val KEY_SUGGESTION_DEBUG_LOGGING = "suggestion_debug_logging"
     private const val KEY_IME_OVERLAY_DEBUG_LOGGING = "ime_overlay_debug_logging"
+    internal const val KEY_CLIPBOARD_PASTE_SUGGESTION = "clipboard_paste_suggestion"
+    private const val KEY_OTP_ENABLED = "otp_enabled"
+    private const val KEY_OTP_SMS = "otp_source_sms"
+    private const val KEY_OTP_NOTIFICATION = "otp_source_notification"
+    private const val KEY_OTP_HELPER = "otp_source_helper"
     private const val KEY_EXPERIMENTAL_CANDIDATES_VIEW_ENABLED = "experimental_candidates_view_enabled"
     private const val KEY_USE_KEYBOARD_PROXIMITY = "use_keyboard_proximity"
     private const val KEY_USE_EDIT_TYPE_RANKING = "use_edit_type_ranking"
@@ -3242,6 +3249,34 @@ object SettingsManager {
             .putBoolean(KEY_EXPERIMENTAL_SUGGESTIONS_ENABLED, enabled)
             .apply()
     }
+
+    internal fun getClipboardPasteSuggestion(context: Context) =
+        getPreferences(context).getBoolean(KEY_CLIPBOARD_PASTE_SUGGESTION, false)
+
+    internal fun setClipboardPasteSuggestion(context: Context, enabled: Boolean) {
+        getPreferences(context).edit { putBoolean(KEY_CLIPBOARD_PASTE_SUGGESTION, enabled) }
+    }
+
+    internal fun getOtpEnabled(context: Context) = getPreferences(context).getBoolean(KEY_OTP_ENABLED, false)
+
+    internal fun setOtpEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit { putBoolean(KEY_OTP_ENABLED, enabled) }
+    }
+
+    internal fun getOtpSourceEnabled(context: Context, source: OtpSource) =
+        getPreferences(context).getBoolean(otpSourceKey(source), false)
+
+    internal fun setOtpSourceEnabled(context: Context, source: OtpSource, enabled: Boolean) {
+        getPreferences(context).edit { putBoolean(otpSourceKey(source), enabled) }
+    }
+
+    private fun otpSourceKey(source: OtpSource) = when (source) {
+        OtpSource.SMS -> KEY_OTP_SMS
+        OtpSource.NOTIFICATION -> KEY_OTP_NOTIFICATION
+        OtpSource.HELPER -> KEY_OTP_HELPER
+    }
+
+    internal fun isOtpPreference(key: String) = key == KEY_OTP_ENABLED || OtpSource.entries.any { otpSourceKey(it) == key }
 
     /** Opt-in candidates lifecycle for the hardware keyboard; existing installs keep the input view. */
     fun getExperimentalCandidatesViewEnabled(context: Context): Boolean {

@@ -226,6 +226,7 @@ internal fun KeyboardBarSettingsScreen(
                 SettingLinkIds.MODIFIERS_INDICATOR_BOTTOM_STRIP) { enabled ->
                 setIndicator(SettingsManager.MODIFIER_INDICATOR_BOTTOM_STRIP, enabled)
             }
+            OtpSettingsRows()
             KeyboardTextScaleSettingsCard()
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_layout_section))
             KeyboardBarArrangementField(arrangement, displayedSuggestions && displayedActions) {

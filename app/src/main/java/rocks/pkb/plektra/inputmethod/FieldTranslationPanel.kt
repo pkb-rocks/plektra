@@ -19,8 +19,8 @@ import java.util.UUID
 internal class FieldTranslationPanel(private val context: Context, private val host: LinearLayout,
     private val session: FieldTranslationSession, private val locale: Locale,
     private val isCurrent: () -> Boolean, private val onClosed: () -> Unit,
-    private val engineFactory: (String,String) -> TranslationEngine = { a,b -> LocalTranslationEngine(a,b).let{if(rocks.pkb.plektra.SettingsManager.getPreferences(context).getBoolean(TranslationPunctuation.PREFERENCE,true))PunctuationTranslationEngine(it,b)else it} }) {
-    private enum class Stage { LANGUAGES, CONSENT, WORKING, PREVIEW, EDITING, ERROR }
+    private val engineFactory: (String,String) -> TranslationEngine = { a,b -> TranslationEngines.create(context,a,b) }) {
+    private enum class Stage { LANGUAGES, CONSENT, ONLINE_CONSENT, WORKING, PREVIEW, EDITING, ERROR }
     private val colors = TranslationTheme.colors(context)
     private val prefs = context.getSharedPreferences("translation_preferences",Context.MODE_PRIVATE)
     private val displayLocale = context.resources.configuration.locales[0]
@@ -42,6 +42,8 @@ internal class FieldTranslationPanel(private val context: Context, private val h
     private val gestures = TranslationGestures()
     private var engine: TranslationEngine? = null
     private var translated = ""
+    private val usage=DeepLUsage(context)
+    private var onlineChoice=0
     private var previewChoice=0
     private var editingChoice = -1
     private var editor: EditText? = null
@@ -392,6 +394,8 @@ internal class FieldTranslationPanel(private val context: Context, private val h
         return true
     }
     private fun choose() {
+        if(stage==Stage.ONLINE_CONSENT){root.findViewById<Button>(if(onlineChoice==0)R.id.field_translation_run else R.id.field_translation_usage_refresh)?.performClick();return}
+
         if(stage==Stage.PREVIEW){root.findViewById<Button>(if(previewChoice==0)R.id.field_translation_replace else R.id.field_translation_edit)?.performClick();return}
 
         if(stage != Stage.LANGUAGES || selected !in options.indices) return
@@ -401,6 +405,8 @@ internal class FieldTranslationPanel(private val context: Context, private val h
         target = code; begin()
     }
     internal fun moveChoice(steps: Int) {
+        if(stage==Stage.ONLINE_CONSENT){onlineChoice=(onlineChoice+steps.coerceIn(-1,1)).coerceIn(0,1);paintOnlineChoice();return}
+
         if(stage==Stage.PREVIEW){previewChoice=(previewChoice+steps.coerceIn(-1,1)).coerceIn(0,1);paintPreviewChoice();return}
 
         if(stage != Stage.LANGUAGES || options.isEmpty()) return
@@ -428,16 +434,33 @@ internal class FieldTranslationPanel(private val context: Context, private val h
     }
     private fun begin() {
         if(!guarded()) return
+        if(TranslationEngines.selected(context)==TranslationEngines.BERGAMOT && setOf(source,target)!=setOf("fr","en")) {
+            clear(Stage.ERROR,R.string.status_bar_button_translation);root.addView(status(R.string.translation_bergamot_languages));footer();return
+        }
         val version = ++generation; engine?.close()
-        val client = engineFactory(source,target); engine = client; working()
+        val client = engineFactory(source,target); engine = client
+        client.configurationIssue?.let{clear(Stage.ERROR,R.string.status_bar_button_translation);root.addView(status(it));configureDeepL();footer();return}
+        working()
         client.available({ available ->
-            if(valid(version)) { if(available) translate(client,version) else consent(client,version) }
+            if(valid(version)) { if(available){if(client.requiresOnlineConsent)onlineConsent(client,version)else translate(client,version)}else consent(client,version) }
         },{ failure(version) })
     }
+    private fun quotaLine():TextView=text(DeepLUsage.label(context,usage.cached()),12f).apply{id=R.id.field_translation_quota}
+    private fun refreshQuota(version:Int){usage.refresh({value->if(valid(version))root.findViewById<TextView>(R.id.field_translation_quota)?.text=DeepLUsage.label(context,value)},{if(valid(version))root.findViewById<TextView>(R.id.field_translation_quota)?.setText(R.string.translation_deepl_usage_error)})}
+    private fun onlineConsent(client:TranslationEngine,version:Int){
+        clear(Stage.ONLINE_CONSENT,R.string.translation_engine_deepl);onlineChoice=0
+        root.addView(status(R.string.translation_deepl_consent));root.addView(quotaLine())
+        root.addView(text(context.getString(R.string.translation_deepl_request_size,session.text.codePointCount(0,session.text.length)),12f))
+        action(R.string.translation_deepl_send,R.id.field_translation_run){if(valid(version)&&guarded())translate(client,version)}
+        action(R.string.translation_deepl_refresh,R.id.field_translation_usage_refresh,false){usage.refresh({value->if(valid(version))root.findViewById<TextView>(R.id.field_translation_quota)?.text=DeepLUsage.label(context,value)},{if(valid(version))root.findViewById<TextView>(R.id.field_translation_quota)?.setText(R.string.translation_deepl_usage_error)})}
+        paintOnlineChoice();footer()
+    }
+    private fun paintOnlineChoice(){listOf(R.id.field_translation_run,R.id.field_translation_usage_refresh).forEachIndexed{index,id->root.findViewById<Button>(id)?.apply{isSelected=index==onlineChoice;setTextColor((if(isSelected)colors.onPrimary else colors.primary).toArgb());background=shape((if(isSelected)colors.primary else colors.surfaceContainerLow).toArgb(),23)}}}
+    private fun configureDeepL(){action(R.string.translation_deepl_configure,R.id.field_translation_configure,false){close();context.startActivity(android.content.Intent(context,rocks.pkb.plektra.SettingsActivity::class.java).setAction(android.content.Intent.ACTION_VIEW).setData(android.net.Uri.parse("plektra://setting/main.translation")).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))}}
     private fun consent(client: TranslationEngine,version: Int) {
         clear(Stage.CONSENT,R.string.translation_download)
         val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        column.addView(status(R.string.translation_download_notice))
+        column.addView(status(if(client.isLibre)R.string.translation_bergamot_download else R.string.translation_download_notice))
         val mobile = CheckBox(context).apply {
             id = R.id.field_translation_mobile; setText(R.string.translation_allow_mobile); textSize = 13f
             setTextColor(colors.onSurface.toArgb()); buttonTintList = android.content.res.ColorStateList.valueOf(colors.primary.toArgb())
@@ -458,6 +481,7 @@ internal class FieldTranslationPanel(private val context: Context, private val h
             if(!guarded()) return@translate
             translated = value; prefs.edit().putString("source",source).putString("target",target).apply()
             preview(false)
+            if(client.requiresOnlineConsent)refreshQuota(version)
         },{ failure(version) })
     }
     private fun paintPreviewChoice(){
@@ -476,10 +500,10 @@ internal class FieldTranslationPanel(private val context: Context, private val h
         }else text(translated,17f).apply{id=R.id.field_translation_preview}
         value.setTextColor(colors.onSurface.toArgb());value.setPadding(dp(12),dp(12),dp(12),dp(12));value.background=shape(colors.surfaceContainerLow.toArgb(),14)
         body(value)
-        root.addView(ImageView(context).apply{
-            id=R.id.field_translation_attribution;setImageResource(R.drawable.translation_google_attribution)
-            contentDescription="powered by Google Translate";scaleType=ImageView.ScaleType.FIT_START
-        },LinearLayout.LayoutParams(dp(132),dp(18)).apply{topMargin=dp(8);gravity=Gravity.END})
+        if(engine?.attribution!=null)root.addView(text(engine!!.attribution!!,11f).apply{gravity=Gravity.END;setTextColor(colors.onSurfaceVariant.toArgb())})
+        else if(engine?.isLibre==true)root.addView(text("Bergamot · MPL 2.0",11f).apply{id=R.id.field_translation_attribution;gravity=Gravity.END;setTextColor(colors.onSurfaceVariant.toArgb())})
+        else root.addView(ImageView(context).apply{id=R.id.field_translation_attribution;setImageResource(R.drawable.translation_google_attribution);contentDescription="powered by Google Translate";scaleType=ImageView.ScaleType.FIT_START},LinearLayout.LayoutParams(dp(132),dp(18)).apply{topMargin=dp(8);gravity=Gravity.END})
+        if(engine?.requiresOnlineConsent==true)root.addView(quotaLine())
         action(R.string.translation_accept,R.id.field_translation_replace){
             val final=editor?.text?.toString() ?: translated
             if(!isCurrent()||!session.replace(final)){changed();return@action};close()
@@ -498,8 +522,8 @@ internal class FieldTranslationPanel(private val context: Context, private val h
     private fun acceptEditing(){root.findViewById<Button>(if(editingChoice==1)R.id.field_translation_edit else R.id.field_translation_replace)?.performClick()}
     private fun failure(version: Int) {
         if(!valid(version)) return
-        clear(Stage.ERROR,R.string.status_bar_button_translation); root.addView(status(R.string.translation_error))
-        action(R.string.translation_translate,R.id.field_translation_run) { begin() }
+        clear(Stage.ERROR,R.string.status_bar_button_translation); root.addView(status(engine?.failureMessage ?: R.string.translation_error))
+        action(R.string.translation_retry,R.id.field_translation_run) { begin() };if(engine?.requiresOnlineConsent==true)configureDeepL()
         footer()
     }
     private fun changed() { Toast.makeText(context,R.string.translation_changed,Toast.LENGTH_LONG).show(); close() }
@@ -551,7 +575,7 @@ internal class FieldTranslationPanel(private val context: Context, private val h
         if(closed) return
         android.util.Log.d("KeyboardTranslation","close stage=$stage")
         drag?.cancel(); bottomDrag.cancel(); resize.cancel(); bottomContact = false; editorInput = null
-        closed = true; generation++; engine?.close(); engine = null; gestures.reset()
+        closed = true; generation++; usage.close();engine?.close(); engine = null; gestures.reset()
         dialog?.dismiss(); dialog = null; onClosed()
     }
 }

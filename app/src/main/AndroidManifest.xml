@@ -4,16 +4,16 @@
 
     <!-- Permesso per le notifiche (richiesto da Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    
+
     <!-- Permesso per la vibrazione (richiesto per haptic feedback) -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Riavvia il timeout dello schermo dopo un tocco sulla tastiera -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    
+
     <!-- Permesso per il riconoscimento vocale -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    
+
     <!-- Permesso per l'accesso a Internet (richiesto per il controllo aggiornamenti) -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -34,7 +34,7 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
-        
+
         <!-- Query per vedere i launcher -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -48,7 +48,10 @@
         <package android:name="com.clicks.companionapp" />
     </queries>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:networkSecurityConfig="@xml/translation_network_security"
         android:name=".PlektraApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -63,7 +66,7 @@
             android:exported="false"
             android:label="${appLabel}"
             android:theme="@style/Theme.Plektra" />
-        
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|navigation"
@@ -141,14 +144,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
+
         <!-- Activity per la personalizzazione SYM -->
         <activity
             android:name=".SymCustomizationActivity"
             android:exported="false"
             android:label="@string/sym_customize_title"
             android:theme="@style/Theme.Plektra" />
-        
+
         <activity android:name=".KeyboardLayoutActivity" android:exported="false" android:theme="@style/Theme.Plektra" />
         <activity android:name=".NotesActivity" android:exported="false"
             android:configChanges="keyboard|keyboardHidden|navigation"
@@ -189,14 +192,14 @@
                     android:pathPrefix="/settings/" />
             </intent-filter>
         </activity>
-        
+
         <!-- Activity per gestire le lingue degli input method subtypes -->
         <activity
             android:name=".LanguagesActivity"
             android:exported="false"
             android:label="@string/languages_title"
             android:theme="@style/Theme.Plektra" />
-        
+
         <activity
             android:name=".dictionaries.InstalledDictionariesActivity"
             android:exported="false"
@@ -254,7 +257,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity="" />
-        
+
         <!-- Attività per assegnare scorciatoie del launcher -->
         <activity
             android:name=".inputmethod.LauncherShortcutAssignmentActivity"

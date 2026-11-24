@@ -20,6 +20,9 @@ import java.util.Locale
 @RunWith(RobolectricTestRunner::class) @Config(sdk=[33])
 class FieldTranslationPanelTest {
  private class Fake : TranslationEngine {
+  var online=false;var issue:Int?=null
+  override val requiresOnlineConsent get()=online
+  override val configurationIssue get()=issue
   var installed=false;var downloads=0;var wifi=false;var closed=false
   var pending:((String)->Unit)?=null;var fail:(()->Unit)?=null;var received:String?=null
   override fun available(done:(Boolean)->Unit,failed:()->Unit){done(installed)}
@@ -253,4 +256,19 @@ class FieldTranslationPanelTest {
   assertEquals("Bonjour",fake.received);assertEquals("Bonjour",text)
   verify(input,never()).commitText(any(CharSequence::class.java),anyInt())
  }
+ @Test fun onlineEngineRequiresExplicitApprovalBeforeReceivingText() {
+  fake.installed=true;fake.online=true;start();choose();assertNull(fake.received)
+  assertNotNull(view().findViewById<Button>(R.id.field_translation_run));panel.acceptChoice()
+  assertEquals("Bonjour",fake.received);assertEquals("Bonjour",text)
+  fake.pending!!("Hello");assertEquals("Bonjour",text);accept();assertEquals("Hello",text)
+ }
+ @Test fun closingOnlineConsentNeverSendsTheSelection() {
+  fake.installed=true;fake.online=true;start();choose();panel.close();assertNull(fake.received)
+  verify(input,never()).commitText(any(CharSequence::class.java),anyInt())
+ }
+ @Test fun missingCredentialShowsConfigurationWithoutSendingOrDownloading() {
+  fake.issue=R.string.translation_deepl_missing;start();choose();assertNull(fake.received);assertEquals(0,fake.downloads)
+  assertNotNull(view().findViewById<Button>(R.id.field_translation_configure));assertEquals("Bonjour",text)
+ }
+
 }

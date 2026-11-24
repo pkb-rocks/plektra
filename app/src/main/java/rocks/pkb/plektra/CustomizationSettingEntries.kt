@@ -1,7 +1,19 @@
 package rocks.pkb.plektra
 
+private val keyboardBarContents = SettingRoute(destination = SettingsDestination.Customization,
+    customizationDestination = "status_bar_buttons")
+
 /** Addressable customization controls; dynamic data rows remain inside their aggregate editors. */
 internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
+    SettingEntry("keyboard_bar.clipboard_paste_suggestion", R.string.clipboard_paste_suggestion,
+        summaryRes = R.string.clipboard_paste_suggestion_summary, route = keyboardBarContents),
+    SettingEntry("keyboard_bar.otp", R.string.otp_title, summaryRes = R.string.otp_summary, route = keyboardBarContents),
+    SettingEntry("keyboard_bar.otp_sms", R.string.otp_sms, route = keyboardBarContents,
+        unavailableFallbackId = "keyboard_bar.otp", availabilityCheck = { BuildConfig.DISTRIBUTION_CHANNEL == "direct" && SettingsManager.getOtpEnabled(it) }),
+    SettingEntry("keyboard_bar.otp_notifications", R.string.otp_notifications, route = keyboardBarContents,
+        unavailableFallbackId = "keyboard_bar.otp", availabilityCheck = SettingsManager::getOtpEnabled),
+    SettingEntry("keyboard_bar.otp_helper", R.string.otp_helper, route = keyboardBarContents,
+        unavailableFallbackId = "keyboard_bar.otp", availabilityCheck = SettingsManager::getOtpEnabled),
     SettingEntry("keyboard_bar.text_scale", R.string.keyboard_text_size_title,
         summaryRes = R.string.keyboard_text_size_hint, route = SettingRoute(
             destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons")),

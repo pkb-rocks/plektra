@@ -105,6 +105,27 @@ class FullSuggestionsBarAppearanceTest {
         assertEquals(View.VISIBLE, view.visibility)
     }
 
+    @Test fun privateActionOnlyReplacesTheMiddleWordAndReleasesItsListenerOnDismiss() {
+        val bar = FullSuggestionsBar(context)
+        val view = bar.ensureView()
+        bar.setContentEnabled(suggestions = true, menuButtons = false)
+        val words = listOf("first", "second", "third")
+        fun render() = bar.update(words, true, null, null, false, null, null, null, null, null, null, null)
+        fun labels() = descendants(view).filterIsInstance<TextView>().filter { it.text.isNotEmpty() }
+        render()
+        val normal = listOf("third", "first", "second")
+        assertEquals(normal, labels().map { it.text.toString() })
+        bar.centerAction = FullSuggestionsBar.CenterAction("private", { bar.centerAction = null; render() }) {
+            fail("dismissed action inserted")
+        }
+        render()
+        assertEquals(listOf("third", "private", "second"), labels().map { it.text.toString() })
+        val stale = labels()[1]
+        assertTrue(stale.performLongClick())
+        assertEquals(normal, labels().map { it.text.toString() })
+        assertFalse(stale.performClick())
+    }
+
     @Test fun liveSpeechPreviewUpdatesInOrderWithoutInsertionActions() {
         val bar = FullSuggestionsBar(context)
         val view = bar.ensureView()

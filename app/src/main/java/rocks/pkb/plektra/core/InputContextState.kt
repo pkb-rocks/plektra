@@ -15,7 +15,8 @@ data class InputContextState(
     val inputVariation: Int,
     val inputType: Int,
     val restrictedReason: RestrictedReason?,
-    val isAppRawMode: Boolean = false
+    val isAppRawMode: Boolean = false,
+    val containsInsertedOtp: Boolean = false
 ) {
 
     val isPhoneField: Boolean
@@ -39,7 +40,7 @@ data class InputContextState(
      * Disabled for: PASSWORD, URI, EMAIL, FILTER, LITERAL_ENTRY
      */
     val shouldDisableAutoCorrect: Boolean
-        get() = isAppRawMode || restrictedReason != null
+        get() = containsInsertedOtp || isAppRawMode || restrictedReason != null
     
     /**
      * Disable auto-capitalization (automatic capitalization after period/enter).

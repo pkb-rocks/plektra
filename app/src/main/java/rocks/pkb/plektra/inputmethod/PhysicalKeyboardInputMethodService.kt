@@ -79,6 +79,11 @@ import java.util.Locale
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
 import rocks.pkb.plektra.clipboard.ClipboardHistoryManager
+import rocks.pkb.plektra.clipboard.RecentPaste
+import rocks.pkb.plektra.inputmethod.otp.InsertedCodes
+import rocks.pkb.plektra.inputmethod.otp.OtpInbox
+import rocks.pkb.plektra.inputmethod.otp.OtpRuntime
+import rocks.pkb.plektra.inputmethod.suggestions.ui.FullSuggestionsBar
 import android.content.pm.PackageManager
 import rikka.shizuku.Shizuku
 
@@ -171,6 +176,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private lateinit var smoothCaretOverlayController: SmoothCaretOverlayController
     private var smoothCaretEditorHidden = false
     private lateinit var candidatesBarController: CandidatesBarController
+    private lateinit var recentPaste: RecentPaste
+    private var otpRuntime: OtpRuntime? = null // Deferred until credential storage is available.
+    private var slotEditor: EditorInfo? = null
+    private var renderedOtp: OtpInbox.Entry? = null
+    private var renderedPaste: RecentPaste.Entry? = null
+    private val privateEditors = mutableMapOf<Pair<String, Int>, InsertedCodes>()
     private lateinit var textExpansionController: TextExpansionController
     private lateinit var emojiShortcodeSource: EmojiShortcodeSource
     private lateinit var symbolShortcodeSource: SymbolShortcodeSource
@@ -441,7 +452,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private fun updateInputContextState(info: EditorInfo?) {
         // Exact Typing: the raw-mode choice also covers WebAPKs (matched via their host browser).
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
-        inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
+        inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp).copy(
+            containsInsertedOtp = info?.privateEditorKey() in privateEditors
+        )
         keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, info?.packageName)
     }
 
@@ -1261,7 +1274,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         outputKeyCodeName: String
     ): Boolean {
         inputConnection.finishComposingText()
-        inputConnection.commitText("\n", 1)
+        if (inputConnection.commitText("\n", 1)) dismissCenterSuggestion()
         textInputController.handleAutoCapAfterEnter(
             keyCode,
             inputConnection,
@@ -1978,6 +1991,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             currentLocale = initialLocale,
             keyboardLayoutProvider = { SettingsManager.getKeyboardLayout(this) },
             activeSuggestionLocalesProvider = { getAdditionalSuggestionLocalesForActiveInputStyle() },
+            privateEditorText = { privateEditors[currentInputEditorInfo?.privateEditorKey()] },
             isStorageAvailable = { !directBootLocked }
         )
         inputEventRouter.suggestionController = suggestionController
@@ -1990,6 +2004,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (!lockedAtCreate) startClipboardHistory()
 
         candidatesBarController = CandidatesBarController(this, clipboardHistoryManager, assets, PhysicalKeyboardInputMethodService::class.java)
+        recentPaste = RecentPaste(this) { refreshCenterSuggestion() }
+        if (!lockedAtCreate) attachOtpRuntime()
         val snippetExpansionSource = SnippetExpansionSource {
             SettingsManager.getSnippets(this)
         }
@@ -2043,6 +2059,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             },
             requestSurfaceUpdate = { updateStatusBarText() },
             onCommitted = {
+                dismissCenterSuggestion()
                 markSelectionUpdateSkipAfterCommit()
                 suggestionController.onContextReset()
                 suggestionController.readInitialContext(currentInputConnection)
@@ -2051,6 +2068,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
         prepareEnabledExpansionAssets()
         candidatesBarController.onAddUserWord = { word ->
+            dismissCenterSuggestion()
             if (shiftLayerLatched || altModifierLayerLatched) {
                 shiftLayerLatched = false
                 altModifierLayerLatched = false
@@ -2066,6 +2084,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             showAddSubstitutionDialog(word)
         }
         candidatesBarController.onSuggestionCommitted = {
+            dismissCenterSuggestion()
             if (shiftLayerLatched || altModifierLayerLatched) {
                 shiftLayerLatched = false
                 altModifierLayerLatched = false
@@ -2123,6 +2142,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
 
             override fun onVariationSelected(variation: String) {
+                dismissCenterSuggestion()
                 val keepLayerLatchedAfterVariation =
                     SettingsManager.isStaticVariationBarLayerStickyEnabled(this@PhysicalKeyboardInputMethodService)
                 val hasLatchedLayer = shiftLayerLatched || altModifierLayerLatched
@@ -2287,7 +2307,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             handleSoftwareKeyboardTextInput(text, inputConnection ?: currentInputConnection, snapshot)
         }
         candidatesBarController.onSymTextCommitted = {
-            modifierStateController.consumeShiftOneShot()
+            onSymbolCommitted()
             updateStatusBarText()
         }
         candidatesBarController.onSoftwareKeyboardBoundaryTextInput = { text, inputConnection ->
@@ -2311,6 +2331,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         clipboardHistoryManager.addAccessStateListener {
             uiHandler.post {
+                refreshCenterSuggestion()
                 candidatesBarController.updateClipboardCount(clipboardHistoryManager.getHistorySize())
             }
         }
@@ -2328,6 +2349,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Register callback to be notified when an Alt character is inserted after long press.
         // Variations are updated automatically by updateStatusBarText().
         alternateCharacterManager.onAltCharInserted = { char ->
+            dismissCenterSuggestion()
             DeferredPunctuationSpaceTracker.onTextCommitted(this, char.toString())
             updateStatusBarText()
             val ic = currentInputConnection
@@ -2347,6 +2369,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Track normal characters committed via Alt short press (no long press triggered)
         alternateCharacterManager.onNormalCharCommitted = { text ->
+            dismissCenterSuggestion()
             if (::suggestionController.isInitialized) {
                 // Avoid double-tracking plain letters already handled by the main pipeline.
                 val ch = text.firstOrNull()
@@ -2380,7 +2403,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 keyCode,
                 currentInputConnection,
                 updateStatusBar = { updateStatusBarText() },
-                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+                onSymbolCommitted = ::onSymbolCommitted
             )
         }
         candidatesBarController.onSymPageKeyLongPressed = { keyCode ->
@@ -2470,6 +2493,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Register listener for SharedPreferences changes
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPrefs, key ->
             Log.d(TRACKPAD_DEBUG_TAG, "SharedPrefs changed: key=$key")
+            if (key == SettingsManager.KEY_CLIPBOARD_PASTE_SUGGESTION || key == null) refreshCenterSuggestion()
             if (key == "sym_mappings_custom") {
                 Log.d(TAG, "SYM mappings page 1 changed, reloading...")
                 // Reload SYM mappings for page 1
@@ -2669,6 +2693,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(
                         this, currentInputEditorInfo?.packageName
                     )
+                    refreshCenterSuggestion()
                     // Closes an open clipboard or emoji picker page and drops invisible candidates.
                     symLayoutController.currentSymPage()
                     if (keyboardBarHiddenInEditor) {
@@ -2799,6 +2824,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     ): Boolean {
         if (liveSpeechEditor != null) cancelSpeechRecognition()
         val ic = inputConnection ?: return false
+        if (text.isNotEmpty() && ic === currentInputConnection) dismissCenterSuggestion()
 
         if (text == " ") {
             if (::textExpansionController.isInitialized &&
@@ -3084,6 +3110,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     override fun onDestroy() {
+        otpRuntime?.onChanged = null
+        otpRuntime = null
+        slotEditor = null
+        if (::recentPaste.isInitialized) recentPaste.current(false)
+        if (::candidatesBarController.isInitialized) candidatesBarController.setCenterSuggestion(null)
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         caretBadgeController.destroy()
@@ -3199,6 +3230,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         trackpadGestureDetector = buildTrackpadGestureDetector()
         if (shouldStartShizukuTrackpadDetector()) trackpadGestureDetector.start()
         keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, currentInputEditorInfo?.packageName)
+        attachOtpRuntime()
+        refreshCenterSuggestion(render = false, requestSurface = false)
         if (isInputViewActive) suggestionController.readInitialContext(currentInputConnection)
         invalidateRenderedStatusSnapshot()
         updateStatusBarText()
@@ -3565,6 +3598,81 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         syncCursorAnchorMonitoring()
     }
     
+    private fun EditorInfo.privateEditorKey() = packageName.orEmpty() to fieldId
+
+    private fun attachOtpRuntime() {
+        otpRuntime = OtpRuntime.get(this).also { it.onChanged = { refreshCenterSuggestion() } }
+    }
+
+    private fun onSymbolCommitted() {
+        dismissCenterSuggestion()
+        modifierStateController.consumeShiftOneShot()
+    }
+
+    private fun dismissCenterSuggestion() {
+        renderedOtp?.let { entry ->
+            otpRuntime?.run { inbox.dismiss(entry); refresh() }
+            return
+        }
+        renderedPaste?.let { entry ->
+            recentPaste.dismiss(entry)
+            refreshCenterSuggestion()
+        }
+    }
+
+    private fun pasteAllowed() = SettingsManager.getClipboardPasteSuggestion(this) &&
+        !inputContextState.isPasswordField && clipboardHistoryManager.isHistoryAccessible()
+
+    private fun refreshCenterSuggestion(render: Boolean = true, requestSurface: Boolean = true) {
+        val runtime = otpRuntime ?: return
+        val editor = slotEditor
+        val connection = currentInputConnection
+        val allowed = editor != null && connection != null && !keyboardBarHiddenInEditor
+        val otp = if (allowed) runtime.inbox.current() else null
+        val paste = recentPaste.current(allowed && otp == null && pasteAllowed())?.takeUnless {
+            // Helper can both broadcast and copy the same code.
+            runtime.inbox.wasDismissed(it.label)
+        }
+        if (otp === renderedOtp && paste === renderedPaste) return
+        renderedOtp = otp
+        renderedPaste = paste
+        val label = otp?.code ?: paste?.label
+        fun stillBound() = slotEditor === editor && currentInputConnection === connection &&
+            !keyboardBarHiddenInEditor && otp === renderedOtp && paste === renderedPaste
+        val action = if (label == null || editor == null || connection == null) null else
+            FullSuggestionsBar.CenterAction(label, { if (stillBound()) dismissCenterSuggestion() }) {
+                if (!stillBound()) return@CenterAction
+                if (otp != null) {
+                    runtime.inbox.use(otp) { commitPrivateText(editor, connection, it, isPaste = false) }
+                    runtime.refresh()
+                } else if (paste != null) {
+                    if (pasteAllowed() && runtime.inbox.current() == null) {
+                        recentPaste.use(paste) { commitPrivateText(editor, connection, it, isPaste = true) }
+                    }
+                    refreshCenterSuggestion()
+                }
+            }
+        candidatesBarController.setCenterSuggestion(action)
+        invalidateRenderedStatusSnapshot()
+        if (render) updateStatusBarText()
+        if (action != null && requestSurface &&
+            SettingsManager.resolveEffectiveSoftwareKeyboardMode(this) != SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL) {
+            ensureImeSurfaceVisible()
+        }
+    }
+
+    private fun commitPrivateText(editor: EditorInfo, connection: InputConnection, text: String, isPaste: Boolean): Boolean {
+        if (!connection.commitText(text, 1)) return false
+        inputContextState = inputContextState.copy(containsInsertedOtp = true)
+        val guard = privateEditors.getOrPut(editor.privateEditorKey()) { InsertedCodes() }
+        // A multiline paste can resurface one token at a time. Guard the editor, not the clip.
+        if (isPaste) guard.protectWholeEditor() else guard.remember(text)
+        cancelPendingSelectionDrivenUiWork()
+        suggestionController.onContextReset()
+        textExpansionController.clear()
+        return true
+    }
+
     /**
      * Shows the surface appropriate for the effective keyboard mode: the full input view in
      * virtual mode, or the candidates/status surface in hardware mode.
@@ -3949,6 +4057,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ++speechEditorSession
         }
         super.onStartInput(info, restarting)
+        slotEditor = null
+        refreshCenterSuggestion(render = false)
         if (::textExpansionController.isInitialized) textExpansionController.clear()
         if (
             !restarting ||
@@ -3978,6 +4088,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val isEditable = state.isEditable
         val isReallyEditable = state.isReallyEditable
         isInputViewActive = isEditable
+        slotEditor = info.takeIf { state.isReallyEditable }
+        refreshCenterSuggestion(render = false, requestSurface = false)
         softwareKeypadSession.onFieldStarted(state.inputType, restarting)
         if (!restarting) hardwareKeypadAutoOpen.settle()
         keyboardVisibilityController.onInputStarted(restarting)
@@ -4154,6 +4266,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             candidatesBarController.resetSuggestionActionMode()
         }
         inputContextState = InputContextState.EMPTY
+        slotEditor = null
+        refreshCenterSuggestion()
         multiTapController.cancelAll()
         disableEmojiSearchInputCapture()
         resetModifierStates(preserveNavMode = true)
@@ -4206,6 +4320,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     
     override fun onWindowShown() {
         super.onWindowShown()
+        refreshCenterSuggestion(requestSurface = false)
         keyboardVisibilityController.onImeWindowVisibilityChanged(shown = true)
         updateStatusBarText()
         attachTrackpadDecorViewMotionHook("onWindowShown")
@@ -5074,6 +5189,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val initialInputConnection = currentInputConnection
         val inputType = info?.inputType ?: EditorInfo.TYPE_NULL
         val hasEditableField = initialInputConnection != null && inputType != EditorInfo.TYPE_NULL
+        if (hasEditableField && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || keyCode == KeyEvent.KEYCODE_SPACE)) {
+            dismissCenterSuggestion()
+        }
         // Accepted hardware input settles the keypad choice before shortcut early returns.
         if (hasEditableField && keyCode != KeyEvent.KEYCODE_BACK && event != null &&
             event.flags and KeyEvent.FLAG_SOFT_KEYBOARD == 0) {
@@ -5326,7 +5444,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 val inputConnection = currentInputConnection
                 val committed = handleBoundaryTextBeforeCommit(symChar, inputConnection) ||
                     inputConnection?.commitText(symChar, 1) == true
-                if (committed) modifierStateController.consumeShiftOneShot()
+                if (committed) onSymbolCommitted()
                 updateStatusBarText()
                 return true
             }
@@ -5653,6 +5771,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     event?.unicodeChar?.takeIf { it != 0 } != null -> event.unicodeChar.toChar().toString()
                     else -> ""
                 }
+                if (typedText.isNotEmpty() && event?.isMetaPressed != true) dismissCenterSuggestion()
                 val insertedDeferredSpace =
                     DeferredPunctuationSpaceTracker.prepareForTextCommit(this, ic, typedText)
                 if (insertedDeferredSpace) {
@@ -6091,7 +6210,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 keyCode,
                 currentInputConnection,
                 updateStatusBar = { updateStatusBarText() },
-                onSymbolCommitted = { modifierStateController.consumeShiftOneShot() }
+                onSymbolCommitted = ::onSymbolCommitted
             )
         ) {
             return true
@@ -6647,7 +6766,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
             ic.deleteSurroundingText(deleteBefore, deleteAfter)
             val textToCommit = if (shouldAppendSpace) "$replacement " else replacement
-            ic.commitText(textToCommit, 1)
+            if (ic.commitText(textToCommit, 1)) dismissCenterSuggestion()
             if (shiftOneShot) {
                 modifierStateController.consumeShiftOneShot()
             }

@@ -19,16 +19,16 @@ import rocks.pkb.plektra.inputmethod.statusbar.button.UndoButtonFactory
 
 /**
  * Central registry for status bar button factories.
- * 
+ *
  * Manages the creation and configuration of status bar buttons.
  * Built-in buttons (clipboard, microphone, language) are registered by default.
  * Custom buttons can be registered dynamically.
- * 
+ *
  * Usage:
  * ```
  * val registry = StatusBarButtonRegistry()
  * val enabledButtons = registry.getEnabledButtons(context)
- * 
+ *
  * for (config in enabledButtons) {
  *     val result = registry.createButton(context, config.id, buttonSize, callbacks)
  *     // Add result.view to layout
@@ -36,9 +36,9 @@ import rocks.pkb.plektra.inputmethod.statusbar.button.UndoButtonFactory
  * ```
  */
 class StatusBarButtonRegistry {
-    
+
     private val factories = mutableMapOf<StatusBarButtonId, StatusBarButtonFactory>()
-    
+
     // Keep references to specific factories for direct access when needed
     private val clipboardFactory = ClipboardButtonFactory()
     private val microphoneFactory = MicrophoneButtonFactory()
@@ -51,9 +51,10 @@ class StatusBarButtonRegistry {
     private val symbolsFactory = SymbolsButtonFactory()
     private val undoFactory = UndoButtonFactory(isRedo = false)
     private val redoFactory = UndoButtonFactory(isRedo = true)
-    
+
     init {
         // Register built-in button factories
+        factories[StatusBarButtonId.Translation] = rocks.pkb.plektra.inputmethod.statusbar.button.TranslationButtonFactory()
         factories[StatusBarButtonId.Clipboard] = clipboardFactory
         factories[StatusBarButtonId.Microphone] = microphoneFactory
         factories[StatusBarButtonId.Language] = languageFactory
@@ -68,49 +69,49 @@ class StatusBarButtonRegistry {
         factories[StatusBarButtonId.Redo] = redoFactory
         factories[StatusBarButtonId.Keypad] = KeypadButtonFactory()
     }
-    
+
     /**
      * Registers a custom button factory.
-     * 
+     *
      * @param id The unique identifier for this button
      * @param factory The factory to create the button
      */
     fun register(id: StatusBarButtonId, factory: StatusBarButtonFactory) {
         factories[id] = factory
     }
-    
+
     /**
      * Unregisters a button factory.
-     * 
+     *
      * Note: Built-in buttons cannot be unregistered, only disabled via configuration.
-     * 
+     *
      * @param id The identifier of the button to unregister
      * @return true if the factory was removed, false if it wasn't registered or is built-in
      */
     fun unregister(id: StatusBarButtonId): Boolean {
-        if (id in listOf(StatusBarButtonId.Clipboard, StatusBarButtonId.Microphone, StatusBarButtonId.Language, StatusBarButtonId.Emoji, StatusBarButtonId.Hamburger, StatusBarButtonId.MinimalUi, StatusBarButtonId.SoftwareKeyboardMode, StatusBarButtonId.Settings, StatusBarButtonId.KeyboardPicker, StatusBarButtonId.Symbols, StatusBarButtonId.Undo, StatusBarButtonId.Redo)) {
+        if (id in listOf(StatusBarButtonId.Translation,StatusBarButtonId.Clipboard, StatusBarButtonId.Microphone, StatusBarButtonId.Language, StatusBarButtonId.Emoji, StatusBarButtonId.Hamburger, StatusBarButtonId.MinimalUi, StatusBarButtonId.SoftwareKeyboardMode, StatusBarButtonId.Settings, StatusBarButtonId.KeyboardPicker, StatusBarButtonId.Symbols, StatusBarButtonId.Undo, StatusBarButtonId.Redo)) {
             return false // Cannot unregister built-in buttons
         }
         return factories.remove(id) != null
     }
-    
+
     /**
      * Gets the factory for a specific button ID.
-     * 
+     *
      * @param id The button identifier
      * @return The factory, or null if not registered
      */
     fun getFactory(id: StatusBarButtonId): StatusBarButtonFactory? {
         return factories[id]
     }
-    
+
     /**
      * Creates a button using the registered factory.
-     * 
+     *
      * The factory will extract only the callbacks it needs from StatusBarCallbacks.
      * This allows VariationBarView to pass all callbacks without knowing which buttons
      * will use which callbacks.
-     * 
+     *
      * @param context Android context
      * @param id The button identifier
      * @param size Button size in pixels
@@ -125,10 +126,10 @@ class StatusBarButtonRegistry {
     ): ButtonCreationResult? {
         return factories[id]?.create(context, size, callbacks)
     }
-    
+
     /**
      * Updates a button's state.
-     * 
+     *
      * @param id The button identifier
      * @param view The button view to update
      * @param state The new state
@@ -136,23 +137,23 @@ class StatusBarButtonRegistry {
     fun updateButton(id: StatusBarButtonId, view: View, state: ButtonState) {
         factories[id]?.update(view, state)
     }
-    
+
     /**
      * Cleans up resources for a button being removed.
-     * 
+     *
      * @param id The button identifier
      * @param view The button view being removed
      */
     fun cleanupButton(id: StatusBarButtonId, view: View) {
         factories[id]?.cleanup(view)
     }
-    
+
     /**
      * Gets the list of enabled buttons based on slot configuration.
-     * 
+     *
      * Reads from SettingsManager to determine which buttons are in each slot.
      * Layout: [Left Slots] [---variations---] [Right Slots]
-     * 
+     *
      * @param context Android context (for reading settings)
      * @return List of enabled button configurations, sorted for display
      */
@@ -183,7 +184,7 @@ class StatusBarButtonRegistry {
         rightSlots: List<String>
     ): List<StatusBarButtonConfig> {
         val enabledButtons = mutableListOf<StatusBarButtonConfig>()
-        
+
         leftSlots.forEachIndexed { index, button ->
             buttonIdFromString(button)?.let { id ->
                 enabledButtons.add(StatusBarButtonConfig(
@@ -194,7 +195,7 @@ class StatusBarButtonRegistry {
                 ))
             }
         }
-        
+
         rightSlots.forEachIndexed { index, button ->
             buttonIdFromString(button)?.let { id ->
                 enabledButtons.add(StatusBarButtonConfig(
@@ -205,16 +206,17 @@ class StatusBarButtonRegistry {
                 ))
             }
         }
-        
+
         return enabledButtons
     }
-    
+
     /**
      * Converts a button string ID to a StatusBarButtonId.
      * Returns null for "none" or unknown IDs.
      */
     private fun buttonIdFromString(buttonString: String): StatusBarButtonId? {
         return when (buttonString) {
+            SettingsManager.STATUS_BAR_BUTTON_TRANSLATION -> StatusBarButtonId.Translation
             SettingsManager.STATUS_BAR_BUTTON_CLIPBOARD -> StatusBarButtonId.Clipboard
             SettingsManager.STATUS_BAR_BUTTON_MICROPHONE -> StatusBarButtonId.Microphone
             SettingsManager.STATUS_BAR_BUTTON_EMOJI -> StatusBarButtonId.Emoji
@@ -231,10 +233,10 @@ class StatusBarButtonRegistry {
             else -> null
         }
     }
-    
+
     /**
      * Gets the default button configuration.
-     * 
+     *
      * Default layout: [Clipboard] [---variations---] [Emoji] [Language]
      */
     fun getDefaultConfiguration(): List<StatusBarButtonConfig> {
@@ -259,24 +261,24 @@ class StatusBarButtonRegistry {
             )
         )
     }
-    
+
     /**
      * Direct access to the microphone factory for audio level updates.
      * This is needed because audio level updates happen frequently and
      * we want to avoid the overhead of looking up the factory each time.
      */
     fun getMicrophoneFactory(): MicrophoneButtonFactory = microphoneFactory
-    
+
     /**
      * Direct access to the language factory for text updates.
      */
     fun getLanguageFactory(): LanguageButtonFactory = languageFactory
-    
+
     /**
      * Direct access to the clipboard factory for badge updates.
      */
     fun getClipboardFactory(): ClipboardButtonFactory = clipboardFactory
-    
+
     /**
      * Direct access to the emoji factory.
      */

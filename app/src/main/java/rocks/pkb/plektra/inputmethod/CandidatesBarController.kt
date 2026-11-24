@@ -126,14 +126,17 @@ class CandidatesBarController(
             inputStatusBar.onLanguageSwitchRequested = value
             candidatesStatusBar.onLanguageSwitchRequested = value
         }
-    
+
+    var onTranslationRequested: (() -> Unit)? = null
+        set(value){field=value;inputStatusBar.onTranslationRequested=value;candidatesStatusBar.onTranslationRequested=value}
+    fun updateTranslationButton(active:Boolean){inputStatusBar.updateTranslationButton(active);candidatesStatusBar.updateTranslationButton(active)}
     var onClipboardRequested: (() -> Unit)? = null
         set(value) {
             field = value
             inputStatusBar.onClipboardRequested = value
             candidatesStatusBar.onClipboardRequested = value
         }
-    
+
     var onEmojiPickerRequested: (() -> Unit)? = null
         set(value) {
             field = value
@@ -161,7 +164,7 @@ class CandidatesBarController(
             inputStatusBar.onEmojiPickerCommittingText = value
             candidatesStatusBar.onEmojiPickerCommittingText = value
         }
-    
+
     var onSymbolsPageRequested: (() -> Unit)? = null
         set(value) {
             field = value
@@ -386,7 +389,7 @@ class CandidatesBarController(
         inputStatusBar.refreshWindowInsets()
         candidatesStatusBar.refreshWindowInsets()
     }
-    
+
     fun invalidateStaticVariations() {
         inputStatusBar.invalidateStaticVariations()
         candidatesStatusBar.invalidateStaticVariations()
@@ -396,7 +399,7 @@ class CandidatesBarController(
         inputStatusBar.setMicrophoneButtonActive(isActive)
         candidatesStatusBar.setMicrophoneButtonActive(isActive)
     }
-    
+
     fun updateSpeechFeedback(processing: Boolean, countdown: Int?) {
         inputStatusBar.updateSpeechFeedback(processing, countdown)
         candidatesStatusBar.updateSpeechFeedback(processing, countdown)
@@ -406,7 +409,7 @@ class CandidatesBarController(
         inputStatusBar.updateMicrophoneAudioLevel(rmsdB)
         candidatesStatusBar.updateMicrophoneAudioLevel(rmsdB)
     }
-    
+
     fun showSpeechRecognitionHint(show: Boolean) {
         inputStatusBar.showSpeechRecognitionHint(show)
         candidatesStatusBar.showSpeechRecognitionHint(show)

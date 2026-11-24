@@ -52,6 +52,9 @@ class StatusBarButtonHost(
     ): HostedButton? {
         val existing = hostedButtons[id]
         if (existing != null) {
+            if (id == StatusBarButtonId.Translation) {
+                rocks.pkb.plektra.inputmethod.statusbar.button.TranslationButtonFactory.bind(existing.button, callbacks)
+            }
             if (id == StatusBarButtonId.Language) {
                 registry.getLanguageFactory().refreshLanguageText(context, existing.button)
             }

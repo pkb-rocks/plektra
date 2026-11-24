@@ -75,6 +75,7 @@ class VariationBarView(
     var onAddUserWord: ((String) -> Unit)? = null
     var onAddUserWordSubstitutionRequested: ((String) -> Unit)? = null
     var onLanguageSwitchRequested: (() -> Unit)? = null
+    var onTranslationRequested: (() -> Unit)? = null
     var onClipboardRequested: (() -> Unit)? = null
     var onEmojiPickerRequested: (() -> Unit)? = null
     var onSymbolsPageRequested: (() -> Unit)? = null
@@ -84,7 +85,7 @@ class VariationBarView(
     var onMinimalUiToggleRequested: (() -> Unit)? = null
     var onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null
     var onKeypadRequested: (() -> Unit)? = null
-    
+
     /**
      * Sets the microphone button active state (red pulsing background) during speech recognition.
      */
@@ -92,7 +93,7 @@ class VariationBarView(
         isMicrophoneActive = isActive
         buttonHost?.setMicrophoneActive(isActive)
     }
-    
+
     /**
      * Updates the microphone button visual feedback based on audio level.
      * Changes the red color intensity based on audio volume.
@@ -153,7 +154,7 @@ class VariationBarView(
     private var longPressExecuted: Boolean = false
     private var lastClipboardCount: Int? = null
     private var isTitan2Layout: Boolean = false
-    
+
     // New modular components
     private val statusBarAnimator = StatusBarAnimator()
     private val buttonHost = buttonRegistry?.let { StatusBarButtonHost(context, it) }
@@ -189,6 +190,10 @@ class VariationBarView(
             lastThemeSignature = null
         }
 
+    fun updateTranslationButton(active:Boolean) {
+        rocks.pkb.plektra.inputmethod.statusbar.button.TranslationButtonFactory.updateState(container,active)
+    }
+
     fun ensureView(): FrameLayout {
         if (wrapper != null) {
             return wrapper!!
@@ -220,7 +225,7 @@ class VariationBarView(
                 }
             }
         }
-        
+
         // Container for left fixed buttons (clipboard)
         leftButtonsContainer = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -561,7 +566,7 @@ class VariationBarView(
         val totalButtonCount = leftButtonCount + rightButtonCount
         val hasLeftButtons = leftButtonCount > 0
         val hasRightButtons = rightButtonCount > 0
-        
+
         // Calculate fixed button size from the actual amount of visible content.
         // If variations are hidden, buttons divide the whole bar width.
         val reservesVariationArea = variationAreaVisible
@@ -652,11 +657,12 @@ class VariationBarView(
         lastVariationAreaVisible = variationAreaVisible
         lastThemeSignature = themeSignature
         lastGeometrySignature = geometrySignature
-        
+
         // Create a single callbacks object with all available callbacks.
         // Each button factory will extract only the callbacks it needs.
         val statusBarCallbacks = StatusBarCallbacks(
             onClipboardRequested = onClipboardRequested,
+            onTranslationRequested = onTranslationRequested,
             onSpeechRecognitionRequested = onSpeechRecognitionRequested,
             onEmojiPickerRequested = onEmojiPickerRequested,
             onLanguageSwitchRequested = onLanguageSwitchRequested,
@@ -670,7 +676,7 @@ class VariationBarView(
             onRedoRequested = onRedoRequested,
             onHapticFeedback = { NotificationHelper.triggerHapticFeedback(context) }
         )
-        
+
         // Generic function to create and add any button type.
         // The factory handles all button-specific logic (callbacks, state, etc.)
         fun createAndAddButton(
@@ -703,7 +709,7 @@ class VariationBarView(
                 host.updateClipboardCount(snapshot.clipboardCount)
             }
         }
-        
+
         // Build left side buttons
         leftButtonsContainer?.removeAllViews()
         val leftButtons = enabledButtons.filter { it.position == StatusBarButtonPosition.LEFT }
@@ -791,7 +797,7 @@ class VariationBarView(
                     touchStartY = motionEvent.y
                     lastCursorMoveX = motionEvent.x
                     hideSwipeHintImmediate()
-                    
+
                     // Setup long press detection
                     cancelLongPress()
                     longPressExecuted = false
@@ -803,7 +809,7 @@ class VariationBarView(
                         }
                         longPressHandler?.postDelayed(longPressRunnable!!, 500) // 500ms for long press
                     }
-                    
+
                     Log.d(TAG, "Touch down on overlay at ($touchStartX, $touchStartY)")
                     true
                 }
@@ -998,7 +1004,7 @@ class VariationBarView(
         hint.alpha = 0f
         hint.visibility = View.GONE
     }
-    
+
     /**
      * Shows or hides the speech recognition hint message in the hint view.
      * When showing, replaces the swipe hint text with speech recognition message.
@@ -1007,21 +1013,21 @@ class VariationBarView(
     fun showSpeechRecognitionHint(show: Boolean) {
         val hint = emptyHintView ?: return
         val overlayView = overlay ?: return
-        
+
         isShowingSpeechRecognitionHint = show
-        
+
         if (show) {
             // Ensure overlay is visible
             overlayView.visibility = View.VISIBLE
-            
+
             // Save original hint text if not already saved
             if (originalHintText == null) {
                 originalHintText = hint.text
             }
-            
+
             // Set speech recognition message
             hint.text = context.getString(R.string.speech_recognition_prompt)
-            
+
             // Show hint immediately (no delay) with animation
             hint.animate().cancel()
             hint.visibility = View.VISIBLE
@@ -1037,7 +1043,7 @@ class VariationBarView(
                 hint.text = originalHintText
                 originalHintText = null
             }
-            
+
             // Hide hint with animation
             hint.animate().cancel()
             hint.animate()
@@ -1097,7 +1103,7 @@ class VariationBarView(
             Log.e(TAG, "Error opening Settings", e)
         }
     }
-    
+
     private fun cancelLongPress() {
         longPressRunnable?.let { runnable ->
             longPressHandler?.removeCallbacks(runnable)
@@ -1132,10 +1138,10 @@ class VariationBarView(
         val textWidth = paint.measureText(variation).toInt()
         val horizontalPadding = 0 // Testing with 0 padding
         val requiredWidth = textWidth + horizontalPadding
-        
+
         // Keep status bar layout stable; long labels are clipped instead of resizing the row.
         val calculatedWidth = buttonWidth
-        
+
         val stateListDrawable = themeOverride?.let {
             VariationButtonStyles.createButtonDrawable(
                 heightPx = buttonHeight,

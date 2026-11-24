@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.size
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -71,6 +72,7 @@ enum class SettingsDestination {
     AutoCorrection,
     Customization,
     NavMode,
+    Translation,
     Advanced,
     About,
     CustomInputStyles,
@@ -299,6 +301,7 @@ fun SettingsScreen(
                     initialKeyCode = entry.navModeKeyCode
                 )
             }
+            SettingsDestination.Translation -> TranslationSettingsScreen(onBack={navigateBack()})
             SettingsDestination.Advanced -> {
                 AdvancedSettingsScreen(
                     modifier = modifier,
@@ -540,6 +543,8 @@ private fun SettingsMainScreen(
             )
 
             SettingsGroupDivider(stringResource(R.string.settings_group_utility))
+            val translationContext=LocalContext.current
+            SettingsCategoryRow(icon=Icons.Filled.Translate,title=stringResource(R.string.translation_settings_title),description=stringResource(R.string.translation_settings_description),linkId=SettingLinkIds.MAIN_TRANSLATION,onClick={openSettingsPage(translationContext,SettingsPage(SettingsDestination.Translation))})
 
             SettingsCategoryRow(
                 icon = Icons.AutoMirrored.Filled.ManageSearch,

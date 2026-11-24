@@ -149,7 +149,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var lastImeConfiguration: Configuration? = null
 
     private lateinit var alternateCharacterManager: AlternateCharacterManager
-    
+
     // Speech recognition using SpeechRecognizer (modern approach)
     private val speechScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var speechEditorSession = 0L
@@ -161,7 +161,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val speechScreenAwakeController by lazy { ImeTouchScreenAwakeController(this) }
     private var isSpeechRecognitionActive: Boolean = false
     private var pendingSpeechRecognition: Boolean = false
-    
+
     // Broadcast receiver for permission request result
     private var permissionResultReceiver: BroadcastReceiver? = null
     // Broadcast receiver for user dictionary updates
@@ -193,50 +193,50 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // Keys whose Sym+C/V/X/A edit action ran: their repeats and release must not type.
     private val consumedSymEditKeys = mutableSetOf<Int>()
     private var dispatchingSoftwareKeyboardKey: Boolean = false
-    
+
     // Aggiungi per Power Shortcuts
     private var powerShortcutToast: android.widget.Toast? = null
-    
+
     // Mapping Ctrl+key -> action or keycode (loaded from JSON)
     private val ctrlKeyMap = mutableMapOf<Int, KeyMappingLoader.CtrlMapping>()
-    
+
     // Accessor properties for backwards compatibility with existing code
     private var capsLockEnabled: Boolean
         get() = modifierStateController.capsLockEnabled
         set(value) { modifierStateController.capsLockEnabled = value }
-    
+
     private var shiftPressed: Boolean
         get() = modifierStateController.shiftPressed
         set(value) { modifierStateController.shiftPressed = value }
-    
+
     private var ctrlLatchActive: Boolean
         get() = modifierStateController.ctrlLatchActive
         set(value) { modifierStateController.ctrlLatchActive = value }
-    
+
     private var altLatchActive: Boolean
         get() = modifierStateController.altLatchActive
         set(value) { modifierStateController.altLatchActive = value }
-    
+
     private var ctrlPressed: Boolean
         get() = modifierStateController.ctrlPressed
         set(value) { modifierStateController.ctrlPressed = value }
-    
+
     private var altPressed: Boolean
         get() = modifierStateController.altPressed
         set(value) { modifierStateController.altPressed = value }
-    
+
     private var shiftPhysicallyPressed: Boolean
         get() = modifierStateController.shiftPhysicallyPressed
         set(value) { modifierStateController.shiftPhysicallyPressed = value }
-    
+
     private var ctrlPhysicallyPressed: Boolean
         get() = modifierStateController.ctrlPhysicallyPressed
         set(value) { modifierStateController.ctrlPhysicallyPressed = value }
-    
+
     private var altPhysicallyPressed: Boolean
         get() = modifierStateController.altPhysicallyPressed
         set(value) { modifierStateController.altPhysicallyPressed = value }
-    
+
     private var shiftOneShot: Boolean
         get() = modifierStateController.shiftOneShot
         set(value) { modifierStateController.shiftOneShot = value }
@@ -244,15 +244,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var ctrlOneShot: Boolean
         get() = modifierStateController.ctrlOneShot
         set(value) { modifierStateController.ctrlOneShot = value }
-    
+
     private var altOneShot: Boolean
         get() = modifierStateController.altOneShot
         set(value) { modifierStateController.altOneShot = value }
-    
+
     private var ctrlLatchFromNavMode: Boolean
         get() = modifierStateController.ctrlLatchFromNavMode
         set(value) { modifierStateController.ctrlLatchFromNavMode = value }
-    
+
     // Flag to track whether we are in a valid input context
     private var isInputViewActive = false
     private var emojiSearchExternalSelectionStart: Int? = null
@@ -265,13 +265,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     // Where the picker's own emoji commits leave the caret while its search keeps the keys, oldest
     // first, until the app reports that selection.
     private val pendingEmojiSearchCommitCursors = mutableListOf<Int>()
-    
+
     // Snapshot of the current input context (numeric/password/restricted fields, etc.)
     private var inputContextState: InputContextState = InputContextState.EMPTY
-    
+
     private val isNumericField: Boolean
         get() = inputContextState.isNumericField
-    
+
     private val shouldDisableSmartFeatures: Boolean
         get() = inputContextState.shouldDisableSmartFeatures
 
@@ -287,12 +287,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             val includeRestrictedFields = SettingsManager.getAutoCapitalizeRestrictedFields(this)
             return !includeRestrictedFields || inputContextState.isPasswordField
         }
-    
+
     // Current package name
     private var currentPackageName: String? = null
     /** Per-app "never show the bar"; vetoes every IME surface while hardware input keeps working. */
     private var keyboardBarHiddenInEditor = false
-    
+
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
     private val CURSOR_UPDATE_DELAY = 50L
@@ -314,6 +314,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private lateinit var keyboardVisibilityController: KeyboardVisibilityController
     private lateinit var launcherShortcutController: LauncherShortcutController
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
+    private var fieldTranslation: FieldTranslationPanel? = null
     private var latestSuggestionResults: List<SuggestionResult> = emptyList()
     private var lastRenderedStatusSnapshot: StatusBarController.StatusSnapshot? = null
     private var lastRenderedEmojiMapText: String? = null
@@ -777,7 +778,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun openQuickLauncher(): Boolean = QuickLauncherOpener.open(this)
-    
+
     /**
      * Starts voice input using SpeechRecognizer via SpeechRecognitionManager.
      */
@@ -789,7 +790,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         // Speech providers and their credentials live in credential-protected storage.
         if (directBootLocked) return
-        
+
         val provider = SpeechSettings.provider(this)
         if (provider == SpeechProvider.FUTO) {
             startExternalSpeechRecognition()
@@ -797,7 +798,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
 
         // Check microphone permission first
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) 
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
             != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "RECORD_AUDIO permission not granted, requesting...")
             pendingSpeechRecognition = true
@@ -807,7 +808,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             startActivity(intent)
             return
         }
-        
+
         if (provider.isCloud) {
             val apiKey = try { SpeechSettings.readKey(this, provider) } catch (_: Exception) { null }
             if (apiKey.isNullOrBlank()) {
@@ -1513,13 +1514,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun handleSuggestionsUpdated(suggestions: List<SuggestionResult>) {
-        val safeSuggestions = if (inputContextState.shouldDisableSuggestions) emptyList() else suggestions
+        val safeSuggestions = if (inputContextState.shouldDisableSuggestions || fieldTranslation!=null) emptyList() else suggestions
         latestSuggestionResults = safeSuggestions
         DebugCaptureStore.recordSuggestionsUpdated(safeSuggestions)
         scheduleStatusBarTextUpdate()
     }
 
     private fun visibleSuggestionStrings(): List<String> {
+        if(fieldTranslation!=null)return emptyList()
         if (latestSuggestionResults.isEmpty()) return emptyList()
 
         val hasWordStartSuggestion = latestSuggestionResults.any {
@@ -1613,8 +1615,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (isAutoCapSuppressedAtCursor()) return false
         return modifierStateController.requestShiftOneShotFromAutoCap()
     }
-    
-    
+
+
 
     /**
      * Initializes the input context for a field.
@@ -1625,15 +1627,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (restarting) {
             return
         }
-        
+
         val state = inputContextState
         val isEditable = state.isEditable
         val isReallyEditable = state.isReallyEditable
         val canCheckAutoCapitalize = isEditable && !shouldDisableAutoCapitalize
-        
+
         if (!isReallyEditable) {
             isInputViewActive = false
-            
+
             if (canCheckAutoCapitalize) {
                 AutoCapitalizeHelper.checkAndEnableAutoCapitalize(
                     this,
@@ -1646,18 +1648,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             return
         }
-        
+
         isInputViewActive = true
-        
+
         enforceSmartFeatureDisabledState()
-        
+
         if (ctrlLatchFromNavMode && ctrlLatchActive) {
             val inputConnection = currentInputConnection
             if (inputConnection != null) {
                 navModeController.exitNavMode()
             }
         }
-        
+
         AutoCapitalizeHelper.checkAndEnableAutoCapitalize(
             this,
             currentInputConnection,
@@ -1666,19 +1668,19 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
             onUpdateStatusBar = { updateStatusBarText() }
         )
-        
+
         symLayoutController.restoreSymPageIfNeeded { updateStatusBarText() }
-        
+
         alternateCharacterManager.reloadLongPressThreshold()
         alternateCharacterManager.resetTransientState()
     }
-    
+
     private fun enforceSmartFeatureDisabledState() {
         // The candidates surface also contains Plektra's hardware-keyboard status bar.
         // Individual smart features hide their own content; the surface itself stays visible.
         deactivateVariations()
     }
-    
+
     /**
      * Loads keyboard layout using the central resolver (auto-by-locale or manual override).
      */
@@ -1695,7 +1697,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         val layout = LayoutMappingRepository.loadLayout(assets, layoutName, this)
         Log.d(TAG, "Keyboard layout loaded: $layoutName")
     }
-    
+
     /**
      * Gets the character from the selected keyboard layout for a given keyCode and shift state.
      * If the keyCode is mapped in the layout, returns that character.
@@ -1714,7 +1716,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         return null
     }
-    
+
     /**
      * Gets the text from the selected keyboard layout, all of it when the key types several
      * characters (Uyghur Shift+L types لا). Returns the original event character if not mapped in layout.
@@ -1807,13 +1809,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             isLanguageSwitchInProgress = false
         }
     }
-    
+
     private fun showPowerShortcutToast(message: String) {
         uiHandler.post {
             val now = System.currentTimeMillis()
             val sameText = lastLayoutToastText == message
             val sinceLast = now - lastLayoutToastTime
-            
+
             if (!sameText || sinceLast > 1000) {
                 lastLayoutToastText = message
                 lastLayoutToastTime = now
@@ -1861,7 +1863,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         return tapResult.handled
     }
-    
+
     private fun reloadNavModeMappings() {
         try {
             ctrlKeyMap.clear()
@@ -1872,7 +1874,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             Log.e(TAG, "Error reloading nav mode mappings", e)
         }
     }
-    
+
     /**
      * Checks if a keycode corresponds to an alphabetic key (A-Z).
      * Returns true only for alphabetic keys, false for all others (modifiers, volume, etc.).
@@ -1964,10 +1966,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
         autoCorrectionManager = AutoCorrectionManager(this)
         val suggestionDebugLogging = SettingsManager.isSuggestionDebugLoggingEnabled(this)
-        
+
         // Get locale from current IME subtype
         val initialLocale = getLocaleFromSubtype()
-        
+
         suggestionController = SuggestionController(
             context = this,
             assets = assets,
@@ -1981,7 +1983,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             isStorageAvailable = { !directBootLocked }
         )
         inputEventRouter.suggestionController = suggestionController
-        
+
         // Preload dictionary in background so it's ready when user focuses a field
         if (!lockedAtCreate) suggestionController.preloadDictionary()
 
@@ -2163,6 +2165,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             variationInteractedDuringHold = true
             startSpeechRecognition()
         }
+        candidatesBarController.onTranslationRequested={toggleFieldTranslation()}
+
         // Register listener for clipboard page
         candidatesBarController.onClipboardRequested = clipboard@{
             if (directBootLocked) return@clipboard
@@ -2284,14 +2288,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             modifierStateController.registerNonModifierKey()
         }
         candidatesBarController.onSoftwareKeyboardTextInput = { text, inputConnection, snapshot ->
-            handleSoftwareKeyboardTextInput(text, inputConnection ?: currentInputConnection, snapshot)
+            if(fieldTranslation?.commitSoftwareText(text)==true)true else handleSoftwareKeyboardTextInput(text, inputConnection ?: currentInputConnection, snapshot)
         }
         candidatesBarController.onSymTextCommitted = {
             modifierStateController.consumeShiftOneShot()
             updateStatusBarText()
         }
         candidatesBarController.onSoftwareKeyboardBoundaryTextInput = { text, inputConnection ->
-            handleBoundaryTextBeforeCommit(text, inputConnection)
+            if(fieldTranslation!=null)false else handleBoundaryTextBeforeCommit(text, inputConnection)
         }
         candidatesBarController.onMinimalUiToggleRequested = {
             keyboardVisibilityController.toggleSlimMode()
@@ -2323,7 +2327,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         alternateCharacterManager.reloadSymMappings() // Load custom mappings for page 1 if present
         alternateCharacterManager.reloadSymMappings2() // Load custom mappings for page 2 if present
         alternateCharacterManager.onBoundaryTextRequested = { text, inputConnection ->
-            handleBoundaryTextBeforeCommit(text, inputConnection)
+            if(fieldTranslation!=null)false else handleBoundaryTextBeforeCommit(text, inputConnection)
         }
         // Register callback to be notified when an Alt character is inserted after long press.
         // Variations are updated automatically by updateStatusBarText().
@@ -2446,7 +2450,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
         // Initialize keyboard layout
         loadKeyboardLayout()
-        
+
         // Initialize nav mode mappings file if needed
         rocks.pkb.plektra.SettingsManager.initializeNavModeMappingsFile(this)
         ctrlKeyMap.putAll(KeyMappingLoader.loadCtrlKeyMappings(assets, this))
@@ -2454,14 +2458,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             VariationRepository.loadVariations(assets, this, activeKeyboardLayoutName)
         )
         keyboardVisibilityController.syncStatusBarPresentationModeFromSettings()
-        
+
         if (!lockedAtCreate) {
             // Load auto-correction rules
             AutoCorrector.loadCorrections(assets, this)
             // Register additional subtypes (custom input styles); the system keeps them before unlock.
             registerAdditionalSubtypes()
         }
-        
+
         // Trackpad gestures detector (instantiated early to avoid late-init issues in listener)
         Log.d(TRACKPAD_DEBUG_TAG, "onCreate: Building initial trackpad gesture detector...")
         trackpadGestureDetector = buildTrackpadGestureDetector()
@@ -2702,7 +2706,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         Log.d(TRACKPAD_DEBUG_TAG, "onCreate: SharedPreferences listener registered")
         rocks.pkb.plektra.ThemeTextureStore.addAvailabilityListener(themeImageAvailabilityListener)
-        
+
         // Register broadcast receiver for permission request result
         permissionResultReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -2722,20 +2726,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
         }
-        
+
         val permissionFilter = IntentFilter().apply {
             addAction(PermissionRequestActivity.ACTION_PERMISSION_GRANTED)
             addAction(PermissionRequestActivity.ACTION_PERMISSION_DENIED)
         }
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(permissionResultReceiver, permissionFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(permissionResultReceiver, permissionFilter)
         }
-        
+
         Log.d(TAG, "Broadcast receiver registered for permission request results")
-        
+
         // Register broadcast receiver for user dictionary updates
         userDictionaryReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -2751,7 +2755,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
         }
-        
+
         val userDictFilter = IntentFilter(AppBroadcastActions.USER_DICTIONARY_UPDATED).apply {
             addAction(rocks.pkb.plektra.dictionaries.DictionaryRepositoryManager.ACTION_DICTIONARIES_CHANGED)
         }
@@ -2760,9 +2764,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         } else {
             registerReceiver(userDictionaryReceiver, userDictFilter)
         }
-        
+
         Log.d(TAG, "Broadcast receiver registered for user dictionary updates")
-        
+
         // Register broadcast receiver for additional IME subtypes updates
         additionalSubtypesReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -2772,14 +2776,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
         }
-        
+
         val subtypesFilter = IntentFilter("rocks.pkb.plektra.ACTION_ADDITIONAL_SUBTYPES_UPDATED")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(additionalSubtypesReceiver, subtypesFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(additionalSubtypesReceiver, subtypesFilter)
         }
-        
+
         Log.d(TAG, "Broadcast receiver registered for additional subtypes updates")
 
         // Start trackpad gesture detection
@@ -3067,7 +3071,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             "buildTrackpadGestureDetector() - gesturesEnabled=$gesturesEnabled, swipeThreshold=$swipeThreshold, eventDeviceSelection=$eventDeviceSelection, fallbackEventDevice=$fallbackEventDevice"
         )
         return TrackpadGestureDetector(
-            isEnabled = { shouldStartShizukuTrackpadDetector() },
+            isEnabled = { fieldTranslation==null && shouldStartShizukuTrackpadDetector() },
             onSwipeUp = { third -> acceptSuggestionAtIndex(third) },
             scope = trackpadScope,
             swipeUpThreshold = swipeThreshold,
@@ -3082,8 +3086,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             firmwareIncremental = Build.VERSION.INCREMENTAL.orEmpty()
         )
     }
-    
+
     override fun onDestroy() {
+        fieldTranslation?.close()
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         caretBadgeController.destroy()
@@ -3107,7 +3112,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             prefs.unregisterOnSharedPreferenceChangeListener(it)
         }
         rocks.pkb.plektra.ThemeTextureStore.removeAvailabilityListener(themeImageAvailabilityListener)
-        
+
         cancelSpeechRecognition()
         speechScope.cancel()
         // Cleanup SpeechRecognitionManager
@@ -3130,7 +3135,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Log.e(TAG, "Error while unregistering permission result receiver", e)
             }
         }
-        
+
         userDictionaryReceiver?.let {
             try {
                 unregisterReceiver(it)
@@ -3138,7 +3143,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Log.e(TAG, "Error while unregistering user dictionary receiver", e)
             }
         }
-        
+
         additionalSubtypesReceiver?.let {
             try {
                 unregisterReceiver(it)
@@ -3412,7 +3417,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             preserveNavMode = preserveNavMode,
             onNavModeCancelled = { navModeController.cancelNotification() }
         )
-        
+
         symLayoutController.reset()
         alternateCharacterManager.resetTransientState()
         deactivateVariations()
@@ -3564,7 +3569,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (cursorUpdatesAccepted || cursorUpdateAttempts >= MAX_CURSOR_UPDATE_ATTEMPTS) return
         syncCursorAnchorMonitoring()
     }
-    
+
     /**
      * Shows the surface appropriate for the effective keyboard mode: the full input view in
      * virtual mode, or the candidates/status surface in hardware mode.
@@ -3595,7 +3600,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         variationMs = ImePerfLogger.elapsedMs(variationStart)
         val clipboardCount = clipboardHistoryManager?.getHistorySize() ?: 0
-        
+
         val modifierSnapshot = modifierStateController.snapshot()
         val state = inputContextState
         val addWordCandidate = if (state.shouldDisableSuggestions || isSpeechRecognitionActive) null else suggestionController.pendingAddWord()
@@ -3910,7 +3915,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             else -> null
         }
     }
-    
+
     /**
      * Disattiva le variazioni.
      */
@@ -3919,7 +3924,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             variationStateController.clear()
         }
     }
-    
+
 
     override fun onUnbindInput() {
         disableSmoothCaretExperiment()
@@ -3937,6 +3942,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        fieldTranslation?.close()
         // Runs a pending handoff before this input starts, also after a missed ACTION_USER_UNLOCKED.
         DirectBootStorage.completeUnlock(this)
         lastEditorSelectionStart = info?.initialSelStart ?: -1
@@ -3965,10 +3971,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         cancelPendingSelectionDrivenUiWork()
         invalidateRenderedStatusSnapshot()
         editorHasActiveSelection = false
-        
+
         currentPackageName = info?.packageName
         updateDebugImeContextSnapshot(info)
-        
+
         // Reset clipboard overlay when starting new input
 
         updateInputContextState(info)
@@ -3985,15 +3991,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             keyboardVisibilityController.onKeyboardBarConfigurationChanged()
         }
         traceImeVisibility("onStartInput restarting=$restarting")
-        
+
         if (restarting) {
             enforceSmartFeatureDisabledState()
         }
-        
+
         if (info != null && isEditable) {
             info.inputType = info.inputType or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         }
-        
+
         if (isEditable && isReallyEditable && !restarting && isInputViewActive) {
             val respectAppVisibility = SettingsManager.getAutoShowRespectAppVisibility(this)
             val shouldShowSurface = keyboardVisibilityController.shouldShowSurfaceOnInputStart(
@@ -4015,7 +4021,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 shouldShowSurface -> ensureImeSurfaceVisible()
             }
         }
-        
+
         if (!restarting) {
             if (ctrlLatchFromNavMode && ctrlLatchActive) {
                 val inputConnection = currentInputConnection
@@ -4040,7 +4046,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
-            
+
             // Handle input field capitalization flags (CAP_CHARACTERS, CAP_WORDS, CAP_SENTENCES)
             AutoCapitalizeHelper.handleInputFieldCapitalizationFlags(
                 context = this,
@@ -4050,7 +4056,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
-            
+
             AutoCapitalizeHelper.checkAutoCapitalizeOnRestart(
                 this,
                 currentInputConnection,
@@ -4075,7 +4081,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         traceImeVisibility("onStartInputView restarting=$restarting")
         initializeInputContext(restarting)
         suggestionController.onContextReset()
-        
+
         // Read word at cursor immediately when entering a populated text field
         if (!inputContextState.shouldDisableSuggestions) {
             suggestionController.readInitialContext(currentInputConnection)
@@ -4083,13 +4089,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
         val isEditable = inputContextState.isEditable
         val state = inputContextState
-        
+
         // Always reset shift one-shot when entering a field (both restarting and new field)
         // Then let auto-cap logic decide if it should be enabled
         modifierStateController.clearFieldCapsLockRequest()
         if (isEditable) {
             modifierStateController.consumeShiftOneShot()
-            
+
             // Handle input field capitalization flags (CAP_CHARACTERS, CAP_WORDS, CAP_SENTENCES)
             AutoCapitalizeHelper.handleInputFieldCapitalizationFlags(
                 context = this,
@@ -4099,7 +4105,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 enableShiftOneShot = { requestAutoCapShiftOneShot() },
                 onUpdateStatusBar = { updateStatusBarText() }
             )
-            
+
             AutoCapitalizeHelper.checkAutoCapitalizeOnRestart(
                 this,
                 currentInputConnection,
@@ -4116,10 +4122,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             val gesturesEnabled = SettingsManager.getTrackpadGesturesEnabled(this)
             if (shouldStartShizukuTrackpadDetector() && !trackpadGestureDetector.isRunning()) {
                 val shizukuRunning = try { Shizuku.pingBinder() } catch (e: Exception) { false }
-                val shizukuAuthorized = try { 
-                    Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED 
+                val shizukuAuthorized = try {
+                    Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
                 } catch (e: Exception) { false }
-                
+
                 if (shizukuRunning && shizukuAuthorized) {
                     Log.d(TRACKPAD_DEBUG_TAG, "onStartInputView: Gestures enabled and Shizuku ready, starting detector...")
                     trackpadGestureDetector.start()
@@ -4136,6 +4142,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onFinishInput() {
+        fieldTranslation?.close()
         cancelSpeechRecognition()
         ++speechEditorSession
         disableSmoothCaretExperiment()
@@ -4166,7 +4173,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             lastSystemStatusIconResId = null
         }
     }
-    
+
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         caretBadgeController.onEditorGone()
@@ -4203,7 +4210,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             physicalProfileOverride = physicalKeyboardProfileOverride
         )
     }
-    
+
     override fun onWindowShown() {
         super.onWindowShown()
         keyboardVisibilityController.onImeWindowVisibilityChanged(shown = true)
@@ -4247,7 +4254,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             "DecorView hook attached[$reason]: view=${decorView.javaClass.simpleName}, focused=${decorView.isFocused}"
         )
     }
-    
+
     /**
      * Registers additional subtypes (custom input styles) with the system.
      * Called on startup and when custom input styles are modified.
@@ -4255,20 +4262,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private fun registerAdditionalSubtypes() {
         try {
             val imm = getSystemService(InputMethodManager::class.java)
-            
+
             // Get IME ID - try both formats
             val componentName = android.content.ComponentName(this, PhysicalKeyboardInputMethodService::class.java)
             val imeIdShort = componentName.flattenToShortString()
             val imeIdFull = componentName.flattenToString()
-            
+
             // Find the actual IME in the system list to get the correct ID format
             val inputMethodInfo = imm.getInputMethodList().firstOrNull { info ->
-                info.packageName == packageName && 
+                info.packageName == packageName &&
                 info.serviceName == PhysicalKeyboardInputMethodService::class.java.name
             }
-            
+
             val imeId = inputMethodInfo?.id ?: imeIdFull
-            
+
             Log.d(TAG, "Registering additional subtypes")
             Log.d(TAG, "Component: $componentName")
             Log.d(TAG, "IME ID (short): $imeIdShort")
@@ -4276,27 +4283,27 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             Log.d(TAG, "IME ID (from system): ${inputMethodInfo?.id}")
             Log.d(TAG, "Using IME ID: $imeId")
             Log.d(TAG, "IME found in system: ${inputMethodInfo != null}")
-            
+
             val prefString = SettingsManager.getCustomInputStyles(this)
             Log.d(TAG, "Custom input styles pref string: $prefString")
-            
+
             val subtypes = AdditionalSubtypeUtils.createAdditionalSubtypesArray(
                 prefString,
                 assets,
                 this
             )
-            
+
             Log.d(TAG, "Created ${subtypes.size} additional subtypes")
             subtypes.forEachIndexed { index, subtype ->
                 Log.d(TAG, "Subtype $index: locale=${subtype.localeString()}, nameResId=${subtype.nameResId}, extraValue=${subtype.extraValue}")
             }
-            
+
             if (subtypes.isNotEmpty() && inputMethodInfo != null) {
                 // Note: setAdditionalInputMethodSubtypes is deprecated but still works on most Android versions
                 // The subtypes will appear in the IME picker but may need to be enabled manually by the user
                 setAdditionalInputMethodSubtypesCompat(imm, imeId, subtypes)
                 Log.d(TAG, "Successfully called setAdditionalInputMethodSubtypes with ${subtypes.size} subtypes")
-                
+
                 // Send broadcast to notify system of IME subtype changes (if supported)
                 try {
                     val intent = Intent("android.view.InputMethod.SUBTYPE_CHANGED").apply {
@@ -4308,30 +4315,30 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 } catch (e: Exception) {
                     Log.w(TAG, "Could not send SUBTYPE_CHANGED broadcast", e)
                 }
-                
+
                 // Try to explicitly enable the additional subtypes after a delay
                 // This ensures the system has processed the registration first
                 Handler(Looper.getMainLooper()).postDelayed({
                     try {
                         // Re-fetch InputMethodInfo to get updated subtype list
-                        val updatedInfo = imm.getInputMethodList().firstOrNull { 
-                            it.packageName == packageName && 
+                        val updatedInfo = imm.getInputMethodList().firstOrNull {
+                            it.packageName == packageName &&
                             it.serviceName == PhysicalKeyboardInputMethodService::class.java.name
                         }
-                        
+
                         if (updatedInfo != null) {
                             // Get all subtypes from InputMethodInfo (including base from method.xml and additional)
                             val allSubtypes = mutableListOf<android.view.inputmethod.InputMethodSubtype>()
                             for (i in 0 until updatedInfo.subtypeCount) {
                                 allSubtypes.add(updatedInfo.getSubtypeAt(i))
                             }
-                            
+
                             // Get current system locales to filter out removed ones
                             val currentSystemLocales = getSystemEnabledLocales()
                             val systemLanguageCodes = currentSystemLocales.map { locale ->
                                 locale.split("_").first().lowercase()
                             }.toSet()
-                            
+
                             // Filter ALL subtypes (base + additional) to keep only visible, valid input styles.
                             val validSubtypes = allSubtypes.filter { subtype ->
                                 AdditionalSubtypeUtils.shouldKeepSubtype(
@@ -4342,10 +4349,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                                     systemLanguageCodes
                                 )
                             }
-                            
+
                             // Convert to hash codes for setExplicitlyEnabledInputMethodSubtypes
                             val validEnabledHashCodes = validSubtypes.map { it.hashCode() }.toIntArray()
-                            
+
                             // Always update enabled subtypes, even if empty (to disable removed ones)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                                 imm.setExplicitlyEnabledInputMethodSubtypes(
@@ -4371,23 +4378,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 if (inputMethodInfo != null) {
                     Handler(Looper.getMainLooper()).postDelayed({
                         try {
-                            val updatedInfo = imm.getInputMethodList().firstOrNull { 
-                                it.packageName == packageName && 
+                            val updatedInfo = imm.getInputMethodList().firstOrNull {
+                                it.packageName == packageName &&
                                 it.serviceName == PhysicalKeyboardInputMethodService::class.java.name
                             }
-                            
+
                             if (updatedInfo != null) {
                                 // Get all subtypes from InputMethodInfo (base subtypes from method.xml)
                                 val allSubtypes = mutableListOf<android.view.inputmethod.InputMethodSubtype>()
                                 for (i in 0 until updatedInfo.subtypeCount) {
                                     allSubtypes.add(updatedInfo.getSubtypeAt(i))
                                 }
-                                
+
                                 val currentSystemLocales = getSystemEnabledLocales()
                                 val systemLanguageCodes = currentSystemLocales.map { locale ->
                                     locale.split("_").first().lowercase()
                                 }.toSet()
-                                
+
                                 // Filter to keep only visible subtypes with valid system locales.
                                 val validSubtypes = allSubtypes.filter { subtype ->
                                     AdditionalSubtypeUtils.shouldKeepSubtype(
@@ -4398,9 +4405,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                                         systemLanguageCodes
                                     )
                                 }
-                                
+
                                 val validEnabledHashCodes = validSubtypes.map { it.hashCode() }.toIntArray()
-                                
+
                                 // Always update to disable removed subtypes
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                                     imm.setExplicitlyEnabledInputMethodSubtypes(
@@ -4417,22 +4424,22 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         }
                     }, 500)
                 }
-                
+
                 if (subtypes.isEmpty()) {
                     Log.d(TAG, "No subtypes to register")
                 } else {
                     Log.w(TAG, "Cannot register subtypes: InputMethodInfo not found")
                 }
             }
-            
+
             // Refresh subtype caches if needed
             refreshSubtypeCaches()
-            
+
             // Force a small delay to ensure system processes the registration
             Handler(Looper.getMainLooper()).postDelayed({
                 try {
-                    val verifyInfo = imm.getInputMethodList().firstOrNull { 
-                        it.packageName == packageName && 
+                    val verifyInfo = imm.getInputMethodList().firstOrNull {
+                        it.packageName == packageName &&
                         it.serviceName == PhysicalKeyboardInputMethodService::class.java.name
                     }
                     if (verifyInfo != null) {
@@ -4443,7 +4450,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                             val isAdditional = AdditionalSubtypeUtils.isAdditionalSubtype(subtype)
                             Log.d(TAG, "Subtype $index: locale=${subtype.localeString()}, isAdditional=$isAdditional, extraValue=${subtype.extraValue}")
                         }
-                        
+
                         // Also try to get subtypes directly from InputMethodInfo
                         try {
                             val subtypeCount = verifyInfo.subtypeCount
@@ -4468,7 +4475,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             e.printStackTrace()
         }
     }
-    
+
     /**
      * Refreshes subtype caches after registration.
      * This ensures getEnabledInputMethodSubtypeList reflects the new subtypes.
@@ -4477,8 +4484,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         try {
             val imm = getSystemService(InputMethodManager::class.java)
             // Force refresh by getting the enabled subtypes list
-            val inputMethodInfo = imm.getInputMethodList().firstOrNull { 
-                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name 
+            val inputMethodInfo = imm.getInputMethodList().firstOrNull {
+                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name
             }
             if (inputMethodInfo != null) {
                 val enabledSubtypes = imm.getEnabledInputMethodSubtypeList(inputMethodInfo, true)
@@ -4488,15 +4495,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             Log.e(TAG, "Error refreshing subtype caches", e)
         }
     }
-    
+
     /**
      * Finds a subtype by locale.
      */
     private fun findSubtypeByLocale(locale: String): android.view.inputmethod.InputMethodSubtype? {
         return try {
             val imm = getSystemService(InputMethodManager::class.java)
-            val inputMethodInfo = imm.getInputMethodList().firstOrNull { 
-                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name 
+            val inputMethodInfo = imm.getInputMethodList().firstOrNull {
+                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name
             }
             if (inputMethodInfo != null) {
                 val enabledSubtypes = imm.getEnabledInputMethodSubtypeList(inputMethodInfo, true)
@@ -4509,7 +4516,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             null
         }
     }
-    
+
     /**
      * Finds a subtype by locale and keyboard layout set.
      */
@@ -4519,8 +4526,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     ): android.view.inputmethod.InputMethodSubtype? {
         return try {
             val imm = getSystemService(InputMethodManager::class.java)
-            val inputMethodInfo = imm.getInputMethodList().firstOrNull { 
-                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name 
+            val inputMethodInfo = imm.getInputMethodList().firstOrNull {
+                it.id == packageName + "/" + PhysicalKeyboardInputMethodService::class.java.name
             }
             if (inputMethodInfo != null) {
                 val enabledSubtypes = imm.getEnabledInputMethodSubtypeList(inputMethodInfo, true)
@@ -4537,7 +4544,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             null
         }
     }
-    
+
     /**
      * Gets the list of system-enabled locales.
      * Returns locales in format "en_US", "it_IT", etc.
@@ -4570,7 +4577,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
         return locales
     }
-    
+
     /**
      * Formats a Locale object to "en_US" format.
      */
@@ -4583,7 +4590,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             language
         }
     }
-    
+
     /**
      * Gets the locale from an IME subtype.
      * Falls back to the current subtype, then Italian if no subtype is available.
@@ -4635,14 +4642,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
             }
     }
-    
+
     /**
      * Called when the user switches IME subtypes (languages).
      * Reloads the dictionary for the new language and switches to the layout specified in the subtype or JSON mapping.
      */
     override fun onCurrentInputMethodSubtypeChanged(newSubtype: android.view.inputmethod.InputMethodSubtype) {
         super.onCurrentInputMethodSubtypeChanged(newSubtype)
-        
+
         // Dictionaries load after unlock, for the subtype current at that time.
         if (::suggestionController.isInitialized && !directBootLocked) {
             val newLocale = getLocaleFromSubtype(newSubtype)
@@ -4654,7 +4661,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Log.d(TAG, "IME subtype changed, updating locale to: ${newLocale.language}")
             }
         }
-        
+
         val layoutToUse = AdditionalSubtypeUtils.resolveInputStyleLayout(assets, this, newSubtype)
 
         val currentLayout = SettingsManager.getKeyboardLayout(this)
@@ -4665,7 +4672,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             switchToLayout(layoutToUse, showToast = false)
         }
     }
-    
+
     override fun onWindowHidden() {
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
@@ -4683,7 +4690,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         resetModifierStates(preserveNavMode = true)
         suggestionController.onContextReset()
     }
-    
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         val diff = lastImeConfiguration?.diff(newConfig) ?: -1
         lastImeConfiguration = Configuration(newConfig)
@@ -4716,7 +4723,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             registerAdditionalSubtypes()
         }, 500) // Small delay to ensure system has processed locale changes
     }
-    
+
     /**
      * Called when the cursor position or selection changes in the text field.
      */
@@ -4754,7 +4761,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 cancelSpeechRecognition()
             } else return
         }
-        
+
         val state = inputContextState
         val cursorPositionChanged = (oldSelStart != newSelStart) || (oldSelEnd != newSelEnd)
         val collapsedSelection = newSelStart == newSelEnd
@@ -4783,7 +4790,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             // until the user explicitly focuses the emoji search field again.
             disableEmojiSearchInputCapture()
         }
-        
+
         if (cursorPositionChanged && collapsedSelection && !shouldSkipForCommit) {
             if (!forwardByOne) {
                 DeferredPunctuationSpaceTracker.clear()
@@ -4794,7 +4801,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             // Drop add-word candidate if cursor leaves its word
             suggestionController.clearPendingAddWordIfCursorOutside(currentInputConnection)
-            
+
             // Always update status bar (it handles variations/suggestions internally based on flags).
             // Telegram can emit a selection update for every hardware key. Coalescing keeps
             // expensive InputConnection reads from stacking up behind fast typing.
@@ -4810,7 +4817,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 "onUpdateSelection old=($oldSelStart,$oldSelEnd) new=($newSelStart,$newSelEnd) collapsed=$collapsedSelection forwardByOne=$forwardByOne skipForCommit=$shouldSkipForCommit"
             )
         }
-        
+
         // Auto-cap reads editor context through InputConnection. For simple typing feedback,
         // debounce it so remote editors like Telegram don't pay that cost for every character.
         if (cursorPositionChanged && collapsedSelection && forwardByOne) {
@@ -4990,7 +4997,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (inputConnection == null) {
             return super.onKeyLongPress(keyCode, event)
         }
-        
+
         // If the keyboard is hidden but we have an InputConnection, reactivate it
         if (!isInputViewActive) {
             isInputViewActive = true
@@ -4998,17 +5005,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 ensureImeSurfaceVisible()
             }
         }
-        
+
         // Intercept long presses BEFORE Android handles them
         if (alternateCharacterManager.hasAltMapping(keyCode)) {
             // Consumiamo l'evento per evitare il popup di Android
             return true
         }
-        
+
         return super.onKeyLongPress(keyCode, event)
     }
 
     override fun onKeyDown(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if(event_!=null&&fieldTranslation?.key(event_)==true)return true
         if (liveSpeechEditor != null && (event_?.unicodeChar?.let { it != 0 } == true ||
             keyCode_ in listOf(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_FORWARD_DEL, KeyEvent.KEYCODE_ENTER,
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN))) {
@@ -5417,7 +5425,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (!isModifierKey) {
             modifierStateController.registerNonModifierKey()
         }
-        
+
         // If NO editable field is active, handle ONLY nav mode
         if (!hasEditableField) {
             if (KeyEventInputPolicy.appliesTo(info) && !navModeController.isNavModeActive() &&
@@ -5435,7 +5443,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     isLauncherPackage = { pkg -> launcherShortcutController.isLauncher(pkg) },
                     handleLauncherShortcut = { key -> launcherShortcutController.handleLauncherShortcut(key) },
                     handlePowerShortcut = { key -> launcherShortcutController.handlePowerShortcut(key) },
-                    togglePowerShortcutMode = { message, isNavModeActive -> 
+                    togglePowerShortcutMode = { message, isNavModeActive ->
                         launcherShortcutController.togglePowerShortcutMode(
                             showToast = { showPowerShortcutToast(it) },
                             isNavModeActive = isNavModeActive
@@ -5450,7 +5458,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 powerShortcutsEnabled = powerShortcutsEnabled
             )
         }
-        
+
         val routingResult = inputEventRouter.handleEditableFieldKeyDownPrelude(
             keyCode = keyCode,
             params = InputEventRouter.EditableFieldKeyDownParams(
@@ -5474,7 +5482,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             InputEventRouter.EditableFieldRoutingResult.CallSuper -> return super.onKeyDown(keyCode, event)
             InputEventRouter.EditableFieldRoutingResult.Continue -> {}
         }
-        
+
         // Handle Alt+Shift for subtype cycling
         if (
             hasEditableField &&
@@ -5616,7 +5624,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
-        
+
         val altActiveNow = event?.isAltPressed == true || altLatchActive || altOneShot
         val debugUnicodeOverride = resolveAltMappedUnicodeForDebug(
             keyCode = keyCode,
@@ -5708,7 +5716,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (!altActiveNow && !ctrlActiveNow && handleVietnameseTelexKey(keyCode, event, ic)) {
             return true
         }
-        
+
         // Mircea Horea IONICĂ (mionica), pastiera 09b1f51ac9; no call/audio side effects.
         if (hasEditableField && keyCode == KeyEvent.KEYCODE_GRAVE &&
             DeviceSpecific.hasBlackberryKeyboard(DeviceSpecific.resolveInputProfile(event, physicalKeyboardProfileOverride).profileId) &&
@@ -5784,7 +5792,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 },
                 toggleMinimalUi = { keyboardVisibilityController.toggleSlimMode() },
                 handleBoundaryText = { text, inputConnection ->
-                    handleBoundaryTextBeforeCommit(text, inputConnection)
+                    if(fieldTranslation!=null)false else handleBoundaryTextBeforeCommit(text, inputConnection)
                 },
                 onShiftOneShotToggledOff = { suppressAutoCapRenderingAtCursorIfNeeded() }
             )
@@ -5866,6 +5874,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
+        if(event_!=null&&fieldTranslation?.key(event_)==true)return true
         if (!replayingProtectedNumberKey) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
                 is AccidentalKeyPressFilter.KeyUpResult.Suppressed -> {
@@ -5942,7 +5951,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         ) {
             return true
         }
-        
+
         if (keyEventTextOutput.consumeKeyUp(keyCode)) return true
         if (!hasEditableField && KeyEventInputPolicy.appliesTo(info) &&
             (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT)) {
@@ -5966,7 +5975,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     isLauncherPackage = { pkg -> launcherShortcutController.isLauncher(pkg) },
                     handleLauncherShortcut = { key -> launcherShortcutController.handleLauncherShortcut(key) },
                     handlePowerShortcut = { key -> launcherShortcutController.handlePowerShortcut(key) },
-                    togglePowerShortcutMode = { message, isNavModeActive -> 
+                    togglePowerShortcutMode = { message, isNavModeActive ->
                         launcherShortcutController.togglePowerShortcutMode(
                             showToast = { showPowerShortcutToast(it) },
                             isNavModeActive = isNavModeActive
@@ -5977,13 +5986,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 )
             )
         }
-        
+
         // Continue with normal IME logic for text fields
         val inputConnection = currentInputConnection ?: return super.onKeyUp(keyCode, event)
-        
+
         // Always notify the tracker (even when the event is consumed)
         notifyDebugKeyEvent(keyCode, event, "KEY_UP", origin = "ime_service")
-        
+
         // Handle Shift release for double-tap
         if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT) {
             if (shiftPressed) {
@@ -6029,7 +6038,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             return super.onKeyUp(keyCode, event)
         }
-        
+
         // Handle Ctrl release for double-tap
         if (keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT) {
             if (ctrlPressed) {
@@ -6066,7 +6075,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
             return super.onKeyUp(keyCode, event)
         }
-        
+
         // Handle Alt release for double-tap
         if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
             handleAltModifierKeyUp(keyCode, event, allowVisualLayer = true)
@@ -6086,7 +6095,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             updateStatusBarText()
             return true
         }
-        
+
         if (symLayoutController.handlePagedKeyUp(
                 keyCode,
                 currentInputConnection,
@@ -6120,7 +6129,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     fun removeAltKeyMapping(keyCode: Int) {
         alternateCharacterManager.removeAltKeyMapping(keyCode)
     }
-    
+
     /**
      * Updates additional IME subtypes from SharedPreferences.
      * This must be called from within the IME service process.
@@ -6130,27 +6139,27 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             val packageName = packageName
             val serviceName = PhysicalKeyboardInputMethodService::class.java.name
-            
+
             val imeInfo = imm.enabledInputMethodList.find {
-                it.packageName == packageName && 
+                it.packageName == packageName &&
                 it.serviceName == serviceName
             } ?: run {
                 Log.w(TAG, "IME not found, cannot update additional subtypes")
                 return
             }
-            
+
             val imeId = imeInfo.id
             val additionalSubtypes = SettingsManager.getAdditionalImeSubtypes(this)
-            
+
             Log.d(TAG, "Updating additional subtypes from IME service: ${additionalSubtypes.joinToString(", ")}")
-            
+
             if (additionalSubtypes.isEmpty()) {
                 // Clear additional subtypes
                 setAdditionalInputMethodSubtypesCompat(imm, imeId, emptyArray())
                 Log.d(TAG, "Cleared additional subtypes")
                 return
             }
-            
+
             // Build subtypes
             val subtypes = additionalSubtypes.map { langCode ->
                 val localeTag = getLocaleTagForLanguage(langCode)
@@ -6162,10 +6171,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     .setSubtypeExtraValue("noSuggestions=true")
                     .build()
             }
-            
+
             setAdditionalInputMethodSubtypesCompat(imm, imeId, subtypes.toTypedArray())
             Log.d(TAG, "Updated ${subtypes.size} additional subtypes from IME service")
-            
+
             // Verify
             val verifySubtypes = imm.getEnabledInputMethodSubtypeList(imeInfo, true)
             Log.d(TAG, "Verification: Android reports ${verifySubtypes.size} enabled subtypes after update")
@@ -6181,12 +6190,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 }
                 Log.d(TAG, "  - locale: ${subtype.localeString()}, name: $name")
             }
-            
+
         } catch (e: Exception) {
             Log.e(TAG, "Error updating additional subtypes from IME service", e)
         }
     }
-    
+
     private fun getLocaleTagForLanguage(languageCode: String): String {
         val localeMap = mapOf(
             "ru" to "ru_RU",
@@ -6204,14 +6213,29 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
         return localeMap[languageCode.lowercase()] ?: languageCode
     }
-    
+
     private fun getSubtypeNameResourceId(languageCode: String): Int {
         val resourceName = "input_method_name_$languageCode"
         return resources.getIdentifier(resourceName, "string", packageName)
             .takeIf { it != 0 } ?: R.string.input_method_name
     }
 
+    private fun toggleFieldTranslation(){
+        if(directBootLocked)return
+        fieldTranslation?.let{it.close();return}
+        val input=currentInputConnection ?: return
+        val info=currentInputEditorInfo ?: return
+        val selection=FieldTranslationSession.capture(info,input)
+        if(selection==null){android.widget.Toast.makeText(this,R.string.translation_select_text,android.widget.Toast.LENGTH_LONG).show();return}
+        val host=if(candidatesBarController.isInputViewActuallyRendered())candidatesBarController.getInputView()else candidatesBarController.getCandidatesView()
+        val panel=FieldTranslationPanel(this,host,selection,getLocaleFromSubtype(),
+            isCurrent={currentInputConnection===input&&currentInputEditorInfo===info},
+            onClosed={fieldTranslation=null;candidatesBarController.updateTranslationButton(false);latestSuggestionResults=emptyList();if(::suggestionController.isInitialized)suggestionController.readInitialContext(currentInputConnection);updateStatusBarText()})
+        fieldTranslation=panel;latestSuggestionResults=emptyList();updateStatusBarText();candidatesBarController.updateTranslationButton(true);panel.start()
+    }
+
     private fun handleNativeImeTrackpadMotion(event: MotionEvent, origin: String): Boolean {
+        if(fieldTranslation?.motion(event)==true)return true
         if (!isNativeImeTrackpadProviderActive()) {
             return false
         }

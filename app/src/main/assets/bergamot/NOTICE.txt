@@ -1,0 +1,8 @@
+Bergamot on-device translation backend for Plektra.
+Bergamot translator npm 0.4.9, upstream commit 8cc5d0495479c9ec56eafafd6bcd7fb5b929ca98. The WASM engine and generated engine worker are unmodified. Trailing whitespace in blank/comment lines of translator.js and worker/translator-worker.js was normalized; no executable statements were changed. Engine source and MPL 2.0: https://github.com/browsermt/bergamot-translator/tree/8cc5d0495479c9ec56eafafd6bcd7fb5b929ca98
+Model registry: https://bergamot.s3.amazonaws.com/models/index.json
+French/English models match Mozilla legacy registry SHA256 values: https://storage.googleapis.com/bergamot-models-sandbox/0.3.3/registry.json
+Models source/license: https://github.com/mozilla/firefox-translations-models
+This model repository is archived; newer model catalog: https://mozilla.github.io/translations/model-registry/
+Model licenses included. No online translation service used.
+The engine serves its bundled worker and verified model files on the loopback interface only. Language downloads require explicit user consent.

@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><script type="module">
+import {LatencyOptimisedTranslator} from './translator.js';
+window.runTranslations=async(from,to,texts)=>{
+ let translator;
+ try {
+  translator=new LatencyOptimisedTranslator({registryUrl:location.origin+'/registry.json',cacheSize:0});
+  const results=[];
+  for(const text of texts){const result=await translator.translate({from,to,text,html:false});results.push(result.target.text);}
+  Bergamot.result(JSON.stringify(results));
+ }catch(error){Bergamot.error();}finally{if(translator)translator.delete();}
+};
+Bergamot.ready();</script>

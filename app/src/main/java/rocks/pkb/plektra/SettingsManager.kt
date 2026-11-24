@@ -37,7 +37,7 @@ import java.util.zip.ZipInputStream
 object SettingsManager {
     private const val TAG = "SettingsManager"
     private const val PREFS_NAME = "plektra_prefs"
-    
+
     // Settings keys
     private const val KEY_LONG_PRESS_THRESHOLD = "long_press_threshold"
     const val KEY_TYPING_SOUND_MODE = "typing_sound_mode"
@@ -226,7 +226,7 @@ object SettingsManager {
     private const val KEY_KEYBOARD_THEME_SAVED_THEMES = "keyboard_theme_saved_themes"
     private const val KEY_KEYBOARD_THEME_DRAFTS = "keyboard_theme_drafts"
     private const val KEY_KEYBOARD_THEME_PREVIEW_VIEWPORT_SCALE = "keyboard_theme_preview_viewport_scale"
-    
+
     // Status bar button slot configuration keys
     private const val KEY_STATUS_BAR_SLOT_LEFT = "status_bar_slot_left"
     private const val KEY_STATUS_BAR_SLOT_RIGHT_1 = "status_bar_slot_right_1"
@@ -239,13 +239,14 @@ object SettingsManager {
     private const val KEY_DYNAMIC_VARIATION_BAR_SLOT_COUNT = "dynamic_variation_bar_slot_count"
     private const val KEY_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT = "dynamic_variation_bar_resize_to_content"
     const val KEY_MODIFIER_INDICATOR_MODE = "modifier_indicator_mode"
-    
+
     // Public constants for button IDs
     const val STATUS_BAR_BUTTON_NONE = "none"
     const val STATUS_BAR_BUTTON_CLIPBOARD = "clipboard"
     const val STATUS_BAR_BUTTON_MICROPHONE = "microphone"
     const val STATUS_BAR_BUTTON_EMOJI = "emoji"
     const val STATUS_BAR_BUTTON_LANGUAGE = "language"
+    const val STATUS_BAR_BUTTON_TRANSLATION = "translation"
     const val STATUS_BAR_BUTTON_HAMBURGER = "hamburger"
     const val STATUS_BAR_BUTTON_MINIMAL_UI = "minimal_ui"
     const val STATUS_BAR_BUTTON_SOFTWARE_KEYBOARD_MODE = "software_keyboard_mode"
@@ -285,7 +286,7 @@ object SettingsManager {
     const val ENTER_SEND_STRATEGY_PLAIN_ENTER = "plain_enter"
     const val ENTER_ADDITIONAL_SEND_SHORTCUT_NONE = "none"
     const val ENTER_ADDITIONAL_SEND_SHORTCUT_SYM_ENTER = "sym_enter"
-    
+
     // Default slot assignments
     private const val DEFAULT_SLOT_LEFT = STATUS_BAR_BUTTON_HAMBURGER
     private const val DEFAULT_SLOT_RIGHT_1 = STATUS_BAR_BUTTON_EMOJI
@@ -300,7 +301,7 @@ object SettingsManager {
     const val MAX_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 9
 
     private const val VARIATIONS_FILE_NAME = "variations.json"
-    
+
     // Default values
     private const val DEFAULT_LONG_PRESS_THRESHOLD = 300L
     const val TYPING_SOUND_MODE_OFF = "off"
@@ -1659,14 +1660,14 @@ object SettingsManager {
             .putStringSet(KEY_ADDITIONAL_IME_SUBTYPES, normalized)
             .apply()
     }
-    
+
     /**
      * Returns the long-press threshold in milliseconds.
      */
     fun getLongPressThreshold(context: Context): Long {
         return getPreferences(context).getLong(KEY_LONG_PRESS_THRESHOLD, DEFAULT_LONG_PRESS_THRESHOLD)
     }
-    
+
     /**
      * Sets the long-press threshold in milliseconds.
      * The value is automatically clamped between MIN and MAX.
@@ -1753,17 +1754,17 @@ object SettingsManager {
             .putBoolean(KEY_CTRL_LATCH_STAYS_ON_SPACE, enabled)
             .apply()
     }
-    
+
     /**
      * Returns the minimum allowed value for the long-press threshold.
      */
     fun getMinLongPressThreshold(): Long = MIN_LONG_PRESS_THRESHOLD
-    
+
     /**
      * Returns the maximum allowed value for the long-press threshold.
      */
     fun getMaxLongPressThreshold(): Long = MAX_LONG_PRESS_THRESHOLD
-    
+
     /**
      * Returns the default value for the long-press threshold.
      */
@@ -1986,7 +1987,7 @@ object SettingsManager {
         }
         return copied
     }
-    
+
     /**
      * Returns the swipe incremental threshold in DIP.
      * This is the distance that must be traveled to move the cursor one position.
@@ -1994,7 +1995,7 @@ object SettingsManager {
     fun getSwipeIncrementalThreshold(context: Context): Float {
         return getPreferences(context).getFloat(KEY_SWIPE_INCREMENTAL_THRESHOLD, DEFAULT_SWIPE_INCREMENTAL_THRESHOLD)
     }
-    
+
     /**
      * Sets the swipe incremental threshold in DIP.
      * The value is automatically clamped between MIN and MAX.
@@ -2005,29 +2006,29 @@ object SettingsManager {
             .putFloat(KEY_SWIPE_INCREMENTAL_THRESHOLD, clampedValue)
             .apply()
     }
-    
+
     /**
      * Returns the minimum allowed value for the swipe incremental threshold.
      */
     fun getMinSwipeIncrementalThreshold(): Float = MIN_SWIPE_INCREMENTAL_THRESHOLD
-    
+
     /**
      * Returns the maximum allowed value for the swipe incremental threshold.
      */
     fun getMaxSwipeIncrementalThreshold(): Float = MAX_SWIPE_INCREMENTAL_THRESHOLD
-    
+
     /**
      * Returns the default value for the swipe incremental threshold.
      */
     fun getDefaultSwipeIncrementalThreshold(): Float = DEFAULT_SWIPE_INCREMENTAL_THRESHOLD
-    
+
     /**
      * Returns the state of auto-capitalization for the first letter.
      */
     fun getAutoCapitalizeFirstLetter(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_AUTO_CAPITALIZE_FIRST_LETTER, DEFAULT_AUTO_CAPITALIZE_FIRST_LETTER)
     }
-    
+
     /**
      * Sets the state of auto-capitalization for the first letter.
      */
@@ -2085,7 +2086,7 @@ object SettingsManager {
     fun getDoubleSpaceToPeriod(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_DOUBLE_SPACE_TO_PERIOD, DEFAULT_DOUBLE_SPACE_TO_PERIOD)
     }
-    
+
     /**
      * Sets the state of the double-space-to-period feature.
      */
@@ -2280,14 +2281,14 @@ object SettingsManager {
             )
             .apply()
     }
-    
+
     /**
      * Returns the state of swipe-to-delete.
      */
     fun getSwipeToDelete(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_SWIPE_TO_DELETE, DEFAULT_SWIPE_TO_DELETE)
     }
-    
+
     /**
      * Sets the state of swipe-to-delete.
      */
@@ -2319,7 +2320,7 @@ object SettingsManager {
             .putString(KEY_SWIPE_TO_DELETE_PROVIDER, normalized)
             .commit()
     }
-    
+
     /**
      * Returns the state of automatically showing the keyboard when a field gains focus.
      */
@@ -2355,7 +2356,7 @@ object SettingsManager {
     fun getAutoShowKeyboard(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
     }
-    
+
     /**
      * With automatic showing enabled, Plektra still leaves the decision to Android and the app at
      * input start; their show requests, a tap or a key press open the keyboard.
@@ -2971,7 +2972,7 @@ object SettingsManager {
             .putBoolean(KEY_CLEAR_ALT_ON_SPACE, enabled)
             .apply()
     }
-    
+
     /**
      * Returns custom SYM mappings.
      * Returns an empty map if there are no custom mappings.
@@ -2979,7 +2980,7 @@ object SettingsManager {
     fun getSymMappings(context: Context): Map<Int, String> {
         val prefs = getPreferences(context)
         val jsonString = prefs.getString(KEY_SYM_MAPPINGS_CUSTOM, null) ?: return emptyMap()
-        
+
         return try {
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
@@ -2998,7 +2999,7 @@ object SettingsManager {
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
                 "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M, "KEYCODE_0" to KeyEvent.KEYCODE_0, "KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE
             )
-            
+
             val result = mutableMapOf<Int, String>()
             val keys = mappingsObject.keys()
             while (keys.hasNext()) {
@@ -3015,7 +3016,7 @@ object SettingsManager {
             emptyMap()
         }
     }
-    
+
     /**
      * Saves custom SYM mappings.
      */
@@ -3036,7 +3037,7 @@ object SettingsManager {
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
                 KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M", KeyEvent.KEYCODE_0 to "KEYCODE_0", KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE"
             )
-            
+
             val mappingsObject = JSONObject()
             for ((keyCode, emoji) in mappings) {
                 val keyName = keyCodeToName[keyCode]
@@ -3044,10 +3045,10 @@ object SettingsManager {
                     mappingsObject.put(keyName, emoji)
                 }
             }
-            
+
             val jsonObject = JSONObject()
             jsonObject.put("mappings", mappingsObject)
-            
+
             getPreferences(context).edit()
                 .putString(KEY_SYM_MAPPINGS_CUSTOM, jsonObject.toString())
                 .apply()
@@ -3055,7 +3056,7 @@ object SettingsManager {
             Log.e(TAG, "Error saving custom SYM mappings", e)
         }
     }
-    
+
     /**
      * Resets custom SYM mappings back to defaults.
      */
@@ -3064,7 +3065,7 @@ object SettingsManager {
             .remove(KEY_SYM_MAPPINGS_CUSTOM)
             .apply()
     }
-    
+
     /**
      * Returns true if custom SYM mappings exist.
      */
@@ -3072,7 +3073,7 @@ object SettingsManager {
         val prefs = getPreferences(context)
         return prefs.contains(KEY_SYM_MAPPINGS_CUSTOM)
     }
-    
+
     /**
      * Returns custom SYM mappings for page 2.
      * Returns an empty map if there are no custom mappings.
@@ -3080,7 +3081,7 @@ object SettingsManager {
     fun getSymMappingsPage2(context: Context): Map<Int, String> {
         val prefs = getPreferences(context)
         val jsonString = prefs.getString(KEY_SYM_MAPPINGS_PAGE2_CUSTOM, null) ?: return emptyMap()
-        
+
         return try {
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
@@ -3099,7 +3100,7 @@ object SettingsManager {
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
                 "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M, "KEYCODE_0" to KeyEvent.KEYCODE_0, "KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE
             )
-            
+
             val result = mutableMapOf<Int, String>()
             val keys = mappingsObject.keys()
             while (keys.hasNext()) {
@@ -3116,7 +3117,7 @@ object SettingsManager {
             emptyMap()
         }
     }
-    
+
     /**
      * Saves custom SYM mappings for page 2.
      */
@@ -3137,7 +3138,7 @@ object SettingsManager {
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
                 KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M", KeyEvent.KEYCODE_0 to "KEYCODE_0", KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE"
             )
-            
+
             val mappingsObject = JSONObject()
             for ((keyCode, character) in mappings) {
                 val keyName = keyCodeToName[keyCode]
@@ -3145,10 +3146,10 @@ object SettingsManager {
                     mappingsObject.put(keyName, character)
                 }
             }
-            
+
             val jsonObject = JSONObject()
             jsonObject.put("mappings", mappingsObject)
-            
+
             getPreferences(context).edit()
                 .putString(KEY_SYM_MAPPINGS_PAGE2_CUSTOM, jsonObject.toString())
                 .apply()
@@ -3156,7 +3157,7 @@ object SettingsManager {
             Log.e(TAG, "Error saving custom SYM page 2 mappings", e)
         }
     }
-    
+
     /**
      * Resets custom SYM mappings for page 2 back to defaults.
      */
@@ -3165,7 +3166,7 @@ object SettingsManager {
             .remove(KEY_SYM_MAPPINGS_PAGE2_CUSTOM)
             .apply()
     }
-    
+
     /**
      * Returns true if custom SYM page 2 mappings exist.
      */
@@ -3173,7 +3174,7 @@ object SettingsManager {
         val prefs = getPreferences(context)
         return prefs.contains(KEY_SYM_MAPPINGS_PAGE2_CUSTOM)
     }
-    
+
     /**
      * Returns whether auto-correction is enabled.
      */
@@ -3356,25 +3357,25 @@ object SettingsManager {
     fun getAutoCorrectEnabledLanguages(context: Context): Set<String> {
         val prefs = getPreferences(context)
         val languagesString = prefs.getString(KEY_AUTO_CORRECT_ENABLED_LANGUAGES, null)
-        
+
         // If languages are explicitly set, return them as-is (user controlled)
         if (languagesString != null && languagesString.isNotEmpty()) {
             return languagesString.split(",").toSet()
         }
-        
+
         // Default: system language + x-plektra, with fallback to English
         val systemLanguage = context.applicationContext.resources.configuration.locales[0].language.lowercase()
         val supportedLanguages = setOf("it", "en", "es", "fr", "de", "pl")
-        
+
         val defaultLanguage = if (systemLanguage in supportedLanguages) {
             systemLanguage
         } else {
             "en" // Fallback to English
         }
-        
+
         return setOf(defaultLanguage, "x-plektra")
     }
-    
+
     /**
      * Sets the list of languages enabled for auto-correction.
      * @param languages Set of language codes (e.g. "it", "en")
@@ -3385,7 +3386,7 @@ object SettingsManager {
             .putString(KEY_AUTO_CORRECT_ENABLED_LANGUAGES, languagesString)
             .apply()
     }
-    
+
     /**
      * Returns true if a language is enabled for auto-correction.
      */
@@ -3394,12 +3395,12 @@ object SettingsManager {
         // If the list is empty, all languages are enabled (default behavior)
         return enabledLanguages.isEmpty() || enabledLanguages.contains(language)
     }
-    
+
     /**
      * Special JSON field for the language name.
      */
     private const val LANGUAGE_NAME_KEY = "__name"
-    
+
     /**
      * Returns custom corrections for a language.
      */
@@ -3407,7 +3408,7 @@ object SettingsManager {
         val prefs = getPreferences(context)
         val key = "auto_correct_custom_$languageCode"
         val jsonString = prefs.getString(key, null) ?: return emptyMap()
-        
+
         return try {
             val jsonObject = JSONObject(jsonString)
             val corrections = mutableMapOf<String, String>()
@@ -3549,7 +3550,7 @@ object SettingsManager {
     fun setEmojiSymbolsExactOnClose(context: Context, enabled: Boolean) {
         getPreferences(context).edit().putBoolean(KEY_EMOJI_SYMBOLS_EXACT_ON_CLOSE, enabled).apply()
     }
-    
+
     /**
      * Returns the display name of a custom language from JSON.
      */
@@ -3557,7 +3558,7 @@ object SettingsManager {
         val prefs = getPreferences(context)
         val key = "auto_correct_custom_$languageCode"
         val jsonString = prefs.getString(key, null) ?: return null
-        
+
         return try {
             val jsonObject = JSONObject(jsonString)
             if (jsonObject.has(LANGUAGE_NAME_KEY)) {
@@ -3570,20 +3571,20 @@ object SettingsManager {
             null
         }
     }
-    
+
     /**
      * Saves custom corrections for a language.
      * @param languageName The display name of the language (optional, if null it is not saved/updated)
      */
     fun saveCustomAutoCorrections(
-        context: Context, 
-        languageCode: String, 
+        context: Context,
+        languageCode: String,
         corrections: Map<String, String>,
         languageName: String? = null
     ) {
         try {
             val jsonObject = JSONObject()
-            
+
             // Save the language name if provided
             if (languageName != null) {
                 jsonObject.put(LANGUAGE_NAME_KEY, languageName)
@@ -3594,7 +3595,7 @@ object SettingsManager {
                     jsonObject.put(LANGUAGE_NAME_KEY, existingName)
                 }
             }
-            
+
             // Save corrections
             corrections.forEach { (key, value) ->
                 // Skip the special field if present in the corrections
@@ -3602,7 +3603,7 @@ object SettingsManager {
                     jsonObject.put(key, value)
                 }
             }
-            
+
             val key = "auto_correct_custom_$languageCode"
             getPreferences(context).edit()
                 .putString(key, jsonObject.toString())
@@ -3611,7 +3612,7 @@ object SettingsManager {
             Log.e(TAG, "Error saving custom corrections for $languageCode", e)
         }
     }
-    
+
     /**
      * Updates only the display name of a custom language.
      */
@@ -3620,15 +3621,15 @@ object SettingsManager {
             val prefs = getPreferences(context)
             val key = "auto_correct_custom_$languageCode"
             val jsonString = prefs.getString(key, null)
-            
+
             val jsonObject = if (jsonString != null) {
                 JSONObject(jsonString)
             } else {
                 JSONObject()
             }
-            
+
             jsonObject.put(LANGUAGE_NAME_KEY, languageName)
-            
+
             prefs.edit()
                 .putString(key, jsonObject.toString())
                 .apply()
@@ -3636,7 +3637,7 @@ object SettingsManager {
             Log.e(TAG, "Error updating language name for $languageCode", e)
         }
     }
-    
+
     /**
      * Returns the long-press action, including optional fixed SYM key layers.
      */
@@ -3648,7 +3649,7 @@ object SettingsManager {
             else -> DEFAULT_LONG_PRESS_MODIFIER
         }
     }
-    
+
     /**
      * Sets the long-press action.
      */
@@ -3665,7 +3666,7 @@ object SettingsManager {
             .putString(KEY_LONG_PRESS_MODIFIER, validModifier)
             .apply()
     }
-    
+
     /**
      * Returns true if long press uses Shift, false if it uses Alt.
      * @deprecated Use getLongPressModifier() for more granular control
@@ -3694,7 +3695,7 @@ object SettingsManager {
         "sym_symbols" -> 2
         else -> if (getSymPagesConfig(context).prefersEmojiLongPressLayer()) 1 else 2
     }
-    
+
     /**
      * Data class per rappresentare una scorciatoia del launcher.
      * Estendibile per supportare diversi tipi di azioni in futuro (app, shortcut, ecc.)
@@ -3720,7 +3721,7 @@ object SettingsManager {
             // Aggiungi altri tipi in futuro qui
         }
     }
-    
+
     private const val KEY_LAUNCHER_SHORTCUTS = "launcher_shortcuts"
     private const val KEY_LAUNCHER_SHORTCUTS_ENABLED = "launcher_shortcuts_enabled"
     private const val KEY_QUICK_LAUNCHER_DEFAULT_ASSIGNED = "quick_launcher_default_assigned"
@@ -3761,7 +3762,7 @@ object SettingsManager {
     const val QUICK_LAUNCHER_BEHAVIOR_NIAGARA = "niagara"
     const val QUICK_LAUNCHER_ANIMATION_DURATION_MIN_MS = 0
     const val QUICK_LAUNCHER_ANIMATION_DURATION_MAX_MS = 320
-    
+
     // Nav mode settings
     private const val KEY_NAV_MODE_ENABLED = "nav_mode_enabled"
     private const val DEFAULT_NAV_MODE_ENABLED = true
@@ -3771,7 +3772,7 @@ object SettingsManager {
     private const val CURRENT_NAV_MODE_DEFAULT_MAPPINGS_VERSION = 3
     private const val NAV_MODE_MAPPINGS_FILE_NAME = "ctrl_key_mappings.json"
     private const val KEY_NAV_MODE_MAPPINGS_UPDATED = "nav_mode_mappings_updated"
-    
+
     /**
      * Imposta una scorciatoia del launcher per un tasto (tipo app).
      */
@@ -3830,14 +3831,14 @@ object SettingsManager {
             )
         )
     }
-    
+
     /**
      * Imposta un'azione del launcher per un tasto (generico, estendibile).
      */
     fun setLauncherAction(context: Context, keyCode: Int, action: LauncherShortcut) {
         val prefs = getPreferences(context)
         val shortcutsJson = prefs.getString(KEY_LAUNCHER_SHORTCUTS, "{}") ?: "{}"
-        
+
         try {
             val shortcuts = JSONObject(shortcutsJson)
             if (action.isQuickLauncherCommand()) {
@@ -3873,14 +3874,14 @@ object SettingsManager {
             Log.e(TAG, "Errore nel salvataggio dell'azione per tasto $keyCode", e)
         }
     }
-    
+
     /**
      * Rimuove una scorciatoia del launcher per un tasto.
      */
     fun removeLauncherShortcut(context: Context, keyCode: Int) {
         val prefs = getPreferences(context)
         val shortcutsJson = prefs.getString(KEY_LAUNCHER_SHORTCUTS, "{}") ?: "{}"
-        
+
         try {
             val shortcuts = JSONObject(shortcutsJson)
             shortcuts.remove(keyCode.toString())
@@ -3889,7 +3890,7 @@ object SettingsManager {
             Log.e(TAG, "Errore nella rimozione della scorciatoia per tasto $keyCode", e)
         }
     }
-    
+
     /**
      * Scambia le scorciatoie del launcher tra due tasti (operazione atomica).
      * Se uno dei tasti non ha uno shortcut, lo shortcut viene spostato.
@@ -3897,18 +3898,18 @@ object SettingsManager {
     fun swapLauncherShortcuts(context: Context, fromKeyCode: Int, toKeyCode: Int) {
         val prefs = getPreferences(context)
         val shortcutsJson = prefs.getString(KEY_LAUNCHER_SHORTCUTS, "{}") ?: "{}"
-        
+
         try {
             val shortcuts = JSONObject(shortcutsJson)
-            
+
             // Get current shortcuts (if any)
             val fromShortcutObj = shortcuts.optJSONObject(fromKeyCode.toString())
             val toShortcutObj = shortcuts.optJSONObject(toKeyCode.toString())
-            
+
             // Swap: remove both first
             shortcuts.remove(fromKeyCode.toString())
             shortcuts.remove(toKeyCode.toString())
-            
+
             // Add swapped shortcuts
             if (fromShortcutObj != null) {
                 shortcuts.put(toKeyCode.toString(), fromShortcutObj)
@@ -3916,14 +3917,14 @@ object SettingsManager {
             if (toShortcutObj != null) {
                 shortcuts.put(fromKeyCode.toString(), toShortcutObj)
             }
-            
+
             // Save atomically
             prefs.edit().putString(KEY_LAUNCHER_SHORTCUTS, shortcuts.toString()).apply()
         } catch (e: Exception) {
             Log.e(TAG, "Errore nello scambio delle scorciatoie tra tasti $fromKeyCode e $toKeyCode", e)
         }
     }
-    
+
     /**
      * Ottiene tutte le scorciatoie del launcher salvate.
      */
@@ -3944,7 +3945,7 @@ object SettingsManager {
             if (json == shortcutsJson) return parsed
         }
         val shortcuts = mutableMapOf<Int, LauncherShortcut>()
-        
+
         try {
             val json = JSONObject(shortcutsJson)
             val keys = json.keys()
@@ -3954,7 +3955,7 @@ object SettingsManager {
                 if (keyCode != null) {
                     val shortcutObj = json.getJSONObject(key)
                     val type = shortcutObj.optString("type", LauncherShortcut.TYPE_APP)
-                    
+
                     shortcuts[keyCode] = LauncherShortcut(
                         type = type,
                         packageName = shortcutObj.optString("packageName").takeIf { it.isNotEmpty() },
@@ -3975,10 +3976,10 @@ object SettingsManager {
         } catch (e: Exception) {
             Log.e(TAG, "Errore nel caricamento delle scorciatoie", e)
         }
-        
+
         return shortcuts
     }
-    
+
     /**
      * Ottiene una scorciatoia del launcher per un tasto specifico.
      */
@@ -4234,14 +4235,14 @@ object SettingsManager {
             .putInt(KEY_QUICK_LAUNCHER_STATIC_TOP_HIGHLIGHT_COLOR, color)
             .apply()
     }
-    
+
     /**
      * Restituisce se le scorciatoie del launcher sono abilitate.
      */
     fun getLauncherShortcutsEnabled(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_LAUNCHER_SHORTCUTS_ENABLED, DEFAULT_LAUNCHER_SHORTCUTS_ENABLED)
     }
-    
+
     /**
      * Imposta se le scorciatoie del launcher sono abilitate.
      */
@@ -4430,18 +4431,18 @@ object SettingsManager {
             else -> QUICK_LAUNCHER_BEHAVIOR_PLEKTRA
         }
     }
-    
+
     // Power Shortcuts settings
     private const val KEY_POWER_SHORTCUTS_ENABLED = "power_shortcuts_enabled"
     private const val DEFAULT_POWER_SHORTCUTS_ENABLED = true
-    
+
     /**
      * Restituisce se i Power Shortcuts sono abilitati.
      */
     fun getPowerShortcutsEnabled(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_POWER_SHORTCUTS_ENABLED, DEFAULT_POWER_SHORTCUTS_ENABLED)
     }
-    
+
     /**
      * Imposta se i Power Shortcuts sono abilitati.
      */
@@ -4465,14 +4466,14 @@ object SettingsManager {
             .putBoolean(KEY_SYM_EDIT_SHORTCUTS, enabled)
             .apply()
     }
-    
+
     /**
      * Returns whether nav mode is enabled.
      */
     fun getNavModeEnabled(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_NAV_MODE_ENABLED, DEFAULT_NAV_MODE_ENABLED)
     }
-    
+
     /**
      * Sets whether nav mode is enabled.
      */
@@ -4497,14 +4498,14 @@ object SettingsManager {
             .putBoolean(KEY_NAV_MODE_CTRL_HOLD_ENABLED, enabled)
             .apply()
     }
-    
+
     /**
      * Returns the File for nav mode mappings in filesDir.
      */
     fun getNavModeMappingsFile(context: Context): File {
         return File(context.filesDir, NAV_MODE_MAPPINGS_FILE_NAME)
     }
-    
+
     /**
      * Initializes the nav mode mappings file by copying from assets if it doesn't exist.
      */
@@ -4516,7 +4517,7 @@ object SettingsManager {
             migrateNavModeMappingsFileIfNeeded(context)
             return@keyboardSourceChange // File already exists, don't overwrite
         }
-        
+
         try {
             val inputStream: InputStream = context.assets.open("common/ctrl/$NAV_MODE_MAPPINGS_FILE_NAME")
             val outputStream = FileOutputStream(mappingsFile)
@@ -4584,7 +4585,7 @@ object SettingsManager {
             Log.e(TAG, "Error migrating nav mode mappings file", e)
         }
     }
-    
+
     /**
      * Saves nav mode key mappings to the JSON file in filesDir.
      */
@@ -4605,7 +4606,7 @@ object SettingsManager {
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
                 KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M", KeyEvent.KEYCODE_0 to "KEYCODE_0", KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE"
             )
-            
+
             val mappingsObject = JSONObject()
             for ((keyCode, mapping) in mappings) {
                 val keyName = keyCodeToName[keyCode]
@@ -4622,7 +4623,7 @@ object SettingsManager {
                     mappingsObject.put(keyName, mappingObject)
                 }
             }
-            
+
             // Also include all alphabetic keys that might not be in the mappings map
             // but should be saved as "none" if they're not explicitly set
             val allAlphabeticKeys = listOf(
@@ -4634,7 +4635,7 @@ object SettingsManager {
                 KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
                 KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_GRAVE
             )
-            
+
             // Ensure all alphabetic keys are in the JSON (even if "none")
             allAlphabeticKeys.forEach { keyCode ->
                 val keyName = keyCodeToName[keyCode]
@@ -4644,24 +4645,24 @@ object SettingsManager {
                     mappingsObject.put(keyName, mappingObject)
                 }
             }
-            
+
             val jsonObject = JSONObject()
             jsonObject.put("mappings", mappingsObject)
-            
+
             val mappingsFile = getNavModeMappingsFile(context)
             mappingsFile.writeText(jsonObject.toString())
-            
+
             // Update timestamp in SharedPreferences to notify the service
             getPreferences(context).edit()
                 .putLong(KEY_NAV_MODE_MAPPINGS_UPDATED, System.currentTimeMillis())
                 .apply()
-            
+
             Log.d(TAG, "Nav mode key mappings saved")
         } catch (e: Exception) {
             Log.e(TAG, "Error saving nav mode key mappings", e)
         }
     }
-    
+
     /**
      * Resets nav mode key mappings to default by deleting the custom file.
      */
@@ -4674,7 +4675,7 @@ object SettingsManager {
             }
             // Re-initialize from assets
             initializeNavModeMappingsFile(context)
-            
+
             // Update timestamp in SharedPreferences to notify the service
             getPreferences(context).edit()
                 .putLong(KEY_NAV_MODE_MAPPINGS_UPDATED, System.currentTimeMillis())
@@ -4683,7 +4684,7 @@ object SettingsManager {
             Log.e(TAG, "Error resetting nav mode key mappings", e)
         }
     }
-    
+
     /**
      * Returns true if custom nav mode mappings exist.
      */
@@ -4691,7 +4692,7 @@ object SettingsManager {
         val mappingsFile = getNavModeMappingsFile(context)
         return mappingsFile.exists()
     }
-    
+
     /** Layout, mapping and selection changes reach the Direct Boot snapshot before returning. */
     private inline fun <T> keyboardSourceChange(context: Context, change: () -> T): T =
         rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig.changeSources(context, change)
@@ -4702,7 +4703,7 @@ object SettingsManager {
     fun getKeyboardLayout(context: Context): String {
         return getPreferences(context).getString(KEY_KEYBOARD_LAYOUT, DEFAULT_KEYBOARD_LAYOUT) ?: DEFAULT_KEYBOARD_LAYOUT
     }
-    
+
     /**
      * Sets the keyboard layout name.
      */
@@ -5176,7 +5177,7 @@ object SettingsManager {
         setKeyboardLayout(context, nextLayout)
         return nextLayout
     }
-    
+
     /**
      * Sets the SYM page to restore when returning from settings.
      * @param context The context
@@ -5187,7 +5188,7 @@ object SettingsManager {
             .putInt(KEY_RESTORE_SYM_PAGE, page)
             .apply()
     }
-    
+
     /**
      * Gets the SYM page to restore when returning from settings.
      * @param context The context
@@ -5196,7 +5197,7 @@ object SettingsManager {
     fun getRestoreSymPage(context: Context): Int {
         return getPreferences(context).getInt(KEY_RESTORE_SYM_PAGE, 0)
     }
-    
+
     /**
      * Clears the SYM page restore state.
      * @param context The context
@@ -5206,7 +5207,7 @@ object SettingsManager {
             .remove(KEY_RESTORE_SYM_PAGE)
             .apply()
     }
-    
+
     /**
      * Sets a pending SYM page state when opening SymCustomizationActivity.
      * This will be converted to restore_sym_page only if user presses back.
@@ -5218,7 +5219,7 @@ object SettingsManager {
             .putInt(KEY_PENDING_RESTORE_SYM_PAGE, page)
             .apply()
     }
-    
+
     /**
      * Gets the pending SYM page state.
      * @param context The context
@@ -5227,7 +5228,7 @@ object SettingsManager {
     fun getPendingRestoreSymPage(context: Context): Int {
         return getPreferences(context).getInt(KEY_PENDING_RESTORE_SYM_PAGE, 0)
     }
-    
+
     /**
      * Clears the pending SYM page state.
      * @param context The context
@@ -5237,7 +5238,7 @@ object SettingsManager {
             .remove(KEY_PENDING_RESTORE_SYM_PAGE)
             .apply()
     }
-    
+
     /**
      * Confirms the pending restore by moving it to restore_sym_page.
      * Called when user presses back from SymCustomizationActivity.
@@ -5374,7 +5375,7 @@ object SettingsManager {
             .remove(LEGACY_KEY_ALT_CHARACTER_LAYER_BINDING)
             .apply()
     }
-    
+
     /**
      * Gets whether SYM layout should auto-close after key press.
      * @param context The context
@@ -5383,7 +5384,7 @@ object SettingsManager {
     fun getSymAutoClose(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_SYM_AUTO_CLOSE, DEFAULT_SYM_AUTO_CLOSE)
     }
-    
+
     /**
      * Sets whether SYM layout should auto-close after key press.
      * @param context The context
@@ -5449,7 +5450,7 @@ object SettingsManager {
             dismissedString.split(",").toSet()
         }
     }
-    
+
     /**
      * Adds a release tag name to the dismissed releases set.
      * @param context The context
@@ -5463,7 +5464,7 @@ object SettingsManager {
             .putString(KEY_DISMISSED_RELEASES, dismissedString)
             .apply()
     }
-    
+
     /**
      * Checks if a release tag name has been dismissed.
      * @param context The context
@@ -5473,7 +5474,7 @@ object SettingsManager {
     fun isReleaseDismissed(context: Context, tagName: String): Boolean {
         return getDismissedReleases(context).contains(tagName)
     }
-    
+
     /**
      * Checks if the tutorial has been completed.
      * @param context The context
@@ -5482,7 +5483,7 @@ object SettingsManager {
     fun isTutorialCompleted(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_TUTORIAL_COMPLETED, false)
     }
-    
+
     /**
      * Marks the tutorial as completed.
      * @param context The context
@@ -5493,7 +5494,7 @@ object SettingsManager {
             .putString(KEY_LAST_SEEN_WHATS_NEW_VERSION, BuildConfig.VERSION_NAME)
             .apply()
     }
-    
+
     /**
      * Resets the tutorial completion status, allowing it to be shown again.
      * @param context The context
@@ -5728,7 +5729,7 @@ object SettingsManager {
     fun getVariationsFile(context: Context): File {
         return File(context.filesDir, VARIATIONS_FILE_NAME)
     }
-    
+
     /**
      * Helper to load current JSON from file or assets.
      */
@@ -5780,7 +5781,7 @@ object SettingsManager {
             Log.e(TAG, "Error saving static variation rows", e)
         }
     }
-    
+
     /**
      * Saves variations to variations.json file in filesDir.
      */
@@ -5800,7 +5801,7 @@ object SettingsManager {
                 }
                 variationsObject.put(letter, variationsArray)
             }
-            
+
             val currentJson = loadCurrentJson(context)
             val jsonObject = if (currentJson != null) {
                 JSONObject(currentJson.toString())
@@ -5829,13 +5830,13 @@ object SettingsManager {
                 staticVariationsAlt.forEach { staticArray.put(it) }
                 jsonObject.put("staticVariationsAlt", staticArray)
             }
-            
+
             FileOutputStream(getVariationsFile(context)).use { outputStream ->
                 outputStream.write(jsonObject.toString(2).toByteArray(Charsets.UTF_8))
             }
-            
+
             notifyVariationsUpdated(context)
-            
+
             Log.d(TAG, "Variations saved to ${getVariationsFile(context).absolutePath}")
         } catch (e: Exception) {
             Log.e(TAG, "Error saving variations", e)
@@ -5859,7 +5860,7 @@ object SettingsManager {
             Log.e(TAG, "Error saving static variation base preset", e)
         }
     }
-    
+
     /**
      * Resets variations back to defaults by copying defaultvariations.json from assets.
      */
@@ -5871,22 +5872,22 @@ object SettingsManager {
                 inputStream.copyTo(outputStream)
             }
             inputStream.close()
-            
+
             notifyVariationsUpdated(context)
-            
+
             Log.d(TAG, "Variations reset to default from assets")
         } catch (e: Exception) {
             Log.e(TAG, "Error resetting variations to default", e)
         }
     }
-    
+
     /**
      * Returns true if custom variations file exists.
      */
     fun hasCustomVariations(context: Context): Boolean {
         return getVariationsFile(context).exists()
     }
-    
+
     /**
      * Touch the variations_updated flag so the IME reloads variations/static bar content.
      */
@@ -6104,11 +6105,11 @@ object SettingsManager {
             .putString(KEY_HIDDEN_SYSTEM_INPUT_STYLES, array.toString())
             .apply()
     }
-    
+
     // ========================
     // Status Bar Button Slots
     // ========================
-    
+
     /**
      * Gets the button assigned to the left slot.
      */
@@ -6225,7 +6226,7 @@ object SettingsManager {
             .putString(KEY_SLIM_STATUS_BAR_SLOTS_RIGHT, statusBarSlotsToJson(normalized))
             .apply()
     }
-    
+
     /**
      * Sets the button for the left slot.
      */
@@ -6234,7 +6235,7 @@ object SettingsManager {
             .putString(KEY_STATUS_BAR_SLOT_LEFT, buttonId)
             .apply()
     }
-    
+
     /**
      * Gets the button assigned to the first right slot.
      */
@@ -6242,7 +6243,7 @@ object SettingsManager {
         return getPreferences(context).getString(KEY_STATUS_BAR_SLOT_RIGHT_1, DEFAULT_SLOT_RIGHT_1)
             ?: DEFAULT_SLOT_RIGHT_1
     }
-    
+
     /**
      * Sets the button for the first right slot.
      */
@@ -6251,7 +6252,7 @@ object SettingsManager {
             .putString(KEY_STATUS_BAR_SLOT_RIGHT_1, buttonId)
             .apply()
     }
-    
+
     /**
      * Gets the button assigned to the second right slot.
      */
@@ -6259,7 +6260,7 @@ object SettingsManager {
         return getPreferences(context).getString(KEY_STATUS_BAR_SLOT_RIGHT_2, DEFAULT_SLOT_RIGHT_2)
             ?: DEFAULT_SLOT_RIGHT_2
     }
-    
+
     /**
      * Sets the button for the second right slot.
      */
@@ -6482,7 +6483,7 @@ object SettingsManager {
         )
         return order.filter { it in indicators }.joinToString(",")
     }
-    
+
     /**
      * Returns all available button options for dropdown selection.
      */
@@ -6493,6 +6494,7 @@ object SettingsManager {
             STATUS_BAR_BUTTON_EMOJI,
             STATUS_BAR_BUTTON_MICROPHONE,
             STATUS_BAR_BUTTON_LANGUAGE,
+            STATUS_BAR_BUTTON_TRANSLATION,
             STATUS_BAR_BUTTON_HAMBURGER,
             STATUS_BAR_BUTTON_MINIMAL_UI,
             STATUS_BAR_BUTTON_SOFTWARE_KEYBOARD_MODE,

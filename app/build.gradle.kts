@@ -282,7 +282,7 @@ android {
             isDebuggable = false
         }
     }
-    
+
     // Validate signing config only when building release
     tasks.whenTaskAdded {
         if (!isFdroidBuild && (
@@ -357,7 +357,7 @@ android {
             }
         }
     }
-    
+
     androidResources {
         // The emoji font stays uncompressed so Android can map it instead of copying 11 MB.
         noCompress += "ttf"
@@ -482,6 +482,7 @@ androidComponents.onVariants(androidComponents.selector().withBuildType("release
 }
 
 dependencies {
+    implementation("com.google.mlkit:translate:17.0.3")
 
     implementation(libs.androidx.core.ktx)
     implementation("androidx.window:window:1.5.1")

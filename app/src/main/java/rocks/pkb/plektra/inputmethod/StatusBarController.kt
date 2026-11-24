@@ -96,14 +96,14 @@ class StatusBarController(
             field = value
             variationBarView?.onVariationSelectedListener = value
         }
-    
+
     // Listener for cursor movement (to update variations)
     var onCursorMovedListener: (() -> Unit)? = null
         set(value) {
             field = value
             variationBarView?.onCursorMovedListener = value
         }
-    
+
     // Listener for speech recognition request
     var onSpeechRecognitionRequested: (() -> Unit)? = null
         set(value) {
@@ -140,19 +140,25 @@ class StatusBarController(
     var onDeleteUserSuggestion: ((String) -> Unit)? = null
 
     var canDeleteUserSuggestion: ((String) -> Boolean)? = null
-    
+
     var onLanguageSwitchRequested: (() -> Unit)? = null
         set(value) {
             field = value
             variationBarView?.onLanguageSwitchRequested = value
         }
-    
+
+    var onTranslationRequested: (() -> Unit)? = null
+        set(value){field=value;variationBarView?.onTranslationRequested=value}
+    fun updateTranslationButton(active:Boolean){
+        rocks.pkb.plektra.inputmethod.statusbar.button.TranslationButtonFactory.updateState(statusBarLayout,active)
+        variationBarView?.updateTranslationButton(active)
+    }
     var onClipboardRequested: (() -> Unit)? = null
         set(value) {
             field = value
             variationBarView?.onClipboardRequested = value
         }
-    
+
     var onEmojiPickerRequested: (() -> Unit)? = null
         set(value) {
             field = value
@@ -160,7 +166,7 @@ class StatusBarController(
         }
 
     var onEmojiPageRequested: (() -> Unit)? = null
-    
+
     var onSymbolsPageRequested: (() -> Unit)? = null
         set(value) {
             field = value
@@ -234,14 +240,14 @@ class StatusBarController(
 
     /** A layout or SYM page picked from the on-screen layout key; see [SoftwareKeyboardPageChoices]. */
     var onSoftwareKeyboardPageChoice: ((String) -> Unit)? = null
-    
+
     // Callback for speech recognition state changes (active/inactive)
     var onSpeechRecognitionStateChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
             // Note: VariationBarView doesn't need this directly, but we can add it if needed
         }
-    
+
     fun invalidateStaticVariations() {
         variationBarView?.invalidateStaticVariations()
     }
@@ -254,7 +260,7 @@ class StatusBarController(
         hamburgerMenuView?.setMicrophoneActive(isActive)
         fullSuggestionsBar?.setMicrophoneButtonActive(isActive)
     }
-    
+
     /**
      * Updates the microphone button visual feedback based on audio level.
      * @param rmsdB The RMS audio level in decibels (typically -10 to 0)
@@ -270,7 +276,7 @@ class StatusBarController(
         hamburgerMenuView?.updateMicrophoneAudioLevel(rmsdB)
         fullSuggestionsBar?.updateMicrophoneAudioLevel(rmsdB)
     }
-    
+
     /**
      * Shows or hides the speech recognition hint message.
      * When showing, replaces the swipe hint with speech recognition message.
@@ -428,7 +434,7 @@ class StatusBarController(
     private var lastSoftwareKeyboardSymPageRendered: Int = 0
     private var lastSoftwareKeyboardSymLayoutRendered: String? = null
     private var lastSoftwareKeyboardSymStyleRendered: AospKeyboardView.SoftwareLayoutStyle? = null
-    
+
     init {
         onHamburgerMenuRequested = { toggleHamburgerMenu() }
     }
@@ -547,6 +553,7 @@ class StatusBarController(
     private fun statusBarCallbacks(): StatusBarCallbacks =
         StatusBarCallbacks(
             onClipboardRequested = onClipboardRequested,
+            onTranslationRequested = onTranslationRequested,
             onSpeechRecognitionRequested = onSpeechRecognitionRequested,
             onEmojiPickerRequested = onEmojiPickerRequested,
             onLanguageSwitchRequested = onLanguageSwitchRequested,
@@ -772,21 +779,21 @@ class StatusBarController(
             // Container for modifier indicators (horizontal, left-aligned).
             // Add left padding to avoid the IME collapse button.
             val leftPadding = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 
-                64f, 
+                TypedValue.COMPLEX_UNIT_DIP,
+                64f,
                 context.resources.displayMetrics
             ).toInt()
             val horizontalPadding = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 
-                16f, 
+                TypedValue.COMPLEX_UNIT_DIP,
+                16f,
                 context.resources.displayMetrics
             ).toInt()
             val verticalPadding = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 
-                8f, 
+                TypedValue.COMPLEX_UNIT_DIP,
+                8f,
                 context.resources.displayMetrics
             ).toInt()
-            
+
             modifiersContainer = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.START or Gravity.CENTER_VERTICAL
@@ -808,7 +815,7 @@ class StatusBarController(
                 )
                 visibility = View.GONE
             }
-            
+
             // Keep the TextView for backward compatibility (hidden)
             emojiMapTextView = TextView(context).apply {
                 visibility = View.GONE
@@ -1018,7 +1025,7 @@ class StatusBarController(
     private fun ensureLayoutCreated(emojiMapText: String = ""): LinearLayout? {
         return statusBarLayout ?: getOrCreateLayout(emojiMapText)
     }
-    
+
     /**
      * Recursively finds a clickable view at the given coordinates in the view hierarchy.
      * Coordinates are relative to the parent view.
@@ -1033,7 +1040,7 @@ class StatusBarController(
             }
             return null
         }
-        
+
         // For ViewGroup, check children first (they are on top)
         // Iterate in reverse to check topmost views first
         for (i in parent.childCount - 1 downTo 0) {
@@ -1043,7 +1050,7 @@ class StatusBarController(
                 val childTop = child.top.toFloat()
                 val childRight = child.right.toFloat()
                 val childBottom = child.bottom.toFloat()
-                
+
                 if (x >= childLeft && x < childRight &&
                     y >= childTop && y < childBottom) {
                     // Point is inside this child, recurse with relative coordinates
@@ -1053,7 +1060,7 @@ class StatusBarController(
                     if (found != null) {
                         return found
                     }
-                    
+
                     // If child itself is clickable, return it
                     if (child.isClickable) {
                         return child
@@ -1061,30 +1068,30 @@ class StatusBarController(
                 }
             }
         }
-        
+
         // If no child was found and parent is clickable, return parent
         if (parent.isClickable) {
             return parent
         }
-        
+
         return null
     }
-    
+
     /**
      * Crea un indicatore per un modificatore (deprecato, mantenuto per compatibilità).
      */
     private fun createModifierIndicator(text: String, isActive: Boolean): TextView {
         val dp8 = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 
-            8f, 
+            TypedValue.COMPLEX_UNIT_DIP,
+            8f,
             context.resources.displayMetrics
         ).toInt()
         val dp6 = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 
-            6f, 
+            TypedValue.COMPLEX_UNIT_DIP,
+            6f,
             context.resources.displayMetrics
         ).toInt()
-        
+
         return TextView(context).apply {
             this.text = text
             textSize = 12f
@@ -1209,7 +1216,7 @@ class StatusBarController(
             override val description: String
         ) : MenuBarModifierIndicator(locked, description)
     }
-    
+
     /**
      * Updates the clipboard history view inline in the keyboard container.
      */
@@ -1503,25 +1510,25 @@ class StatusBarController(
             lastHardwareSymThemeRendered == theme && !inputConnectionChanged && !inputConnectionBecameAvailable) {
             return
         }
-        
+
         // Rimuovi tutti i tasti esistenti
         container.removeAllViews()
         emojiKeyButtons.clear()
-        
+
         // Definizione delle righe della tastiera
         val defaultKeyboardRows = listOf(
-            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
-                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
-                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
+            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E,
+                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y,
+                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O,
                    android.view.KeyEvent.KEYCODE_P),
-            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
-                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
+            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D,
+                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H,
                    android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
+            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C,
+                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N,
                    android.view.KeyEvent.KEYCODE_M)
         )
-        
+
         // Adapted from Mircea Horea IONICĂ (mionica), pastiera 09b1f51ac9.
         val isBlackberry = DeviceSpecific.hasBlackberryKeyboard(SettingsManager.getPhysicalKeyboardProfileOverride(context))
         val keyboardRows = if (isBlackberry) defaultKeyboardRows.dropLast(1) + listOf(listOf(
@@ -1541,13 +1548,13 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
             android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", KeyEvent.KEYCODE_0 to "0", KeyEvent.KEYCODE_GRAVE to "$"
         )
-        
+
         val keySpacing = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             4f,
             context.resources.displayMetrics
         ).toInt()
-        
+
         // Calcola la larghezza fissa dei tasti basata sulla prima riga (10 caselle)
         val maxKeysInRow = 10 // Prima riga ha 10 caselle
         val screenWidth = context.resources.displayMetrics.widthPixels
@@ -1559,9 +1566,9 @@ class StatusBarController(
         val availableWidth = screenWidth - horizontalPadding
         val totalSpacing = keySpacing * (maxKeysInRow - 1)
         val fixedKeyWidth = (availableWidth - totalSpacing) / maxKeysInRow
-        
+
         val keyHeight = hardwareSymKeyHeightPx()
-        
+
         // Crea ogni riga della tastiera
         for ((rowIndex, row) in keyboardRows.withIndex()) {
             val rowLayout = LinearLayout(context).apply {
@@ -1576,7 +1583,7 @@ class StatusBarController(
                     }
                 }
             }
-            
+
             if (isBlackberry) {
                 rowLayout.gravity = Gravity.START
                 row.forEachIndexed { index, code ->
@@ -1613,17 +1620,17 @@ class StatusBarController(
                         for (i in 0..3) {
                             addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
                         }
-                        
+
                         // Editor button (left part of spacebar area)
                         val editorButton = createSymEditorButton(keyHeight, fixedKeyWidth, page)
                         rowLayout.addView(editorButton)
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
+
                         // Globe Button (right part of spacebar area)
                         val selectionButton = createKeyboardSelectionButton(keyHeight, fixedKeyWidth)
                         rowLayout.addView(selectionButton)
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
+
                         // B N M (3 keys)
                         for (i in 4..6) {
                             addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
@@ -1635,10 +1642,10 @@ class StatusBarController(
                 container.addView(rowLayout)
                 continue
             }
-            
+
             // Default non-Titan 2 layout logic...
             // (The rest of the loop for non-Titan 2 remains the same)
-            
+
             // Per la terza riga, aggiungi placeholder con emoji picker button a sinistra
             if (rowIndex == 2) {
                 val leftPlaceholder = createPlaceholderWithEmojiPickerButton(keyHeight, page)
@@ -1646,11 +1653,11 @@ class StatusBarController(
                     marginEnd = keySpacing
                 })
             }
-            
+
             for ((index, keyCode) in row.withIndex()) {
                 val label = keyLabels[keyCode] ?: ""
                 val content = symMappings[keyCode] ?: ""
-                
+
                 val keyButton = createEmojiKeyButton(label, content, keyHeight, page, rocks.pkb.plektra.core.SymLayoutController.shownPagedKind)
                 emojiKeyButtons.add(keyButton)
                 keyButton.isLongClickable = true
@@ -1660,7 +1667,7 @@ class StatusBarController(
                     }
                     true
                 }
-                
+
                 // Aggiungi click listener per rendere il pulsante touchabile
                 if (content.isNotEmpty() && inputConnection != null) {
                     keyButton.isClickable = true
@@ -1670,7 +1677,7 @@ class StatusBarController(
                         commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
                     }
                 }
-                
+
                 // Usa larghezza fissa invece di weight
                 rowLayout.addView(keyButton, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
                     // Aggiungi margine solo se non è l'ultimo tasto della riga
@@ -1679,7 +1686,7 @@ class StatusBarController(
                     }
                 })
             }
-            
+
             // Per la terza riga, aggiungi placeholder con icona matita a destra
             if (rowIndex == 2) {
                 val rightPlaceholder = createPlaceholderWithPencilButton(keyHeight, page)
@@ -1690,7 +1697,7 @@ class StatusBarController(
                     marginStart = keySpacing
                 })
             }
-            
+
             container.addView(rowLayout)
         }
 
@@ -2405,7 +2412,7 @@ class StatusBarController(
             isFocusable = false
         }
     }
-    
+
     /**
      * Crea un placeholder con icona emoji per aprire l'emoji picker (symPage 4).
      */
@@ -2418,15 +2425,15 @@ class StatusBarController(
                 height
             )
         }
-        
+
         placeholder.background = null
-        
+
         val iconSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             28f,
             context.resources.displayMetrics
         ).toInt()
-        
+
         val button = ImageView(context).apply {
             background = null
             setImageResource(if (page == 1) R.drawable.ic_emoji_symbols_24 else R.drawable.ic_sentiment_satisfied_24)
@@ -2445,7 +2452,7 @@ class StatusBarController(
             isClickable = true
             isFocusable = true
         }
-        
+
         button.setOnClickListener {
             if (page == 1) {
                 onSymbolsPageRequested?.invoke()
@@ -2453,11 +2460,11 @@ class StatusBarController(
                 onEmojiPageRequested?.invoke()
             }
         }
-        
+
         placeholder.addView(button)
         return placeholder
     }
-    
+
     /**
      * Crea un placeholder con icona matita per aprire la schermata di personalizzazione SYM.
      */
@@ -2470,17 +2477,17 @@ class StatusBarController(
                 height
             )
         }
-        
+
         // Background trasparente
         placeholder.background = null
-        
+
         // Dimensione icona più grande
         val iconSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             28f, // Aumentata per maggiore visibilità
             context.resources.displayMetrics
         ).toInt()
-        
+
         val button = ImageView(context).apply {
             background = null
             setImageResource(R.drawable.ic_edit_24)
@@ -2499,11 +2506,11 @@ class StatusBarController(
             isClickable = true
             isFocusable = true
         }
-        
+
         button.setOnClickListener {
             openSymCustomization(page = page, keyCode = null, openPicker = false)
         }
-        
+
         placeholder.addView(button)
         return placeholder
     }
@@ -2571,7 +2578,7 @@ class StatusBarController(
             Log.e(TAG, "Errore nell'apertura della schermata di personalizzazione SYM", e)
         }
     }
-    
+
     /**
      * Crea un tasto della griglia emoji/caratteri.
      * @param label La lettera del tasto
@@ -2595,7 +2602,7 @@ class StatusBarController(
             )
             contentDescription = buildSymKeyContentDescription(label, content)
         }
-        
+
         // Background del tasto con angoli leggermente arrotondati
         val cornerRadius = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -2607,7 +2614,7 @@ class StatusBarController(
             setCornerRadius(cornerRadius)
             setStroke(dpToPx(1f), theme.divider)
         }
-        
+
         // Emoji/carattere deve occupare tutto il tasto, centrata
         // Calcola textSize in base all'altezza disponibile (convertendo da pixel a sp)
         val heightInDp = height / context.resources.displayMetrics.density
@@ -2619,7 +2626,7 @@ class StatusBarController(
             // Per emoji, usa la dimensione normale
             (heightInDp * 0.75f)
         }
-        
+
         val textLike = pagedKind == rocks.pkb.plektra.core.SymPagedLayer.Kind.KAOMOJI ||
             content.codePointCount(0, content.length) > 3 && !content.any { Character.isSurrogate(it) }
         val contentText = TextView(context).apply {
@@ -2649,14 +2656,14 @@ class StatusBarController(
                 gravity = Gravity.CENTER
             }
         }
-        
+
         // Label (lettera) - posizionato in basso a destra, davanti all'emoji
         val labelPadding = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             2f, // Pochissimo margine
             context.resources.displayMetrics
         ).toInt()
-        
+
         val labelText = TextView(context).apply {
             text = label
             textSize = 12f
@@ -2671,7 +2678,7 @@ class StatusBarController(
                 bottomMargin = labelPadding
             }
         }
-        
+
         // Aggiungi prima il contenuto (dietro) poi il testo (davanti)
         val contentGroup = FrameLayout(context).apply {
             layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -2683,7 +2690,7 @@ class StatusBarController(
             rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.Style(
                 theme.normalKey, theme.accent, cornerRadius, theme.divider, dpToPx(1f), drawable),
             content = contentGroup)
-        
+
         return keyLayout
     }
 
@@ -2918,7 +2925,7 @@ class StatusBarController(
             }
             true
         }
-        
+
         if (content.isNotEmpty() && inputConnection != null) {
             keyButton.isClickable = true
             keyButton.isFocusable = true
@@ -2927,17 +2934,17 @@ class StatusBarController(
                 commitTouchSymbolAfterCloseIfNeeded(keyButton, inputConnection, content)
             }
         }
-        
+
         rowLayout.addView(keyButton, LinearLayout.LayoutParams(width, height))
         if (!isLast) {
             rowLayout.addView(View(context), LinearLayout.LayoutParams(spacing, height))
         }
     }
-    
+
     /**
      * Crea una griglia emoji personalizzabile (per la schermata di personalizzazione).
      * Restituisce una View che può essere incorporata in Compose tramite AndroidView.
-     * 
+     *
      * @param symMappings Le mappature emoji da visualizzare
      * @param onKeyClick Callback chiamato quando un tasto viene cliccato (keyCode, emoji)
      */
@@ -2963,21 +2970,21 @@ class StatusBarController(
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-        
+
         // Definizione delle righe della tastiera (stessa struttura della tastiera reale)
         val keyboardRows = listOf(
-            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
-                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
-                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
+            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E,
+                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y,
+                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O,
                    android.view.KeyEvent.KEYCODE_P),
-            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
-                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
+            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D,
+                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H,
                    android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
+            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C,
+                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N,
                    android.view.KeyEvent.KEYCODE_M)
         )
-        
+
         val keyLabels = mapOf(
             android.view.KeyEvent.KEYCODE_Q to "Q", android.view.KeyEvent.KEYCODE_W to "W", android.view.KeyEvent.KEYCODE_E to "E",
             android.view.KeyEvent.KEYCODE_R to "R", android.view.KeyEvent.KEYCODE_T to "T", android.view.KeyEvent.KEYCODE_Y to "Y",
@@ -2989,27 +2996,27 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
             android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", KeyEvent.KEYCODE_0 to "0", KeyEvent.KEYCODE_GRAVE to "$"
         )
-        
+
         val keySpacing = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             4f,
             context.resources.displayMetrics
         ).toInt()
-        
+
         // Calcola la larghezza fissa dei tasti basata sulla prima riga (10 caselle)
         // Usa ViewTreeObserver per ottenere la larghezza effettiva del container dopo il layout
         val maxKeysInRow = 10 // Prima riga ha 10 caselle
-        
+
         // Inizializza con una larghezza temporanea, verrà aggiornata dopo il layout
         var fixedKeyWidth = 0
-        
+
         container.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 val containerWidth = container.width
                 if (containerWidth > 0) {
                     val totalSpacing = keySpacing * (maxKeysInRow - 1)
                     fixedKeyWidth = (containerWidth - totalSpacing) / maxKeysInRow
-                    
+
                     // Aggiorna tutti i tasti con la larghezza corretta
                     for (i in 0 until container.childCount) {
                         val rowLayout = container.getChildAt(i) as? LinearLayout
@@ -3027,24 +3034,24 @@ class StatusBarController(
                             }
                         }
                     }
-                    
+
                     // Rimuovi il listener dopo il primo layout
                     container.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             }
         })
-        
+
         // Valore iniziale basato sulla larghezza dello schermo (verrà aggiornato dal listener)
         val screenWidth = context.resources.displayMetrics.widthPixels
         val totalSpacing = keySpacing * (maxKeysInRow - 1)
         fixedKeyWidth = (screenWidth - totalSpacing) / maxKeysInRow
-        
+
         val keyHeight = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             56f,
             context.resources.displayMetrics
         ).toInt()
-        
+
         // Crea ogni riga della tastiera (stessa struttura della tastiera reale)
         for ((rowIndex, row) in keyboardRows.withIndex()) {
             val rowLayout = LinearLayout(context).apply {
@@ -3059,7 +3066,7 @@ class StatusBarController(
                     }
                 }
             }
-            
+
             if (isTitan2Layout) {
                 // Ortholinear layout for Titan 2 (Customization Preview)
                 when (rowIndex) {
@@ -3079,15 +3086,15 @@ class StatusBarController(
                         for (i in 0..3) {
                             addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
                         }
-                        
+
                         // Close Button Placeholder (no icon in customization preview)
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
+
                         // Globe Button Placeholder (no icon in customization preview)
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
+
                         // B N M (3 keys)
                         for (i in 4..6) {
                             addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, navigationKeys, false)
@@ -3100,7 +3107,7 @@ class StatusBarController(
                 container.addView(rowLayout)
                 continue
             }
-            
+
             // Per la terza riga, aggiungi placeholder trasparente a sinistra
             if (rowIndex == 2) {
                 val leftPlaceholder = createPlaceholderButton(keyHeight)
@@ -3108,20 +3115,20 @@ class StatusBarController(
                     marginEnd = keySpacing
                 })
             }
-            
+
             for ((index, keyCode) in row.withIndex()) {
                 val label = keyLabels[keyCode] ?: ""
                 val emoji = symMappings[keyCode] ?: ""
-                
+
                 // Usa la stessa funzione createEmojiKeyButton della tastiera reale
                 val keyButton = createEmojiKeyButton(label, emoji, keyHeight, page)
                 navigationKeys[keyCode]?.let { markNavigationKey(keyButton, label, emoji, it) }
-                
+
                 // Aggiungi click listener
                 keyButton.setOnClickListener {
                     onKeyClick(keyCode, emoji)
                 }
-                
+
                 // Usa larghezza fissa invece di weight (stesso layout della tastiera reale)
                 rowLayout.addView(keyButton, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
                     if (index < row.size - 1) {
@@ -3129,7 +3136,7 @@ class StatusBarController(
                     }
                 })
             }
-            
+
             // Per la terza riga nella schermata di personalizzazione, aggiungi placeholder trasparente a destra
             // per mantenere l'allineamento (senza matita e senza click listener)
             if (rowIndex == 2) {
@@ -3138,10 +3145,10 @@ class StatusBarController(
                     marginStart = keySpacing
                 })
             }
-            
+
             container.addView(rowLayout)
         }
-        
+
         return container
     }
 
@@ -3180,7 +3187,7 @@ class StatusBarController(
             rowLayout.addView(View(context), LinearLayout.LayoutParams(spacing, height))
         }
     }
-    
+
     /**
      * Anima l'apparizione della griglia emoji solo con slide up (nessun fade).
      * @param backgroundView Il view dello sfondo da impostare a opaco immediatamente
@@ -3227,7 +3234,7 @@ class StatusBarController(
         }
         animator.start()
     }
-    
+
     /**
      * Anima la scomparsa della griglia emoji (slide down + fade out).
      * @param backgroundView Il view dello sfondo (non animato, rimane opaco)
@@ -3270,8 +3277,8 @@ class StatusBarController(
         animator.start()
     }
 
-    
-    
+
+
 
     fun update(snapshot: StatusSnapshot, emojiMapText: String = "", inputConnection: android.view.inputmethod.InputConnection? = null, symMappings: Map<Int, String>? = null) {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
@@ -3319,7 +3326,7 @@ class StatusBarController(
         if ((snapshot.symPage > 0 && !isFullSoftwareKeyboardMode) || snapshot.clipboardOverlay) {
             hideHamburgerMenu()
         }
-        
+
         val layout = ensureLayoutCreated(emojiMapText) ?: return
         if ((!hasSuggestionRow && !showSlimMenuButtons && !barPresentation.actions && !barPresentation.bottomIndicators && !isFullSoftwareKeyboardMode &&
                 snapshot.symPage == 0 && !snapshot.clipboardOverlay && expansionSuggestions.isEmpty()) || snapshot.navModeActive) {
@@ -3337,16 +3344,16 @@ class StatusBarController(
         val symSurfaceView = symSurfaceContainer ?: return
         val symSurfaceStackView = symSurfaceStack ?: return
         emojiView.visibility = View.GONE
-        
+
         if (snapshot.navModeActive) {
             layout.visibility = View.GONE
             return
         }
         layout.visibility = View.VISIBLE
         applyAccessibilityLiveRegionPreference(layout)
-        
+
         rocks.pkb.plektra.ThemeTextureBackground.set(layout, activeColors.background, activeColors.textures["background"])
-        
+
         modifiersContainerView.visibility = View.GONE
         val showHardwareBottomIndicators = barPresentation.bottomIndicators
         val showHardwareStatusBarIndicators = barPresentation.inlineIndicators
@@ -3611,7 +3618,7 @@ class StatusBarController(
             }
             return
         }
-        
+
         if (emojiKeyboardView.visibility == View.VISIBLE) {
             emojiPickerView?.resetBrowseState()
             animateEmojiKeyboardOut(emojiKeyboardView, layout) {

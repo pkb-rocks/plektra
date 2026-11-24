@@ -9,6 +9,7 @@ import java.text.Normalizer
  * of deep links (`plektra://setting/<id>`) and must never change once shipped.
  */
 object SettingLinkIds {
+    const val MAIN_TRANSLATION="main.translation"
     // Main screen navigation rows
     const val MAIN_KEYBOARDS_DEVICES = "main.keyboards_devices"
     const val MAIN_MODIFIERS = "main.modifiers"
@@ -328,6 +329,7 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_APP_ENTER_BEHAVIOR
         ),
+        entry(SettingLinkIds.MAIN_TRANSLATION,R.string.translation_settings_title,R.string.translation_settings_description,destination=SettingsDestination.Translation),
         entry(
             SettingLinkIds.MAIN_ADVANCED,
             R.string.settings_category_advanced,
@@ -1130,6 +1132,7 @@ object SettingLinkRegistry {
         SettingsDestination.AutoCorrection to R.string.settings_category_auto_correction,
         SettingsDestination.Customization to R.string.settings_category_customization,
         SettingsDestination.NavMode to R.string.nav_mode_title,
+        SettingsDestination.Translation to R.string.translation_settings_title,
         SettingsDestination.Advanced to R.string.settings_category_advanced,
         SettingsDestination.About to R.string.about_title,
         SettingsDestination.CustomInputStyles to R.string.custom_input_styles_title,

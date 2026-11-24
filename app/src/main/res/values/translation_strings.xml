@@ -1,0 +1,33 @@
+<resources>
+  <string name="status_bar_button_translation">Translation</string>
+  <string name="status_bar_button_translation_description">Translate selected text</string>
+  <string name="translation_close">Close translation</string>
+  <string name="translation_allow_mobile">Allow mobile data for this download</string>
+  <string name="translation_translate">Translate with Google</string>
+  <string name="translation_download_notice">Download the required Google language packs? About 30 MB per language. Wi-Fi is used unless you allow mobile data. Downloaded languages can then work offline.</string>
+  <string name="translation_download">Download languages</string>
+  <string name="translation_working">Preparing translation… A language download may wait for Wi-Fi.</string>
+  <string name="translation_error">Translation unavailable. Check your connection if language packs need downloading, then try again.</string>
+  <string name="translation_changed">The text or selection has changed. Select it again; nothing was replaced.</string>
+  <string name="translation_choose_target">Translate into…</string>
+  <string name="translation_choose_source">Original language</string>
+  <string name="translation_source">From: %1$s · Change</string>
+  <string name="translation_other_languages">Other languages</string>
+  <string name="translation_gesture_hint">Swipe ↑↓ · Double-tap to choose</string>
+  <string name="translation_accept">Accept translation</string>
+  <string name="translation_edit">Edit translation</string>
+  <string name="translation_discard_edits">Discard edits</string>
+  <string name="translation_drag_hint">Hold the title to move this window.</string>
+  <string name="translation_move_handle">Move window</string>
+  <string name="translation_search_language">Search languages</string>
+  <string name="translation_search_clear">Clear search</string>
+  <string name="translation_search_empty">No matching language</string>
+    <string name="translation_settings_title">Integrated text translation</string>
+    <string name="translation_settings_description">Translate selected text and review it before replacing it</string>
+    <string name="translation_settings_intro">Choose Translation for a keyboard bar button. Select text, tap that button, choose the source and target languages, then review or edit the proposal before accepting. Supported physical touchpads can navigate the language list and preview actions with vertical swipes and a double tap.</string>
+    <string name="translation_settings_engine">Translation engine</string>
+    <string name="translation_settings_offline">Google ML Kit. Languages are downloaded with your permission; translation then runs on your device.</string>
+    <string name="translation_settings_punctuation">Preserve punctuation and paragraphs</string>
+    <string name="translation_text_only">Only text can be pasted into a translation proposal.</string>
+    <string name="translation_select_text">Select text to translate first.</string>
+</resources>

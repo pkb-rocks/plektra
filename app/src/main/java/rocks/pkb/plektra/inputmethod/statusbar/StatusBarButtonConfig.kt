@@ -7,6 +7,7 @@ import android.view.View
  * Sealed class allows type-safe handling of all button types.
  */
 sealed class StatusBarButtonId(val key: String) {
+    object Translation : StatusBarButtonId("translation")
     object Clipboard : StatusBarButtonId("clipboard")
     object Microphone : StatusBarButtonId("microphone")
     object Language : StatusBarButtonId("language")
@@ -42,7 +43,7 @@ enum class StatusBarButtonPosition {
 
 /**
  * Configuration for a single status bar button.
- * 
+ *
  * @param id Unique identifier for the button
  * @param position Where the button should be placed (LEFT or RIGHT)
  * @param enabled Whether the button is currently enabled
@@ -73,13 +74,14 @@ data class ButtonCallbacks(
 data class StatusBarCallbacks(
     /** Called when clipboard button is clicked */
     val onClipboardRequested: (() -> Unit)? = null,
-    
+    val onTranslationRequested: (() -> Unit)? = null,
+
     /** Called when microphone button is clicked */
     val onSpeechRecognitionRequested: (() -> Unit)? = null,
-    
+
     /** Called when emoji button is clicked */
     val onEmojiPickerRequested: (() -> Unit)? = null,
-    
+
     /** Called when language button is clicked */
     val onLanguageSwitchRequested: (() -> Unit)? = null,
 
@@ -91,13 +93,13 @@ data class StatusBarCallbacks(
 
     /** Called when the hardware/virtual keyboard mode override is requested */
     val onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null,
-    
+
     /** Called when the contextual keypad button is clicked */
     val onKeypadRequested: (() -> Unit)? = null,
 
     /** Called when language button is long-pressed (opens settings) */
     val onOpenSettings: (() -> Unit)? = null,
-    
+
     /** Called when symbols button is clicked */
     val onSymbolsPageRequested: (() -> Unit)? = null,
 
@@ -106,7 +108,7 @@ data class StatusBarCallbacks(
 
     /** Called when redo button is clicked */
     val onRedoRequested: (() -> Unit)? = null,
-    
+
     /** Called to trigger haptic feedback */
     val onHapticFeedback: (() -> Unit)? = null
 )

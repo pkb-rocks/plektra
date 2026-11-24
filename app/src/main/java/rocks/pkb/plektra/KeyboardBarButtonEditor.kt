@@ -245,6 +245,7 @@ private fun getButtonDescription(buttonId: String): String {
         SettingsManager.STATUS_BAR_BUTTON_CLIPBOARD -> stringResource(R.string.status_bar_button_clipboard_description)
         SettingsManager.STATUS_BAR_BUTTON_MICROPHONE -> stringResource(R.string.status_bar_button_microphone_description)
         SettingsManager.STATUS_BAR_BUTTON_EMOJI -> stringResource(R.string.status_bar_button_emoji_description)
+        SettingsManager.STATUS_BAR_BUTTON_TRANSLATION -> stringResource(R.string.status_bar_button_translation_description)
         SettingsManager.STATUS_BAR_BUTTON_LANGUAGE -> stringResource(R.string.status_bar_button_language_description)
         SettingsManager.STATUS_BAR_BUTTON_HAMBURGER -> stringResource(R.string.status_bar_button_hamburger_description)
         SettingsManager.STATUS_BAR_BUTTON_MINIMAL_UI -> stringResource(R.string.status_bar_button_minimal_ui_description)
@@ -267,6 +268,7 @@ private fun getButtonIconRes(buttonId: String): Int {
         SettingsManager.STATUS_BAR_BUTTON_CLIPBOARD -> R.drawable.ic_content_paste_24
         SettingsManager.STATUS_BAR_BUTTON_MICROPHONE -> R.drawable.ic_baseline_mic_24
         SettingsManager.STATUS_BAR_BUTTON_EMOJI -> R.drawable.ic_emoji_emotions_24
+        SettingsManager.STATUS_BAR_BUTTON_TRANSLATION -> R.drawable.ic_field_translation
         SettingsManager.STATUS_BAR_BUTTON_LANGUAGE -> R.drawable.ic_globe_24
         SettingsManager.STATUS_BAR_BUTTON_HAMBURGER -> R.drawable.ic_menu_24
         SettingsManager.STATUS_BAR_BUTTON_MINIMAL_UI -> R.drawable.ic_minimal_ui_24
@@ -285,6 +287,7 @@ internal fun stringResourceForButton(context: android.content.Context, buttonId:
         SettingsManager.STATUS_BAR_BUTTON_CLIPBOARD -> context.getString(R.string.status_bar_button_clipboard)
         SettingsManager.STATUS_BAR_BUTTON_MICROPHONE -> context.getString(R.string.status_bar_button_microphone)
         SettingsManager.STATUS_BAR_BUTTON_EMOJI -> context.getString(R.string.status_bar_button_emoji)
+        SettingsManager.STATUS_BAR_BUTTON_TRANSLATION -> context.getString(R.string.status_bar_button_translation)
         SettingsManager.STATUS_BAR_BUTTON_LANGUAGE -> context.getString(R.string.status_bar_button_language)
         SettingsManager.STATUS_BAR_BUTTON_HAMBURGER -> context.getString(R.string.status_bar_button_hamburger)
         SettingsManager.STATUS_BAR_BUTTON_MINIMAL_UI -> context.getString(R.string.status_bar_button_minimal_ui)

@@ -1,0 +1,33 @@
+<resources>
+  <string name="status_bar_button_translation">Traduction</string>
+  <string name="status_bar_button_translation_description">Traduire le texte sélectionné</string>
+  <string name="translation_close">Fermer la traduction</string>
+  <string name="translation_allow_mobile">Autoriser les données mobiles pour ce téléchargement</string>
+  <string name="translation_translate">Traduire avec Google</string>
+  <string name="translation_download_notice">Télécharger les langues nécessaires depuis Google ? Environ 30 Mo par langue, en Wi-Fi sauf si tu autorises les données mobiles. Ces langues fonctionneront ensuite hors ligne.</string>
+  <string name="translation_download">Télécharger les langues</string>
+  <string name="translation_working">Préparation de la traduction… Un téléchargement de langue peut attendre le Wi-Fi.</string>
+  <string name="translation_error">Traduction indisponible. Vérifie la connexion si des langues doivent être téléchargées, puis réessaie.</string>
+  <string name="translation_changed">Le texte ou la sélection a changé. Sélectionne à nouveau le passage ; rien n’a été remplacé.</string>
+  <string name="translation_choose_target">Traduire en…</string>
+  <string name="translation_choose_source">Langue du texte d’origine</string>
+  <string name="translation_source">Depuis : %1$s · Modifier</string>
+  <string name="translation_other_languages">Autres langues</string>
+  <string name="translation_gesture_hint">Glisse ↑↓ · Double-tape pour choisir</string>
+  <string name="translation_accept">Accepter la traduction</string>
+  <string name="translation_edit">Corriger la traduction</string>
+  <string name="translation_discard_edits">Annuler les modifications</string>
+  <string name="translation_drag_hint">Maintenir le titre pour déplacer la fenêtre.</string>
+  <string name="translation_move_handle">Déplacer la fenêtre</string>
+  <string name="translation_search_language">Rechercher une langue</string>
+  <string name="translation_search_clear">Effacer la recherche</string>
+  <string name="translation_search_empty">Aucune langue trouvée</string>
+    <string name="translation_settings_title">Traduction de texte intégrée</string>
+    <string name="translation_settings_description">Traduire une sélection et vérifier la proposition avant remplacement</string>
+    <string name="translation_settings_intro">Choisissez Traduction pour un bouton de la barre du clavier. Sélectionnez un texte, touchez ce bouton, choisissez les langues puis vérifiez ou corrigez la proposition avant de la valider. Les pavés physiques compatibles permettent de parcourir les langues et les actions par glissement vertical et double-tap.</string>
+    <string name="translation_settings_engine">Moteur de traduction</string>
+    <string name="translation_settings_offline">Google ML Kit. Les langues sont téléchargées avec votre accord ; la traduction se fait ensuite sur votre appareil.</string>
+    <string name="translation_settings_punctuation">Conserver la ponctuation et les paragraphes</string>
+    <string name="translation_text_only">Seul du texte peut être collé dans une proposition de traduction.</string>
+    <string name="translation_select_text">Sélectionnez le texte à traduire.</string>
+</resources>

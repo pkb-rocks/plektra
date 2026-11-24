@@ -374,6 +374,7 @@ class FullSuggestionsBar(
                 it.setOnLongClickListener(null)
                 it.text = null
                 container?.removeView(it)
+                bindRowGeometry()
             }
             field = value
             resetActionMode()

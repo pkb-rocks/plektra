@@ -414,7 +414,13 @@ class StatusBarController(
         get() = slimModeActive && buttonRegistry.getEnabledSlimButtons(context).isNotEmpty()
     private var hasTransientSurface: Boolean = false
     val hasTransientContent: Boolean
-        get() = hasTransientSurface || expansionSuggestions.isNotEmpty()
+        get() = hasTransientSurface || expansionSuggestions.isNotEmpty() || centerSuggestion != null
+    internal var centerSuggestion: FullSuggestionsBar.CenterAction? = null
+        set(value) {
+            field = value
+            // Also release stale listeners on the currently inactive surface.
+            fullSuggestionsBar?.centerAction = null
+        }
     private var fullSuggestionsBar: FullSuggestionsBar? = null
     private var expansionSuggestions: List<String> = emptyList()
     private var onExpansionSuggestionSelected: ((String) -> Unit)? = null
@@ -1819,6 +1825,7 @@ class StatusBarController(
             }
 
             override fun onEnter() {
+                centerSuggestion?.dismiss?.invoke()
                 onSoftwareKeyboardNonShiftInteraction?.invoke()
                 val searchTarget = softwareKeyboardSearchTarget(snapshot)
                 if (searchTarget != null) {
@@ -2215,16 +2222,17 @@ class StatusBarController(
             sendSoftwareCtrlTap(inputConnection)
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply { marginEnd = keySpacing })
         row4.addView(createSoftwareSymbolControl(",", keyHeight, fixedKeyWidth) {
-            inputConnection?.commitText(",", 1)
+            if (inputConnection?.commitText(",", 1) == true) centerSuggestion?.dismiss?.invoke()
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply { marginEnd = keySpacing })
         row4.addView(createSoftwareSymbolSpaceControl(buildSoftwareKeyboardSpacebarLabel(snapshot), keyHeight, inputConnection), LinearLayout.LayoutParams(fixedKeyWidth * 4, keyHeight).apply { marginEnd = keySpacing })
         row4.addView(createSoftwareSymbolControl(".", keyHeight, fixedKeyWidth) {
-            inputConnection?.commitText(".", 1)
+            if (inputConnection?.commitText(".", 1) == true) centerSuggestion?.dismiss?.invoke()
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply { marginEnd = keySpacing })
         row4.addView(createSoftwareSymbolControl("", keyHeight, fixedKeyWidth, iconRes = R.drawable.keyboard_control_key_24) {
             sendSoftwareCtrlTap(inputConnection)
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply { marginEnd = keySpacing })
         row4.addView(createSoftwareSymbolControl("", keyHeight, fixedKeyWidth, iconRes = R.drawable.keyboard_return_24) {
+            centerSuggestion?.dismiss?.invoke()
             inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
             inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
         }, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
@@ -2293,9 +2301,11 @@ class StatusBarController(
         height: Int,
         inputConnection: android.view.inputmethod.InputConnection?
     ): TextView {
-        val view = createSoftwareSymbolControl(label, height, 0, onClick = {
-            inputConnection?.commitText(" ", 1)
-        })
+        val commitSpace = {
+            if (inputConnection?.commitText(" ", 1) == true) centerSuggestion?.dismiss?.invoke()
+            Unit
+        }
+        val view = createSoftwareSymbolControl(label, height, 0, onClick = commitSpace)
         var downX = 0f
         var lastX = 0f
         var moved = false
@@ -2340,7 +2350,7 @@ class StatusBarController(
                 android.view.MotionEvent.ACTION_UP -> {
                     handler.removeCallbacks(longPressRunnable)
                     if (!moved && !longPressTriggered && kotlin.math.abs(event.x - downX) < step) {
-                        inputConnection?.commitText(" ", 1)
+                        commitSpace()
                     }
                     true
                 }
@@ -3303,7 +3313,9 @@ class StatusBarController(
         val suggestionsAvailable = barPresentation.suggestions && !snapshot.shouldDisableSuggestions &&
             (SettingsManager.isExperimentalSuggestionsEnabled(context) || isFullSoftwareKeyboardMode || snapshot.speechPreviewActive) &&
             (snapshot.suggestions.isNotEmpty() || !snapshot.addWordCandidate.isNullOrBlank())
-        val hasSuggestionRow = expansionActive || suggestionsAvailable
+        val centerAction = centerSuggestion.takeIf { !snapshot.navModeActive && !snapshot.clipboardOverlay &&
+            !snapshot.speechPreviewActive && (snapshot.symPage == 0 || isSoftwareKeyboardOverlayPage) }
+        val hasSuggestionRow = expansionActive || suggestionsAvailable || centerAction != null
         fullSuggestionsBar?.onCursorMovedListener = onCursorMovedListener
         variationBarView?.forceVariationAreaVisible = barPresentation.actions
         variationBarView?.setSymModeActive((snapshot.symPage > 0 && !isSoftwareKeyboardOverlayPage) || snapshot.clipboardOverlay)
@@ -3321,6 +3333,7 @@ class StatusBarController(
         }
         
         val layout = ensureLayoutCreated(emojiMapText) ?: return
+        fullSuggestionsBar?.centerAction = centerAction
         if ((!hasSuggestionRow && !showSlimMenuButtons && !barPresentation.actions && !barPresentation.bottomIndicators && !isFullSoftwareKeyboardMode &&
                 snapshot.symPage == 0 && !snapshot.clipboardOverlay && expansionSuggestions.isEmpty()) || snapshot.navModeActive) {
             collapseLayout()

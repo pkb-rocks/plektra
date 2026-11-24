@@ -31,6 +31,9 @@ import org.robolectric.util.ReflectionHelpers
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.KeyboardBarArrangement
 import rocks.pkb.plektra.KeyboardBarConfiguration
+import rocks.pkb.plektra.core.suggestions.SuggestionController
+import rocks.pkb.plektra.core.suggestions.SuggestionResult
+import rocks.pkb.plektra.core.suggestions.SuggestionSource
 import rocks.pkb.plektra.inputmethod.CandidatesBarController
 import rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodService
 import rocks.pkb.plektra.inputmethod.StatusBarController.StatusSnapshot
@@ -457,6 +460,12 @@ class OtpAndroidTest {
             try {
                 val ime = ctl.get()
                 val bar = requireNotNull(ime.onCreateInputView()) as ViewGroup
+                // Compare geometry for the same word results. Real dictionary readiness is async,
+                // and a private insert (unlike the control commit) intentionally resets the tracker.
+                val engine = ReflectionHelpers.getField<SuggestionController>(ime, "suggestionController")
+                val publish = requireNotNull(engine.suggestionsListener)
+                val words = listOf("first", "second", "third").map { SuggestionResult(it, 0, 1.0, SuggestionSource.MAIN) }
+                engine.suggestionsListener = { publish(if (suggestions) words else emptyList()) }
                 for (field in fields) for (exit in Exit.entries) {
                     rows++
                     fun exercise(withChip: Boolean): List<Int> {

@@ -279,10 +279,47 @@ class SuggestionControllerNextWordTest {
         assertEquals(SuggestionKind.STARTER_WORD, latest[2].kind)
     }
 
-    private fun newController(): SuggestionController {
+    @Test
+    fun refocusedPrivateTextIsNotSuggestedLoggedOrLearned() {
+        val code = "x7j93"
+        val guard = rocks.pkb.plektra.inputmethod.otp.InsertedCodes().apply { remember(code) }
+        val controller = newController(guard)
+        var before = "prefixx7"
+        var after = "j93suffix"
+        val connection = Proxy.newProxyInstance(InputConnection::class.java.classLoader, arrayOf(InputConnection::class.java)) { _, method, _ ->
+            when (method.name) {
+                "getTextBeforeCursor" -> before
+                "getTextAfterCursor" -> after
+                "commitText" -> true
+                else -> null
+            }
+        } as InputConnection
+        fun assertPrivate(marker: String) {
+            controller.readInitialContext(connection)
+            assertTrue(controller.currentSuggestions().isEmpty())
+            assertEquals(null, controller.pendingAddWord())
+            before += after
+            after = ""
+            controller.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, connection)
+            controller.flushNextWordLearningForTests()
+            assertEquals(0, store.deleteNextWord("de-DE", before))
+            assertTrue(org.robolectric.shadows.ShadowLog.getLogs().none { marker in it.msg.orEmpty() })
+        }
+        assertPrivate(code)
+        before += " ordinaryword"
+        controller.readInitialContext(connection)
+        assertEquals("ordinaryword", controller.pendingAddWord())
+        guard.protectWholeEditor()
+        before = "clipboardtoken"
+        assertPrivate(before)
+    }
+
+    private fun newController(privateWords: ((String) -> Boolean)? = null): SuggestionController {
         val context = RuntimeEnvironment.getApplication()
         return SuggestionController(
             context = context,
+            privateEditorText = { privateWords },
+            debugLogging = privateWords != null,
             assets = context.assets,
             settingsProvider = { SuggestionSettings(suggestionsEnabled = true, maxSuggestions = 3) },
             onSuggestionsUpdated = { snapshots.add(it) },

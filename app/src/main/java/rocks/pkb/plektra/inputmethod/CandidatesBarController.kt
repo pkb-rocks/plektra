@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.view.inputmethod.InputConnection
+import rocks.pkb.plektra.inputmethod.suggestions.ui.FullSuggestionsBar
 
 /**
  * Coordinates the two StatusBarController instances (full input view vs
@@ -335,6 +336,11 @@ class CandidatesBarController(
     fun setSlimModeActive(active: Boolean) {
         inputStatusBar.setSlimModeActive(active)
         candidatesStatusBar.setSlimModeActive(active)
+    }
+
+    internal fun setCenterSuggestion(action: FullSuggestionsBar.CenterAction?) {
+        inputStatusBar.centerSuggestion = action
+        candidatesStatusBar.centerSuggestion = action
     }
 
     fun hasTransientContent(): Boolean = inputStatusBar.hasTransientContent ||

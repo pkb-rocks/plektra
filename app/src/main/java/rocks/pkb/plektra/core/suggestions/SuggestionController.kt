@@ -38,6 +38,7 @@ class SuggestionController(
     ) -> DictionaryRepository)? = null,
     nextWordPredictorOverride: NextWordPredictor? = null,
     private val activeSuggestionLocalesProvider: (() -> List<Locale>)? = null,
+    private val privateEditorText: () -> ((String) -> Boolean)? = { null },
     // False before the user unlocks: dictionaries, learned words and n-grams live in credential storage.
     private val isStorageAvailable: () -> Boolean = { true }
 ) {
@@ -272,6 +273,10 @@ class SuggestionController(
 
     fun onCharacterCommitted(text: CharSequence, inputConnection: InputConnection?) {
         if (!isEnabled()) return
+        if (privateEditorText() != null && extractWordAtCursor(inputConnection) == "") {
+            onContextReset()
+            return
+        }
         if (debugLogging) {
             val caller = Throwable().stackTrace.getOrNull(1)?.let { "${it.className}#${it.methodName}:${it.lineNumber}" }
             Log.d("PlektraIME", "SuggestionController.onCharacterCommitted('$text') caller=$caller")
@@ -308,6 +313,12 @@ class SuggestionController(
         inputConnection: InputConnection?,
         boundaryCharOverride: Char? = null
     ): AutoReplaceController.ReplaceResult {
+        // A private insert bypasses the tracker. Don't sync it back from the editor on space.
+        if (privateEditorText() != null) {
+            val boundary = boundaryCharOverride ?: boundaryCharFor(keyCode, event)
+            tracker.onBoundaryReached(boundary, inputConnection)
+            return AutoReplaceController.ReplaceResult(false, boundary != null && inputConnection != null)
+        }
         if (debugLogging) {
             Log.d(
                 "PlektraIME",
@@ -364,7 +375,7 @@ class SuggestionController(
         }
         
         val word = extractWordAtCursor(inputConnection)
-        if (!word.isNullOrBlank()) {
+        if (word != null) {
             tracker.setWord(word)
         } else if (previousCompletedWord == null) {
             publishSentenceStartPredictionsOrStarter()
@@ -391,7 +402,7 @@ class SuggestionController(
                 return@Runnable
             }
             val word = extractWordAtCursor(inputConnection)
-            if (!word.isNullOrBlank()) {
+            if (word != null) {
                 tracker.setWord(word)
             } else {
                 tracker.reset()
@@ -879,7 +890,11 @@ class SuggestionController(
                 }
             }
             val word = before.substring(start) + after.substring(0, end)
-            if (word.isBlank()) null else word
+            when {
+                word.isBlank() -> null // Real boundary (eligible for next-word predictions).
+                privateEditorText()?.invoke(word) == true -> "" // Reset without publishing the token.
+                else -> word
+            }
         } catch (_: Exception) {
             null
         }
@@ -937,7 +952,7 @@ class SuggestionController(
         pendingInitialContextConnection?.let { inputConnection ->
             pendingInitialContextConnection = null
             val word = extractWordAtCursor(inputConnection)
-            if (!word.isNullOrBlank()) {
+            if (word != null) {
                 tracker.setWord(word)
                 return
             }

@@ -33,10 +33,7 @@ object ClicksPowerKeyboardController {
     private var client: ClicksPowerKeyboardGattClient? = null
     private var connectedDeviceName: String? = null
     private var pendingAutomaticChargingState: Boolean? = null
-    private val buttonRemapWritesInProgress = mutableSetOf<ClicksButtonBindingTarget>()
-    private val buttonRemapCallbacks = mutableMapOf<ClicksButtonBindingTarget, (Boolean) -> Unit>()
-    // A rejected write is retried on the next connection or selection instead of in a loop.
-    private val buttonRemapFailedTargets = mutableSetOf<ClicksButtonBindingTarget>()
+    private lateinit var buttonBindings: ClicksButtonBindingCoordinator
     private var manualOverrideExpiredOnReconnect = false
     private lateinit var socCalibrationStore: ClicksPowerSocCalibrationStore
     private var socCalibrationTracker: ClicksPowerSocCalibrationTracker? = null
@@ -61,6 +58,11 @@ object ClicksPowerKeyboardController {
         context = appContext.applicationContext
         socCalibrationStore = SharedPreferencesClicksPowerSocCalibrationStore(
             context.getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE)
+        )
+        buttonBindings = ClicksButtonBindingCoordinator(
+            store = SettingsClicksButtonBindingStore(context),
+            keyboardState = { state.keyboard },
+            writer = { client }
         )
         SettingsManager.getMostRecentClicksPowerKeyboardSnapshot(context)?.let { snapshot ->
             state = state.copy(
@@ -128,22 +130,7 @@ object ClicksPowerKeyboardController {
         onComplete: (Boolean) -> Unit = {}
     ): ClicksButtonBindingRequestStatus {
         check(initialized)
-        SettingsManager.setClicksDesiredButtonBinding(context, target, binding)
-        buttonRemapFailedTargets -= target
-        if (ClicksButtonBindingSyncPolicy.isConfirmed(state.keyboard, target, binding.firmwareOutput)) {
-            if (ClicksButtonBindingSyncPolicy.canWrite(state.keyboard)) {
-                SettingsManager.markClicksButtonBindingApplied(context, target, binding.firmwareOutput)
-            }
-            return ClicksButtonBindingRequestStatus.CONFIRMED
-        }
-        if (!ClicksButtonBindingSyncPolicy.canWrite(state.keyboard) || client == null) {
-            return ClicksButtonBindingRequestStatus.PENDING_CONNECTION
-        }
-        // A newer selection supersedes the UI callback of an older in-flight write. The older
-        // firmware write may still finish, but only the latest request owns the visible result.
-        buttonRemapCallbacks[target] = onComplete
-        startDesiredButtonRemapWrite(target, binding)
-        return ClicksButtonBindingRequestStatus.APPLYING
+        return buttonBindings.request(target, binding, onComplete)
     }
 
     fun setManualChargingOverride(enabled: Boolean) {
@@ -174,8 +161,7 @@ object ClicksPowerKeyboardController {
         val previousClient = client
         client = null
         previousClient?.close()
-        finishAllButtonRemapCallbacks(success = false)
-        buttonRemapFailedTargets.clear()
+        buttonBindings.onConnectionReset()
         handler.removeCallbacks(chargingRefresh)
         socCalibrationTracker?.disconnect()
         socCalibrationTracker = null
@@ -278,80 +264,7 @@ object ClicksPowerKeyboardController {
     private fun publishAndEvaluate() {
         publish()
         evaluateChargingAutomation()
-        reconcileDesiredButtonBindings()
-    }
-
-    private fun reconcileDesiredButtonBindings() {
-        if (client == null) return
-        ClicksButtonBindingTarget.entries.forEach { target ->
-            val desired = SettingsManager.getClicksDesiredButtonBinding(context, target) ?: return@forEach
-            when (
-                ClicksButtonBindingSyncPolicy.reconcileAction(
-                    state.keyboard,
-                    target,
-                    desired,
-                    failedInCurrentConnection = target in buttonRemapFailedTargets
-                )
-            ) {
-                ClicksButtonBindingReconcileAction.NONE -> Unit
-                ClicksButtonBindingReconcileAction.MARK_APPLIED ->
-                    SettingsManager.markClicksButtonBindingApplied(context, target, desired.firmwareOutput)
-                ClicksButtonBindingReconcileAction.WRITE -> startDesiredButtonRemapWrite(target, desired)
-            }
-        }
-    }
-
-    private fun startDesiredButtonRemapWrite(
-        target: ClicksButtonBindingTarget,
-        desired: ClicksDesiredButtonBinding
-    ) {
-        if (!buttonRemapWritesInProgress.add(target)) return
-        val activeClient = client
-        if (activeClient == null) {
-            buttonRemapWritesInProgress.remove(target)
-            finishButtonRemapCallback(target, success = false)
-            return
-        }
-        activeClient.setSpecialKeyRemap(target.firmwareCommand, desired.firmwareOutput) {
-            buttonRemapWritesInProgress.remove(target)
-            val latestDesired = SettingsManager.getClicksDesiredButtonBinding(context, target)
-            val latestDesiredConfirmed = latestDesired != null &&
-                ClicksButtonBindingSyncPolicy.isConfirmed(
-                    state.keyboard,
-                    target,
-                    latestDesired.firmwareOutput
-                )
-            when (
-                ClicksButtonBindingCompletionPolicy.resolve(
-                    attemptedOutput = desired.firmwareOutput,
-                    latestDesiredOutput = latestDesired?.firmwareOutput,
-                    latestDesiredConfirmed = latestDesiredConfirmed
-                )
-            ) {
-                ClicksButtonBindingCompletion.SUCCESS -> {
-                    latestDesired?.let {
-                        SettingsManager.markClicksButtonBindingApplied(context, target, it.firmwareOutput)
-                    }
-                    finishButtonRemapCallback(target, success = true)
-                }
-                ClicksButtonBindingCompletion.FAILURE -> {
-                    if (client === activeClient) buttonRemapFailedTargets += target
-                    finishButtonRemapCallback(target, success = false)
-                }
-                ClicksButtonBindingCompletion.KEEP_PENDING -> Unit
-            }
-            reconcileDesiredButtonBindings()
-        }
-    }
-
-    private fun finishButtonRemapCallback(target: ClicksButtonBindingTarget, success: Boolean) {
-        buttonRemapCallbacks.remove(target)?.invoke(success)
-    }
-
-    private fun finishAllButtonRemapCallbacks(success: Boolean) {
-        val callbacks = buttonRemapCallbacks.values.toList()
-        buttonRemapCallbacks.clear()
-        callbacks.forEach { it(success) }
+        buttonBindings.reconcile()
     }
 
     /**

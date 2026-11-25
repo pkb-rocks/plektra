@@ -1,0 +1,133 @@
+package rocks.pkb.plektra
+
+import android.content.Context
+
+/** Writes one firmware button remap; [onComplete] runs after the written state was published. */
+internal fun interface ClicksButtonRemapWriter {
+    fun writeButtonRemap(command: Int, output: ByteArray, onComplete: (Boolean) -> Unit)
+}
+
+internal interface ClicksButtonBindingStore {
+    fun desired(target: ClicksButtonBindingTarget): ClicksDesiredButtonBinding?
+    fun setDesired(target: ClicksButtonBindingTarget, binding: ClicksDesiredButtonBinding)
+    fun markApplied(target: ClicksButtonBindingTarget, output: ByteArray)
+}
+
+internal class SettingsClicksButtonBindingStore(private val context: Context) : ClicksButtonBindingStore {
+    override fun desired(target: ClicksButtonBindingTarget) =
+        SettingsManager.getClicksDesiredButtonBinding(context, target)
+
+    override fun setDesired(target: ClicksButtonBindingTarget, binding: ClicksDesiredButtonBinding) =
+        SettingsManager.setClicksDesiredButtonBinding(context, target, binding)
+
+    override fun markApplied(target: ClicksButtonBindingTarget, output: ByteArray) =
+        SettingsManager.markClicksButtonBindingApplied(context, target, output)
+}
+
+/**
+ * Brings pending Plektra button selections onto the keyboard, one firmware write per target at a
+ * time.
+ *
+ * While a write is in flight for a target, the firmware state of that target is about to change.
+ * A selection is therefore only marked as applied once no older write can still replace it; the
+ * completion of the older write reconciles the latest selection instead.
+ */
+internal class ClicksButtonBindingCoordinator(
+    private val store: ClicksButtonBindingStore,
+    private val keyboardState: () -> ClicksPowerKeyboardState,
+    private val writer: () -> ClicksButtonRemapWriter?
+) {
+    private val writesInProgress = mutableSetOf<ClicksButtonBindingTarget>()
+    private val callbacks = mutableMapOf<ClicksButtonBindingTarget, (Boolean) -> Unit>()
+    // A rejected write is retried on the next connection or selection instead of in a loop.
+    private val failedTargets = mutableSetOf<ClicksButtonBindingTarget>()
+
+    fun request(
+        target: ClicksButtonBindingTarget,
+        binding: ClicksDesiredButtonBinding,
+        onComplete: (Boolean) -> Unit
+    ): ClicksButtonBindingRequestStatus {
+        store.setDesired(target, binding)
+        failedTargets -= target
+        val state = keyboardState()
+        val writeInProgress = target in writesInProgress
+        if (!writeInProgress && ClicksButtonBindingSyncPolicy.isConfirmed(state, target, binding.firmwareOutput)) {
+            if (ClicksButtonBindingSyncPolicy.canWrite(state)) store.markApplied(target, binding.firmwareOutput)
+            return ClicksButtonBindingRequestStatus.CONFIRMED
+        }
+        if (!ClicksButtonBindingSyncPolicy.canWrite(state) || writer() == null) {
+            return ClicksButtonBindingRequestStatus.PENDING_CONNECTION
+        }
+        // A newer selection supersedes the UI callback of an older in-flight write. The older
+        // firmware write may still finish, but only the latest request owns the visible result.
+        callbacks[target] = onComplete
+        if (!writeInProgress) startWrite(target, binding)
+        return ClicksButtonBindingRequestStatus.APPLYING
+    }
+
+    fun reconcile() {
+        if (writer() == null) return
+        ClicksButtonBindingTarget.entries.forEach { target ->
+            // The completion of the running write reconciles this target with its final state.
+            if (target in writesInProgress) return@forEach
+            val desired = store.desired(target) ?: return@forEach
+            when (
+                ClicksButtonBindingSyncPolicy.reconcileAction(
+                    keyboardState(),
+                    target,
+                    desired,
+                    failedInCurrentConnection = target in failedTargets
+                )
+            ) {
+                ClicksButtonBindingReconcileAction.NONE -> Unit
+                ClicksButtonBindingReconcileAction.MARK_APPLIED -> store.markApplied(target, desired.firmwareOutput)
+                ClicksButtonBindingReconcileAction.WRITE -> startWrite(target, desired)
+            }
+        }
+    }
+
+    /** Ends all visible requests of a closed connection; their writes no longer complete. */
+    fun onConnectionReset() {
+        val pendingCallbacks = callbacks.values.toList()
+        callbacks.clear()
+        failedTargets.clear()
+        pendingCallbacks.forEach { it(false) }
+    }
+
+    private fun startWrite(target: ClicksButtonBindingTarget, desired: ClicksDesiredButtonBinding) {
+        val activeWriter = writer()
+        if (activeWriter == null) {
+            finishCallback(target, success = false)
+            return
+        }
+        if (!writesInProgress.add(target)) return
+        activeWriter.writeButtonRemap(target.firmwareCommand, desired.firmwareOutput) {
+            writesInProgress.remove(target)
+            val latestDesired = store.desired(target)
+            val latestDesiredConfirmed = latestDesired != null &&
+                ClicksButtonBindingSyncPolicy.isConfirmed(keyboardState(), target, latestDesired.firmwareOutput)
+            when (
+                ClicksButtonBindingCompletionPolicy.resolve(
+                    attemptedOutput = desired.firmwareOutput,
+                    latestDesiredOutput = latestDesired?.firmwareOutput,
+                    latestDesiredConfirmed = latestDesiredConfirmed
+                )
+            ) {
+                ClicksButtonBindingCompletion.SUCCESS -> {
+                    latestDesired?.let { store.markApplied(target, it.firmwareOutput) }
+                    finishCallback(target, success = true)
+                }
+                ClicksButtonBindingCompletion.FAILURE -> {
+                    if (writer() === activeWriter) failedTargets += target
+                    finishCallback(target, success = false)
+                }
+                ClicksButtonBindingCompletion.KEEP_PENDING -> Unit
+            }
+            reconcile()
+        }
+    }
+
+    private fun finishCallback(target: ClicksButtonBindingTarget, success: Boolean) {
+        callbacks.remove(target)?.invoke(success)
+    }
+}

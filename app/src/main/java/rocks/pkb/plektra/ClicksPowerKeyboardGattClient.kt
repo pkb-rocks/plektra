@@ -59,7 +59,7 @@ class ClicksPowerKeyboardGattClient(
     deviceName: String,
     initialState: ClicksPowerKeyboardState = ClicksPowerKeyboardState(),
     private val onStateChanged: (ClicksPowerKeyboardState) -> Unit
-) : Closeable {
+) : Closeable, ClicksButtonRemapWriter {
     private val appContext = context.applicationContext
     private val handler = Handler(Looper.getMainLooper())
     private val operations = ArrayDeque<Operation>()
@@ -374,6 +374,9 @@ class ClicksPowerKeyboardGattClient(
             })
         }
     }
+
+    override fun writeButtonRemap(command: Int, output: ByteArray, onComplete: (Boolean) -> Unit) =
+        setSpecialKeyRemap(command, output, onComplete)
 
     fun verifyRecommendedSettings(onComplete: (Boolean) -> Unit) {
         enqueueConfigReadResult(ClicksPowerKeyboardProtocol.COMMAND_FEATURE_FLAGS, 1) { featurePayload ->

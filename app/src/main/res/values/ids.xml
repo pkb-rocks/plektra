@@ -16,4 +16,7 @@
     <item name="keyboard_bar_row_geometry" type="id" />
     <item name="keyboard_bar_canvas_geometry" type="id" />
     <item name="keyboard_artwork_container" type="id" />
+    <item name="plektra_toolbar_emoji" type="id" />
+    <item name="plektra_emoji_search_toggle" type="id" />
+    <item name="plektra_emoji_search_field" type="id" />
 </resources>

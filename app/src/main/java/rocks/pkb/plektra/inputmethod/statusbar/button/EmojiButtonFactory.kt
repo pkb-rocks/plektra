@@ -35,6 +35,7 @@ class EmojiButtonFactory : StatusBarButtonFactory {
     
     private fun createButton(context: Context, size: Int): ImageView {
         return ImageView(context).apply {
+            id = R.id.plektra_toolbar_emoji
             setImageResource(R.drawable.ic_emoji_emotions_24)
             setColorFilter(Color.WHITE)
             contentDescription = context.getString(R.string.status_bar_button_emoji_description)

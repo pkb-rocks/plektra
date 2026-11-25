@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import rocks.pkb.plektra.backlight.KeyboardBacklightFeature
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 
 private val hardwareKeyboardProfiles = listOf(
@@ -261,6 +262,12 @@ private fun HardwareKeyboardListScreen(
                     }
                 )
 
+            }
+            // Bound to verified firmware, not to the selected keyboard profile.
+            val keyboardBacklightOffered = remember { KeyboardBacklightFeature.isOffered(context) }
+            if (keyboardBacklightOffered) {
+                HardwareKeyboardSectionDivider(stringResource(R.string.keyboard_backlight_section_title))
+                KeyboardBacklightSection()
             }
             if (DeviceSpecific.hasBlackberryKeyboard(profile)) {
                 HardwareKeyboardSectionTitle(stringResource(R.string.keyboard_currency_symbol_title))

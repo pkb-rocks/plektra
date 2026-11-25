@@ -1,5 +1,7 @@
 package rocks.pkb.plektra
 
+import rocks.pkb.plektra.backlight.KeyboardBacklightFeature
+
 /** Static rows and aggregate editors; individual user/device data is not indexed. */
 internal fun inputDeviceSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("text_expansion.snippets.enabled", R.string.snippets_enable_title, summaryRes = R.string.snippets_title, route = SettingRoute(SettingsDestination.TextInput)),
@@ -33,6 +35,7 @@ internal fun inputDeviceSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("hardware.titan2_layout", R.string.titan2_layout_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("hardware.profile", R.string.hardware_keyboard_profile_select_label, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("hardware.currency", R.string.keyboard_currency_symbol_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
+    SettingEntry("hardware.keyboard_backlight_follows_display", R.string.keyboard_backlight_follows_display_title, summaryRes = R.string.keyboard_backlight_section_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn), availabilityCheck = { KeyboardBacklightFeature.isOffered(it) }),
     SettingEntry("hardware.alt_editor", R.string.alt_key_editor_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("clicks.number_row_repeat", R.string.clicks_number_row_repeat_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.PowerKeyboard)),
     SettingEntry("clicks.sticky_alt", R.string.clicks_sticky_alt_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.PowerKeyboard)),

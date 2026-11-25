@@ -157,7 +157,7 @@ class DeviceControlCommandSource : CommandSource {
         const val COMMAND_UNIHERTZ_KEYBOARD_BACKLIGHT = "settings.unihertz.keyboard_backlight"
 
         // Exported vendor screen behind the Titan 2 Elite "Keyboard LED" Quick Settings tile.
-        // Switching the backlight directly requires a vendor service that ordinary apps cannot reach.
+        // "Backlight follows display" in the hardware keyboard settings changes the timeout itself.
         const val UNIHERTZ_KEYBOARD_BACKLIGHT_COMPONENT =
             "com.agui.settings/com.agui.settings.touchpad.KeyboardLEDSettingsActivity"
         private const val ACTION_NOTIFICATION_SETTINGS = "android.settings.NOTIFICATION_SETTINGS"

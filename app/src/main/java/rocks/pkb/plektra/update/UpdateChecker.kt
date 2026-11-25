@@ -191,7 +191,10 @@ fun showUpdateDialog(
     releasePageUrl: String?,
     onClosed: () -> Unit = {}
 ) {
-    val dialog = AlertDialog.Builder(context)
+    val dialogTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.platformAlertDialogThemeRes(
+        rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(context).useDarkTheme
+    )
+    val dialog = AlertDialog.Builder(context, dialogTheme)
         .setTitle(R.string.successor_dialog_title)
         .setMessage(context.getString(R.string.successor_dialog_message, displayName))
         .setPositiveButton(R.string.successor_dialog_open_release) { _, _ ->
@@ -214,7 +217,10 @@ private fun showPlektraStableUpdateDialog(
     releasePageUrl: String?,
     onClosed: () -> Unit
 ) {
-    val dialog = AlertDialog.Builder(context)
+    val dialogTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.platformAlertDialogThemeRes(
+        rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(context).useDarkTheme
+    )
+    val dialog = AlertDialog.Builder(context, dialogTheme)
         .setTitle(R.string.plektra_stable_update_title)
         .setMessage(context.getString(R.string.plektra_stable_update_message, displayName))
         .setPositiveButton(R.string.plektra_stable_update_open) { _, _ ->
@@ -248,7 +254,10 @@ internal fun showReleaseNotice(context: Context, result: UpdateCheckResult) {
         showUpdateDialog(context, tag, name, result.releasePageUrl, showFollowUp)
         return
     }
-    val builder = AlertDialog.Builder(context)
+    val dialogTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.platformAlertDialogThemeRes(
+        rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(context).useDarkTheme
+    )
+    val builder = AlertDialog.Builder(context, dialogTheme)
         .setTitle(R.string.nightly_update_title)
         .setMessage(context.getString(R.string.nightly_update_message, name))
         .setPositiveButton(R.string.nightly_update_open) { _, _ ->

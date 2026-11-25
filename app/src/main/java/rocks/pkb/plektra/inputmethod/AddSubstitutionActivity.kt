@@ -43,6 +43,7 @@ import rocks.pkb.plektra.LocalizedComponentActivity
 import rocks.pkb.plektra.LiteralEntryKeyboardOptions
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.core.suggestions.UserDictionaryStore
+import rocks.pkb.plektra.ui.theme.PlektraTheme
 
 class AddSubstitutionActivity : LocalizedComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +64,7 @@ class AddSubstitutionActivity : LocalizedComponentActivity() {
         }
 
         setContent {
-            MaterialTheme {
+            PlektraTheme(applySystemBars = false) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

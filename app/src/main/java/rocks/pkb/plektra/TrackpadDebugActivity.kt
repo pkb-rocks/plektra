@@ -40,7 +40,7 @@ class TrackpadDebugActivity : LocalizedComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PlektraTheme {
+            PlektraTheme(applySystemBars = false) {
                 TrackpadDebugScreen(
                     events = events,
                     axisState = axisState,

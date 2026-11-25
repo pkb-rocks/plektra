@@ -79,8 +79,13 @@ open class NotesActivity : Activity() {
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
         selectedNote = notes.active()
-        val dark = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        val paper = if (dark) Color.rgb(28, 29, 31) else Color.rgb(250, 250, 248)
+        val resolvedTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(this)
+        val dark = resolvedTheme.useDarkTheme
+        val paper = when {
+            resolvedTheme.useOledBlack -> Color.BLACK
+            dark -> Color.rgb(28, 29, 31)
+            else -> Color.rgb(250, 250, 248)
+        }
         val ink = if (dark) Color.rgb(237, 237, 235) else Color.rgb(30, 34, 36)
         inkColor = ink
         accentColor = if (dark) Color.rgb(101, 211, 208) else Color.rgb(0, 119, 122)
@@ -449,7 +454,10 @@ open class NotesActivity : Activity() {
     private fun showNotes() {
         saveNote()
         val items = notes.all()
-        AlertDialog.Builder(this).setTitle(R.string.notes_title)
+        val dialogTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.platformAlertDialogThemeRes(
+            rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(this).useDarkTheme
+        )
+        AlertDialog.Builder(this, dialogTheme).setTitle(R.string.notes_title)
             .setItems(items.map { it.title.ifBlank { getString(R.string.notes_untitled) } }.toTypedArray()) { _, index ->
                 switchNote(items[index])
             }.setPositiveButton(R.string.notes_new) { _, _ -> switchNote(notes.create(), focusHeading = true) }

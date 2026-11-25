@@ -210,6 +210,9 @@ object SettingsManager {
     private const val KEY_OVERLAPPING_KEYS_ENABLED = "overlapping_keys_enabled"
     private const val KEY_GLOBAL_VARIATION_LAYOUT_OVERRIDE = "global_variation_layout_override" // Optional layout id used for variation ordering across all layouts
     private const val KEY_APP_LANGUAGE_TAG = "app_language_tag" // BCP-47 language tag for app UI (null/blank = system)
+    const val KEY_APP_THEME_MODE = "app_theme_mode"
+    const val KEY_APP_DARK_SURFACE_STYLE = "app_dark_surface_style"
+    const val KEY_APP_DYNAMIC_COLOR = "app_dynamic_color"
     private const val KEY_APP_ENTER_BEHAVIOR_ENABLED = "app_enter_behavior_enabled"
     private const val KEY_APP_ENTER_BEHAVIOR_PRESET = "app_enter_behavior_preset"
     private const val KEY_APP_ENTER_BEHAVIOR_OVERRIDES = "app_enter_behavior_overrides"
@@ -579,6 +582,61 @@ object SettingsManager {
     fun setAppLanguageTag(context: Context, languageTag: String?) {
         getPreferences(context).edit()
             .putString(KEY_APP_LANGUAGE_TAG, languageTag?.takeIf { it.isNotBlank() })
+            .apply()
+    }
+
+    fun getAppThemeMode(context: Context): rocks.pkb.plektra.ui.theme.AppThemeMode =
+        rocks.pkb.plektra.ui.theme.AppThemeMode.fromStorage(
+            getPreferences(context).getString(KEY_APP_THEME_MODE, null)
+        )
+
+    fun setAppThemeMode(context: Context, mode: rocks.pkb.plektra.ui.theme.AppThemeMode) {
+        getPreferences(context).edit()
+            .putString(KEY_APP_THEME_MODE, mode.storageValue)
+            .apply()
+    }
+
+    fun getAppDarkSurfaceStyle(context: Context): rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle =
+        rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle.fromStorage(
+            getPreferences(context).getString(KEY_APP_DARK_SURFACE_STYLE, null)
+        )
+
+    fun setAppDarkSurfaceStyle(context: Context, style: rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle) {
+        getPreferences(context).edit()
+            .putString(KEY_APP_DARK_SURFACE_STYLE, style.storageValue)
+            .apply()
+    }
+
+    fun getAppDynamicColorEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_APP_DYNAMIC_COLOR, true)
+
+    fun setAppDynamicColorEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_APP_DYNAMIC_COLOR, enabled)
+            .apply()
+    }
+
+    fun getAppAppearancePreferences(context: Context): rocks.pkb.plektra.ui.theme.AppAppearancePreferences {
+        val prefs = getPreferences(context)
+        return rocks.pkb.plektra.ui.theme.AppAppearancePreferences(
+            themeMode = rocks.pkb.plektra.ui.theme.AppThemeMode.fromStorage(
+                prefs.getString(KEY_APP_THEME_MODE, null)
+            ),
+            darkSurfaceStyle = rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle.fromStorage(
+                prefs.getString(KEY_APP_DARK_SURFACE_STYLE, null)
+            ),
+            dynamicColor = prefs.getBoolean(KEY_APP_DYNAMIC_COLOR, true)
+        )
+    }
+
+    fun setAppAppearancePreferences(
+        context: Context,
+        preferences: rocks.pkb.plektra.ui.theme.AppAppearancePreferences
+    ) {
+        getPreferences(context).edit()
+            .putString(KEY_APP_THEME_MODE, preferences.themeMode.storageValue)
+            .putString(KEY_APP_DARK_SURFACE_STYLE, preferences.darkSurfaceStyle.storageValue)
+            .putBoolean(KEY_APP_DYNAMIC_COLOR, preferences.dynamicColor)
             .apply()
     }
 

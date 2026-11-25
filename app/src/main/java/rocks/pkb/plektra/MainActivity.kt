@@ -215,7 +215,7 @@ class MainActivity : LocalizedComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            PlektraTheme {
+            PlektraTheme(statusBarAlwaysDarkSurface = true) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),

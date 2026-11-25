@@ -89,7 +89,7 @@ class LauncherShortcutAssignmentActivity : LocalizedComponentActivity() {
         
         // Usa un tema trasparente per mostrare il bottom sheet sopra il launcher
         setContent {
-            PlektraTheme {
+            PlektraTheme(applySystemBars = false) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

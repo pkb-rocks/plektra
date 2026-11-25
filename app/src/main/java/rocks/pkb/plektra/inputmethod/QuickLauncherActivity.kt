@@ -166,7 +166,7 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
         registerQuickLauncherPreferencesListener()
 
         setContent {
-            PlektraTheme {
+            PlektraTheme(applySystemBars = false) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

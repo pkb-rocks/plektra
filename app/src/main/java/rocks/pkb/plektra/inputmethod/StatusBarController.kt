@@ -299,7 +299,6 @@ class StatusBarController(
     companion object {
         private const val TAG = "StatusBarController"
         private val DEFAULT_BACKGROUND = Color.parseColor("#000000")
-        private const val TITAN_2_ELITE_CORNER_FALLBACK_RADIUS_DP = 50f
         private const val HARDWARE_SYM_KEY_HEIGHT_DP = 56f
     }
 
@@ -663,6 +662,12 @@ class StatusBarController(
         statusBarLayout?.let { ViewCompat.requestApplyInsets(it) }
     }
 
+    /** An input device changed; a known-panel detection may depend on it. */
+    fun onInputDevicesChanged() {
+        (statusBarLayout as? ImeChromeLayout)?.onPanelIdentityChanged()
+        ledStatusView.invalidateGeometry()
+    }
+
     fun collapseLayout() {
         val layout = statusBarLayout ?: return
         hideHamburgerMenu()
@@ -723,31 +728,18 @@ class StatusBarController(
                     } else {
                         0
                     }
-                    val fallbackCornerRadius = if (useTitan2EliteRoundedCornerInsets) {
-                        dpToPx(TITAN_2_ELITE_CORNER_FALLBACK_RADIUS_DP)
-                    } else {
-                        0
-                    }
+                    val displayCornerRadii = DisplayCorners.resolveBottomRadii(
+                        bottomLeftRadius, bottomRightRadius, DisplayCorners.hasKnownRoundedPanel(context),
+                        dpToPx(DisplayCorners.KNOWN_PANEL_FALLBACK_RADIUS_DP)
+                    )
                     val bottomInset = max(navAndGestures.bottom, cutout.bottom)
                     val appliedBottomPadding = baseBottomPadding + bottomInset
                     (view as? ImeChromeLayout)?.bottomCornerRadiiPx =
-                        if (useTitan2EliteRoundedCornerInsets) {
-                            Pair(
-                                bottomLeftRadius.takeIf { it > 0 } ?: fallbackCornerRadius,
-                                bottomRightRadius.takeIf { it > 0 } ?: fallbackCornerRadius
-                            )
-                        } else {
-                            null
-                        }
+                        displayCornerRadii.takeIf { useTitan2EliteRoundedCornerInsets }
                     (view as? ImeChromeLayout)?.fillDisplayCorners =
                         SettingsManager.getTitan2EliteFillBottomCorners(context)
                     ledStatusView.followDisplayContour = useTitan2EliteRoundedCornerInsets
-                    ledStatusView.bottomCornerRadiiPx =
-                        if (useTitan2EliteRoundedCornerInsets || DeviceSpecific.isTitan2EliteDevice() ||
-                            bottomLeftRadius > 0 || bottomRightRadius > 0) {
-                            Pair(bottomLeftRadius.takeIf { it > 0 } ?: dpToPx(TITAN_2_ELITE_CORNER_FALLBACK_RADIUS_DP),
-                                bottomRightRadius.takeIf { it > 0 } ?: dpToPx(TITAN_2_ELITE_CORNER_FALLBACK_RADIUS_DP))
-                        } else null
+                    ledStatusView.bottomCornerRadiiPx = displayCornerRadii
                     (view as? ImeChromeLayout)?.let { chrome ->
                         if (chrome.ledOnlyReservedHeightPx != null) {
                             chrome.ledOnlyReservedHeightPx = ledStatusView.reservedStripHeightPx()

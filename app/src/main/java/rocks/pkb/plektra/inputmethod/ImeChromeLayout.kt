@@ -420,6 +420,16 @@ internal class ImeChromeLayout(context: Context) : LinearLayout(context) {
         return super.dispatchTouchEvent(event)
     }
 
+    /** The panel identity may have changed: follow its default contour and its corner fallback. */
+    fun onPanelIdentityChanged() {
+        if (geometry.refreshPanelDefault()) {
+            applyBottomCornerClip()
+            requestLayout()
+            invalidate()
+        }
+        androidx.core.view.ViewCompat.requestApplyInsets(this)
+    }
+
     // Extend the shape above the view so even a bar shorter than the display
     // radius follows the original arc, rather than shrinking it to fit the bar.
     private fun applyBottomCornerClip() {

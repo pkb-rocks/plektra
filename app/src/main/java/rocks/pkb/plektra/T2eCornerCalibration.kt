@@ -3,6 +3,7 @@ package rocks.pkb.plektra
 import android.content.Context
 import android.graphics.Path
 import kotlin.math.*
+import rocks.pkb.plektra.inputmethod.DisplayCorners
 
 internal data class T2eCornerCalibration(
     val size: Float = 1.17f,
@@ -13,6 +14,21 @@ internal data class T2eCornerCalibration(
 ) {
     companion object {
         const val KEY = "titan2_elite_corner_calibration"
+
+        /** A quarter circle with exactly the radius Android reports, as Android describes it. */
+        val NEUTRAL = T2eCornerCalibration(size = 1f, offsetPx = 0f, squircle = 0f, shiftXPx = 0f, shiftYPx = 0f)
+
+        /**
+         * The calibration without a saved one: the measured contour of the known Titan 2 Elite
+         * panel (see [DisplayCorners.hasKnownRoundedPanel]) and the neutral contour on every other
+         * panel.
+         */
+        fun defaults(knownPanel: Boolean): T2eCornerCalibration =
+            if (knownPanel) T2eCornerCalibration() else NEUTRAL
+
+        /** The default for the display [context] shows on. */
+        fun defaults(context: Context): T2eCornerCalibration = defaults(DisplayCorners.hasKnownRoundedPanel(context))
+
         private var previewOwner: Any? = null
         private var preview: T2eCornerCalibration? = null
         private val previewListeners = mutableSetOf<() -> Unit>()
@@ -30,17 +46,23 @@ internal data class T2eCornerCalibration(
 
         fun read(context: Context): T2eCornerCalibration = preview ?: readSaved(context)
 
-        fun readSaved(context: Context): T2eCornerCalibration = runCatching {
-            val defaults = T2eCornerCalibration()
-            val json = org.json.JSONObject(SettingsManager.getPreferences(context).getString(KEY, "{}") ?: "{}")
+        /** A calibration the user saved applies on every panel; it was chosen for this display. */
+        fun readSaved(context: Context): T2eCornerCalibration {
+            val defaults = defaults(context)
+            val raw = SettingsManager.getPreferences(context).getString(KEY, null) ?: return defaults
+            return runCatching { parse(raw, defaults) }.getOrDefault(defaults)
+        }
+
+        private fun parse(raw: String, defaults: T2eCornerCalibration): T2eCornerCalibration {
+            val json = org.json.JSONObject(raw)
             fun number(key: String, fallback: Float, range: ClosedFloatingPointRange<Float>): Float =
                 json.optDouble(key, fallback.toDouble()).toFloat().let {
                     if (it.isFinite()) it.coerceIn(range) else fallback
                 }
-            T2eCornerCalibration(number("size", defaults.size, 0.4f..1.8f),
+            return T2eCornerCalibration(number("size", defaults.size, 0.4f..1.8f),
                 number("offset_px", defaults.offsetPx, -16f..16f), number("squircle", defaults.squircle, 0f..4f),
                 number("shift_x_px", defaults.shiftXPx, -16f..16f), number("shift_y_px", defaults.shiftYPx, -16f..16f))
-        }.getOrDefault(T2eCornerCalibration())
+        }
     }
 
     fun save(context: Context) {

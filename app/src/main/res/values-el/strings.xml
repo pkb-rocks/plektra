@@ -1584,8 +1584,8 @@ QWERTZ σε φυσικό QWERTY
     <string name="status_bar_buttons_section">Κουμπιά</string>
     <string name="slim_preview_suggestions">Προτάσεις</string>
     <string name="device_specific_interface_section">Διεπαφή συγκεκριμένης συσκευής</string>
-    <string name="titan2_elite_rounded_corners_title">Στρογγυλεμένες γωνίες Titan 2 Elite</string>
-    <string name="titan2_elite_rounded_corners_description">Κρατά τα στοιχεία ελέγχου Slim και εκτεταμένης γραμμής κατάστασης μέσα στις στρογγυλεμένες γωνίες οθόνης του Elite.</string>
+    <string name="titan2_elite_rounded_corners_title">Στρογγυλεμένες γωνίες οθόνης</string>
+    <string name="titan2_elite_rounded_corners_description">Κρατά τα στοιχεία ελέγχου Slim και εκτεταμένης γραμμής κατάστασης μέσα στις στρογγυλεμένες γωνίες οθόνης.</string>
     <string name="status_bar_slot_left">Αριστερό slot</string>
     <string name="status_bar_slot_right_1">Δεξί slot 1</string>
     <string name="status_bar_slot_right_2">Δεξί slot 2</string>

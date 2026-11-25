@@ -592,7 +592,7 @@ fun AdvancedSettingsScreen(
                             }
                         }
 
-                        if (rocks.pkb.plektra.inputmethod.DeviceSpecific.isTitan2EliteDevice() ||
+                        if (rocks.pkb.plektra.inputmethod.DisplayCorners.hasRoundedDisplay(context) ||
                             SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) {
                             Surface(modifier = Modifier.fillMaxWidth()
                                 .settingRow("advanced.corner_calibration") {

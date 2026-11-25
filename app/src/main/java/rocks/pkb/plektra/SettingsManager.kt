@@ -1611,11 +1611,19 @@ object SettingsManager {
             .apply()
     }
 
-    fun getTitan2EliteRoundedCornerInsetsEnabled(context: Context): Boolean =
-        getPreferences(context).getBoolean(
-            KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS,
-            DeviceSpecific.isTitan2EliteDevice()
-        )
+    /**
+     * Whether the keyboard bar follows rounded display corners. A stored choice always wins.
+     * Without one, it is on for displays with rounded bottom corners; the default is never
+     * persisted.
+     */
+    fun getTitan2EliteRoundedCornerInsetsEnabled(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        return if (prefs.contains(KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS)) {
+            prefs.getBoolean(KEY_TITAN2_ELITE_ROUNDED_CORNER_INSETS, false)
+        } else {
+            rocks.pkb.plektra.inputmethod.DisplayCorners.hasRoundedDisplay(context)
+        }
+    }
 
     fun getTitan2EliteFillBottomCorners(context: Context): Boolean =
         getPreferences(context).getBoolean(KEY_TITAN2_ELITE_FILL_BOTTOM_CORNERS, true)

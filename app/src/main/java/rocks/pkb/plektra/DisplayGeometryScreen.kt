@@ -15,7 +15,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.selectable
-import rocks.pkb.plektra.inputmethod.DeviceSpecific
+import rocks.pkb.plektra.inputmethod.DisplayCorners
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.*
@@ -50,7 +50,8 @@ fun DisplayGeometryScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
         PlektraSettingsHeader(stringResource(R.string.keyboard_bar_geometry), onBack)
     }) { paddingValues ->
         Column(Modifier.fillMaxWidth().padding(paddingValues).verticalScroll(rememberScrollState())) {
-        if (DeviceSpecific.isTitan2EliteDevice()) {
+        // A stored choice stays reachable even on a display without rounded corners.
+        if (DisplayCorners.hasRoundedDisplay(context) || titan2EliteRoundedCornerInsetsEnabled) {
         SettingsSectionDivider(stringResource(R.string.device_specific_interface_section))
         Surface(modifier = Modifier.fillMaxWidth().settingRow("status_bar.rounded_corners")) {
             Row(

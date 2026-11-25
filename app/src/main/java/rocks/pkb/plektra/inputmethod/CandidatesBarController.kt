@@ -23,6 +23,12 @@ class CandidatesBarController(
     private val candidatesStatusBar = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY, clipboardHistoryManager, assets, imeServiceClass)
     private var candidatesSurfaceActive = true
 
+    /** An input device changed; a known-panel detection may depend on it. */
+    fun onInputDevicesChanged() {
+        inputStatusBar.onInputDevicesChanged()
+        candidatesStatusBar.onInputDevicesChanged()
+    }
+
     var onVariationSelectedListener: VariationButtonHandler.OnVariationSelectedListener? = null
         set(value) {
             field = value

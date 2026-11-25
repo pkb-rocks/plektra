@@ -1113,7 +1113,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="status_bar_buttons_title">Tastaturleiste</string>
     <string name="status_bar_buttons_description">Vorschläge, Menütasten, LEDs und Profile</string>
     <string name="device_specific_interface_section">Gerätespezifisches Interface</string>
-    <string name="titan2_elite_rounded_corners_title">Runde Ecken des Titan 2 Elite</string>
+    <string name="titan2_elite_rounded_corners_title">Gerundete Displayecken</string>
     <string name="titan2_elite_rounded_corners_description">Hält die Bedienelemente von Slim und der erweiterten Tastaturleiste innerhalb der gerundeten Displayecken.</string>
     <string name="titan2_elite_fill_bottom_corners_title">Untere Displayecken füllen</string>
     <string name="titan2_elite_fill_bottom_corners_description">Behält die Rundung der äußeren Buttons bei und erweitert den Theme-Hintergrund bis an den physischen Displayrand.</string>
@@ -1566,7 +1566,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_bar_buttons_summary">Links: %1$s · Rechts: %2$s</string>
     <string name="keyboard_bar_variations_summary">Zeichen, Anzahl der Plätze und Größe</string>
     <string name="keyboard_bar_requires_suggestions">Benötigt Vorschläge</string>
-    <string name="keyboard_bar_geometry_unavailable">Eckenanpassungen sind für das Geräteprofil Titan 2 Elite verfügbar.</string>
+    <string name="keyboard_bar_geometry_unavailable">Eckenanpassungen sind für Displays mit gerundeten Ecken verfügbar.</string>
     <string name="keyboard_bar_variations_title">Varianten</string>
     <string name="keyboard_bar_corner_size">Eckengröße</string>
 

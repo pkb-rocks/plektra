@@ -105,6 +105,20 @@ internal class KeyboardBarGeometry(private val context: Context) {
         if (forceCalibration) dirty = true
     }
 
+    /**
+     * Re-reads the calibration after the panel identity may have changed, for example when a
+     * detection of [DisplayCorners.hasKnownRoundedPanel] depends on hardware that enumerates
+     * after the IME started. Only the default follows the panel; a saved calibration reads the
+     * same. Returns whether the contour changed.
+     */
+    fun refreshPanelDefault(): Boolean {
+        val current = T2eCornerCalibration.read(context)
+        if (current == calibrationSnapshot) return false
+        calibrationSnapshot = current
+        dirty = true
+        return true
+    }
+
     fun prepare(width: Float, height: Float) {
         if (!dirty && width == preparedWidth && height == preparedHeight) return
         if (preferencesDirty) { refreshSettings(); preferencesDirty = false }

@@ -1687,8 +1687,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="status_bar_buttons_section">Buttons</string>
     <string name="slim_preview_suggestions">Suggestions</string>
     <string name="device_specific_interface_section">Device-specific interface</string>
-    <string name="titan2_elite_rounded_corners_title">Titan 2 Elite rounded corners</string>
-    <string name="titan2_elite_rounded_corners_description">Round the bottom corners of the keyboard bar to match the Elite’s rounded display corners.</string>
+    <string name="titan2_elite_rounded_corners_title">Rounded display corners</string>
+    <string name="titan2_elite_rounded_corners_description">Round the bottom corners of the keyboard bar to match the rounded display corners.</string>
     <string name="titan2_elite_fill_bottom_corners_title">Fill lower display corners</string>
     <string name="titan2_elite_fill_bottom_corners_description">Keep the outer buttons rounded while extending the theme background to the physical display edge.</string>
     <string name="status_bar_slot_left">Left Slot</string>
@@ -1890,7 +1890,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_bar_buttons_summary">Left: %1$s · Right: %2$s</string>
     <string name="keyboard_bar_variations_summary">Characters, number of slots and sizing</string>
     <string name="keyboard_bar_requires_suggestions">Requires suggestions</string>
-    <string name="keyboard_bar_geometry_unavailable">Corner adjustments are available for the Titan 2 Elite device profile.</string>
+    <string name="keyboard_bar_geometry_unavailable">Corner adjustments are available on displays with rounded corners.</string>
     <string name="keyboard_bar_variations_title">Variations</string>
     <string name="keyboard_bar_corner_size">Corner size</string>
 

@@ -126,7 +126,7 @@ class CornerCalibrationActivity : LocalizedComponentActivity() {
             text = label; isAllCaps = false; setOnClickListener { action() }
         }
         actions.addView(button("Zurücksetzen") {
-            draft = T2eCornerCalibration()
+            draft = T2eCornerCalibration.defaults(this@CornerCalibrationActivity)
             refreshSliders.forEach { it() }
             refreshPreview()
         }, LinearLayout.LayoutParams(0, dp(52), 1f))

@@ -598,6 +598,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 clicksConnectionChanged = didClicksConnectionChange,
                 clicksDisconnected = didClicksDisconnect
             )
+            // The panel contour default may follow the connected input devices; a stored
+            // calibration wins either way.
+            candidatesBarController.onInputDevicesChanged()
         }
         pendingInputDeviceModeRefresh = refresh
         uiHandler.postDelayed(refresh, 120L)

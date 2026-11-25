@@ -102,7 +102,7 @@ class NavModeKeyMappingDialogTest {
         RuntimeEnvironment.setFontScale(1.3f)
         open()
         assertEveryTypeReachableAndSavable()
-        compose.onNode(hasContentDescription(string(R.string.nav_mode_use_default, "DPAD_UP")) and hasClickAction())
+        compose.onNode(hasContentDescription(string(R.string.nav_mode_use_default, string(R.string.nav_mode_desc_dpad_up))) and hasClickAction())
             .assertFullyVisible("Use default")
     }
 

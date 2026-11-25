@@ -88,6 +88,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.material.icons.filled.RestartAlt
+import rocks.pkb.plektra.commands.CommandTarget
+import rocks.pkb.plektra.commands.CommandIcon
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import rocks.pkb.plektra.inputmethod.commandMaterialIcon
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.commands.CommandRegistry
 import rocks.pkb.plektra.commands.CommandSourceId
@@ -127,6 +137,11 @@ fun NavModeSettingsScreen(
 
     // Dialog state for key configuration
     var selectedKeyCode by remember(initialKeyCode) { mutableStateOf(initialKeyCode) }
+
+    // Command targets are resolved once per screen and shared by keycaps and the mapping dialog.
+    val commandTargets = remember { CommandRegistry(context).getCommands(CommandSurface.NavMode) }
+    val commandsById = remember(commandTargets) { commandTargets.associateBy { it.id } }
+    val appIcons = rememberAppCommandIcons(commandTargets)
 
     // Load default mappings for comparison
     val defaultMappings = remember {
@@ -405,6 +420,8 @@ fun NavModeSettingsScreen(
                             mappings = keyMappings,
                             defaultMappings = defaultMappings,
                             layoutHints = layoutHints,
+                            commandsById = commandsById,
+                            appIcons = appIcons,
                             onKeyClick = { keyCode ->
                                 selectedKeyCode = keyCode
                             }
@@ -442,6 +459,8 @@ fun NavModeSettingsScreen(
             keyCode = keyCode,
             currentMapping = keyMappings[keyCode],
             defaultMapping = defaultMappings[keyCode],
+            commandTargets = commandTargets,
+            appIcons = appIcons,
             onDismiss = { selectedKeyCode = null },
             onSave = { mapping ->
                 val newMappings = keyMappings.toMutableMap()
@@ -463,6 +482,8 @@ private fun KeyboardRow(
     mappings: Map<Int, KeyMappingLoader.CtrlMapping>,
     defaultMappings: Map<Int, KeyMappingLoader.CtrlMapping>,
     layoutHints: Map<Int, String>,
+    commandsById: Map<String, CommandTarget>,
+    appIcons: Map<String, ImageBitmap>,
     onKeyClick: (Int) -> Unit
 ) {
     Row(
@@ -479,6 +500,8 @@ private fun KeyboardRow(
                 mapping = mappings[keyCode],
                 defaultMapping = defaultMappings[keyCode],
                 layoutHint = layoutHints[keyCode],
+                command = mappings[keyCode]?.takeIf { it.type == "command" }?.let { commandsById[it.value] },
+                appIcon = mappings[keyCode]?.takeIf { it.type == "command" }?.let { appIcons[it.value] },
                 onClick = { onKeyClick(keyCode) },
                 modifier = Modifier
                     .width(keySize)
@@ -488,13 +511,14 @@ private fun KeyboardRow(
     }
 }
 
-private fun mappingIcon(mapping: KeyMappingLoader.CtrlMapping?): ImageVector? = when (mapping?.type) {
-    "keycode" -> keycodeIcon(mapping.value)
-    "action" -> actionIcon(mapping.value)
-    "native_ctrl" -> typeIcon("native_ctrl")
-    "command" -> typeIcon("command")
-    else -> null
-}
+private fun mappingIcon(mapping: KeyMappingLoader.CtrlMapping?, command: CommandTarget? = null): ImageVector? =
+    when (mapping?.type) {
+        "keycode" -> keycodeIcon(mapping.value)
+        "action" -> actionIcon(mapping.value)
+        "native_ctrl" -> typeIcon("native_ctrl")
+        "command" -> command?.let(::commandMaterialIcon) ?: typeIcon("command")
+        else -> null
+    }
 
 /** Keycap in the Nav Mode keyboard: letter, layout hint, mapping icon and a one-line short label. */
 @Composable
@@ -503,6 +527,8 @@ private fun KeyButton(
     mapping: KeyMappingLoader.CtrlMapping?,
     defaultMapping: KeyMappingLoader.CtrlMapping?,
     layoutHint: String?,
+    command: CommandTarget?,
+    appIcon: ImageBitmap?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -510,15 +536,15 @@ private fun KeyButton(
     val keyLabel = getKeyLabel(keyCode)
     val hasMapping = mapping != null && mapping.type != "none"
     val customized = mapping != null && mapping != defaultMapping
-    val icon = if (hasMapping) mappingIcon(mapping) else null
+    val icon = if (hasMapping) mappingIcon(mapping, command) else null
     // Direction arrows carry their meaning in the icon; every other mapping keeps a short label.
     val shortLabel = if (hasMapping && !(mapping?.type == "keycode" && mapping.value.startsWith("DPAD_"))) {
         // The icon already shows the direction, so drop arrows from labels such as "←WordSel".
-        mapping?.let { getMappingLabelShort(it) }?.let { label ->
+        (command?.label ?: mapping?.let { getMappingLabelShort(it) })?.let { label ->
             if (icon != null) label.trim('←', '→', ' ').ifEmpty { label } else label
         }
     } else null
-    val fullLabel = mapping?.let { getMappingLabel(it) }
+    val fullLabel = mapping?.let { mappingDescription(it, command) }
         ?: if (mapping == null && defaultMapping != null) stringResource(R.string.nav_mode_default) else null
     // The keycaps are a dense diagram with a fixed geometry: let text follow the system scale up
     // to 120% and keep the full meaning in the key's accessibility label and in the dialog.
@@ -532,11 +558,7 @@ private fun KeyButton(
         shape = shape,
         color = if (hasMapping) scheme.surfaceContainerHigh else scheme.surfaceContainerLow,
         contentColor = contentColor,
-        border = if (customized) {
-            BorderStroke(1.5.dp, scheme.primary)
-        } else {
-            BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.6f))
-        },
+        border = BorderStroke(1.5.dp, if (customized) scheme.primary else scheme.outlineVariant.copy(alpha = 0.6f)),
         modifier = modifier.semantics(mergeDescendants = true) {
             contentDescription = listOfNotNull(keyLabel, fullLabel, layoutHint).joinToString(", ")
         }
@@ -581,6 +603,11 @@ private fun KeyButton(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     when {
+                        appIcon != null -> Image(
+                            bitmap = appIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                         icon != null -> Icon(
                             imageVector = icon,
                             contentDescription = null,
@@ -632,8 +659,32 @@ private data class PickerTone(
 private data class NavOptionEntry(
     val value: String,
     val label: String,
-    val icon: ImageVector? = null
+    val icon: ImageVector? = null,
+    val appIcon: ImageBitmap? = null
 )
+
+/**
+ * Real launcher icons for app and app-action commands, rendered off the main thread once per
+ * command list so scrolling never decodes or rasterizes drawables.
+ */
+@Composable
+private fun rememberAppCommandIcons(commands: List<CommandTarget>): Map<String, ImageBitmap> {
+    val sizePx = with(LocalDensity.current) { 24.dp.roundToPx() }
+    val icons by produceState(emptyMap<String, ImageBitmap>(), commands, sizePx) {
+        value = withContext(Dispatchers.Default) {
+            commands.mapNotNull { command ->
+                if (command.source != CommandSourceId.Apps && command.source != CommandSourceId.AppActions) {
+                    return@mapNotNull null
+                }
+                val drawable = (command.icon as? CommandIcon.DrawableIcon)?.drawable ?: return@mapNotNull null
+                // Draw a private copy so the shared drawable's bounds stay untouched.
+                val copy = drawable.constantState?.newDrawable()?.mutate() ?: drawable
+                runCatching { command.id to copy.toBitmap(sizePx, sizePx).asImageBitmap() }.getOrNull()
+            }.toMap()
+        }
+    }
+    return icons
+}
 
 private data class NavOptionGroup(
     val id: String,
@@ -714,18 +765,23 @@ internal fun KeyMappingDialog(
     currentMapping: KeyMappingLoader.CtrlMapping?,
     defaultMapping: KeyMappingLoader.CtrlMapping?,
     onDismiss: () -> Unit,
-    onSave: (KeyMappingLoader.CtrlMapping) -> Unit
+    onSave: (KeyMappingLoader.CtrlMapping) -> Unit,
+    commandTargets: List<CommandTarget> = LocalContext.current.let { context ->
+        remember { CommandRegistry(context).getCommands(CommandSurface.NavMode) }
+    },
+    appIcons: Map<String, ImageBitmap> = emptyMap()
 ) {
     val keyLabel = getKeyLabel(keyCode)
-    val context = LocalContext.current
     var selectedType by remember { mutableStateOf<String?>(currentMapping?.type) }
     var selectedValue by remember { mutableStateOf<String?>(currentMapping?.value) }
     var selectedCommandSource by remember { mutableStateOf<CommandSourceId?>(null) }
-    val commandTargets = remember { CommandRegistry(context).getCommands(CommandSurface.NavMode) }
     val commandGroupsBySource = remember(commandTargets) {
         commandTargets.groupBy { it.source }
     }
-    val defaultLabel = defaultMapping?.let { getMappingLabel(it) }
+    val defaultCommand = defaultMapping?.takeIf { it.type == "command" }
+        ?.let { mapping -> commandTargets.firstOrNull { it.id == mapping.value } }
+    val defaultLabel = defaultMapping?.let { mappingDescription(it, defaultCommand) }
+    val defaultIcon = mappingIcon(defaultMapping, defaultCommand)
     val fontScale = LocalDensity.current.fontScale
     val minCellWidth = if (fontScale >= 1.4f) 200.dp else 180.dp
     val selection = keyMappingSelection(selectedType, selectedValue)
@@ -739,7 +795,9 @@ internal fun KeyMappingDialog(
     val safeBottomPx = WindowInsets.safeDrawing.getBottom(density)
     val hostHeightPx = hostView.rootView.height.takeIf { it > 0 }
         ?: with(density) { LocalConfiguration.current.screenHeightDp.dp.roundToPx() }
-    val dialogMaxHeight = with(density) { (hostHeightPx - safeTopPx - safeBottomPx).coerceAtLeast(0).toDp() } - 16.dp
+    val availableHeight = with(density) { (hostHeightPx - safeTopPx - safeBottomPx).coerceAtLeast(0).toDp() } - 16.dp
+    // One fixed card height for every type, so switching type never resizes the dialog.
+    val dialogHeight = availableHeight.coerceAtMost(640.dp)
 
     // label shown on the chip, full label for accessibility
     val types = listOf(
@@ -813,7 +871,12 @@ internal fun KeyMappingDialog(
                     accent = tone.accent,
                     showCount = true,
                     options = commands.map {
-                        NavOptionEntry(value = it.id, label = it.label, icon = commandSourceIcon(source))
+                        NavOptionEntry(
+                            value = it.id,
+                            label = it.label,
+                            icon = commandMaterialIcon(it),
+                            appIcon = appIcons[it.id]
+                        )
                     }
                 )
             }
@@ -829,7 +892,7 @@ internal fun KeyMappingDialog(
                 .widthIn(max = 560.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
-                .heightIn(max = dialogMaxHeight)
+                .height(dialogHeight)
                 .semantics { paneTitle = keyLabel },
             shape = RoundedCornerShape(20.dp),
             tonalElevation = 2.dp,
@@ -877,30 +940,49 @@ internal fun KeyMappingDialog(
                     )
                     if (defaultLabel != null) {
                         val useDefault = stringResource(R.string.nav_mode_use_default, defaultLabel)
-                        TextButton(
+                        // Outlined reset chip: the app's reset icon, the default's own icon and its
+                        // readable name; 48dp touch target around a compact visual.
+                        Surface(
                             onClick = {
                                 selectedType = defaultMapping?.type
                                 selectedValue = defaultMapping?.value
                                 selectedCommandSource = null
                             },
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                             modifier = Modifier
-                                .heightIn(min = 48.dp)
-                                .widthIn(max = 200.dp)
-                                .semantics { contentDescription = useDefault },
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                .minimumInteractiveComponentSize()
+                                .widthIn(max = 220.dp)
+                                .semantics { contentDescription = useDefault }
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Restore,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = defaultLabel,
-                                style = MaterialTheme.typography.labelLarge,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.RestartAlt,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                if (defaultIcon != null) {
+                                    Icon(
+                                        imageVector = defaultIcon,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                                Text(
+                                    text = defaultLabel,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }
@@ -941,10 +1023,10 @@ internal fun KeyMappingDialog(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.weight(1f, fill = false)
+                    modifier = Modifier.weight(1f)
                 ) {
                     if (selectedType == "command" && commandGroupsBySource.size > 1) {
-                        item(key = "command_sources", span = { GridItemSpan(maxLineSpan) }) {
+                        item(key = "command_sources", span = { GridItemSpan(maxLineSpan) }, contentType = "sources") {
                             Row(
                                 modifier = Modifier.horizontalScroll(rememberScrollState()),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -985,26 +1067,27 @@ internal fun KeyMappingDialog(
                     }
 
                     optionGroups.forEach { group ->
-                        item(key = "header:$selectedType:${group.id}", span = { GridItemSpan(maxLineSpan) }) {
+                        item(key = "header:$selectedType:${group.id}", span = { GridItemSpan(maxLineSpan) }, contentType = "header") {
                             OptionCategoryHeader(
                                 title = group.title,
                                 accentColor = group.accent,
                                 count = if (group.showCount) group.options.size else null
                             )
                         }
-                        items(group.options, key = { "$selectedType:${it.value}" }) { entry ->
+                        items(group.options, key = { "$selectedType:${it.value}" }, contentType = { "option" }) { entry ->
                             NavOptionTile(
                                 label = entry.label,
                                 selected = selectedValue == entry.value,
                                 tone = tone,
                                 icon = entry.icon,
+                                appIcon = entry.appIcon,
                                 onClick = { selectedValue = entry.value }
                             )
                         }
                     }
 
                     if (selectedType == "native_ctrl" || selectedType == "none") {
-                        item(key = "hint:$selectedType", span = { GridItemSpan(maxLineSpan) }) {
+                        item(key = "hint:$selectedType", span = { GridItemSpan(maxLineSpan) }, contentType = "hint") {
                             val hintText = if (selectedType == "native_ctrl") {
                                 stringResource(R.string.nav_mode_native_ctrl_hint, keyLabel)
                             } else {
@@ -1067,11 +1150,7 @@ private fun TypeSegment(
         shape = RoundedCornerShape(12.dp),
         color = if (selected) tone.container else MaterialTheme.colorScheme.surfaceContainerLow,
         contentColor = contentColor,
-        border = if (selected) {
-            BorderStroke(1.5.dp, tone.accent)
-        } else {
-            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
-        },
+        border = BorderStroke(1.5.dp, if (selected) tone.accent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
         modifier = modifier
             .heightIn(min = 48.dp)
             .semantics {
@@ -1149,6 +1228,7 @@ private fun NavOptionTile(
     selected: Boolean,
     tone: PickerTone,
     icon: ImageVector? = null,
+    appIcon: ImageBitmap? = null,
     onClick: () -> Unit
 ) {
     val containerColor = if (selected) {
@@ -1161,11 +1241,7 @@ private fun NavOptionTile(
     } else {
         MaterialTheme.colorScheme.onSurface
     }
-    val border = if (selected) {
-        BorderStroke(1.5.dp, tone.accent)
-    } else {
-        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
-    }
+    val border = BorderStroke(1.5.dp, if (selected) tone.accent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
 
     Surface(
         selected = selected,
@@ -1185,7 +1261,9 @@ private fun NavOptionTile(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (icon != null) {
+            if (appIcon != null) {
+                Image(bitmap = appIcon, contentDescription = null, modifier = Modifier.size(20.dp))
+            } else if (icon != null) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
@@ -1269,15 +1347,52 @@ private fun getKeyLabel(keyCode: Int): String {
     }
 }
 
-private fun getMappingLabel(mapping: KeyMappingLoader.CtrlMapping): String? {
-    return when (mapping.type) {
-        "keycode" -> mapping.value
-        "action" -> mapping.value
-        "command" -> mapping.value
-        "native_ctrl" -> "Ctrl"
-        "none" -> null // Don't show label for "none"
-        else -> null
+/** Readable name of a mapping for headers and accessibility, rather than its internal id. */
+@Composable
+private fun mappingDescription(mapping: KeyMappingLoader.CtrlMapping, command: CommandTarget? = null): String =
+    when (mapping.type) {
+        "keycode" -> keycodeDescriptionRes(mapping.value)?.let { stringResource(it) } ?: mapping.value
+        "action" -> actionDescriptionRes(mapping.value)?.let { stringResource(it) } ?: getActionLabel(mapping.value)
+        "command" -> command?.label ?: mapping.value
+        "native_ctrl" -> stringResource(R.string.nav_mode_native_ctrl)
+        else -> stringResource(R.string.nav_mode_none)
     }
+
+private fun keycodeDescriptionRes(keycode: String): Int? = when (keycode) {
+    "DPAD_UP" -> R.string.nav_mode_desc_dpad_up
+    "DPAD_DOWN" -> R.string.nav_mode_desc_dpad_down
+    "DPAD_LEFT" -> R.string.nav_mode_desc_dpad_left
+    "DPAD_RIGHT" -> R.string.nav_mode_desc_dpad_right
+    "DPAD_CENTER" -> R.string.nav_mode_desc_dpad_center
+    "MOVE_HOME" -> R.string.nav_mode_desc_move_home
+    "MOVE_END" -> R.string.nav_mode_desc_move_end
+    "PAGE_UP" -> R.string.nav_mode_desc_page_up
+    "PAGE_DOWN" -> R.string.nav_mode_desc_page_down
+    "TAB" -> R.string.nav_mode_desc_tab
+    "ESCAPE" -> R.string.nav_mode_desc_escape
+    "FORWARD_DEL" -> R.string.nav_mode_desc_forward_del
+    else -> null
+}
+
+private fun actionDescriptionRes(action: String): Int? = when (action) {
+    "copy" -> R.string.nav_mode_action_copy
+    "paste" -> R.string.nav_mode_action_paste
+    "cut" -> R.string.nav_mode_action_cut
+    "undo" -> R.string.nav_mode_action_undo
+    "select_all" -> R.string.nav_mode_desc_select_all
+    "expand_selection_left" -> R.string.nav_mode_desc_expand_selection_left
+    "expand_selection_right" -> R.string.nav_mode_desc_expand_selection_right
+    "move_word_left" -> R.string.nav_mode_desc_move_word_left
+    "move_word_right" -> R.string.nav_mode_desc_move_word_right
+    "expand_selection_word_left" -> R.string.nav_mode_desc_expand_selection_word_left
+    "expand_selection_word_right" -> R.string.nav_mode_desc_expand_selection_word_right
+    "page_start" -> R.string.nav_mode_desc_page_start
+    "page_end" -> R.string.nav_mode_desc_page_end
+    "toggle_minimal_ui" -> R.string.nav_mode_desc_toggle_minimal_ui
+    "media_play_pause" -> R.string.nav_mode_action_media_play_pause
+    "media_previous" -> R.string.nav_mode_desc_media_previous
+    "media_next" -> R.string.nav_mode_desc_media_next
+    else -> null
 }
 
 @Composable
@@ -1322,26 +1437,7 @@ private fun getMappingLabelShort(mapping: KeyMappingLoader.CtrlMapping): String?
             "FORWARD_DEL" -> stringResource(R.string.nav_mode_keycode_forward_delete)
             else -> mapping.value
         }
-        "action" -> when (mapping.value) {
-            "copy" -> stringResource(R.string.nav_mode_action_copy)
-            "paste" -> stringResource(R.string.nav_mode_action_paste)
-            "cut" -> stringResource(R.string.nav_mode_action_cut)
-            "undo" -> stringResource(R.string.nav_mode_action_undo)
-            "select_all" -> stringResource(R.string.nav_mode_action_select_all)
-            "expand_selection_left" -> stringResource(R.string.nav_mode_action_expand_selection_left)
-            "expand_selection_right" -> stringResource(R.string.nav_mode_action_expand_selection_right)
-            "move_word_left" -> stringResource(R.string.nav_mode_action_move_word_left)
-            "move_word_right" -> stringResource(R.string.nav_mode_action_move_word_right)
-            "expand_selection_word_left" -> stringResource(R.string.nav_mode_action_expand_selection_word_left)
-            "expand_selection_word_right" -> stringResource(R.string.nav_mode_action_expand_selection_word_right)
-            "page_start" -> stringResource(R.string.nav_mode_action_page_start)
-            "page_end" -> stringResource(R.string.nav_mode_action_page_end)
-            "toggle_minimal_ui" -> stringResource(R.string.nav_mode_action_toggle_slim)
-            "media_play_pause" -> stringResource(R.string.nav_mode_action_media_play_pause)
-            "media_previous" -> stringResource(R.string.nav_mode_action_media_previous)
-            "media_next" -> stringResource(R.string.nav_mode_action_media_next)
-            else -> mapping.value
-        }
+        "action" -> getActionLabel(mapping.value)
         "command" -> mapping.value.substringAfterLast('.').replace('_', ' ')
         "native_ctrl" -> "Ctrl"
         "none" -> null // Don't show label for "none"

@@ -130,7 +130,8 @@
       "rocks.pkb.plektra.inputmethod.ui.LedStatusRenderingTest",
       "rocks.pkb.plektra.inputmethod.ui.LedStatusViewTest",
       "rocks.pkb.plektra.inputmethod.ui.ModifierLedLayoutTest",
-      "rocks.pkb.plektra.ui.theme.AppThemeResolverTest"
+      "rocks.pkb.plektra.ui.theme.AppThemeResolverTest",
+      "rocks.pkb.plektra.SuggestionSettingsLayoutTest"
     ],
     "editing": [
       "rocks.pkb.plektra.AppEnterBehaviorDefaultsTest",

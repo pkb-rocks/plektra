@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">«%1$s»-ի համար արդյունքներ չկան</string>
     <string name="quick_launcher_enter_hint">Enter</string>
     <string name="nav_mode_guide_title">Nav Mode ուղեցույց</string>
-    <string name="nav_mode_guide_description">Ինչպես են Ctrl-ը, նշանակումները, հավելվածների դյուրանցումները և դասավորության հուշումները աշխատում միասին։</string>
     <string name="nav_mode_guide_text">Nav Mode-ը տառային ստեղները վերածում է նավիգացիայի և դյուրանցումների ստեղների։ Արդյունքը կարող է տարբերվել ըստ հավելվածի, քանի որ որոշ հավելվածներ հասկանում են Android խմբագրիչի գործողությունները, իսկ մյուսները արձագանքում են միայն իրական Ctrl դյուրանցումներին։
 
 Նավիգացիա պահված Ctrl-ով

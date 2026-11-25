@@ -226,7 +226,7 @@
     
     <!-- Auto-Correction Section -->
     <string name="auto_correct_title">Text replacements</string>
-    <string name="auto_correct_title_description">Apply saved rules like “ca → ça” when pressing Space or Enter.</string>
+    <string name="auto_correct_title_description">Apply saved rules like “teh → the” when pressing Space or Enter.</string>
     <string name="auto_correct_languages_title">Manage text replacements</string>
     <string name="auto_correct_languages_description">Saved replacement rules run before automatic correction.</string>
     <string name="auto_correct_settings_title">Text Replacements</string>
@@ -260,6 +260,11 @@
     <string name="auto_correct_language_code_required">Substitution name is required</string>
     <string name="auto_correct_language_already_exists">This substitution already exists</string>
     <string name="auto_correct_suggestions_toggle_title">Suggestions while typing</string>
+    <string name="auto_correct_section_suggestions">Suggestions</string>
+    <string name="auto_correct_starter_words_title">Start words</string>
+    <string name="auto_correct_starter_words_description">Offer common words in an empty field and after a sentence. Without personalization, they come from the dictionary only.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Choose where suggestions appear in the keyboard bar.</string>
+    <string name="kw_auto_correction_starter_words">start words, starter words, empty field, new sentence, first word, common words, dictionary, suggestions</string>
     <string name="auto_correct_suggestions_personalization_title">Personalized suggestions</string>
     <string name="auto_correct_suggestions_personalization_description">Learn from your typing for next-word and empty-field suggestions. Turning this off keeps saved words and uses dictionary suggestions only.</string>
     <string name="auto_correct_add_word_button_title">Show \"Add word\" (+) button</string>
@@ -941,7 +946,6 @@
     <!-- Nav Mode Settings -->
     <string name="nav_mode_title">Nav Mode</string>
     <string name="nav_mode_guide_title">Nav Mode guide</string>
-    <string name="nav_mode_guide_description">How Ctrl, mappings, app shortcuts, and layout hints work together.</string>
     <string name="nav_mode_guide_text">Nav Mode turns letter keys into navigation and shortcut keys. The result can differ by app because some apps understand Android editor actions, while others only react to real Ctrl shortcuts.
 
 Ctrl-hold navigation
@@ -969,11 +973,11 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="nav_mode_enable_description">Double-tap Ctrl to activate navigation mode</string>
     <string name="nav_mode_ctrl_hold_title">Ctrl-hold navigation</string>
     <string name="nav_mode_ctrl_hold_description">When enabled, text fields use Nav Mode mappings while Ctrl is held. When off, Ctrl shortcuts are passed to the app. Keys set to Native Ctrl are always passed through as real Ctrl shortcuts.</string>
-    <string name="layout_aware_ctrl_shortcuts_title">Layout-aware app Ctrl shortcuts</string>
-    <string name="layout_aware_ctrl_shortcuts_description">When held Ctrl is passed to apps, translate Ctrl+letter through the active Plektra layout first.</string>
+    <string name="layout_aware_ctrl_shortcuts_title">App shortcuts follow the keyboard layout</string>
+    <string name="layout_aware_ctrl_shortcuts_description">Ctrl plus the key that types a letter sends that letter’s shortcut. Example: QWERTZ on QWERTY keys, the key that types Z sends Ctrl+Z (undo).</string>
     <string name="layout_aware_ctrl_shortcuts_disabled_description">Disabled while Ctrl-hold navigation is active, because held Ctrl is handled by Nav Mode instead of the app.</string>
     <string name="layout_aware_ctrl_shortcuts_info_title">Ctrl shortcuts and Nav Mode</string>
-    <string name="layout_aware_ctrl_shortcuts_info_text">There are two paths for held Ctrl. If Ctrl-hold navigation is on, Plektra handles Ctrl+key with the Nav Mode mappings shown below. If Ctrl-hold navigation is off, Plektra passes Ctrl+key to the app. This option only affects that app path: when enabled, Ctrl+letter is translated through the active Plektra layout first, so shortcuts can follow the letters you type. When disabled, apps receive the original physical key positions.</string>
+    <string name="layout_aware_ctrl_shortcuts_info_text">When Ctrl-hold navigation is off, Plektra passes Ctrl+key to the app. With this option, the shortcut follows the letter your active Plektra layout types on that key, not the printed key position.\n\nExamples:\n• QWERTZ layout on QWERTY keys: the key that types Z sends Ctrl+Z to undo, the key that types Y sends Ctrl+Y to redo where the app supports it.\n• AZERTY: Ctrl+A selects all and Ctrl+W closes a tab at the positions where your layout types A and W.\n• Colemak or Dvorak: Ctrl+C, Ctrl+X and Ctrl+V follow the letters C, X and V.\n\nOnly Latin letters a–z are translated; other keys keep their original code. Your shortcuts move with the letters when you switch layouts. With the option off, apps receive the physical key positions. With Ctrl-hold navigation on, the Nav Mode mappings below apply instead and are not translated.</string>
     <string name="nav_mode_key_mappings">Key Mappings</string>
     <string name="nav_mode_revert_to_default">Revert to Default</string>
     <string name="nav_mode_note">Note: Modifying nav mode keys also affects Ctrl+key combinations in text fields.</string>

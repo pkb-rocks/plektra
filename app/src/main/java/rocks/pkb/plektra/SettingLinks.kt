@@ -79,6 +79,7 @@ object SettingLinkIds {
     const val AUTO_CORRECTION_SUGGESTIONS = "auto_correction.suggestions"
     const val AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION = "auto_correction.suggestions_personalization"
     const val AUTO_CORRECTION_ADD_WORD_BUTTON = "auto_correction.add_word_button"
+    const val AUTO_CORRECTION_STARTER_WORDS = "auto_correction.starter_words"
     const val AUTO_CORRECTION_ACCENT_MATCHING = "auto_correction.accent_matching"
     const val AUTO_CORRECTION_KEYBOARD_PROXIMITY = "auto_correction.keyboard_proximity"
     const val AUTO_CORRECTION_EDIT_TYPE_RANKING = "auto_correction.edit_type_ranking"
@@ -605,6 +606,12 @@ object SettingLinkRegistry {
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
         ),
         entry(
+            SettingLinkIds.AUTO_CORRECTION_STARTER_WORDS,
+            R.string.auto_correct_starter_words_title,
+            R.string.auto_correct_starter_words_description,
+            destination = SettingsDestination.AutoCorrection
+        ),
+        entry(
             SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION,
             R.string.auto_correct_suggestions_personalization_title,
             R.string.auto_correct_suggestions_personalization_description,
@@ -1107,6 +1114,7 @@ object SettingLinkRegistry {
         SettingLinkIds.AUTO_CORRECTION_LANGUAGES to R.string.kw_auto_correction_languages,
         SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS to R.string.kw_auto_correction_suggestions,
         SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION to R.string.kw_auto_correction_suggestions_personalization,
+        SettingLinkIds.AUTO_CORRECTION_STARTER_WORDS to R.string.kw_auto_correction_starter_words,
         SettingLinkIds.AUTO_CORRECTION_ADD_WORD_BUTTON to R.string.kw_auto_correction_add_word_button,
         SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING to R.string.kw_auto_correction_accent_matching,
         SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING to R.string.kw_auto_correction_exact_typing,

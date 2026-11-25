@@ -22,6 +22,9 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SpaceBar
+import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.animation.*
@@ -70,6 +73,12 @@ fun AutoCorrectionCategoryScreen(
     var suggestionsAddWordButtonEnabled by remember {
         mutableStateOf(SettingsManager.getSuggestionsAddWordButtonEnabled(context))
     }
+    var starterWordsEnabled by remember {
+        mutableStateOf(SettingsManager.getSuggestionStarterWordsEnabled(context))
+    }
+    var autoSpaceAfterSuggestion by remember {
+        mutableStateOf(SettingsManager.getAutoSpaceAfterSuggestion(context))
+    }
     var accentMatchingEnabled by remember {
         mutableStateOf(SettingsManager.getAccentMatchingEnabled(context))
     }
@@ -93,6 +102,8 @@ fun AutoCorrectionCategoryScreen(
             suggestionsEnabled = SettingsManager.getSuggestionsEnabled(context)
             suggestionsPersonalizationEnabled = SettingsManager.getSuggestionsPersonalizationEnabled(context)
             suggestionsAddWordButtonEnabled = SettingsManager.getSuggestionsAddWordButtonEnabled(context)
+            starterWordsEnabled = SettingsManager.getSuggestionStarterWordsEnabled(context)
+            autoSpaceAfterSuggestion = SettingsManager.getAutoSpaceAfterSuggestion(context)
             accentMatchingEnabled = SettingsManager.getAccentMatchingEnabled(context)
             autoReplaceOnSpaceEnter = SettingsManager.getAutoReplaceOnSpaceEnter(context)
             maxAutoReplaceDistance = SettingsManager.getMaxAutoReplaceDistance(context)
@@ -157,13 +168,13 @@ fun AutoCorrectionCategoryScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
+                                .heightIn(min = 80.dp)
                                 .settingRow(SettingLinkIds.AUTO_CORRECTION_TEXT_REPLACEMENTS)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
@@ -202,7 +213,7 @@ fun AutoCorrectionCategoryScreen(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(80.dp)
+                                    .heightIn(min = 80.dp)
                                     .settingRow(SettingLinkIds.AUTO_CORRECTION_LANGUAGES) {
                                         navigateTo(AutoCorrectionDestination.Settings)
                                     }
@@ -210,7 +221,7 @@ fun AutoCorrectionCategoryScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
@@ -247,13 +258,13 @@ fun AutoCorrectionCategoryScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
+                                .heightIn(min = 80.dp)
                                 .settingRow(SettingLinkIds.AUTO_CORRECTION_AUTO_REPLACE)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
@@ -346,7 +357,7 @@ fun AutoCorrectionCategoryScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
+                                .heightIn(min = 80.dp)
                                 .settingRow(SettingLinkIds.AUTO_CORRECTION_USER_DICTIONARY) {
                                     navigateTo(AutoCorrectionDestination.UserDictionary)
                                 }
@@ -354,7 +365,7 @@ fun AutoCorrectionCategoryScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
@@ -390,7 +401,7 @@ fun AutoCorrectionCategoryScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
+                                .heightIn(min = 80.dp)
                                 .settingRow(SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING) {
                                     navigateTo(AutoCorrectionDestination.AppExactTyping)
                                 }
@@ -398,7 +409,7 @@ fun AutoCorrectionCategoryScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
@@ -430,17 +441,18 @@ fun AutoCorrectionCategoryScreen(
                             }
                         }
 
+                        SettingsSectionLabel(stringResource(R.string.auto_correct_section_suggestions))
                         // Advanced suggestions master toggle
                         Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(80.dp)
+                                    .heightIn(min = 80.dp)
                                     .settingRow(SettingLinkIds.AUTO_CORRECTION_EXPERIMENTAL_SUGGESTIONS)
                             ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
@@ -479,16 +491,18 @@ fun AutoCorrectionCategoryScreen(
                                 }
                             }
 
-                        TextButton(
-                            modifier = Modifier.fillMaxWidth().settingRow(SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS),
-                            onClick = {
-                                context.startActivity(android.content.Intent(context, SettingsActivity::class.java).apply {
-                                    putExtra(SettingsActivity.EXTRA_DESTINATION, SettingsActivity.DESTINATION_CUSTOMIZATION)
-                                    putExtra(SettingsActivity.EXTRA_CUSTOMIZATION_DESTINATION,
-                                        SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS)
-                                })
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.Lightbulb,
+                            title = stringResource(R.string.auto_correct_starter_words_title),
+                            description = stringResource(R.string.auto_correct_starter_words_description),
+                            checked = starterWordsEnabled,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_STARTER_WORDS,
+                            onCheckedChange = { enabled ->
+                                starterWordsEnabled = enabled
+                                SettingsManager.setSuggestionStarterWordsEnabled(context, enabled)
                             }
-                        ) { Text(stringResource(R.string.status_bar_buttons_title)) }
+                        )
 
                         AutoCorrectionSwitchRow(
                             icon = Icons.Filled.History,
@@ -516,132 +530,68 @@ fun AutoCorrectionCategoryScreen(
                             }
                         )
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.TextFields,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_accent_matching_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                }
-                                Switch(
-                                    checked = accentMatchingEnabled,
-                                    onCheckedChange = { enabled ->
-                                        accentMatchingEnabled = enabled
-                                        SettingsManager.setAccentMatchingEnabled(context, enabled)
-                                    },
-                                    enabled = experimentalSuggestionsEnabled
-                                )
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.TextFields,
+                            title = stringResource(R.string.auto_correct_accent_matching_title),
+                            checked = accentMatchingEnabled,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING,
+                            onCheckedChange = { enabled ->
+                                accentMatchingEnabled = enabled
+                                SettingsManager.setAccentMatchingEnabled(context, enabled)
                             }
-                        }
-
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.AUTO_CORRECTION_KEYBOARD_PROXIMITY)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.TextFields,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_keyboard_proximity_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_keyboard_proximity_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2
-                                    )
-                                }
-                                Switch(
-                                    checked = useKeyboardProximity,
-                                    onCheckedChange = { enabled ->
-                                        useKeyboardProximity = enabled
-                                        SettingsManager.setUseKeyboardProximity(context, enabled)
-                                    },
-                                    enabled = experimentalSuggestionsEnabled
-                                )
+                        )
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.TextFields,
+                            title = stringResource(R.string.auto_correct_keyboard_proximity_title),
+                            description = stringResource(R.string.auto_correct_keyboard_proximity_description),
+                            checked = useKeyboardProximity,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_KEYBOARD_PROXIMITY,
+                            onCheckedChange = { enabled ->
+                                useKeyboardProximity = enabled
+                                SettingsManager.setUseKeyboardProximity(context, enabled)
                             }
-                        }
-
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.AUTO_CORRECTION_EDIT_TYPE_RANKING)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.TextFields,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_edit_type_ranking_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_edit_type_ranking_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Switch(
-                                    checked = useEditTypeRanking,
-                                    onCheckedChange = { enabled ->
-                                        useEditTypeRanking = enabled
-                                        SettingsManager.setUseEditTypeRanking(context, enabled)
-                                    },
-                                    enabled = experimentalSuggestionsEnabled
-                                )
+                        )
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.TextFields,
+                            title = stringResource(R.string.auto_correct_edit_type_ranking_title),
+                            description = stringResource(R.string.auto_correct_edit_type_ranking_description),
+                            checked = useEditTypeRanking,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_EDIT_TYPE_RANKING,
+                            onCheckedChange = { enabled ->
+                                useEditTypeRanking = enabled
+                                SettingsManager.setUseEditTypeRanking(context, enabled)
                             }
-                        }
+                        )
 
+                        // The same stored settings as on their home pages; listed here so they are found with suggestions.
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.SpaceBar,
+                            title = stringResource(R.string.auto_space_after_suggestion_title),
+                            description = stringResource(R.string.auto_space_after_suggestion_description),
+                            checked = autoSpaceAfterSuggestion,
+                            enabled = true,
+                            linkId = null,
+                            onCheckedChange = { enabled ->
+                                autoSpaceAfterSuggestion = enabled
+                                SettingsManager.setAutoSpaceAfterSuggestion(context, enabled)
+                            }
+                        )
+                        AutoCorrectionLinkRow(
+                            icon = Icons.Filled.ViewWeek,
+                            title = stringResource(R.string.status_bar_buttons_title),
+                            description = stringResource(R.string.auto_correct_keyboard_bar_link_description),
+                            linkId = SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS,
+                            onClick = {
+                                context.startActivity(android.content.Intent(context, SettingsActivity::class.java).apply {
+                                    putExtra(SettingsActivity.EXTRA_DESTINATION, SettingsActivity.DESTINATION_CUSTOMIZATION)
+                                    putExtra(SettingsActivity.EXTRA_CUSTOMIZATION_DESTINATION,
+                                        SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS)
+                                })
+                            }
+                        )
                     }
                 }
             }
@@ -693,17 +643,17 @@ private sealed class AutoCorrectionDestination {
 private fun AutoCorrectionSwitchRow(
     icon: ImageVector,
     title: String,
-    description: String,
+    description: String? = null,
     checked: Boolean,
     enabled: Boolean,
-    linkId: String,
+    linkId: String?,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Surface(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 72.dp)
+                .heightIn(min = if (description == null) 64.dp else 72.dp)
                 .settingRow(linkId)
                 .toggleable(
                     value = checked,
@@ -739,7 +689,7 @@ private fun AutoCorrectionSwitchRow(
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                     }
                 )
-                Text(
+                if (description != null) Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
                     color = if (enabled) {
@@ -753,6 +703,38 @@ private fun AutoCorrectionSwitchRow(
                 checked = checked,
                 onCheckedChange = null,
                 enabled = enabled
+            )
+        }
+    }
+}
+
+@Composable
+private fun AutoCorrectionLinkRow(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    linkId: String,
+    onClick: () -> Unit
+) {
+    Surface(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 72.dp)
+                .settingRow(linkId, onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text(text = description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">No hay resultados para \"%1$s\"</string>
     <string name="quick_launcher_enter_hint">Intro</string>
     <string name="nav_mode_guide_title">Guía de Nav Mode</string>
-    <string name="nav_mode_guide_description">Cómo funcionan juntos Ctrl, asignaciones, atajos de apps y pistas de layout.</string>
     <string name="nav_mode_guide_text">Nav Mode convierte las teclas de letras en teclas de navegación y atajos. El resultado puede variar según la app, porque algunas apps entienden las acciones de editor de Android, mientras que otras solo reaccionan a atajos Ctrl reales.
 
 Navegación con Ctrl mantenido

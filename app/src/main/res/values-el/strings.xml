@@ -904,7 +904,6 @@
     <!-- Nav Mode Settings -->
     <string name="nav_mode_title">Nav Mode</string>
     <string name="nav_mode_guide_title">Οδηγός Nav Mode</string>
-    <string name="nav_mode_guide_description">Πώς συνεργάζονται το Ctrl, οι αντιστοιχίσεις, οι συντομεύσεις εφαρμογών και οι υποδείξεις διάταξης.</string>
     <string name="nav_mode_guide_text">Το Nav Mode μετατρέπει τα πλήκτρα γραμμάτων σε πλήκτρα πλοήγησης και συντομεύσεων. Το αποτέλεσμα μπορεί να διαφέρει ανά εφαρμογή, επειδή ορισμένες εφαρμογές καταλαβαίνουν ενέργειες επεξεργαστή Android, ενώ άλλες αντιδρούν μόνο σε πραγματικές συντομεύσεις Ctrl.
 
 Πλοήγηση με κρατημένο Ctrl

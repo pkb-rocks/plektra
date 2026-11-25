@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">Brak wyników dla „%1$s”</string>
     <string name="quick_launcher_enter_hint">Enter</string>
     <string name="nav_mode_guide_title">Przewodnik Nav Mode</string>
-    <string name="nav_mode_guide_description">Jak Ctrl, mapowania, skróty aplikacji i podpowiedzi układu działają razem.</string>
     <string name="nav_mode_guide_text">Nav Mode zamienia klawisze liter w klawisze nawigacji i skrótów. Wynik może zależeć od aplikacji, bo niektóre aplikacje rozumieją akcje edytora Androida, a inne reagują tylko na prawdziwe skróty Ctrl.
 
 Nawigacja z przytrzymanym Ctrl

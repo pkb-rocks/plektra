@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">Không có kết quả cho “%1$s”</string>
     <string name="quick_launcher_enter_hint">Enter</string>
     <string name="nav_mode_guide_title">Hướng dẫn Nav Mode</string>
-    <string name="nav_mode_guide_description">Cách Ctrl, ánh xạ, phím tắt ứng dụng và gợi ý bố cục hoạt động cùng nhau.</string>
     <string name="nav_mode_guide_text">Nav Mode biến các phím chữ thành phím điều hướng và phím tắt. Kết quả có thể khác nhau theo ứng dụng, vì một số ứng dụng hiểu hành động trình soạn thảo Android, còn ứng dụng khác chỉ phản hồi phím tắt Ctrl thật.
 
 Điều hướng khi giữ Ctrl

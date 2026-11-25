@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">Немає результатів для «%1$s»</string>
     <string name="quick_launcher_enter_hint">Enter</string>
     <string name="nav_mode_guide_title">Посібник Nav Mode</string>
-    <string name="nav_mode_guide_description">Як Ctrl, призначення, ярлики застосунків і підказки розкладки працюють разом.</string>
     <string name="nav_mode_guide_text">Nav Mode перетворює клавіші літер на клавіші навігації та ярликів. Результат може відрізнятися залежно від застосунку, бо деякі застосунки розуміють дії редактора Android, а інші реагують лише на справжні скорочення Ctrl.
 
 Навігація з утриманим Ctrl

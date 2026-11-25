@@ -326,7 +326,6 @@ fun TextInputSettingsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            SettingsSectionHeader(text = stringResource(R.string.text_expansion_title))
             SettingsNavigationRow(
                 title = stringResource(R.string.text_expansion_title),
                 description = stringResource(R.string.text_expansion_description),
@@ -334,7 +333,7 @@ fun TextInputSettingsScreen(
                 onClick = { openSettingsChild(context, "text", "expansion") }
             )
 
-            SettingsSectionHeader(text = stringResource(R.string.text_input_section_capitalization))
+            SettingsSectionLabel(text = stringResource(R.string.text_input_section_capitalization))
             SettingsSwitchRow(
                 title = stringResource(R.string.auto_capitalize_title),
                 description = stringResource(R.string.auto_capitalize_description),
@@ -351,7 +350,7 @@ fun TextInputSettingsScreen(
                         title = stringResource(R.string.auto_capitalize_respect_manual_shift_off_title),
                         description = stringResource(R.string.auto_capitalize_respect_manual_shift_off_description),
                         checked = autoCapitalizeRespectManualShiftOff,
-                        inset = 52.dp,
+                        dependent = true,
                         linkId = SettingLinkIds.TEXT_INPUT_AUTO_CAPITALIZE_RESPECT_MANUAL_SHIFT_OFF,
                         onCheckedChange = { enabled ->
                             autoCapitalizeRespectManualShiftOff = enabled
@@ -362,7 +361,7 @@ fun TextInputSettingsScreen(
                         title = stringResource(R.string.auto_capitalize_restricted_fields_title),
                         description = stringResource(R.string.auto_capitalize_restricted_fields_description),
                         checked = autoCapitalizeRestrictedFields,
-                        inset = 52.dp,
+                        dependent = true,
                         linkId = SettingLinkIds.TEXT_INPUT_AUTO_CAPITALIZE_RESTRICTED_FIELDS,
                         onCheckedChange = { enabled ->
                             autoCapitalizeRestrictedFields = enabled
@@ -382,7 +381,7 @@ fun TextInputSettingsScreen(
                 }
             )
 
-            SettingsSectionHeader(text = stringResource(R.string.text_input_section_spacing_punctuation))
+            SettingsSectionLabel(text = stringResource(R.string.text_input_section_spacing_punctuation))
             SettingsSwitchRow(
                 title = stringResource(R.string.double_space_to_period_title),
                 description = stringResource(R.string.double_space_to_period_description),
@@ -440,7 +439,7 @@ fun TextInputSettingsScreen(
                     title = stringResource(R.string.french_punctuation_only_french_title),
                     description = stringResource(R.string.french_punctuation_only_french_description),
                     checked = frenchPunctuationOnlyFrenchLayouts,
-                    inset = 52.dp,
+                    dependent = true,
                     linkId = SettingLinkIds.TEXT_INPUT_FRENCH_PUNCTUATION_ONLY_FRENCH,
                     onCheckedChange = { enabled ->
                         frenchPunctuationOnlyFrenchLayouts = enabled
@@ -449,7 +448,7 @@ fun TextInputSettingsScreen(
                 )
             }
 
-            SettingsSectionHeader(text = stringResource(R.string.text_input_section_typography))
+            SettingsSectionLabel(text = stringResource(R.string.text_input_section_typography))
             SettingsDropdownSwitchRow(
                 title = stringResource(R.string.spaced_hyphen_to_en_dash_title),
                 checked = spacedHyphenToEnDash,
@@ -505,7 +504,7 @@ fun TextInputSettingsScreen(
                 }
             )
 
-            SettingsSectionHeader(text = stringResource(R.string.text_input_section_keyboard_behavior))
+            SettingsSectionLabel(text = stringResource(R.string.text_input_section_keyboard_behavior))
             SettingsSwitchRow(
                 title = stringResource(R.string.auto_show_keyboard_title),
                 description = stringResource(R.string.auto_show_keyboard_description),
@@ -521,7 +520,7 @@ fun TextInputSettingsScreen(
                     title = stringResource(R.string.auto_show_respect_app_visibility_title),
                     description = stringResource(R.string.auto_show_respect_app_visibility_description),
                     checked = autoShowRespectAppVisibility,
-                    inset = 32.dp,
+                    dependent = true,
                     linkId = SettingLinkIds.TEXT_INPUT_AUTO_SHOW_RESPECT_APP_VISIBILITY,
                     onCheckedChange = { enabled ->
                         autoShowRespectAppVisibility = enabled
@@ -555,7 +554,7 @@ fun TextInputSettingsScreen(
                 )
             }
 
-            SettingsSectionHeader(text = stringResource(R.string.text_input_section_delete))
+            SettingsSectionLabel(text = stringResource(R.string.text_input_section_delete))
             Surface(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -672,32 +671,6 @@ fun TextInputSettingsScreen(
 }
 
 @Composable
-private fun SettingsSectionHeader(text: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
-        )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
-}
-
-@Composable
 private fun SettingsRowFrame(
     modifier: Modifier = Modifier,
     minHeight: androidx.compose.ui.unit.Dp = 64.dp,
@@ -725,17 +698,18 @@ private fun SettingsSwitchRow(
     title: String,
     description: String? = null,
     checked: Boolean,
-    inset: androidx.compose.ui.unit.Dp = 16.dp,
+    /** Refines the row above: no icon of its own, text aligned with that row's title. */
+    dependent: Boolean = false,
     onCheckedChange: (Boolean) -> Unit,
     linkId: String? = null,
     status: FeatureStatus? = null
 ) {
     SettingsRowFrame(
         modifier = Modifier.settingRow(linkId),
-        inset = inset,
+        inset = if (dependent) 52.dp else 16.dp,
         minHeight = if (description == null) 64.dp else 72.dp
     ) {
-        Icon(
+        if (!dependent) Icon(
             imageVector = Icons.Filled.TextFields,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
@@ -752,8 +726,7 @@ private fun SettingsSwitchRow(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -794,8 +767,7 @@ private fun SettingsNavigationRow(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Icon(

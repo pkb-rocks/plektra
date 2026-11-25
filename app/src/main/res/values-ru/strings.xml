@@ -712,7 +712,6 @@
     <string name="quick_launcher_no_results">Нет результатов для «%1$s»</string>
     <string name="quick_launcher_enter_hint">Enter</string>
     <string name="nav_mode_guide_title">Руководство Nav Mode</string>
-    <string name="nav_mode_guide_description">Как Ctrl, назначения, ярлыки приложений и подсказки раскладки работают вместе.</string>
     <string name="nav_mode_guide_text">Nav Mode превращает буквенные клавиши в клавиши навигации и ярлыков. Результат может различаться по приложениям: одни приложения понимают действия редактора Android, а другие реагируют только на настоящие сочетания Ctrl.
 
 Навигация с удержанием Ctrl

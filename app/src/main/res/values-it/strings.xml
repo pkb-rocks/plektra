@@ -423,7 +423,6 @@
     <!-- Nav Mode Settings -->
     <string name="nav_mode_title">Nav Mode</string>
     <string name="nav_mode_guide_title">Guida Nav Mode</string>
-    <string name="nav_mode_guide_description">Come Ctrl, mappature, scorciatoie app e suggerimenti layout funzionano insieme.</string>
     <string name="nav_mode_guide_text">Nav Mode trasforma i tasti lettera in tasti di navigazione e scorciatoie. Il risultato può variare in base all\'app, perché alcune app capiscono le azioni editor di Android, mentre altre reagiscono solo a vere scorciatoie Ctrl.
 
 Navigazione con Ctrl tenuto premuto

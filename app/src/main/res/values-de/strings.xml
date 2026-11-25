@@ -114,7 +114,7 @@
     <string name="select_emoji">Emoji auswählen</string>
     <string name="close">Schließen</string>
     <string name="auto_correct_title">Textersetzungen</string>
-    <string name="auto_correct_title_description">Gespeicherte Regeln wie „ca → ça“ bei Leerzeichen oder Enter anwenden.</string>
+    <string name="auto_correct_title_description">Gespeicherte Regeln wie „gehts → geht’s“ bei Leerzeichen oder Enter anwenden.</string>
     <string name="auto_correct_languages_title">Textersetzungen verwalten</string>
     <string name="auto_correct_languages_description">Gespeicherte Ersetzungsregeln greifen vor der automatischen Korrektur.</string>
     <string name="auto_correct_settings_title">Textersetzungen</string>
@@ -141,6 +141,11 @@
     <string name="auto_correct_language_code_required">Der Ersetzungsname ist erforderlich</string>
     <string name="auto_correct_language_already_exists">Diese Ersetzung existiert bereits</string>
     <string name="auto_correct_suggestions_toggle_title">Vorschläge während der Eingabe</string>
+    <string name="auto_correct_section_suggestions">Vorschläge</string>
+    <string name="auto_correct_starter_words_title">Startwörter</string>
+    <string name="auto_correct_starter_words_description">Häufige Wörter in leeren Feldern und nach einem Satz anbieten. Ohne Personalisierung stammen sie nur aus dem Wörterbuch.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Festlegen, wo Vorschläge in der Tastaturleiste erscheinen.</string>
+    <string name="kw_auto_correction_starter_words">Startwörter, Startwort, leeres Feld, neuer Satz, erstes Wort, häufige Wörter, Wörterbuch, Vorschläge</string>
     <string name="auto_correct_suggestions_personalization_title">Personalisierte Vorschläge</string>
     <string name="auto_correct_suggestions_personalization_description">Lernt aus deiner Eingabe für Wortfolge- und Startvorschläge. Ausgeschaltet bleiben gespeicherte Wörter erhalten und es werden nur Wörterbuchvorschläge genutzt.</string>
     <string name="auto_correct_add_word_button_title">„Wort hinzufügen“ (+)-Taste anzeigen</string>
@@ -349,7 +354,6 @@
     <string name="auto_correct_no_corrections_found">Keine Korrekturen gefunden</string>
     <string name="nav_mode_title">Nav-Modus</string>
     <string name="nav_mode_guide_title">Anleitung zum Nav-Modus</string>
-    <string name="nav_mode_guide_description">Wie Ctrl, Zuordnungen, App-Shortcuts und Layout-Hinweise zusammenspielen.</string>
     <string name="nav_mode_guide_text">Der Nav-Modus macht Buchstabentasten zeitweise zu Navigations- und Shortcut-Tasten. Das Ergebnis kann je nach App unterschiedlich sein, weil manche Apps Android-Editor-Aktionen verstehen und andere nur auf echte Ctrl-Shortcuts reagieren.
 
 Navigation mit gehaltenem Ctrl
@@ -377,11 +381,11 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="nav_mode_enable_description">Doppeltippen auf Ctrl, um den Navigationsmodus zu aktivieren</string>
     <string name="nav_mode_ctrl_hold_title">Nav-Modus bei gehaltenem Ctrl</string>
     <string name="nav_mode_ctrl_hold_description">Wenn aktiv, verwenden Textfelder beim Halten von Ctrl die Nav-Modus-Zuordnungen. Wenn aus, werden Ctrl-Shortcuts an die App weitergegeben. Tasten mit Native Ctrl werden immer als echte Ctrl-Shortcuts durchgereicht.</string>
-    <string name="layout_aware_ctrl_shortcuts_title">App-Ctrl-Shortcuts mit aktivem Layout</string>
-    <string name="layout_aware_ctrl_shortcuts_description">Wenn gehaltenes Ctrl an Apps weitergegeben wird, Ctrl+Buchstabe vorher über das aktive Plektra-Layout übersetzen.</string>
+    <string name="layout_aware_ctrl_shortcuts_title">App-Kürzel folgen dem Tastaturlayout</string>
+    <string name="layout_aware_ctrl_shortcuts_description">Ctrl plus die Taste, die einen Buchstaben schreibt, sendet dessen Kürzel. Beispiel: QWERTZ auf QWERTY-Tasten, die Taste für Z sendet Ctrl+Z (Rückgängig).</string>
     <string name="layout_aware_ctrl_shortcuts_disabled_description">Deaktiviert, solange Navigation mit gehaltenem Ctrl aktiv ist, weil gehaltenes Ctrl dann vom Nav-Modus statt von der App behandelt wird.</string>
     <string name="layout_aware_ctrl_shortcuts_info_title">Ctrl-Shortcuts und Nav-Modus</string>
-    <string name="layout_aware_ctrl_shortcuts_info_text">Für gehaltenes Ctrl gibt es zwei Wege. Wenn Navigation mit gehaltenem Ctrl aktiv ist, behandelt Plektra Ctrl+Taste mit den unten gezeigten Nav-Modus-Zuordnungen. Wenn Navigation mit gehaltenem Ctrl aus ist, gibt Plektra Ctrl+Taste an die App weiter. Diese Option betrifft nur diesen App-Weg: Aktiviert wird Ctrl+Buchstabe vorher über das aktive Plektra-Layout übersetzt, damit Shortcuts den getippten Buchstaben folgen können. Deaktiviert bekommen Apps die ursprünglichen physischen Tastenpositionen.</string>
+    <string name="layout_aware_ctrl_shortcuts_info_text">Ist Navigation mit gehaltenem Ctrl aus, gibt Plektra Ctrl+Taste an die App weiter. Mit dieser Option folgt das Kürzel dem Buchstaben, den dein aktives Plektra-Layout auf dieser Taste schreibt, nicht der aufgedruckten Tastenposition.\n\nBeispiele:\n• QWERTZ-Layout auf QWERTY-Tasten: Die Taste, die Z schreibt, sendet Ctrl+Z zum Rückgängigmachen, die Taste für Y sendet Ctrl+Y zum Wiederholen, sofern die App das unterstützt.\n• AZERTY: Ctrl+A wählt alles aus und Ctrl+W schließt einen Tab an den Positionen, an denen dein Layout A und W schreibt.\n• Colemak oder Dvorak: Ctrl+C, Ctrl+X und Ctrl+V folgen den Buchstaben C, X und V.\n\nNur lateinische Buchstaben a–z werden übersetzt; andere Tasten behalten ihren ursprünglichen Code. Beim Layoutwechsel wandern die Kürzel mit den Buchstaben. Ohne die Option bekommen Apps die physischen Tastenpositionen. Ist Navigation mit gehaltenem Ctrl aktiv, gelten stattdessen die Nav-Modus-Zuordnungen unten; sie werden nicht übersetzt.</string>
     <string name="nav_mode_key_mappings">Tastenzuordnungen</string>
     <string name="nav_mode_revert_to_default">Auf Standard zurücksetzen</string>
     <string name="nav_mode_note">Hinweis: Das Ändern der Nav-Modus-Tasten wirkt sich auch auf Ctrl+Taste-Kombinationen in Textfeldern aus.</string>

@@ -4,10 +4,13 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.text.Selection
+import android.text.Spannable
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
 import kotlinx.coroutines.runBlocking
@@ -249,6 +252,43 @@ class NotesAppearanceTest {
             assertEquals(1, heading.selectionStart)
             assertEquals(6, heading.selectionEnd)
             assertEquals(secondNote.id, repo.active().id)
+        } finally {
+            controller.pause().stop().destroy()
+        }
+    }
+
+    @Test
+    fun retainedNotesKeepsRenderedPreviewSelectionAcrossAppearanceChange() {
+        SettingsManager.setAppAppearancePreferences(
+            context,
+            AppAppearancePreferences(AppThemeMode.LIGHT, AppDarkSurfaceStyle.STANDARD, dynamicColor = false)
+        )
+        val controller = Robolectric.buildActivity(NotesActivity::class.java).setup()
+        try {
+            val activity = controller.get()
+            val editor = activity.findViewById<EditText>(R.id.notes_body)
+            editor.setText("Keep **rendered** preview selection")
+            activity.findViewById<View>(R.id.notes_preview_toggle).performClick()
+            val preview = activity.findViewById<TextView>(R.id.notes_preview_body)
+            val renderedText = preview.text.toString()
+            assertEquals("Keep rendered preview selection", renderedText)
+            val renderedBefore = preview.text
+            Selection.setSelection(preview.text as Spannable, 5, 13)
+
+            controller.pause().stop()
+            SettingsManager.setAppAppearancePreferences(
+                context,
+                AppAppearancePreferences(AppThemeMode.DARK, AppDarkSurfaceStyle.STANDARD, dynamicColor = false)
+            )
+            controller.start().resume().visible()
+
+            assertEquals(Color.rgb(28, 29, 31), rootColor(activity))
+            assertEquals(Color.rgb(237, 237, 235), preview.currentTextColor)
+            assertTrue("Preview must be re-rendered for the new appearance", preview.text !== renderedBefore)
+            assertEquals(renderedText, preview.text.toString())
+            assertEquals(5, preview.selectionStart)
+            assertEquals(13, preview.selectionEnd)
+            assertEquals("Keep **rendered** preview selection", editor.text.toString())
         } finally {
             controller.pause().stop().destroy()
         }

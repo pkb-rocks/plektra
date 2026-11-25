@@ -423,7 +423,16 @@ open class NotesActivity : Activity() {
         }
 
         if (refreshMarkdown && viewMode != ViewMode.MARKDOWN) {
+            val previousText = preview.text.toString()
+            val selectionStart = preview.selectionStart
+            val selectionEnd = preview.selectionEnd
             markwon.setMarkdown(preview, editor.text.toString())
+            // Re-rendering replaces the Spannable and drops a selection made for copying.
+            val rendered = preview.text as? android.text.Spannable
+            if (rendered != null && selectionStart >= 0 && selectionEnd >= 0 && rendered.toString() == previousText) {
+                android.text.Selection.setSelection(rendered, selectionStart.coerceAtMost(rendered.length),
+                    selectionEnd.coerceAtMost(rendered.length))
+            }
         }
     }
 

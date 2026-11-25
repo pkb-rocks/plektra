@@ -18,12 +18,11 @@ import android.widget.ImageView
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -98,7 +97,6 @@ import rocks.pkb.plektra.data.layout.LayoutMappingRepository
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.ui.theme.PlektraTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -129,8 +127,11 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
     private var keyboardLayout: Map<Int, LayoutMapping> = emptyMap()
     private var enterHandledOnKeyDown = false
     private var pendingDismissKeyCode: Int? = null
-    private var dismissRequestId by mutableStateOf(0)
-    private var dismissInProgress = false
+    /**
+     * Set once closing begins, by dismissal or a started command. From then on the launcher takes
+     * no query, Enter or command input, and the activity finishes at once (see [requestAnimatedDismiss]).
+     */
+    private var closing = false
     private var quickLauncherPrefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -191,13 +192,11 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
                         staticTopHighlight = staticTopHighlight,
                         staticTopHighlightColor = staticTopHighlightColor,
                         animationDurationMs = animationDurationMs,
-                        dismissRequestId = dismissRequestId,
                         onCommandSelected = { launchCommand(it) },
                         onCustomizationChanged = { updateCommandCustomization(it) },
                         onCustomizationsReloadRequested = { reloadCommandCustomizations() },
                         onMoveFavorite = { commandId, direction -> moveFavorite(commandId, direction) },
-                        onDismiss = { requestAnimatedDismiss() },
-                        onDismissAnimationFinished = { finish() }
+                        onDismiss = { requestAnimatedDismiss() }
                     )
                 }
             }
@@ -251,6 +250,9 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
     }
 
     private fun handleQuickLauncherKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // Keys that still reach the closing window must neither edit the query nor start a
+        // command. Focus has already moved; only events queued before that land here.
+        if (closing) return true
         if (isSymQuickLauncherToggle(keyCode, event)) {
             return handleDismissKeyDown(keyCode, event)
         }
@@ -391,6 +393,11 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
     }
 
     private fun handleQuickLauncherKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (closing) {
+            pendingDismissKeyCode = null
+            enterHandledOnKeyDown = false
+            return true
+        }
         if (pendingDismissKeyCode == keyCode) {
             return handleDismissKeyUp(keyCode, event)
         }
@@ -446,8 +453,10 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
     }
 
     private fun launchCommand(command: CommandTarget) {
+        if (closing) return
         val result = CommandExecutor(this).execute(command)
         if (result.isSuccess) {
+            beginClosing()
             finish()
         } else {
             Log.w(TAG, "Command failed: ${command.id}")
@@ -470,15 +479,34 @@ class QuickLauncherActivity : LocalizedComponentActivity() {
         return true
     }
 
+    /**
+     * Finishes the activity at once. Only a finished activity hands the activity focus back: the
+     * window manager keeps the focus with the top focusable activity, whatever its window flags.
+     * The editor below and its IME therefore return without waiting for an animation, and
+     * without an editor the IME stays hidden.
+     *
+     * The launcher runs as a task of its own above the editor's app, so closing it is a task
+     * switch. Activity transition overrides do not apply to task switches, and no public API sets
+     * one, so the launcher plays no exit animation of its own: the system's task transition, which
+     * follows the system animation setting, is what remains visible. The animation setting
+     * governs the sheet's entry only.
+     */
     private fun requestAnimatedDismiss() {
-        if (dismissInProgress) return
-        dismissInProgress = true
-        if (animationDurationMs <= 0) {
-            finish()
-        } else {
-            dismissRequestId += 1
-        }
+        if (closing) return
+        beginClosing()
+        finish()
     }
+
+    /** Ends the interactive part of the launcher. No input connection is restored or written to. */
+    private fun beginClosing() {
+        if (closing) return
+        closing = true
+        pendingDismissKeyCode = null
+        enterHandledOnKeyDown = false
+    }
+
+
+    internal fun debugIsClosing(): Boolean = closing
 
     private fun isDismissKey(keyCode: Int): Boolean {
         return keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE
@@ -645,25 +673,16 @@ private fun QuickLauncherSheet(
     staticTopHighlight: Boolean,
     staticTopHighlightColor: Int,
     animationDurationMs: Int,
-    dismissRequestId: Int,
     onCommandSelected: (CommandTarget) -> Unit,
     onCustomizationChanged: (SettingsManager.QuickLauncherCommandCustomization) -> Unit,
     onCustomizationsReloadRequested: () -> Unit,
     onMoveFavorite: (String, Int) -> Unit,
-    onDismiss: () -> Unit,
-    onDismissAnimationFinished: () -> Unit
+    onDismiss: () -> Unit
 ) {
     val maxSheetHeight = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     val visible = remember { MutableTransitionState(false) }
     LaunchedEffect(Unit) {
         visible.targetState = true
-    }
-    LaunchedEffect(dismissRequestId) {
-        if (dismissRequestId > 0) {
-            visible.targetState = false
-            delay(animationDurationMs.toLong().coerceAtLeast(0L))
-            onDismissAnimationFinished()
-        }
     }
     val isCollapsedPill = pillMode && query.isBlank()
     val widthFraction = if (isCollapsedPill) 0.72f else widthPercent.coerceIn(50, 100) / 100f
@@ -702,10 +721,8 @@ private fun QuickLauncherSheet(
             initialOffsetY = { it },
             animationSpec = tween(durationMillis = animationDurationMs)
         ) + fadeIn(animationSpec = tween(durationMillis = (animationDurationMs / 2).coerceAtLeast(0))),
-        exit = slideOutVertically(
-            targetOffsetY = { it },
-            animationSpec = tween(durationMillis = animationDurationMs)
-        ) + fadeOut(animationSpec = tween(durationMillis = (animationDurationMs / 2).coerceAtLeast(0)))
+        // Closing finishes the activity at once, see requestAnimatedDismiss().
+        exit = ExitTransition.None
     ) {
         Surface(
             modifier = Modifier

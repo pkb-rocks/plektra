@@ -171,6 +171,23 @@ class SuggestionPersonalizationAndAddWordTest {
         assertTrue(controller.currentSuggestions().isEmpty())
     }
 
+    @Test
+    fun starterWordsWithoutPersonalizationNeedAConfirmedSentenceEndAtABoundary() {
+        val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
+        listOf('/' to KeyEvent.KEYCODE_SLASH, '(' to KeyEvent.KEYCODE_9, '"' to KeyEvent.KEYCODE_APOSTROPHE,
+            '[' to KeyEvent.KEYCODE_LEFT_BRACKET).forEach { (char, keyCode) ->
+            typeWord(controller, "ich")
+            controller.onBoundaryKey(keyCode, null, textBeforeCursor("ich"), char)
+            assertTrue("after $char", controller.currentSuggestions().isEmpty())
+        }
+        listOf('.' to KeyEvent.KEYCODE_PERIOD, '!' to KeyEvent.KEYCODE_1, '?' to KeyEvent.KEYCODE_SLASH,
+            '\n' to KeyEvent.KEYCODE_ENTER).forEach { (char, keyCode) ->
+            typeWord(controller, "ich")
+            controller.onBoundaryKey(keyCode, null, textBeforeCursor("ich"), char)
+            assertEquals("after $char", listOf("hello", "ich", "help"), controller.currentSuggestions().map { it.candidate })
+        }
+    }
+
     private fun textBeforeCursor(text: String): InputConnection =
         Proxy.newProxyInstance(InputConnection::class.java.classLoader, arrayOf(InputConnection::class.java)) { _, method, _ ->
             when (method.name) {

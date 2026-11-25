@@ -822,7 +822,8 @@ class SuggestionController(
 
         if (!settings.personalizationEnabled) {
             previousCompletedWord = null
-            sentenceStartPending = !isSoftPredictionBoundary(boundaryChar)
+            // Only a confirmed sentence end starts a new sentence; "/", "(" or quotes stay within it.
+            sentenceStartPending = isSentenceEnd(boundaryChar)
             if (sentenceStartPending) publishNeutralStarterSuggestions(suggestionGeneration.get()) else publishEmptySuggestions()
             return
         }
@@ -1095,8 +1096,10 @@ class SuggestionController(
             null
         } ?: return null
         val last = before.trimEnd { it == ' ' || it == '\t' || it == '\u00A0' }.lastOrNull() ?: return true
-        return last in SENTENCE_ENDS
+        return isSentenceEnd(last)
     }
+
+    private fun isSentenceEnd(char: Char?): Boolean = char != null && char in SENTENCE_ENDS
 
     private fun updateSentenceStart(inputConnection: InputConnection?) {
         sentenceStartAt(inputConnection)?.let { sentenceStartPending = it }

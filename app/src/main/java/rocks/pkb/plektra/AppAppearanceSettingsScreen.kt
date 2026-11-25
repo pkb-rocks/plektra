@@ -84,10 +84,11 @@ fun AppAppearanceSettingsScreen(
                 .consumeWindowInsets(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             AppearancePreviewCard(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 preferences = preferences,
                 resolvedDark = resolvedTheme.useDarkTheme,
                 resolvedOled = resolvedTheme.useOledBlack,
@@ -95,18 +96,15 @@ fun AppAppearanceSettingsScreen(
             )
 
             // Theme mode section (System / Light / Dark)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column {
                 AppearanceSectionHeader(
                     title = stringResource(R.string.app_appearance_mode_title),
                     description = stringResource(R.string.app_appearance_mode_description)
                 )
-                Surface(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_THEME_MODE),
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        .settingRow(SettingLinkIds.APP_APPEARANCE_THEME_MODE)
                 ) {
                     Column(
                         modifier = Modifier
@@ -132,7 +130,6 @@ fun AppAppearanceSettingsScreen(
                                 )
                             }
                         )
-                        SectionGroupDivider()
                         AppearanceRadioRow(
                             title = stringResource(R.string.app_appearance_mode_light),
                             description = stringResource(R.string.app_appearance_mode_light_description),
@@ -152,7 +149,6 @@ fun AppAppearanceSettingsScreen(
                                 )
                             }
                         )
-                        SectionGroupDivider()
                         AppearanceRadioRow(
                             title = stringResource(R.string.app_appearance_mode_dark),
                             description = stringResource(R.string.app_appearance_mode_dark_description),
@@ -177,7 +173,7 @@ fun AppAppearanceSettingsScreen(
             }
 
             // Dark surface style section (Gray / OLED black)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column {
                 AppearanceSectionHeader(
                     title = stringResource(R.string.app_appearance_dark_surface_title),
                     description = stringResource(
@@ -188,13 +184,10 @@ fun AppAppearanceSettingsScreen(
                         }
                     )
                 )
-                Surface(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_DARK_SURFACE),
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        .settingRow(SettingLinkIds.APP_APPEARANCE_DARK_SURFACE)
                 ) {
                     Column(
                         modifier = Modifier
@@ -217,7 +210,6 @@ fun AppAppearanceSettingsScreen(
                                 )
                             }
                         )
-                        SectionGroupDivider()
                         AppearanceRadioRow(
                             title = stringResource(R.string.app_appearance_dark_surface_oled),
                             description = stringResource(R.string.app_appearance_dark_surface_oled_description),
@@ -239,17 +231,14 @@ fun AppAppearanceSettingsScreen(
             }
 
             // Dynamic system color toggle
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column {
                 AppearanceSectionHeader(
                     title = stringResource(R.string.app_appearance_color_title)
                 )
-                Surface(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR),
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        .settingRow(SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR)
                 ) {
                     val checked = preferences.dynamicColor && dynamicColorSupported
                     Row(
@@ -314,15 +303,15 @@ fun AppAppearanceSettingsScreen(
                 text = stringResource(R.string.app_appearance_scope_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 4.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
 @Composable
 private fun AppearancePreviewCard(
+    modifier: Modifier = Modifier,
     preferences: AppAppearancePreferences,
     resolvedDark: Boolean,
     resolvedOled: Boolean,
@@ -342,7 +331,7 @@ private fun AppearancePreviewCard(
     )
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clearAndSetSemantics {
                 contentDescription = previewAccessibility
@@ -549,23 +538,14 @@ private fun AppearanceSectionHeader(
     title: String,
     description: String? = null
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
-        )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SettingsSectionLabel(title)
         if (description != null) {
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
     }
@@ -620,14 +600,6 @@ private fun AppearanceRadioRow(
     }
 }
 
-@Composable
-private fun SectionGroupDivider() {
-    HorizontalDivider(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
-    )
-}
-
 fun currentAppAppearanceSummary(
     context: Context,
     preferences: AppAppearancePreferences = SettingsManager.getAppAppearancePreferences(context)
@@ -646,5 +618,5 @@ fun currentAppAppearanceSummary(
     if (preferences.dynamicColor && AppThemeResolver.isDynamicColorSupported()) {
         parts += context.getString(R.string.app_appearance_summary_dynamic)
     }
-    return parts.joinToString(" · ")
+    return parts.joinToString(", ")
 }

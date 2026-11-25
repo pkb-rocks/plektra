@@ -1665,6 +1665,11 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="extended_status_bar_title">Full keyboard bar</string>
     <string name="keyboard_bar_show_on_launcher">Show bar on the launcher home screen</string>
     <string name="keyboard_bar_show_on_launcher_description">Also show the bar when Niagara uses an invisible input field on its home screen.</string>
+    <string name="hardware_only_mode_title">Hardware keyboard only</string>
+    <string name="hardware_only_mode_description">Plektra shows nothing on screen in any app: no bar, on-screen keyboard, SYM pages, emoji picker, clipboard or caret badge, even when you open them with a key or shortcut. Typing on the physical keyboard keeps working, including modifiers, shortcuts and hardware SYM layers. Useful with TalkBack or whenever you type only on the keyboard.</string>
+    <string name="hardware_only_mode_no_keyboard_title">No physical keyboard detected</string>
+    <string name="hardware_only_mode_no_keyboard_message">Plektra does not detect a physical keyboard right now. In hardware-only mode Plektra shows no on-screen keyboard, so you can type only with a keyboard that is connected. You can turn the mode off again here in Plektra’s settings.</string>
+    <string name="hardware_only_mode_no_keyboard_confirm">Turn on</string>
     <string name="keyboard_bar_hidden_apps_title">Never show the bar</string>
     <string name="keyboard_bar_hidden_apps_row_description">Apps in which the bar stays hidden, even when opened manually</string>
     <string name="keyboard_bar_hidden_apps_summary_none">No apps selected</string>

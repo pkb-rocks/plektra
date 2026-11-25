@@ -68,6 +68,8 @@ internal fun KeyboardBarSettingsScreen(
     var suggestionsBold by remember { mutableStateOf(SettingsManager.getSuggestionsBold(context)) }
     var showOnLauncher by remember { mutableStateOf(SettingsManager.getShowKeyboardBarOnLauncher(context)) }
     var hiddenAppCount by remember { mutableStateOf(SettingsManager.getKeyboardBarHiddenPackages(context).size) }
+    var hardwareOnly by remember { mutableStateOf(SettingsManager.getHardwareOnlyMode(context)) }
+    var hardwareOnlyConfirmation by remember { mutableStateOf(false) }
     var indicators by remember { mutableStateOf(SettingsManager.getModifierIndicators(context)) }
     var variationsVisible by remember {
         mutableStateOf(SettingsManager.areStatusBarVariationsEnabled(context))
@@ -108,6 +110,7 @@ internal fun KeyboardBarSettingsScreen(
             rightSlots = SettingsManager.getStatusBarSlotsRight(context)
             showOnLauncher = SettingsManager.getShowKeyboardBarOnLauncher(context)
             hiddenAppCount = SettingsManager.getKeyboardBarHiddenPackages(context).size
+            hardwareOnly = SettingsManager.getHardwareOnlyMode(context)
             dynamicVariationSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
             dynamicVariationsResizeToContent = SettingsManager.getDynamicVariationBarResizeToContent(context)
         }
@@ -247,6 +250,16 @@ internal fun KeyboardBarSettingsScreen(
                 ImeCaptionBarSettings.open(context)
             }
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_visibility_section))
+            KeyboardBarCheckRow(stringResource(R.string.hardware_only_mode_title), hardwareOnly,
+                SettingLinkIds.KEYBOARD_BAR_HARDWARE_ONLY, stringResource(R.string.hardware_only_mode_description)) { enabled ->
+                // Only a missing keyboard needs a warning; detection can miss one, so it never blocks the choice.
+                if (enabled && !rocks.pkb.plektra.inputmethod.DeviceSpecific.hasConnectedHardwareKeyboard()) {
+                    hardwareOnlyConfirmation = true
+                } else {
+                    hardwareOnly = enabled
+                    SettingsManager.setHardwareOnlyMode(context, enabled)
+                }
+            }
             KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_show_on_launcher), showOnLauncher,
                 "status_bar.show_on_launcher", stringResource(R.string.keyboard_bar_show_on_launcher_description)) {
                 showOnLauncher = it; SettingsManager.setShowKeyboardBarOnLauncher(context, it)
@@ -391,6 +404,19 @@ internal fun KeyboardBarSettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+
+    if (hardwareOnlyConfirmation) {
+        AlertDialog(onDismissRequest = { hardwareOnlyConfirmation = false },
+            title = { Text(stringResource(R.string.hardware_only_mode_no_keyboard_title)) },
+            text = { Text(stringResource(R.string.hardware_only_mode_no_keyboard_message)) },
+            dismissButton = { TextButton(onClick = { hardwareOnlyConfirmation = false }) {
+                Text(stringResource(android.R.string.cancel)) } },
+            confirmButton = { TextButton(onClick = {
+                hardwareOnly = true
+                SettingsManager.setHardwareOnlyMode(context, true)
+                hardwareOnlyConfirmation = false
+            }) { Text(stringResource(R.string.hardware_only_mode_no_keyboard_confirm)) } })
     }
 
     if (resetConfirmation) {

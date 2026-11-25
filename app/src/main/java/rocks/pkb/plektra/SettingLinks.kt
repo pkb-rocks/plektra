@@ -87,6 +87,7 @@ object SettingLinkIds {
     // Accessibility screen
     const val ACCESSIBILITY_LIVE_READ = "accessibility.live_read"
     const val ACCESSIBILITY_READ_SECOND_ROW = "accessibility.read_second_row"
+    const val KEYBOARD_BAR_HARDWARE_ONLY = "status_bar.hardware_only"
     const val ACCESSIBILITY_SUGGESTIONS_DELAY = "accessibility.suggestions_delay"
     const val ACCESSIBILITY_BOUNCE_KEYS = "accessibility.bounce_keys"
     const val ACCESSIBILITY_BOUNCE_KEYS_CHARACTER_KEYS = "accessibility.bounce_keys_character_keys"
@@ -1002,6 +1003,13 @@ object SettingLinkRegistry {
             "status_bar.show_on_launcher",
             R.string.keyboard_bar_show_on_launcher,
             R.string.keyboard_bar_show_on_launcher_description,
+            destination = SettingsDestination.Customization,
+            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
+        ),
+        entry(
+            SettingLinkIds.KEYBOARD_BAR_HARDWARE_ONLY,
+            R.string.hardware_only_mode_title,
+            R.string.hardware_only_mode_description,
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
         ),

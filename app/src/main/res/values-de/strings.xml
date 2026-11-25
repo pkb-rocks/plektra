@@ -1512,6 +1512,11 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="titan2_elite_max_icon_shrink_description">Verkleinert äußere Buttonsymbole automatisch nur bei Bedarf bis zu dieser Grenze. 0% schaltet die Verkleinerung aus; die Positionierung bleibt aktiv.</string>
     <string name="keyboard_bar_show_on_launcher">Leiste auf dem Launcher-Startbildschirm anzeigen</string>
     <string name="keyboard_bar_show_on_launcher_description">Leiste auch anzeigen, wenn Niagara auf dem Startbildschirm ein unsichtbares Eingabefeld verwendet.</string>
+    <string name="hardware_only_mode_title">Nur Hardware-Tastatur</string>
+    <string name="hardware_only_mode_description">Plektra zeigt in keiner App etwas auf dem Bildschirm an: weder Leiste noch Bildschirmtastatur, SYM-Seiten, Emoji-Auswahl, Zwischenablage oder Modifier-Anzeige am Cursor – auch nicht beim Öffnen per Taste oder Kürzel. Die physische Tastatur tippt weiter, einschließlich Modifikatoren, Kürzeln und Hardware-SYM-Ebenen. Nützlich mit TalkBack oder immer dann, wenn du nur auf der Tastatur tippst.</string>
+    <string name="hardware_only_mode_no_keyboard_title">Keine physische Tastatur erkannt</string>
+    <string name="hardware_only_mode_no_keyboard_message">Plektra erkennt gerade keine physische Tastatur. Im Modus »Nur Hardware-Tastatur« zeigt Plektra keine Bildschirmtastatur an; tippen kannst du dann nur mit einer angeschlossenen Tastatur. Hier in Plektras Einstellungen kannst du den Modus wieder ausschalten.</string>
+    <string name="hardware_only_mode_no_keyboard_confirm">Einschalten</string>
     <string name="keyboard_bar_hidden_apps_title">Leiste niemals anzeigen</string>
     <string name="keyboard_bar_hidden_apps_row_description">Apps, in denen die Leiste verborgen bleibt – auch beim manuellen Öffnen</string>
     <string name="keyboard_bar_hidden_apps_summary_none">Keine Apps ausgewählt</string>

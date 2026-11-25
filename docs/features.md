@@ -42,5 +42,6 @@ Plektra stores its input data locally. Backups can include settings, layouts, ma
 - Configurable TalkBack announcements for keyboard bar changes
 - Adjustable suggestion reading delays
 - Bounce Keys for accidental repeated physical-key presses
+- **Hardware keyboard only** (Keyboard bar → Visibility): Plektra shows no on-screen surface in any app, including SYM pages, the emoji picker, the clipboard and the caret badge. Physical typing, modifiers, shortcuts and hardware SYM layers keep working. Per-app »Never show the bar« stays available for single apps
 
 See the [visual feature presentation](showcase/README.md).

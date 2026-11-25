@@ -99,6 +99,14 @@ def digest(path):
     return result.hexdigest()
 
 
+# Failures of a device, transport or local file operation; anything else is a programming error.
+RECOVERABLE = (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError, tarfile.TarError)
+
+
+def describe(error):
+    return str(error) or type(error).__name__
+
+
 def regenerable(archive_name, member_name):
     """True for archive members that the app rebuilds and the helper therefore never restores."""
     parts = Path(member_name).parts
@@ -299,23 +307,40 @@ class Device:
         metadata = self.validate_backup(backup)
         speech_payload(values)
         require_replacement_keys(backup / CREDENTIAL_DATA, values)
-        failure = None
-        with self.stopped():
-            try:
-                self.restore_data(backup)
-            except RuntimeError as error:
+        failure, unfinished = None, []
+        try:
+            with self.stopped():
+                try:
+                    self.restore_data(backup)
+                except RECOVERABLE as error:
+                    failure = error
+                # Permissions and keyboard selection do not depend on the data and are always attempted.
+                for permission in metadata['permissions']:
+                    try:
+                        self.shell('pm', 'grant', self.package, permission)
+                    except RECOVERABLE as error:
+                        unfinished.append('runtime permission ' + permission + ': ' + describe(error))
+                if not failure and not unfinished and any(name.endswith('_key') for name in speech_payload(values)):
+                    self.speech(values)
+        except RECOVERABLE as error:
+            if failure:
+                unfinished.append('app stop or restart: ' + describe(error))
+            else:
                 failure = error
-            # Permissions and keyboard selection do not depend on the data and are always restored.
-            for permission in metadata['permissions']:
-                self.shell('pm', 'grant', self.package, permission)
-            if not failure and any(name.endswith('_key') for name in speech_payload(values)):
-                self.speech(values)
         if metadata['ime'].startswith(self.package + '/'):
-            self.shell('ime', 'enable', metadata['ime'])
-            self.shell('ime', 'set', metadata['ime'])
+            try:
+                self.shell('ime', 'enable', metadata['ime'])
+                self.shell('ime', 'set', metadata['ime'])
+            except RECOVERABLE as error:
+                unfinished.append('keyboard selection ' + metadata['ime'] + ': ' + describe(error))
+        for item in unfinished:
+            print('Not restored: ' + item, file=sys.stderr)
         if failure:
-            print('Runtime permissions and keyboard selection restored; app data was not.', file=sys.stderr)
+            print('App data was not restored completely; permissions and keyboard selection were '
+                  + ('attempted, see above.' if unfinished else 'restored.'), file=sys.stderr)
             raise failure
+        if unfinished:
+            raise RuntimeError('App data restored, but ' + str(len(unfinished)) + ' finishing step(s) failed')
         print('App data hashes, runtime permissions and keyboard selection restored.')
         if metadata['ime'].startswith(self.package + '/'):
             self.await_snapshot()
@@ -406,7 +431,7 @@ if __name__ == '__main__':
     try:
         os.umask(0o077)
         main()
-    except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError, tarfile.TarError) as error:
+    except RECOVERABLE as error:
         # Messages name operations, paths and archive members; keys only travel on stdin.
-        print('Debug device operation failed: ' + (str(error) or type(error).__name__) + '. Backups are retained.', file=sys.stderr)
+        print('Debug device operation failed: ' + describe(error) + '. Backups are retained.', file=sys.stderr)
         sys.exit(1)

@@ -276,6 +276,57 @@ class DebugDeviceTest(unittest.TestCase):
                 app.restore(backup)
         self.assertEqual(device.package + '/.KeyboardService', app.selected)
 
+    def test_every_recoverable_data_failure_still_restores_permissions_and_backup_ime(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        failures = [RuntimeError('data'), debug.subprocess.TimeoutExpired(['adb'], 180), OSError('disk'),
+                    debug.tarfile.TarError('archive')]
+        for failure in failures:
+            with self.subTest(type(failure).__name__), tempfile.TemporaryDirectory() as folder:
+                backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+                app = FakeApp(self, device)
+                with patch.object(device, 'restore_data', side_effect=failure):
+                    with self.assertRaises(type(failure)) as raised:
+                        app.restore(backup)
+                self.assertIs(failure, raised.exception)
+                self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
+                self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_failed_grant_neither_blocks_the_ime_nor_hides_the_data_failure(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        app = FakeApp(self, device)
+        original = app.shell
+        def shell(*args, **kwargs):
+            if args[:2] == ('pm', 'grant'):
+                raise RuntimeError('ADB operation failed: shell')
+            return original(*args, **kwargs)
+        app.shell = shell
+        data_failure = OSError('disk')
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            stderr = io.StringIO()
+            with patch.object(device, 'restore_data', side_effect=data_failure), patch.object(debug.sys, 'stderr', stderr):
+                with self.assertRaises(OSError) as raised:
+                    app.restore(backup)
+        self.assertIs(data_failure, raised.exception)
+        self.assertEqual(device.package + '/.KeyboardService', app.selected)
+        self.assertIn('Not restored: runtime permission android.permission.RECORD_AUDIO', stderr.getvalue())
+
+    def test_failed_finishing_step_after_good_data_is_reported_as_failure(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        app = FakeApp(self, device)
+        original = app.shell
+        def shell(*args, **kwargs):
+            if args[:2] == ('ime', 'set'):
+                raise RuntimeError('ADB operation failed: shell')
+            return original(*args, **kwargs)
+        app.shell = shell
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            with patch.object(debug.sys, 'stderr', io.StringIO()):
+                with self.assertRaisesRegex(RuntimeError, 'finishing step'):
+                    app.restore(backup)
+        self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
+
     def test_backup_never_archives_regenerable_data(self):
         self.assertIn('--exclude=./files/direct_boot_files', debug.tar_excludes(debug.DEVICE_DATA))
         self.assertTrue(debug.regenerable(debug.DEVICE_DATA, './files/direct_boot_files/current'))

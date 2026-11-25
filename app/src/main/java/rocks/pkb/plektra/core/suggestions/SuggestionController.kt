@@ -57,10 +57,8 @@ class SuggestionController(
         },
         onWordReset = {
             cancelPendingWordSuggestions()
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
             pendingAddUserWord = null
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
         },
         autoSpacePunctuationProvider = { settingsProvider().autoSpacePunctuation }
     )
@@ -147,9 +145,7 @@ class SuggestionController(
             tracker.reset()
         }
         pendingAddUserWord = null
-        latestSuggestionsPersonalized = false
-        latestSuggestions.set(emptyList())
-        suggestionsListener?.invoke(emptyList())
+        publishEmptySuggestions()
         // Keep the active word and pending cursor context when only dictionary files changed.
         schedulePrimaryDictionaryLoad(refreshAfterLoad = true)
     }
@@ -164,6 +160,9 @@ class SuggestionController(
 
     private val latestSuggestions: AtomicReference<List<SuggestionResult>> = AtomicReference(emptyList())
     @Volatile private var latestSuggestionsPersonalized: Boolean = false
+    // Orders final suggestion publication (cache write + listener delivery) against cross-thread
+    // OFF invalidation without ever holding this lock across repository lookups or background UI calls.
+    private val publishLock = Any()
     // Dedicated IO scope so dictionary preload never blocks the main thread.
     private val loadScope = CoroutineScope(Dispatchers.IO)
     private val suggestionScope = CoroutineScope(Dispatchers.Default)
@@ -181,18 +180,57 @@ class SuggestionController(
     private var sentenceStartPending: Boolean = true
 
     private fun cancelPendingWordSuggestions() {
-        suggestionGeneration.incrementAndGet()
-        suggestionJob.getAndSet(null)?.cancel()
+        val jobToCancel = synchronized(publishLock) {
+            suggestionGeneration.incrementAndGet()
+            suggestionJob.getAndSet(null)
+        }
+        jobToCancel?.cancel()
+    }
+
+    private fun publishEmptySuggestions() {
+        synchronized(publishLock) {
+            latestSuggestionsPersonalized = false
+            latestSuggestions.set(emptyList())
+            suggestionsListener?.invoke(emptyList())
+        }
+    }
+
+    private fun publishPersonalizedSuggestions(
+        suggestions: List<SuggestionResult>,
+        generation: Int
+    ) {
+        synchronized(publishLock) {
+            val currentSettings = settingsProvider()
+            if (
+                !isEnabled() ||
+                !currentSettings.suggestionsEnabled ||
+                !currentSettings.personalizationEnabled ||
+                generation != suggestionGeneration.get()
+            ) {
+                latestSuggestionsPersonalized = false
+                latestSuggestions.set(emptyList())
+                suggestionsListener?.invoke(emptyList())
+                return
+            }
+            latestSuggestionsPersonalized = suggestions.isNotEmpty()
+            latestSuggestions.set(suggestions)
+            suggestionsListener?.invoke(suggestions)
+        }
     }
 
     /**
      * Thread-safe immediate privacy barrier used when personalization is turned off from a
      * non-main thread (for example, live backup restore) before [onSettingsChanged] runs on main.
+     * Performs no repository lookups or UI callbacks; cancels any active job outside [publishLock].
      */
     fun invalidatePersonalizedSuggestionsImmediately() {
-        cancelPendingWordSuggestions()
-        latestSuggestionsPersonalized = false
-        latestSuggestions.set(emptyList())
+        val jobToCancel = synchronized(publishLock) {
+            suggestionGeneration.incrementAndGet()
+            latestSuggestionsPersonalized = false
+            latestSuggestions.set(emptyList())
+            suggestionJob.getAndSet(null)
+        }
+        jobToCancel?.cancel()
     }
 
     private fun updateSuggestionsForWord(
@@ -203,31 +241,48 @@ class SuggestionController(
         if (!isEnabled() || !settings.suggestionsEnabled || word.isBlank() || word.length > 48) {
             cancelPendingWordSuggestions()
             pendingAddUserWord = null
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
         if (debugLogging) {
             Log.d("PlektraIME", "trackerWordChanged='$word' len=${word.length}")
         }
 
-        val generation = suggestionGeneration.incrementAndGet()
-        suggestionJob.getAndSet(null)?.cancel()
-        if (clearPublishedSuggestions || (!settings.personalizationEnabled && latestSuggestionsPersonalized)) {
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-        }
-
         val wordSnapshot = word
         val localeSnapshot = currentLocale
         val layoutSnapshot = keyboardLayoutProvider()
         val primaryRepository = dictionaryRepository
-        val personalizedSnapshot = settings.personalizationEnabled
-        // This is a bounded hash lookup, independent of expensive suggestion ranking.
-        // Publish the new label immediately rather than hiding the add button until results arrive.
-        pendingAddUserWord = addWordCandidateFor(wordSnapshot, primaryRepository, settings)
-        suggestionsListener?.invoke(latestSuggestions.get())
+        // Bounded hash lookup stays strictly outside publishLock.
+        val initialPendingCandidate = addWordCandidateFor(wordSnapshot, primaryRepository, settings)
+
+        var generation = 0
+        var activeSettings = settings
+        var shouldLaunch = false
+        var previousJob: Job? = null
+        synchronized(publishLock) {
+            val currentSettings = settingsProvider()
+            previousJob = suggestionJob.getAndSet(null)
+            generation = suggestionGeneration.incrementAndGet()
+            if (!isEnabled() || !currentSettings.suggestionsEnabled) {
+                pendingAddUserWord = null
+                latestSuggestionsPersonalized = false
+                latestSuggestions.set(emptyList())
+                suggestionsListener?.invoke(emptyList())
+            } else {
+                activeSettings = currentSettings
+                if (clearPublishedSuggestions || (!currentSettings.personalizationEnabled && latestSuggestionsPersonalized)) {
+                    latestSuggestionsPersonalized = false
+                    latestSuggestions.set(emptyList())
+                }
+                pendingAddUserWord = if (currentSettings.showAddWordButton) initialPendingCandidate else null
+                suggestionsListener?.invoke(latestSuggestions.get())
+                shouldLaunch = true
+            }
+        }
+        previousJob?.cancel()
+        if (!shouldLaunch) return
+
+        val personalizedSnapshot = activeSettings.personalizationEnabled
         val extraRepositories = activeExtraSuggestionEngines().mapNotNull { extra ->
             if (!extra.repository.isReady) {
                 scheduleRepositoryLoad(extra.repository, refreshAfterLoad = true)
@@ -247,10 +302,10 @@ class SuggestionController(
                     setKeyboardLayout(layoutSnapshot)
                 }.suggest(
                     wordSnapshot,
-                    settings.maxSuggestions,
-                    settings.accentMatching,
-                    settings.useKeyboardProximity,
-                    settings.useEditTypeRanking,
+                    activeSettings.maxSuggestions,
+                    activeSettings.accentMatching,
+                    activeSettings.useKeyboardProximity,
+                    activeSettings.useEditTypeRanking,
                     personalizedSnapshot
                 )
             } else {
@@ -264,10 +319,10 @@ class SuggestionController(
                     setKeyboardLayout(layoutSnapshot)
                 }.suggest(
                     wordSnapshot,
-                    settings.maxSuggestions,
-                    settings.accentMatching,
-                    settings.useKeyboardProximity,
-                    settings.useEditTypeRanking,
+                    activeSettings.maxSuggestions,
+                    activeSettings.accentMatching,
+                    activeSettings.useKeyboardProximity,
+                    activeSettings.useEditTypeRanking,
                     personalizedSnapshot
                 )
             }
@@ -275,30 +330,48 @@ class SuggestionController(
             coroutineContext.ensureActive()
             if (generation != suggestionGeneration.get()) return@launch
             if (personalizedSnapshot && !settingsProvider().personalizationEnabled) return@launch
-            val next = mergeSuggestionResults(primary, extraSuggestions, settings.maxSuggestions, localeSnapshot)
+            val next = mergeSuggestionResults(primary, extraSuggestions, activeSettings.maxSuggestions, localeSnapshot)
 
             cursorHandler.post {
-                val currentSettings = settingsProvider()
+                val preCheckSettings = settingsProvider()
                 if (
                     !isEnabled() ||
-                    !currentSettings.suggestionsEnabled ||
+                    !preCheckSettings.suggestionsEnabled ||
                     generation != suggestionGeneration.get() ||
                     tracker.currentWord != wordSnapshot ||
-                    (personalizedSnapshot && !currentSettings.personalizationEnabled)
+                    (personalizedSnapshot && !preCheckSettings.personalizationEnabled)
                 ) {
                     return@post
                 }
-                pendingAddUserWord = addWordCandidateFor(wordSnapshot, primaryRepository, currentSettings)
-                latestSuggestionsPersonalized = personalizedSnapshot && next.isNotEmpty()
-                latestSuggestions.set(next)
-                suggestionsListener?.invoke(next)
+                // Repository lookup runs strictly outside publishLock.
+                val pendingCandidate = addWordCandidateFor(wordSnapshot, primaryRepository, preCheckSettings)
+
+                synchronized(publishLock) {
+                    val currentSettings = settingsProvider()
+                    if (
+                        !isEnabled() ||
+                        !currentSettings.suggestionsEnabled ||
+                        generation != suggestionGeneration.get() ||
+                        tracker.currentWord != wordSnapshot ||
+                        (personalizedSnapshot && !currentSettings.personalizationEnabled)
+                    ) {
+                        return@post
+                    }
+                    pendingAddUserWord = if (currentSettings.showAddWordButton) pendingCandidate else null
+                    latestSuggestionsPersonalized = personalizedSnapshot && next.isNotEmpty()
+                    latestSuggestions.set(next)
+                    suggestionsListener?.invoke(next)
+                }
             }
         }
-        suggestionJob.set(launchedJob)
-        if (generation != suggestionGeneration.get()) {
-            suggestionJob.compareAndSet(launchedJob, null)
-            launchedJob.cancel()
+        val jobToCancel = synchronized(publishLock) {
+            if (generation == suggestionGeneration.get()) {
+                suggestionJob.getAndSet(launchedJob)
+            } else {
+                launchedJob
+            }
         }
+        jobToCancel?.cancel()
     }
 
     private fun addWordCandidateFor(
@@ -458,13 +531,11 @@ class SuggestionController(
         cursorRunnable = null
         pendingInitialContextConnection = null
         cancelPendingWordSuggestions()
-        latestSuggestionsPersonalized = false
-        latestSuggestions.set(emptyList())
         tracker.onContextChanged()
         pendingAddUserWord = null
         previousCompletedWord = null
         sentenceStartPending = true
-        suggestionsListener?.invoke(emptyList())
+        publishEmptySuggestions()
     }
 
     fun onNavModeToggle() {
@@ -553,9 +624,17 @@ class SuggestionController(
         } else {
             remaining
         }
-        latestSuggestionsPersonalized = settings.personalizationEnabled && next.isNotEmpty()
-        latestSuggestions.set(next)
-        suggestionsListener?.invoke(next)
+        synchronized(publishLock) {
+            val currentSettings = settingsProvider()
+            val safeNext = if (currentSettings.personalizationEnabled) {
+                next
+            } else {
+                next.filter { it.kind == SuggestionKind.CURRENT_WORD }
+            }
+            latestSuggestionsPersonalized = currentSettings.personalizationEnabled && safeNext.isNotEmpty()
+            latestSuggestions.set(safeNext)
+            suggestionsListener?.invoke(safeNext)
+        }
     }
 
     private fun forgetNextWordSuggestion(candidate: String, hardDeleteEverywhere: Boolean) {
@@ -617,15 +696,15 @@ class SuggestionController(
         if (!isEnabled() || !settings.suggestionsEnabled) {
             pendingAddUserWord = null
             previousCompletedWord = null
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
         if (!settings.personalizationEnabled) {
             previousCompletedWord = null
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
+            synchronized(publishLock) {
+                latestSuggestionsPersonalized = false
+                latestSuggestions.set(emptyList())
+            }
         }
         val activeWord = tracker.currentWord.takeIf { it.isNotBlank() }
             ?: extractWordAtCursor(inputConnection)?.takeIf { it.isNotBlank() }
@@ -640,17 +719,13 @@ class SuggestionController(
         } else {
             pendingAddUserWord = null
             if (!settings.personalizationEnabled) {
-                latestSuggestionsPersonalized = false
-                latestSuggestions.set(emptyList())
-                suggestionsListener?.invoke(emptyList())
+                publishEmptySuggestions()
             } else if (previousCompletedWord != null) {
                 publishNextWordPredictions(previousCompletedWord!!)
             } else if (dictionaryRepository.isReady) {
                 publishSentenceStartPredictionsOrStarter()
             } else {
-                latestSuggestionsPersonalized = false
-                latestSuggestions.set(emptyList())
-                suggestionsListener?.invoke(emptyList())
+                publishEmptySuggestions()
             }
         }
     }
@@ -675,18 +750,14 @@ class SuggestionController(
         val settings = settingsProvider()
         if (!isEnabled() || !settings.suggestionsEnabled || !isStorageAvailable()) {
             previousCompletedWord = null
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
 
         if (!settings.personalizationEnabled) {
             previousCompletedWord = null
             sentenceStartPending = !isSoftPredictionBoundary(boundaryChar)
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
 
@@ -711,27 +782,22 @@ class SuggestionController(
                 if (previous != null) {
                     publishNextWordPredictions(previous)
                 } else {
-                    latestSuggestionsPersonalized = false
-                    latestSuggestions.set(emptyList())
-                    suggestionsListener?.invoke(emptyList())
+                    publishEmptySuggestions()
                 }
             }
             else -> {
                 previousCompletedWord = null
                 sentenceStartPending = true
-                latestSuggestionsPersonalized = false
-                latestSuggestions.set(emptyList())
-                suggestionsListener?.invoke(emptyList())
+                publishEmptySuggestions()
             }
         }
     }
 
     private fun publishNextWordPredictions(previousWord: String) {
+        val generation = suggestionGeneration.get()
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled || !settings.personalizationEnabled) {
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
         val primary = nextWordPredictor.predict(
@@ -745,20 +811,17 @@ class SuggestionController(
         val predictions = mergeSuggestionResults(primary, extras, settings.maxSuggestions)
         val suggestions = fillWithStarterSuggestions(predictions, settings)
         if (suggestions.isNotEmpty()) {
-            latestSuggestionsPersonalized = true
-            latestSuggestions.set(suggestions)
-            suggestionsListener?.invoke(suggestions)
+            publishPersonalizedSuggestions(suggestions, generation)
         } else {
             publishStarterSuggestions()
         }
     }
 
     private fun publishSentenceStartPredictionsOrStarter() {
+        val generation = suggestionGeneration.get()
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled || !settings.personalizationEnabled) {
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
         val primary = nextWordPredictor.predictSentenceStart(currentLocale, settings.maxSuggestions)
@@ -768,27 +831,22 @@ class SuggestionController(
         val predictions = mergeSuggestionResults(primary, extras, settings.maxSuggestions)
         val suggestions = fillWithStarterSuggestions(predictions, settings)
         if (suggestions.isNotEmpty()) {
-            latestSuggestionsPersonalized = true
-            latestSuggestions.set(suggestions)
-            suggestionsListener?.invoke(suggestions)
+            publishPersonalizedSuggestions(suggestions, generation)
         } else {
             publishStarterSuggestions()
         }
     }
 
     private fun publishStarterSuggestions() {
+        val generation = suggestionGeneration.get()
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled || !settings.personalizationEnabled || !dictionaryRepository.isReady) {
-            latestSuggestionsPersonalized = false
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
 
         val suggestions = starterSuggestions(settings)
-        latestSuggestionsPersonalized = suggestions.isNotEmpty()
-        latestSuggestions.set(suggestions)
-        suggestionsListener?.invoke(suggestions)
+        publishPersonalizedSuggestions(suggestions, generation)
     }
 
     private fun starterSuggestions(settings: SuggestionSettings): List<SuggestionResult> {

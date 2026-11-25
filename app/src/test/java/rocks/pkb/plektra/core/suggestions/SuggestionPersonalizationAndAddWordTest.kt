@@ -11,8 +11,11 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import java.lang.reflect.Proxy
 import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -21,12 +24,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.core.InputContextState
+import rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodService
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
@@ -635,6 +640,168 @@ class SuggestionPersonalizationAndAddWordTest {
             snapshots.subList(snapshotIndexBeforeRestore, snapshots.size)
                 .none { list -> list.any { it.candidate == "hellhound" } }
         )
+    }
+
+    @Test
+    fun crossThreadInvalidation_beatsAlreadyRunningMainPublish_andRecomputesNeutralDictionaryResults() {
+        val realRepo = AndroidDictionaryRepository(
+            context = context,
+            assets = context.assets,
+            userDictionaryStore = UserDictionaryStore(),
+            baseLocale = Locale.ENGLISH
+        ).apply {
+            isReady = true
+            index(
+                listOf(
+                    DictionaryEntry("hello", 220, SuggestionSource.MAIN),
+                    DictionaryEntry("help", 200, SuggestionSource.MAIN),
+                    DictionaryEntry("held", 180, SuggestionSource.MAIN),
+                    DictionaryEntry("hellhound", 250, SuggestionSource.USER)
+                )
+            )
+            buildSymSpell()
+        }
+
+        val personalizationEnabled = AtomicBoolean(true)
+        val armedForPublish = AtomicBoolean(false)
+        val computedOnBackground = CountDownLatch(1)
+        val mainPausedInsideIsKnownWord = CountDownLatch(1)
+        val backgroundInvalidationCompleted = CountDownLatch(1)
+        val workerFailure = AtomicReference<Throwable?>(null)
+        val listenerEventsAfterBarrier = CopyOnWriteArrayList<List<SuggestionResult>>()
+        val barrierCompleted = AtomicBoolean(false)
+        val listenerCalledOffMain = AtomicBoolean(false)
+
+        val wrappedRepo = Proxy.newProxyInstance(
+            DictionaryRepository::class.java.classLoader,
+            arrayOf(DictionaryRepository::class.java)
+        ) { _, method, args ->
+            if (method.name == "isKnownWord" && armedForPublish.compareAndSet(true, false)) {
+                mainPausedInsideIsKnownWord.countDown()
+                assertTrue(
+                    "Background invalidation thread must not deadlock on main publish",
+                    backgroundInvalidationCompleted.await(3, TimeUnit.SECONDS)
+                )
+            }
+            val result = if (args == null) method.invoke(realRepo) else method.invoke(realRepo, *args)
+            if (method.name == "symSpellLookup") {
+                computedOnBackground.countDown()
+            }
+            result
+        } as DictionaryRepository
+
+        val service = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java).get()
+        val inputContextStateField = PhysicalKeyboardInputMethodService::class.java.getDeclaredField("inputContextState").apply {
+            isAccessible = true
+        }
+        inputContextStateField.set(
+            service,
+            InputContextState.fromEditorInfo(
+                EditorInfo().apply {
+                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
+                }
+            )
+        )
+        val handleSuggestionsUpdated = PhysicalKeyboardInputMethodService::class.java.getDeclaredMethod(
+            "handleSuggestionsUpdated",
+            List::class.java
+        ).apply { isAccessible = true }
+        val latestServiceResultsField = PhysicalKeyboardInputMethodService::class.java.getDeclaredField("latestSuggestionResults").apply {
+            isAccessible = true
+        }
+
+        val controller = SuggestionController(
+            context = context,
+            assets = context.assets,
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    personalizationEnabled = personalizationEnabled.get(),
+                    showAddWordButton = true,
+                    maxSuggestions = 3
+                )
+            },
+            onSuggestionsUpdated = { list ->
+                if (Thread.currentThread() !== Looper.getMainLooper().thread) {
+                    listenerCalledOffMain.set(true)
+                }
+                snapshots.add(list)
+                if (barrierCompleted.get()) {
+                    listenerEventsAfterBarrier.add(list)
+                }
+                handleSuggestionsUpdated.invoke(service, list)
+            },
+            currentLocale = Locale.ENGLISH,
+            dictionaryRepositoryFactory = { _, _, _, _, _ -> wrappedRepo },
+            nextWordPredictorOverride = NextWordPredictor(store)
+        ).also { controllers.add(it) }
+
+        val restoreThread = Thread({
+            try {
+                assertTrue(mainPausedInsideIsKnownWord.await(3, TimeUnit.SECONDS))
+                personalizationEnabled.set(false)
+                SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+                controller.invalidatePersonalizedSuggestionsImmediately()
+                barrierCompleted.set(true)
+                assertTrue(controller.currentSuggestions().isEmpty())
+            } catch (t: Throwable) {
+                workerFailure.set(t)
+            } finally {
+                backgroundInvalidationCompleted.countDown()
+            }
+        }, "r3-2a-live-restore")
+
+        try {
+            controller.onCharacterCommitted("hel", null)
+            assertTrue(computedOnBackground.await(3, TimeUnit.SECONDS))
+            Thread.sleep(50)
+
+            armedForPublish.set(true)
+            restoreThread.start()
+            // Draining Main enters cursorHandler.post, passes initial checks, pauses inside isKnownWord,
+            // lets restoreThread run OFF + invalidatePersonalizedSuggestionsImmediately(), then resumes.
+            shadowOf(Looper.getMainLooper()).idle()
+            restoreThread.join(3000)
+            assertFalse("Restore worker thread must complete", restoreThread.isAlive)
+            workerFailure.get()?.let { throw AssertionError(it) }
+
+            @Suppress("UNCHECKED_CAST")
+            val serviceAfterBarrier = latestServiceResultsField.get(service) as List<SuggestionResult>
+            assertTrue(
+                "Controller cache must not be overwritten by stale in-flight main publish",
+                controller.currentSuggestions().isEmpty()
+            )
+            assertTrue(
+                "Service must not receive stale personalized list after OFF barrier",
+                serviceAfterBarrier.none { it.candidate == "hellhound" }
+            )
+            assertTrue(
+                "No listener callback after OFF barrier may receive stale personalized list",
+                listenerEventsAfterBarrier.none { list -> list.any { it.candidate == "hellhound" } }
+            )
+
+            // Subsequent main-thread onSettingsChanged recomputes and publishes neutral OFF dictionary results.
+            controller.onSettingsChanged(null)
+            val refreshed = waitForSuggestionCandidates("help", "held", "hello")
+            assertEquals(listOf("help", "held", "hello"), refreshed.map { it.candidate })
+            @Suppress("UNCHECKED_CAST")
+            val serviceAfterRecompute = latestServiceResultsField.get(service) as List<SuggestionResult>
+            assertEquals(
+                listOf("help", "held", "hello"),
+                serviceAfterRecompute.map { it.candidate }
+            )
+            assertTrue(
+                "No listener callback after OFF barrier may ever contain stale personalized candidate",
+                listenerEventsAfterBarrier.none { list -> list.any { it.candidate == "hellhound" } }
+            )
+            assertFalse(
+                "Background invalidation must never invoke UI listener off main thread",
+                listenerCalledOffMain.get()
+            )
+        } finally {
+            backgroundInvalidationCompleted.countDown()
+            restoreThread.join(3000)
+        }
     }
 
     @Test

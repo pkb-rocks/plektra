@@ -125,7 +125,19 @@ class ClipboardHistoryManager internal constructor(
         fetchPrimaryClip()
     }
 
+    /**
+     * A clip that can't be read (the app that copied it denies its content, or the clipboard
+     * service fails) is skipped and logged: this runs for every copy, in the keyboard's process.
+     */
     private fun fetchPrimaryClip() {
+        try {
+            readPrimaryClip()
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Skipped a clip that couldn't be read (${e.javaClass.simpleName})")
+        }
+    }
+
+    private fun readPrimaryClip() {
         if (!isHistoryAccessible()) return
         val clipData = clipboardManager.primaryClip ?: return
         val sensitive = clipData.description.extras?.getBoolean("android.content.extra.IS_SENSITIVE", false) == true

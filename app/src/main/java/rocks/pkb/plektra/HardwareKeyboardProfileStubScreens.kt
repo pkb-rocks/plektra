@@ -6,8 +6,6 @@ import android.content.Intent
 import android.content.ComponentName
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import android.view.accessibility.AccessibilityManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -317,12 +315,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             inProgress = buttonBindingsInProgress,
             resultMessage = buttonBindingResult,
             onBack = { mappingPage = null },
-            onOpenLauncherInterceptionSettings = {
-                context.startActivity(
-                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            },
+            onOpenLauncherInterceptionSettings = { AccessibilitySettingsLauncher.open(context) },
             onRedSelected = { choiceId, mode, firmwareOutput, plektraFunction ->
                 clicksButtonMode = mode
                 SettingsManager.setClicksButtonMode(context, mode)
@@ -1372,15 +1365,9 @@ private fun hasClicksBluetoothPermission(context: android.content.Context): Bool
 
 private fun isClicksLauncherInterceptionEnabled(context: android.content.Context): Boolean {
     if (!BuildConfig.ENABLE_ACCESSIBILITY_SERVICE) return false
-    val expected = ComponentName(context, ClicksLauncherButtonAccessibilityService::class.java)
-    val manager = context.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE)
-        as? AccessibilityManager ?: return false
-    return manager
-        .getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-        .any { info ->
-            val serviceInfo = info.resolveInfo?.serviceInfo ?: return@any false
-            ComponentName(serviceInfo.packageName, serviceInfo.name) == expected
-        }
+    return AccessibilitySettingsLauncher.isEnabled(
+        context, ComponentName(context, ClicksLauncherButtonAccessibilityService::class.java)
+    )
 }
 
 private fun openClicksFirmwareUpdates(context: android.content.Context) {

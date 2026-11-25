@@ -57,6 +57,7 @@
       "rocks.pkb.plektra.clipboard.ClipboardUnreadableClipTest"
     ],
     "ui-settings": [
+      "rocks.pkb.plektra.AccessibilitySettingsLauncherTest",
       "rocks.pkb.plektra.AppAppearanceSettingsScreenTest",
       "rocks.pkb.plektra.AutoCorrectionSuggestionSettingsUiTest",
       "rocks.pkb.plektra.ClicksButtonBindingScreenSyncTest",

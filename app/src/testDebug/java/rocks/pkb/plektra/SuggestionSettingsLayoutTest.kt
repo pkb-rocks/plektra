@@ -73,6 +73,47 @@ class SuggestionSettingsLayoutTest {
     }
 
     @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun autoCorrectionTextIsNeverCutAtLargeFontInGerman() {
+        SettingsManager.setExperimentalSuggestionsEnabled(context, true)
+        val german = android.content.res.Configuration(context.resources.configuration).apply {
+            setLocale(java.util.Locale.GERMAN)
+        }
+        val localized = context.createConfigurationContext(german)
+        compose.setContent {
+            val host = androidx.compose.ui.platform.LocalContext.current
+            // Wraps the host activity, which the settings page navigates with.
+            val germanHost = androidx.compose.runtime.remember(host) {
+                android.view.ContextThemeWrapper(host, 0).apply { applyOverrideConfiguration(german) }
+            }
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalContext provides germanHost,
+                androidx.compose.ui.platform.LocalConfiguration provides german,
+                androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, 1.3f)
+            ) { AutoCorrectionCategoryScreen(onBack = {}) }
+        }
+        assertNoTextOverflow(localized.getString(R.string.experimental_suggestions_title))
+    }
+
+    /** Every laid-out text keeps all its lines; [mustAppear] guards against an untranslated run. */
+    private fun assertNoTextOverflow(mustAppear: String) {
+        compose.onNodeWithText(mustAppear).assertExists()
+        val nodes = compose.onAllNodes(androidx.compose.ui.test.SemanticsMatcher.keyIsDefined(
+            androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult)).fetchSemanticsNodes()
+        assertTrue(nodes.isNotEmpty())
+        nodes.forEach { node ->
+            val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            node.config[androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult].action?.invoke(layouts)
+            layouts.forEach { layout ->
+                // Lines beyond maxLines or a too small height; the width flag misreports under Robolectric.
+                val cut = layout.didOverflowHeight || (0 until layout.lineCount).any(layout::isLineEllipsized)
+                assertFalse("Cut text: ${layout.layoutInput.text}", cut)
+            }
+        }
+    }
+
+    @Test
     fun navModeGuideOpensFromTheTopBarHelpAction() {
         compose.setContent { NavModeSettingsScreen(onBack = {}) }
         val guide = context.getString(R.string.nav_mode_guide_title)

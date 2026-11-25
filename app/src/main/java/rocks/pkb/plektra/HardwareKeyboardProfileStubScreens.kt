@@ -1682,9 +1682,7 @@ private fun ClicksButtonBindingRow(
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    }
                 )
             },
             leadingIcon = {

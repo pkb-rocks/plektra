@@ -188,14 +188,12 @@ fun AutoCorrectionCategoryScreen(
 	                                    Text(
 	                                        text = stringResource(R.string.auto_correct_title),
 	                                        style = MaterialTheme.typography.titleMedium,
-	                                        fontWeight = FontWeight.Medium,
-	                                        maxLines = 1
+	                                        fontWeight = FontWeight.Medium
 	                                    )
 	                                    Text(
 	                                        text = stringResource(R.string.auto_correct_title_description),
 	                                        style = MaterialTheme.typography.bodySmall,
-	                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-	                                        maxLines = 2
+	                                        color = MaterialTheme.colorScheme.onSurfaceVariant
 	                                    )
 	                                }
                                 Switch(
@@ -235,14 +233,12 @@ fun AutoCorrectionCategoryScreen(
 	                                        Text(
 	                                            text = stringResource(R.string.auto_correct_languages_title),
 	                                            style = MaterialTheme.typography.titleMedium,
-	                                            fontWeight = FontWeight.Medium,
-	                                            maxLines = 1
+	                                            fontWeight = FontWeight.Medium
 	                                        )
 	                                        Text(
 	                                            text = stringResource(R.string.auto_correct_languages_description),
 	                                            style = MaterialTheme.typography.bodySmall,
-	                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-	                                            maxLines = 2
+	                                            color = MaterialTheme.colorScheme.onSurfaceVariant
 	                                        )
 	                                    }
                                     Icon(
@@ -278,14 +274,12 @@ fun AutoCorrectionCategoryScreen(
                                     Text(
                                         text = stringResource(R.string.auto_correct_auto_replace_title),
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
+                                        fontWeight = FontWeight.Medium
                                     )
                                     Text(
                                         text = stringResource(R.string.auto_correct_auto_replace_description),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 Switch(
@@ -379,14 +373,12 @@ fun AutoCorrectionCategoryScreen(
                                         Text(
 	                                        text = stringResource(R.string.auto_correct_manage_user_dict_title),
 	                                        style = MaterialTheme.typography.titleMedium,
-	                                        fontWeight = FontWeight.Medium,
-	                                        maxLines = 1
+	                                        fontWeight = FontWeight.Medium
 	                                    )
 	                                    Text(
 	                                        text = stringResource(R.string.auto_correct_manage_user_dict_description),
 	                                        style = MaterialTheme.typography.bodySmall,
-	                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-	                                        maxLines = 2
+	                                        color = MaterialTheme.colorScheme.onSurfaceVariant
 	                                    )
 	                                }
                                     Icon(
@@ -423,14 +415,12 @@ fun AutoCorrectionCategoryScreen(
                                     Text(
                                         text = stringResource(R.string.app_raw_mode_title),
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
+                                        fontWeight = FontWeight.Medium
                                     )
                                     Text(
                                         text = stringResource(R.string.app_raw_mode_row_description),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 Icon(
@@ -466,14 +456,12 @@ fun AutoCorrectionCategoryScreen(
                                         Text(
                                             text = stringResource(R.string.experimental_suggestions_title),
                                             style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Medium,
-                                            maxLines = 1
+                                            fontWeight = FontWeight.Medium
                                         )
                                         Text(
                                             text = stringResource(R.string.experimental_suggestions_subtitle),
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            maxLines = 2
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                     FeatureStatusIcon(FeatureStatus.Experimental)

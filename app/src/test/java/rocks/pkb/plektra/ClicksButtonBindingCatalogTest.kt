@@ -33,6 +33,23 @@ class ClicksButtonBindingCatalogTest {
     }
 
     @Test
+    fun directSelectionRequiresReadFirmwareOutputToMatch() {
+        val mode = SettingsManager.ClicksPowerButtonMode.TOGGLE_EMOJI_PICKER
+
+        assertEquals(
+            "emoji",
+            ClicksButtonBindingCatalog.directActionSelection(mode, choices(), byteArrayOf(0x00, 0x44))?.id
+        )
+        assertNull(
+            ClicksButtonBindingCatalog.directActionSelection(
+                mode,
+                choices(),
+                ClicksPowerKeyboardProtocol.leftAltRemapOutput()
+            )
+        )
+    }
+
+    @Test
     fun firmwareSelectionUsesByteContent() {
         assertEquals(
             "native",

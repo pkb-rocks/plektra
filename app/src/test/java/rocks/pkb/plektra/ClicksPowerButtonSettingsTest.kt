@@ -2,6 +2,8 @@ package rocks.pkb.plektra
 
 import android.content.Context
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -100,6 +102,60 @@ class ClicksPowerButtonSettingsTest {
         )
     }
 
+    @Test
+    fun legacyBindingWithoutPendingMarkerIsTreatedAsApplied() {
+        // State written by releases before the pending marker existed.
+        context.getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE).edit()
+            .putString("clicks_keyboard_button_binding_choice", "alt_native")
+            .putString("clicks_keyboard_button_binding_output", "0000")
+            .commit()
+
+        val binding = requireNotNull(
+            SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.KEYBOARD)
+        )
+
+        assertEquals("alt_native", binding.choiceId)
+        assertFalse(binding.pending)
+    }
+
+    @Test
+    fun pendingMarkerIsClearedOnlyForTheAppliedOutput() {
+        val target = ClicksButtonBindingTarget.KEYBOARD
+        val alt = ClicksPowerKeyboardProtocol.leftAltRemapOutput()
+        SettingsManager.setClicksDesiredButtonBinding(context, target, ClicksDesiredButtonBinding("alt_alt", alt))
+        assertTrue(SettingsManager.getClicksDesiredButtonBinding(context, target)!!.pending)
+
+        SettingsManager.markClicksButtonBindingApplied(
+            context,
+            target,
+            ClicksPowerKeyboardProtocol.nativeRemapOutput()
+        )
+        assertTrue(SettingsManager.getClicksDesiredButtonBinding(context, target)!!.pending)
+
+        SettingsManager.markClicksButtonBindingApplied(context, target, alt)
+        val applied = SettingsManager.getClicksDesiredButtonBinding(context, target)!!
+        assertFalse(applied.pending)
+        assertTrue(applied.firmwareOutput.contentEquals(alt))
+        assertNull(SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.MICROPHONE))
+    }
+
+    @Test
+    fun restoredOutputDoesNotInheritPendingMarkerOfAnotherOutput() {
+        val target = ClicksButtonBindingTarget.RED
+        SettingsManager.setClicksDesiredButtonBinding(
+            context,
+            target,
+            ClicksDesiredButtonBinding("red_alt", ClicksPowerKeyboardProtocol.leftAltRemapOutput())
+        )
+        // A backup restore replaces the exported choice and output but not the device sync marker.
+        context.getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE).edit()
+            .putString("clicks_red_button_binding_choice", "red_quick_launcher")
+            .putString("clicks_red_button_binding_output", "0000")
+            .commit()
+
+        assertFalse(SettingsManager.getClicksDesiredButtonBinding(context, target)!!.pending)
+    }
+
     private fun assertBindingEquals(
         expected: ClicksDesiredButtonBinding,
         actual: ClicksDesiredButtonBinding?
@@ -107,5 +163,6 @@ class ClicksPowerButtonSettingsTest {
         requireNotNull(actual)
         assertEquals(expected.choiceId, actual.choiceId)
         assertTrue(expected.firmwareOutput.contentEquals(actual.firmwareOutput))
+        assertEquals(expected.pending, actual.pending)
     }
 }

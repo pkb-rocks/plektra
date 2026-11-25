@@ -34,12 +34,20 @@ internal object ClicksButtonBindingCatalog {
         choices.firstOrNull { it.id == binding.choiceId }
     }
 
+    /**
+     * Selects the choice of a direct-action [mode]. When [firmwareOutput] has been read, the choice
+     * must also match it: the software mode is inert once the button no longer emits its output.
+     */
     fun directActionSelection(
         mode: SettingsManager.ClicksPowerButtonMode,
-        choices: List<ClicksButtonBindingChoice>
+        choices: List<ClicksButtonBindingChoice>,
+        firmwareOutput: ByteArray? = null
     ): ClicksButtonBindingChoice? = mode
         .takeIf { it.directActionOrNull() != null }
         ?.let { directMode -> choices.firstOrNull { it.softwareMode == directMode } }
+        ?.takeIf { choice ->
+            firmwareOutput == null || choice.firmwareOutput?.contentEquals(firmwareOutput) == true
+        }
 
     fun firmwareSelection(
         output: ByteArray,

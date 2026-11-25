@@ -496,7 +496,10 @@ internal object BackupPreferenceContract {
         "field_scoped_virtual_previous_override" to "runtime-derived state",
         "typing_sound_updated_at" to "runtime refresh marker",
         "clicks_bluetooth_permission_explained" to "permission UI state",
-        "clicks_manual_charging_until" to "transient runtime state"
+        "clicks_manual_charging_until" to "transient runtime state",
+        "clicks_red_button_binding_pending_output" to "keyboard firmware sync state",
+        "clicks_keyboard_button_binding_pending_output" to "keyboard firmware sync state",
+        "clicks_microphone_button_binding_pending_output" to "keyboard firmware sync state"
     )
 
     fun expectedExportType(prefName: String, key: String): PreferenceValueType? {

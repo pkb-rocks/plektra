@@ -145,6 +145,21 @@ class ClicksPowerButtonEventMapperTest {
     }
 
     @Test
+    fun firmwareAltFromKeyboardButtonReachesTheImeUnchangedForEveryKeyboardButtonMode() {
+        SettingsManager.ClicksPowerButtonMode.entries.forEach { mode ->
+            mapper.reset()
+            clicksAppAltChord(deviceId = 7).forEach { input ->
+                val result = map(input, altMode = mode)
+
+                assertSame("$mode ${input.keyCode}", input, result.event)
+                assertEquals(input.keyCode, result.keyCode)
+                assertFalse(result.consume)
+                assertEquals(null, result.directAction)
+            }
+        }
+    }
+
+    @Test
     fun eventsFromOtherKeyboardsAreUntouched() {
         val input = event(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_META_LEFT)
 
@@ -196,4 +211,23 @@ class ClicksPowerButtonEventMapperTest {
         0,
         InputDevice.SOURCE_KEYBOARD
     )
+
+    /**
+     * Keyboard button assigned to Alt in the Clicks app: the firmware sends HID Left Alt, which
+     * Android reports as KEYCODE_ALT_LEFT (scan code 56) around the chorded letter.
+     */
+    private fun clicksAppAltChord(deviceId: Int): List<KeyEvent> {
+        fun key(downTime: Long, eventTime: Long, action: Int, keyCode: Int, metaState: Int, scanCode: Int) =
+            KeyEvent(downTime, eventTime, action, keyCode, 0, metaState, deviceId, scanCode, 0, InputDevice.SOURCE_KEYBOARD)
+        return listOf(
+            key(1_000L, 1_000L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ALT_LEFT, ALT_META, 56),
+            key(1_040L, 1_040L, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_U, ALT_META, 22),
+            key(1_040L, 1_090L, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_U, ALT_META, 22),
+            key(1_000L, 1_130L, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ALT_LEFT, 0, 56)
+        )
+    }
+
+    private companion object {
+        const val ALT_META = KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
+    }
 }

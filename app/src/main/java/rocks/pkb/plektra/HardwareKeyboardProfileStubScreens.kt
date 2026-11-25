@@ -490,7 +490,8 @@ fun ClicksPowerKeyboardSettingsScreen(
                         clicksMicrophoneButtonMode = SettingsManager.ClicksPowerButtonMode.NATIVE
                         desiredRedButtonBinding = ClicksDesiredButtonBinding(
                             choiceId = "red_quick_launcher",
-                            firmwareOutput = ClicksPowerKeyboardProtocol.nativeRemapOutput()
+                            firmwareOutput = ClicksPowerKeyboardProtocol.nativeRemapOutput(),
+                            pending = false
                         ).also {
                             SettingsManager.setClicksDesiredButtonBinding(
                                 context,
@@ -500,7 +501,8 @@ fun ClicksPowerKeyboardSettingsScreen(
                         }
                         desiredKeyboardButtonBinding = ClicksDesiredButtonBinding(
                             choiceId = "alt_native",
-                            firmwareOutput = ClicksPowerKeyboardProtocol.nativeRemapOutput()
+                            firmwareOutput = ClicksPowerKeyboardProtocol.nativeRemapOutput(),
+                            pending = false
                         ).also {
                             SettingsManager.setClicksDesiredButtonBinding(
                                 context,
@@ -510,7 +512,8 @@ fun ClicksPowerKeyboardSettingsScreen(
                         }
                         desiredMicrophoneButtonBinding = ClicksDesiredButtonBinding(
                             choiceId = "microphone_dictation",
-                            firmwareOutput = ClicksPowerKeyboardProtocol.dictationRemapOutput()
+                            firmwareOutput = ClicksPowerKeyboardProtocol.dictationRemapOutput(),
+                            pending = false
                         ).also {
                             SettingsManager.setClicksDesiredButtonBinding(
                                 context,
@@ -956,10 +959,18 @@ private fun ClicksButtonMappingsScreen(
         redSym
     ) + redShortcutChoices
     val desiredRedSelection = ClicksButtonBindingCatalog.desiredSelection(
-        desiredRedButtonBinding,
+        ClicksButtonBindingSyncPolicy.displayedBinding(
+            state,
+            ClicksButtonBindingTarget.RED,
+            desiredRedButtonBinding
+        ),
         redChoices
     )
-    val redDirectSelection = ClicksButtonBindingCatalog.directActionSelection(redButtonMode, redChoices)
+    val redDirectSelection = ClicksButtonBindingCatalog.directActionSelection(
+        redButtonMode,
+        redChoices,
+        ClicksButtonBindingSyncPolicy.currentOutput(state, ClicksButtonBindingTarget.RED)
+    )
     val redSelected = desiredRedSelection ?: redDirectSelection ?: if (state.tabRemap != null) {
         ClicksButtonBindingCatalog.firmwareSelection(state.tabRemap, redChoices)
             ?.takeUnless { choice ->
@@ -1021,8 +1032,7 @@ private fun ClicksButtonMappingsScreen(
     fun firmwareChoices(
         bindingId: String,
         nativeAction: String,
-        nativeDescription: String,
-        includeAlt: Boolean
+        nativeDescription: String
     ): List<ClicksButtonBindingChoice> = buildList {
         add(
             ClicksButtonBindingChoice(
@@ -1061,17 +1071,15 @@ private fun ClicksButtonMappingsScreen(
                 )
             )
         }
-        if (includeAlt) {
-            add(
-                ClicksButtonBindingChoice(
-                    id = "${bindingId}_alt",
-                    label = groupedLabel(keyCategory, stringResource(R.string.clicks_button_mode_alt)),
-                    description = stringResource(R.string.clicks_binding_alt_output_description),
-                    softwareMode = SettingsManager.ClicksPowerButtonMode.NATIVE,
-                    firmwareOutput = altOutput
-                )
+        add(
+            ClicksButtonBindingChoice(
+                id = "${bindingId}_alt",
+                label = groupedLabel(keyCategory, stringResource(R.string.clicks_button_mode_alt)),
+                description = stringResource(R.string.clicks_binding_alt_output_description),
+                softwareMode = SettingsManager.ClicksPowerButtonMode.NATIVE,
+                firmwareOutput = altOutput
             )
-        }
+        )
         shortcutOutputs.forEach { (label, bytes) ->
             add(
                 ClicksButtonBindingChoice(
@@ -1088,8 +1096,7 @@ private fun ClicksButtonMappingsScreen(
     val altFirmwareChoices = firmwareChoices(
         bindingId = CLICKS_BINDING_ALT,
         nativeAction = stringResource(R.string.clicks_alt_native_action),
-        nativeDescription = stringResource(R.string.clicks_alt_native_description),
-        includeAlt = false
+        nativeDescription = stringResource(R.string.clicks_alt_native_description)
     )
     val altDirectChoices = listOf(
         SettingsManager.ClicksPowerButtonMode.QUICK_LAUNCHER,
@@ -1109,8 +1116,7 @@ private fun ClicksButtonMappingsScreen(
     val microphoneFirmwareChoices = firmwareChoices(
         bindingId = CLICKS_BINDING_MICROPHONE,
         nativeAction = stringResource(R.string.clicks_microphone_native_action),
-        nativeDescription = stringResource(R.string.clicks_microphone_native_description),
-        includeAlt = true
+        nativeDescription = stringResource(R.string.clicks_microphone_native_description)
     )
     val microphoneEmojiChoice = ClicksButtonBindingChoice(
         id = "microphone_toggle_emoji_picker",
@@ -1146,40 +1152,62 @@ private fun ClicksButtonMappingsScreen(
         return custom to (choices + custom)
     }
     val desiredAltSelection = ClicksButtonBindingCatalog.desiredSelection(
-        desiredKeyboardButtonBinding,
+        ClicksButtonBindingSyncPolicy.displayedBinding(
+            state,
+            ClicksButtonBindingTarget.KEYBOARD,
+            desiredKeyboardButtonBinding
+        ),
         altChoices
     )
     val (altSelected, displayedAltChoices) = desiredAltSelection
         ?.let { it to altChoices }
-        ?: ClicksButtonBindingCatalog.directActionSelection(altButtonMode, altChoices)
+        ?: ClicksButtonBindingCatalog.directActionSelection(
+            altButtonMode,
+            altChoices,
+            ClicksButtonBindingSyncPolicy.currentOutput(state, ClicksButtonBindingTarget.KEYBOARD)
+        )
             ?.let { it to altChoices }
         ?: selectedFirmwareChoice(
             CLICKS_BINDING_ALT,
-            state.altRemap?.takeUnless { it.contentEquals(altOutput) },
+            state.altRemap,
             altChoices
         )
     val desiredMicrophoneSelection = ClicksButtonBindingCatalog.desiredSelection(
-        desiredMicrophoneButtonBinding,
+        ClicksButtonBindingSyncPolicy.displayedBinding(
+            state,
+            ClicksButtonBindingTarget.MICROPHONE,
+            desiredMicrophoneButtonBinding
+        ),
         microphoneChoices
     )
     val (microphoneSelected, displayedMicrophoneChoices) = desiredMicrophoneSelection
         ?.let { it to microphoneChoices }
-        ?: ClicksButtonBindingCatalog.directActionSelection(microphoneButtonMode, microphoneChoices)
+        ?: ClicksButtonBindingCatalog.directActionSelection(
+            microphoneButtonMode,
+            microphoneChoices,
+            ClicksButtonBindingSyncPolicy.currentOutput(state, ClicksButtonBindingTarget.MICROPHONE)
+        )
             ?.let { it to microphoneChoices }
         ?: selectedFirmwareChoice(
             CLICKS_BINDING_MICROPHONE,
             state.geminiRemap,
             microphoneChoices
         )
-    val redBindingPending = desiredRedButtonBinding?.let {
-        !ClicksButtonBindingSyncPolicy.isConfirmed(state, ClicksButtonBindingTarget.RED, it.firmwareOutput)
-    } == true
-    val keyboardBindingPending = desiredKeyboardButtonBinding?.let {
-        !ClicksButtonBindingSyncPolicy.isConfirmed(state, ClicksButtonBindingTarget.KEYBOARD, it.firmwareOutput)
-    } == true
-    val microphoneBindingPending = desiredMicrophoneButtonBinding?.let {
-        !ClicksButtonBindingSyncPolicy.isConfirmed(state, ClicksButtonBindingTarget.MICROPHONE, it.firmwareOutput)
-    } == true
+    val redBindingPending = ClicksButtonBindingSyncPolicy.isPending(
+        state,
+        ClicksButtonBindingTarget.RED,
+        desiredRedButtonBinding
+    )
+    val keyboardBindingPending = ClicksButtonBindingSyncPolicy.isPending(
+        state,
+        ClicksButtonBindingTarget.KEYBOARD,
+        desiredKeyboardButtonBinding
+    )
+    val microphoneBindingPending = ClicksButtonBindingSyncPolicy.isPending(
+        state,
+        ClicksButtonBindingTarget.MICROPHONE,
+        desiredMicrophoneButtonBinding
+    )
 
     HardwareProfileScaffold(
         modifier = modifier,
@@ -1240,7 +1268,7 @@ private fun ClicksButtonMappingsScreen(
             onSelected = { choice ->
                 onAltSelected(
                     choice.id,
-                    requireNotNull(choice.softwareMode),
+                    choice.softwareMode ?: SettingsManager.ClicksPowerButtonMode.NATIVE,
                     requireNotNull(choice.firmwareOutput),
                     choice.plektraFunction
                 )

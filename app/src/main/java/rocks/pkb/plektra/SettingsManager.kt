@@ -133,6 +133,11 @@ object SettingsManager {
     private const val KEY_CLICKS_KEYBOARD_BUTTON_BINDING_OUTPUT = "clicks_keyboard_button_binding_output"
     private const val KEY_CLICKS_MICROPHONE_BUTTON_BINDING_CHOICE = "clicks_microphone_button_binding_choice"
     private const val KEY_CLICKS_MICROPHONE_BUTTON_BINDING_OUTPUT = "clicks_microphone_button_binding_output"
+    private const val KEY_CLICKS_RED_BUTTON_BINDING_PENDING_OUTPUT = "clicks_red_button_binding_pending_output"
+    private const val KEY_CLICKS_KEYBOARD_BUTTON_BINDING_PENDING_OUTPUT =
+        "clicks_keyboard_button_binding_pending_output"
+    private const val KEY_CLICKS_MICROPHONE_BUTTON_BINDING_PENDING_OUTPUT =
+        "clicks_microphone_button_binding_pending_output"
     private const val KEY_RESTORE_SYM_PAGE = "restore_sym_page" // SYM page to restore when returning from settings
     private const val KEY_PENDING_RESTORE_SYM_PAGE = "pending_restore_sym_page" // Temporary SYM page state saved when opening settings
     private const val KEY_SYM_PAGES_CONFIG = "sym_pages_config" // Order/enabled pages for SYM
@@ -2465,8 +2470,13 @@ object SettingsManager {
         val (choiceKey, outputKey) = clicksDesiredButtonBindingKeys(target)
         val preferences = getPreferences(context)
         val choiceId = preferences.getString(choiceKey, null)?.takeIf(String::isNotBlank) ?: return null
-        val output = preferences.getString(outputKey, null)?.decodeClicksRemapOutput() ?: return null
-        return ClicksDesiredButtonBinding(choiceId, output)
+        val encodedOutput = preferences.getString(outputKey, null) ?: return null
+        val output = encodedOutput.decodeClicksRemapOutput() ?: return null
+        // Bindings stored before the pending marker existed, or restored from a backup, have no
+        // marker for their output. They count as applied so Plektra never replaces a firmware
+        // assignment that was changed in the Clicks app in the meantime.
+        val pending = preferences.getString(clicksPendingButtonBindingKey(target), null) == encodedOutput
+        return ClicksDesiredButtonBinding(choiceId, output, pending)
     }
 
     internal fun setClicksDesiredButtonBinding(
@@ -2476,11 +2486,34 @@ object SettingsManager {
     ) {
         require(binding.firmwareOutput.size == 2)
         val (choiceKey, outputKey) = clicksDesiredButtonBindingKeys(target)
-        getPreferences(context).edit()
+        val encodedOutput = binding.firmwareOutput.encodeClicksRemapOutput()
+        val pendingKey = clicksPendingButtonBindingKey(target)
+        val editor = getPreferences(context).edit()
             .putString(choiceKey, binding.choiceId)
-            .putString(outputKey, binding.firmwareOutput.encodeClicksRemapOutput())
-            .apply()
+            .putString(outputKey, encodedOutput)
+        if (binding.pending) editor.putString(pendingKey, encodedOutput) else editor.remove(pendingKey)
+        editor.apply()
     }
+
+    /** Marks [output] as applied unless a newer selection has replaced it in the meantime. */
+    internal fun markClicksButtonBindingApplied(
+        context: Context,
+        target: ClicksButtonBindingTarget,
+        output: ByteArray
+    ) {
+        val pendingKey = clicksPendingButtonBindingKey(target)
+        val preferences = getPreferences(context)
+        if (preferences.getString(pendingKey, null) == output.encodeClicksRemapOutput()) {
+            preferences.edit().remove(pendingKey).apply()
+        }
+    }
+
+    private fun clicksPendingButtonBindingKey(target: ClicksButtonBindingTarget): String =
+        when (target) {
+            ClicksButtonBindingTarget.RED -> KEY_CLICKS_RED_BUTTON_BINDING_PENDING_OUTPUT
+            ClicksButtonBindingTarget.KEYBOARD -> KEY_CLICKS_KEYBOARD_BUTTON_BINDING_PENDING_OUTPUT
+            ClicksButtonBindingTarget.MICROPHONE -> KEY_CLICKS_MICROPHONE_BUTTON_BINDING_PENDING_OUTPUT
+        }
 
     private fun clicksDesiredButtonBindingKeys(target: ClicksButtonBindingTarget): Pair<String, String> =
         when (target) {

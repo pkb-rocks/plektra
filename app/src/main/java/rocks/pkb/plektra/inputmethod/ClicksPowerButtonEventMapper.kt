@@ -9,7 +9,8 @@ import rocks.pkb.plektra.SettingsManager
  * The red Clicks button reports native Tab. The Launcher button reports Left Meta. Modifier
  * state is retained per input device so Alt and SYM remain active for ordinary key events while
  * a remapped physical button is held. F12 is reserved as the firmware sentinel for a direct action
- * on the physical keyboard button, keeping it distinct from Alt emitted by the microphone key.
+ * on the physical keyboard button, keeping it distinct from a firmware-assigned Alt output, which
+ * passes through unchanged.
  */
 internal class ClicksPowerButtonEventMapper {
     data class Result(

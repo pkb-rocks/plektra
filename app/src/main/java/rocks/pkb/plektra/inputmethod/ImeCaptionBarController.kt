@@ -30,7 +30,9 @@ internal class ImeCaptionBarController(private val sdkInt: Int = Build.VERSION.S
      * @return true when the choice waits for a known caption bar state.
      */
     fun update(controller: WindowInsetsController?, hide: Boolean, captionBarVisible: Boolean?): Boolean {
-        if (sdkInt < Build.VERSION_CODES.UPSIDE_DOWN_CAKE || controller == null) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+            sdkInt < Build.VERSION_CODES.UPSIDE_DOWN_CAKE || controller == null
+        ) return false
         // A hide on another window cannot be undone from here; it is not Plektra's to restore.
         if (ownedWindow != null && ownedWindow !== controller) ownedWindow = null
         val owned = ownedWindow === controller
@@ -63,7 +65,9 @@ internal class ImeCaptionBarController(private val sdkInt: Int = Build.VERSION.S
 
         /** The caption bar state of an attached decor, or null while it is not known. */
         fun captionBarVisible(decor: View?): Boolean? {
-            if (decor == null || !decor.isAttachedToWindow) return null
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R ||
+                decor == null || !decor.isAttachedToWindow
+            ) return null
             captionBarVisibleForTests?.let { return it }
             return decor.rootWindowInsets?.isVisible(WindowInsets.Type.captionBar())
         }

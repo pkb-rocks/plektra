@@ -1,6 +1,7 @@
 package rocks.pkb.plektra.ui.theme
 
 import android.app.Activity
+import android.os.Build
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
@@ -128,7 +129,7 @@ fun PlektraTheme(
     )
 
     val baseScheme = when {
-        resolved.useDynamicColor -> {
+        resolved.useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (resolved.useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         resolved.useDarkTheme -> DarkColorScheme

@@ -215,6 +215,8 @@ fun ClicksPowerKeyboardSettingsScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 launcherInterceptionEnabled = isClicksLauncherInterceptionEnabled(context)
+                // Assignments may have changed in the Clicks app; show what the keyboard holds now.
+                ClicksPowerKeyboardController.activeClient()?.refresh()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -1203,6 +1205,8 @@ private fun ClicksButtonMappingsScreen(
         desiredMicrophoneButtonBinding
     )
 
+    val firmwareReadState = ClicksButtonBindingSyncPolicy.readState(state)
+
     HardwareProfileScaffold(
         modifier = modifier,
         title = stringResource(R.string.clicks_button_bindings_title),
@@ -1241,6 +1245,7 @@ private fun ClicksButtonMappingsScreen(
             enabled = CLICKS_BINDING_RED !in inProgress,
             applying = CLICKS_BINDING_RED in inProgress,
             pending = redBindingPending,
+            readState = firmwareReadState,
             onSelected = { choice ->
                 onRedSelected(
                     choice.id,
@@ -1259,6 +1264,7 @@ private fun ClicksButtonMappingsScreen(
             enabled = CLICKS_BINDING_ALT !in inProgress,
             applying = CLICKS_BINDING_ALT in inProgress,
             pending = keyboardBindingPending,
+            readState = firmwareReadState,
             onSelected = { choice ->
                 onAltSelected(
                     choice.id,
@@ -1277,6 +1283,7 @@ private fun ClicksButtonMappingsScreen(
             enabled = CLICKS_BINDING_MICROPHONE !in inProgress,
             applying = CLICKS_BINDING_MICROPHONE in inProgress,
             pending = microphoneBindingPending,
+            readState = firmwareReadState,
             onSelected = { choice ->
                 onMicrophoneSelected(
                     choice.id,
@@ -1640,9 +1647,15 @@ private fun ClicksButtonBindingRow(
     enabled: Boolean,
     applying: Boolean,
     pending: Boolean,
+    readState: ClicksButtonBindingReadState = ClicksButtonBindingReadState.UNKNOWN,
     onSelected: (ClicksButtonBindingChoice) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val readStateText = when (readState) {
+        ClicksButtonBindingReadState.READING -> stringResource(R.string.clicks_button_binding_reading)
+        ClicksButtonBindingReadState.LAST_KNOWN -> stringResource(R.string.clicks_button_binding_last_known)
+        ClicksButtonBindingReadState.UNKNOWN, ClicksButtonBindingReadState.CURRENT -> null
+    }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { if (enabled) expanded = it },
@@ -1663,9 +1676,9 @@ private fun ClicksButtonBindingRow(
                     text = if (pending) {
                         stringResource(R.string.clicks_button_binding_pending)
                     } else {
-                        hardwareDescription
+                        readStateText ?: hardwareDescription
                     },
-                    color = if (pending) {
+                    color = if (pending || readStateText != null) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant

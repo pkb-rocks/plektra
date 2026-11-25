@@ -562,6 +562,8 @@
     <string name="clicks_button_binding_success">Button assignment applied.</string>
     <string name="clicks_button_binding_failure">Button assignment could not be applied.</string>
     <string name="clicks_button_binding_pending">Will be applied when a supported keyboard connection is ready.</string>
+    <string name="clicks_button_binding_reading">Reading the current assignment from the keyboard…</string>
+    <string name="clicks_button_binding_last_known">Last known assignment; the keyboard is not connected.</string>
     <string name="clicks_launcher_interception_service_label">Plektra Clicks button interception</string>
     <string name="clicks_launcher_interception_service_description">Intercepts only explicitly configured buttons of a supported Clicks Power Keyboard.</string>
     <string name="clicks_launcher_interception_title">Android Clicks-button interception</string>

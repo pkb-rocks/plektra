@@ -19,6 +19,18 @@ internal data class ClicksDesiredButtonBinding(
     val pending: Boolean = true
 )
 
+/** How far the shown firmware assignment can be trusted. */
+internal enum class ClicksButtonBindingReadState {
+    /** Nothing was read; the Plektra selection is shown. */
+    UNKNOWN,
+    /** Read in the current connection. */
+    CURRENT,
+    /** Read earlier; a fresh read of the connected keyboard has not completed yet. */
+    READING,
+    /** Read earlier; the keyboard is not connected. */
+    LAST_KNOWN
+}
+
 internal enum class ClicksButtonBindingRequestStatus {
     CONFIRMED,
     APPLYING,
@@ -72,6 +84,13 @@ internal object ClicksButtonBindingSyncPolicy {
             ClicksButtonBindingReconcileAction.MARK_APPLIED
         failedInCurrentConnection -> ClicksButtonBindingReconcileAction.NONE
         else -> ClicksButtonBindingReconcileAction.WRITE
+    }
+
+    fun readState(state: ClicksPowerKeyboardState): ClicksButtonBindingReadState = when {
+        state.specialKeyEnableFlags == null -> ClicksButtonBindingReadState.UNKNOWN
+        state.ready && state.sessionValidated && !state.stale -> ClicksButtonBindingReadState.CURRENT
+        state.connected -> ClicksButtonBindingReadState.READING
+        else -> ClicksButtonBindingReadState.LAST_KNOWN
     }
 
     fun isPending(

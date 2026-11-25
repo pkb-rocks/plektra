@@ -181,6 +181,43 @@ class ClicksButtonBindingSyncPolicyTest {
         assertNull(ClicksButtonBindingSyncPolicy.currentOutput(state, ClicksButtonBindingTarget.KEYBOARD))
     }
 
+    @Test
+    fun readStateDistinguishesFreshReadsFromLastKnownAssignments() {
+        assertEquals(ClicksButtonBindingReadState.UNKNOWN, ClicksButtonBindingSyncPolicy.readState(ClicksPowerKeyboardState()))
+        assertEquals(
+            ClicksButtonBindingReadState.CURRENT,
+            ClicksButtonBindingSyncPolicy.readState(writableState().copy(connected = true))
+        )
+        // A refresh marks cached data stale until the complete read validated the session again.
+        assertEquals(
+            ClicksButtonBindingReadState.READING,
+            ClicksButtonBindingSyncPolicy.readState(writableState(stale = true, sessionValidated = false).copy(connected = true))
+        )
+        assertEquals(
+            ClicksButtonBindingReadState.LAST_KNOWN,
+            ClicksButtonBindingSyncPolicy.readState(
+                writableState(stale = true, sessionValidated = false).copy(connected = false, ready = false)
+            )
+        )
+    }
+
+    @Test
+    fun freshReadOfAnExternalAssignmentIsShownAndNeverOverwritten() {
+        val applied = ClicksDesiredButtonBinding(
+            choiceId = "alt_language_switch",
+            firmwareOutput = ClicksPowerKeyboardProtocol.languageSwitchRemapOutput(),
+            pending = false
+        )
+        val external = writableState(altRemap = ClicksPowerKeyboardProtocol.leftAltRemapOutput())
+
+        assertEquals(
+            ClicksButtonBindingReconcileAction.NONE,
+            ClicksButtonBindingSyncPolicy.reconcileAction(external, ClicksButtonBindingTarget.KEYBOARD, applied, false)
+        )
+        assertNull(ClicksButtonBindingSyncPolicy.displayedBinding(external, ClicksButtonBindingTarget.KEYBOARD, applied))
+        assertFalse(ClicksButtonBindingSyncPolicy.isPending(external, ClicksButtonBindingTarget.KEYBOARD, applied))
+    }
+
     private fun writableState(
         stale: Boolean = false,
         sessionValidated: Boolean = true,

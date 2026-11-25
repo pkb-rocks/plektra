@@ -538,6 +538,8 @@
     <string name="clicks_button_binding_success">Η αντιστοίχιση κουμπιού εφαρμόστηκε.</string>
     <string name="clicks_button_binding_failure">Δεν ήταν δυνατή η εφαρμογή της αντιστοίχισης κουμπιού.</string>
     <string name="clicks_button_binding_pending">Θα εφαρμοστεί όταν είναι έτοιμη μια υποστηριζόμενη σύνδεση πληκτρολογίου.</string>
+    <string name="clicks_button_binding_reading">Ανάγνωση της τρέχουσας αντιστοίχισης από το πληκτρολόγιο…</string>
+    <string name="clicks_button_binding_last_known">Τελευταία γνωστή αντιστοίχιση· το πληκτρολόγιο δεν είναι συνδεδεμένο.</string>
     <string name="clicks_launcher_interception_service_label">Παρεμπόδιση κουμπιών Clicks από Plektra</string>
     <string name="clicks_launcher_interception_service_description">Παρεμποδίζει μόνο ρητά ρυθμισμένα κουμπιά ενός υποστηριζόμενου Clicks Power Keyboard.</string>
     <string name="clicks_launcher_interception_title">Παρεμπόδιση κουμπιών Clicks Android</string>

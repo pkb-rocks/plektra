@@ -790,7 +790,11 @@ class FullSuggestionsBar(
                         }
                     } else if (addWordCandidate != null && suggestion.equals(addWordCandidate, ignoreCase = true)) {
                         val addDrawable = androidx.core.content.ContextCompat.getDrawable(context, android.R.drawable.ic_input_add)?.mutate()
-                        addDrawable?.setTint(Color.YELLOW)
+                        addDrawable?.setTint(rocks.pkb.plektra.inputmethod.ui.AddWordIconColor.resolve(
+                            surface = themeOverride?.suggestion ?: DEFAULT_SUGGESTION_COLOR,
+                            accent = themeOverride?.accent,
+                            text = themeOverride?.textAndIcons ?: Color.WHITE
+                        ))
                         addDrawable?.setBounds(0, 0, dpToPx(18f), dpToPx(18f))
                         setCompoundDrawables(null, null, addDrawable, null)
                         compoundDrawablePadding = dpToPx(6f)

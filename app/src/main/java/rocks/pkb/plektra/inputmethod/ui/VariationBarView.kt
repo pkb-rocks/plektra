@@ -1169,7 +1169,11 @@ class VariationBarView(
             setPadding(0, 0, 0, 0) // Testing with 0 padding
             if (isAddCandidate) {
                 val addDrawable = ContextCompat.getDrawable(context, android.R.drawable.ic_input_add)?.mutate()
-                addDrawable?.setTint(themeOverride?.accent ?: Color.YELLOW)
+                addDrawable?.setTint(AddWordIconColor.resolve(
+                    surface = themeOverride?.normalKey ?: VariationButtonStyles.NORMAL_COLOR,
+                    accent = themeOverride?.accent,
+                    text = themeOverride?.textAndIcons ?: Color.WHITE
+                ))
                 setCompoundDrawablesWithIntrinsicBounds(null, null, addDrawable, null)
                 compoundDrawablePadding = dp4
             }

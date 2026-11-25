@@ -2,7 +2,6 @@
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="device_sharedpref" path="direct_boot_keyboard_config.xml"/>
-        <exclude domain="device_file" path="direct_boot_files/"/>
         <!-- Include SharedPreferences for cloud backup, including Clicks snapshots and learned
              SOC calibration. Restored device values remain stale until GATT validates identity. -->
         <include domain="sharedpref" path="."/>

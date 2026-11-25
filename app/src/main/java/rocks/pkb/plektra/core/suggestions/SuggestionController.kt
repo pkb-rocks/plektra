@@ -515,6 +515,7 @@ class SuggestionController(
         if (!word.isNullOrBlank()) {
             tracker.setWord(word)
         } else if (previousCompletedWord == null) {
+            if (!settingsProvider().personalizationEnabled) updateSentenceStart(inputConnection)
             publishSentenceStartPredictionsOrStarter()
         }
     }
@@ -549,7 +550,9 @@ class SuggestionController(
                     publishNextWordPredictions(previous)
                 } else {
                     previousCompletedWord = null
-                    sentenceStartPending = true
+                    // Without personalization no previous word is kept; the text tells where the cursor is.
+                    sentenceStartPending = settingsProvider().personalizationEnabled ||
+                        (sentenceStartAt(inputConnection) ?: true)
                     publishSentenceStartPredictionsOrStarter()
                 }
             }
@@ -781,7 +784,8 @@ class SuggestionController(
         } else {
             pendingAddUserWord = null
             if (!settings.personalizationEnabled) {
-                publishNeutralStarterSuggestions(suggestionGeneration.get())
+                updateSentenceStart(inputConnection)
+                publishSentenceStartPredictionsOrStarter()
             } else if (previousCompletedWord != null) {
                 publishNextWordPredictions(previousCompletedWord!!)
             } else if (dictionaryRepository.isReady) {
@@ -887,7 +891,8 @@ class SuggestionController(
             return
         }
         if (!settings.personalizationEnabled) {
-            publishNeutralStarterSuggestions(generation)
+            // Start words belong to an empty field or a new sentence, not after a word within one.
+            if (sentenceStartPending) publishNeutralStarterSuggestions(generation) else publishEmptySuggestions()
             return
         }
         val primary = nextWordPredictor.predictSentenceStart(currentLocale, settings.maxSuggestions)
@@ -1082,6 +1087,21 @@ class SuggestionController(
         }
     }
 
+    /** True at an empty field or after a sentence end; null when the editor text is unavailable. */
+    private fun sentenceStartAt(inputConnection: InputConnection?): Boolean? {
+        val before = try {
+            inputConnection?.getTextBeforeCursor(SENTENCE_CONTEXT_CHARS, 0)
+        } catch (_: Exception) {
+            null
+        } ?: return null
+        val last = before.trimEnd { it == ' ' || it == '\t' || it == '\u00A0' }.lastOrNull() ?: return true
+        return last in SENTENCE_ENDS
+    }
+
+    private fun updateSentenceStart(inputConnection: InputConnection?) {
+        sentenceStartAt(inputConnection)?.let { sentenceStartPending = it }
+    }
+
     private fun lastCharBeforeCursor(inputConnection: InputConnection?): Char? {
         return try {
             inputConnection?.getTextBeforeCursor(1, 0)?.lastOrNull()
@@ -1221,5 +1241,7 @@ class SuggestionController(
     companion object {
         private const val CURSOR_WORD_CONTEXT_CHARS = 128
         private const val PRIMARY_SUGGESTION_BOOST = 0.35
+        private const val SENTENCE_CONTEXT_CHARS = 64
+        private val SENTENCE_ENDS = setOf('.', '!', '?', '…', '\n')
     }
 }

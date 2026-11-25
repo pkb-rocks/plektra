@@ -147,6 +147,45 @@ class SuggestionPersonalizationAndAddWordTest {
     }
 
     @Test
+    fun starterWordsWithoutPersonalizationFollowTheEditorTextOnRefreshes() {
+        val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
+        typeWord(controller, "ich")
+        pressSpace(controller)
+        assertTrue(snapshots.last().isEmpty())
+
+        // Editors report selection changes while typing; settings may change mid-sentence.
+        controller.onSettingsChanged(textBeforeCursor("ich "))
+        assertTrue(controller.currentSuggestions().isEmpty())
+        controller.onCursorMoved(textBeforeCursor("ich "))
+        shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200))
+        assertTrue(controller.currentSuggestions().isEmpty())
+
+        // After a sentence end or in an empty field they are offered.
+        controller.onCursorMoved(textBeforeCursor("Ich bin da. "))
+        shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200))
+        assertEquals(listOf("hello", "ich", "help"), controller.currentSuggestions().map { it.candidate })
+        controller.onSettingsChanged(textBeforeCursor(""))
+        assertEquals(listOf("hello", "ich", "help"), controller.currentSuggestions().map { it.candidate })
+        controller.onContextReset()
+        controller.readInitialContext(textBeforeCursor("ich "))
+        assertTrue(controller.currentSuggestions().isEmpty())
+    }
+
+    private fun textBeforeCursor(text: String): InputConnection =
+        Proxy.newProxyInstance(InputConnection::class.java.classLoader, arrayOf(InputConnection::class.java)) { _, method, _ ->
+            when (method.name) {
+                "getTextBeforeCursor" -> text
+                "getTextAfterCursor" -> ""
+                "getSelectedText" -> null
+                else -> when (method.returnType) {
+                    java.lang.Boolean.TYPE -> false
+                    Integer.TYPE -> 0
+                    else -> null
+                }
+            }
+        } as InputConnection
+
+    @Test
     fun starterWordsOffKeepsLearnedPredictionsButNoFillers() {
         val controller = newController(personalizationProvider = { true }, starterWordsProvider = { false })
         controller.onContextReset()

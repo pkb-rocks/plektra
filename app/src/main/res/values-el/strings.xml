@@ -945,6 +945,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="nav_mode_action">Action</string>
     <string name="nav_mode_native_ctrl">Native Ctrl</string>
     <string name="nav_mode_none">None</string>
+    <string name="nav_mode_command">Εντολή</string>
     <string name="nav_mode_use_default">Χρήση προεπιλογής: %1$s</string>
     <string name="nav_mode_save">Αποθήκευση</string>
     <string name="nav_mode_cancel">Άκυρο</string>

@@ -976,6 +976,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="nav_mode_action">Action</string>
     <string name="nav_mode_native_ctrl">Native Ctrl</string>
     <string name="nav_mode_none">None</string>
+    <string name="nav_mode_command">Command</string>
     <string name="nav_mode_use_default">Use Default: %1$s</string>
     <string name="nav_mode_save">Save</string>
     <string name="nav_mode_cancel">Cancel</string>

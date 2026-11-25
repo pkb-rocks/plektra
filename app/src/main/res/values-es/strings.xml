@@ -213,6 +213,7 @@
     <string name="nav_mode_keycode">Keycode</string>
     <string name="nav_mode_action">Acción</string>
     <string name="nav_mode_none">Ninguno</string>
+    <string name="nav_mode_command">Comando</string>
     <string name="nav_mode_use_default">Usar Predeterminado: %1$s</string>
     <string name="nav_mode_save">Guardar</string>
     <string name="nav_mode_cancel">Cancelar</string>

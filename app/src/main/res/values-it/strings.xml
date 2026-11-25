@@ -466,6 +466,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="nav_mode_action">Azione</string>
     <string name="nav_mode_native_ctrl">Native Ctrl</string>
     <string name="nav_mode_none">Nessuno</string>
+    <string name="nav_mode_command">Comando</string>
     <string name="nav_mode_use_default">Usa Predefinito: %1$s</string>
     <string name="nav_mode_save">Salva</string>
     <string name="nav_mode_cancel">Annulla</string>

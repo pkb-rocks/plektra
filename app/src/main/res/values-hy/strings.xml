@@ -224,6 +224,7 @@
     <string name="nav_mode_keycode">Կոդ</string>
     <string name="nav_mode_action">Գործողություն</string>
     <string name="nav_mode_none">Չկա</string>
+    <string name="nav_mode_command">Հրաման</string>
     <string name="nav_mode_use_default">Օգտագործել լռելյայնը՝ %1$s</string>
     <string name="nav_mode_save">Պահպանել</string>
     <string name="nav_mode_cancel">Չեղարկել</string>

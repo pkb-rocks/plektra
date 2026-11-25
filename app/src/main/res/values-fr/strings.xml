@@ -207,6 +207,7 @@
     <string name="nav_mode_keycode">Keycode</string>
     <string name="nav_mode_action">Action</string>
     <string name="nav_mode_none">Aucun</string>
+    <string name="nav_mode_command">Commande</string>
     <string name="nav_mode_use_default">Utiliser par Défaut : %1$s</string>
     <string name="nav_mode_save">Enregistrer</string>
     <string name="nav_mode_cancel">Annuler</string>

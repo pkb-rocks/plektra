@@ -241,6 +241,7 @@
     <string name="nav_mode_keycode">Код клавіші</string>
     <string name="nav_mode_action">Дія</string>
     <string name="nav_mode_none">Нічого</string>
+    <string name="nav_mode_command">Команда</string>
     <string name="nav_mode_use_default">Стандартно: %1$s</string>
     <string name="nav_mode_save">Зберегти</string>
     <string name="nav_mode_cancel">Скасувати</string>

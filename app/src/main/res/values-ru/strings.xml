@@ -243,6 +243,7 @@
     <string name="nav_mode_keycode">Код</string>
     <string name="nav_mode_action">Действие</string>
     <string name="nav_mode_none">Ничего</string>
+    <string name="nav_mode_command">Команда</string>
     <string name="nav_mode_use_default">Использовать умолчания: %1$s</string>
     <string name="nav_mode_save">Сохранить</string>
     <string name="nav_mode_cancel">Отмена</string>

@@ -257,6 +257,7 @@
     <string name="nav_mode_keycode">Keycode</string>
     <string name="nav_mode_action">Hành động</string>
     <string name="nav_mode_none">Không có</string>
+    <string name="nav_mode_command">Lệnh</string>
     <string name="nav_mode_use_default">Dùng mặc định: %1$s</string>
     <string name="nav_mode_save">Lưu</string>
     <string name="nav_mode_cancel">Hủy</string>

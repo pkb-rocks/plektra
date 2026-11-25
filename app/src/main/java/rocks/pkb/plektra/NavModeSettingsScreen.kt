@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
@@ -422,8 +423,7 @@ fun NavModeSettingsScreen(
             onDismiss = { selectedKeyCode = null },
             onSave = { mapping ->
                 val newMappings = keyMappings.toMutableMap()
-                // Always set the mapping (even if "none")
-                newMappings[keyCode] = mapping ?: KeyMappingLoader.CtrlMapping("none", "")
+                newMappings[keyCode] = mapping
                 keyMappings = newMappings
                 SettingsManager.saveNavModeKeyMappings(context, newMappings)
                 selectedKeyCode = null
@@ -604,14 +604,23 @@ private fun KeyButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** The mapping the dialog would save, or null while the chosen type still needs a value. */
+internal fun keyMappingSelection(type: String?, value: String?): KeyMappingLoader.CtrlMapping? {
+    return when (type) {
+        "keycode", "action", "command" -> value?.let { KeyMappingLoader.CtrlMapping(type, it) }
+        "native_ctrl", "none" -> KeyMappingLoader.CtrlMapping(type, "")
+        else -> null
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun KeyMappingDialog(
+internal fun KeyMappingDialog(
     keyCode: Int,
     currentMapping: KeyMappingLoader.CtrlMapping?,
     defaultMapping: KeyMappingLoader.CtrlMapping?,
     onDismiss: () -> Unit,
-    onSave: (KeyMappingLoader.CtrlMapping?) -> Unit
+    onSave: (KeyMappingLoader.CtrlMapping) -> Unit
 ) {
     val keyLabel = getKeyLabel(keyCode)
     val context = LocalContext.current
@@ -620,7 +629,35 @@ private fun KeyMappingDialog(
     val commandTargets = remember { CommandRegistry(context).getCommands(CommandSurface.NavMode) }
     val defaultLabel = defaultMapping?.let { getMappingLabel(it) }
     val dialogMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.9f
-    val gridMaxHeight = dialogMaxHeight * 0.6f
+    val selection = keyMappingSelection(selectedType, selectedValue)
+    val types = listOf(
+        "keycode" to stringResource(R.string.nav_mode_keycode),
+        "action" to stringResource(R.string.nav_mode_action),
+        "native_ctrl" to stringResource(R.string.nav_mode_native_ctrl),
+        "command" to stringResource(R.string.nav_mode_command),
+        "none" to stringResource(R.string.nav_mode_none)
+    )
+    val keycodes = listOf(
+        "DPAD_UP", "DPAD_DOWN", "DPAD_LEFT", "DPAD_RIGHT",
+        "TAB", "MOVE_HOME", "MOVE_END", "PAGE_UP", "PAGE_DOWN", "ESCAPE", "DPAD_CENTER",
+        "FORWARD_DEL"
+    )
+    val actions = listOf(
+        "copy", "paste", "cut", "undo",
+        "select_all", "expand_selection_left", "expand_selection_right",
+        "move_word_left", "move_word_right",
+        "expand_selection_word_left", "expand_selection_word_right",
+        "page_start", "page_end",
+        "toggle_minimal_ui",
+        "media_play_pause", "media_previous", "media_next"
+    )
+    // Value choices for the selected type as (stored value, label).
+    val options = when (selectedType) {
+        "keycode" -> keycodes.map { it to it }
+        "action" -> actions.map { it to getActionLabel(it) }
+        "command" -> commandTargets.map { it.id to commandLabel(it) }
+        else -> emptyList()
+    }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -650,150 +687,62 @@ private fun KeyMappingDialog(
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                // Type and value choices share one scrolling list so Cancel and Save stay on screen
+                // in short windows and with large text.
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 200.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(1.dp),
+                    modifier = Modifier.weight(1f, fill = false)
                 ) {
-                    // Type selection
-                    Text(
-                        text = stringResource(R.string.nav_mode_type),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        FilterChip(
-                            selected = selectedType == "keycode",
-                            onClick = {
-                                selectedType = "keycode"
-                                selectedValue = null
-                            },
-                            label = { Text(stringResource(R.string.nav_mode_keycode)) }
-                        )
-                        FilterChip(
-                            selected = selectedType == "action",
-                            onClick = {
-                                selectedType = "action"
-                                selectedValue = null
-                            },
-                            label = { Text(stringResource(R.string.nav_mode_action)) }
-                        )
-                        FilterChip(
-                            selected = selectedType == "native_ctrl",
-                            onClick = {
-                                selectedType = "native_ctrl"
-                                selectedValue = null
-                            },
-                            label = { Text(stringResource(R.string.nav_mode_native_ctrl)) }
-                        )
-                        FilterChip(
-                            selected = selectedType == "command",
-                            onClick = {
-                                selectedType = "command"
-                                selectedValue = null
-                            },
-                            label = { Text("Command") }
-                        )
-                        FilterChip(
-                            selected = selectedType == "none",
-                            onClick = {
-                                selectedType = "none"
-                                selectedValue = null
-                            },
-                            label = { Text(stringResource(R.string.nav_mode_none)) }
-                        )
-                        if (defaultLabel != null) {
-                            TextButton(
-                                onClick = {
-                                    selectedType = defaultMapping?.type
-                                    selectedValue = defaultMapping?.value
-                                },
-                                modifier = Modifier.weight(1f),
-                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                    item(key = "type", span = { GridItemSpan(maxLineSpan) }) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = stringResource(R.string.nav_mode_type),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                Text(
-                                    text = stringResource(R.string.nav_mode_use_default, defaultLabel),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    textDecoration = TextDecoration.Underline
-                                )
+                                types.forEach { (type, label) ->
+                                    FilterChip(
+                                        selected = selectedType == type,
+                                        onClick = {
+                                            selectedType = type
+                                            selectedValue = null
+                                        },
+                                        label = { Text(label) }
+                                    )
+                                }
+                                if (defaultLabel != null) {
+                                    TextButton(
+                                        onClick = {
+                                            selectedType = defaultMapping?.type
+                                            selectedValue = defaultMapping?.value
+                                        },
+                                        modifier = Modifier.align(Alignment.CenterVertically),
+                                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.nav_mode_use_default, defaultLabel),
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            textDecoration = TextDecoration.Underline
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-
-                    // Value selection based on type
-                    if (selectedType == "keycode") {
-                        val keycodes = listOf(
-                            "DPAD_UP", "DPAD_DOWN", "DPAD_LEFT", "DPAD_RIGHT",
-                            "TAB", "MOVE_HOME", "MOVE_END", "PAGE_UP", "PAGE_DOWN", "ESCAPE", "DPAD_CENTER",
-                            "FORWARD_DEL"
+                    items(options, key = { (value, _) -> "$selectedType:$value" }) { (value, label) ->
+                        FilterChip(
+                            selected = selectedValue == value,
+                            onClick = { selectedValue = value },
+                            label = { Text(label, modifier = Modifier.padding(vertical = 4.dp)) },
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp),
-                            modifier = Modifier.heightIn(max = gridMaxHeight)
-                        ) {
-                            items(keycodes) { keycode ->
-                                FilterChip(
-                                    selected = selectedValue == keycode,
-                                    onClick = { selectedValue = keycode },
-                                    label = { Text(keycode) },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    } else if (selectedType == "action") {
-                        val actions = listOf(
-                            "copy", "paste", "cut", "undo",
-                            "select_all", "expand_selection_left", "expand_selection_right",
-                            "move_word_left", "move_word_right",
-                            "expand_selection_word_left", "expand_selection_word_right",
-                            "page_start", "page_end",
-                            "toggle_minimal_ui",
-                            "media_play_pause", "media_previous", "media_next"
-                        )
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp),
-                            modifier = Modifier.heightIn(max = gridMaxHeight)
-                        ) {
-                            items(actions) { action ->
-                                FilterChip(
-                                    selected = selectedValue == action,
-                                    onClick = { selectedValue = action },
-                                    label = { Text(getActionLabel(action)) },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    } else if (selectedType == "command") {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp),
-                            modifier = Modifier.heightIn(max = gridMaxHeight)
-                        ) {
-                            items(commandTargets, key = { it.id }) { command ->
-                                FilterChip(
-                                    selected = selectedValue == command.id,
-                                    onClick = { selectedValue = command.id },
-                                    label = {
-                                        Text(
-                                            text = commandLabel(command),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
                     }
                 }
 
@@ -812,23 +761,9 @@ private fun KeyMappingDialog(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(
-                        onClick = {
-                            val mapping = when (selectedType) {
-                                "keycode" -> selectedValue?.let {
-                                    KeyMappingLoader.CtrlMapping("keycode", it)
-                                }
-                                "action" -> selectedValue?.let {
-                                    KeyMappingLoader.CtrlMapping("action", it)
-                                }
-                                "command" -> selectedValue?.let {
-                                    KeyMappingLoader.CtrlMapping("command", it)
-                                }
-                                "native_ctrl" -> KeyMappingLoader.CtrlMapping("native_ctrl", "")
-                                "none" -> KeyMappingLoader.CtrlMapping("none", "")
-                                else -> null
-                            }
-                            onSave(mapping)
-                        },
+                        // Disabled until the chosen type has a value, so a type switch cannot save as None.
+                        onClick = { selection?.let(onSave) },
+                        enabled = selection != null,
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(stringResource(R.string.nav_mode_save))

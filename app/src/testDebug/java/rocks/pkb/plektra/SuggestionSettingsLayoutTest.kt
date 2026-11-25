@@ -114,6 +114,23 @@ class SuggestionSettingsLayoutTest {
     }
 
     @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun layoutAwareCtrlSummaryStaysWithinTwoLines() {
+        SettingsManager.setNavModeEnabled(context, true)
+        compose.setContent { NavModeSettingsScreen(onBack = {}) }
+        val summary = context.getString(R.string.layout_aware_ctrl_shortcuts_description)
+        val node = compose.onNodeWithText(summary).fetchSemanticsNode()
+        val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        node.config[androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult].action?.invoke(layouts)
+        assertTrue(layouts.single().lineCount <= 2)
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    @Config(sdk = [33], qualifiers = "de-w411dp-h2400dp")
+    fun layoutAwareCtrlSummaryStaysWithinTwoLinesInGerman() = layoutAwareCtrlSummaryStaysWithinTwoLines()
+
+    @Test
     fun navModeGuideOpensFromTheTopBarHelpAction() {
         compose.setContent { NavModeSettingsScreen(onBack = {}) }
         val guide = context.getString(R.string.nav_mode_guide_title)

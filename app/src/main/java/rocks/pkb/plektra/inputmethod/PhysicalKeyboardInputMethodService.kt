@@ -463,6 +463,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             hardwareKeypadAutoOpen.settle()
             endTemporaryKeypad()
         }
+        if (::smoothCaretOverlayController.isInitialized) refreshSmoothCaretExperiment()
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -3406,6 +3407,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
 
     private fun refreshSmoothCaretExperiment() {
         val shouldEnable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            !plektraSurfacesBlocked &&
             SettingsManager.getExperimentalSmoothCaret(this) &&
             ::smoothCaretOverlayController.isInitialized &&
             smoothCaretOverlayController.canShow() &&
@@ -3429,7 +3431,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             currentInputConnection?.setImeConsumesInput(false)
         }
         smoothCaretEditorHidden = false
-        if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.hide()
+        if (::smoothCaretOverlayController.isInitialized) {
+            if (plektraSurfacesBlocked) smoothCaretOverlayController.release()
+            else smoothCaretOverlayController.hide()
+        }
         syncCursorAnchorMonitoring()
     }
 

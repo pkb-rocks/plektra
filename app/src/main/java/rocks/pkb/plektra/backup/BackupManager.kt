@@ -307,6 +307,9 @@ object PreferencesBackupHelper {
                         }
                     }
                 }
+                if (prefName == "plektra_prefs") {
+                    SettingsManager.clicksButtonBindingSyncMarkerInvalidatedBy(restoredKey)?.let(editor::remove)
+                }
                 applied.add(qualifiedKey)
             }
             // Use commit() instead of apply() to ensure values are written synchronously

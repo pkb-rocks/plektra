@@ -11,6 +11,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import rocks.pkb.plektra.backup.PreferenceValue
+import rocks.pkb.plektra.backup.PreferenceValueType
+import rocks.pkb.plektra.backup.PreferencesBackupHelper
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
@@ -154,6 +157,39 @@ class ClicksPowerButtonSettingsTest {
             .commit()
 
         assertFalse(SettingsManager.getClicksDesiredButtonBinding(context, target)!!.pending)
+    }
+
+    @Test
+    fun restoredBindingWithTheOutputOfALocalRequestIsAppliedAndNotWritten() {
+        val target = ClicksButtonBindingTarget.RED
+        SettingsManager.setClicksDesiredButtonBinding(
+            context,
+            target,
+            ClicksDesiredButtonBinding("red_quick_launcher", ClicksPowerKeyboardProtocol.nativeRemapOutput())
+        )
+        assertTrue(SettingsManager.getClicksDesiredButtonBinding(context, target)!!.pending)
+
+        PreferencesBackupHelper.restorePreferences(
+            context,
+            mapOf(
+                "plektra_prefs" to mapOf(
+                    "clicks_red_button_binding_choice" to PreferenceValue(PreferenceValueType.STRING, "red_native"),
+                    "clicks_red_button_binding_output" to PreferenceValue(PreferenceValueType.STRING, "0000")
+                )
+            )
+        )
+
+        val restored = SettingsManager.getClicksDesiredButtonBinding(context, target)!!
+        assertEquals("red_native", restored.choiceId)
+        assertFalse(restored.pending)
+        // The firmware meanwhile carries an Alt assignment from the Clicks app.
+        val writes = mutableListOf<ByteArray>()
+        ClicksButtonBindingCoordinator(
+            store = SettingsClicksButtonBindingStore(context),
+            keyboardState = { writableClicksState(tabRemap = ClicksPowerKeyboardProtocol.leftAltRemapOutput()) },
+            writer = { ClicksButtonRemapWriter { _, output, _ -> writes += output } }
+        ).reconcile()
+        assertTrue(writes.isEmpty())
     }
 
     private fun assertBindingEquals(

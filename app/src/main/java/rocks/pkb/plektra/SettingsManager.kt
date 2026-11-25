@@ -2508,6 +2508,15 @@ object SettingsManager {
         }
     }
 
+    /**
+     * The device sync marker that a restored Clicks button binding key invalidates, or null for
+     * other keys. A restored binding counts as applied even if its output equals a local request.
+     */
+    internal fun clicksButtonBindingSyncMarkerInvalidatedBy(restoredKey: String): String? =
+        ClicksButtonBindingTarget.entries
+            .firstOrNull { restoredKey in clicksDesiredButtonBindingKeys(it).toList() }
+            ?.let(::clicksPendingButtonBindingKey)
+
     private fun clicksPendingButtonBindingKey(target: ClicksButtonBindingTarget): String =
         when (target) {
             ClicksButtonBindingTarget.RED -> KEY_CLICKS_RED_BUTTON_BINDING_PENDING_OUTPUT

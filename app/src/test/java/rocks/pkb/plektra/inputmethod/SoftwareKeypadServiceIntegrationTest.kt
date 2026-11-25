@@ -331,7 +331,7 @@ class SoftwareKeypadServiceIntegrationTest {
                 clipboardEnabled = true, emojiPickerEnabled = true))
         SettingsManager.setKeyboardBarHiddenInApp(context, "sym.test", true)
         prepareSymField()
-        setField(service, "keyboardBarHiddenInEditor", true)
+        setField(service, "plektraSurfacesBlocked", true)
         assertEquals(1, tapSym(onScreen = false, at = 1_000L))
         assertEquals(2, tapSym(onScreen = false, at = 2_000L))
         assertEquals(0, tapSym(onScreen = false, at = 3_000L))
@@ -343,7 +343,7 @@ class SoftwareKeypadServiceIntegrationTest {
         SettingsManager.setSymPagesConfig(context,
             SymPagesConfig(deviceEnabled = false, emojiEnabled = true, symbolsEnabled = true, emojiPickerEnabled = true))
         SettingsManager.setKeyboardBarHiddenInApp(context, "sym.test", true)
-        setField(service, "keyboardBarHiddenInEditor", true)
+        setField(service, "plektraSurfacesBlocked", true)
         assertEquals(1, tapSym(onScreen = false, at = 1_000L))
         // P leaves the layer's own page for a generated one, where A is the search key.
         pressHardwareKey(KeyEvent.KEYCODE_P)
@@ -356,7 +356,7 @@ class SoftwareKeypadServiceIntegrationTest {
         }
 
         SettingsManager.setKeyboardBarHiddenInApp(context, "sym.test", false)
-        setField(service, "keyboardBarHiddenInEditor", false)
+        setField(service, "plektraSurfacesBlocked", false)
         pressHardwareKey(KeyEvent.KEYCODE_A)
         assertEquals("unblocked, the same key opens the picker", 4, symPage())
     }

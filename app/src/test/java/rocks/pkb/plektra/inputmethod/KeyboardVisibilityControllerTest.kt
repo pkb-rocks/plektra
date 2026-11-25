@@ -593,6 +593,23 @@ class KeyboardVisibilityControllerTest {
         assertEquals(1, h.showRequests)
     }
 
+    /**
+     * Contract for refresh-only requests such as Android's API 36 IME switcher callback
+     * (onCustomImeSwitcherButtonRequestedVisible): they refresh the bar but never open a
+     * blocked surface, whether the block is per-app or global hardware-only mode.
+     */
+    @Test
+    fun refreshOnlyRequestsNeverOpenABlockedSurface() {
+        val h = Harness()
+        h.blocked = true
+        h.controller.onKeyboardBarConfigurationChanged()
+        h.controller.syncStatusBarPresentationModeFromSettings()
+        h.drain()
+        assertEquals(0, h.showRequests + h.inputAttachments + h.candidatesAttachments)
+        assertTrue(h.windowShows.isEmpty())
+        assertTrue(h.candidatesShown.none { it })
+    }
+
     private inner class Harness {
         var allowPersistent = true
         var blocked = false

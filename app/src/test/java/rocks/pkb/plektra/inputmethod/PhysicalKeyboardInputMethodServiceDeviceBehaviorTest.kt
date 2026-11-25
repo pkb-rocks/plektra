@@ -2042,6 +2042,147 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         assertFalse(visibilityController().allowsSurface())
     }
 
+    // --- Global hardware-only mode (#228) ---
+
+    @Test
+    fun hardwareOnly_vetoesEverySurfaceInEveryAppAndVirtualModeWhileHardwareInputWorks() {
+        val context = RuntimeEnvironment.getApplication()
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        assertFalse("off by default", SettingsManager.getHardwareOnlyMode(context))
+        SettingsManager.setHardwareOnlyMode(context, true)
+        try {
+            for (pkg in listOf("com.example.one", "rocks.pkb.plektra.test")) {
+                for (mode in listOf(SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE,
+                        SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL)) {
+                    // A software-mode override must not get past the veto.
+                    SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, mode)
+                    focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = pkg)
+                    assertFalse("$pkg $mode", visibilityController().allowsSurface())
+                    assertFalse("$pkg $mode", service.onEvaluateInputViewShown())
+                    assertFalse("$pkg $mode", service.onShowInputRequested(0, false))
+                }
+            }
+            SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE)
+            focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT)
+
+            // Explicit SYM-page, emoji and clipboard opens leave every picker closed.
+            assertFalse(symLayout().openEmojiPickerPage())
+            assertFalse(symLayout().openClipboardPage())
+            setField(service, "physicalKeyboardProfileOverride", "mp01")
+            assertTrue("the dedicated emoji key is consumed",
+                service.onKeyDown(666, keyEvent(KeyEvent.ACTION_DOWN, 666, 9_500L, 9_500L)))
+            assertEquals(0, symLayout().currentSymPage())
+            setField(service, "physicalKeyboardProfileOverride", "auto")
+
+            // Letters, a held Shift, the hardware SYM layer and a Ctrl shortcut keep working.
+            val t0 = 10_000L
+            service.onKeyDown(KeyEvent.KEYCODE_B, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_B, t0, t0))
+            service.onKeyUp(KeyEvent.KEYCODE_B, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_B, t0, t0 + 20L))
+            val shiftMeta = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+            service.onKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT,
+                keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SHIFT_LEFT, t0 + 100L, t0 + 100L, shiftMeta))
+            service.onKeyDown(KeyEvent.KEYCODE_C,
+                keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_C, t0 + 150L, t0 + 150L, shiftMeta))
+            service.onKeyUp(KeyEvent.KEYCODE_C,
+                keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_C, t0 + 150L, t0 + 170L, shiftMeta))
+            service.onKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT,
+                keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SHIFT_LEFT, t0 + 100L, t0 + 200L))
+            tapSym(t0 + 300L)
+            service.onKeyDown(KeyEvent.KEYCODE_A, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A, t0 + 340L, t0 + 340L))
+            service.onKeyUp(KeyEvent.KEYCODE_A, keyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_A, t0 + 340L, t0 + 360L))
+            assertEquals("commits=${recorder.committedTexts}", listOf("b", "C", "@"), recorder.committedTexts)
+            shadowOf(android.os.Looper.getMainLooper()).idle()
+            tapCtrl(t0 + 1_000L)
+            service.onKeyDown(KeyEvent.KEYCODE_A, keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A, t0 + 1_060L, t0 + 1_060L))
+            assertTrue("Ctrl+A stays a shortcut, commits=${recorder.committedTexts}",
+                recorder.contextMenuActions.contains(android.R.id.selectAll) || recorder.sentKeyEvents.isNotEmpty())
+            assertFalse(visibilityController().allowsSurface())
+        } finally {
+            SettingsManager.setHardwareOnlyMode(context, false)
+            SettingsManager.setSoftwareKeyboardModeRuntimeOverride(context, null)
+        }
+    }
+
+    @Test
+    fun hardwareOnly_liveToggleClosesOpenPickersAndLeavesThePerAppListInEffect() {
+        val context = RuntimeEnvironment.getApplication()
+        val looper = shadowOf(android.os.Looper.getMainLooper())
+        SettingsManager.setKeyboardBarHiddenInApp(context, "com.example.blocked", true)
+        try {
+            focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = "com.example.allowed")
+            assertTrue(symLayout().openEmojiPickerPage())
+
+            // Switched on in the open editor: the picker closes and no show path opens anything.
+            SettingsManager.setHardwareOnlyMode(context, true)
+            looper.idle()
+            assertEquals(0, symLayout().currentSymPage())
+            assertFalse(visibilityController().allowsSurface())
+            assertFalse(service.onShowInputRequested(0, false))
+            assertFalse(symLayout().openClipboardPage())
+
+            // Switched off again: the same editor gets its surface back without a refocus.
+            SettingsManager.setHardwareOnlyMode(context, false)
+            looper.idle()
+            assertTrue(visibilityController().allowsSurface())
+            assertTrue(symLayout().openEmojiPickerPage())
+            symLayout().closeSymPage()
+
+            // The per-app choice was never touched and still applies with the global mode off.
+            assertEquals(setOf("com.example.blocked"), SettingsManager.getKeyboardBarHiddenPackages(context))
+            focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT, packageName = "com.example.blocked")
+            assertFalse(visibilityController().allowsSurface())
+        } finally {
+            SettingsManager.setHardwareOnlyMode(context, false)
+            SettingsManager.setKeyboardBarHiddenInApp(context, "com.example.blocked", false)
+        }
+    }
+
+    @Test
+    fun surfaceVeto_hidesAVisibleCaretBadgeAndRestoresItWhenLifted() {
+        val context = RuntimeEnvironment.getApplication()
+        val looper = shadowOf(android.os.Looper.getMainLooper())
+        org.robolectric.shadows.ShadowSettings.setCanDrawOverlays(true)
+        SettingsManager.setCaretModifierBadgeEnabled(context, true)
+        SettingsManager.setAutoCapitalizeFirstLetter(context, false)
+        try {
+            focusNewField(RecordingInputConnection(), InputType.TYPE_CLASS_TEXT)
+            val badge = getField<Lazy<CaretBadgeController>>(service, "caretBadgeController\$delegate").value
+            fun attached() = getField<Boolean>(badge, "attached")
+            val caret = android.view.inputmethod.CursorAnchorInfo.Builder().setMatrix(android.graphics.Matrix())
+                .setInsertionMarkerLocation(100f, 100f, 115f, 120f,
+                    android.view.inputmethod.CursorAnchorInfo.FLAG_HAS_VISIBLE_REGION)
+                .build()
+            tapShift(11_000L)
+            looper.idle()
+            service.onUpdateCursorAnchorInfo(caret)
+            assertTrue("precondition: the armed Shift shows the badge", attached())
+
+            SettingsManager.setHardwareOnlyMode(context, true)
+            looper.idle()
+            assertFalse("the overlay window is removed, so it exposes no node", attached())
+            if (!modifierController().shiftOneShot) tapShift(12_000L)
+            looper.idle()
+            assertTrue("hardware Shift still arms", modifierController().shiftOneShot)
+            service.onUpdateCursorAnchorInfo(caret)
+            assertFalse("an armed modifier shows no badge under the veto", attached())
+
+            SettingsManager.setHardwareOnlyMode(context, false)
+            looper.idle()
+            service.onUpdateCursorAnchorInfo(caret)
+            assertTrue(attached())
+
+            // The per-app veto covers the badge the same way.
+            SettingsManager.setKeyboardBarHiddenInApp(context, "rocks.pkb.plektra.test", true)
+            looper.idle()
+            assertFalse(attached())
+        } finally {
+            SettingsManager.setHardwareOnlyMode(context, false)
+            SettingsManager.setKeyboardBarHiddenInApp(context, "rocks.pkb.plektra.test", false)
+            SettingsManager.setCaretModifierBadgeEnabled(context, false)
+            org.robolectric.shadows.ShadowSettings.setCanDrawOverlays(false)
+        }
+    }
+
     private fun visibilityController(): KeyboardVisibilityController =
         getField(service, "keyboardVisibilityController")
 

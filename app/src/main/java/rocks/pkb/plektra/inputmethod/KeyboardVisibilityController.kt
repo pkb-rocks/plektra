@@ -10,10 +10,12 @@ import rocks.pkb.plektra.core.SymLayoutController
 /**
  * Owns explicit show requests; framework callbacks alone never prove that a child was drawn.
  *
- * Visibility precedence, strongest first: [isSurfaceBlocked] (per-app "never show the bar")
- * vetoes every surface, including explicit opens, hardware-key recovery and transient SYM
- * pages; then [allowsPersistentSurface] together with transient content; then configured
- * content and automatic show decisions. New overrides must stay below the app block.
+ * Visibility precedence, strongest first: [isSurfaceBlocked] (global hardware-only mode or
+ * per-app "never show the bar") vetoes every surface, including explicit opens, hardware-key
+ * recovery, transient SYM pages and software-mode overrides; then [allowsPersistentSurface]
+ * together with transient content; then configured content and automatic show decisions.
+ * New overrides must stay below the block. Callbacks that only refresh the bar, such as
+ * Android's API 36 IME switcher request, must not open a surface themselves.
  */
 class KeyboardVisibilityController(
     private val context: Context,

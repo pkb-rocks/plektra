@@ -271,7 +271,7 @@ internal class DirectBootKeyboardConfig(private val context: Context) {
                 "french_punctuation_spacing", "french_punctuation_only_french", "comma_space",
                 "auto_space_punctuation", "space_after_punctuation", "smart_quotes", "smart_quotes_style",
                 "swipe_to_delete", "swipe_to_delete_provider", "swipe_incremental_threshold",
-                "auto_show_keyboard", "auto_show_respect_app_visibility", "hardware_keypad_auto_open",
+                "auto_show_keyboard", "auto_show_respect_app_visibility", "hardware_keypad_auto_open", "hardware_only_mode",
                 "slim_mode_override", "slim_mode_active", "overlapping_keys_enabled",
                 "experimental_candidates_view_enabled", "modifier_indicator_mode", "status_bar_variations_visible",
                 "tap_haptic_use_system", "tap_haptic_duration_ms",

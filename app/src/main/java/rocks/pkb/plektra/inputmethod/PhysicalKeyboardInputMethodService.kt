@@ -290,8 +290,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     
     // Current package name
     private var currentPackageName: String? = null
-    /** Per-app "never show the bar"; vetoes every IME surface while hardware input keeps working. */
-    private var keyboardBarHiddenInEditor = false
+    /**
+     * Global hardware-only mode or per-app "never show the bar": vetoes every Plektra surface,
+     * including the caret badge, while hardware input keeps working. See [refreshPlektraSurfaceBlock].
+     */
+    private var plektraSurfacesBlocked = false
     
     // Constants
     private val DOUBLE_TAP_THRESHOLD = 500L
@@ -442,7 +445,24 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Exact Typing: the raw-mode choice also covers WebAPKs (matched via their host browser).
         val isRawModeApp = SettingsManager.isRawModeApp(this, info?.packageName)
         inputContextState = InputContextState.fromEditorInfo(info, isRawModeApp)
-        keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, info?.packageName)
+        plektraSurfacesBlocked = SettingsManager.arePlektraSurfacesBlocked(this, info?.packageName)
+    }
+
+    /**
+     * Re-reads the surface veto for the current editor after a settings change. A newly blocked
+     * editor also loses every open picker, invisible expansion candidate and keypad decision;
+     * the caller refreshes the bar and the visibility controller, which closes the window.
+     */
+    private fun refreshPlektraSurfaceBlock() {
+        plektraSurfacesBlocked = SettingsManager.arePlektraSurfacesBlocked(this, currentInputEditorInfo?.packageName)
+        // Closes an open clipboard or emoji picker page and drops invisible candidates.
+        symLayoutController.currentSymPage()
+        if (plektraSurfacesBlocked) {
+            if (::textExpansionController.isInitialized) textExpansionController.clear()
+            // Back to the hardware surface: no open keypad decision or field-scoped keypad.
+            hardwareKeypadAutoOpen.settle()
+            endTemporaryKeypad()
+        }
     }
 
     private fun markSelectionUpdateSkipAfterCommit() {
@@ -2038,7 +2058,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     )
                 ).map { config ->
                     // A hidden bar must not keep invisible candidates that Space/Tab/Enter accept.
-                    if (keyboardBarHiddenInEditor) config.copy(presentation = ExpansionPresentation.OFF) else config
+                    if (plektraSurfacesBlocked) config.copy(presentation = ExpansionPresentation.OFF) else config
                 }
             },
             showSuggestionBar = { labels, onSelected ->
@@ -2367,7 +2387,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
         }
         symLayoutController = SymLayoutController(this, prefs, alternateCharacterManager) {
-            !keyboardBarHiddenInEditor
+            !plektraSurfacesBlocked
         }
         // The emoji pages read the emoji categories synchronously: load them ahead.
         expansionAssetScope.launch {
@@ -2406,7 +2426,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 SettingsManager.getShowKeyboardBarOnLauncher(this) ||
                     !LauncherEditorPolicy.isNiagaraHomeEditor(currentInputEditorInfo)
             },
-            isSurfaceBlocked = { keyboardBarHiddenInEditor },
+            isSurfaceBlocked = { plektraSurfacesBlocked },
             isNavModeLatched = { ctrlLatchFromNavMode },
             currentInputConnection = { currentInputConnection },
             isInputViewShown = { isInputViewShown },
@@ -2672,19 +2692,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Handler(Looper.getMainLooper()).post {
                     updateStatusBarText()
                 }
-            } else if (key == SettingsManager.KEY_KEYBOARD_BAR_HIDDEN_APPS) {
+            } else if (
+                key == SettingsManager.KEY_KEYBOARD_BAR_HIDDEN_APPS || key == SettingsManager.KEY_HARDWARE_ONLY_MODE
+            ) {
                 Handler(Looper.getMainLooper()).post {
-                    keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(
-                        this, currentInputEditorInfo?.packageName
-                    )
-                    // Closes an open clipboard or emoji picker page and drops invisible candidates.
-                    symLayoutController.currentSymPage()
-                    if (keyboardBarHiddenInEditor) {
-                        if (::textExpansionController.isInitialized) textExpansionController.clear()
-                        // Back to the hardware surface: no open keypad decision or field-scoped keypad.
-                        hardwareKeypadAutoOpen.settle()
-                        endTemporaryKeypad()
-                    }
+                    refreshPlektraSurfaceBlock()
                     invalidateRenderedStatusSnapshot()
                     updateStatusBarText()
                     keyboardVisibilityController.onKeyboardBarConfigurationChanged()
@@ -3227,7 +3239,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         trackpadGestureDetector.stop()
         trackpadGestureDetector = buildTrackpadGestureDetector()
         if (shouldStartShizukuTrackpadDetector()) trackpadGestureDetector.start()
-        keyboardBarHiddenInEditor = SettingsManager.isKeyboardBarHiddenInApp(this, currentInputEditorInfo?.packageName)
+        refreshPlektraSurfaceBlock()
         if (isInputViewActive) suggestionController.readInitialContext(currentInputConnection)
         invalidateRenderedStatusSnapshot()
         updateStatusBarText()
@@ -3696,7 +3708,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Show the armed modifier beside the text cursor
         // Never in restricted fields (passwords and the like): the badge would reveal the Shift state of
         // what is being typed to anything that can see the screen.
+        // A surface veto also covers the badge: it is Plektra UI drawn over the app.
         val caretBadgeAllowed = SettingsManager.getCaretModifierBadgeEnabled(this) &&
+            !plektraSurfacesBlocked &&
             !inputContextState.shouldDisableSuggestions &&
             caretBadgeController.canDrawOverlays()
         caretBadgeController.onSnapshot(snapshot, caretBadgeAllowed)

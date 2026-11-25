@@ -2434,6 +2434,24 @@ object SettingsManager {
             .apply()
     }
 
+    /**
+     * Hardware-only mode: Plektra shows no surface in any app (bar, on-screen keyboard, SYM pages,
+     * emoji picker, clipboard, caret badge) while physical typing keeps working. Off by default;
+     * the per-app list above keeps its own effect while this is off.
+     */
+    const val KEY_HARDWARE_ONLY_MODE = "hardware_only_mode"
+
+    fun getHardwareOnlyMode(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_HARDWARE_ONLY_MODE, false)
+
+    fun setHardwareOnlyMode(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_HARDWARE_ONLY_MODE, enabled).apply()
+    }
+
+    /** The single surface veto: global hardware-only mode or the per-app »never show the bar«. */
+    fun arePlektraSurfacesBlocked(context: Context, packageName: String?): Boolean =
+        getHardwareOnlyMode(context) || isKeyboardBarHiddenInApp(context, packageName)
+
     fun getAutoShowKeyboard(context: Context): Boolean {
         return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
     }

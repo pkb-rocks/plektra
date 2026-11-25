@@ -46,6 +46,8 @@
         <package android:name="net.dinglisch.android.taskerm" />
         <package android:name="io.homeassistant.companion.android" />
         <package android:name="com.clicks.companionapp" />
+        <!-- Unihertz keyboard backlight settings for the device-control command -->
+        <package android:name="com.agui.settings" />
     </queries>
 
     <application

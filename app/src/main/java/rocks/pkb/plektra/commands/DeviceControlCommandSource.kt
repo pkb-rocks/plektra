@@ -1,7 +1,9 @@
 package rocks.pkb.plektra.commands
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -34,6 +36,15 @@ class DeviceControlCommandSource : CommandSource {
                 add(settingsCommand("settings.android.internet_panel", "Internet", Settings.Panel.ACTION_INTERNET_CONNECTIVITY, opensPanel = true))
             }
             add(settingsCommand("settings.android.display", "Display / brightness", Settings.ACTION_DISPLAY_SETTINGS))
+            add(
+                settingsCommand(
+                    id = COMMAND_UNIHERTZ_KEYBOARD_BACKLIGHT,
+                    label = "Keyboard backlight",
+                    action = Intent.ACTION_MAIN,
+                    componentName = UNIHERTZ_KEYBOARD_BACKLIGHT_COMPONENT,
+                    searchTokens = listOf("light", "LED", "keyboard backlight duration")
+                )
+            )
             add(settingsCommand("settings.android.sound", "Sound & vibration", Settings.ACTION_SOUND_SETTINGS))
             add(settingsCommand("settings.android.nfc", "NFC", Settings.ACTION_NFC_SETTINGS))
             add(settingsCommand("settings.android.battery", "Battery", Settings.ACTION_BATTERY_SAVER_SETTINGS))
@@ -78,7 +89,9 @@ class DeviceControlCommandSource : CommandSource {
         action: String,
         data: String? = null,
         opensPanel: Boolean = false,
-        extras: Map<String, String> = emptyMap()
+        extras: Map<String, String> = emptyMap(),
+        componentName: String? = null,
+        searchTokens: List<String> = emptyList()
     ): CommandTarget {
         return CommandTarget(
             id = id,
@@ -87,24 +100,26 @@ class DeviceControlCommandSource : CommandSource {
             label = label,
             subtitle = if (opensPanel) "System panel" else "Settings",
             icon = CommandIcon.Settings,
-            launch = SettingsIntentSpec(action, data, extras),
+            launch = SettingsIntentSpec(action, data, extras, componentName),
             capabilities = buildSet {
                 add(CommandCapability.SendsIntent)
                 if (opensPanel) add(CommandCapability.OpensSystemPanel)
             },
             defaultSurfaces = setOf(CommandSurface.AssignedKey, CommandSurface.NavMode, CommandSurface.QuickLauncher),
-            searchTokens = listOf(label, "settings", "system", "device", "control")
+            searchTokens = listOf(label, "settings", "system", "device", "control") + searchTokens
         )
     }
 
     private fun SettingsIntentSpec(
         action: String,
         data: String?,
-        extras: Map<String, String>
+        extras: Map<String, String>,
+        componentName: String?
     ): CommandLaunchSpec.IntentUri {
         return CommandLaunchSpec.IntentUri(
             action = action,
             data = data,
+            componentName = componentName,
             flags = extras.map { "${it.key}=${it.value}" }
         )
     }
@@ -112,6 +127,17 @@ class DeviceControlCommandSource : CommandSource {
     private fun Context.canResolve(launch: CommandLaunchSpec): Boolean {
         if (launch is CommandLaunchSpec.InternalAction) return true
         val spec = launch as? CommandLaunchSpec.IntentUri ?: return false
+        spec.componentName?.let { flattened ->
+            val component = ComponentName.unflattenFromString(flattened) ?: return false
+            return try {
+                val info = packageManager.getActivityInfo(component, 0)
+                info.exported && info.enabled &&
+                    (info.permission.isNullOrEmpty() ||
+                        checkSelfPermission(info.permission) == PackageManager.PERMISSION_GRANTED)
+            } catch (_: PackageManager.NameNotFoundException) {
+                false
+            }
+        }
         val intent = Intent(spec.action, spec.data?.let(Uri::parse))
         return intent.resolveActivity(packageManager) != null
     }
@@ -128,6 +154,12 @@ class DeviceControlCommandSource : CommandSource {
         const val ACTION_BRIGHTNESS_DOWN = "device.brightness.down"
         const val ACTION_EXPAND_NOTIFICATIONS = "device.shade.notifications"
         const val ACTION_EXPAND_QUICK_SETTINGS = "device.shade.quick_settings"
+        const val COMMAND_UNIHERTZ_KEYBOARD_BACKLIGHT = "settings.unihertz.keyboard_backlight"
+
+        // Exported vendor screen behind the Titan 2 Elite "Keyboard LED" Quick Settings tile.
+        // Switching the backlight directly requires a vendor service that ordinary apps cannot reach.
+        const val UNIHERTZ_KEYBOARD_BACKLIGHT_COMPONENT =
+            "com.agui.settings/com.agui.settings.touchpad.KeyboardLEDSettingsActivity"
         private const val ACTION_NOTIFICATION_SETTINGS = "android.settings.NOTIFICATION_SETTINGS"
     }
 }

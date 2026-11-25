@@ -16,6 +16,7 @@ object SettingLinkIds {
     const val MAIN_TEXT_INPUT = "main.text_input"
     const val MAIN_AUTO_CORRECTION = "main.auto_correction"
     const val MAIN_KEYBOARD_THEME = "main.keyboard_theme"
+    const val MAIN_APP_APPEARANCE = "main.app_appearance"
     const val MAIN_APP_LANGUAGE = "main.app_language"
     const val MAIN_STATUS_BAR_BUTTONS = "main.status_bar_buttons"
     const val MAIN_CUSTOMIZATION = "main.customization"
@@ -28,6 +29,9 @@ object SettingLinkIds {
 
     // App appearance
     const val CUSTOMIZATION_APP_ICON = "customization.app_icon"
+    const val APP_APPEARANCE_THEME_MODE = "app_appearance.theme_mode"
+    const val APP_APPEARANCE_DARK_SURFACE = "app_appearance.dark_surface"
+    const val APP_APPEARANCE_DYNAMIC_COLOR = "app_appearance.dynamic_color"
 
     // Text input screen
     const val TEXT_INPUT_TEXT_EXPANSION = "text_input.text_expansion"
@@ -291,6 +295,30 @@ object SettingLinkRegistry {
             R.string.keyboard_theme_title,
             destination = SettingsDestination.Customization,
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME
+        ),
+        entry(
+            SettingLinkIds.MAIN_APP_APPEARANCE,
+            R.string.app_appearance_title,
+            R.string.app_appearance_description,
+            destination = SettingsDestination.AppAppearance
+        ),
+        entry(
+            SettingLinkIds.APP_APPEARANCE_THEME_MODE,
+            R.string.app_appearance_mode_title,
+            R.string.app_appearance_mode_description,
+            destination = SettingsDestination.AppAppearance
+        ),
+        entry(
+            SettingLinkIds.APP_APPEARANCE_DARK_SURFACE,
+            R.string.app_appearance_dark_surface_title,
+            R.string.app_appearance_dark_surface_description,
+            destination = SettingsDestination.AppAppearance
+        ),
+        entry(
+            SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR,
+            R.string.app_appearance_dynamic_color_title,
+            R.string.app_appearance_dynamic_color_description,
+            destination = SettingsDestination.AppAppearance
         ),
         entry(
             SettingLinkIds.MAIN_APP_LANGUAGE,
@@ -1034,6 +1062,10 @@ object SettingLinkRegistry {
         SettingLinkIds.MAIN_TEXT_INPUT to R.string.kw_main_text_input,
         SettingLinkIds.MAIN_AUTO_CORRECTION to R.string.kw_main_auto_correction,
         SettingLinkIds.MAIN_KEYBOARD_THEME to R.string.kw_main_keyboard_theme,
+        SettingLinkIds.MAIN_APP_APPEARANCE to R.string.kw_main_app_appearance,
+        SettingLinkIds.APP_APPEARANCE_THEME_MODE to R.string.kw_app_appearance_theme_mode,
+        SettingLinkIds.APP_APPEARANCE_DARK_SURFACE to R.string.kw_app_appearance_dark_surface,
+        SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR to R.string.kw_app_appearance_dynamic_color,
         SettingLinkIds.MAIN_APP_LANGUAGE to R.string.kw_main_app_language,
         SettingLinkIds.MAIN_CUSTOMIZATION to R.string.kw_main_customization,
         SettingLinkIds.MAIN_ADVANCED to R.string.kw_main_advanced,
@@ -1142,6 +1174,7 @@ object SettingLinkRegistry {
         SettingsDestination.About to R.string.about_title,
         SettingsDestination.CustomInputStyles to R.string.custom_input_styles_title,
         SettingsDestination.AppLanguage to R.string.app_language_title,
+        SettingsDestination.AppAppearance to R.string.app_appearance_title,
         SettingsDestination.Modifiers to R.string.modifiers_title,
         SettingsDestination.ModifierIndicators to R.string.modifiers_section_indicators
     )

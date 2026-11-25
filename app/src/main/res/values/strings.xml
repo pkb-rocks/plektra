@@ -2015,4 +2015,34 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kaomoji_placement_emoji">After the emoji</string>
     <string name="kaomoji_placement_off">Off</string>
     <string name="emoji_picker_extras_title">Text symbols and kaomoji in the emoji picker</string>
+
+    <!-- App appearance settings -->
+    <string name="app_appearance_title">Appearance</string>
+    <string name="app_appearance_description">Theme mode, dark surface style, and dynamic colors</string>
+    <string name="app_appearance_mode_title">Theme mode</string>
+    <string name="app_appearance_mode_description">Choose whether Plektra follows your device theme or stays light or dark.</string>
+    <string name="app_appearance_mode_system">System</string>
+    <string name="app_appearance_mode_system_description">Follow device theme</string>
+    <string name="app_appearance_mode_light">Light</string>
+    <string name="app_appearance_mode_light_description">Always use light surfaces</string>
+    <string name="app_appearance_mode_dark">Dark</string>
+    <string name="app_appearance_mode_dark_description">Always use dark surfaces</string>
+    <string name="app_appearance_dark_surface_title">Dark surfaces</string>
+    <string name="app_appearance_dark_surface_description">Choose standard Material dark gray or pure black for OLED displays.</string>
+    <string name="app_appearance_dark_surface_light_hint">Applies when Dark or System dark theme is active.</string>
+    <string name="app_appearance_dark_surface_gray">Gray</string>
+    <string name="app_appearance_dark_surface_gray_description">Regular Material dark surface</string>
+    <string name="app_appearance_dark_surface_oled">OLED black</string>
+    <string name="app_appearance_dark_surface_oled_description">Pure black background with subtly elevated dark surfaces</string>
+    <string name="app_appearance_color_title">Colors</string>
+    <string name="app_appearance_dynamic_color_title">Dynamic system colors</string>
+    <string name="app_appearance_dynamic_color_description">Adapt app accent and surface tones to your wallpaper.</string>
+    <string name="app_appearance_dynamic_color_unavailable">Requires Android 12 or newer.</string>
+    <string name="app_appearance_summary_dynamic">Dynamic</string>
+    <string name="app_appearance_preview_content_description">Appearance preview: %1$s</string>
+    <string name="app_appearance_scope_note">Applies to Plektra app screens and dialogs. Keyboard themes are configured separately.</string>
+    <string name="kw_main_app_appearance">appearance, app theme, dark mode, light mode, system, oled, amoled, black, gray, grey, dynamic colors, material you, wallpaper</string>
+    <string name="kw_app_appearance_theme_mode">theme mode, system, light, dark, night mode, day mode</string>
+    <string name="kw_app_appearance_dark_surface">dark surface, oled, amoled, pure black, true black, pitch black, gray, grey, surface</string>
+    <string name="kw_app_appearance_dynamic_color">dynamic color, dynamic colors, material you, wallpaper, monet, system colors</string>
 </resources>

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.material.icons.filled.RoundedCorner
+import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Language
@@ -75,6 +76,7 @@ enum class SettingsDestination {
     About,
     CustomInputStyles,
     AppLanguage,
+    AppAppearance,
     DeviceSymLayerEditor,
     Modifiers,
     ModifierIndicators
@@ -237,7 +239,8 @@ fun SettingsScreen(
                     onAboutClick = { navigateTo(SettingsDestination.About) },
                     onBackClick = { navigateBack() },
                     onCustomInputStylesClick = { navigateTo(SettingsDestination.CustomInputStyles) },
-                    onAppLanguageClick = { navigateTo(SettingsDestination.AppLanguage) }
+                    onAppLanguageClick = { navigateTo(SettingsDestination.AppLanguage) },
+                    onAppAppearanceClick = { navigateTo(SettingsDestination.AppAppearance) }
                 )
             }
             SettingsDestination.KeyboardsDevices -> {
@@ -320,6 +323,9 @@ fun SettingsScreen(
             SettingsDestination.AppLanguage -> {
                 AppLanguageSettingsScreen(modifier = modifier, onBack = { navigateBack() })
             }
+            SettingsDestination.AppAppearance -> {
+                AppAppearanceSettingsScreen(modifier = modifier, onBack = { navigateBack() })
+            }
             SettingsDestination.DeviceSymLayerEditor -> {
                 DeviceSymLayerEditorStubScreen(modifier = modifier, onBack = { navigateBack() })
             }
@@ -379,9 +385,11 @@ private fun SettingsMainScreen(
     onBackClick: () -> Unit,
     onCustomInputStylesClick: () -> Unit,
     onAppLanguageClick: () -> Unit,
+    onAppAppearanceClick: () -> Unit,
     onOpenSettingEntry: (SettingEntry) -> Unit
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    val appAppearancePreferences = rocks.pkb.plektra.ui.theme.rememberAppAppearancePreferences()
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchResults = remember(searchQuery, context) {
         SettingLinkRegistry.search(context, searchQuery)
@@ -511,6 +519,13 @@ private fun SettingsMainScreen(
                 title = stringResource(R.string.keyboard_theme_title),
                 linkId = SettingLinkIds.MAIN_KEYBOARD_THEME,
                 onClick = onKeyboardThemeClick
+            )
+            SettingsCategoryRow(
+                icon = Icons.Filled.Contrast,
+                title = stringResource(R.string.app_appearance_title),
+                description = currentAppAppearanceSummary(context, appAppearancePreferences),
+                linkId = SettingLinkIds.MAIN_APP_APPEARANCE,
+                onClick = onAppAppearanceClick
             )
             SettingsCategoryRow(
                 icon = ImageVector.vectorResource(R.drawable.translate_24),

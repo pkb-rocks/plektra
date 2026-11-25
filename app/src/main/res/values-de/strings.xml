@@ -1699,4 +1699,34 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kaomoji_placement_emoji">Nach den Emoji</string>
     <string name="kaomoji_placement_off">Aus</string>
     <string name="emoji_picker_extras_title">Textsymbole und Kaomoji im Emoji-Picker</string>
+
+    <!-- App-Darstellung -->
+    <string name="app_appearance_title">Darstellung</string>
+    <string name="app_appearance_description">Modus, dunkle Flächen und dynamische Systemfarben</string>
+    <string name="app_appearance_mode_title">Modus</string>
+    <string name="app_appearance_mode_description">Wähle, ob Plektra dem System folgt oder dauerhaft hell bzw. dunkel bleibt.</string>
+    <string name="app_appearance_mode_system">System</string>
+    <string name="app_appearance_mode_system_description">Geräte-Design übernehmen</string>
+    <string name="app_appearance_mode_light">Hell</string>
+    <string name="app_appearance_mode_light_description">Immer helle Oberflächen verwenden</string>
+    <string name="app_appearance_mode_dark">Dunkel</string>
+    <string name="app_appearance_mode_dark_description">Immer dunkle Oberflächen verwenden</string>
+    <string name="app_appearance_dark_surface_title">Dunkle Flächen</string>
+    <string name="app_appearance_dark_surface_description">Wähle zwischen regulärem dunklem Material-Grau und reinem OLED-Schwarz.</string>
+    <string name="app_appearance_dark_surface_light_hint">Wird aktiv, sobald der Dunkelmodus oder ein dunkles Systemdesign genutzt wird.</string>
+    <string name="app_appearance_dark_surface_gray">Grau</string>
+    <string name="app_appearance_dark_surface_gray_description">Reguläre dunkle Material-Oberfläche</string>
+    <string name="app_appearance_dark_surface_oled">OLED-Schwarz</string>
+    <string name="app_appearance_dark_surface_oled_description">Tiefschwarzer Hintergrund mit dezent abgesetzten dunklen Flächen</string>
+    <string name="app_appearance_color_title">Farben</string>
+    <string name="app_appearance_dynamic_color_title">Dynamische Systemfarben</string>
+    <string name="app_appearance_dynamic_color_description">Passt Akzent- und Oberflächenfarben an dein Hintergrundbild an.</string>
+    <string name="app_appearance_dynamic_color_unavailable">Erfordert Android 12 oder neuer.</string>
+    <string name="app_appearance_summary_dynamic">Dynamisch</string>
+    <string name="app_appearance_preview_content_description">Darstellungsvorschau: %1$s</string>
+    <string name="app_appearance_scope_note">Gilt für Plektras App-Oberfläche und Dialoge. Tastatur-Themes werden separat eingestellt.</string>
+    <string name="kw_main_app_appearance">Darstellung, Design, App-Theme, Aussehen, Dunkelmodus, Hellmodus, System, OLED, AMOLED, Schwarz, Grau, dynamische Farben, Systemfarben, Material You</string>
+    <string name="kw_app_appearance_theme_mode">Modus, System, Hell, Dunkel, Nachtmodus, Hellmodus, Dunkelmodus</string>
+    <string name="kw_app_appearance_dark_surface">dunkle Flächen, OLED, AMOLED, Schwarz, reines Schwarz, Tiefschwarz, Grau, Oberfläche</string>
+    <string name="kw_app_appearance_dynamic_color">dynamische Farben, Systemfarben, Material You, Hintergrundbild, Akzentfarben</string>
 </resources>

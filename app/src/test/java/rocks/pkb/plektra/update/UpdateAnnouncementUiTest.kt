@@ -5,9 +5,11 @@ import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Looper
+import android.util.TypedValue
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.inputmethod.NotificationHelper
+import rocks.pkb.plektra.ui.theme.AppThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -72,5 +74,72 @@ class UpdateAnnouncementUiTest {
 
         notification.contentIntent.send()
         assertEquals(releaseUrl, shadowOf(activity).nextStartedActivity.data.toString())
+    }
+
+    private fun isLightDialogTheme(context: Context): Boolean {
+        val value = TypedValue()
+        assertTrue(context.theme.resolveAttribute(android.R.attr.isLightTheme, value, true))
+        return value.data != 0
+    }
+
+    @Test
+    @Config(qualifiers = "notnight")
+    fun updateDialogsFollowForcedDarkAppThemeOnLightOs() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        SettingsManager.getPreferences(activity).edit().clear().commit()
+        SettingsManager.setAppThemeMode(activity, AppThemeMode.DARK)
+
+        showUpdateDialog(activity, "v26.10", "Plektra 26.10", "https://example.com/release")
+        assertFalse(isLightDialogTheme(ShadowAlertDialog.getLatestAlertDialog().context))
+
+        showReleaseNotice(
+            activity,
+            UpdateCheckResult(
+                successful = true,
+                hasAnnouncement = true,
+                releaseTag = "v26.10-stable",
+                displayName = "Plektra 26.10",
+                releasePageUrl = "https://example.com/stable",
+                isPlektraStableUpdate = true
+            )
+        )
+        assertFalse(isLightDialogTheme(ShadowAlertDialog.getLatestAlertDialog().context))
+
+        showReleaseNotice(
+            activity,
+            UpdateCheckResult(
+                successful = true,
+                hasAnnouncement = true,
+                releaseTag = "v26.10-nightly",
+                displayName = "Plektra Nightly",
+                releasePageUrl = "https://example.com/nightly",
+                isNightlyUpdate = true
+            )
+        )
+        assertFalse(isLightDialogTheme(ShadowAlertDialog.getLatestAlertDialog().context))
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun updateDialogsFollowForcedLightAppThemeOnDarkOs() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        SettingsManager.getPreferences(activity).edit().clear().commit()
+        SettingsManager.setAppThemeMode(activity, AppThemeMode.LIGHT)
+
+        showUpdateDialog(activity, "v26.10", "Plektra 26.10", "https://example.com/release")
+        assertTrue(isLightDialogTheme(ShadowAlertDialog.getLatestAlertDialog().context))
+
+        showReleaseNotice(
+            activity,
+            UpdateCheckResult(
+                successful = true,
+                hasAnnouncement = true,
+                releaseTag = "v26.10-stable",
+                displayName = "Plektra 26.10",
+                releasePageUrl = "https://example.com/stable",
+                isPlektraStableUpdate = true
+            )
+        )
+        assertTrue(isLightDialogTheme(ShadowAlertDialog.getLatestAlertDialog().context))
     }
 }

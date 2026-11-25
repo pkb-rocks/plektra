@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.Drawable
@@ -34,6 +35,8 @@ import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
 import io.noties.markwon.ext.tasklist.TaskListSpan
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import rocks.pkb.plektra.ui.theme.AppThemeResolver
+import rocks.pkb.plektra.ui.theme.ResolvedAppTheme
 
 open class NotesActivity : Activity() {
     protected lateinit var editor: EditText
@@ -41,10 +44,14 @@ open class NotesActivity : Activity() {
     protected lateinit var root: LinearLayout
     protected open val notesPreferencesName: String = "notes"
     private val notePrefs by lazy { getSharedPreferences(notesPreferencesName, MODE_PRIVATE) }
+    private val appAppearancePrefs by lazy { SettingsManager.getPreferences(this) }
     private val notes by lazy { NotesRepository(notePrefs) }
     private lateinit var selectedNote: NotesRepository.Note
     private val noteCollectionListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == "collection") closeRemovedNote()
+    }
+    private val appearancePreferenceListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (AppThemeResolver.isAppearancePreferenceKey(key)) syncAppearanceIfNeeded()
     }
     private var loadingNote = false
     private val undo = ArrayDeque<String>()
@@ -57,6 +64,9 @@ open class NotesActivity : Activity() {
     private lateinit var formatBar: HorizontalScrollView
     private lateinit var panes: LinearLayout
     private lateinit var paneDivider: View
+    private lateinit var modeTabGroup: LinearLayout
+    private val modeTabDividers = mutableListOf<View>()
+    private var savedIndicator: TextView? = null
     private val modeTabs = mutableListOf<Pair<ViewMode, TextView>>()
     private val actionIcons = mutableMapOf<TextView, Drawable>()
     private lateinit var undoButton: TextView
@@ -65,31 +75,26 @@ open class NotesActivity : Activity() {
     private var editingSelectionEnd = 0
     private var viewMode = ViewMode.MARKDOWN
     private var inkColor = Color.BLACK
+    private var mutedInkColor = Color.GRAY
     private var accentColor = Color.rgb(0, 119, 122)
     private var dividerColor = Color.LTGRAY
+    private var appliedTheme: ResolvedAppTheme? = null
     private enum class ViewMode { MARKDOWN, BOTH, PREVIEW }
     private var restoreHeadingFocus = false
     private var horizontalGutter = 24
-    private val markwon by lazy {
-        Markwon.builder(this).usePlugin(TablePlugin.create(this))
-            .usePlugin(TaskListPlugin.create(inkColor, dividerColor, Color.WHITE))
-            .usePlugin(StrikethroughPlugin.create()).build()
-    }
+    private lateinit var markwon: Markwon
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
         selectedNote = notes.active()
-        val resolvedTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(this)
+        val resolvedTheme = AppThemeResolver.resolve(this)
         val dark = resolvedTheme.useDarkTheme
-        val paper = when {
-            resolvedTheme.useOledBlack -> Color.BLACK
-            dark -> Color.rgb(28, 29, 31)
-            else -> Color.rgb(250, 250, 248)
-        }
-        val ink = if (dark) Color.rgb(237, 237, 235) else Color.rgb(30, 34, 36)
-        inkColor = ink
+        val paper = resolvePaperColor(resolvedTheme)
+        inkColor = if (dark) Color.rgb(237, 237, 235) else Color.rgb(30, 34, 36)
+        mutedInkColor = if (dark) Color.LTGRAY else Color.GRAY
         accentColor = if (dark) Color.rgb(101, 211, 208) else Color.rgb(0, 119, 122)
         dividerColor = if (dark) Color.rgb(65, 66, 68) else Color.rgb(218, 219, 216)
+        markwon = buildMarkwon()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -109,8 +114,8 @@ open class NotesActivity : Activity() {
             id = R.id.notes_heading
             textSize = 22f
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-            setTextColor(ink)
-            setHintTextColor(if (dark) Color.LTGRAY else Color.GRAY)
+            setTextColor(inkColor)
+            setHintTextColor(mutedInkColor)
             hint = getString(R.string.notes_untitled)
             background = null
             setSingleLine(true)
@@ -122,14 +127,17 @@ open class NotesActivity : Activity() {
             setPadding(dp(8), dp(8), 0, dp(8))
         }
         navigation.addView(heading, LinearLayout.LayoutParams(0, dp(56), 1f))
-        if (resources.configuration.screenWidthDp >= 600) navigation.addView(TextView(this).apply {
-            text = "✓ ${getString(R.string.notes_saved)}"
-            setTextColor(if (dark) Color.LTGRAY else Color.GRAY)
-            textSize = 12f
-            setPadding(dp(12), 0, dp(12), 0)
-        })
+        if (resources.configuration.screenWidthDp >= 600) {
+            savedIndicator = TextView(this).apply {
+                text = "✓ ${getString(R.string.notes_saved)}"
+                setTextColor(mutedInkColor)
+                textSize = 12f
+                setPadding(dp(12), 0, dp(12), 0)
+            }
+            navigation.addView(savedIndicator)
+        }
         root.addView(navigation)
-        val tabs = LinearLayout(this).apply {
+        modeTabGroup = LinearLayout(this).apply {
             background = GradientDrawable().apply {
                 cornerRadius = dp(4).toFloat()
                 setStroke(dp(1), dividerColor)
@@ -142,8 +150,11 @@ open class NotesActivity : Activity() {
             Triple(ViewMode.PREVIEW, R.drawable.ic_notes_preview, R.string.notes_preview),
         )
         modes.forEachIndexed { index, (mode, icon, label) ->
-            if (index > 0) tabs.addView(View(this).apply { setBackgroundColor(dividerColor) },
-                LinearLayout.LayoutParams(dp(1), dp(48)))
+            if (index > 0) {
+                val divider = View(this).apply { setBackgroundColor(dividerColor) }
+                modeTabDividers += divider
+                modeTabGroup.addView(divider, LinearLayout.LayoutParams(dp(1), dp(48)))
+            }
             val tab = iconAction(icon, label) { setViewMode(mode, showInput = true) }
             tab.id = when (mode) {
                 ViewMode.MARKDOWN -> R.id.notes_markdown_toggle
@@ -151,9 +162,9 @@ open class NotesActivity : Activity() {
                 ViewMode.PREVIEW -> R.id.notes_preview_toggle
             }
             modeTabs += mode to tab
-            tabs.addView(tab)
+            modeTabGroup.addView(tab)
         }
-        navigation.addView(tabs, LinearLayout.LayoutParams(-2, dp(48)))
+        navigation.addView(modeTabGroup, LinearLayout.LayoutParams(-2, dp(48)))
         navigation.addView(iconAction(R.drawable.ic_notes_add, R.string.notes_new) { switchNote(notes.create(), focusHeading = true) }
             .apply { id = R.id.notes_new })
         navigation.addView(iconAction(R.drawable.ic_notes_more, R.string.notes_title) { showNotes() })
@@ -181,13 +192,14 @@ open class NotesActivity : Activity() {
         editor = object : EditText(this) {
             override fun isSuggestionsEnabled() = false
             private val gutterPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-                color = if (dark) Color.LTGRAY else Color.GRAY
+                color = mutedInkColor
                 textSize = dp(11).toFloat()
                 textAlign = android.graphics.Paint.Align.RIGHT
             }
             override fun onDraw(canvas: android.graphics.Canvas) {
                 super.onDraw(canvas)
                 val textLayout = layout ?: return
+                gutterPaint.color = mutedInkColor
                 var number = 1
                 for (line in 0 until textLayout.lineCount) {
                     val offset = textLayout.getLineStart(line)
@@ -201,8 +213,8 @@ open class NotesActivity : Activity() {
             id = R.id.notes_body
             textSize = 16f
             typeface = Typeface.MONOSPACE
-            setTextColor(ink)
-            setHintTextColor(if (dark) Color.LTGRAY else Color.GRAY)
+            setTextColor(inkColor)
+            setHintTextColor(mutedInkColor)
             hint = getString(R.string.notes_body_hint)
             background = null
             gravity = Gravity.TOP
@@ -215,7 +227,7 @@ open class NotesActivity : Activity() {
         preview = TextView(this).apply {
             id = R.id.notes_preview_body
             textSize = 17f
-            setTextColor(ink)
+            setTextColor(inkColor)
             setTextIsSelectable(true)
             setPadding(dp(20), dp(16), dp(8), dp(16))
             setOnTouchListener { _, event ->
@@ -281,10 +293,7 @@ open class NotesActivity : Activity() {
         if (BuildConfig.DEBUG) root.viewTreeObserver.addOnGlobalFocusChangeListener { old, new ->
             android.util.Log.d("PlektraNotesFocus", "focus ${old?.id} -> ${new?.id} editor=${editor.hasFocus()} heading=${heading.hasFocus()}")
         }
-        WindowCompat.getInsetsController(window, root).apply {
-            isAppearanceLightStatusBars = !dark
-            isAppearanceLightNavigationBars = !dark
-        }
+        applyAppearance(resolvedTheme, refreshMarkdown = false)
         heading.doAfterTextChanged { saveNote() }
         lastBody = editor.text.toString()
         editor.doAfterTextChanged {
@@ -335,16 +344,87 @@ open class NotesActivity : Activity() {
     override fun onStart() {
         super.onStart()
         notePrefs.registerOnSharedPreferenceChangeListener(noteCollectionListener)
+        appAppearancePrefs.registerOnSharedPreferenceChangeListener(appearancePreferenceListener)
+        syncAppearanceIfNeeded()
     }
 
     override fun onStop() {
         notePrefs.unregisterOnSharedPreferenceChangeListener(noteCollectionListener)
+        appAppearancePrefs.unregisterOnSharedPreferenceChangeListener(appearancePreferenceListener)
         super.onStop()
     }
 
     override fun onResume() {
         super.onResume()
         closeRemovedNote()
+        if (!isFinishing) {
+            syncAppearanceIfNeeded()
+        }
+    }
+
+    private fun resolvePaperColor(resolvedTheme: ResolvedAppTheme): Int = when {
+        resolvedTheme.useOledBlack -> Color.BLACK
+        resolvedTheme.useDarkTheme -> Color.rgb(28, 29, 31)
+        else -> Color.rgb(250, 250, 248)
+    }
+
+    private fun buildMarkwon(): Markwon =
+        Markwon.builder(this).usePlugin(TablePlugin.create(this))
+            .usePlugin(TaskListPlugin.create(inkColor, dividerColor, Color.WHITE))
+            .usePlugin(StrikethroughPlugin.create()).build()
+
+    private fun syncAppearanceIfNeeded() {
+        val resolvedTheme = AppThemeResolver.resolve(this)
+        if (resolvedTheme == appliedTheme) return
+        applyAppearance(resolvedTheme, refreshMarkdown = true)
+    }
+
+    private fun applyAppearance(resolvedTheme: ResolvedAppTheme, refreshMarkdown: Boolean) {
+        appliedTheme = resolvedTheme
+        val dark = resolvedTheme.useDarkTheme
+        val paper = resolvePaperColor(resolvedTheme)
+        inkColor = if (dark) Color.rgb(237, 237, 235) else Color.rgb(30, 34, 36)
+        mutedInkColor = if (dark) Color.LTGRAY else Color.GRAY
+        accentColor = if (dark) Color.rgb(101, 211, 208) else Color.rgb(0, 119, 122)
+        dividerColor = if (dark) Color.rgb(65, 66, 68) else Color.rgb(218, 219, 216)
+        markwon = buildMarkwon()
+
+        root.setBackgroundColor(paper)
+        heading.setTextColor(inkColor)
+        heading.setHintTextColor(mutedInkColor)
+        savedIndicator?.setTextColor(mutedInkColor)
+        modeTabGroup.background = GradientDrawable().apply {
+            cornerRadius = dp(4).toFloat()
+            setStroke(dp(1), dividerColor)
+        }
+        modeTabDividers.forEach { it.setBackgroundColor(dividerColor) }
+        editor.setTextColor(inkColor)
+        editor.setHintTextColor(mutedInkColor)
+        editor.invalidate()
+        preview.setTextColor(inkColor)
+        paneDivider.setBackgroundColor(dividerColor)
+
+        val selectedModeTab = modeTabs.firstOrNull { it.first == viewMode }?.second
+        actionIcons.forEach { (button, glyph) ->
+            button.setTextColor(inkColor)
+            button.background = actionBackground()
+            glyph.setTint(if (button === selectedModeTab) accentColor else inkColor)
+        }
+
+        window.setBackgroundDrawable(ColorDrawable(paper))
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        @Suppress("DEPRECATION")
+        window.statusBarColor = paper
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = paper
+        WindowCompat.getInsetsController(window, root).apply {
+            isAppearanceLightStatusBars = !dark
+            isAppearanceLightNavigationBars = !dark
+        }
+
+        if (refreshMarkdown && viewMode != ViewMode.MARKDOWN) {
+            markwon.setMarkdown(preview, editor.text.toString())
+        }
     }
 
     private fun closeRemovedNote() {
@@ -361,6 +441,7 @@ open class NotesActivity : Activity() {
         val start = target?.selectionStart
         val end = target?.selectionEnd
         super.onConfigurationChanged(newConfig)
+        syncAppearanceIfNeeded()
         if (viewMode != ViewMode.PREVIEW && target != null) {
             target.requestFocus()
             target.setSelection((start ?: 0).coerceIn(0, target.length()), (end ?: 0).coerceIn(0, target.length()))

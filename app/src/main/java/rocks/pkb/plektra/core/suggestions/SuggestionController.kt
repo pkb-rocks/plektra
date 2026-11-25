@@ -201,6 +201,29 @@ class SuggestionController(
         }
     }
 
+    /**
+     * Publishes start words from the bundled dictionary alone. They carry nothing learned, so the
+     * personalization barriers do not apply to them.
+     */
+    private fun publishNeutralStarterSuggestions(generation: Int) {
+        val settings = settingsProvider()
+        val suggestions = if (settings.starterWordsEnabled && dictionaryRepository.isReady) {
+            starterSuggestions(settings.copy(personalizationEnabled = false))
+        } else {
+            emptyList()
+        }
+        synchronized(publishLock) {
+            val currentSettings = settingsProvider()
+            val published = suggestions.takeIf {
+                isEnabled() && currentSettings.suggestionsEnabled && currentSettings.starterWordsEnabled
+            }.orEmpty()
+            if (published.isNotEmpty() && generation != suggestionGeneration.get()) return
+            latestSuggestionsPersonalized = false
+            latestSuggestions.set(published)
+            suggestionsListener?.invoke(published)
+        }
+    }
+
     private fun publishPersonalizedSuggestions(
         suggestions: List<SuggestionResult>,
         generation: Int
@@ -664,7 +687,7 @@ class SuggestionController(
                     suggestionsListener?.invoke(emptyList())
                     return
                 }
-                val neutralRemaining = remaining.filter { it.kind == SuggestionKind.CURRENT_WORD }
+                val neutralRemaining = remaining.filter(SuggestionResult::isNeutral)
                 latestSuggestionsPersonalized = false
                 latestSuggestions.set(neutralRemaining)
                 suggestionsListener?.invoke(neutralRemaining)
@@ -758,7 +781,7 @@ class SuggestionController(
         } else {
             pendingAddUserWord = null
             if (!settings.personalizationEnabled) {
-                publishEmptySuggestions()
+                publishNeutralStarterSuggestions(suggestionGeneration.get())
             } else if (previousCompletedWord != null) {
                 publishNextWordPredictions(previousCompletedWord!!)
             } else if (dictionaryRepository.isReady) {
@@ -796,7 +819,7 @@ class SuggestionController(
         if (!settings.personalizationEnabled) {
             previousCompletedWord = null
             sentenceStartPending = !isSoftPredictionBoundary(boundaryChar)
-            publishEmptySuggestions()
+            if (sentenceStartPending) publishNeutralStarterSuggestions(suggestionGeneration.get()) else publishEmptySuggestions()
             return
         }
 
@@ -859,8 +882,12 @@ class SuggestionController(
     private fun publishSentenceStartPredictionsOrStarter() {
         val generation = suggestionGeneration.get()
         val settings = settingsProvider()
-        if (!settings.suggestionsEnabled || !settings.personalizationEnabled) {
+        if (!settings.suggestionsEnabled) {
             publishEmptySuggestions()
+            return
+        }
+        if (!settings.personalizationEnabled) {
+            publishNeutralStarterSuggestions(generation)
             return
         }
         val primary = nextWordPredictor.predictSentenceStart(currentLocale, settings.maxSuggestions)
@@ -892,13 +919,15 @@ class SuggestionController(
     }
 
     private fun starterSuggestions(settings: SuggestionSettings): List<SuggestionResult> {
-        val primary = starterSuggestionsFor(dictionaryRepository, PRIMARY_SUGGESTION_BOOST, settings.maxSuggestions)
+        if (!settings.starterWordsEnabled) return emptyList()
+        val personalized = settings.personalizationEnabled
+        val primary = starterSuggestionsFor(dictionaryRepository, PRIMARY_SUGGESTION_BOOST, settings.maxSuggestions, personalized)
         val extras = activeExtraSuggestionEngines().flatMap { extra ->
             if (!extra.repository.isReady) {
                 scheduleRepositoryLoad(extra.repository, refreshAfterLoad = true)
                 emptyList()
             } else {
-                starterSuggestionsFor(extra.repository, 0.0, settings.maxSuggestions)
+                starterSuggestionsFor(extra.repository, 0.0, settings.maxSuggestions, personalized)
             }
         }
         return mergeSuggestionResults(primary, extras, settings.maxSuggestions)
@@ -938,9 +967,10 @@ class SuggestionController(
     private fun starterSuggestionsFor(
         repository: DictionaryRepository,
         scoreBoost: Double,
-        limit: Int
+        limit: Int,
+        usePersonalization: Boolean
     ): List<SuggestionResult> {
-        return repository.topCommonEntries(limit * 3)
+        return repository.topCommonEntries(limit * 3, usePersonalization)
             .map { entry ->
                 SuggestionResult(
                     candidate = entry.word,

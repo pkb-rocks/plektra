@@ -4,6 +4,8 @@ data class SuggestionSettings(
     val textReplacementsEnabled: Boolean = true,
     val suggestionsEnabled: Boolean = true,
     val personalizationEnabled: Boolean = true,
+    /** Start words fill an empty field; without personalization they come from the bundled dictionary only. */
+    val starterWordsEnabled: Boolean = true,
     val showAddWordButton: Boolean = true,
     val accentMatching: Boolean = true,
     val autoReplaceOnSpaceEnter: Boolean = false,

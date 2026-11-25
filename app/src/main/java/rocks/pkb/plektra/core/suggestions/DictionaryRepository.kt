@@ -53,9 +53,30 @@ interface DictionaryRepository {
     fun topByNormalized(normalized: String, limit: Int = 5, usePersonalization: Boolean): List<DictionaryEntry> =
         topByNormalized(normalized, limit)
     fun topCommonEntries(limit: Int = 16): List<DictionaryEntry>
+    /**
+     * Without personalization only bundled dictionary words, ranked by their static frequency:
+     * nothing the user typed, added or used influences the result.
+     */
+    fun topCommonEntries(limit: Int, usePersonalization: Boolean): List<DictionaryEntry> =
+        if (usePersonalization) topCommonEntries(limit) else neutralCommonEntries(topCommonEntries(STARTER_POOL), limit)
     fun isKnownWord(word: String): Boolean
     fun ensureLoadScheduled(background: () -> Unit)
 }
+
+internal const val STARTER_POOL = 48
+
+/** Bundled-dictionary words fit to start a text, most frequent first. */
+internal fun neutralCommonEntries(entries: Iterable<DictionaryEntry>, limit: Int): List<DictionaryEntry> =
+    entries.asSequence()
+        .filter { entry ->
+            entry.source == SuggestionSource.MAIN &&
+                entry.word.length > 1 &&
+                entry.word.any { it.isLetter() } &&
+                entry.word.none { !it.isLetter() && it != '\'' }
+        }
+        .sortedWith(compareByDescending<DictionaryEntry> { it.frequency }.thenBy { it.word.length }.thenBy { it.word })
+        .take(limit)
+        .toList()
 
 /**
  * Loads and indexes lightweight dictionaries from assets and merges them with the user dictionary.
@@ -128,6 +149,7 @@ class AndroidDictionaryRepository(
     @Volatile private var symSpell: SymSpell? = null
     @Volatile private var symSpellBuilt: Boolean = false
     @Volatile private var topCommonEntriesCache: List<DictionaryEntry>? = null
+    @Volatile private var neutralCommonEntriesCache: List<DictionaryEntry>? = null
     @Volatile override var isReady: Boolean = false
         internal set
     @Volatile private var loadStarted: Boolean = false
@@ -187,6 +209,7 @@ class AndroidDictionaryRepository(
                     symSpell = null
                     symSpellBuilt = false
                     topCommonEntriesCache = null
+                    neutralCommonEntriesCache = null
                 }
 
                 val loadTime = System.currentTimeMillis() - startTime
@@ -218,6 +241,7 @@ class AndroidDictionaryRepository(
                 prefixCache.clear()
                 normalizedIndex.clear()
                 topCommonEntriesCache = null
+                neutralCommonEntriesCache = null
                 symSpell = null
                 symSpellBuilt = false
                 isReady = false
@@ -287,6 +311,7 @@ class AndroidDictionaryRepository(
             }
         }
         topCommonEntriesCache = null
+        neutralCommonEntriesCache = null
     }
 
     override fun markUsed(word: String) {
@@ -320,6 +345,15 @@ class AndroidDictionaryRepository(
             .take(48)
             .toList()
         topCommonEntriesCache = computed
+        return computed.take(limit)
+    }
+
+    override fun topCommonEntries(limit: Int, usePersonalization: Boolean): List<DictionaryEntry> {
+        if (usePersonalization) return topCommonEntries(limit)
+        if (!isReady || limit <= 0) return emptyList()
+        val computed = neutralCommonEntriesCache
+            ?: neutralCommonEntries(normalizedIndex.values.asSequence().flatten().asIterable(), STARTER_POOL)
+                .also { neutralCommonEntriesCache = it }
         return computed.take(limit)
     }
 
@@ -824,5 +858,6 @@ class AndroidDictionaryRepository(
             list.sortByDescending { effectiveFrequency(it) }
         }
         topCommonEntriesCache = null
+        neutralCommonEntriesCache = null
     }
 }

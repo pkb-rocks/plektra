@@ -11,7 +11,11 @@ data class SuggestionResult(
     val score: Double,
     val source: SuggestionSource,
     val kind: SuggestionKind = SuggestionKind.CURRENT_WORD
-)
+) {
+    /** Shown without personalization: completions of the typed word, or start words from the bundled dictionary. */
+    val isNeutral: Boolean
+        get() = kind == SuggestionKind.CURRENT_WORD || (kind == SuggestionKind.STARTER_WORD && source == SuggestionSource.MAIN)
+}
 
 enum class SuggestionKind {
     CURRENT_WORD,

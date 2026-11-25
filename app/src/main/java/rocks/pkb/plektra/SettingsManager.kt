@@ -79,6 +79,7 @@ object SettingsManager {
     private const val KEY_SUGGESTIONS_ENABLED = "suggestions_enabled"
     private const val KEY_SUGGESTIONS_BOLD = "suggestions_bold"
     const val KEY_SUGGESTIONS_PERSONALIZATION_ENABLED = "suggestions_personalization_enabled"
+    const val KEY_SUGGESTION_STARTER_WORDS_ENABLED = "suggestion_starter_words_enabled"
     const val KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED = "suggestions_add_word_button_enabled"
     private const val KEY_SNIPPETS_ENABLED = "snippets_enabled"
     private const val KEY_SNIPPETS_PREFIX = "snippets_prefix"
@@ -3405,9 +3406,24 @@ object SettingsManager {
      * Enables or disables usage-based suggestion personalization without deleting stored data.
      */
     fun setSuggestionsPersonalizationEnabled(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SUGGESTIONS_PERSONALIZATION_ENABLED, enabled)
-            .apply()
+        val editor = getPreferences(context).edit()
+        // Start words followed personalization until they had their own setting; keep what the user sees.
+        if (!getPreferences(context).contains(KEY_SUGGESTION_STARTER_WORDS_ENABLED)) {
+            editor.putBoolean(KEY_SUGGESTION_STARTER_WORDS_ENABLED, getSuggestionsPersonalizationEnabled(context))
+        }
+        editor.putBoolean(KEY_SUGGESTIONS_PERSONALIZATION_ENABLED, enabled).apply()
+    }
+
+    /**
+     * Whether an empty field or a new sentence offers start words. Independent of personalization,
+     * which only decides whether learned words may appear among them. Until set, it keeps the
+     * earlier behavior of following personalization.
+     */
+    fun getSuggestionStarterWordsEnabled(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SUGGESTION_STARTER_WORDS_ENABLED, getSuggestionsPersonalizationEnabled(context))
+
+    fun setSuggestionStarterWordsEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SUGGESTION_STARTER_WORDS_ENABLED, enabled).apply()
     }
 
     /**

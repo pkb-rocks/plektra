@@ -118,6 +118,68 @@ class SuggestionPersonalizationAndAddWordTest {
     }
 
     @Test
+    fun starterWordsWithoutPersonalizationComeFromTheBundledDictionaryOnly() {
+        fakeRepository.addTestEntry("secretuser", 255, SuggestionSource.USER)
+        var personalizationEnabled = true
+        val controller = newController(
+            personalizationProvider = { personalizationEnabled },
+            starterWordsProvider = { true }
+        )
+        typeWord(controller, "badstart")
+        pressSpace(controller)
+        controller.flushNextWordLearningForTests()
+
+        personalizationEnabled = false
+        controller.onContextReset()
+        controller.readInitialContext(emptyInputConnection())
+        val starters = snapshots.last()
+        assertEquals(listOf("hello", "ich", "help"), starters.map { it.candidate })
+        assertTrue(starters.all { it.kind == SuggestionKind.STARTER_WORD && it.source == SuggestionSource.MAIN })
+        assertFalse(controller.currentSuggestions().any { it.candidate == "secretuser" || it.candidate == "badstart" })
+
+        // A new sentence offers them again; a space within a sentence offers no learned next word.
+        typeWord(controller, "ich")
+        pressSpace(controller)
+        assertTrue(snapshots.last().isEmpty())
+        typeWord(controller, "dann")
+        pressPeriod(controller)
+        assertEquals(listOf("hello", "ich", "help"), snapshots.last().map { it.candidate })
+    }
+
+    @Test
+    fun starterWordsOffKeepsLearnedPredictionsButNoFillers() {
+        val controller = newController(personalizationProvider = { true }, starterWordsProvider = { false })
+        controller.onContextReset()
+        controller.readInitialContext(emptyInputConnection())
+        assertTrue(snapshots.last().isEmpty())
+
+        typeWord(controller, "ich")
+        pressSpace(controller)
+        typeWord(controller, "dann")
+        pressPeriod(controller)
+        typeWord(controller, "ich")
+        pressSpace(controller)
+        controller.flushNextWordLearningForTests()
+        assertEquals(listOf("dann"), snapshots.last().map { it.candidate })
+        assertTrue(snapshots.last().none { it.kind == SuggestionKind.STARTER_WORD })
+    }
+
+    @Test
+    fun starterWordSettingKeepsTheEarlierCouplingUntilChosen() {
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+        // Materialized from the value before the change: what the user saw is kept.
+        assertTrue(SettingsManager.getSuggestionStarterWordsEnabled(context))
+        SettingsManager.getPreferences(context).edit().clear().commit()
+        SettingsManager.getPreferences(context).edit()
+            .putBoolean(SettingsManager.KEY_SUGGESTIONS_PERSONALIZATION_ENABLED, false).commit()
+        assertFalse(SettingsManager.getSuggestionStarterWordsEnabled(context))
+        SettingsManager.setSuggestionStarterWordsEnabled(context, true)
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, true)
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+        assertTrue(SettingsManager.getSuggestionStarterWordsEnabled(context))
+    }
+
+    @Test
     fun personalizationOff_doesNotLearnNewNGramsOrUsageCountsWhileOff() {
         var personalizationEnabled = false
         val controller = newController(
@@ -1106,7 +1168,9 @@ class SuggestionPersonalizationAndAddWordTest {
     private fun newController(
         personalizationProvider: () -> Boolean = { true },
         showAddWordButtonProvider: () -> Boolean = { true },
-        autoReplaceOnSpaceEnter: Boolean = false
+        autoReplaceOnSpaceEnter: Boolean = false,
+        // Start words followed personalization before they had their own setting.
+        starterWordsProvider: () -> Boolean = personalizationProvider
     ): SuggestionController {
         return SuggestionController(
             context = context,
@@ -1115,6 +1179,7 @@ class SuggestionPersonalizationAndAddWordTest {
                 SuggestionSettings(
                     suggestionsEnabled = true,
                     personalizationEnabled = personalizationProvider(),
+                    starterWordsEnabled = starterWordsProvider(),
                     showAddWordButton = showAddWordButtonProvider(),
                     autoReplaceOnSpaceEnter = autoReplaceOnSpaceEnter,
                     maxSuggestions = 3

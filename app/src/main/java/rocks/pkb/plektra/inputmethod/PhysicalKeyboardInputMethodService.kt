@@ -1053,6 +1053,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             suggestionsEnabled = suggestionsEnabled,
             personalizationEnabled = SettingsManager.getSuggestionsPersonalizationEnabled(this) &&
                 !inputContextState.shouldDisablePersonalizedLearning,
+            starterWordsEnabled = SettingsManager.getSuggestionStarterWordsEnabled(this),
             showAddWordButton = SettingsManager.getSuggestionsAddWordButtonEnabled(this),
             accentMatching = SettingsManager.getAccentMatchingEnabled(this),
             autoReplaceOnSpaceEnter = SettingsManager.getAutoReplaceOnSpaceEnter(this),
@@ -1554,8 +1555,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private fun handleSuggestionsUpdated(suggestions: List<SuggestionResult>) {
         val safeSuggestions = when {
             inputContextState.shouldDisableSuggestions -> emptyList()
-            !getSuggestionSettings().personalizationEnabled ->
-                suggestions.filter { it.kind == SuggestionKind.CURRENT_WORD }
+            !getSuggestionSettings().personalizationEnabled -> suggestions.filter { it.isNeutral }
             else -> suggestions
         }
         latestSuggestionResults = safeSuggestions
@@ -2725,6 +2725,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             } else if (
                 key == null ||
                 key == SettingsManager.KEY_SUGGESTIONS_PERSONALIZATION_ENABLED ||
+                key == SettingsManager.KEY_SUGGESTION_STARTER_WORDS_ENABLED ||
                 key == SettingsManager.KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED
             ) {
                 val applySuggestionSettingsChange = {

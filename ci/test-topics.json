@@ -129,6 +129,7 @@
       "rocks.pkb.plektra.core.PunctuationTest",
       "rocks.pkb.plektra.core.TextInputControllerTest",
       "rocks.pkb.plektra.inputmethod.AutoCapitalizeHelperOpeningPunctuationTest",
+      "rocks.pkb.plektra.inputmethod.AutoCapitalizeHelperPartialFieldTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterBoundaryTextTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterForwardDeleteAlternativesTest",
       "rocks.pkb.plektra.inputmethod.SoftwareKeyboardTextInputHandlerTest",

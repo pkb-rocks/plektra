@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
+import org.junit.Before
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -30,9 +31,24 @@ class ClicksButtonBindingScreenSyncTest {
     private val pendingHint get() = context.getString(R.string.clicks_button_binding_pending)
     private val successMessage get() = context.getString(R.string.clicks_button_binding_success)
 
+    @Before
+    fun setUp() {
+        // Robolectric creates a new Application per test; the process singleton must not keep
+        // a previous test's preference store. Production has only one Application instance.
+        resetControllerInitialization()
+    }
+
+    private fun resetControllerInitialization() {
+        ClicksPowerKeyboardController::class.java.getDeclaredField("initialized").apply {
+            isAccessible = true
+            setBoolean(ClicksPowerKeyboardController, false)
+        }
+    }
+
     @After
     fun tearDown() {
         ClicksPowerKeyboardController.simulateKeyboardSessionForTest(null, ClicksPowerKeyboardState())
+        resetControllerInitialization()
     }
 
     @Test

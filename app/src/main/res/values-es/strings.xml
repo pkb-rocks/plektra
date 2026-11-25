@@ -940,4 +940,11 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="auto_space_after_suggestion_title">Espacio tras sugerencias</string>
     <string name="auto_space_after_suggestion_description">Añadir un espacio automáticamente tras aceptar una palabra sugerida.</string>
     <string name="kw_text_input_auto_space_after_suggestion">sugerencia, sugerencias, espacio, espaciado, palabra, coma, puntuación</string>
+    <string name="auto_correct_section_suggestions">Sugerencias</string>
+    <string name="auto_correct_starter_words_title">Palabras iniciales</string>
+    <string name="auto_correct_starter_words_description">Ofrece palabras frecuentes en un campo vacío y después de una frase. Sin personalización, solo proceden del diccionario.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Elige dónde aparecen las sugerencias en la barra del teclado.</string>
+    <string name="kw_auto_correction_starter_words">palabras iniciales, campo vacío, nueva frase, primera palabra, palabras frecuentes, diccionario, sugerencias</string>
+    <string name="clicks_button_binding_reading">Leyendo la asignación actual del teclado…</string>
+    <string name="clicks_button_binding_last_known">Última asignación conocida; el teclado no está conectado.</string>
 </resources>

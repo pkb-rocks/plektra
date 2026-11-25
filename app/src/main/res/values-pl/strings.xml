@@ -941,4 +941,11 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="auto_space_after_suggestion_title">Spacja po podpowiedziach</string>
     <string name="auto_space_after_suggestion_description">Automatycznie dodawaj spację po zaakceptowaniu podpowiedzianego słowa.</string>
     <string name="kw_text_input_auto_space_after_suggestion">podpowiedź, podpowiedzi, spacja, odstęp, słowo, przecinek, interpunkcja</string>
+    <string name="auto_correct_section_suggestions">Podpowiedzi</string>
+    <string name="auto_correct_starter_words_title">Słowa początkowe</string>
+    <string name="auto_correct_starter_words_description">Proponuj częste słowa w pustym polu i po zdaniu. Bez personalizacji pochodzą tylko ze słownika.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Wybierz, gdzie podpowiedzi pojawiają się na pasku klawiatury.</string>
+    <string name="kw_auto_correction_starter_words">słowa początkowe, puste pole, nowe zdanie, pierwsze słowo, częste słowa, słownik, podpowiedzi</string>
+    <string name="clicks_button_binding_reading">Odczytywanie bieżącego przypisania z klawiatury…</string>
+    <string name="clicks_button_binding_last_known">Ostatnie znane przypisanie; klawiatura nie jest połączona.</string>
 </resources>

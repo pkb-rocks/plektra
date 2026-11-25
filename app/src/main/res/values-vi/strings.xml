@@ -938,4 +938,11 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="auto_space_after_suggestion_title">Dấu cách sau gợi ý</string>
     <string name="auto_space_after_suggestion_description">Tự động thêm dấu cách sau khi chấp nhận một từ gợi ý.</string>
     <string name="kw_text_input_auto_space_after_suggestion">gợi ý, dấu cách, khoảng trắng, từ, dấu phẩy, dấu câu</string>
+    <string name="auto_correct_section_suggestions">Gợi ý</string>
+    <string name="auto_correct_starter_words_title">Từ mở đầu</string>
+    <string name="auto_correct_starter_words_description">Gợi ý các từ phổ biến khi ô trống và sau một câu. Khi tắt cá nhân hóa, chỉ lấy từ từ điển.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Chọn nơi gợi ý xuất hiện trên thanh bàn phím.</string>
+    <string name="kw_auto_correction_starter_words">từ mở đầu, ô trống, câu mới, từ đầu tiên, từ phổ biến, từ điển, gợi ý</string>
+    <string name="clicks_button_binding_reading">Đang đọc gán phím hiện tại từ bàn phím…</string>
+    <string name="clicks_button_binding_last_known">Gán phím đã biết gần nhất; bàn phím chưa được kết nối.</string>
 </resources>

@@ -1118,4 +1118,11 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="emoji_picker_extras_title">Simboli di testo e kaomoji nel selettore emoji</string>
     <string name="software_keyboard_key_hints_title">Mostra etichette secondarie</string>
     <string name="software_keyboard_key_hints_description">Mostra in alto a destra l\'alternativa della pressione prolungata e in basso a sinistra il carattere Alt o SYM dei tasti.</string>
+    <string name="auto_correct_section_suggestions">Suggerimenti</string>
+    <string name="auto_correct_starter_words_title">Parole iniziali</string>
+    <string name="auto_correct_starter_words_description">Propone parole comuni in un campo vuoto e dopo una frase. Senza personalizzazione provengono solo dal dizionario.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Scegli dove compaiono i suggerimenti nella barra della tastiera.</string>
+    <string name="kw_auto_correction_starter_words">parole iniziali, campo vuoto, nuova frase, prima parola, parole comuni, dizionario, suggerimenti</string>
+    <string name="clicks_button_binding_reading">Lettura dell’assegnazione attuale dalla tastiera…</string>
+    <string name="clicks_button_binding_last_known">Ultima assegnazione nota; la tastiera non è connessa.</string>
 </resources>

@@ -941,4 +941,11 @@ Nav Mode использует физическое положение клави
     <string name="auto_space_after_suggestion_title">Пробел после подсказок</string>
     <string name="auto_space_after_suggestion_description">Автоматически добавлять пробел после принятия предложенного слова.</string>
     <string name="kw_text_input_auto_space_after_suggestion">подсказка, подсказки, пробел, отступ, слово, запятая, пунктуация</string>
+    <string name="auto_correct_section_suggestions">Подсказки</string>
+    <string name="auto_correct_starter_words_title">Начальные слова</string>
+    <string name="auto_correct_starter_words_description">Предлагать частые слова в пустом поле и после предложения. Без персонализации — только из словаря.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Выберите, где подсказки появляются на панели клавиатуры.</string>
+    <string name="kw_auto_correction_starter_words">начальные слова, пустое поле, новое предложение, первое слово, частые слова, словарь, подсказки</string>
+    <string name="clicks_button_binding_reading">Чтение текущего назначения с клавиатуры…</string>
+    <string name="clicks_button_binding_last_known">Последнее известное назначение; клавиатура не подключена.</string>
 </resources>

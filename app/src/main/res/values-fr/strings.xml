@@ -940,4 +940,11 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="auto_space_after_suggestion_title">Espace après les suggestions</string>
     <string name="auto_space_after_suggestion_description">Ajouter automatiquement une espace après avoir accepté un mot suggéré.</string>
     <string name="kw_text_input_auto_space_after_suggestion">suggestion, suggestions, espace, espacement, mot, virgule, ponctuation</string>
+    <string name="auto_correct_section_suggestions">Suggestions</string>
+    <string name="auto_correct_starter_words_title">Mots de départ</string>
+    <string name="auto_correct_starter_words_description">Propose des mots courants dans un champ vide et après une phrase. Sans personnalisation, ils proviennent uniquement du dictionnaire.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Choisissez où les suggestions apparaissent dans la barre du clavier.</string>
+    <string name="kw_auto_correction_starter_words">mots de départ, champ vide, nouvelle phrase, premier mot, mots courants, dictionnaire, suggestions</string>
+    <string name="clicks_button_binding_reading">Lecture de l’attribution actuelle depuis le clavier…</string>
+    <string name="clicks_button_binding_last_known">Dernière attribution connue ; le clavier n’est pas connecté.</string>
 </resources>

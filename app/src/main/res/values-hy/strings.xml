@@ -939,4 +939,11 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="auto_space_after_suggestion_title">Բացատ առաջարկներից հետո</string>
     <string name="auto_space_after_suggestion_description">Առաջարկված բառն ընդունելուց հետո ավտոմատ կերպով ավելացնել բացատ։</string>
     <string name="kw_text_input_auto_space_after_suggestion">առաջարկ, առաջարկներ, բացատ, բառ, ստորակետ, կետադրություն</string>
+    <string name="auto_correct_section_suggestions">Առաջարկներ</string>
+    <string name="auto_correct_starter_words_title">Սկզբնական բառեր</string>
+    <string name="auto_correct_starter_words_description">Առաջարկել հաճախակի բառեր դատարկ դաշտում և նախադասությունից հետո։ Առանց անհատականացման՝ միայն բառարանից։</string>
+    <string name="auto_correct_keyboard_bar_link_description">Ընտրեք, թե որտեղ են առաջարկները հայտնվում ստեղնաշարի գոտում։</string>
+    <string name="kw_auto_correction_starter_words">սկզբնական բառեր, դատարկ դաշտ, նոր նախադասություն, առաջին բառ, հաճախակի բառեր, բառարան, առաջարկներ</string>
+    <string name="clicks_button_binding_reading">Ընթացիկ նշանակումը կարդացվում է ստեղնաշարից…</string>
+    <string name="clicks_button_binding_last_known">Վերջին հայտնի նշանակումը․ ստեղնաշարը միացված չէ։</string>
 </resources>

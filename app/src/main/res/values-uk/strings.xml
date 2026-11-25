@@ -941,4 +941,11 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="auto_space_after_suggestion_title">Пробіл після підказок</string>
     <string name="auto_space_after_suggestion_description">Автоматично додавати пробіл після прийняття запропонованого слова.</string>
     <string name="kw_text_input_auto_space_after_suggestion">підказка, підказки, пробіл, відступ, слово, кома, пунктуація</string>
+    <string name="auto_correct_section_suggestions">Підказки</string>
+    <string name="auto_correct_starter_words_title">Початкові слова</string>
+    <string name="auto_correct_starter_words_description">Пропонувати поширені слова в порожньому полі та після речення. Без персоналізації — лише зі словника.</string>
+    <string name="auto_correct_keyboard_bar_link_description">Виберіть, де підказки з’являються на панелі клавіатури.</string>
+    <string name="kw_auto_correction_starter_words">початкові слова, порожнє поле, нове речення, перше слово, поширені слова, словник, підказки</string>
+    <string name="clicks_button_binding_reading">Зчитування поточного призначення з клавіатури…</string>
+    <string name="clicks_button_binding_last_known">Останнє відоме призначення; клавіатуру не під’єднано.</string>
 </resources>

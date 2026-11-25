@@ -1516,7 +1516,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     private fun handleSuggestionsUpdated(suggestions: List<SuggestionResult>) {
-        val safeSuggestions = if (inputContextState.shouldDisableSuggestions) emptyList() else suggestions
+        val safeSuggestions = when {
+            inputContextState.shouldDisableSuggestions -> emptyList()
+            !getSuggestionSettings().personalizationEnabled ->
+                suggestions.filter { it.kind == SuggestionKind.CURRENT_WORD }
+            else -> suggestions
+        }
         latestSuggestionResults = safeSuggestions
         DebugCaptureStore.recordSuggestionsUpdated(safeSuggestions)
         scheduleStatusBarTextUpdate()
@@ -2685,16 +2690,25 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     keyboardVisibilityController.onKeyboardBarConfigurationChanged()
                 }
             } else if (
+                key == null ||
                 key == SettingsManager.KEY_SUGGESTIONS_PERSONALIZATION_ENABLED ||
                 key == SettingsManager.KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED
             ) {
-                Handler(Looper.getMainLooper()).post {
+                val applySuggestionSettingsChange = {
                     if (::suggestionController.isInitialized) {
                         suggestionController.onSettingsChanged(currentInputConnection)
                     }
                     invalidateRenderedStatusSnapshot()
                     updateStatusBarText()
                     keyboardVisibilityController.onKeyboardBarConfigurationChanged()
+                }
+                if (Looper.myLooper() == Looper.getMainLooper()) {
+                    applySuggestionSettingsChange()
+                } else {
+                    if (::suggestionController.isInitialized && !getSuggestionSettings().personalizationEnabled) {
+                        suggestionController.invalidatePersonalizedSuggestionsImmediately()
+                    }
+                    Handler(Looper.getMainLooper()).post(applySuggestionSettingsChange)
                 }
             } else if (SettingsManager.isModifierIndicatorPreferenceKey(key) ||
                 key == "suggestions_enabled" || key == "suggestions_bold" || key == "status_bar_variations_visible" ||

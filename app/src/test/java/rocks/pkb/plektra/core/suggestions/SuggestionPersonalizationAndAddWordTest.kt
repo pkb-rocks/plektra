@@ -11,6 +11,8 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import java.lang.reflect.Proxy
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -459,6 +461,180 @@ class SuggestionPersonalizationAndAddWordTest {
         assertTrue(caseOffLow.replaced)
         assertEquals("Problem", caseOffLow.replacement)
         assertEquals(caseOffLow, caseOffHigh)
+    }
+
+    @Test
+    fun personalizationOff_withActiveWord_synchronouslyClearsPublishedPersonalizedCacheBeforeRecompute() {
+        fakeRepository.addTestEntry("hellhound", 250, SuggestionSource.USER)
+        var personalizationEnabled = true
+        val controller = newController(
+            personalizationProvider = { personalizationEnabled }
+        )
+
+        typeWord(controller, "hel")
+        val personalized = waitForSuggestionCandidates("hellhound", "help", "held")
+        assertEquals("hellhound", personalized.first().candidate)
+        assertEquals("hellhound", controller.currentSuggestions().first().candidate)
+
+        val snapshotIndexBeforeOff = snapshots.size
+        personalizationEnabled = false
+        controller.onSettingsChanged(null)
+
+        // Immediately after handling the OFF setting change, stale personalized cache must be gone.
+        assertTrue(
+            "currentSuggestions must be cleared synchronously on OFF",
+            controller.currentSuggestions().isEmpty()
+        )
+        assertTrue(
+            "Listener must be notified synchronously with cleared suggestions on OFF",
+            snapshots.size > snapshotIndexBeforeOff
+        )
+        assertTrue(
+            "Immediate listener emissions on OFF must not republish stale personalized results",
+            snapshots.subList(snapshotIndexBeforeOff, snapshots.size).all { it.isEmpty() }
+        )
+
+        // Subsequent non-personalized dictionary results appear cleanly after recompute.
+        val refreshed = waitForSuggestionCandidates("help", "held", "hello")
+        assertEquals(listOf("help", "held", "hello"), refreshed.map { it.candidate })
+
+        // No listener emission from the settings change onward may ever contain the stale personalized entry.
+        val emissionsAfterOff = snapshots.subList(snapshotIndexBeforeOff, snapshots.size)
+        assertTrue(
+            "No listener call after OFF may publish stale personalized candidate",
+            emissionsAfterOff.none { list -> list.any { it.candidate == "hellhound" } }
+        )
+    }
+
+    @Test
+    fun personalizationOff_withInFlightMainQueuedPersonalizedJob_neverPublishesStaleResults() {
+        fakeRepository.addTestEntry("hellhound", 250, SuggestionSource.USER)
+        var personalizationEnabled = true
+        val firstLookupCompleted = CountDownLatch(1)
+        val instrumentedRepo = object : DictionaryRepository by fakeRepository {
+            override fun symSpellLookup(
+                term: String,
+                maxSuggestions: Int,
+                usePersonalization: Boolean
+            ): List<SymSpell.SuggestItem> {
+                val result = fakeRepository.symSpellLookup(term, maxSuggestions, usePersonalization)
+                if (usePersonalization && term == "hel") {
+                    firstLookupCompleted.countDown()
+                }
+                return result
+            }
+        }
+        val controller = SuggestionController(
+            context = context,
+            assets = context.assets,
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    personalizationEnabled = personalizationEnabled,
+                    showAddWordButton = true,
+                    maxSuggestions = 3
+                )
+            },
+            onSuggestionsUpdated = { snapshots.add(it) },
+            currentLocale = Locale.GERMANY,
+            dictionaryRepositoryFactory = { _, _, _, _, _ -> instrumentedRepo },
+            nextWordPredictorOverride = NextWordPredictor(store)
+        ).also { controllers.add(it) }
+
+        // Type active word while ON, wait until the background job has computed and posted to Main Looper
+        // WITHOUT idling Main Looper yet.
+        controller.onCharacterCommitted("hel", null)
+        assertTrue("Expected personalized lookup to finish in background", firstLookupCompleted.await(3, TimeUnit.SECONDS))
+        // Give the coroutine a brief moment to execute cursorHandler.post onto the Main Looper queue.
+        Thread.sleep(30)
+
+        val snapshotIndexBeforeOff = snapshots.size
+        personalizationEnabled = false
+        controller.onSettingsChanged(null)
+
+        // Immediately cleared before Main Looper drains queued stale publish.
+        assertTrue(controller.currentSuggestions().isEmpty())
+        assertTrue(snapshots.subList(snapshotIndexBeforeOff, snapshots.size).all { it.isEmpty() })
+
+        // Drain the Main Looper (which still held the stale personalized publish runnable) and wait for replacement.
+        shadowOf(Looper.getMainLooper()).idle()
+        assertTrue(
+            "Stale Main-queued personalized job must be dropped",
+            snapshots.subList(snapshotIndexBeforeOff, snapshots.size)
+                .none { list -> list.any { it.candidate == "hellhound" } }
+        )
+
+        val refreshed = waitForSuggestionCandidates("help", "held", "hello")
+        assertEquals(listOf("help", "held", "hello"), refreshed.map { it.candidate })
+        assertTrue(
+            "No emission after OFF may ever contain stale personalized candidate",
+            snapshots.subList(snapshotIndexBeforeOff, snapshots.size)
+                .none { list -> list.any { it.candidate == "hellhound" } }
+        )
+    }
+
+    @Test
+    fun liveRestorePrivacyBarrier_blocksQueuedPersonalizedPublishEvenBeforeOnSettingsChangedRuns() {
+        fakeRepository.addTestEntry("hellhound", 250, SuggestionSource.USER)
+        var personalizationEnabled = true
+        val personalizedLookupDone = CountDownLatch(1)
+        val instrumentedRepo = object : DictionaryRepository by fakeRepository {
+            override fun symSpellLookup(
+                term: String,
+                maxSuggestions: Int,
+                usePersonalization: Boolean
+            ): List<SymSpell.SuggestItem> {
+                val result = fakeRepository.symSpellLookup(term, maxSuggestions, usePersonalization)
+                if (usePersonalization && term == "hel") {
+                    personalizedLookupDone.countDown()
+                }
+                return result
+            }
+        }
+        val controller = SuggestionController(
+            context = context,
+            assets = context.assets,
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    personalizationEnabled = personalizationEnabled,
+                    showAddWordButton = true,
+                    maxSuggestions = 3
+                )
+            },
+            onSuggestionsUpdated = { snapshots.add(it) },
+            currentLocale = Locale.GERMANY,
+            dictionaryRepositoryFactory = { _, _, _, _, _ -> instrumentedRepo },
+            nextWordPredictorOverride = NextWordPredictor(store)
+        ).also { controllers.add(it) }
+
+        controller.onCharacterCommitted("hel", null)
+        assertTrue(personalizedLookupDone.await(3, TimeUnit.SECONDS))
+        Thread.sleep(30)
+
+        // Simulate live restore flipping preference OFF from a background thread before main-thread onSettingsChanged runs.
+        val snapshotIndexBeforeRestore = snapshots.size
+        personalizationEnabled = false
+        controller.invalidatePersonalizedSuggestionsImmediately()
+
+        // Main Looper drains the previously queued personalized publish BEFORE onSettingsChanged runs.
+        shadowOf(Looper.getMainLooper()).idle()
+        assertTrue(controller.currentSuggestions().isEmpty())
+        assertTrue(
+            "Queued personalized publish must be blocked after live-restore OFF barrier",
+            snapshots.subList(snapshotIndexBeforeRestore, snapshots.size)
+                .none { list -> list.any { it.candidate == "hellhound" } }
+        )
+
+        // Then onSettingsChanged runs on main and recomputes clean dictionary suggestions.
+        controller.onSettingsChanged(null)
+        assertTrue(controller.currentSuggestions().isEmpty())
+        val refreshed = waitForSuggestionCandidates("help", "held", "hello")
+        assertEquals(listOf("help", "held", "hello"), refreshed.map { it.candidate })
+        assertTrue(
+            snapshots.subList(snapshotIndexBeforeRestore, snapshots.size)
+                .none { list -> list.any { it.candidate == "hellhound" } }
+        )
     }
 
     @Test

@@ -11,12 +11,17 @@ Only --reinstall uninstalls the existing app. Restore/reinstall require .env
 replacement keys for all backed-up speech providers: Android Keystore keys cannot
 be restored from app files. Speech import verifies encrypted readback, without
 contacting cloud APIs. Backups contain APKs, credential/device app data and runtime
-permission/IME metadata; regenerable cache/code_cache directories are excluded.
+permission/IME metadata. Regenerable data is neither backed up nor restored: cache and
+code_cache, and the Direct Boot keyboard snapshot, which the app rebuilds from the
+restored credential-protected data on its next start after unlock. Snapshot files in
+older backups are skipped. Runtime permissions and the keyboard selection are restored
+even when the app data check fails, and the failure is reported afterwards.
 """
 import argparse
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -25,11 +30,22 @@ import shlex
 import subprocess
 import sys
 import tarfile
+import tempfile
+import time
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = re.compile(r'rocks\.pkb\.plektra(?:\.unsovereign)?(?:\.nightly)?')
 PROVIDERS = {'OPENAI': 'OPENAI_API_KEY', 'OPENROUTER': 'OPENROUTER_API_KEY'}
+CREDENTIAL_DATA, DEVICE_DATA = 'credential-data.tar', 'device-data.tar'
+# Regenerable members per archive. The Direct Boot snapshot (DirectBootKeyboardConfig) is a
+# projection of credential-protected data; the app replaces and deletes its generations on
+# every start after unlock, so restoring an archived generation cannot be verified reliably.
+REGENERABLE = {
+    CREDENTIAL_DATA: ('cache', 'code_cache'),
+    DEVICE_DATA: ('cache', 'code_cache', 'files/direct_boot_files', 'shared_prefs/direct_boot_keyboard_config.xml'),
+}
+SNAPSHOT_POINTER = 'files/direct_boot_files/current'
 
 
 def read_env(path):
@@ -81,6 +97,35 @@ def digest(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b''):
             result.update(chunk)
     return result.hexdigest()
+
+
+def regenerable(archive_name, member_name):
+    """True for archive members that the app rebuilds and the helper therefore never restores."""
+    parts = Path(member_name).parts
+    path = '/'.join(parts[1:] if parts and parts[0] == '.' else parts)
+    return any(path == prefix or path.startswith(prefix + '/') for prefix in REGENERABLE[archive_name])
+
+
+def tar_excludes(archive_name):
+    return ['--exclude=./' + prefix for prefix in REGENERABLE[archive_name]]
+
+
+def restorable(archive, destination):
+    """Copies the user data of [archive] into [destination]; returns (regular files, skipped count)."""
+    files, skipped = [], 0
+    with tarfile.open(archive) as source, tarfile.open(fileobj=destination, mode='w') as target:
+        for member in source:
+            if regenerable(archive.name, member.name):
+                skipped += 1
+                continue
+            data = source.extractfile(member) if member.isfile() else None
+            if member.isfile():
+                content = data.read()
+                files.append((member.name, hashlib.sha256(content).hexdigest()))
+                data = io.BytesIO(content)
+            target.addfile(member, data)
+    destination.seek(0)
+    return files, skipped
 
 
 def stored_providers(archive):
@@ -169,9 +214,9 @@ class Device:
                 target = destination / ('base.apk' if index == 0 else f'split-{index}.apk')
                 self.call('pull', path.removeprefix('package:'), str(target))
                 target.chmod(0o600)
-            for name, remote in [('credential-data.tar', '.'), ('device-data.tar', '/data/user_de/0/' + self.package)]:
+            for name, remote in self.data_locations():
                 with (destination / name).open('wb') as stream:
-                    result = subprocess.run(self.adb + ['exec-out', 'run-as', self.package, 'tar', '--exclude=./cache', '--exclude=./code_cache', '-C', remote, '-cf', '-', '.'],
+                    result = subprocess.run(self.adb + ['exec-out', 'run-as', self.package, 'tar', *tar_excludes(name), '-C', remote, '-cf', '-', '.'],
                                             stdout=stream, stderr=subprocess.PIPE, timeout=180)
                 if result.returncode:
                     raise RuntimeError('Could not back up app data')
@@ -190,12 +235,12 @@ class Device:
         metadata = json.loads((backup / 'metadata.json').read_text())
         if metadata['package'] != self.package or metadata['serial'] != self.serial:
             raise ValueError('Backup belongs to another package or device')
-        if not metadata.get('sha256') or not {'base.apk', 'credential-data.tar', 'device-data.tar'} <= metadata['sha256'].keys():
+        if not metadata.get('sha256') or not {'base.apk', CREDENTIAL_DATA, DEVICE_DATA} <= metadata['sha256'].keys():
             raise ValueError('Backup is incomplete')
         for name, expected in metadata['sha256'].items():
             if Path(name).name != name or digest(backup / name) != expected:
                 raise ValueError('Backup checksum mismatch')
-        for name in ('credential-data.tar', 'device-data.tar'):
+        for name in (CREDENTIAL_DATA, DEVICE_DATA):
             with tarfile.open(backup / name) as tar:
                 for member in tar:
                     path = Path(member.name)
@@ -203,33 +248,91 @@ class Device:
                         raise ValueError('Unsafe archive member')
         return metadata
 
+    def data_locations(self):
+        return [(CREDENTIAL_DATA, '.'), (DEVICE_DATA, '/data/user_de/0/' + self.package)]
+
+    def app_running(self):
+        """Process ids of the app; ADB exits non-zero when none runs."""
+        try:
+            return self.shell('pidof', self.package)
+        except RuntimeError:
+            return ''
+
+    def remote_sha256(self, path):
+        """Digest of an app file, or None when it does not exist."""
+        output = self.shell('run-as', self.package, 'sh', '-c',
+                            'if [ -f "$1" ]; then sha256sum "$1"; else echo missing; fi', 'sh', path)
+        return None if output == 'missing' else output.split()[0]
+
+    def restore_data(self, backup, attempts=3):
+        """Writes and verifies the user data; raises with the first divergent file named."""
+        written = []
+        for name, remote in self.data_locations():
+            with tempfile.TemporaryFile() as stream:
+                files, skipped = restorable(backup / name, stream)
+                result = subprocess.run(self.adb + ['exec-in', 'run-as', self.package, 'tar', '-C', remote, '-xof', '-'],
+                                        stdin=stream, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180)
+            if result.returncode:
+                raise RuntimeError('App data restoration failed while writing ' + name)
+            if skipped:
+                print(f'Skipped {skipped} regenerable entries of {name}; the app rebuilds them.')
+            written += [(name, member if remote == '.' else remote + '/' + member.removeprefix('./'), expected)
+                        for member, expected in files]
+        for _ in range(attempts):
+            for name, path, expected in written:
+                actual = self.remote_sha256(path)
+                if actual is None:
+                    raise RuntimeError('Restored file is missing: ' + name + ' ' + path)
+                if expected != actual:
+                    raise RuntimeError('Restored file checksum mismatch: ' + name + ' ' + path)
+            running = self.app_running()
+            if not running:
+                return
+            # A running process could later write its in-memory settings over the restored ones;
+            # once it is stopped, a passing check is final.
+            print('The app started during the restore (pid ' + running + '); stopping it and checking again.')
+            self.shell('am', 'force-stop', self.package)
+        raise RuntimeError('The app kept starting during the restore; restored files may be overwritten. '
+                           'Restore again once nothing launches it.')
+
     def restore(self, backup, values):
         metadata = self.validate_backup(backup)
         speech_payload(values)
-        require_replacement_keys(backup / 'credential-data.tar', values)
+        require_replacement_keys(backup / CREDENTIAL_DATA, values)
+        failure = None
         with self.stopped():
-            for name, remote in [('credential-data.tar', '.'), ('device-data.tar', '/data/user_de/0/' + self.package)]:
-                with (backup / name).open('rb') as stream:
-                    result = subprocess.run(self.adb + ['exec-in', 'run-as', self.package, 'tar', '--exclude=./cache', '--exclude=./code_cache', '-C', remote, '-xof', '-'],
-                                            stdin=stream, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180)
-                if result.returncode:
-                    raise RuntimeError('App data restoration failed')
-                with tarfile.open(backup / name) as tar:
-                    for member in tar:
-                        if member.isfile() and Path(member.name).parts[0] not in ('cache', 'code_cache'):
-                            expected = hashlib.sha256(tar.extractfile(member).read()).hexdigest()
-                            path = member.name if remote == '.' else remote + '/' + member.name
-                            actual = self.shell('run-as', self.package, 'sha256sum', path).split()[0]
-                            if expected != actual:
-                                raise RuntimeError('Restored file checksum mismatch: ' + name + ' ' + member.name)
+            try:
+                self.restore_data(backup)
+            except RuntimeError as error:
+                failure = error
+            # Permissions and keyboard selection do not depend on the data and are always restored.
             for permission in metadata['permissions']:
                 self.shell('pm', 'grant', self.package, permission)
-            if any(name.endswith('_key') for name in speech_payload(values)):
+            if not failure and any(name.endswith('_key') for name in speech_payload(values)):
                 self.speech(values)
         if metadata['ime'].startswith(self.package + '/'):
             self.shell('ime', 'enable', metadata['ime'])
             self.shell('ime', 'set', metadata['ime'])
+        if failure:
+            print('Runtime permissions and keyboard selection restored; app data was not.', file=sys.stderr)
+            raise failure
         print('App data hashes, runtime permissions and keyboard selection restored.')
+        if metadata['ime'].startswith(self.package + '/'):
+            self.await_snapshot()
+
+    def await_snapshot(self, attempts=20, delay=0.5):
+        """Reports whether the selected keyboard rebuilt the Direct Boot snapshot."""
+        pointer = '/data/user_de/0/' + self.package + '/' + SNAPSHOT_POINTER
+        for _ in range(attempts):
+            generation = self.shell('run-as', self.package, 'sh', '-c', 'cat "$1" 2>/dev/null || true', 'sh', pointer)
+            if re.fullmatch(r'generation-[0-9a-f-]{36}', generation) and self.remote_sha256(
+                    pointer.removesuffix('current') + generation + '/settings.json'):
+                print('Direct Boot keyboard snapshot rebuilt.')
+                return True
+            time.sleep(delay)
+        print('Warning: the Direct Boot keyboard snapshot has not been rebuilt yet. Before the next unlock, '
+              'the keyboard uses its previous or default settings until Plektra runs once after unlock.', file=sys.stderr)
+        return False
 
     def install(self, apk, backup, values, reinstall=False):
         sdk = Path(os.environ.get('ANDROID_SDK_ROOT') or os.environ.get('ANDROID_HOME') or Path.home() / 'Library/Android/sdk')
@@ -242,7 +345,7 @@ class Device:
         self.backup(backup)
         self.validate_backup(backup)
         if reinstall:
-            require_replacement_keys(backup / 'credential-data.tar', values)
+            require_replacement_keys(backup / CREDENTIAL_DATA, values)
             with self.stopped():
                 self.call('uninstall', self.package)
                 self.call('install', str(apk), timeout=180)
@@ -303,6 +406,7 @@ if __name__ == '__main__':
     try:
         os.umask(0o077)
         main()
-    except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError, tarfile.TarError):
-        print('Debug device operation failed; device/env/debug APK or backup validation did not pass. Backups are retained.', file=sys.stderr)
+    except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError, tarfile.TarError) as error:
+        # Messages name operations, paths and archive members; keys only travel on stdin.
+        print('Debug device operation failed: ' + (str(error) or type(error).__name__) + '. Backups are retained.', file=sys.stderr)
         sys.exit(1)

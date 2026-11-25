@@ -13,6 +13,88 @@ debug = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(debug)
 
 
+def write_tar(path, entries):
+    with tarfile.open(path, 'w') as archive:
+        for name, data in entries.items():
+            member = tarfile.TarInfo(name)
+            member.size = len(data)
+            archive.addfile(member, io.BytesIO(data))
+
+
+class FakeApp:
+    """Device side of a restore: app files by absolute path, plus a process the test can start."""
+
+    def __init__(self, test, device, on_restored=None):
+        self.test, self.device, self.on_restored = test, device, on_restored
+        self.files, self.pid, self.calls, self.selected = {}, '', [], 'other.keyboard/Service'
+        self.de = '/data/user_de/0/' + device.package
+
+    def absolute(self, path):
+        return path if path.startswith('/') else '/data/data/' + self.device.package + '/' + path.removeprefix('./')
+
+    def run(self, args, stdin=None, **kwargs):
+        remote = args[args.index('-C') + 1]
+        base = self.de if remote.startswith('/') else '/data/data/' + self.device.package
+        with tarfile.open(fileobj=stdin) as archive:
+            for member in archive:
+                if member.isfile():
+                    self.files[base + '/' + member.name.removeprefix('./')] = archive.extractfile(member).read()
+        if remote.startswith('/') and self.on_restored:
+            self.on_restored(self)
+        return debug.subprocess.CompletedProcess(args, 0, b'', b'')
+
+    def shell(self, *args, **kwargs):
+        self.calls.append(args)
+        if args[:2] == ('ime', 'list'):
+            return 'other.keyboard/Service'
+        if args[:2] == ('ime', 'set'):
+            self.selected = args[2]
+        if args[:2] == ('am', 'force-stop'):
+            self.pid = ''
+        if args[0] == 'pidof':
+            if not self.pid:
+                raise RuntimeError('ADB operation failed: shell')
+            return self.pid
+        if args[:3] == ('run-as', self.device.package, 'sh') and 'sha256sum' in args[4]:
+            data = self.files.get(self.absolute(args[-1]))
+            return 'missing' if data is None else debug.hashlib.sha256(data).hexdigest() + '  ' + args[-1]
+        if args[:3] == ('run-as', self.device.package, 'sh'):
+            return self.files.get(self.absolute(args[-1]), b'').decode()
+        return ''
+
+    def restore(self, backup):
+        with patch.object(self.device, 'shell', side_effect=self.shell), \
+             patch.object(self.device, 'current_ime', side_effect=lambda: self.selected), \
+             patch.object(debug.subprocess, 'run', side_effect=self.run), \
+             patch.object(debug.time, 'sleep'):
+            self.device.restore(backup, {})
+
+
+def write_backup(device, folder, credential, device_data):
+    backup = Path(folder)
+    (backup / 'base.apk').write_bytes(b'apk')
+    write_tar(backup / debug.CREDENTIAL_DATA, credential)
+    write_tar(backup / debug.DEVICE_DATA, device_data)
+    metadata = {'package': device.package, 'serial': device.serial, 'ime': device.package + '/.KeyboardService',
+                'permissions': ['android.permission.RECORD_AUDIO'],
+                'sha256': {p.name: debug.digest(p) for p in backup.iterdir()}}
+    (backup / 'metadata.json').write_text(json.dumps(metadata))
+    return backup
+
+
+OLD_GENERATION = './files/direct_boot_files/generation-00000000-0000-0000-0000-000000000000'
+NEW_GENERATION = 'generation-11111111-1111-1111-1111-111111111111'
+
+
+def rebuild_snapshot(app):
+    """What DirectBootKeyboardConfig.refresh does after a start: publish a new generation, delete the rest."""
+    root = app.de + '/files/direct_boot_files/'
+    for path in [path for path in app.files if path.startswith(root)]:
+        del app.files[path]
+    app.files[root + NEW_GENERATION + '/settings.json'] = b'{}'
+    app.files[root + 'current'] = NEW_GENERATION.encode()
+
+
 class DebugDeviceTest(unittest.TestCase):
     def test_env_is_data_and_preserves_quoted_characters(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -134,6 +216,71 @@ class DebugDeviceTest(unittest.TestCase):
             (backup / 'credential-data.tar').write_bytes(b'changed')
             with self.assertRaisesRegex(ValueError, 'checksum'):
                 device.validate_backup(backup)
+
+    def test_restore_survives_a_direct_boot_generation_change_and_restores_the_rest(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        def start_app(app):
+            app.pid = '4242'
+            rebuild_snapshot(app)
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>',
+                                                   './cache/tmp': b'regenerable'},
+                                  {'./files/direct_boot_files/current': OLD_GENERATION.rsplit('/', 1)[1].encode(),
+                                   OLD_GENERATION + '/settings.json': b'{"old": 1}',
+                                   OLD_GENERATION + '/files/ctrl_key_mappings.json': b'{}',
+                                   './shared_prefs/direct_boot_keyboard_config.xml': b'<map/>',
+                                   './shared_prefs/de_user_choice.xml': b'<map/>'})
+            app = FakeApp(self, device, on_restored=start_app)
+            app.restore(backup)
+        self.assertEqual(b'<map/>', app.files['/data/data/rocks.pkb.plektra.nightly/shared_prefs/plektra_prefs.xml'])
+        self.assertIn(app.de + '/shared_prefs/de_user_choice.xml', app.files)
+        self.assertFalse(any('generation-0000' in path or 'direct_boot_keyboard_config' in path or '/cache/' in path
+                             for path in app.files))
+        self.assertIn(('am', 'force-stop', device.package), app.calls[app.calls.index(('pidof', device.package)):])
+        self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
+        self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_missing_user_file_is_named_and_permissions_and_ime_are_still_restored(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        def lose_settings(app):
+            del app.files['/data/data/rocks.pkb.plektra.nightly/shared_prefs/plektra_prefs.xml']
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            app = FakeApp(self, device, on_restored=lose_settings)
+            with self.assertRaisesRegex(RuntimeError, 'missing: credential-data.tar ./shared_prefs/plektra_prefs.xml'):
+                app.restore(backup)
+        self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
+        self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_changed_user_file_is_a_checksum_failure(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        def overwrite(app):
+            app.files[app.de + '/files/user.json'] = b'changed'
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {}, {'./files/user.json': b'original'})
+            with self.assertRaisesRegex(RuntimeError, 'checksum mismatch: device-data.tar'):
+                FakeApp(self, device, on_restored=overwrite).restore(backup)
+
+    def test_an_app_that_keeps_starting_fails_the_restore(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        app = FakeApp(self, device)
+        original = app.shell
+        def shell(*args, **kwargs):
+            if args[0] == 'pidof':
+                app.pid = '7'
+            return original(*args, **kwargs)
+        app.shell = shell
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            with self.assertRaisesRegex(RuntimeError, 'kept starting'):
+                app.restore(backup)
+        self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_backup_never_archives_regenerable_data(self):
+        self.assertIn('--exclude=./files/direct_boot_files', debug.tar_excludes(debug.DEVICE_DATA))
+        self.assertTrue(debug.regenerable(debug.DEVICE_DATA, './files/direct_boot_files/current'))
+        self.assertFalse(debug.regenerable(debug.DEVICE_DATA, './files/direct_boot_files_user.json'))
+        self.assertFalse(debug.regenerable(debug.CREDENTIAL_DATA, './files/direct_boot_files/current'))
 
     def test_invalid_apk_never_backs_up_or_uninstalls(self):
         device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')

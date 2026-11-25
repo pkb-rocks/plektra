@@ -229,7 +229,7 @@ python3 scripts/debug_device.py --device <serial> backup
 python3 scripts/debug_device.py --device <serial> --env .env restore <backup-directory>
 ```
 
-Restore requires the same package on the same device with a debuggable APK installed. Only supplied keys and optional speech settings are changed by the key import; omitted settings remain unchanged.
+Restore requires the same package on the same device with a debuggable APK installed. The Direct Boot keyboard snapshot is not restored; the app rebuilds it from the restored data on its next start, and the helper reports whether that happened. When a restored file is missing or differs, runtime permissions and keyboard selection are still restored and the failing file is named. Only supplied keys and optional speech settings are changed by the key import; omitted settings remain unchanged.
 
 Distributed forks must use their own name, application ID, update endpoints and branding, and must not present themselves as official Plektra releases.
 

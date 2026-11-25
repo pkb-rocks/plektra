@@ -993,6 +993,15 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="nav_mode_save">Save</string>
     <string name="nav_mode_cancel">Cancel</string>
     <string name="nav_mode_default">default</string>
+    <string name="nav_mode_category_direction">Direction</string>
+    <string name="nav_mode_category_navigation_keys">Paging &amp; control</string>
+    <string name="nav_mode_category_clipboard">Clipboard &amp; undo</string>
+    <string name="nav_mode_category_selection">Selection &amp; words</string>
+    <string name="nav_mode_category_document_ui">Document &amp; display</string>
+    <string name="nav_mode_category_media">Media</string>
+    <string name="nav_mode_command_source_all">All</string>
+    <string name="nav_mode_native_ctrl_hint">Sends Ctrl+%1$s directly to the active app.</string>
+    <string name="nav_mode_none_hint">Leaves %1$s unassigned in Nav Mode.</string>
     
     <!-- Unicode Character Picker -->
     <string name="unicode_picker_title_for_letter">Select character for %1$s</string>

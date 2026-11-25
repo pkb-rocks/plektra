@@ -400,6 +400,15 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="nav_mode_save">Speichern</string>
     <string name="nav_mode_cancel">Abbrechen</string>
     <string name="nav_mode_default">Standard</string>
+    <string name="nav_mode_category_direction">Richtung</string>
+    <string name="nav_mode_category_navigation_keys">Seiten &amp; Steuerung</string>
+    <string name="nav_mode_category_clipboard">Zwischenablage &amp; Rückgängig</string>
+    <string name="nav_mode_category_selection">Auswahl &amp; Wörter</string>
+    <string name="nav_mode_category_document_ui">Dokument &amp; Ansicht</string>
+    <string name="nav_mode_category_media">Medien</string>
+    <string name="nav_mode_command_source_all">Alle</string>
+    <string name="nav_mode_native_ctrl_hint">Sendet Ctrl+%1$s direkt an die aktive App.</string>
+    <string name="nav_mode_none_hint">Lässt %1$s im Nav-Modus unbelegt.</string>
     <string name="unicode_picker_title_for_letter">Zeichen für %1$s auswählen</string>
     <string name="unicode_picker_title">Unicode-Zeichen auswählen</string>
     <string name="unicode_picker_close">Schließen</string>

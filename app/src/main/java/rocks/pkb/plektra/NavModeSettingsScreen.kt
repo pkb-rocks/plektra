@@ -2,6 +2,8 @@ package rocks.pkb.plektra
 
 import android.content.Context
 import android.view.KeyEvent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,24 +19,28 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,8 +51,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.window.DialogProperties
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.commands.CommandRegistry
+import rocks.pkb.plektra.commands.CommandSourceId
 import rocks.pkb.plektra.commands.CommandSurface
-import rocks.pkb.plektra.commands.CommandTarget
 import rocks.pkb.plektra.data.layout.JsonLayoutLoader
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
 import kotlin.math.min
@@ -590,6 +596,69 @@ internal fun keyMappingSelection(type: String?, value: String?): KeyMappingLoade
     }
 }
 
+private data class PickerTone(
+    val container: Color,
+    val content: Color,
+    val accent: Color
+)
+
+private data class NavOptionEntry(
+    val value: String,
+    val label: String,
+    val icon: ImageVector? = null
+)
+
+private data class NavOptionGroup(
+    val id: String,
+    val title: String,
+    val accent: Color,
+    val showCount: Boolean = false,
+    val options: List<NavOptionEntry>
+)
+
+@Composable
+private fun pickerToneForType(type: String?): PickerTone {
+    val scheme = MaterialTheme.colorScheme
+    return when (type) {
+        "keycode" -> PickerTone(
+            container = scheme.primaryContainer,
+            content = scheme.onPrimaryContainer,
+            accent = scheme.primary
+        )
+        "action" -> PickerTone(
+            container = scheme.tertiaryContainer,
+            content = scheme.onTertiaryContainer,
+            accent = scheme.tertiary
+        )
+        "command" -> PickerTone(
+            container = scheme.secondaryContainer,
+            content = scheme.onSecondaryContainer,
+            accent = scheme.secondary
+        )
+        "native_ctrl" -> PickerTone(
+            container = scheme.primaryContainer.copy(alpha = 0.72f),
+            content = scheme.onPrimaryContainer,
+            accent = scheme.primary
+        )
+        else -> PickerTone(
+            container = scheme.surfaceContainerHighest,
+            content = scheme.onSurface,
+            accent = scheme.outline
+        )
+    }
+}
+
+private fun keycodeIcon(keycode: String): ImageVector? {
+    return when (keycode) {
+        "DPAD_UP" -> Icons.Filled.KeyboardArrowUp
+        "DPAD_DOWN" -> Icons.Filled.KeyboardArrowDown
+        "DPAD_LEFT" -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
+        "DPAD_RIGHT" -> Icons.AutoMirrored.Filled.KeyboardArrowRight
+        "DPAD_CENTER" -> Icons.Filled.RadioButtonUnchecked
+        else -> null
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun KeyMappingDialog(
@@ -603,10 +672,18 @@ internal fun KeyMappingDialog(
     val context = LocalContext.current
     var selectedType by remember { mutableStateOf<String?>(currentMapping?.type) }
     var selectedValue by remember { mutableStateOf<String?>(currentMapping?.value) }
+    var selectedCommandSource by remember { mutableStateOf<CommandSourceId?>(null) }
     val commandTargets = remember { CommandRegistry(context).getCommands(CommandSurface.NavMode) }
+    val commandGroupsBySource = remember(commandTargets) {
+        commandTargets.groupBy { it.source }
+    }
     val defaultLabel = defaultMapping?.let { getMappingLabel(it) }
-    val dialogMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.9f
+    val dialogMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.92f
+    val fontScale = LocalDensity.current.fontScale
+    val minCellWidth = if (fontScale >= 1.4f) 220.dp else 180.dp
     val selection = keyMappingSelection(selectedType, selectedValue)
+    val activeTone = pickerToneForType(selectedType)
+
     val types = listOf(
         "keycode" to stringResource(R.string.nav_mode_keycode),
         "action" to stringResource(R.string.nav_mode_action),
@@ -614,25 +691,82 @@ internal fun KeyMappingDialog(
         "command" to stringResource(R.string.nav_mode_command),
         "none" to stringResource(R.string.nav_mode_none)
     )
-    val keycodes = listOf(
-        "DPAD_UP", "DPAD_DOWN", "DPAD_LEFT", "DPAD_RIGHT",
-        "TAB", "MOVE_HOME", "MOVE_END", "PAGE_UP", "PAGE_DOWN", "ESCAPE", "DPAD_CENTER",
-        "FORWARD_DEL"
-    )
-    val actions = listOf(
-        "copy", "paste", "cut", "undo",
-        "select_all", "expand_selection_left", "expand_selection_right",
-        "move_word_left", "move_word_right",
-        "expand_selection_word_left", "expand_selection_word_right",
-        "page_start", "page_end",
-        "toggle_minimal_ui",
-        "media_play_pause", "media_previous", "media_next"
-    )
-    // Value choices for the selected type as (stored value, label).
-    val options = when (selectedType) {
-        "keycode" -> keycodes.map { it to it }
-        "action" -> actions.map { it to getActionLabel(it) }
-        "command" -> commandTargets.map { it.id to commandLabel(it) }
+
+    val optionGroups: List<NavOptionGroup> = when (selectedType) {
+        "keycode" -> listOf(
+            NavOptionGroup(
+                id = "direction",
+                title = stringResource(R.string.nav_mode_category_direction),
+                accent = activeTone.accent,
+                options = listOf("DPAD_UP", "DPAD_DOWN", "DPAD_LEFT", "DPAD_RIGHT", "DPAD_CENTER")
+                    .map { NavOptionEntry(value = it, label = it, icon = keycodeIcon(it)) }
+            ),
+            NavOptionGroup(
+                id = "navigation_keys",
+                title = stringResource(R.string.nav_mode_category_navigation_keys),
+                accent = activeTone.accent,
+                options = listOf("MOVE_HOME", "MOVE_END", "PAGE_UP", "PAGE_DOWN", "TAB", "ESCAPE", "FORWARD_DEL")
+                    .map { NavOptionEntry(value = it, label = it) }
+            )
+        )
+        "action" -> listOf(
+            NavOptionGroup(
+                id = "clipboard",
+                title = stringResource(R.string.nav_mode_category_clipboard),
+                accent = activeTone.accent,
+                options = listOf("copy", "paste", "cut", "undo")
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+            ),
+            NavOptionGroup(
+                id = "selection",
+                title = stringResource(R.string.nav_mode_category_selection),
+                accent = activeTone.accent,
+                options = listOf(
+                    "select_all",
+                    "expand_selection_left",
+                    "expand_selection_right",
+                    "move_word_left",
+                    "move_word_right",
+                    "expand_selection_word_left",
+                    "expand_selection_word_right"
+                ).map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+            ),
+            NavOptionGroup(
+                id = "document_ui",
+                title = stringResource(R.string.nav_mode_category_document_ui),
+                accent = activeTone.accent,
+                options = listOf("page_start", "page_end", "toggle_minimal_ui")
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+            ),
+            NavOptionGroup(
+                id = "media",
+                title = stringResource(R.string.nav_mode_category_media),
+                accent = activeTone.accent,
+                options = listOf("media_play_pause", "media_previous", "media_next")
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+            )
+        )
+        "command" -> {
+            val scheme = MaterialTheme.colorScheme
+            commandGroupsBySource.entries
+                .filter { (source, _) -> selectedCommandSource == null || source == selectedCommandSource }
+                .map { (source, commands) ->
+                    val sourceAccent = when (source) {
+                        CommandSourceId.Apps -> scheme.secondary
+                        CommandSourceId.Plektra -> scheme.primary
+                        CommandSourceId.AppActions -> scheme.tertiary
+                        CommandSourceId.DeviceControl -> scheme.secondary
+                        CommandSourceId.NavActions -> scheme.primary
+                    }
+                    NavOptionGroup(
+                        id = source.storageValue,
+                        title = source.displayLabel,
+                        accent = sourceAccent,
+                        showCount = true,
+                        options = commands.map { NavOptionEntry(value = it.id, label = it.label) }
+                    )
+                }
+        }
         else -> emptyList()
     }
 
@@ -643,111 +777,398 @@ internal fun KeyMappingDialog(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 10.dp)
                 .heightIn(max = dialogMaxHeight),
-            shape = AlertDialogDefaults.shape,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
-            color = AlertDialogDefaults.containerColor,
-            contentColor = AlertDialogDefaults.textContentColor
+            shape = RoundedCornerShape(20.dp),
+            tonalElevation = 2.dp,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.nav_mode_configure_key, keyLabel),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Compact left-aligned header with keycap badge
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
+                        modifier = Modifier.defaultMinSize(minWidth = 34.dp, minHeight = 32.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = keyLabel,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
+                    }
+                    Text(
+                        text = stringResource(R.string.nav_mode_configure_key, keyLabel),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
-                // Type and value choices share one scrolling list so Cancel and Save stay on screen
-                // in short windows and with large text.
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+
+                // Type and value choices share one scrolling grid so Cancel and Save stay on screen
+                // in short windows and at 100–150% font scale.
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 200.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(1.dp),
+                    columns = GridCells.Adaptive(minSize = minCellWidth),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.weight(1f, fill = false)
                 ) {
                     item(key = "type", span = { GridItemSpan(maxLineSpan) }) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
                                 text = stringResource(R.string.nav_mode_type),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.semantics { heading() }
                             )
                             FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalArrangement = Arrangement.spacedBy(0.dp)
                             ) {
                                 types.forEach { (type, label) ->
+                                    val isSelected = selectedType == type
+                                    val chipTone = pickerToneForType(type)
                                     FilterChip(
-                                        selected = selectedType == type,
+                                        selected = isSelected,
                                         onClick = {
-                                            selectedType = type
-                                            selectedValue = null
+                                            if (selectedType != type) {
+                                                selectedType = type
+                                                selectedValue = null
+                                                selectedCommandSource = null
+                                            }
                                         },
-                                        label = { Text(label) }
+                                        label = {
+                                            Text(
+                                                text = label,
+                                                maxLines = 1,
+                                                softWrap = false,
+                                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
+                                            )
+                                        },
+                                        leadingIcon = if (isSelected) {
+                                            {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Check,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        } else null,
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = chipTone.container,
+                                            selectedLabelColor = chipTone.content,
+                                            selectedLeadingIconColor = chipTone.content,
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                            labelColor = MaterialTheme.colorScheme.onSurface
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled = true,
+                                            selected = isSelected,
+                                            borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f),
+                                            selectedBorderColor = chipTone.accent.copy(alpha = 0.8f),
+                                            selectedBorderWidth = 1.dp
+                                        )
                                     )
                                 }
-                                if (defaultLabel != null) {
-                                    TextButton(
-                                        onClick = {
-                                            selectedType = defaultMapping?.type
-                                            selectedValue = defaultMapping?.value
-                                        },
-                                        modifier = Modifier.align(Alignment.CenterVertically),
-                                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.nav_mode_use_default, defaultLabel),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            textDecoration = TextDecoration.Underline
-                                        )
-                                    }
+                            }
+                            if (defaultLabel != null) {
+                                TextButton(
+                                    onClick = {
+                                        selectedType = defaultMapping?.type
+                                        selectedValue = defaultMapping?.value
+                                        selectedCommandSource = null
+                                    },
+                                    modifier = Modifier.heightIn(min = 48.dp),
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Restore,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.nav_mode_use_default, defaultLabel),
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
                                 }
                             }
                         }
                     }
-                    items(options, key = { (value, _) -> "$selectedType:$value" }) { (value, label) ->
-                        FilterChip(
-                            selected = selectedValue == value,
-                            onClick = { selectedValue = value },
-                            label = { Text(label, modifier = Modifier.padding(vertical = 4.dp)) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+
+                    if (selectedType == "command" && commandGroupsBySource.size > 1) {
+                        item(key = "command_sources", span = { GridItemSpan(maxLineSpan) }) {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalArrangement = Arrangement.spacedBy(0.dp)
+                            ) {
+                                val allSelected = selectedCommandSource == null
+                                FilterChip(
+                                    selected = allSelected,
+                                    onClick = { selectedCommandSource = null },
+                                    label = {
+                                        Text(
+                                            text = stringResource(R.string.nav_mode_command_source_all),
+                                            maxLines = 1,
+                                            softWrap = false
+                                        )
+                                    },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = activeTone.container,
+                                        selectedLabelColor = activeTone.content,
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                                    ),
+                                    border = FilterChipDefaults.filterChipBorder(
+                                        enabled = true,
+                                        selected = allSelected,
+                                        borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+                                        selectedBorderColor = activeTone.accent.copy(alpha = 0.75f)
+                                    )
+                                )
+                                commandGroupsBySource.keys.forEach { source ->
+                                    val sourceSelected = selectedCommandSource == source
+                                    FilterChip(
+                                        selected = sourceSelected,
+                                        onClick = { selectedCommandSource = source },
+                                        label = {
+                                            Text(
+                                                text = source.displayLabel,
+                                                maxLines = 1,
+                                                softWrap = false
+                                            )
+                                        },
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = activeTone.container,
+                                            selectedLabelColor = activeTone.content,
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled = true,
+                                            selected = sourceSelected,
+                                            borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+                                            selectedBorderColor = activeTone.accent.copy(alpha = 0.75f)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    optionGroups.forEach { group ->
+                        item(key = "header:$selectedType:${group.id}", span = { GridItemSpan(maxLineSpan) }) {
+                            OptionCategoryHeader(
+                                title = group.title,
+                                accentColor = group.accent,
+                                count = if (group.showCount) group.options.size else null
+                            )
+                        }
+                        items(group.options, key = { "$selectedType:${it.value}" }) { entry ->
+                            NavOptionTile(
+                                label = entry.label,
+                                selected = selectedValue == entry.value,
+                                tone = activeTone,
+                                icon = entry.icon,
+                                onClick = { selectedValue = entry.value }
+                            )
+                        }
+                    }
+
+                    if (selectedType == "native_ctrl" || selectedType == "none") {
+                        item(key = "hint:$selectedType", span = { GridItemSpan(maxLineSpan) }) {
+                            val hintText = if (selectedType == "native_ctrl") {
+                                stringResource(R.string.nav_mode_native_ctrl_hint, keyLabel)
+                            } else {
+                                stringResource(R.string.nav_mode_none_hint, keyLabel)
+                            }
+                            PickerModeHintCard(
+                                text = hintText,
+                                accentColor = activeTone.accent
+                            )
+                        }
                     }
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp),
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
                         onClick = onDismiss,
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                        modifier = Modifier.heightIn(min = 48.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(stringResource(R.string.nav_mode_cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(
+                    FilledTonalButton(
                         // Disabled until the chosen type has a value, so a type switch cannot save as None.
                         onClick = { selection?.let(onSave) },
                         enabled = selection != null,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.heightIn(min = 48.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
                     ) {
                         Text(stringResource(R.string.nav_mode_save))
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun OptionCategoryHeader(
+    title: String,
+    accentColor: Color,
+    count: Int? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp, bottom = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(3.dp)
+                .height(14.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(accentColor)
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = accentColor,
+            modifier = Modifier
+                .weight(1f)
+                .semantics { heading() }
+        )
+        if (count != null) {
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun NavOptionTile(
+    label: String,
+    selected: Boolean,
+    tone: PickerTone,
+    icon: ImageVector? = null,
+    onClick: () -> Unit
+) {
+    val containerColor = if (selected) {
+        tone.container
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerLow
+    }
+    val contentColor = if (selected) {
+        tone.content
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+    val border = if (selected) {
+        BorderStroke(1.5.dp, tone.accent)
+    } else {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+    }
+
+    Surface(
+        selected = selected,
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = containerColor,
+        contentColor = contentColor,
+        border = border,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (selected) tone.content else tone.accent,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                color = contentColor,
+                modifier = Modifier.weight(1f)
+            )
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    tint = tone.content,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PickerModeHintCard(
+    text: String,
+    accentColor: Color
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.35f)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)
+        )
     }
 }
 
@@ -797,10 +1218,6 @@ private fun getMappingLabel(mapping: KeyMappingLoader.CtrlMapping): String? {
     }
 }
 
-private fun commandLabel(command: CommandTarget): String {
-    return "${command.source.displayLabel}: ${command.label}"
-}
-
 @Composable
 private fun getActionLabel(action: String): String {
     return when (action) {
@@ -815,6 +1232,8 @@ private fun getActionLabel(action: String): String {
         "move_word_right" -> stringResource(R.string.nav_mode_action_move_word_right)
         "expand_selection_word_left" -> stringResource(R.string.nav_mode_action_expand_selection_word_left)
         "expand_selection_word_right" -> stringResource(R.string.nav_mode_action_expand_selection_word_right)
+        "page_start" -> stringResource(R.string.nav_mode_action_page_start)
+        "page_end" -> stringResource(R.string.nav_mode_action_page_end)
         "toggle_minimal_ui" -> stringResource(R.string.nav_mode_action_toggle_slim)
         "media_play_pause" -> stringResource(R.string.nav_mode_action_media_play_pause)
         "media_previous" -> stringResource(R.string.nav_mode_action_media_previous)

@@ -104,6 +104,21 @@ class NavModeKeyMappingDialogTest {
         node(string(R.string.nav_mode_use_default, "DPAD_UP")).reveal().assertFullyVisible("Use default")
     }
 
+    // Titan 2 Elite at 360 dpi with 150% font scale: None never breaks character-by-character
+    // and Save/Cancel stay reachable across every type.
+    @Test @Config(qualifiers = "w480dp-h533dp-360dpi")
+    fun typesAndNoneStaySingleLineAndSavableAt150PercentFontScale() {
+        RuntimeEnvironment.setFontScale(1.5f)
+        open()
+        val noneLabel = string(R.string.nav_mode_none)
+        node(noneLabel).reveal().assertFullyVisible(noneLabel)
+        val layouts = mutableListOf<TextLayoutResult>()
+        compose.onNodeWithText(noneLabel, useUnmergedTree = true)
+            .fetchSemanticsNode().config[SemanticsActions.GetTextLayoutResult].action!!.invoke(layouts)
+        assertEquals("None must not wrap", 1, layouts.single().lineCount)
+        assertEveryTypeReachableAndSavable()
+    }
+
     // Titan 2 Elite at 360 dpi while the keyboard bar takes part of the window.
     @Test @Config(qualifiers = "w480dp-h400dp-360dpi")
     fun typesAndActionsStayReachableInShortWindow() {
@@ -124,7 +139,7 @@ class NavModeKeyMappingDialogTest {
     fun commandSelectionIsSavedAndItsLabelIsReadable() {
         open()
         node(string(R.string.nav_mode_command)).reveal().performClick()
-        val label = "Plektra: Toggle Keyboard Mode"
+        val label = "Toggle Keyboard Mode"
         node(label).reveal().performClick()
         assertTextNotTruncated(label)
         node(string(R.string.nav_mode_save)).performClick()

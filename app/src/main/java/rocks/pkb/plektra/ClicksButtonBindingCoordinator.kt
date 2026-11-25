@@ -31,6 +31,12 @@ internal class SettingsClicksButtonBindingStore(private val context: Context) : 
  * While a write is in flight for a target, the firmware state of that target is about to change.
  * A selection is therefore only marked as applied once no older write can still replace it; the
  * completion of the older write reconciles the latest selection instead.
+ *
+ * A failed write can leave the firmware changed without a published state: the GATT client writes
+ * the remap bytes and the enable flags in two steps and publishes only after both succeeded. The
+ * published output of that target is therefore not trusted to confirm a selection until the
+ * target was written successfully again or the keyboard state was read again. Every complete read
+ * starts by publishing an unvalidated session, so observing one marks the end of that doubt.
  */
 internal class ClicksButtonBindingCoordinator(
     private val store: ClicksButtonBindingStore,
@@ -43,6 +49,7 @@ internal class ClicksButtonBindingCoordinator(
     private val callbacks = mutableMapOf<ClicksButtonBindingTarget, (Boolean) -> Unit>()
     // A rejected write is retried on the next connection or selection instead of in a loop.
     private val failedTargets = mutableSetOf<ClicksButtonBindingTarget>()
+    private val unverifiedTargets = mutableSetOf<ClicksButtonBindingTarget>()
 
     fun request(
         target: ClicksButtonBindingTarget,
@@ -51,10 +58,10 @@ internal class ClicksButtonBindingCoordinator(
     ): ClicksButtonBindingRequestStatus {
         store.setDesired(target, binding)
         failedTargets -= target
-        val state = keyboardState()
+        val state = observe(keyboardState())
         val writeInProgress = target in writesInProgress
         val status = when {
-            !writeInProgress && ClicksButtonBindingSyncPolicy.isConfirmed(state, target, binding.firmwareOutput) -> {
+            !writeInProgress && isVerified(state, target, binding.firmwareOutput) -> {
                 if (ClicksButtonBindingSyncPolicy.canWrite(state)) store.markApplied(target, binding.firmwareOutput)
                 ClicksButtonBindingRequestStatus.CONFIRMED
             }
@@ -74,6 +81,7 @@ internal class ClicksButtonBindingCoordinator(
     }
 
     fun reconcile() {
+        observe(keyboardState())
         if (writer() == null) return
         ClicksButtonBindingTarget.entries.forEach { target ->
             // The completion of the running write reconciles this target with its final state.
@@ -84,7 +92,8 @@ internal class ClicksButtonBindingCoordinator(
                     keyboardState(),
                     target,
                     desired,
-                    failedInCurrentConnection = target in failedTargets
+                    failedInCurrentConnection = target in failedTargets,
+                    outputUnverified = target in unverifiedTargets
                 )
             ) {
                 ClicksButtonBindingReconcileAction.NONE -> Unit
@@ -102,6 +111,7 @@ internal class ClicksButtonBindingCoordinator(
         val pendingCallbacks = callbacks.values.toList()
         callbacks.clear()
         failedTargets.clear()
+        unverifiedTargets.clear()
         pendingCallbacks.forEach { it(false) }
     }
 
@@ -112,11 +122,19 @@ internal class ClicksButtonBindingCoordinator(
             return
         }
         if (!writesInProgress.add(target)) return
-        activeWriter.writeButtonRemap(target.firmwareCommand, desired.firmwareOutput) {
+        activeWriter.writeButtonRemap(target.firmwareCommand, desired.firmwareOutput) { written ->
             writesInProgress.remove(target)
+            val state = keyboardState()
+            when {
+                written -> unverifiedTargets -= target
+                // An already invalid session is read completely before it can confirm anything.
+                state.sessionValidated && writer() === activeWriter -> unverifiedTargets += target
+            }
+            observe(state)
             val latestDesired = store.desired(target)
-            val latestDesiredConfirmed = latestDesired != null &&
-                ClicksButtonBindingSyncPolicy.isConfirmed(keyboardState(), target, latestDesired.firmwareOutput)
+            // The state of a failed write predates it and cannot confirm the latest selection.
+            val latestDesiredConfirmed = written && latestDesired != null &&
+                isVerified(state, target, latestDesired.firmwareOutput)
             when (
                 ClicksButtonBindingCompletionPolicy.resolve(
                     attemptedOutput = desired.firmwareOutput,
@@ -136,8 +154,19 @@ internal class ClicksButtonBindingCoordinator(
                 ClicksButtonBindingCompletion.KEEP_PENDING -> Unit
             }
             reconcile()
+            // The latest selection stays pending but cannot be written in this session now.
+            if (target !in writesInProgress) finishCallback(target, success = false)
         }
     }
+
+    /** Forgets doubts about published outputs once a new complete read has begun. */
+    private fun observe(state: ClicksPowerKeyboardState): ClicksPowerKeyboardState {
+        if (!state.sessionValidated) unverifiedTargets.clear()
+        return state
+    }
+
+    private fun isVerified(state: ClicksPowerKeyboardState, target: ClicksButtonBindingTarget, output: ByteArray) =
+        target !in unverifiedTargets && ClicksButtonBindingSyncPolicy.isConfirmed(state, target, output)
 
     private fun finishCallback(target: ClicksButtonBindingTarget, success: Boolean) {
         callbacks.remove(target)?.invoke(success)

@@ -63,10 +63,13 @@ internal object ClicksButtonBindingSyncPolicy {
         state: ClicksPowerKeyboardState,
         target: ClicksButtonBindingTarget,
         desired: ClicksDesiredButtonBinding?,
-        failedInCurrentConnection: Boolean
+        failedInCurrentConnection: Boolean,
+        /** A failed write may have changed the firmware without publishing it; see the coordinator. */
+        outputUnverified: Boolean = false
     ): ClicksButtonBindingReconcileAction = when {
         desired == null || !desired.pending || !canWrite(state) -> ClicksButtonBindingReconcileAction.NONE
-        isConfirmed(state, target, desired.firmwareOutput) -> ClicksButtonBindingReconcileAction.MARK_APPLIED
+        !outputUnverified && isConfirmed(state, target, desired.firmwareOutput) ->
+            ClicksButtonBindingReconcileAction.MARK_APPLIED
         failedInCurrentConnection -> ClicksButtonBindingReconcileAction.NONE
         else -> ClicksButtonBindingReconcileAction.WRITE
     }

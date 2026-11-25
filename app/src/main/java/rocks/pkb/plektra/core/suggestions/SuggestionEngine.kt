@@ -37,6 +37,23 @@ class SuggestionEngine(
         return source == SuggestionSource.USER || source == SuggestionSource.DEFAULT_USER
     }
 
+    private fun effectiveFrequencyFor(
+        entry: DictionaryEntry,
+        normalizedWord: String,
+        usePersonalization: Boolean
+    ): Int {
+        if (usePersonalization || entry.source != SuggestionSource.USER) {
+            return repository.effectiveFrequency(entry)
+        }
+        val mainEntry = repository.topByNormalized(normalizedWord, limit = 5)
+            .firstOrNull { it.source == SuggestionSource.MAIN && it.word.equals(entry.word, ignoreCase = true) }
+        return if (mainEntry != null) {
+            repository.effectiveFrequency(mainEntry)
+        } else {
+            repository.effectiveFrequency(entry.copy(frequency = 1))
+        }
+    }
+
     /**
      * Build character-to-position map for a given keyboard layout.
      * Physical key positions match the actual Plektra compact keyboard layout:
@@ -312,7 +329,8 @@ class SuggestionEngine(
         limit: Int = 3,
         includeAccentMatching: Boolean = true,
         useKeyboardProximity: Boolean = true,
-        useEditTypeRanking: Boolean = true
+        useEditTypeRanking: Boolean = true,
+        usePersonalization: Boolean = true
     ): List<SuggestionResult> {
         if (currentWord.isBlank() || currentWord.length > 48) return emptyList()
         if (!repository.isReady) return emptyList()
@@ -325,7 +343,8 @@ class SuggestionEngine(
                 limit = (limit * 2).coerceAtMost(12),
                 includeAccentMatching = includeAccentMatching,
                 useKeyboardProximity = useKeyboardProximity,
-                useEditTypeRanking = useEditTypeRanking
+                useEditTypeRanking = useEditTypeRanking,
+                usePersonalization = usePersonalization
             )
             val filtered = rootResults
                 .filter { it.distance <= 1 } // stay conservative on apostrophated forms
@@ -344,7 +363,8 @@ class SuggestionEngine(
             limit = limit,
             includeAccentMatching = includeAccentMatching,
             useKeyboardProximity = useKeyboardProximity,
-            useEditTypeRanking = useEditTypeRanking
+            useEditTypeRanking = useEditTypeRanking,
+            usePersonalization = usePersonalization
         )
     }
 
@@ -353,7 +373,8 @@ class SuggestionEngine(
         limit: Int,
         includeAccentMatching: Boolean,
         useKeyboardProximity: Boolean,
-        useEditTypeRanking: Boolean
+        useEditTypeRanking: Boolean,
+        usePersonalization: Boolean
     ): List<SuggestionResult> {
         val normalizedWord = normalize(currentWord)
         val normalizedWordBare = normalizedWord.replace("'", "")
@@ -375,7 +396,8 @@ class SuggestionEngine(
         val completions = repository.lookupByPrefixMerged(normalizedWord, maxSize = 200)
             .filter {
                 val norm = normalizeCached(it.word)
-                val meetsFrequency = isPreferredUserEntry(it.source) || repository.effectiveFrequency(it) >= minFrequencyForPrefixSuggestion
+                val meetsFrequency = isPreferredUserEntry(it.source) ||
+                    effectiveFrequencyFor(it, norm, usePersonalization) >= minFrequencyForPrefixSuggestion
                 // Only show words that are longer (actual completions) and meet frequency threshold
                 // Exception: USER dictionary words are always included regardless of frequency
                 norm.startsWith(normalizedWord) && it.word.length > currentWord.length && meetsFrequency
@@ -414,12 +436,12 @@ class SuggestionEngine(
         val seen = HashSet<String>(limit * 3)
         val top = ArrayList<SuggestionResult>(limit)
 
-        // Comparator with three-tier priority: USER words > prefix completions > edit-distance
+        // Comparator with three-tier priority: USER words (when personalized) > prefix completions > edit-distance
         val comparator = Comparator<SuggestionResult> { a, b ->
-            val aIsUser = isPreferredUserEntry(a.source)
-            val bIsUser = isPreferredUserEntry(b.source)
+            val aIsUser = usePersonalization && isPreferredUserEntry(a.source)
+            val bIsUser = usePersonalization && isPreferredUserEntry(b.source)
 
-            // User dictionary words ALWAYS rank highest
+            // User dictionary words rank highest only when personalization is enabled
             if (aIsUser && !bIsUser) return@Comparator -1
             if (!aIsUser && bIsUser) return@Comparator 1
 
@@ -491,6 +513,12 @@ class SuggestionEngine(
             val candidateList: List<DictionaryEntry> = overrideCandidates ?: when {
                 isSingleCharInput -> repository.topByNormalized(term, limit = 5)
                 distance == 0 -> repository.topByNormalized(term, limit = 3)
+                !usePersonalization -> {
+                    val entries = repository.topByNormalized(term, limit = 5)
+                    listOfNotNull(
+                        entries.maxByOrNull { effectiveFrequencyFor(it, term, usePersonalization = false) }
+                    )
+                }
                 else -> listOfNotNull(repository.bestEntryForNormalized(term))
             }
             if (candidateList.isEmpty()) return
@@ -506,7 +534,7 @@ class SuggestionEngine(
                     return@forEach
                 }
 
-                val effectiveFreq = repository.effectiveFrequency(entry)
+                val effectiveFreq = effectiveFrequencyFor(entry, normCandidate, usePersonalization)
 
                 // Filter prefix completions by their ACTUAL frequency, not SymSpell boosted frequency
                 // Exception: Never filter user dictionary words
@@ -561,7 +589,7 @@ class SuggestionEngine(
                     else -> 0.0
                 }
                 val frequencyScore = (effectiveFreq / 1_600.0)
-                val sourceBoost = if (isPreferredUserEntry(entry.source)) 5.0 else 1.0
+                val sourceBoost = if (usePersonalization && isPreferredUserEntry(entry.source)) 5.0 else 1.0
                 val accentBonus = if (isSingleCharInput && candidateLen == 1 && hasAccent) 0.8 else 0.0
                 val accentSameLengthBonus = if (!isSingleCharInput && candidateLen == currentWord.length && hasAccent) 0.4 else 0.0
                 val baseLetterMalus = if (isSingleCharInput && candidateLen == 1 && !hasAccent && isSameBaseLetter) -2.0 else 0.0

@@ -1015,6 +1015,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         return SuggestionSettings(
             textReplacementsEnabled = SettingsManager.getAutoCorrectEnabled(this),
             suggestionsEnabled = suggestionsEnabled,
+            personalizationEnabled = SettingsManager.getSuggestionsPersonalizationEnabled(this) &&
+                !inputContextState.shouldDisablePersonalizedLearning,
+            showAddWordButton = SettingsManager.getSuggestionsAddWordButtonEnabled(this),
             accentMatching = SettingsManager.getAccentMatchingEnabled(this),
             autoReplaceOnSpaceEnter = SettingsManager.getAutoReplaceOnSpaceEnter(this),
             maxAutoReplaceDistance = SettingsManager.getMaxAutoReplaceDistance(this),
@@ -2681,6 +2684,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                     updateStatusBarText()
                     keyboardVisibilityController.onKeyboardBarConfigurationChanged()
                 }
+            } else if (
+                key == SettingsManager.KEY_SUGGESTIONS_PERSONALIZATION_ENABLED ||
+                key == SettingsManager.KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED
+            ) {
+                Handler(Looper.getMainLooper()).post {
+                    if (::suggestionController.isInitialized) {
+                        suggestionController.onSettingsChanged(currentInputConnection)
+                    }
+                    invalidateRenderedStatusSnapshot()
+                    updateStatusBarText()
+                    keyboardVisibilityController.onKeyboardBarConfigurationChanged()
+                }
             } else if (SettingsManager.isModifierIndicatorPreferenceKey(key) ||
                 key == "suggestions_enabled" || key == "suggestions_bold" || key == "status_bar_variations_visible" ||
                 key?.startsWith("slim_status_bar_slots_") == true ||
@@ -3598,7 +3613,15 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         
         val modifierSnapshot = modifierStateController.snapshot()
         val state = inputContextState
-        val addWordCandidate = if (state.shouldDisableSuggestions || isSpeechRecognitionActive) null else suggestionController.pendingAddWord()
+        val addWordCandidate = if (
+            state.shouldDisableSuggestions ||
+            isSpeechRecognitionActive ||
+            !SettingsManager.getSuggestionsAddWordButtonEnabled(this)
+        ) {
+            null
+        } else {
+            suggestionController.pendingAddWord()
+        }
         val suggestionsEnabled = SettingsManager.isExperimentalSuggestionsEnabled(this) && rocks.pkb.plektra.KeyboardBarConfiguration.read(this)
             .presentation(SettingsManager.getSlimModeActive(this)).suggestions
         val suggestionsStart = ImePerfLogger.mark()
@@ -6523,7 +6546,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         variationInteractedDuringHold = true
 
         // Allow gesture only when suggestions bar should be visible/usable
-        val addWordCandidate = suggestionController.pendingAddWord()
+        val addWordCandidate = if (SettingsManager.getSuggestionsAddWordButtonEnabled(this)) {
+            suggestionController.pendingAddWord()
+        } else {
+            null
+        }
         val addWordGestureEnabled = SettingsManager.getTrackpadGestureAddWordEnabled(this)
         val canAddWordByGesture = TrackpadAddWordGesturePolicy.canAddWordByGesture(
             third = third,

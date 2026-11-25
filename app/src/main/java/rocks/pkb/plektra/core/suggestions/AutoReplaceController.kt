@@ -334,7 +334,9 @@ class AutoReplaceController(
                 val shouldAppendBoundary = boundaryChar != null &&
                     !(boundaryChar == ' ' && replacement.endsWith("'"))
                 inputConnection.commitText(replacement, 1)
-                repository.markUsed(replacement)
+                if (settings.personalizationEnabled) {
+                    repository.markUsed(replacement)
+                }
                 lastReplacement = LastReplacement(
                     originalWord = word,
                     replacedWord = replacement
@@ -376,7 +378,9 @@ class AutoReplaceController(
                 val shouldAppendBoundary = boundaryChar != null &&
                     !(boundaryChar == ' ' && caseReplacement.endsWith("'"))
                 inputConnection.commitText(caseReplacement, 1)
-                repository.markUsed(caseReplacement)
+                if (settings.personalizationEnabled) {
+                    repository.markUsed(caseReplacement)
+                }
                 lastReplacement = LastReplacement(
                     originalWord = word,
                     replacedWord = caseReplacement
@@ -414,7 +418,8 @@ class AutoReplaceController(
             limit = 1,
             includeAccentMatching = settings.accentMatching,
             useKeyboardProximity = settings.useKeyboardProximity,
-            useEditTypeRanking = settings.useEditTypeRanking
+            useEditTypeRanking = settings.useEditTypeRanking,
+            usePersonalization = settings.personalizationEnabled
         ).firstOrNull()
         // Suggestion ranking can assign zero distance to completions. Replacement safety
         // uses the actual distance of the dictionary root before restoring its prefix.
@@ -486,7 +491,9 @@ class AutoReplaceController(
             val shouldAppendBoundary = boundaryChar != null &&
                 !(boundaryChar == ' ' && replacement.endsWith("'"))
             inputConnection.commitText(replacement, 1)
-            repository.markUsed(replacement)
+            if (settings.personalizationEnabled) {
+                repository.markUsed(replacement)
+            }
             
             // Store last replacement for undo
             lastReplacement = LastReplacement(

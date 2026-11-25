@@ -78,6 +78,8 @@ object SettingsManager {
     private const val KEY_AUTO_CORRECT_ENABLED_LANGUAGES = "auto_correct_enabled_languages"
     private const val KEY_SUGGESTIONS_ENABLED = "suggestions_enabled"
     private const val KEY_SUGGESTIONS_BOLD = "suggestions_bold"
+    const val KEY_SUGGESTIONS_PERSONALIZATION_ENABLED = "suggestions_personalization_enabled"
+    const val KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED = "suggestions_add_word_button_enabled"
     private const val KEY_SNIPPETS_ENABLED = "snippets_enabled"
     private const val KEY_SNIPPETS_PREFIX = "snippets_prefix"
     private const val KEY_SNIPPETS = "snippets_v1"
@@ -421,6 +423,8 @@ object SettingsManager {
 
     private const val DEFAULT_USE_KEYBOARD_PROXIMITY = false
     private const val DEFAULT_USE_EDIT_TYPE_RANKING = false
+    private const val DEFAULT_SUGGESTIONS_PERSONALIZATION_ENABLED = true
+    private const val DEFAULT_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED = true
     private const val DEFAULT_IME_OVERLAY_DEBUG_LOGGING = false
     private const val DEFAULT_CLIPBOARD_HISTORY_ENABLED = true
     private const val DEFAULT_CLIPBOARD_RETENTION_TIME = 0L // Keep normal entries until deleted
@@ -3326,6 +3330,45 @@ object SettingsManager {
 
     fun setSuggestionsBold(context: Context, enabled: Boolean) {
         getPreferences(context).edit().putBoolean(KEY_SUGGESTIONS_BOLD, enabled).apply()
+    }
+
+    /**
+     * Returns whether usage-based suggestion personalization (learned next-word/sentence-start
+     * predictions and usage-based ranking) is enabled.
+     */
+    fun getSuggestionsPersonalizationEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(
+            KEY_SUGGESTIONS_PERSONALIZATION_ENABLED,
+            DEFAULT_SUGGESTIONS_PERSONALIZATION_ENABLED
+        )
+    }
+
+    /**
+     * Enables or disables usage-based suggestion personalization without deleting stored data.
+     */
+    fun setSuggestionsPersonalizationEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SUGGESTIONS_PERSONALIZATION_ENABLED, enabled)
+            .apply()
+    }
+
+    /**
+     * Returns whether the yellow "+" add-word button is shown in the suggestions bar.
+     */
+    fun getSuggestionsAddWordButtonEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(
+            KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED,
+            DEFAULT_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED
+        )
+    }
+
+    /**
+     * Enables or disables the "+" add-word button in the suggestions bar.
+     */
+    fun setSuggestionsAddWordButtonEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SUGGESTIONS_ADD_WORD_BUTTON_ENABLED, enabled)
+            .apply()
     }
 
     /**

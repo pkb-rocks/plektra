@@ -5,15 +5,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Clear
@@ -25,7 +28,9 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
@@ -59,6 +64,12 @@ fun AutoCorrectionCategoryScreen(
     var suggestionsEnabled by remember {
         mutableStateOf(SettingsManager.getSuggestionsEnabled(context))
     }
+    var suggestionsPersonalizationEnabled by remember {
+        mutableStateOf(SettingsManager.getSuggestionsPersonalizationEnabled(context))
+    }
+    var suggestionsAddWordButtonEnabled by remember {
+        mutableStateOf(SettingsManager.getSuggestionsAddWordButtonEnabled(context))
+    }
     var accentMatchingEnabled by remember {
         mutableStateOf(SettingsManager.getAccentMatchingEnabled(context))
     }
@@ -73,6 +84,23 @@ fun AutoCorrectionCategoryScreen(
     }
     var useEditTypeRanking by remember {
         mutableStateOf(SettingsManager.getUseEditTypeRanking(context))
+    }
+    DisposableEffect(context) {
+        val preferences = SettingsManager.getPreferences(context)
+        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            autoCorrectEnabled = SettingsManager.getAutoCorrectEnabled(context)
+            experimentalSuggestionsEnabled = SettingsManager.isExperimentalSuggestionsEnabled(context)
+            suggestionsEnabled = SettingsManager.getSuggestionsEnabled(context)
+            suggestionsPersonalizationEnabled = SettingsManager.getSuggestionsPersonalizationEnabled(context)
+            suggestionsAddWordButtonEnabled = SettingsManager.getSuggestionsAddWordButtonEnabled(context)
+            accentMatchingEnabled = SettingsManager.getAccentMatchingEnabled(context)
+            autoReplaceOnSpaceEnter = SettingsManager.getAutoReplaceOnSpaceEnter(context)
+            maxAutoReplaceDistance = SettingsManager.getMaxAutoReplaceDistance(context)
+            useKeyboardProximity = SettingsManager.getUseKeyboardProximity(context)
+            useEditTypeRanking = SettingsManager.getUseEditTypeRanking(context)
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
     val currentDestination = when (val page = settingsChild(context, "autocorrection")) {
         "Settings" -> AutoCorrectionDestination.Settings
@@ -462,6 +490,32 @@ fun AutoCorrectionCategoryScreen(
                             }
                         ) { Text(stringResource(R.string.status_bar_buttons_title)) }
 
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.History,
+                            title = stringResource(R.string.auto_correct_suggestions_personalization_title),
+                            description = stringResource(R.string.auto_correct_suggestions_personalization_description),
+                            checked = suggestionsPersonalizationEnabled,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION,
+                            onCheckedChange = { enabled ->
+                                suggestionsPersonalizationEnabled = enabled
+                                SettingsManager.setSuggestionsPersonalizationEnabled(context, enabled)
+                            }
+                        )
+
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.AddCircleOutline,
+                            title = stringResource(R.string.auto_correct_add_word_button_title),
+                            description = stringResource(R.string.auto_correct_add_word_button_description),
+                            checked = suggestionsAddWordButtonEnabled,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_ADD_WORD_BUTTON,
+                            onCheckedChange = { enabled ->
+                                suggestionsAddWordButtonEnabled = enabled
+                                SettingsManager.setSuggestionsAddWordButtonEnabled(context, enabled)
+                            }
+                        )
+
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -633,6 +687,75 @@ private sealed class AutoCorrectionDestination {
     data class Edit(val languageCode: String) : AutoCorrectionDestination()
     object UserDictionary : AutoCorrectionDestination()
     object AppExactTyping : AutoCorrectionDestination()
+}
+
+@Composable
+private fun AutoCorrectionSwitchRow(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    checked: Boolean,
+    enabled: Boolean,
+    linkId: String,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Surface(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 72.dp)
+                .settingRow(linkId)
+                .toggleable(
+                    value = checked,
+                    enabled = enabled,
+                    role = Role.Switch,
+                    onValueChange = onCheckedChange
+                )
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (enabled) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                },
+                modifier = Modifier.size(24.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = if (enabled) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    }
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (enabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                    }
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = null,
+                enabled = enabled
+            )
+        }
+    }
 }
 
 private enum class UserDictSource { DEFAULT, USER }

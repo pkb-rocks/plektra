@@ -141,6 +141,10 @@
     <string name="auto_correct_language_code_required">Der Ersetzungsname ist erforderlich</string>
     <string name="auto_correct_language_already_exists">Diese Ersetzung existiert bereits</string>
     <string name="auto_correct_suggestions_toggle_title">Vorschläge während der Eingabe</string>
+    <string name="auto_correct_suggestions_personalization_title">Personalisierte Vorschläge</string>
+    <string name="auto_correct_suggestions_personalization_description">Lernt aus deiner Eingabe für Wortfolge- und Startvorschläge. Ausgeschaltet bleiben gespeicherte Wörter erhalten und es werden nur Wörterbuchvorschläge genutzt.</string>
+    <string name="auto_correct_add_word_button_title">„Wort hinzufügen“ (+)-Taste anzeigen</string>
+    <string name="auto_correct_add_word_button_description">Zeigt die +-Taste in der Vorschlagsleiste für unbekannte Wörter an. Ausgeschaltet wird der Platz für einen dritten Vorschlag genutzt.</string>
     <string name="auto_correct_accent_matching_title">Akzente &amp; Schreibzeichen</string>
     <string name="auto_correct_auto_replace_title">Automatische Korrektur</string>
     <string name="auto_correct_auto_replace_description">Wörterbuchvorschläge nutzen, um wahrscheinliche Tippfehler bei Leerzeichen oder Enter zu korrigieren.</string>
@@ -1478,6 +1482,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kw_keyboards_devices_accessories">Zubehör, Clicks, Cover</string>
     <string name="kw_auto_correction_languages">Tastaturlayout, Eingabesprachen, Layouts, Wörterbücher, pro Sprache</string>
     <string name="kw_auto_correction_suggestions">Vorschläge, Kandidaten, Vorhersage</string>
+    <string name="kw_auto_correction_suggestions_personalization">personalisieren, personalisiert, Personalisierung, lernen, Nutzung, Verlauf, nächstes Wort, leeres Feld, Vorhersagen, Datenschutz, nur Wörterbuch</string>
+    <string name="kw_auto_correction_add_word_button">Plus, gelbes Plus, Wort hinzufügen, dritter Vorschlag, Vorschlagsleiste, Slot, Plus ausblenden</string>
     <string name="kw_auto_correction_accent_matching">Akzente, Diakritika, Übereinstimmung</string>
     <string name="kw_accessibility_suggestions_delay">Verzögerung, Vorschläge, Barrierefreiheit, Timeout</string>
     <string name="kw_keyboard_timing_long_press">Langdruck, lange Taste, Verzögerung, Timing, Schwellenwert</string>

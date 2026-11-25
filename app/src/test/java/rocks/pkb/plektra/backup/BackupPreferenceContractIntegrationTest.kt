@@ -141,6 +141,8 @@ class BackupPreferenceContractIntegrationTest {
         SettingsManager.setAppEnterBehaviorOverrides(context, listOf(enterOverride))
         SettingsManager.setNavModeCtrlHoldEnabled(context, true)
         SettingsManager.setDynamicVariationBarResizeToContent(context, true)
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+        SettingsManager.setSuggestionsAddWordButtonEnabled(context, false)
         SettingsManager.setTypingSoundMode(context, SettingsManager.TYPING_SOUND_MODE_CUSTOM)
         SettingsManager.setTypingSoundOutputMode(context, SettingsManager.TYPING_SOUND_OUTPUT_NOTIFICATION)
         val typingSoundFile = File(
@@ -237,6 +239,8 @@ class BackupPreferenceContractIntegrationTest {
         assertEquals(listOf(enterOverride), SettingsManager.getAppEnterBehaviorOverrides(context))
         assertTrue(SettingsManager.getNavModeCtrlHoldEnabled(context))
         assertTrue(SettingsManager.getDynamicVariationBarResizeToContent(context))
+        assertFalse(SettingsManager.getSuggestionsPersonalizationEnabled(context))
+        assertFalse(SettingsManager.getSuggestionsAddWordButtonEnabled(context))
         assertEquals(
             "[\"ContractWord\"]",
             SettingsManager.getPreferences(context).getString("user_dictionary_entries", null)

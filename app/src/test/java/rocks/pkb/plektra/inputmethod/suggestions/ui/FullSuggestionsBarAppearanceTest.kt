@@ -140,6 +140,91 @@ class FullSuggestionsBarAppearanceTest {
         assertTrue(line.parent != null)
     }
 
+    @Test fun hidingAddWordButtonShowsThirdSuggestionWithoutPseudoSuggestionsAndUpdatesOnToggle() {
+        val bar = FullSuggestionsBar(context)
+        val view = bar.ensureView()
+        bar.setContentEnabled(suggestions = true, menuButtons = false)
+        val addedWords = mutableListOf<String>()
+        fun slotViews() = descendants(view).filterIsInstance<TextView>()
+        fun render(suggestions: List<String>, addCandidate: String?, reserveEmptyRow: Boolean = false) {
+            bar.update(
+                suggestions = suggestions,
+                shouldShow = true,
+                inputConnection = null,
+                listener = null,
+                shouldDisableSuggestions = false,
+                addWordCandidate = addCandidate,
+                onAddUserWord = { addedWords.add(it) },
+                onAddUserWordSubstitutionRequested = null,
+                onSuggestionCommitted = null,
+                onHideSuggestion = null,
+                onDeleteUserSuggestion = null,
+                canDeleteUserSuggestion = null,
+                reserveEmptyRow = reserveEmptyRow
+            )
+        }
+
+        // Default ON: left slot shows add-word candidate with yellow + icon, displacing 3rd suggestion.
+        render(listOf("First", "Second", "Third"), "OwnWord")
+        var slots = slotViews()
+        assertEquals(listOf("OwnWord", "First", "Second"), slots.map { it.text.toString() })
+        assertNotNull(slots[0].compoundDrawables[2])
+
+        // Hide Add Word button: left slot immediately promotes the 3rd suggestion with no + icon.
+        SettingsManager.setSuggestionsAddWordButtonEnabled(context, false)
+        render(listOf("First", "Second", "Third"), "OwnWord")
+        slots = slotViews()
+        assertEquals(listOf("Third", "First", "Second"), slots.map { it.text.toString() })
+        assertTrue(slots.all { it.compoundDrawables[2] == null })
+        assertTrue(slots.all { it.isClickable })
+        slots[0].performClick()
+        assertTrue(addedWords.isEmpty())
+
+        // 2 suggestions with Add Word hidden: only 2 real suggestions, no invented pseudo-suggestion.
+        render(listOf("First", "Second"), "OwnWord")
+        slots = slotViews()
+        assertEquals(listOf("", "First", "Second"), slots.map { it.text.toString() })
+        assertFalse(slots[0].isClickable)
+        assertTrue(slots.all { it.compoundDrawables[2] == null })
+
+        // 1 suggestion with Add Word hidden: only center slot populated.
+        render(listOf("First"), "OwnWord")
+        slots = slotViews()
+        assertEquals(listOf("", "First", ""), slots.map { it.text.toString() })
+        assertFalse(slots[0].isClickable)
+        assertTrue(slots[1].isClickable)
+        assertFalse(slots[2].isClickable)
+
+        // 0 suggestions with Add Word hidden: no add-only bar, hides when unreserved and stays blank when reserved.
+        render(emptyList(), "OwnWord", reserveEmptyRow = false)
+        assertEquals(View.GONE, view.visibility)
+
+        render(emptyList(), "OwnWord", reserveEmptyRow = true)
+        assertEquals(View.VISIBLE, view.visibility)
+        slots = slotViews()
+        assertEquals(listOf("", "", ""), slots.map { it.text.toString() })
+        assertTrue(slots.all { !it.isClickable && it.compoundDrawables[2] == null })
+
+        // Toggle back ON: yellow + add-word button returns immediately.
+        SettingsManager.setSuggestionsAddWordButtonEnabled(context, true)
+        render(listOf("First", "Second", "Third"), "OwnWord")
+        slots = slotViews()
+        assertEquals(listOf("OwnWord", "First", "Second"), slots.map { it.text.toString() })
+        assertNotNull(slots[0].compoundDrawables[2])
+        slots[0].performClick()
+        assertEquals(listOf("OwnWord"), addedWords)
+
+        // Edge case: same visible slot strings when candidate transitions from add-word button to ordinary 3rd suggestion.
+        render(listOf("First", "Second"), "SameWord")
+        slots = slotViews()
+        assertEquals(listOf("SameWord", "First", "Second"), slots.map { it.text.toString() })
+        assertNotNull(slots[0].compoundDrawables[2])
+        render(listOf("First", "Second", "SameWord"), null)
+        slots = slotViews()
+        assertEquals(listOf("SameWord", "First", "Second"), slots.map { it.text.toString() })
+        assertNull(slots[0].compoundDrawables[2])
+    }
+
     private fun descendants(view: View): List<View> = listOf(view) +
         if (view is ViewGroup) (0 until view.childCount).flatMap { descendants(view.getChildAt(it)) }
         else emptyList()

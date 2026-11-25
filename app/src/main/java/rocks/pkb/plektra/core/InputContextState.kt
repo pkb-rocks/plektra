@@ -15,7 +15,8 @@ data class InputContextState(
     val inputVariation: Int,
     val inputType: Int,
     val restrictedReason: RestrictedReason?,
-    val isAppRawMode: Boolean = false
+    val isAppRawMode: Boolean = false,
+    val noPersonalizedLearning: Boolean = false
 ) {
 
     val isPhoneField: Boolean
@@ -33,6 +34,14 @@ data class InputContextState(
      */
     val shouldDisableSuggestions: Boolean
         get() = isAppRawMode || restrictedReason != null
+
+    /**
+     * Disable usage-based learning and personalized ranking/predictions.
+     * Disabled for restricted fields, raw-mode apps, and private/incognito editors
+     * that set [EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING].
+     */
+    val shouldDisablePersonalizedLearning: Boolean
+        get() = shouldDisableSuggestions || noPersonalizedLearning
     
     /**
      * Disable auto-correction (automatic word replacement).
@@ -240,6 +249,9 @@ data class InputContextState(
                 else -> null
             }
 
+            val noPersonalizedLearning =
+                (info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING) != 0
+
             val state = InputContextState(
                 isEditable = isEditable,
                 isReallyEditable = isReallyEditable,
@@ -247,7 +259,8 @@ data class InputContextState(
                 inputVariation = inputVariation,
                 inputType = inputType,
                 restrictedReason = restrictedReason,
-                isAppRawMode = isRawModeApp
+                isAppRawMode = isRawModeApp,
+                noPersonalizedLearning = noPersonalizedLearning
             )
 
             // Debug logging

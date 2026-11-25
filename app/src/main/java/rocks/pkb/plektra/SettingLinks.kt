@@ -77,6 +77,8 @@ object SettingLinkIds {
     const val AUTO_CORRECTION_USER_DICTIONARY = "auto_correction.user_dictionary"
     const val AUTO_CORRECTION_EXPERIMENTAL_SUGGESTIONS = "auto_correction.experimental_suggestions"
     const val AUTO_CORRECTION_SUGGESTIONS = "auto_correction.suggestions"
+    const val AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION = "auto_correction.suggestions_personalization"
+    const val AUTO_CORRECTION_ADD_WORD_BUTTON = "auto_correction.add_word_button"
     const val AUTO_CORRECTION_ACCENT_MATCHING = "auto_correction.accent_matching"
     const val AUTO_CORRECTION_KEYBOARD_PROXIMITY = "auto_correction.keyboard_proximity"
     const val AUTO_CORRECTION_EDIT_TYPE_RANKING = "auto_correction.edit_type_ranking"
@@ -602,6 +604,18 @@ object SettingLinkRegistry {
             customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_STATUS_BAR_BUTTONS
         ),
         entry(
+            SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION,
+            R.string.auto_correct_suggestions_personalization_title,
+            R.string.auto_correct_suggestions_personalization_description,
+            destination = SettingsDestination.AutoCorrection
+        ),
+        entry(
+            SettingLinkIds.AUTO_CORRECTION_ADD_WORD_BUTTON,
+            R.string.auto_correct_add_word_button_title,
+            R.string.auto_correct_add_word_button_description,
+            destination = SettingsDestination.AutoCorrection
+        ),
+        entry(
             SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING,
             R.string.auto_correct_accent_matching_title,
             destination = SettingsDestination.AutoCorrection
@@ -1084,6 +1098,8 @@ object SettingLinkRegistry {
         SettingLinkIds.KEYBOARDS_DEVICES_KEYBOARD_ACCESSORIES to R.string.kw_keyboards_devices_accessories,
         SettingLinkIds.AUTO_CORRECTION_LANGUAGES to R.string.kw_auto_correction_languages,
         SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS to R.string.kw_auto_correction_suggestions,
+        SettingLinkIds.AUTO_CORRECTION_SUGGESTIONS_PERSONALIZATION to R.string.kw_auto_correction_suggestions_personalization,
+        SettingLinkIds.AUTO_CORRECTION_ADD_WORD_BUTTON to R.string.kw_auto_correction_add_word_button,
         SettingLinkIds.AUTO_CORRECTION_ACCENT_MATCHING to R.string.kw_auto_correction_accent_matching,
         SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING to R.string.kw_auto_correction_exact_typing,
         SettingLinkIds.ACCESSIBILITY_SUGGESTIONS_DELAY to R.string.kw_accessibility_suggestions_delay,

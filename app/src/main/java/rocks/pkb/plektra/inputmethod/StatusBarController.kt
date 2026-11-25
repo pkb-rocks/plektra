@@ -3300,9 +3300,14 @@ class StatusBarController(
         val showSlimMenuButtons = hasConfiguredMenuButtons && !isFullSoftwareKeyboardMode &&
             snapshot.symPage == 0 && !snapshot.clipboardOverlay
         val expansionActive = expansionSuggestions.isNotEmpty()
+        val effectiveAddWordCandidate = if (SettingsManager.getSuggestionsAddWordButtonEnabled(context)) {
+            snapshot.addWordCandidate
+        } else {
+            null
+        }
         val suggestionsAvailable = barPresentation.suggestions && !snapshot.shouldDisableSuggestions &&
             (SettingsManager.isExperimentalSuggestionsEnabled(context) || isFullSoftwareKeyboardMode || snapshot.speechPreviewActive) &&
-            (snapshot.suggestions.isNotEmpty() || !snapshot.addWordCandidate.isNullOrBlank())
+            (snapshot.suggestions.isNotEmpty() || !effectiveAddWordCandidate.isNullOrBlank())
         val hasSuggestionRow = expansionActive || suggestionsAvailable
         fullSuggestionsBar?.onCursorMovedListener = onCursorMovedListener
         variationBarView?.forceVariationAreaVisible = barPresentation.actions
@@ -3410,7 +3415,7 @@ class StatusBarController(
             inputConnection,
             onVariationSelectedListener,
             if (expansionActive || sharedVariations.isNotEmpty()) false else snapshot.shouldDisableSuggestions,
-            if (expansionActive || sharedVariations.isNotEmpty() || snapshot.shouldDisableSuggestions) null else snapshot.addWordCandidate,
+            if (expansionActive || sharedVariations.isNotEmpty() || snapshot.shouldDisableSuggestions) null else effectiveAddWordCandidate,
             onAddUserWord,
             onAddUserWordSubstitutionRequested,
             onSuggestionCommitted,

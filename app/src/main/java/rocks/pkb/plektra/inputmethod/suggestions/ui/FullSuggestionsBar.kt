@@ -77,6 +77,8 @@ class FullSuggestionsBar(
     private var lastMinimalUiActive: Boolean? = null
     private var lastSlots: List<String?> = emptyList()
     private var lastSuggestionsBold: Boolean? = null
+    private var lastAddWordButtonEnabled: Boolean? = null
+    private var lastAddWordCandidate: String? = null
     private var lastTextScale: Float? = null
     private var assets: AssetManager? = null
     private var imeServiceClass: Class<*>? = null
@@ -367,6 +369,7 @@ class FullSuggestionsBar(
         actionCandidate = null
         actionSlots = emptyList()
         lastSlots = emptyList()
+        lastAddWordCandidate = null
     }
 
     fun update(
@@ -407,8 +410,14 @@ class FullSuggestionsBar(
             lastSuggestionsBold = suggestionsBold
             lastSlots = emptyList()
         }
+        val addWordButtonEnabled = SettingsManager.getSuggestionsAddWordButtonEnabled(context)
+        if (lastAddWordButtonEnabled != addWordButtonEnabled) {
+            lastAddWordButtonEnabled = addWordButtonEnabled
+            lastSlots = emptyList()
+        }
+        val effectiveAddWordCandidate = if (addWordButtonEnabled) addWordCandidate else null
         val canShowSuggestions = contentEnabled && shouldShow && !shouldDisableSuggestions &&
-            (suggestions.isNotEmpty() || !addWordCandidate.isNullOrBlank())
+            (suggestions.isNotEmpty() || !effectiveAddWordCandidate.isNullOrBlank())
         if (!canShowSuggestions && !hasMenuButtons && !reserveEmptyRow) {
             cancelPendingSuggestionsAccessibilityEnable()
             suggestionButtons.clear()
@@ -417,6 +426,7 @@ class FullSuggestionsBar(
             bar.removeAllViews()
             renderMinimalUiButtons()
             lastSlots = emptyList()
+            lastAddWordCandidate = null
             lastAnnouncedSlots = emptyList()
             actionCandidate = null
             actionSlots = emptyList()
@@ -435,6 +445,7 @@ class FullSuggestionsBar(
             bar.visibility = View.GONE
             bar.removeAllViews()
             lastSlots = emptyList()
+            lastAddWordCandidate = null
             lastAnnouncedSlots = emptyList()
             actionCandidate = null
             actionSlots = emptyList()
@@ -448,14 +459,18 @@ class FullSuggestionsBar(
             !canShowSuggestions -> listOf(null, null, null)
             continuousSpeechPreview -> listOf(suggestions.firstOrNull())
             previewOnly -> List(3) { suggestions.getOrNull(it) }
-            else -> buildSlots(suggestions, addWordCandidate)
+            else -> buildSlots(suggestions, effectiveAddWordCandidate)
         }
         applySuggestionsAccessibilityThrottle(slots)
         if (actionCandidate != null && slots != actionSlots) {
             actionCandidate = null
             actionSlots = emptyList()
         }
-        if (actionCandidate == null && slots == lastSlots && bar.childCount > 0) {
+        if (actionCandidate == null &&
+            slots == lastSlots &&
+            effectiveAddWordCandidate == lastAddWordCandidate &&
+            bar.childCount > 0
+        ) {
             bar.visibility = View.VISIBLE
             bar.alpha = 1f
             frame.alpha = 1f
@@ -472,7 +487,7 @@ class FullSuggestionsBar(
             inputConnection,
             listener,
             shouldDisableSuggestions,
-            addWordCandidate,
+            effectiveAddWordCandidate,
             onAddUserWord,
             onAddUserWordSubstitutionRequested,
             onSuggestionCommitted,
@@ -482,6 +497,7 @@ class FullSuggestionsBar(
             onSuggestionSelectedOverride
         )
         lastSlots = slots
+        lastAddWordCandidate = effectiveAddWordCandidate
     }
 
     fun showPreview(suggestions: List<String>, showStatusButton: Boolean = false) {

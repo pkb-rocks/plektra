@@ -260,6 +260,10 @@
     <string name="auto_correct_language_code_required">Substitution name is required</string>
     <string name="auto_correct_language_already_exists">This substitution already exists</string>
     <string name="auto_correct_suggestions_toggle_title">Suggestions while typing</string>
+    <string name="auto_correct_suggestions_personalization_title">Personalized suggestions</string>
+    <string name="auto_correct_suggestions_personalization_description">Learn from your typing for next-word and empty-field suggestions. Turning this off keeps saved words and uses dictionary suggestions only.</string>
+    <string name="auto_correct_add_word_button_title">Show \"Add word\" (+) button</string>
+    <string name="auto_correct_add_word_button_description">Show the + button in the suggestions bar for unknown words. Turning this off uses that slot for a third suggestion.</string>
     <string name="auto_correct_accent_matching_title">Accent &amp; spelling marks</string>
     <string name="auto_correct_auto_replace_title">Automatic correction</string>
     <string name="auto_correct_auto_replace_description">Use dictionary suggestions to fix likely typos when pressing Space or Enter.</string>
@@ -1817,6 +1821,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_keyboards_devices_accessories">accessories, clicks, cover</string>
     <string name="kw_auto_correction_languages">keyboard layout, input languages, layouts, dictionaries, per language</string>
     <string name="kw_auto_correction_suggestions">suggestions, candidates, prediction</string>
+    <string name="kw_auto_correction_suggestions_personalization">personalize, personalized, personalization, learning, usage, history, next word, empty field, predictions, privacy, dictionary only</string>
+    <string name="kw_auto_correction_add_word_button">plus, yellow plus, add word, third suggestion, 3rd suggestion, suggestion bar, slot, hide plus</string>
     <string name="kw_auto_correction_accent_matching">accents, diacritics, matching</string>
     <string name="kw_accessibility_suggestions_delay">delay, suggestions, accessibility, timeout</string>
     <string name="kw_keyboard_timing_long_press">long press, delay, timing, threshold</string>

@@ -202,6 +202,13 @@ fun ClicksPowerKeyboardSettingsScreen(
             manualChargingUntil = controllerState.manualChargingUntil
             powerState = controllerState.keyboard
             gattClient = ClicksPowerKeyboardController.activeClient()
+            // The controller publishes after it stored a selection or marked it as applied.
+            desiredRedButtonBinding =
+                SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.RED)
+            desiredKeyboardButtonBinding =
+                SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.KEYBOARD)
+            desiredMicrophoneButtonBinding =
+                SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.MICROPHONE)
         }
         onDispose { observation.close() }
     }
@@ -320,12 +327,10 @@ fun ClicksPowerKeyboardSettingsScreen(
                 clicksButtonMode = mode
                 SettingsManager.setClicksButtonMode(context, mode)
                 plektraFunction?.let { applyClicksBindingPlektraFunction(context, it) }
-                val binding = ClicksDesiredButtonBinding(choiceId, firmwareOutput)
-                desiredRedButtonBinding = binding
                 requestButtonBinding(
                     CLICKS_BINDING_RED,
                     ClicksButtonBindingTarget.RED,
-                    binding
+                    ClicksDesiredButtonBinding(choiceId, firmwareOutput)
                 )
             },
             onLauncherSelected = { mode ->
@@ -337,24 +342,20 @@ fun ClicksPowerKeyboardSettingsScreen(
                 clicksAltButtonMode = mode
                 SettingsManager.setClicksAltButtonMode(context, mode)
                 plektraFunction?.let { applyClicksBindingPlektraFunction(context, it) }
-                val binding = ClicksDesiredButtonBinding(choiceId, firmwareOutput)
-                desiredKeyboardButtonBinding = binding
                 requestButtonBinding(
                     CLICKS_BINDING_ALT,
                     ClicksButtonBindingTarget.KEYBOARD,
-                    binding
+                    ClicksDesiredButtonBinding(choiceId, firmwareOutput)
                 )
             },
             onMicrophoneSelected = { choiceId, mode, bytes, plektraFunction ->
                 clicksMicrophoneButtonMode = mode
                 SettingsManager.setClicksMicrophoneButtonMode(context, mode)
                 plektraFunction?.let { applyClicksBindingPlektraFunction(context, it) }
-                val binding = ClicksDesiredButtonBinding(choiceId, bytes)
-                desiredMicrophoneButtonBinding = binding
                 requestButtonBinding(
                     CLICKS_BINDING_MICROPHONE,
                     ClicksButtonBindingTarget.MICROPHONE,
-                    binding
+                    ClicksDesiredButtonBinding(choiceId, bytes)
                 )
             }
         )

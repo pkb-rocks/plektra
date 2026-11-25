@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.InputDevice
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 import java.io.Closeable
@@ -34,6 +35,7 @@ object ClicksPowerKeyboardController {
     private var connectedDeviceName: String? = null
     private var pendingAutomaticChargingState: Boolean? = null
     private lateinit var buttonBindings: ClicksButtonBindingCoordinator
+    private var testButtonRemapWriter: ClicksButtonRemapWriter? = null
     private var manualOverrideExpiredOnReconnect = false
     private lateinit var socCalibrationStore: ClicksPowerSocCalibrationStore
     private var socCalibrationTracker: ClicksPowerSocCalibrationTracker? = null
@@ -62,7 +64,9 @@ object ClicksPowerKeyboardController {
         buttonBindings = ClicksButtonBindingCoordinator(
             store = SettingsClicksButtonBindingStore(context),
             keyboardState = { state.keyboard },
-            writer = { client }
+            writer = { testButtonRemapWriter ?: client },
+            // Observers read the stored selections, including their pending state, on publish.
+            onBindingsChanged = ::publish
         )
         SettingsManager.getMostRecentClicksPowerKeyboardSnapshot(context)?.let { snapshot ->
             state = state.copy(
@@ -200,19 +204,36 @@ object ClicksPowerKeyboardController {
                 context = context,
                 deviceName = deviceName,
                 initialState = state.keyboard
-            ) { keyboardState ->
-                state = state.copy(keyboard = keyboardState)
-                if (keyboardState.sessionValidated && !keyboardState.stale && keyboardState.serialNumber != null) {
-                    SettingsManager.saveClicksPowerKeyboardSnapshot(context, deviceName, keyboardState)
-                }
-                observeSocCalibration()
-                if (pendingAutomaticChargingState == keyboardState.wirelessChargingEnabled) {
-                    pendingAutomaticChargingState = null
-                }
-                publishAndEvaluate()
-            }
+            ) { keyboardState -> onKeyboardStateChanged(deviceName, keyboardState) }
             handler.postDelayed(chargingRefresh, CHARGING_REFRESH_INTERVAL_MS)
         }
+    }
+
+    private fun onKeyboardStateChanged(deviceName: String, keyboardState: ClicksPowerKeyboardState) {
+        state = state.copy(keyboard = keyboardState)
+        if (keyboardState.sessionValidated && !keyboardState.stale && keyboardState.serialNumber != null) {
+            SettingsManager.saveClicksPowerKeyboardSnapshot(context, deviceName, keyboardState)
+        }
+        observeSocCalibration()
+        if (pendingAutomaticChargingState == keyboardState.wirelessChargingEnabled) {
+            pendingAutomaticChargingState = null
+        }
+        publishAndEvaluate()
+    }
+
+    /**
+     * Replaces the GATT session with [writer] and publishes [keyboardState] as if the keyboard had
+     * reported it. Pass a null writer to detach it again.
+     */
+    @VisibleForTesting
+    internal fun simulateKeyboardSessionForTest(
+        writer: ClicksButtonRemapWriter?,
+        keyboardState: ClicksPowerKeyboardState
+    ) {
+        check(initialized)
+        testButtonRemapWriter = writer
+        state = state.copy(keyboard = keyboardState)
+        publishAndEvaluate()
     }
 
     private fun evaluateChargingAutomation() {

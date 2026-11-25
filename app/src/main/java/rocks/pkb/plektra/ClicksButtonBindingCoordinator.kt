@@ -35,7 +35,9 @@ internal class SettingsClicksButtonBindingStore(private val context: Context) : 
 internal class ClicksButtonBindingCoordinator(
     private val store: ClicksButtonBindingStore,
     private val keyboardState: () -> ClicksPowerKeyboardState,
-    private val writer: () -> ClicksButtonRemapWriter?
+    private val writer: () -> ClicksButtonRemapWriter?,
+    /** Runs after a stored selection or its pending state changed. */
+    private val onBindingsChanged: () -> Unit = {}
 ) {
     private val writesInProgress = mutableSetOf<ClicksButtonBindingTarget>()
     private val callbacks = mutableMapOf<ClicksButtonBindingTarget, (Boolean) -> Unit>()
@@ -51,18 +53,24 @@ internal class ClicksButtonBindingCoordinator(
         failedTargets -= target
         val state = keyboardState()
         val writeInProgress = target in writesInProgress
-        if (!writeInProgress && ClicksButtonBindingSyncPolicy.isConfirmed(state, target, binding.firmwareOutput)) {
-            if (ClicksButtonBindingSyncPolicy.canWrite(state)) store.markApplied(target, binding.firmwareOutput)
-            return ClicksButtonBindingRequestStatus.CONFIRMED
+        val status = when {
+            !writeInProgress && ClicksButtonBindingSyncPolicy.isConfirmed(state, target, binding.firmwareOutput) -> {
+                if (ClicksButtonBindingSyncPolicy.canWrite(state)) store.markApplied(target, binding.firmwareOutput)
+                ClicksButtonBindingRequestStatus.CONFIRMED
+            }
+            !ClicksButtonBindingSyncPolicy.canWrite(state) || writer() == null ->
+                ClicksButtonBindingRequestStatus.PENDING_CONNECTION
+            else -> {
+                // A newer selection supersedes the UI callback of an older in-flight write. The
+                // older firmware write may still finish, but only the latest request owns the
+                // visible result.
+                callbacks[target] = onComplete
+                if (!writeInProgress) startWrite(target, binding)
+                ClicksButtonBindingRequestStatus.APPLYING
+            }
         }
-        if (!ClicksButtonBindingSyncPolicy.canWrite(state) || writer() == null) {
-            return ClicksButtonBindingRequestStatus.PENDING_CONNECTION
-        }
-        // A newer selection supersedes the UI callback of an older in-flight write. The older
-        // firmware write may still finish, but only the latest request owns the visible result.
-        callbacks[target] = onComplete
-        if (!writeInProgress) startWrite(target, binding)
-        return ClicksButtonBindingRequestStatus.APPLYING
+        onBindingsChanged()
+        return status
     }
 
     fun reconcile() {
@@ -80,7 +88,10 @@ internal class ClicksButtonBindingCoordinator(
                 )
             ) {
                 ClicksButtonBindingReconcileAction.NONE -> Unit
-                ClicksButtonBindingReconcileAction.MARK_APPLIED -> store.markApplied(target, desired.firmwareOutput)
+                ClicksButtonBindingReconcileAction.MARK_APPLIED -> {
+                    store.markApplied(target, desired.firmwareOutput)
+                    onBindingsChanged()
+                }
                 ClicksButtonBindingReconcileAction.WRITE -> startWrite(target, desired)
             }
         }
@@ -115,6 +126,7 @@ internal class ClicksButtonBindingCoordinator(
             ) {
                 ClicksButtonBindingCompletion.SUCCESS -> {
                     latestDesired?.let { store.markApplied(target, it.firmwareOutput) }
+                    onBindingsChanged()
                     finishCallback(target, success = true)
                 }
                 ClicksButtonBindingCompletion.FAILURE -> {

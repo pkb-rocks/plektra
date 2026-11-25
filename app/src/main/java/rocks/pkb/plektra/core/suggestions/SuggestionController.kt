@@ -179,6 +179,12 @@ class SuggestionController(
     private val suggestionGeneration = AtomicInteger(0)
     private var sentenceStartPending: Boolean = true
 
+    private data class PublishedSuggestionsSnapshot(
+        val suggestions: List<SuggestionResult>,
+        val personalized: Boolean,
+        val generation: Int
+    )
+
     private fun cancelPendingWordSuggestions() {
         val jobToCancel = synchronized(publishLock) {
             suggestionGeneration.incrementAndGet()
@@ -204,12 +210,14 @@ class SuggestionController(
             if (
                 !isEnabled() ||
                 !currentSettings.suggestionsEnabled ||
-                !currentSettings.personalizationEnabled ||
-                generation != suggestionGeneration.get()
+                !currentSettings.personalizationEnabled
             ) {
                 latestSuggestionsPersonalized = false
                 latestSuggestions.set(emptyList())
                 suggestionsListener?.invoke(emptyList())
+                return
+            }
+            if (generation != suggestionGeneration.get()) {
                 return
             }
             latestSuggestionsPersonalized = suggestions.isNotEmpty()
@@ -496,7 +504,7 @@ class SuggestionController(
             tracker.reset()
             previousCompletedWord = null
             sentenceStartPending = true
-            suggestionsListener?.invoke(emptyList())
+            publishEmptySuggestions()
             return
         }
         cursorRunnable = Runnable {
@@ -504,7 +512,7 @@ class SuggestionController(
             if (!dictionaryRepository.isReady) {
                 tracker.reset()
                 previousCompletedWord = null
-                suggestionsListener?.invoke(emptyList())
+                publishEmptySuggestions()
                 return@Runnable
             }
             val word = extractWordAtCursor(inputConnection)
@@ -599,8 +607,15 @@ class SuggestionController(
         val trimmed = candidate.trim()
         if (trimmed.isEmpty()) return
 
-        val current = latestSuggestions.get()
-        val suggestion = current.firstOrNull { it.candidate.equals(trimmed, ignoreCase = true) }
+        // Capture published list, provenance, and generation atomically before leaving publishLock.
+        val snapshot = synchronized(publishLock) {
+            PublishedSuggestionsSnapshot(
+                suggestions = latestSuggestions.get(),
+                personalized = latestSuggestionsPersonalized,
+                generation = suggestionGeneration.get()
+            )
+        }
+        val suggestion = snapshot.suggestions.firstOrNull { it.candidate.equals(trimmed, ignoreCase = true) }
         if (suggestion?.kind == SuggestionKind.NEXT_WORD) {
             forgetNextWordSuggestion(trimmed, hardDeleteEverywhere = hardDeleteUserWord)
         }
@@ -613,9 +628,9 @@ class SuggestionController(
             }
         }
 
-        val remaining = current.filterNot { it.candidate.equals(trimmed, ignoreCase = true) }
+        val remaining = snapshot.suggestions.filterNot { it.candidate.equals(trimmed, ignoreCase = true) }
         val settings = settingsProvider()
-        val next = if (settings.personalizationEnabled) {
+        val nextWithStarters = if (settings.personalizationEnabled) {
             fillWithStarterSuggestions(
                 remaining,
                 settings,
@@ -624,16 +639,40 @@ class SuggestionController(
         } else {
             remaining
         }
+        val nextIsPersonalized = snapshot.personalized ||
+            nextWithStarters.any { it.kind != SuggestionKind.CURRENT_WORD }
+
         synchronized(publishLock) {
             val currentSettings = settingsProvider()
-            val safeNext = if (currentSettings.personalizationEnabled) {
-                next
-            } else {
-                next.filter { it.kind == SuggestionKind.CURRENT_WORD }
+            if (!isEnabled() || !currentSettings.suggestionsEnabled) {
+                latestSuggestionsPersonalized = false
+                latestSuggestions.set(emptyList())
+                suggestionsListener?.invoke(emptyList())
+                return
             }
-            latestSuggestionsPersonalized = currentSettings.personalizationEnabled && safeNext.isNotEmpty()
-            latestSuggestions.set(safeNext)
-            suggestionsListener?.invoke(safeNext)
+            if (snapshot.generation != suggestionGeneration.get()) {
+                // Superseded by concurrent OFF invalidation, settings change, context reset,
+                // or newer word update; do not resurrect the pre-barrier snapshot.
+                return
+            }
+            if (!currentSettings.personalizationEnabled) {
+                if (snapshot.personalized) {
+                    // Snapshot originated from a personalized computation; clear rather than
+                    // republishing ON-ranked CURRENT_WORD items under OFF.
+                    latestSuggestionsPersonalized = false
+                    latestSuggestions.set(emptyList())
+                    suggestionsListener?.invoke(emptyList())
+                    return
+                }
+                val neutralRemaining = remaining.filter { it.kind == SuggestionKind.CURRENT_WORD }
+                latestSuggestionsPersonalized = false
+                latestSuggestions.set(neutralRemaining)
+                suggestionsListener?.invoke(neutralRemaining)
+                return
+            }
+            latestSuggestionsPersonalized = nextIsPersonalized && nextWithStarters.isNotEmpty()
+            latestSuggestions.set(nextWithStarters)
+            suggestionsListener?.invoke(nextWithStarters)
         }
     }
 
@@ -813,7 +852,7 @@ class SuggestionController(
         if (suggestions.isNotEmpty()) {
             publishPersonalizedSuggestions(suggestions, generation)
         } else {
-            publishStarterSuggestions()
+            publishStarterSuggestions(generation)
         }
     }
 
@@ -833,12 +872,15 @@ class SuggestionController(
         if (suggestions.isNotEmpty()) {
             publishPersonalizedSuggestions(suggestions, generation)
         } else {
-            publishStarterSuggestions()
+            publishStarterSuggestions(generation)
         }
     }
 
     private fun publishStarterSuggestions() {
-        val generation = suggestionGeneration.get()
+        publishStarterSuggestions(suggestionGeneration.get())
+    }
+
+    private fun publishStarterSuggestions(generation: Int) {
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled || !settings.personalizationEnabled || !dictionaryRepository.isReady) {
             publishEmptySuggestions()

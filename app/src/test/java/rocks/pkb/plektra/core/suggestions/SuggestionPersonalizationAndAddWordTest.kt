@@ -805,6 +805,220 @@ class SuggestionPersonalizationAndAddWordTest {
     }
 
     @Test
+    fun crossThreadInvalidation_beatsAlreadyRunningDismiss_andSubsequentOffRecomputePublishesNeutralResults() {
+        val realRepo = AndroidDictionaryRepository(
+            context = context,
+            assets = context.assets,
+            userDictionaryStore = UserDictionaryStore(),
+            baseLocale = Locale.ENGLISH
+        ).apply {
+            isReady = true
+            index(
+                listOf(
+                    DictionaryEntry("hello", 220, SuggestionSource.MAIN),
+                    DictionaryEntry("help", 200, SuggestionSource.MAIN),
+                    DictionaryEntry("held", 180, SuggestionSource.MAIN),
+                    DictionaryEntry("hellhound", 250, SuggestionSource.USER)
+                )
+            )
+            buildSymSpell()
+        }
+
+        val personalizationEnabled = AtomicBoolean(true)
+        val armedForDismissFill = AtomicBoolean(false)
+        val mainPausedInsideTopCommon = CountDownLatch(1)
+        val backgroundInvalidationCompleted = CountDownLatch(1)
+        val workerFailure = AtomicReference<Throwable?>(null)
+        val listenerEventsAfterBarrier = CopyOnWriteArrayList<List<SuggestionResult>>()
+        val barrierCompleted = AtomicBoolean(false)
+        val listenerCalledOffMain = AtomicBoolean(false)
+
+        val wrappedRepo = Proxy.newProxyInstance(
+            DictionaryRepository::class.java.classLoader,
+            arrayOf(DictionaryRepository::class.java)
+        ) { _, method, args ->
+            if (method.name == "topCommonEntries" && armedForDismissFill.compareAndSet(true, false)) {
+                mainPausedInsideTopCommon.countDown()
+                assertTrue(
+                    "Background OFF barrier must complete outside dictionary lookup",
+                    backgroundInvalidationCompleted.await(3, TimeUnit.SECONDS)
+                )
+            }
+            if (args == null) method.invoke(realRepo) else method.invoke(realRepo, *args)
+        } as DictionaryRepository
+
+        val service = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java).get()
+        val inputContextStateField = PhysicalKeyboardInputMethodService::class.java.getDeclaredField("inputContextState").apply {
+            isAccessible = true
+        }
+        inputContextStateField.set(
+            service,
+            InputContextState.fromEditorInfo(
+                EditorInfo().apply {
+                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL
+                }
+            )
+        )
+        val handleSuggestionsUpdated = PhysicalKeyboardInputMethodService::class.java.getDeclaredMethod(
+            "handleSuggestionsUpdated",
+            List::class.java
+        ).apply { isAccessible = true }
+        val latestServiceResultsField = PhysicalKeyboardInputMethodService::class.java.getDeclaredField("latestSuggestionResults").apply {
+            isAccessible = true
+        }
+
+        val controller = SuggestionController(
+            context = context,
+            assets = context.assets,
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    personalizationEnabled = personalizationEnabled.get(),
+                    showAddWordButton = true,
+                    maxSuggestions = 3
+                )
+            },
+            onSuggestionsUpdated = { list ->
+                if (Thread.currentThread() !== Looper.getMainLooper().thread) {
+                    listenerCalledOffMain.set(true)
+                }
+                snapshots.add(list)
+                if (barrierCompleted.get()) {
+                    listenerEventsAfterBarrier.add(list)
+                }
+                handleSuggestionsUpdated.invoke(service, list)
+            },
+            currentLocale = Locale.ENGLISH,
+            dictionaryRepositoryFactory = { _, _, _, _, _ -> wrappedRepo },
+            nextWordPredictorOverride = NextWordPredictor(store)
+        ).also { controllers.add(it) }
+
+        val restoreThread = Thread({
+            try {
+                assertTrue(mainPausedInsideTopCommon.await(3, TimeUnit.SECONDS))
+                personalizationEnabled.set(false)
+                SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+                controller.invalidatePersonalizedSuggestionsImmediately()
+                assertTrue(controller.currentSuggestions().isEmpty())
+                barrierCompleted.set(true)
+            } catch (t: Throwable) {
+                workerFailure.set(t)
+            } finally {
+                backgroundInvalidationCompleted.countDown()
+            }
+        }, "r3-3a-dismiss-off")
+
+        try {
+            controller.onCharacterCommitted("hel", null)
+            val publishedOn = waitForSuggestionCandidates("hellhound", "help", "held")
+            assertEquals("hellhound", publishedOn.first().candidate)
+            assertTrue(publishedOn.first().score > 20.0)
+
+            armedForDismissFill.set(true)
+            restoreThread.start()
+            controller.dismissSuggestion("help", hardDeleteUserWord = false)
+            restoreThread.join(3000)
+            assertFalse("Restore worker thread must complete", restoreThread.isAlive)
+            workerFailure.get()?.let { throw AssertionError(it) }
+
+            assertTrue(
+                "Dismiss must not resurrect pre-barrier personalized suggestions in controller cache",
+                controller.currentSuggestions().isEmpty()
+            )
+            assertTrue(
+                "No listener callback after OFF barrier may receive stale personalized list from dismiss",
+                listenerEventsAfterBarrier.none { list ->
+                    list.any { it.candidate == "hellhound" && it.score > 20.0 }
+                }
+            )
+            assertFalse(
+                "Background OFF invalidation must never invoke listener off main thread",
+                listenerCalledOffMain.get()
+            )
+
+            // Subsequent main-thread settings change clears service and publishes neutral OFF results.
+            controller.onSettingsChanged(null)
+            val refreshed = waitForSuggestionCandidates("help", "held", "hello")
+            assertEquals(listOf("help", "held", "hello"), refreshed.map { it.candidate })
+            @Suppress("UNCHECKED_CAST")
+            val serviceAfterRecompute = latestServiceResultsField.get(service) as List<SuggestionResult>
+            assertEquals(listOf("help", "held", "hello"), serviceAfterRecompute.map { it.candidate })
+            assertTrue(
+                "No listener callback after OFF barrier may ever contain stale personalized candidate",
+                listenerEventsAfterBarrier.none { list ->
+                    list.any { it.candidate == "hellhound" && it.score > 20.0 }
+                }
+            )
+        } finally {
+            backgroundInvalidationCompleted.countDown()
+            restoreThread.join(3000)
+        }
+    }
+
+    @Test
+    fun dismissSuggestion_preservesNeutralMatchesWhenOff_andRetainsPersonalizedFillWhenOn() {
+        val realRepo = AndroidDictionaryRepository(
+            context = context,
+            assets = context.assets,
+            userDictionaryStore = UserDictionaryStore(),
+            baseLocale = Locale.ENGLISH
+        ).apply {
+            isReady = true
+            index(
+                listOf(
+                    DictionaryEntry("hello", 220, SuggestionSource.MAIN),
+                    DictionaryEntry("help", 200, SuggestionSource.MAIN),
+                    DictionaryEntry("held", 180, SuggestionSource.MAIN),
+                    DictionaryEntry("hellhound", 250, SuggestionSource.USER)
+                )
+            )
+            buildSymSpell()
+        }
+
+        // OFF control: dismissing one neutral match keeps the remaining neutral dictionary matches.
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, false)
+        var personalizationEnabled = false
+        val controller = SuggestionController(
+            context = context,
+            assets = context.assets,
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    personalizationEnabled = personalizationEnabled,
+                    showAddWordButton = true,
+                    maxSuggestions = 3
+                )
+            },
+            onSuggestionsUpdated = { snapshots.add(it) },
+            currentLocale = Locale.ENGLISH,
+            dictionaryRepositoryFactory = { _, _, _, _, _ -> realRepo },
+            nextWordPredictorOverride = NextWordPredictor(store)
+        ).also { controllers.add(it) }
+
+        controller.onCharacterCommitted("hel", null)
+        assertEquals(
+            listOf("help", "held", "hello"),
+            waitForSuggestionCandidates("help", "held", "hello").map { it.candidate }
+        )
+        controller.dismissSuggestion("help", hardDeleteUserWord = false)
+        assertEquals(listOf("held", "hello"), controller.currentSuggestions().map { it.candidate })
+        assertTrue(controller.currentSuggestions().all { it.kind == SuggestionKind.CURRENT_WORD })
+
+        // Negative control (ON): dismissing a word while ON keeps personalized candidate and refills with starter.
+        personalizationEnabled = true
+        SettingsManager.setSuggestionsPersonalizationEnabled(context, true)
+        controller.onContextReset()
+        controller.onCharacterCommitted("hel", null)
+        assertEquals(
+            listOf("hellhound", "help", "held"),
+            waitForSuggestionCandidates("hellhound", "help", "held").map { it.candidate }
+        )
+        controller.dismissSuggestion("help", hardDeleteUserWord = false)
+        assertEquals("hellhound", controller.currentSuggestions().first().candidate)
+        assertTrue(controller.currentSuggestions().any { it.kind == SuggestionKind.STARTER_WORD })
+    }
+
+    @Test
     fun personalizationAndAddWordButtonSettings_operateIndependentlyAndRefreshOnToggle() {
         var personalizationEnabled = true
         var showAddWordButton = true

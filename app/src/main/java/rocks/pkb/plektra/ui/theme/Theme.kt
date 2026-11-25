@@ -106,7 +106,7 @@ fun PlektraTheme(
     darkSurfaceStyle: AppDarkSurfaceStyle? = null,
     dynamicColor: Boolean? = null,
     applySystemBars: Boolean = true,
-    statusBarAlwaysDarkSurface: Boolean = false,
+    statusBarOnDarkSurface: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -140,11 +140,12 @@ fun PlektraTheme(
         SideEffect {
             val activity = context.findActivity() ?: return@SideEffect
             val window = activity.window ?: return@SideEffect
-            val lightStatusBarIcons = if (statusBarAlwaysDarkSurface) false else !resolved.useDarkTheme
-            val lightNavigationBarIcons = !resolved.useDarkTheme
+            // true = light system bar surface (dark icons); false = dark surface (light icons)
+            val useLightStatusBar = if (statusBarOnDarkSurface) false else !resolved.useDarkTheme
+            val useLightNavigationBar = !resolved.useDarkTheme
 
             if (activity is ComponentActivity) {
-                val statusStyle = if (lightStatusBarIcons) {
+                val statusStyle = if (useLightStatusBar) {
                     SystemBarStyle.light(
                         android.graphics.Color.TRANSPARENT,
                         android.graphics.Color.TRANSPARENT
@@ -152,7 +153,7 @@ fun PlektraTheme(
                 } else {
                     SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
                 }
-                val navigationStyle = if (lightNavigationBarIcons) {
+                val navigationStyle = if (useLightNavigationBar) {
                     SystemBarStyle.light(
                         android.graphics.Color.TRANSPARENT,
                         android.graphics.Color.TRANSPARENT
@@ -167,8 +168,8 @@ fun PlektraTheme(
             }
 
             WindowCompat.getInsetsController(window, view).apply {
-                isAppearanceLightStatusBars = lightStatusBarIcons
-                isAppearanceLightNavigationBars = lightNavigationBarIcons
+                isAppearanceLightStatusBars = useLightStatusBar
+                isAppearanceLightNavigationBars = useLightNavigationBar
             }
             window.setBackgroundDrawable(ColorDrawable(colorScheme.background.toArgb()))
         }

@@ -32,6 +32,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -215,7 +216,8 @@ class MainActivity : LocalizedComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            PlektraTheme(statusBarAlwaysDarkSurface = true) {
+            var statusBarOnDarkHeader by remember { mutableStateOf(true) }
+            PlektraTheme(statusBarOnDarkSurface = statusBarOnDarkHeader) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
@@ -225,7 +227,8 @@ class MainActivity : LocalizedComponentActivity() {
                             modifier = Modifier
                                 .padding(innerPadding)
                                 .fillMaxSize(),
-                            activity = this@MainActivity
+                            activity = this@MainActivity,
+                            onStatusBarOnDarkHeaderChange = { statusBarOnDarkHeader = it }
                         )
                     }
 
@@ -233,6 +236,17 @@ class MainActivity : LocalizedComponentActivity() {
             }
         }
     }
+}
+
+internal fun isDarkHeaderBehindStatusBar(
+    headerHeightPx: Int,
+    scrollOffsetPx: Int,
+    statusBarHeightPx: Int
+): Boolean {
+    if (headerHeightPx <= 0) return scrollOffsetPx == 0
+    val visibleHeaderBottomPx = headerHeightPx - scrollOffsetPx
+    val statusBarMidpointPx = (statusBarHeightPx / 2).coerceAtLeast(0)
+    return visibleHeaderBottomPx > statusBarMidpointPx
 }
 
 private data class RecordedKeyboardEvent(
@@ -338,9 +352,25 @@ private fun debugReportLineColor(line: String, colors: ColorScheme): Color {
 @Composable
 fun KeyboardSetupScreen(
     modifier: Modifier = Modifier,
-    activity: MainActivity
+    activity: MainActivity,
+    onStatusBarOnDarkHeaderChange: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
+    val statusBarTopPx = WindowInsets.statusBars.getTop(LocalDensity.current)
+    var headerHeightPx by remember { mutableIntStateOf(0) }
+    val statusBarOnDarkHeader by remember(scrollState, statusBarTopPx) {
+        derivedStateOf {
+            isDarkHeaderBehindStatusBar(
+                headerHeightPx = headerHeightPx,
+                scrollOffsetPx = scrollState.value,
+                statusBarHeightPx = statusBarTopPx
+            )
+        }
+    }
+    LaunchedEffect(statusBarOnDarkHeader) {
+        onStatusBarOnDarkHeaderChange(statusBarOnDarkHeader)
+    }
 
     var testText by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
@@ -519,7 +549,7 @@ fun KeyboardSetupScreen(
         Column(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -533,7 +563,9 @@ fun KeyboardSetupScreen(
                 context.startActivity(settingsIntent)
 
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .onSizeChanged { headerHeightPx = it.height }
         )
 
         // Enable/select IME actions

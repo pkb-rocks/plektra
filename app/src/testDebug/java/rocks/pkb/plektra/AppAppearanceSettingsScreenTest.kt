@@ -14,11 +14,13 @@ import java.io.File
 import java.io.FileOutputStream
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -229,6 +231,109 @@ class AppAppearanceSettingsScreenTest {
     }
 
     @Test
+    @Config(sdk = [33], qualifiers = "w411dp-h915dp-notnight-xhdpi")
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    fun germanLargeFontOledRendersVisibleAndClickableBackArrow() {
+        SettingsManager.setAppAppearancePreferences(
+            context,
+            AppAppearancePreferences(AppThemeMode.DARK, AppDarkSurfaceStyle.OLED, dynamicColor = false)
+        )
+        SettingsManager.setAppLanguageTag(context, "de")
+        val config = Configuration(context.resources.configuration).apply {
+            setLocale(Locale.GERMAN)
+            fontScale = 1.5f
+        }
+        @Suppress("DEPRECATION")
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        launchAppearanceSettings()
+
+        val deContext = context.createConfigurationContext(config)
+        val backDescription = deContext.getString(R.string.settings_back_content_description)
+        val backNode = compose.onNodeWithContentDescription(backDescription)
+        backNode.assertIsDisplayed().assertIsEnabled()
+
+        val bounds = backNode.fetchSemanticsNode().boundsInRoot
+        assertTrue("Back button width should be positive, was $bounds", bounds.width > 0f)
+        assertTrue("Back button height should be positive, was $bounds", bounds.height > 0f)
+        assertTrue("Back button should be inside viewport top/left, was $bounds", bounds.left >= 0f && bounds.top >= 0f)
+
+        // Verify the rendered bitmap actually contains bright icon pixels inside the back button bounds
+        var brightPixelsInBackButton = 0
+        scenario!!.onActivity { activity ->
+            val decor = activity.window.decorView
+            val dm = activity.resources.displayMetrics
+            val width = dm.widthPixels.coerceAtLeast(1)
+            val height = dm.heightPixels.coerceAtLeast(1)
+            decor.measure(
+                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY)
+            )
+            decor.layout(0, 0, width, height)
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            decor.draw(canvas)
+            val left = bounds.left.toInt().coerceIn(0, width - 1)
+            val top = bounds.top.toInt().coerceIn(0, height - 1)
+            val right = bounds.right.toInt().coerceIn(left + 1, width)
+            val bottom = bounds.bottom.toInt().coerceIn(top + 1, height)
+            for (y in top until bottom) {
+                for (x in left until right) {
+                    val px = bitmap.getPixel(x, y)
+                    if (AndroidColor.red(px) > 128 && AndroidColor.green(px) > 128 && AndroidColor.blue(px) > 128) {
+                        brightPixelsInBackButton++
+                    }
+                }
+            }
+            bitmap.recycle()
+        }
+        assertTrue(
+            "Expected visible bright back-arrow pixels inside $bounds, found $brightPixelsInBackButton",
+            brightPixelsInBackButton > 20
+        )
+
+        backNode.performClick()
+        compose.waitForIdle()
+        scenario!!.onActivity { activity ->
+            assertTrue("Clicking back button should finish SettingsActivity", activity.isFinishing)
+        }
+    }
+
+    @Test
+    @Config(sdk = [30], qualifiers = "w411dp-h1200dp")
+    fun dynamicColorToggleIsDisabledBelowApi31() {
+        launchAppearanceSettings()
+        compose.onNodeWithText(context.getString(R.string.app_appearance_dynamic_color_title))
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+            .assertIsOff()
+    }
+
+    @Test
+    @Config(sdk = [31], qualifiers = "w411dp-h1200dp")
+    fun dynamicColorToggleIsEnabledOnApi31() {
+        launchAppearanceSettings()
+        compose.onNodeWithText(context.getString(R.string.app_appearance_dynamic_color_title))
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsEnabled()
+            .assertIsOn()
+    }
+
+    @Test
+    fun darkHeaderVisibilityHeuristicSwitchesAtStatusBarMidpoint() {
+        assertTrue(isDarkHeaderBehindStatusBar(headerHeightPx = 0, scrollOffsetPx = 0, statusBarHeightPx = 96))
+        assertFalse(isDarkHeaderBehindStatusBar(headerHeightPx = 0, scrollOffsetPx = 20, statusBarHeightPx = 96))
+        assertTrue(isDarkHeaderBehindStatusBar(headerHeightPx = 420, scrollOffsetPx = 0, statusBarHeightPx = 96))
+        assertTrue(isDarkHeaderBehindStatusBar(headerHeightPx = 420, scrollOffsetPx = 371, statusBarHeightPx = 96))
+        assertFalse(isDarkHeaderBehindStatusBar(headerHeightPx = 420, scrollOffsetPx = 372, statusBarHeightPx = 96))
+        assertFalse(isDarkHeaderBehindStatusBar(headerHeightPx = 420, scrollOffsetPx = 500, statusBarHeightPx = 96))
+        assertTrue(isDarkHeaderBehindStatusBar(headerHeightPx = 300, scrollOffsetPx = 0, statusBarHeightPx = 0))
+        assertFalse(isDarkHeaderBehindStatusBar(headerHeightPx = 300, scrollOffsetPx = 300, statusBarHeightPx = 0))
+    }
+
+    @Test
     fun darkHeaderModeKeepsReadableLightStatusBarIconsWhileNavBarFollowsLightMode() {
         SettingsManager.setAppThemeMode(context, AppThemeMode.LIGHT)
 
@@ -236,7 +341,7 @@ class AppAppearanceSettingsScreenTest {
         try {
             hostScenario.onActivity { activity ->
                 activity.setContent {
-                    rocks.pkb.plektra.ui.theme.PlektraTheme(statusBarAlwaysDarkSurface = true) {
+                    rocks.pkb.plektra.ui.theme.PlektraTheme(statusBarOnDarkSurface = true) {
                         androidx.compose.material3.Surface {
                             androidx.compose.material3.Text("Header Host")
                         }

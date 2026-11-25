@@ -286,7 +286,9 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
             }
         }
         invalidate()
-        updateFrameSubscription()
+        if (!reduced) {
+            updateFrameSubscription()
+        }
     }
 
     private fun updateStrings(dt: Float) {

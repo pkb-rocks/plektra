@@ -2,6 +2,7 @@
   "unit": {
     "devices-layouts": [
       "rocks.pkb.plektra.ClicksButtonBindingCatalogTest",
+      "rocks.pkb.plektra.ClicksButtonBindingCoordinatorTest",
       "rocks.pkb.plektra.ClicksButtonBindingSyncPolicyTest",
       "rocks.pkb.plektra.ClicksGattReadSessionPolicyTest",
       "rocks.pkb.plektra.ClicksPowerButtonSettingsTest",
@@ -42,6 +43,7 @@
       "rocks.pkb.plektra.NotesActivityTest",
       "rocks.pkb.plektra.NotesRepositoryTest",
       "rocks.pkb.plektra.ShowcaseReceiverNotesTest",
+      "rocks.pkb.plektra.backup.AppAppearanceBackupRoundTripTest",
       "rocks.pkb.plektra.backup.BackupPreferenceContractIntegrationTest",
       "rocks.pkb.plektra.backup.KeyboardTextScaleBackupTest",
       "rocks.pkb.plektra.backup.NotesAndDictionaryBackupTest",
@@ -55,8 +57,12 @@
       "rocks.pkb.plektra.clipboard.ClipboardUnreadableClipTest"
     ],
     "ui-settings": [
+      "rocks.pkb.plektra.AppAppearanceSettingsScreenTest",
+      "rocks.pkb.plektra.AutoCorrectionSuggestionSettingsUiTest",
+      "rocks.pkb.plektra.ClicksButtonBindingScreenSyncTest",
       "rocks.pkb.plektra.CompactKeyHeightMigrationTest",
       "rocks.pkb.plektra.CustomizationSettingLinkTest",
+      "rocks.pkb.plektra.ImeSettingsObserverTest",
       "rocks.pkb.plektra.KeyboardBarTypographyTest",
       "rocks.pkb.plektra.KeyboardTextScaleVisualTest",
       "rocks.pkb.plektra.KeyboardThemeColorTest",
@@ -64,6 +70,9 @@
       "rocks.pkb.plektra.KeyboardThemeModelTest",
       "rocks.pkb.plektra.KeyboardThemeTextureTest",
       "rocks.pkb.plektra.MainBackgroundTest",
+      "rocks.pkb.plektra.MainStatusBarScrollTest",
+      "rocks.pkb.plektra.NavModeKeyMappingDialogTest",
+      "rocks.pkb.plektra.NotesAppearanceTest",
       "rocks.pkb.plektra.SettingLinkCoverageTest",
       "rocks.pkb.plektra.SettingLinkRegistryTest",
       "rocks.pkb.plektra.SettingsManagerKeyboardThemeAssignmentTest",
@@ -116,7 +125,8 @@
       "rocks.pkb.plektra.inputmethod.ui.EmojiVariantsPopupTest",
       "rocks.pkb.plektra.inputmethod.ui.LedStatusRenderingTest",
       "rocks.pkb.plektra.inputmethod.ui.LedStatusViewTest",
-      "rocks.pkb.plektra.inputmethod.ui.ModifierLedLayoutTest"
+      "rocks.pkb.plektra.inputmethod.ui.ModifierLedLayoutTest",
+      "rocks.pkb.plektra.ui.theme.AppThemeResolverTest"
     ],
     "editing": [
       "rocks.pkb.plektra.AppEnterBehaviorDefaultsTest",
@@ -170,6 +180,7 @@
       "rocks.pkb.plektra.core.suggestions.SuggestionControllerReplacementReadinessTest",
       "rocks.pkb.plektra.core.suggestions.SuggestionDictionaryReloadTest",
       "rocks.pkb.plektra.core.suggestions.SuggestionEngineTest",
+      "rocks.pkb.plektra.core.suggestions.SuggestionPersonalizationAndAddWordTest",
       "rocks.pkb.plektra.core.suggestions.SymSpellTest",
       "rocks.pkb.plektra.core.suggestions.UserNGramStoreTest",
       "rocks.pkb.plektra.core.suggestions.UserOnlyDictionaryTest",
@@ -208,7 +219,9 @@
       "rocks.pkb.plektra.inputmethod.speech.SpeechSessionControllerTest"
     ],
     "ime-integration": [
+      "rocks.pkb.plektra.inputmethod.DirectBootImeLifecycleTest",
       "rocks.pkb.plektra.inputmethod.DisabledSmartFeaturesRegressionTest",
+      "rocks.pkb.plektra.inputmethod.HardwareOnlySmoothCaretTest",
       "rocks.pkb.plektra.inputmethod.InputEventRouterModifierE2ETest",
       "rocks.pkb.plektra.inputmethod.LanguageSwitchServiceE2ETest",
       "rocks.pkb.plektra.inputmethod.PhysicalKeyboardInputMethodServiceDeviceBehaviorTest",

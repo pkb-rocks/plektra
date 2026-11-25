@@ -803,8 +803,8 @@ internal fun KeyMappingDialog(
     val types = listOf(
         Triple("keycode", stringResource(R.string.nav_mode_keycode), stringResource(R.string.nav_mode_keycode)),
         Triple("action", stringResource(R.string.nav_mode_action), stringResource(R.string.nav_mode_action)),
-        Triple("native_ctrl", stringResource(R.string.nav_mode_native_ctrl_short), stringResource(R.string.nav_mode_native_ctrl)),
         Triple("command", stringResource(R.string.nav_mode_command), stringResource(R.string.nav_mode_command)),
+        Triple("native_ctrl", stringResource(R.string.nav_mode_native_ctrl_short), stringResource(R.string.nav_mode_native_ctrl)),
         Triple("none", stringResource(R.string.nav_mode_none), stringResource(R.string.nav_mode_none))
     )
 

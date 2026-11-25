@@ -7,6 +7,7 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -74,7 +75,7 @@ class NavModeKeyMappingDialogTest {
 
     private val typeLabels get() = listOf(
         string(R.string.nav_mode_keycode), string(R.string.nav_mode_action),
-        string(R.string.nav_mode_native_ctrl), string(R.string.nav_mode_command), string(R.string.nav_mode_none)
+        string(R.string.nav_mode_native_ctrl_short), string(R.string.nav_mode_command), string(R.string.nav_mode_none)
     )
 
     private fun assertEveryTypeReachableAndSavable() {
@@ -101,7 +102,8 @@ class NavModeKeyMappingDialogTest {
         RuntimeEnvironment.setFontScale(1.3f)
         open()
         assertEveryTypeReachableAndSavable()
-        node(string(R.string.nav_mode_use_default, "DPAD_UP")).reveal().assertFullyVisible("Use default")
+        compose.onNode(hasContentDescription(string(R.string.nav_mode_use_default, "DPAD_UP")) and hasClickAction())
+            .assertFullyVisible("Use default")
     }
 
     // Titan 2 Elite at 360 dpi with 150% font scale: None never breaks character-by-character

@@ -48,7 +48,46 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardTab
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FirstPage
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.KeyboardControlKey
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
+import androidx.compose.material.icons.automirrored.filled.LastPage
+import androidx.compose.material.icons.filled.OpenWith
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.SettingsRemote
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.VerticalAlignBottom
+import androidx.compose.material.icons.filled.VerticalAlignTop
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.ui.platform.LocalView
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.commands.CommandRegistry
 import rocks.pkb.plektra.commands.CommandSourceId
@@ -350,7 +389,7 @@ fun NavModeSettingsScreen(
                 val exactSizePx = if (maxKeysInRow > 0) availableForKeys / maxKeysInRow else desiredSizePx
                 val finalSizePx = min(desiredSizePx, exactSizePx)
                 val keySize = with(density) { finalSizePx.toDp() }
-                val keyHeight = keySize * 1.25f
+                val keyHeight = keySize * (1.3f + 0.2f * (LocalDensity.current.fontScale.coerceIn(1f, 1.5f) - 1f))
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -438,7 +477,7 @@ private fun KeyboardRow(
             KeyButton(
                 keyCode = keyCode,
                 mapping = mappings[keyCode],
-                hasDefault = defaultMappings.containsKey(keyCode),
+                defaultMapping = defaultMappings[keyCode],
                 layoutHint = layoutHints[keyCode],
                 onClick = { onKeyClick(keyCode) },
                 modifier = Modifier
@@ -449,143 +488,131 @@ private fun KeyboardRow(
     }
 }
 
+private fun mappingIcon(mapping: KeyMappingLoader.CtrlMapping?): ImageVector? = when (mapping?.type) {
+    "keycode" -> keycodeIcon(mapping.value)
+    "action" -> actionIcon(mapping.value)
+    "native_ctrl" -> typeIcon("native_ctrl")
+    "command" -> typeIcon("command")
+    else -> null
+}
+
+/** Keycap in the Nav Mode keyboard: letter, layout hint, mapping icon and a one-line short label. */
 @Composable
 private fun KeyButton(
     keyCode: Int,
     mapping: KeyMappingLoader.CtrlMapping?,
-    hasDefault: Boolean,
+    defaultMapping: KeyMappingLoader.CtrlMapping?,
     layoutHint: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scheme = MaterialTheme.colorScheme
     val keyLabel = getKeyLabel(keyCode)
-    val mappingLabel = mapping?.let { getMappingLabelShort(it) }
     val hasMapping = mapping != null && mapping.type != "none"
-    val backgroundColor = if (hasMapping) {
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-    val borderColor = if (hasMapping) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-    }
-    val keyTextColor = if (hasMapping) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-    }
-    val mappingTextColor = if (hasMapping) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-    }
-    val mappingIcon: ImageVector?
-    val mappingIconDesc: String?
-    if (mapping?.type == "keycode") {
-        when (mapping.value) {
-            "DPAD_UP" -> {
-                mappingIcon = Icons.Filled.KeyboardArrowUp
-                mappingIconDesc = mappingLabel
-            }
-            "DPAD_DOWN" -> {
-                mappingIcon = Icons.Filled.KeyboardArrowDown
-                mappingIconDesc = mappingLabel
-            }
-            "DPAD_LEFT" -> {
-                mappingIcon = Icons.AutoMirrored.Filled.KeyboardArrowLeft
-                mappingIconDesc = mappingLabel
-            }
-            "DPAD_RIGHT" -> {
-                mappingIcon = Icons.AutoMirrored.Filled.KeyboardArrowRight
-                mappingIconDesc = mappingLabel
-            }
-            "DPAD_CENTER" -> {
-                mappingIcon = Icons.Filled.RadioButtonUnchecked
-                mappingIconDesc = mappingLabel
-            }
-            else -> {
-                mappingIcon = null
-                mappingIconDesc = null
-            }
+    val customized = mapping != null && mapping != defaultMapping
+    val icon = if (hasMapping) mappingIcon(mapping) else null
+    // Direction arrows carry their meaning in the icon; every other mapping keeps a short label.
+    val shortLabel = if (hasMapping && !(mapping?.type == "keycode" && mapping.value.startsWith("DPAD_"))) {
+        // The icon already shows the direction, so drop arrows from labels such as "←WordSel".
+        mapping?.let { getMappingLabelShort(it) }?.let { label ->
+            if (icon != null) label.trim('←', '→', ' ').ifEmpty { label } else label
         }
-    } else {
-        mappingIcon = null
-        mappingIconDesc = null
-    }
+    } else null
+    val fullLabel = mapping?.let { getMappingLabel(it) }
+        ?: if (mapping == null && defaultMapping != null) stringResource(R.string.nav_mode_default) else null
+    // The keycaps are a dense diagram with a fixed geometry: let text follow the system scale up
+    // to 120% and keep the full meaning in the key's accessibility label and in the dialog.
+    val fontScale = LocalDensity.current.fontScale
+    val textScale = fontScale.coerceAtMost(1.2f) / fontScale
+    val shape = RoundedCornerShape(10.dp)
+    val contentColor = if (hasMapping) scheme.onSurface else scheme.onSurfaceVariant.copy(alpha = 0.6f)
 
     Surface(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .clickable(onClick = onClick),
-        color = backgroundColor,
-        tonalElevation = if (hasMapping) 2.dp else 0.dp
+        onClick = onClick,
+        shape = shape,
+        color = if (hasMapping) scheme.surfaceContainerHigh else scheme.surfaceContainerLow,
+        contentColor = contentColor,
+        border = if (customized) {
+            BorderStroke(1.5.dp, scheme.primary)
+        } else {
+            BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.6f))
+        },
+        modifier = modifier.semantics(mergeDescendants = true) {
+            contentDescription = listOfNotNull(keyLabel, fullLabel, layoutHint).joinToString(", ")
+        }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 3.dp, vertical = 3.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = keyLabel,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                fontSize = 13.sp,
-                color = keyTextColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
-            )
-            if (layoutHint != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
                 Text(
-                    text = layoutHint,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.tertiary,
+                    text = keyLabel,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp * textScale,
+                    lineHeight = 14.sp * textScale,
+                    color = if (hasMapping) scheme.onSurface else scheme.onSurfaceVariant.copy(alpha = 0.6f),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
+                    softWrap = false,
+                    modifier = Modifier.padding(start = 2.dp)
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                if (layoutHint != null) {
+                    Text(
+                        text = layoutHint.removePrefix("→").trim(),
+                        fontSize = 9.sp * textScale,
+                        lineHeight = 11.sp * textScale,
+                        color = scheme.tertiary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
             }
-            if (mappingIcon != null) {
-                Icon(
-                    imageVector = mappingIcon,
-                    contentDescription = mappingIconDesc,
-                    tint = mappingTextColor,
-                    modifier = Modifier.size(18.dp)
-                )
-            } else if (mappingLabel != null) {
-                Text(
-                    text = mappingLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
-                    color = mappingTextColor,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
-            } else if (hasDefault) {
-                Text(
-                    text = stringResource(R.string.nav_mode_default),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 9.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
-                )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    when {
+                        icon != null -> Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = scheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        mapping == null && defaultMapping != null -> Icon(
+                            imageVector = Icons.Filled.Restore,
+                            contentDescription = null,
+                            tint = scheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    if (shortLabel != null) {
+                        Text(
+                            text = shortLabel,
+                            fontSize = 9.sp * textScale,
+                            lineHeight = 11.sp * textScale,
+                            letterSpacing = 0.sp,
+                            color = contentColor,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
     }
 }
+
 
 /** The mapping the dialog would save, or null while the chosen type still needs a value. */
 internal fun keyMappingSelection(type: String?, value: String?): KeyMappingLoader.CtrlMapping? {
@@ -616,47 +643,68 @@ private data class NavOptionGroup(
     val options: List<NavOptionEntry>
 )
 
+/** One stable tone for every type, so switching type never recolors the picker. */
 @Composable
-private fun pickerToneForType(type: String?): PickerTone {
+private fun pickerTone(): PickerTone {
     val scheme = MaterialTheme.colorScheme
-    return when (type) {
-        "keycode" -> PickerTone(
-            container = scheme.primaryContainer,
-            content = scheme.onPrimaryContainer,
-            accent = scheme.primary
-        )
-        "action" -> PickerTone(
-            container = scheme.tertiaryContainer,
-            content = scheme.onTertiaryContainer,
-            accent = scheme.tertiary
-        )
-        "command" -> PickerTone(
-            container = scheme.secondaryContainer,
-            content = scheme.onSecondaryContainer,
-            accent = scheme.secondary
-        )
-        "native_ctrl" -> PickerTone(
-            container = scheme.primaryContainer.copy(alpha = 0.72f),
-            content = scheme.onPrimaryContainer,
-            accent = scheme.primary
-        )
-        else -> PickerTone(
-            container = scheme.surfaceContainerHighest,
-            content = scheme.onSurface,
-            accent = scheme.outline
-        )
-    }
+    return PickerTone(
+        container = scheme.primaryContainer,
+        content = scheme.onPrimaryContainer,
+        accent = scheme.primary
+    )
 }
 
-private fun keycodeIcon(keycode: String): ImageVector? {
-    return when (keycode) {
-        "DPAD_UP" -> Icons.Filled.KeyboardArrowUp
-        "DPAD_DOWN" -> Icons.Filled.KeyboardArrowDown
-        "DPAD_LEFT" -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
-        "DPAD_RIGHT" -> Icons.AutoMirrored.Filled.KeyboardArrowRight
-        "DPAD_CENTER" -> Icons.Filled.RadioButtonUnchecked
-        else -> null
-    }
+private fun typeIcon(type: String): ImageVector = when (type) {
+    "keycode" -> Icons.Filled.Keyboard
+    "action" -> Icons.Filled.Bolt
+    "native_ctrl" -> Icons.Filled.KeyboardControlKey
+    "command" -> Icons.Filled.Terminal
+    else -> Icons.Filled.Block
+}
+
+private fun commandSourceIcon(source: CommandSourceId): ImageVector = when (source) {
+    CommandSourceId.Apps -> Icons.Filled.Apps
+    CommandSourceId.Plektra -> Icons.Filled.Keyboard
+    CommandSourceId.AppActions -> Icons.Filled.TouchApp
+    CommandSourceId.DeviceControl -> Icons.Filled.SettingsRemote
+    CommandSourceId.NavActions -> Icons.Filled.OpenWith
+}
+
+private fun keycodeIcon(keycode: String): ImageVector = when (keycode) {
+    "DPAD_UP" -> Icons.Filled.KeyboardArrowUp
+    "DPAD_DOWN" -> Icons.Filled.KeyboardArrowDown
+    "DPAD_LEFT" -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
+    "DPAD_RIGHT" -> Icons.AutoMirrored.Filled.KeyboardArrowRight
+    "DPAD_CENTER" -> Icons.Filled.RadioButtonUnchecked
+    "MOVE_HOME" -> Icons.Filled.FirstPage
+    "MOVE_END" -> Icons.AutoMirrored.Filled.LastPage
+    "PAGE_UP" -> Icons.Filled.KeyboardDoubleArrowUp
+    "PAGE_DOWN" -> Icons.Filled.KeyboardDoubleArrowDown
+    "TAB" -> Icons.AutoMirrored.Filled.KeyboardTab
+    "ESCAPE" -> Icons.Filled.Close
+    "FORWARD_DEL" -> Icons.Filled.Delete
+    else -> Icons.Filled.Keyboard
+}
+
+private fun actionIcon(action: String): ImageVector = when (action) {
+    "copy" -> Icons.Filled.ContentCopy
+    "paste" -> Icons.Filled.ContentPaste
+    "cut" -> Icons.Filled.ContentCut
+    "undo" -> Icons.AutoMirrored.Filled.Undo
+    "select_all" -> Icons.Filled.SelectAll
+    "expand_selection_left" -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
+    "expand_selection_right" -> Icons.AutoMirrored.Filled.KeyboardArrowRight
+    "move_word_left" -> Icons.AutoMirrored.Filled.ArrowBack
+    "move_word_right" -> Icons.AutoMirrored.Filled.ArrowForward
+    "expand_selection_word_left" -> Icons.Filled.KeyboardDoubleArrowLeft
+    "expand_selection_word_right" -> Icons.Filled.KeyboardDoubleArrowRight
+    "page_start" -> Icons.Filled.VerticalAlignTop
+    "page_end" -> Icons.Filled.VerticalAlignBottom
+    "toggle_minimal_ui" -> Icons.Filled.Fullscreen
+    "media_play_pause" -> Icons.Filled.PlayArrow
+    "media_previous" -> Icons.Filled.SkipPrevious
+    "media_next" -> Icons.Filled.SkipNext
+    else -> Icons.Filled.Bolt
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -678,18 +726,28 @@ internal fun KeyMappingDialog(
         commandTargets.groupBy { it.source }
     }
     val defaultLabel = defaultMapping?.let { getMappingLabel(it) }
-    val dialogMaxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.92f
     val fontScale = LocalDensity.current.fontScale
-    val minCellWidth = if (fontScale >= 1.4f) 220.dp else 180.dp
+    val minCellWidth = if (fontScale >= 1.4f) 200.dp else 180.dp
     val selection = keyMappingSelection(selectedType, selectedValue)
-    val activeTone = pickerToneForType(selectedType)
+    val tone = pickerTone()
+    // Compose measures dialog content against the full display, while the window manager clamps
+    // the dialog window below the status bar. Size the card from the host window minus the
+    // safe-drawing insets (bars, cutout, IME) so Cancel and Save always stay visible.
+    val density = LocalDensity.current
+    val hostView = LocalView.current
+    val safeTopPx = WindowInsets.safeDrawing.getTop(density)
+    val safeBottomPx = WindowInsets.safeDrawing.getBottom(density)
+    val hostHeightPx = hostView.rootView.height.takeIf { it > 0 }
+        ?: with(density) { LocalConfiguration.current.screenHeightDp.dp.roundToPx() }
+    val dialogMaxHeight = with(density) { (hostHeightPx - safeTopPx - safeBottomPx).coerceAtLeast(0).toDp() } - 16.dp
 
+    // label shown on the chip, full label for accessibility
     val types = listOf(
-        "keycode" to stringResource(R.string.nav_mode_keycode),
-        "action" to stringResource(R.string.nav_mode_action),
-        "native_ctrl" to stringResource(R.string.nav_mode_native_ctrl),
-        "command" to stringResource(R.string.nav_mode_command),
-        "none" to stringResource(R.string.nav_mode_none)
+        Triple("keycode", stringResource(R.string.nav_mode_keycode), stringResource(R.string.nav_mode_keycode)),
+        Triple("action", stringResource(R.string.nav_mode_action), stringResource(R.string.nav_mode_action)),
+        Triple("native_ctrl", stringResource(R.string.nav_mode_native_ctrl_short), stringResource(R.string.nav_mode_native_ctrl)),
+        Triple("command", stringResource(R.string.nav_mode_command), stringResource(R.string.nav_mode_command)),
+        Triple("none", stringResource(R.string.nav_mode_none), stringResource(R.string.nav_mode_none))
     )
 
     val optionGroups: List<NavOptionGroup> = when (selectedType) {
@@ -697,30 +755,30 @@ internal fun KeyMappingDialog(
             NavOptionGroup(
                 id = "direction",
                 title = stringResource(R.string.nav_mode_category_direction),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf("DPAD_UP", "DPAD_DOWN", "DPAD_LEFT", "DPAD_RIGHT", "DPAD_CENTER")
                     .map { NavOptionEntry(value = it, label = it, icon = keycodeIcon(it)) }
             ),
             NavOptionGroup(
                 id = "navigation_keys",
                 title = stringResource(R.string.nav_mode_category_navigation_keys),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf("MOVE_HOME", "MOVE_END", "PAGE_UP", "PAGE_DOWN", "TAB", "ESCAPE", "FORWARD_DEL")
-                    .map { NavOptionEntry(value = it, label = it) }
+                    .map { NavOptionEntry(value = it, label = it, icon = keycodeIcon(it)) }
             )
         )
         "action" -> listOf(
             NavOptionGroup(
                 id = "clipboard",
                 title = stringResource(R.string.nav_mode_category_clipboard),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf("copy", "paste", "cut", "undo")
-                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it), icon = actionIcon(it)) }
             ),
             NavOptionGroup(
                 id = "selection",
                 title = stringResource(R.string.nav_mode_category_selection),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf(
                     "select_all",
                     "expand_selection_left",
@@ -729,56 +787,50 @@ internal fun KeyMappingDialog(
                     "move_word_right",
                     "expand_selection_word_left",
                     "expand_selection_word_right"
-                ).map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+                ).map { NavOptionEntry(value = it, label = getActionLabel(it), icon = actionIcon(it)) }
             ),
             NavOptionGroup(
                 id = "document_ui",
                 title = stringResource(R.string.nav_mode_category_document_ui),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf("page_start", "page_end", "toggle_minimal_ui")
-                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it), icon = actionIcon(it)) }
             ),
             NavOptionGroup(
                 id = "media",
                 title = stringResource(R.string.nav_mode_category_media),
-                accent = activeTone.accent,
+                accent = tone.accent,
                 options = listOf("media_play_pause", "media_previous", "media_next")
-                    .map { NavOptionEntry(value = it, label = getActionLabel(it)) }
+                    .map { NavOptionEntry(value = it, label = getActionLabel(it), icon = actionIcon(it)) }
             )
         )
-        "command" -> {
-            val scheme = MaterialTheme.colorScheme
-            commandGroupsBySource.entries
-                .filter { (source, _) -> selectedCommandSource == null || source == selectedCommandSource }
-                .map { (source, commands) ->
-                    val sourceAccent = when (source) {
-                        CommandSourceId.Apps -> scheme.secondary
-                        CommandSourceId.Plektra -> scheme.primary
-                        CommandSourceId.AppActions -> scheme.tertiary
-                        CommandSourceId.DeviceControl -> scheme.secondary
-                        CommandSourceId.NavActions -> scheme.primary
+        "command" -> commandGroupsBySource.entries
+            .filter { (source, _) -> selectedCommandSource == null || source == selectedCommandSource }
+            .map { (source, commands) ->
+                NavOptionGroup(
+                    id = source.storageValue,
+                    title = source.displayLabel,
+                    accent = tone.accent,
+                    showCount = true,
+                    options = commands.map {
+                        NavOptionEntry(value = it.id, label = it.label, icon = commandSourceIcon(source))
                     }
-                    NavOptionGroup(
-                        id = source.storageValue,
-                        title = source.displayLabel,
-                        accent = sourceAccent,
-                        showCount = true,
-                        options = commands.map { NavOptionEntry(value = it.id, label = it.label) }
-                    )
-                }
-        }
+                )
+            }
         else -> emptyList()
     }
 
-    BasicAlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
             modifier = Modifier
+                .widthIn(max = 560.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .heightIn(max = dialogMaxHeight),
+                .padding(horizontal = 8.dp)
+                .heightIn(max = dialogMaxHeight)
+                .semantics { paneTitle = keyLabel },
             shape = RoundedCornerShape(20.dp),
             tonalElevation = 2.dp,
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -786,23 +838,23 @@ internal fun KeyMappingDialog(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Compact left-aligned header with keycap badge
+                // Header: keycap badge, title and the default shortcut share one line.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                        .padding(start = 14.dp, end = 6.dp, top = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
-                        modifier = Modifier.defaultMinSize(minWidth = 34.dp, minHeight = 32.dp)
+                        modifier = Modifier.defaultMinSize(minWidth = 30.dp, minHeight = 28.dp)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = keyLabel,
@@ -819,156 +871,112 @@ internal fun KeyMappingDialog(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
+                    if (defaultLabel != null) {
+                        val useDefault = stringResource(R.string.nav_mode_use_default, defaultLabel)
+                        TextButton(
+                            onClick = {
+                                selectedType = defaultMapping?.type
+                                selectedValue = defaultMapping?.value
+                                selectedCommandSource = null
+                            },
+                            modifier = Modifier
+                                .heightIn(min = 48.dp)
+                                .widthIn(max = 200.dp)
+                                .semantics { contentDescription = useDefault },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Restore,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = defaultLabel,
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+
+                // Type row: five equal segments with the icon above a single-line label, so all
+                // types fit one row at 100–150% font scale without wrapping.
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+                        .selectableGroup(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    types.forEach { (type, label, fullLabel) ->
+                        TypeSegment(
+                            label = label,
+                            fullLabel = fullLabel,
+                            icon = typeIcon(type),
+                            selected = selectedType == type,
+                            tone = tone,
+                            onClick = {
+                                if (selectedType != type) {
+                                    selectedType = type
+                                    selectedValue = null
+                                    selectedCommandSource = null
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
 
-                // Type and value choices share one scrolling grid so Cancel and Save stay on screen
-                // in short windows and at 100–150% font scale.
+                // Value choices scroll; header, type row and footer stay fixed.
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = minCellWidth),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.weight(1f, fill = false)
                 ) {
-                    item(key = "type", span = { GridItemSpan(maxLineSpan) }) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = stringResource(R.string.nav_mode_type),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.semantics { heading() }
-                            )
-                            FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalArrangement = Arrangement.spacedBy(0.dp)
-                            ) {
-                                types.forEach { (type, label) ->
-                                    val isSelected = selectedType == type
-                                    val chipTone = pickerToneForType(type)
-                                    FilterChip(
-                                        selected = isSelected,
-                                        onClick = {
-                                            if (selectedType != type) {
-                                                selectedType = type
-                                                selectedValue = null
-                                                selectedCommandSource = null
-                                            }
-                                        },
-                                        label = {
-                                            Text(
-                                                text = label,
-                                                maxLines = 1,
-                                                softWrap = false,
-                                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
-                                            )
-                                        },
-                                        leadingIcon = if (isSelected) {
-                                            {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Check,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(16.dp)
-                                                )
-                                            }
-                                        } else null,
-                                        colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = chipTone.container,
-                                            selectedLabelColor = chipTone.content,
-                                            selectedLeadingIconColor = chipTone.content,
-                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                                            labelColor = MaterialTheme.colorScheme.onSurface
-                                        ),
-                                        border = FilterChipDefaults.filterChipBorder(
-                                            enabled = true,
-                                            selected = isSelected,
-                                            borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f),
-                                            selectedBorderColor = chipTone.accent.copy(alpha = 0.8f),
-                                            selectedBorderWidth = 1.dp
-                                        )
-                                    )
-                                }
-                            }
-                            if (defaultLabel != null) {
-                                TextButton(
-                                    onClick = {
-                                        selectedType = defaultMapping?.type
-                                        selectedValue = defaultMapping?.value
-                                        selectedCommandSource = null
-                                    },
-                                    modifier = Modifier.heightIn(min = 48.dp),
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Restore,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = stringResource(R.string.nav_mode_use_default, defaultLabel),
-                                        style = MaterialTheme.typography.labelLarge
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                     if (selectedType == "command" && commandGroupsBySource.size > 1) {
                         item(key = "command_sources", span = { GridItemSpan(maxLineSpan) }) {
-                            FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalArrangement = Arrangement.spacedBy(0.dp)
+                            Row(
+                                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                val allSelected = selectedCommandSource == null
-                                FilterChip(
-                                    selected = allSelected,
-                                    onClick = { selectedCommandSource = null },
-                                    label = {
-                                        Text(
-                                            text = stringResource(R.string.nav_mode_command_source_all),
-                                            maxLines = 1,
-                                            softWrap = false
-                                        )
-                                    },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = activeTone.container,
-                                        selectedLabelColor = activeTone.content,
-                                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                                    ),
-                                    border = FilterChipDefaults.filterChipBorder(
-                                        enabled = true,
-                                        selected = allSelected,
-                                        borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
-                                        selectedBorderColor = activeTone.accent.copy(alpha = 0.75f)
-                                    )
-                                )
-                                commandGroupsBySource.keys.forEach { source ->
+                                val sourceChips = listOf<Pair<CommandSourceId?, String>>(
+                                    null to stringResource(R.string.nav_mode_command_source_all)
+                                ) + commandGroupsBySource.keys.map { it to it.displayLabel }
+                                sourceChips.forEach { (source, label) ->
                                     val sourceSelected = selectedCommandSource == source
                                     FilterChip(
                                         selected = sourceSelected,
                                         onClick = { selectedCommandSource = source },
-                                        label = {
-                                            Text(
-                                                text = source.displayLabel,
-                                                maxLines = 1,
-                                                softWrap = false
+                                        label = { Text(text = label, maxLines = 1, softWrap = false) },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = source?.let(::commandSourceIcon) ?: Icons.Filled.Terminal,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
                                             )
                                         },
                                         colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = activeTone.container,
-                                            selectedLabelColor = activeTone.content,
-                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                                            selectedContainerColor = tone.container,
+                                            selectedLabelColor = tone.content,
+                                            selectedLeadingIconColor = tone.content,
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                            iconColor = tone.accent
                                         ),
                                         border = FilterChipDefaults.filterChipBorder(
                                             enabled = true,
                                             selected = sourceSelected,
                                             borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
-                                            selectedBorderColor = activeTone.accent.copy(alpha = 0.75f)
+                                            selectedBorderColor = tone.accent.copy(alpha = 0.75f)
                                         )
                                     )
                                 }
@@ -988,7 +996,7 @@ internal fun KeyMappingDialog(
                             NavOptionTile(
                                 label = entry.label,
                                 selected = selectedValue == entry.value,
-                                tone = activeTone,
+                                tone = tone,
                                 icon = entry.icon,
                                 onClick = { selectedValue = entry.value }
                             )
@@ -1004,7 +1012,7 @@ internal fun KeyMappingDialog(
                             }
                             PickerModeHintCard(
                                 text = hintText,
-                                accentColor = activeTone.accent
+                                accentColor = tone.accent
                             )
                         }
                     }
@@ -1015,14 +1023,14 @@ internal fun KeyMappingDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                        .padding(horizontal = 12.dp, vertical = 2.dp),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
                         onClick = onDismiss,
                         modifier = Modifier.heightIn(min = 48.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                     ) {
                         Text(stringResource(R.string.nav_mode_cancel))
                     }
@@ -1032,12 +1040,66 @@ internal fun KeyMappingDialog(
                         onClick = { selection?.let(onSave) },
                         enabled = selection != null,
                         modifier = Modifier.heightIn(min = 48.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Text(stringResource(R.string.nav_mode_save))
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TypeSegment(
+    label: String,
+    fullLabel: String,
+    icon: ImageVector,
+    selected: Boolean,
+    tone: PickerTone,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val contentColor = if (selected) tone.content else MaterialTheme.colorScheme.onSurface
+    Surface(
+        selected = selected,
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = if (selected) tone.container else MaterialTheme.colorScheme.surfaceContainerLow,
+        contentColor = contentColor,
+        border = if (selected) {
+            BorderStroke(1.5.dp, tone.accent)
+        } else {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+        },
+        modifier = modifier
+            .heightIn(min = 48.dp)
+            .semantics {
+                role = Role.Tab
+                if (label != fullLabel) contentDescription = fullLabel
+            }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(horizontal = 1.dp, vertical = 4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (selected) tone.content else tone.accent,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = label,
+                // No extra tracking: keeps "Command" whole at 150% in a fifth of a 480dp window.
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp),
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                color = contentColor,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

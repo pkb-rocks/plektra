@@ -45,12 +45,14 @@ class SuggestionEngine(
         if (usePersonalization || entry.source != SuggestionSource.USER) {
             return repository.effectiveFrequency(entry)
         }
-        val mainEntry = repository.topByNormalized(normalizedWord, limit = 5)
-            .firstOrNull { it.source == SuggestionSource.MAIN && it.word.equals(entry.word, ignoreCase = true) }
+        val mainEntry = repository.topByNormalized(normalizedWord, limit = 8, usePersonalization = false)
+            .firstOrNull {
+                it.source != SuggestionSource.USER && it.word.equals(entry.word, ignoreCase = true)
+            }
         return if (mainEntry != null) {
             repository.effectiveFrequency(mainEntry)
         } else {
-            repository.effectiveFrequency(entry.copy(frequency = 1))
+            repository.effectiveFrequency(entry, usePersonalization = false)
         }
     }
 
@@ -393,7 +395,11 @@ class SuggestionEngine(
         } else {
             150 // Medium threshold for longer inputs
         }
-        val completions = repository.lookupByPrefixMerged(normalizedWord, maxSize = 200)
+        val completions = repository.lookupByPrefixMerged(
+            normalizedWord,
+            maxSize = 200,
+            usePersonalization = usePersonalization
+        )
             .filter {
                 val norm = normalizeCached(it.word)
                 val meetsFrequency = isPreferredUserEntry(it.source) ||
@@ -409,20 +415,36 @@ class SuggestionEngine(
             emptyList()
         } else if (inputLen <= 3) {
             // For short inputs, heavily prioritize prefix matches over edit distance
-            repository.symSpellLookup(normalizedWord, maxSuggestions = limit * 2)
+            repository.symSpellLookup(
+                normalizedWord,
+                maxSuggestions = limit * 2,
+                usePersonalization = usePersonalization
+            )
         } else {
-            repository.symSpellLookup(normalizedWord, maxSuggestions = limit * 4)
+            repository.symSpellLookup(
+                normalizedWord,
+                maxSuggestions = limit * 4,
+                usePersonalization = usePersonalization
+            )
         }
         val symResultsAccent = if (includeAccentMatching && inputLen > 1) {
             val normalizedAccentless = stripAccents(normalizedWord)
             if (normalizedAccentless != normalizedWord) {
-                repository.symSpellLookup(normalizedAccentless, maxSuggestions = limit * 2)
+                repository.symSpellLookup(
+                    normalizedAccentless,
+                    maxSuggestions = limit * 2,
+                    usePersonalization = usePersonalization
+                )
             } else emptyList()
         } else emptyList()
 
         val allSymResults = (symResultsPrimary + symResultsAccent)
         val elisionPrefixEntries = if (inputLen == 1) {
-            repository.lookupByPrefixMerged("${normalizedWord}'", maxSize = 80)
+            repository.lookupByPrefixMerged(
+                "${normalizedWord}'",
+                maxSize = 80,
+                usePersonalization = usePersonalization
+            )
         } else emptyList()
         val leadingChar = currentWord.firstOrNull()
         val shortElisionEntries = if (inputLen == 1 && leadingChar != null) {
@@ -470,7 +492,14 @@ class SuggestionEngine(
             if (d != 0) return@Comparator d
             val scoreCmp = b.score.compareTo(a.score)
             if (scoreCmp != 0) return@Comparator scoreCmp
-            a.candidate.length.compareTo(b.candidate.length)
+            val lenCmp = a.candidate.length.compareTo(b.candidate.length)
+            if (lenCmp != 0) return@Comparator lenCmp
+            if (!usePersonalization) {
+                val lowerCmp = a.candidate.lowercase(locale).compareTo(b.candidate.lowercase(locale))
+                if (lowerCmp != 0) return@Comparator lowerCmp
+                return@Comparator a.candidate.compareTo(b.candidate)
+            }
+            0
         }
 
         fun consider(
@@ -511,15 +540,22 @@ class SuggestionEngine(
 
             val isSingleCharInput = inputLen == 1
             val candidateList: List<DictionaryEntry> = overrideCandidates ?: when {
-                isSingleCharInput -> repository.topByNormalized(term, limit = 5)
-                distance == 0 -> repository.topByNormalized(term, limit = 3)
-                !usePersonalization -> {
-                    val entries = repository.topByNormalized(term, limit = 5)
-                    listOfNotNull(
-                        entries.maxByOrNull { effectiveFrequencyFor(it, term, usePersonalization = false) }
+                isSingleCharInput -> repository.topByNormalized(
+                    term,
+                    limit = 5,
+                    usePersonalization = usePersonalization
+                )
+                distance == 0 -> repository.topByNormalized(
+                    term,
+                    limit = 3,
+                    usePersonalization = usePersonalization
+                )
+                else -> listOfNotNull(
+                    repository.bestEntryForNormalized(
+                        term,
+                        usePersonalization = usePersonalization
                     )
-                }
-                else -> listOfNotNull(repository.bestEntryForNormalized(term))
+                )
             }
             if (candidateList.isEmpty()) return
 
@@ -690,7 +726,7 @@ class SuggestionEngine(
             consider(
                 term = normalizedWord,
                 distance = 0,
-                frequency = repository.getExactWordFrequency(currentWord),
+                frequency = repository.getExactWordFrequency(currentWord, usePersonalization),
                 isForcedPrefix = false
             )
         }
@@ -704,10 +740,15 @@ class SuggestionEngine(
         // Ensure short elisions like "l'" are considered even if absent from the dictionary
         for (entry in shortElisionEntries) {
             val norm = normalizeCached(entry.word)
+            val entryFreq = if (usePersonalization || entry.source != SuggestionSource.USER) {
+                entry.frequency
+            } else {
+                1
+            }
             consider(
                 term = norm,
                 distance = 0,
-                frequency = entry.frequency,
+                frequency = entryFreq,
                 isForcedPrefix = true
             )
         }

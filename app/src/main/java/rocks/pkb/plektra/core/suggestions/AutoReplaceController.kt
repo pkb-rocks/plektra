@@ -371,7 +371,7 @@ class AutoReplaceController(
             return ReplaceResult(false, boundaryCommitted)
         }
 
-        primaryDictionaryCaseVariant(lookupWord, word)?.let { caseReplacement ->
+        primaryDictionaryCaseVariant(lookupWord, word, settings.personalizationEnabled)?.let { caseReplacement ->
             if (!rejectedWords.contains(wordLower)) {
                 inputConnection.beginBatchEdit()
                 inputConnection.deleteSurroundingText(word.length, 0)
@@ -406,7 +406,9 @@ class AutoReplaceController(
 
         val orthographicEntry = if (settings.accentMatching) {
             repository.topByNormalized(
-                WordNormalization.normalizeForDictionary(lookupWord, Locale.ROOT), limit = 8
+                WordNormalization.normalizeForDictionary(lookupWord, Locale.ROOT),
+                limit = 8,
+                usePersonalization = settings.personalizationEnabled
             ).firstOrNull { entry ->
                 entry.word.length == lookupWord.length && isAccentOnlyVariant(lookupWord, entry.word)
             }
@@ -448,8 +450,8 @@ class AutoReplaceController(
         
         // Check if word exists in dictionary
         val isKnownWord = knownWordProvider?.invoke(lookupWord) ?: repository.isKnownWord(lookupWord)
-        val isExactKnownWord = repository.getExactWordFrequency(lookupWord) > 0
-        val hasExactPrimaryCase = primaryDictionaryHasExactCase(lookupWord)
+        val isExactKnownWord = repository.getExactWordFrequency(lookupWord, settings.personalizationEnabled) > 0
+        val hasExactPrimaryCase = primaryDictionaryHasExactCase(lookupWord, settings.personalizationEnabled)
 
         // Only auto-replace if word is NOT known (i.e., it's a typo/unknown word)
         // Don't replace valid words with other valid words, even if they have higher frequency
@@ -626,12 +628,20 @@ class AutoReplaceController(
         rejectedWords.clear()
     }
 
-    private fun primaryDictionaryCaseVariant(lookupWord: String, originalWord: String): String? {
+    private fun primaryDictionaryCaseVariant(
+        lookupWord: String,
+        originalWord: String,
+        usePersonalization: Boolean
+    ): String? {
         if (!repository.isReady || lookupWord != originalWord) return null
         if (originalWord.none { it.isLetter() } || originalWord.any { it.isUpperCase() }) return null
 
         val normalized = WordNormalization.normalizeForDictionary(originalWord, Locale.ROOT)
-        val entries = repository.topByNormalized(normalized, limit = 8)
+        val entries = repository.topByNormalized(
+            normalized,
+            limit = 8,
+            usePersonalization = usePersonalization
+        )
         if (entries.any { it.word == originalWord }) return null
 
         return entries
@@ -643,10 +653,14 @@ class AutoReplaceController(
             ?.word
     }
 
-    private fun primaryDictionaryHasExactCase(word: String): Boolean {
+    private fun primaryDictionaryHasExactCase(word: String, usePersonalization: Boolean): Boolean {
         if (!repository.isReady || word.isBlank()) return false
         val normalized = WordNormalization.normalizeForDictionary(word, Locale.ROOT)
-        return repository.topByNormalized(normalized, limit = 8).any { it.word == word }
+        return repository.topByNormalized(
+            normalized,
+            limit = 8,
+            usePersonalization = usePersonalization
+        ).any { it.word == word }
     }
 
     private fun applyCasing(candidate: String, original: String): String {

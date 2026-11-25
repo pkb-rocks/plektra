@@ -51,8 +51,13 @@ class SymSpell(
         }
     }
 
-    fun lookup(input: String, maxSuggestions: Int = 8): List<SuggestItem> {
-        if (input.isEmpty()) return emptyList()
+    @JvmOverloads
+    fun lookup(
+        input: String,
+        maxSuggestions: Int = 8,
+        frequencyProvider: ((String) -> Int)? = null
+    ): List<SuggestItem> {
+        if (input.isEmpty() || maxSuggestions <= 0) return emptyList()
         val suggestions = mutableListOf<SuggestItem>()
         val suggestionSet = HashSet<String>()
         val consideredDeletes = HashSet<String>()
@@ -64,7 +69,8 @@ class SymSpell(
         consideredDeletes.add(inputPrefix)
 
         fun addSuggestion(term: String, distance: Int) {
-            val freq = dictionary[term] ?: 0
+            val freq = frequencyProvider?.invoke(term) ?: (dictionary[term] ?: 0)
+            if (frequencyProvider != null && freq <= 0) return
             val item = SuggestItem(term, distance, freq)
             if (suggestionSet.add(term)) {
                 suggestions.add(item)
@@ -78,7 +84,7 @@ class SymSpell(
         }
 
         // direct hit
-        dictionary[input]?.let { freq ->
+        if (dictionary.containsKey(input)) {
             addSuggestion(input, 0)
         }
 
@@ -108,11 +114,12 @@ class SymSpell(
             }
         }
 
-        // Sort by distance asc, frequency desc, length asc and trim
+        // Sort by distance asc, frequency desc, length asc, term asc and trim
         return suggestions.sortedWith(
             compareBy<SuggestItem> { it.distance }
                 .thenByDescending { it.frequency }
                 .thenBy { it.term.length }
+                .thenBy { it.term }
         ).take(maxSuggestions)
     }
 

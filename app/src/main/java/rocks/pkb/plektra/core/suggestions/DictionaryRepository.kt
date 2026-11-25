@@ -31,11 +31,27 @@ interface DictionaryRepository {
     fun removeUserEntry(word: String)
     fun markUsed(word: String)
     fun effectiveFrequency(entry: DictionaryEntry): Int
+    fun effectiveFrequency(entry: DictionaryEntry, usePersonalization: Boolean): Int =
+        if (usePersonalization || entry.source != SuggestionSource.USER) {
+            effectiveFrequency(entry)
+        } else {
+            effectiveFrequency(entry.copy(frequency = 1))
+        }
     fun getExactWordFrequency(word: String): Int
+    fun getExactWordFrequency(word: String, usePersonalization: Boolean): Int =
+        getExactWordFrequency(word)
     fun lookupByPrefixMerged(prefix: String, maxSize: Int): List<DictionaryEntry>
+    fun lookupByPrefixMerged(prefix: String, maxSize: Int, usePersonalization: Boolean): List<DictionaryEntry> =
+        lookupByPrefixMerged(prefix, maxSize)
     fun symSpellLookup(term: String, maxSuggestions: Int): List<SymSpell.SuggestItem>
+    fun symSpellLookup(term: String, maxSuggestions: Int, usePersonalization: Boolean): List<SymSpell.SuggestItem> =
+        symSpellLookup(term, maxSuggestions)
     fun bestEntryForNormalized(normalized: String): DictionaryEntry?
+    fun bestEntryForNormalized(normalized: String, usePersonalization: Boolean): DictionaryEntry? =
+        bestEntryForNormalized(normalized)
     fun topByNormalized(normalized: String, limit: Int = 5): List<DictionaryEntry>
+    fun topByNormalized(normalized: String, limit: Int = 5, usePersonalization: Boolean): List<DictionaryEntry> =
+        topByNormalized(normalized, limit)
     fun topCommonEntries(limit: Int = 16): List<DictionaryEntry>
     fun isKnownWord(word: String): Boolean
     fun ensureLoadScheduled(background: () -> Unit)
@@ -122,6 +138,14 @@ class AndroidDictionaryRepository(
     private val debugLogging: Boolean = debugLogging
     private val maxRawFrequency = 255.0
     private val scaledFrequencyMax = 1600.0
+    private val neutralizedUserFrequency: Int by lazy {
+        effectiveFrequency(DictionaryEntry("", 1, SuggestionSource.USER))
+    }
+    private val neutralizedEntryComparator =
+        compareByDescending<DictionaryEntry> { effectiveFrequency(it, usePersonalization = false) }
+            .thenBy { it.source.ordinal }
+            .thenBy { it.word.lowercase(baseLocale) }
+            .thenBy { it.word }
 
     override suspend fun loadIfNeeded() {
         if (isReady) return
@@ -311,19 +335,29 @@ class AndroidDictionaryRepository(
         return scaled.coerceAtLeast(1)
     }
 
+    override fun effectiveFrequency(entry: DictionaryEntry, usePersonalization: Boolean): Int {
+        if (usePersonalization || entry.source != SuggestionSource.USER) {
+            return effectiveFrequency(entry)
+        }
+        return neutralizedUserFrequency
+    }
+
     /**
      * Gets the frequency of an exact word (case-insensitive match).
      * Returns the maximum frequency if multiple entries exist (e.g., different sources).
      * Returns 0 if the word doesn't exist.
      */
-    override fun getExactWordFrequency(word: String): Int {
+    override fun getExactWordFrequency(word: String): Int =
+        getExactWordFrequency(word, usePersonalization = true)
+
+    override fun getExactWordFrequency(word: String, usePersonalization: Boolean): Int {
         if (!isReady) return 0
         val normalized = normalize(word)
         val bucket = normalizedIndex[normalized] ?: return 0
         // Find exact match (case-insensitive) and return max frequency
         return bucket
             .filter { it.word.equals(word, ignoreCase = true) }
-            .maxOfOrNull { it.frequency } ?: 0
+            .maxOfOrNull { if (usePersonalization || it.source != SuggestionSource.USER) it.frequency else 1 } ?: 0
     }
 
     fun lookupByPrefix(prefix: String): List<DictionaryEntry> {
@@ -346,20 +380,56 @@ class AndroidDictionaryRepository(
      * transpositions (e.g., "teh" -> "the", "caio" -> "ciao") that would otherwise live
      * under a different prefix.
      */
-    override fun lookupByPrefixMerged(prefix: String, maxSize: Int): List<DictionaryEntry> {
-        if (!isReady || prefix.isBlank()) return emptyList()
+    override fun lookupByPrefixMerged(prefix: String, maxSize: Int): List<DictionaryEntry> =
+        lookupByPrefixMerged(prefix, maxSize, usePersonalization = true)
+
+    override fun lookupByPrefixMerged(
+        prefix: String,
+        maxSize: Int,
+        usePersonalization: Boolean
+    ): List<DictionaryEntry> {
+        if (!isReady || prefix.isBlank() || maxSize <= 0) return emptyList()
         val normalizedPrefix = normalize(prefix)
         val maxPrefixLength = normalizedPrefix.length.coerceAtMost(cachePrefixLength)
         val seen = LinkedHashMap<String, DictionaryEntry>()
 
         for (length in maxPrefixLength downTo 1) {
             val bucket = prefixCache[normalizedPrefix.take(length)] ?: continue
-            for (entry in bucket) {
-                val key = entry.word.lowercase(baseLocale)
-                if (!seen.containsKey(key)) {
-                    seen[key] = entry
-                    if (seen.size >= maxSize) {
-                        return seen.values.toList()
+            if (usePersonalization) {
+                for (entry in bucket) {
+                    val key = entry.word.lowercase(baseLocale)
+                    if (!seen.containsKey(key)) {
+                        seen[key] = entry
+                        if (seen.size >= maxSize) {
+                            return seen.values.toList()
+                        }
+                    }
+                }
+            } else {
+                val deferred = mutableListOf<DictionaryEntry>()
+                for (entry in bucket) {
+                    if (entry.source == SuggestionSource.USER || effectiveFrequency(entry) <= neutralizedUserFrequency) {
+                        deferred.add(entry)
+                        continue
+                    }
+                    val key = entry.word.lowercase(baseLocale)
+                    if (!seen.containsKey(key)) {
+                        seen[key] = entry
+                        if (seen.size >= maxSize) {
+                            return seen.values.toList()
+                        }
+                    }
+                }
+                if (deferred.isNotEmpty() && seen.size < maxSize) {
+                    deferred.sortWith(neutralizedEntryComparator)
+                    for (entry in deferred) {
+                        val key = entry.word.lowercase(baseLocale)
+                        if (!seen.containsKey(key)) {
+                            seen[key] = entry
+                            if (seen.size >= maxSize) {
+                                return seen.values.toList()
+                            }
+                        }
                     }
                 }
             }
@@ -368,13 +438,38 @@ class AndroidDictionaryRepository(
         return seen.values.toList()
     }
 
-    override fun symSpellLookup(term: String, maxSuggestions: Int): List<SymSpell.SuggestItem> {
+    override fun symSpellLookup(term: String, maxSuggestions: Int): List<SymSpell.SuggestItem> =
+        symSpellLookup(term, maxSuggestions, usePersonalization = true)
+
+    override fun symSpellLookup(
+        term: String,
+        maxSuggestions: Int,
+        usePersonalization: Boolean
+    ): List<SymSpell.SuggestItem> {
         val engine = symSpell ?: return emptyList()
-        return engine.lookup(term, maxSuggestions)
+        if (usePersonalization) {
+            return engine.lookup(term, maxSuggestions)
+        }
+        return engine.lookup(term, maxSuggestions) { normalizedTerm ->
+            neutralizedTermFrequency(normalizedTerm)
+        }
     }
 
-    override fun bestEntryForNormalized(normalized: String): DictionaryEntry? {
-        return normalizedIndex[normalized]?.maxByOrNull { effectiveFrequency(it) }
+    private fun neutralizedTermFrequency(normalizedTerm: String): Int {
+        val entries = normalizedIndex[normalizedTerm] ?: return 0
+        return entries.maxOfOrNull { effectiveFrequency(it, usePersonalization = false) } ?: 0
+    }
+
+    override fun bestEntryForNormalized(normalized: String): DictionaryEntry? =
+        bestEntryForNormalized(normalized, usePersonalization = true)
+
+    override fun bestEntryForNormalized(normalized: String, usePersonalization: Boolean): DictionaryEntry? {
+        val entries = normalizedIndex[normalized] ?: return null
+        return if (usePersonalization) {
+            entries.maxByOrNull { effectiveFrequency(it) }
+        } else {
+            entries.minWithOrNull(neutralizedEntryComparator)
+        }
     }
 
     fun allCandidates(): List<DictionaryEntry> {
@@ -386,12 +481,21 @@ class AndroidDictionaryRepository(
      * Returns top entries for a normalized term, sorted by frequency.
      * Useful for single-character inputs to surface multiple variants (e.g., accented).
      */
-    override fun topByNormalized(normalized: String, limit: Int): List<DictionaryEntry> {
-        if (!isReady) return emptyList()
-        return normalizedIndex[normalized]
-            ?.sortedByDescending { effectiveFrequency(it) }
-            ?.take(limit)
-            .orEmpty()
+    override fun topByNormalized(normalized: String, limit: Int): List<DictionaryEntry> =
+        topByNormalized(normalized, limit, usePersonalization = true)
+
+    override fun topByNormalized(
+        normalized: String,
+        limit: Int,
+        usePersonalization: Boolean
+    ): List<DictionaryEntry> {
+        if (!isReady || limit <= 0) return emptyList()
+        val entries = normalizedIndex[normalized] ?: return emptyList()
+        return if (usePersonalization) {
+            entries.sortedByDescending { effectiveFrequency(it) }.take(limit)
+        } else {
+            entries.sortedWith(neutralizedEntryComparator).take(limit)
+        }
     }
 
     /**
@@ -611,7 +715,7 @@ class AndroidDictionaryRepository(
         sortCachesByEffectiveFrequency()
     }
 
-    private fun buildSymSpell() {
+    internal fun buildSymSpell() {
         if (symSpellBuilt && symSpell != null) return
         val engine = SymSpell(maxEditDistance = 2, prefixLength = cachePrefixLength)
         normalizedIndex.forEach { (normalized, entries) ->

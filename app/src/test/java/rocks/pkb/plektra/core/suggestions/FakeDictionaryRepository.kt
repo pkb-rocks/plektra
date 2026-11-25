@@ -42,44 +42,108 @@ class FakeDictionaryRepository : DictionaryRepository {
         return scaled.coerceAtLeast(1)
     }
 
-    override fun getExactWordFrequency(word: String): Int {
+    override fun effectiveFrequency(entry: DictionaryEntry, usePersonalization: Boolean): Int {
+        if (usePersonalization || entry.source != SuggestionSource.USER) {
+            return effectiveFrequency(entry)
+        }
+        return effectiveFrequency(entry.copy(frequency = 1))
+    }
+
+    override fun getExactWordFrequency(word: String): Int =
+        getExactWordFrequency(word, usePersonalization = true)
+
+    override fun getExactWordFrequency(word: String, usePersonalization: Boolean): Int {
         return entries
             .filter { it.word.equals(word, ignoreCase = true) }
-            .maxOfOrNull { it.frequency } ?: 0
+            .maxOfOrNull { if (usePersonalization || it.source != SuggestionSource.USER) it.frequency else 1 } ?: 0
     }
 
-    override fun lookupByPrefixMerged(prefix: String, maxSize: Int): List<DictionaryEntry> {
+    override fun lookupByPrefixMerged(prefix: String, maxSize: Int): List<DictionaryEntry> =
+        lookupByPrefixMerged(prefix, maxSize, usePersonalization = true)
+
+    override fun lookupByPrefixMerged(
+        prefix: String,
+        maxSize: Int,
+        usePersonalization: Boolean
+    ): List<DictionaryEntry> {
+        if (maxSize <= 0) return emptyList()
         val normalizedPrefix = normalize(prefix)
-        return entries
-            .filter { normalize(it.word).startsWith(normalizedPrefix) }
-            .sortedByDescending { effectiveFrequency(it) }
-            .take(maxSize)
+        val seen = LinkedHashMap<String, DictionaryEntry>()
+        for (entry in entries.filter { normalize(it.word).startsWith(normalizedPrefix) }.sortedWith(entryComparator(usePersonalization))) {
+            val key = entry.word.lowercase(baseLocale)
+            if (!seen.containsKey(key)) {
+                seen[key] = entry
+                if (seen.size >= maxSize) break
+            }
+        }
+        return seen.values.toList()
     }
 
-    override fun symSpellLookup(term: String, maxSuggestions: Int): List<SymSpell.SuggestItem> {
+    override fun symSpellLookup(term: String, maxSuggestions: Int): List<SymSpell.SuggestItem> =
+        symSpellLookup(term, maxSuggestions, usePersonalization = true)
+
+    override fun symSpellLookup(
+        term: String,
+        maxSuggestions: Int,
+        usePersonalization: Boolean
+    ): List<SymSpell.SuggestItem> {
+        if (maxSuggestions <= 0) return emptyList()
         val normalizedTerm = normalize(term)
-        return entries
-            .map { entry ->
-                val dist = levenshtein(normalizedTerm, normalize(entry.word))
-                SymSpell.SuggestItem(normalize(entry.word), dist, effectiveFrequency(entry))
+        val bestByTerm = LinkedHashMap<String, SymSpell.SuggestItem>()
+        for (entry in entries) {
+            val entryTerm = normalize(entry.word)
+            val dist = levenshtein(normalizedTerm, entryTerm)
+            if (dist <= 2) {
+                val freq = effectiveFrequency(entry, usePersonalization)
+                val existing = bestByTerm[entryTerm]
+                if (existing == null || freq > existing.frequency) {
+                    bestByTerm[entryTerm] = SymSpell.SuggestItem(entryTerm, dist, freq)
+                }
             }
-            .filter { it.distance <= 2 }
-            .sortedWith(compareBy({ it.distance }, { -it.frequency }))
-            .distinctBy { it.term }
+        }
+        return bestByTerm.values
+            .sortedWith(
+                compareBy<SymSpell.SuggestItem> { it.distance }
+                    .thenByDescending { it.frequency }
+                    .thenBy { it.term.length }
+                    .thenBy { it.term }
+            )
             .take(maxSuggestions)
     }
 
-    override fun bestEntryForNormalized(normalized: String): DictionaryEntry? {
+    override fun bestEntryForNormalized(normalized: String): DictionaryEntry? =
+        bestEntryForNormalized(normalized, usePersonalization = true)
+
+    override fun bestEntryForNormalized(normalized: String, usePersonalization: Boolean): DictionaryEntry? {
         return entries
             .filter { normalize(it.word) == normalized }
-            .maxByOrNull { effectiveFrequency(it) }
+            .minWithOrNull(entryComparator(usePersonalization))
     }
 
-    override fun topByNormalized(normalized: String, limit: Int): List<DictionaryEntry> {
+    override fun topByNormalized(normalized: String, limit: Int): List<DictionaryEntry> =
+        topByNormalized(normalized, limit, usePersonalization = true)
+
+    override fun topByNormalized(
+        normalized: String,
+        limit: Int,
+        usePersonalization: Boolean
+    ): List<DictionaryEntry> {
+        if (limit <= 0) return emptyList()
         return entries
             .filter { normalize(it.word) == normalized }
-            .sortedByDescending { effectiveFrequency(it) }
+            .sortedWith(entryComparator(usePersonalization))
             .take(limit)
+    }
+
+    private fun entryComparator(usePersonalization: Boolean): Comparator<DictionaryEntry> {
+        return if (usePersonalization) {
+            compareByDescending<DictionaryEntry> { effectiveFrequency(it) }
+        } else {
+            compareByDescending<DictionaryEntry> { effectiveFrequency(it, usePersonalization = false) }
+                .thenBy { it.source.ordinal }
+                .thenBy { it.word.lowercase(baseLocale) }
+                .thenBy { it.word }
+        }
     }
 
     override fun topCommonEntries(limit: Int): List<DictionaryEntry> {

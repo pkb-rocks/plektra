@@ -221,6 +221,247 @@ class SuggestionPersonalizationAndAddWordTest {
     }
 
     @Test
+    fun androidDictionaryRepository_personalizationOff_symSpellPreselectionIsIndependentOfUserUsageCounts() {
+        fun buildRepo(userFrequency: Int): AndroidDictionaryRepository {
+            val repo = AndroidDictionaryRepository(
+                context = context,
+                assets = context.assets,
+                userDictionaryStore = UserDictionaryStore(),
+                baseLocale = Locale.ENGLISH
+            )
+            repo.isReady = true
+            val entries = buildList {
+                add(DictionaryEntry("azzz", 200, SuggestionSource.MAIN))
+                for (letter in 'b'..'m') {
+                    add(DictionaryEntry("${letter}zzz", userFrequency, SuggestionSource.USER))
+                }
+            }
+            repo.index(entries)
+            repo.buildSymSpell()
+            return repo
+        }
+
+        val lowUsageRepo = buildRepo(userFrequency = 1)
+        val highUsageRepo = buildRepo(userFrequency = 255)
+
+        val offLow = SuggestionEngine(lowUsageRepo, locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = false)
+        val offHigh = SuggestionEngine(highUsageRepo, locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = false)
+
+        // Exact results and ordering must be identical regardless of USER usage counts when OFF.
+        assertEquals(listOf("azzz", "bzzz", "czzz"), offLow.map { it.candidate })
+        assertEquals(offLow, offHigh)
+
+        // Negative control: when ON, high USER usage counts DO personalize and displace MAIN.
+        val onHigh = SuggestionEngine(highUsageRepo, locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = true)
+        assertFalse(onHigh.any { it.candidate == "azzz" })
+        assertTrue(onHigh.all { it.source == SuggestionSource.USER })
+    }
+
+    @Test
+    fun androidDictionaryRepository_personalizationOff_symSpellWithMoreThanTwelveMainAndUserCandidates() {
+        fun buildRepo(userFrequency: Int): AndroidDictionaryRepository {
+            val repo = AndroidDictionaryRepository(
+                context = context,
+                assets = context.assets,
+                userDictionaryStore = UserDictionaryStore(),
+                baseLocale = Locale.ENGLISH
+            )
+            repo.isReady = true
+            val entries = buildList {
+                // 14 MAIN candidates at edit distance 1 from "zzzz", plus 14 USER candidates.
+                for ((idx, letter) in ('a'..'n').withIndex()) {
+                    add(DictionaryEntry("${letter}zzz", 180 + idx, SuggestionSource.MAIN))
+                }
+                for (letter in 'o'..'z') {
+                    add(DictionaryEntry("${letter}zzz", userFrequency, SuggestionSource.USER))
+                }
+                add(DictionaryEntry("zzza", userFrequency, SuggestionSource.USER))
+                add(DictionaryEntry("zzzb", userFrequency, SuggestionSource.USER))
+            }
+            repo.index(entries)
+            repo.buildSymSpell()
+            return repo
+        }
+
+        val offLow = SuggestionEngine(buildRepo(1), locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = false)
+        val offHigh = SuggestionEngine(buildRepo(255), locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = false)
+
+        assertEquals(listOf("nzzz", "mzzz", "lzzz"), offLow.map { it.candidate })
+        assertEquals(offLow, offHigh)
+
+        // Negative control: ON still ranks high-usage USER candidates ahead of MAIN.
+        val onHigh = SuggestionEngine(buildRepo(255), locale = Locale.ENGLISH)
+            .suggest("zzzz", limit = 3, useKeyboardProximity = false, useEditTypeRanking = false, usePersonalization = true)
+        assertTrue(onHigh.all { it.source == SuggestionSource.USER })
+    }
+
+    @Test
+    fun androidDictionaryRepository_personalizationOff_prefixPreselectionExceedingLimitIgnoresUserUsageCounts() {
+        fun buildRepo(userFrequency: Int): AndroidDictionaryRepository {
+            val repo = AndroidDictionaryRepository(
+                context = context,
+                assets = context.assets,
+                userDictionaryStore = UserDictionaryStore(),
+                baseLocale = Locale.ENGLISH
+            )
+            repo.isReady = true
+            val entries = buildList {
+                add(DictionaryEntry("helium", 210, SuggestionSource.MAIN))
+                add(DictionaryEntry("helmet", 200, SuggestionSource.MAIN))
+                add(DictionaryEntry("helped", 190, SuggestionSource.MAIN))
+                // Exceed the 200-entry prefix bucket preselection cap with letter-only USER words
+                // of the exact same length (no numeric malus or length penalty bias).
+                var count = 0
+                for (c1 in 'a'..'i') {
+                    for (c2 in 'a'..'z') {
+                        if (count >= 220) break
+                        val word = "hel${c1}${c2}x"
+                        val freq = if (userFrequency == 255) 255 - (count % 50) else 1
+                        add(DictionaryEntry(word, freq, SuggestionSource.USER))
+                        count++
+                    }
+                    if (count >= 220) break
+                }
+                // Deliberate USER word that does not compete with MAIN under a distinct prefix.
+                add(DictionaryEntry("zylophonecustom", userFrequency, SuggestionSource.USER))
+            }
+            repo.index(entries)
+            repo.buildSymSpell()
+            return repo
+        }
+
+        val lowRepo = buildRepo(1)
+        val highRepo = buildRepo(255)
+
+        val offLow = SuggestionEngine(lowRepo, locale = Locale.ENGLISH)
+            .suggest("hel", limit = 3, usePersonalization = false)
+        val offHigh = SuggestionEngine(highRepo, locale = Locale.ENGLISH)
+            .suggest("hel", limit = 3, usePersonalization = false)
+
+        assertEquals(listOf("helium", "helmet", "helped"), offLow.map { it.candidate })
+        assertEquals(offLow, offHigh)
+
+        // Deliberate USER words are preserved and still suggestible when OFF.
+        val customOff = SuggestionEngine(highRepo, locale = Locale.ENGLISH)
+            .suggest("zyloph", limit = 3, usePersonalization = false)
+        assertEquals(listOf("zylophonecustom"), customOff.map { it.candidate })
+
+        // Negative control: ON still surfaces high-usage USER prefix words.
+        val onHigh = SuggestionEngine(highRepo, locale = Locale.ENGLISH)
+            .suggest("hel", limit = 3, usePersonalization = true)
+        assertTrue(onHigh.all { it.source == SuggestionSource.USER })
+    }
+
+    @Test
+    fun androidDictionaryRepository_personalizationOff_normalizedListsAndAutoReplaceAccentPathIgnoreUserUsageCounts() {
+        fun buildRepo(userFrequency: Int): AndroidDictionaryRepository {
+            val repo = AndroidDictionaryRepository(
+                context = context,
+                assets = context.assets,
+                userDictionaryStore = UserDictionaryStore(),
+                baseLocale = Locale.FRENCH
+            )
+            repo.isReady = true
+            val entries = buildList {
+                // Single-char accented MAIN vs >5 USER variants under normalized "e".
+                add(DictionaryEntry("é", 210, SuggestionSource.MAIN))
+                add(DictionaryEntry("è", 200, SuggestionSource.MAIN))
+                listOf("ê", "ë", "ē", "ĕ", "ė", "ę", "ě").forEachIndexed { idx, variant ->
+                    val freq = if (userFrequency == 255) 255 - idx else 1
+                    add(DictionaryEntry(variant, freq, SuggestionSource.USER))
+                }
+
+                // Multi-char accent variants exceeding AutoReplaceController's topByNormalized(limit = 8) cap.
+                add(DictionaryEntry("café", 200, SuggestionSource.MAIN))
+                listOf("càfe", "cáfe", "câfe", "cãfe", "cäfe", "cåfe", "cafè", "cafê", "cafë")
+                    .forEachIndexed { idx, variant ->
+                        val freq = if (userFrequency == 255) 255 - idx else 1
+                        add(DictionaryEntry(variant, freq, SuggestionSource.USER))
+                    }
+
+                // Deliberate USER-only accent variant (no MAIN counterpart).
+                add(DictionaryEntry("zérox", userFrequency, SuggestionSource.USER))
+
+                // Case-variant path: MAIN "Problem" vs >8 high-usage USER variants under normalized "problem".
+                add(DictionaryEntry("Problem", 200, SuggestionSource.MAIN))
+                listOf("pròblem", "próblem", "prôblem", "pröblem", "problèm", "problém", "problêm", "problëm", "PROBLEM")
+                    .forEachIndexed { idx, variant ->
+                        val freq = if (userFrequency == 255) 255 - idx else 1
+                        add(DictionaryEntry(variant, freq, SuggestionSource.USER))
+                    }
+            }
+            repo.index(entries)
+            repo.buildSymSpell()
+            return repo
+        }
+
+        val lowRepo = buildRepo(1)
+        val highRepo = buildRepo(255)
+
+        // Single-char normalized list path when OFF.
+        val singleOffLow = SuggestionEngine(lowRepo, locale = Locale.FRENCH)
+            .suggest("e", limit = 3, usePersonalization = false)
+        val singleOffHigh = SuggestionEngine(highRepo, locale = Locale.FRENCH)
+            .suggest("e", limit = 3, usePersonalization = false)
+        assertEquals(listOf("é", "è"), singleOffLow.take(2).map { it.candidate })
+        assertEquals(singleOffLow, singleOffHigh)
+
+        // AutoReplaceController direct accent-variant path when OFF.
+        fun runAutoReplace(repo: AndroidDictionaryRepository, input: String, personalization: Boolean): AutoReplaceController.ReplaceResult {
+            val engine = SuggestionEngine(repo, locale = Locale.FRENCH)
+            val controller = AutoReplaceController(
+                repository = repo,
+                suggestionEngine = engine,
+                settingsProvider = {
+                    SuggestionSettings(
+                        autoReplaceOnSpaceEnter = true,
+                        accentMatching = true,
+                        personalizationEnabled = personalization,
+                        maxAutoReplaceDistance = 1
+                    )
+                }
+            )
+            val tracker = CurrentWordTracker(onWordChanged = {}, onWordReset = {})
+            tracker.setWord(input)
+            val connection = RecordingInputConnection(context, input)
+            return controller.handleBoundary(
+                keyCode = KeyEvent.KEYCODE_SPACE,
+                event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE),
+                tracker = tracker,
+                inputConnection = connection
+            )
+        }
+
+        val accentOffLow = runAutoReplace(lowRepo, "cafe", personalization = false)
+        val accentOffHigh = runAutoReplace(highRepo, "cafe", personalization = false)
+        assertTrue(accentOffLow.replaced)
+        assertEquals("café", accentOffLow.replacement)
+        assertEquals(accentOffLow, accentOffHigh)
+
+        // Deliberate USER-only accent variant still replaces when OFF.
+        val userOnlyOff = runAutoReplace(highRepo, "zerox", personalization = false)
+        assertTrue(userOnlyOff.replaced)
+        assertEquals("zérox", userOnlyOff.replacement)
+
+        // Negative control: when ON, high-usage USER accent variant wins.
+        val accentOnHigh = runAutoReplace(highRepo, "cafe", personalization = true)
+        assertTrue(accentOnHigh.replaced)
+        assertEquals("càfe", accentOnHigh.replacement)
+
+        // Primary dictionary case-variant path when OFF is also independent of USER usage counts.
+        val caseOffLow = runAutoReplace(lowRepo, "problem", personalization = false)
+        val caseOffHigh = runAutoReplace(highRepo, "problem", personalization = false)
+        assertTrue(caseOffLow.replaced)
+        assertEquals("Problem", caseOffLow.replacement)
+        assertEquals(caseOffLow, caseOffHigh)
+    }
+
+    @Test
     fun personalizationAndAddWordButtonSettings_operateIndependentlyAndRefreshOnToggle() {
         var personalizationEnabled = true
         var showAddWordButton = true
@@ -374,8 +615,11 @@ class SuggestionPersonalizationAndAddWordTest {
         } as InputConnection
     }
 
-    private class TrackingDictionaryRepository : DictionaryRepository by FakeDictionaryRepository() {
-        private val delegate = FakeDictionaryRepository()
+    private class TrackingDictionaryRepository private constructor(
+        private val delegate: FakeDictionaryRepository
+    ) : DictionaryRepository by delegate {
+        constructor() : this(FakeDictionaryRepository())
+
         val markedUsedWords = mutableListOf<String>()
 
         override var isReady: Boolean
@@ -390,23 +634,10 @@ class SuggestionPersonalizationAndAddWordTest {
             delegate.addTestEntry(word, frequency, source)
         }
 
-        override suspend fun loadIfNeeded() = delegate.loadIfNeeded()
-        override suspend fun refreshUserEntries() = delegate.refreshUserEntries()
-        override fun addUserEntryQuick(word: String) = delegate.addUserEntryQuick(word)
-        override fun removeUserEntry(word: String) = delegate.removeUserEntry(word)
         override fun markUsed(word: String) {
             markedUsedWords.add(word)
             delegate.markUsed(word)
         }
-        override fun effectiveFrequency(entry: DictionaryEntry) = delegate.effectiveFrequency(entry)
-        override fun getExactWordFrequency(word: String) = delegate.getExactWordFrequency(word)
-        override fun lookupByPrefixMerged(prefix: String, maxSize: Int) = delegate.lookupByPrefixMerged(prefix, maxSize)
-        override fun symSpellLookup(term: String, maxSuggestions: Int) = delegate.symSpellLookup(term, maxSuggestions)
-        override fun bestEntryForNormalized(normalized: String) = delegate.bestEntryForNormalized(normalized)
-        override fun topByNormalized(normalized: String, limit: Int) = delegate.topByNormalized(normalized, limit)
-        override fun topCommonEntries(limit: Int) = delegate.topCommonEntries(limit)
-        override fun isKnownWord(word: String) = delegate.isKnownWord(word)
-        override fun ensureLoadScheduled(background: () -> Unit) = delegate.ensureLoadScheduled(background)
     }
 
     private class RecordingInputConnection(

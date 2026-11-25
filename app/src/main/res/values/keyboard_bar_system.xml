@@ -2,6 +2,10 @@
 <resources>
     <string name="keyboard_bar_system_controls">System keyboard bar</string>
     <string name="keyboard_bar_system_controls_description">Open Android settings for the keyboard switch and hide buttons.</string>
+    <string name="keyboard_bar_hide_ime_caption_bar">Hide navigation bar below Plektra</string>
+    <string name="keyboard_bar_hide_ime_caption_bar_description">While Plektra is open, hides Android\'s navigation handle and the back and keyboard switch buttons below it. Navigation in other apps stays unchanged.</string>
+    <string name="keyboard_bar_ime_switcher_in_bar">Keyboard switch button in the bar</string>
+    <string name="keyboard_bar_ime_switcher_in_bar_description">Otherwise it is in the ☰ menu. While Plektra hides the navigation bar, Android asks for the button and it stays in the bar.</string>
     <string name="status_bar_button_keyboard_picker">Switch keyboard</string>
     <string name="status_bar_button_keyboard_picker_description">Choose another Android keyboard</string>
 </resources>

@@ -22,8 +22,7 @@ class KeyboardPickerButtonFactory : StatusBarButtonFactory {
         // Use the IME context so Android associates the picker with this display.
         button.setOnClickListener {
             button.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager)
-                ?.showInputMethodPicker()
+            rocks.pkb.plektra.inputmethod.ImeSwitcher.open(context)
         }
 
         return ButtonCreationResult(view = button)
@@ -35,7 +34,7 @@ class KeyboardPickerButtonFactory : StatusBarButtonFactory {
 
     private fun createButton(context: Context, size: Int): ImageView {
         return ImageView(context).apply {
-            setImageResource(R.drawable.ic_keyboard_24)
+            setImageResource(rocks.pkb.plektra.inputmethod.ImeSwitcherPolicy.ICON)
             setColorFilter(Color.WHITE)
             contentDescription = context.getString(R.string.status_bar_button_keyboard_picker_description)
             background = StatusBarButtonStyles.createButtonDrawable(size)

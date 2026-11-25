@@ -2420,6 +2420,38 @@ object SettingsManager {
         getPreferences(context).edit().putBoolean("keyboard_bar_show_on_launcher", enabled).apply()
     }
 
+    const val KEY_HIDE_IME_CAPTION_BAR = "hide_ime_caption_bar"
+
+    /**
+     * Whether Plektra hides Android's IME caption bar (navigation handle, back and keyboard
+     * switch below the keyboard) on API 34+. A stored choice always wins; without one, the
+     * device default of [rocks.pkb.plektra.inputmethod.ImeCaptionBarDefaults] applies and is
+     * never persisted.
+     */
+    fun getHideImeCaptionBar(context: Context): Boolean {
+        val prefs = getPreferences(context)
+        return if (prefs.contains(KEY_HIDE_IME_CAPTION_BAR)) prefs.getBoolean(KEY_HIDE_IME_CAPTION_BAR, false)
+        else rocks.pkb.plektra.inputmethod.ImeCaptionBarDefaults.hideByDefault()
+    }
+
+    fun setHideImeCaptionBar(context: Context, hide: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_HIDE_IME_CAPTION_BAR, hide).apply()
+    }
+
+    const val KEY_IME_SWITCHER_IN_BAR = "ime_switcher_in_bar"
+
+    /**
+     * Whether the user prefers Plektra's IME switcher directly in the bar over the ☰ menu alone.
+     * Off by default. See [rocks.pkb.plektra.inputmethod.ImeSwitcherPolicy] for when Android
+     * requires it in the bar anyway.
+     */
+    fun getImeSwitcherInBar(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_IME_SWITCHER_IN_BAR, false)
+
+    fun setImeSwitcherInBar(context: Context, inBar: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_IME_SWITCHER_IN_BAR, inBar).apply()
+    }
+
     // Apps in which the keyboard bar never appears, regardless of every other visibility setting.
     const val KEY_KEYBOARD_BAR_HIDDEN_APPS = "keyboard_bar_hidden_apps"
 

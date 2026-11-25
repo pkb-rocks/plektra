@@ -1,5 +1,6 @@
 package rocks.pkb.plektra
 
+import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -67,6 +68,8 @@ internal fun KeyboardBarSettingsScreen(
     var suggestionsEnabled by remember { mutableStateOf(SettingsManager.getSuggestionsEnabled(context)) }
     var suggestionsBold by remember { mutableStateOf(SettingsManager.getSuggestionsBold(context)) }
     var showOnLauncher by remember { mutableStateOf(SettingsManager.getShowKeyboardBarOnLauncher(context)) }
+    var hideImeCaptionBar by remember { mutableStateOf(SettingsManager.getHideImeCaptionBar(context)) }
+    var imeSwitcherInBar by remember { mutableStateOf(SettingsManager.getImeSwitcherInBar(context)) }
     var hiddenAppCount by remember { mutableStateOf(SettingsManager.getKeyboardBarHiddenPackages(context).size) }
     var hardwareOnly by remember { mutableStateOf(SettingsManager.getHardwareOnlyMode(context)) }
     var hardwareOnlyConfirmation by remember { mutableStateOf(false) }
@@ -244,6 +247,18 @@ internal fun KeyboardBarSettingsScreen(
             KeyboardBarNavigationRow(Icons.Filled.Tune, stringResource(R.string.keyboard_bar_variations_title),
                 stringResource(R.string.keyboard_bar_variations_summary), "keyboard_bar.variations") {
                 openSettingsChild(context, "customization", "KeyboardBarVariations")
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_hide_ime_caption_bar), hideImeCaptionBar,
+                    "keyboard_bar.hide_ime_caption_bar", stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
+                    hideImeCaptionBar = it
+                    SettingsManager.setHideImeCaptionBar(context, it)
+                }
+            }
+            KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_ime_switcher_in_bar), imeSwitcherInBar,
+                "keyboard_bar.ime_switcher_in_bar", stringResource(R.string.keyboard_bar_ime_switcher_in_bar_description)) {
+                imeSwitcherInBar = it
+                SettingsManager.setImeSwitcherInBar(context, it)
             }
             KeyboardBarNavigationRow(Icons.Filled.Tune, stringResource(R.string.keyboard_bar_system_controls),
                 stringResource(R.string.keyboard_bar_system_controls_description), "keyboard_bar.system_controls") {

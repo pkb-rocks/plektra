@@ -282,6 +282,13 @@ class VariationBarView(
             context.resources.displayMetrics
         ).toInt()
 
+    /** Height and spacing of the row's fixed buttons, for overlays that replace the row. */
+    internal fun rowButtonMetrics(): HamburgerMenuView.RowButtonMetrics =
+        HamburgerMenuView.RowButtonMetrics(
+            heightPx = (targetHeightPx() - 2 * verticalPaddingPx()).coerceAtLeast(1),
+            spacingPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics).toInt()
+        )
+
     private fun verticalPaddingPx(): Int =
         TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -513,7 +520,8 @@ class VariationBarView(
             SettingsManager.getDynamicVariationBarSlotCount(context),
             SettingsManager.getDynamicVariationBarResizeToContent(context),
             SettingsManager.getStatusBarSlotsLeft(context), SettingsManager.getStatusBarSlotsRight(context),
-            buttonRegistry?.keypadAccessAvailable == true
+            buttonRegistry?.keypadAccessAvailable == true,
+            buttonRegistry?.imeSwitcherShown == true
         )
         val hasExistingRow = currentVariationsRow != null &&
             currentVariationsRow?.parent == containerView &&

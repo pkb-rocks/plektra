@@ -73,6 +73,8 @@ class EmojiPickerView(
     private val searchPanel: FrameLayout
     private val searchToggleButton: ImageView
     private val closeButton: ImageView
+    /** Android's requested IME switcher (API 36+) while this picker replaces the keyboard bar. */
+    private val imeSwitcherButton: ImageView
     private var controlsHeight = 0
     val edgeControls: Pair<View, View> get() = searchToggleButton to closeButton
 
@@ -213,6 +215,20 @@ class EmojiPickerView(
             setOnClickListener {
                 onCloseRequested?.invoke()
             }
+        }
+
+        imeSwitcherButton = ImageView(context).apply {
+            setImageResource(rocks.pkb.plektra.inputmethod.ImeSwitcherPolicy.ICON)
+            contentDescription = context.getString(R.string.change_keyboard_button)
+            background = createTabBackground(false)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            val pad = dpToPx(4f)
+            setPadding(pad, pad, pad, pad)
+            isClickable = true
+            isFocusable = true
+            visibility = View.GONE
+            layoutParams = LinearLayout.LayoutParams(dpToPx(36f), dpToPx(32f))
+            setOnClickListener { rocks.pkb.plektra.inputmethod.ImeSwitcher.open(context) }
         }
 
         // RecyclerView with headers and emoji grid
@@ -375,6 +391,7 @@ class EmojiPickerView(
                 addView(searchToggleButton)
                 addView(keyboardSwitcherButton)
                 addView(tabScrollView, LinearLayout.LayoutParams(0, tabHeight, 1f))
+                addView(imeSwitcherButton)
                 addView(closeButton)
             }
         )
@@ -436,11 +453,11 @@ class EmojiPickerView(
             (category as? ImageView)?.scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
         fun sizeControls(width: Int) {
-            listOf(searchToggleButton, keyboardSwitcherButton, closeButton).forEach { button ->
+            listOf(searchToggleButton, keyboardSwitcherButton, imeSwitcherButton, closeButton).forEach { button ->
                 button.layoutParams = (button.layoutParams as LinearLayout.LayoutParams).apply {
                     this.width = width / 10
                     this.height = height
-                    marginEnd = if (button === searchToggleButton) spacing else 0
+                    marginEnd = if (button === searchToggleButton || button === imeSwitcherButton) spacing else 0
                 }
             }
             applyEdgeControlAppearance()
@@ -450,7 +467,7 @@ class EmojiPickerView(
     }
 
     private fun applyEdgeControlAppearance() {
-        listOf(searchToggleButton, closeButton).forEach { button ->
+        listOf(searchToggleButton, imeSwitcherButton, closeButton).forEach { button ->
             val theme = themeOverride
             val selected = button === searchToggleButton && isSearchPanelVisible
             val flat = if (button === closeButton) createCloseButtonBackground() else createTabBackground(selected)
@@ -462,7 +479,15 @@ class EmojiPickerView(
                     theme?.divider, dpToPx(1f), flat))
         }
         val bar = closeButton.parent as? LinearLayout ?: return
-        rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.bind(bar, listOf(searchToggleButton, closeButton))
+        rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.bind(bar, listOf(searchToggleButton, imeSwitcherButton, closeButton))
+    }
+
+    /** Shows the IME switcher left of the close button; the host decides where it belongs. */
+    fun setImeSwitcherVisible(visible: Boolean) {
+        val visibility = if (visible) View.VISIBLE else View.GONE
+        if (imeSwitcherButton.visibility == visibility) return
+        imeSwitcherButton.visibility = visibility
+        (imeSwitcherButton.parent as? View)?.requestLayout()
     }
 
     fun configureSoftwareKeyboardMode(heightPx: Int?, onKeyboardLayoutRequested: (() -> Unit)?) {
@@ -1385,6 +1410,7 @@ class EmojiPickerView(
         searchToggleButton.background = createSearchToggleBackground(isSearchPanelVisible)
         keyboardSwitcherButton.setColorFilter(theme?.textAndIcons ?: Color.WHITE)
         keyboardSwitcherButton.background = createTabBackground(false)
+        imeSwitcherButton.setColorFilter(theme?.textAndIcons ?: Color.WHITE)
         applyEdgeControlAppearance()
         emptyView.setTextColor(colorWithAlpha(theme?.textAndIcons ?: Color.WHITE, 128))
         updateTabsSelection()

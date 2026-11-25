@@ -2,6 +2,10 @@
 <resources>
     <string name="keyboard_bar_system_controls">System-Tastaturleiste</string>
     <string name="keyboard_bar_system_controls_description">Android-Einstellungen für Tastaturwechsel und Ausblendpfeil öffnen.</string>
+    <string name="keyboard_bar_hide_ime_caption_bar">Navigationsleiste unter Plektra ausblenden</string>
+    <string name="keyboard_bar_hide_ime_caption_bar_description">Blendet bei geöffnetem Plektra Androids Navigationsgriff sowie Zurück- und Tastaturwechseltaste darunter aus. Die Navigation in anderen Apps bleibt unverändert.</string>
+    <string name="keyboard_bar_ime_switcher_in_bar">Tastaturwechseltaste in der Leiste</string>
+    <string name="keyboard_bar_ime_switcher_in_bar_description">Sonst liegt sie im ☰-Menü. Solange Plektra die Navigationsleiste ausblendet, verlangt Android die Taste; sie bleibt dann in der Leiste.</string>
     <string name="status_bar_button_keyboard_picker">Tastatur wechseln</string>
     <string name="status_bar_button_keyboard_picker_description">Andere Android-Tastatur auswählen</string>
 </resources>

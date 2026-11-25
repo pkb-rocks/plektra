@@ -365,6 +365,17 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private val accidentalKeyPressFilter = AccidentalKeyPressFilter()
     private val physicalKeyResolver = PhysicalKeyResolver()
     private val clicksPowerButtonEventMapper = ClicksPowerButtonEventMapper()
+    private val imeCaptionBarController = ImeCaptionBarController()
+
+    /**
+     * Android's latest request for Plektra's own IME switcher (API 36+). It lives as long as the
+     * service: Android may send it before the window is shown and does not repeat it per show.
+     */
+    internal var imeSwitcherRequested = false
+        private set
+    /** Set once onCreate has built the controllers a status update needs. */
+    private var serviceCreated = false
+    private var imeCaptionBarRetryDecor: View? = null
     private var dispatchingClicksAccessibilityKeyEvent = false
     private var replayingProtectedNumberKey = false
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -598,8 +609,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 clicksConnectionChanged = didClicksConnectionChange,
                 clicksDisconnected = didClicksDisconnect
             )
-            // The panel contour default may follow the connected input devices; a stored
-            // calibration wins either way.
+            // Device defaults for the caption bar and the panel contour may follow the connected
+            // input devices; re-evaluate them. Stored choices win either way.
+            applyImeCaptionBarVisibility()
             candidatesBarController.onInputDevicesChanged()
         }
         pendingInputDeviceModeRefresh = refresh
@@ -2545,6 +2557,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 Handler(Looper.getMainLooper()).post {
                     updateStatusBarText()
                 }
+            } else if (key == SettingsManager.KEY_HIDE_IME_CAPTION_BAR) {
+                applyImeCaptionBarVisibility()
+            } else if (key == SettingsManager.KEY_IME_SWITCHER_IN_BAR) {
+                invalidateRenderedStatusSnapshot()
+                updateStatusBarText()
             } else if (key == "physical_keyboard_profile_override") {
                 Log.d(TAG, "Physical keyboard profile override changed, reloading Device SYM and Alt modifier mappings...")
                 physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
@@ -2835,6 +2852,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         } else {
             Log.d(TRACKPAD_DEBUG_TAG, "onCreate: Initial Shizuku detector start skipped")
         }
+        serviceCreated = true
     }
 
     private fun handleSoftwareKeyboardTextInput(
@@ -3129,6 +3147,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
     
     override fun onDestroy() {
+        serviceCreated = false
         disableSmoothCaretExperiment()
         if (::smoothCaretOverlayController.isInitialized) smoothCaretOverlayController.release()
         caretBadgeController.destroy()
@@ -3221,6 +3240,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         SettingsManager.initializeNavModeMappingsFile(this)
         clearAltOnSpaceEnabled = SettingsManager.getClearAltOnSpace(this)
         physicalKeyboardProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(this)
+        applyImeCaptionBarVisibility()
         updateModifierTapLatchSettings()
         typingSoundPlayer.reload()
         alternateCharacterManager.reloadSymMappings()
@@ -3709,6 +3729,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             keypadAccessAvailable = state.isEditable &&
                 effectiveSoftwareKeyboardMode != SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL &&
                 SoftwareKeypadPolicy.autoKeypadFor(state.inputType) != SoftwareKeypad.FULL,
+            // Android's request stays as sent; the policy decides what the surfaces show.
+            imeSwitcherShown = ImeSwitcherPolicy.showOnSurfaces(
+                androidRequested = imeSwitcherRequested,
+                preferInBar = SettingsManager.getImeSwitcherInBar(this),
+                surfacesBlocked = plektraSurfacesBlocked
+            ),
             // Legacy flag for backward compatibility
             shouldDisableSmartFeatures = shouldDisableSmartFeatures
         )
@@ -4265,9 +4291,53 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     
     override fun onWindowShown() {
         super.onWindowShown()
+        applyImeCaptionBarVisibility()
         keyboardVisibilityController.onImeWindowVisibilityChanged(shown = true)
         updateStatusBarText()
         attachTrackpadDecorViewMotionHook("onWindowShown")
+    }
+
+    /**
+     * API 36+: while Plektra hides the IME caption bar, Android hands its IME switcher button to
+     * the IME. [ImeSwitcherPolicy] then shows it on every surface Plektra shows; a surface the
+     * per-app or global hardware-only setting blocks stays hidden. Older versions never call this; it calls no newer API.
+     */
+    override fun onCustomImeSwitcherButtonRequestedVisible(visible: Boolean) {
+        if (imeSwitcherRequested == visible) return
+        imeSwitcherRequested = visible
+        // Android may call this before onCreate; the first status update then reads the request.
+        if (!serviceCreated) return
+        invalidateRenderedStatusSnapshot()
+        updateStatusBarText()
+    }
+
+    /**
+     * Applies the caption bar choice to the IME window. The current caption bar state is known
+     * only once the decor is attached; before that the choice is applied again on attach.
+     */
+    private fun applyImeCaptionBarVisibility() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+        val imeWindow = window?.window ?: return
+        val decor = imeWindow.peekDecorView()
+        val captionBarVisible = ImeCaptionBarController.captionBarVisible(decor)
+        val waiting = imeCaptionBarController.update(
+            imeWindow.insetsController,
+            SettingsManager.getHideImeCaptionBar(this),
+            captionBarVisible
+        )
+        // Without a decor, onWindowShown applies the choice again.
+        if (waiting && decor != null && !decor.isAttachedToWindow && imeCaptionBarRetryDecor !== decor) {
+            imeCaptionBarRetryDecor = decor
+            decor.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) {
+                    v.removeOnAttachStateChangeListener(this)
+                    if (imeCaptionBarRetryDecor === v) imeCaptionBarRetryDecor = null
+                    applyImeCaptionBarVisibility()
+                }
+
+                override fun onViewDetachedFromWindow(v: View) = Unit
+            })
+        }
     }
 
     private fun shouldStartShizukuTrackpadDetector(): Boolean {

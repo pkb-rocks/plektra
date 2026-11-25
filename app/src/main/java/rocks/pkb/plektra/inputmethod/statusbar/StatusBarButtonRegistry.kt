@@ -173,9 +173,33 @@ class StatusBarButtonRegistry {
         ))
     }
 
+    /**
+     * Plektra's IME switcher is shown on the surfaces ([rocks.pkb.plektra.inputmethod.ImeSwitcherPolicy]).
+     * The keyboard picker then joins the right-hand buttons unless it is configured.
+     */
+    var imeSwitcherShown: Boolean = false
+
+    /** Buttons the user configured for the slim bar, without contextual additions. */
+    fun hasConfiguredSlimButtons(context: Context): Boolean = getEnabledButtons(
+        leftSlots = SettingsManager.getSlimStatusBarSlotsLeft(context),
+        rightSlots = SettingsManager.getSlimStatusBarSlotsRight(context)
+    ).isNotEmpty() || keypadAccessAvailable
+
     private fun withContextualButtons(buttons: List<StatusBarButtonConfig>): List<StatusBarButtonConfig> {
-        if (!keypadAccessAvailable) return buttons
-        return listOf(StatusBarButtonConfig(StatusBarButtonId.Keypad, StatusBarButtonPosition.RIGHT, order = Int.MIN_VALUE)) + buttons
+        val keypad = if (keypadAccessAvailable) {
+            listOf(StatusBarButtonConfig(StatusBarButtonId.Keypad, StatusBarButtonPosition.RIGHT, order = Int.MIN_VALUE))
+        } else emptyList()
+        val switcher = if (imeSwitcherShown && buttons.none { it.id == StatusBarButtonId.KeyboardPicker }) {
+            listOf(IME_SWITCHER)
+        } else emptyList()
+        return keypad + buttons + switcher
+    }
+
+    companion object {
+        /** The keyboard picker as the shown IME switcher, last on the right. */
+        val IME_SWITCHER = StatusBarButtonConfig(
+            StatusBarButtonId.KeyboardPicker, StatusBarButtonPosition.RIGHT, order = Int.MAX_VALUE
+        )
     }
 
     fun getEnabledButtons(

@@ -298,6 +298,8 @@ class StatusBarController(
 
     companion object {
         private const val TAG = "StatusBarController"
+        // Covers the lowest row of the slim bar, the expanded bar and the software keyboard.
+        private const val HIT_BOUNDS_BAND_DP = 56f
         private val DEFAULT_BACKGROUND = Color.parseColor("#000000")
         private const val HARDWARE_SYM_KEY_HEIGHT_DP = 56f
     }
@@ -344,6 +346,8 @@ class StatusBarController(
         val softwareKeypad: SoftwareKeypad = SoftwareKeypad.FULL,
         /** Shows the contextual keypad button in the hardware keyboard bar. */
         val keypadAccessAvailable: Boolean = false,
+        /** Plektra's IME switcher on the visible surfaces, as [ImeSwitcherPolicy] decided. */
+        val imeSwitcherShown: Boolean = false,
         // Legacy flag for backward compatibility
         val shouldDisableSmartFeatures: Boolean = false
     ) {
@@ -357,6 +361,14 @@ class StatusBarController(
     private var symSurfaceContainer: FrameLayout? = null
     private var symSurfaceStack: LinearLayout? = null
     private var symSurfaceCloseButton: View? = null
+    /** The requested IME switcher beside the trailing close control of the clipboard surfaces. */
+    private var symSurfaceSwitcherButton: View? = null
+    /**
+     * Android requests the IME switcher (API 36+) while a hardware SYM page or the clipboard
+     * overlay replaces the keyboard bar's rows; that surface then shows it itself.
+     */
+    private var surfaceSwitcherRequested = false
+    private var lastSymSwitcherRendered = false
     private val surfaceCloseSlotTag = "plektra.surface_close_slot"
     private var emojiKeyboardContainer: LinearLayout? = null
     private var clipboardHistoryView: ClipboardHistoryView? = null
@@ -410,7 +422,7 @@ class StatusBarController(
     private var hamburgerMenuView: HamburgerMenuView? = null
     private var slimModeActive: Boolean = false
     val hasConfiguredMenuButtons: Boolean
-        get() = slimModeActive && buttonRegistry.getEnabledSlimButtons(context).isNotEmpty()
+        get() = slimModeActive && buttonRegistry.hasConfiguredSlimButtons(context)
     private var hasTransientSurface: Boolean = false
     val hasTransientContent: Boolean
         get() = hasTransientSurface || expansionSuggestions.isNotEmpty()
@@ -422,6 +434,8 @@ class StatusBarController(
     private var baseBottomPadding: Int = 0
     private var lastHamburgerInputConnection: android.view.inputmethod.InputConnection? = null
     private var lastInsetsLogSignature: String? = null
+    private var lastHitBoundsLogSignature: String? = null
+    private var lastMandatoryGesturesBottom: Int = 0
     private var softwareKeyboardShown: Boolean = false
     private var lastSoftwareKeyboardHeight: Int = 0
     private var lastSoftwareKeyboardSymPageRendered: Int = 0
@@ -430,6 +444,26 @@ class StatusBarController(
     
     init {
         onHamburgerMenuRequested = { toggleHamburgerMenu() }
+    }
+
+    /** Lowest touch targets for device checks of taps and swipe starts near the gesture zone. */
+    private fun logHitBoundsIfEnabled(chrome: View) {
+        if (!SettingsManager.isImeOverlayDebugLoggingEnabled(context) || !chrome.isShown) return
+        val root = chrome.rootView
+        val rootLocation = IntArray(2).also(root::getLocationOnScreen)
+        val chromeLocation = IntArray(2).also(chrome::getLocationOnScreen)
+        val windowBottom = rootLocation[1] + root.height
+        val contentBottom = chromeLocation[1] + chrome.height - chrome.paddingBottom
+        val report = ImeHitBoundsReport.format(
+            windowBottom = windowBottom,
+            contentBottom = contentBottom,
+            mandatoryGestureTop = windowBottom - lastMandatoryGesturesBottom,
+            cornerRadii = (chrome as? ImeChromeLayout)?.bottomCornerRadiiPx,
+            targets = ImeHitBoundsReport.targets(root, contentBottom, dpToPx(HIT_BOUNDS_BAND_DP))
+        )
+        if (report == lastHitBoundsLogSignature) return
+        lastHitBoundsLogSignature = report
+        Log.d(ImeHitBoundsReport.TAG, report)
     }
 
     private fun logImeOverlayInsetsIfEnabled(
@@ -732,7 +766,21 @@ class StatusBarController(
                         bottomLeftRadius, bottomRightRadius, DisplayCorners.hasKnownRoundedPanel(context),
                         dpToPx(DisplayCorners.KNOWN_PANEL_FALLBACK_RADIUS_DP)
                     )
-                    val bottomInset = max(navAndGestures.bottom, cutout.bottom)
+                    // The caption bar is part of Plektra's own window; its hidden state is the
+                    // system's report, whoever hid it.
+                    val compactCaptionArea = Build.VERSION.SDK_INT >= 34 &&
+                        SettingsManager.getHideImeCaptionBar(context) &&
+                        !insets.isVisible(WindowInsetsCompat.Type.captionBar())
+                    // Stable insets keep the hidden caption height; the visible zone does not.
+                    lastMandatoryGesturesBottom = insets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures()).bottom
+                    val bottomInset = ImeBottomInsetPolicy.resolve(
+                        navigation = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars()).bottom,
+                        gestures = navAndGestures.bottom,
+                        mandatoryGestures = lastMandatoryGesturesBottom,
+                        cutout = cutout.bottom,
+                        compactCaptionArea = compactCaptionArea,
+                        compactClearance = ImeCaptionBarDefaults.compactClearance()
+                    )
                     val appliedBottomPadding = baseBottomPadding + bottomInset
                     (view as? ImeChromeLayout)?.bottomCornerRadiiPx =
                         displayCornerRadii.takeIf { useTitan2EliteRoundedCornerInsets }
@@ -759,6 +807,7 @@ class StatusBarController(
                     )
                     insets
                 }
+                layout.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ -> logHitBoundsIfEnabled(view) }
             }
 
             // Container for modifier indicators (horizontal, left-aligned).
@@ -836,6 +885,10 @@ class StatusBarController(
                 addView(ledStrip)
             }
             symSurfaceCloseButton = createSurfaceCloseButton()
+            symSurfaceSwitcherButton = createKeyboardSelectionButton(0, 0).apply {
+                visibility = View.GONE
+                layoutParams = FrameLayout.LayoutParams(0, 0, Gravity.BOTTOM or Gravity.END)
+            }
             symSurfaceContainer = FrameLayout(context).apply {
                 setTag(R.id.keyboard_artwork_container, true)
                 clipChildren = true
@@ -846,6 +899,7 @@ class StatusBarController(
                 )
                 setBackgroundColor(DEFAULT_BACKGROUND)
                 addView(symSurfaceStack)
+                addView(symSurfaceSwitcherButton)
                 addView(symSurfaceCloseButton)
             }
 
@@ -884,6 +938,7 @@ class StatusBarController(
     private fun attachHamburgerMenu(wrapper: View?) {
         val frame = wrapper as? FrameLayout ?: return
         val menu = hamburgerMenuView ?: HamburgerMenuView(context, buttonRegistry).also { hamburgerMenuView = it }
+        menu.rowButtonMetrics = { variationBarView?.rowButtonMetrics() }
         menu.attachTo(frame)
     }
 
@@ -1320,6 +1375,7 @@ class StatusBarController(
             }
         }
         val colors = activeThemeColors()
+        view.setImeSwitcherVisible(surfaceSwitcherRequested)
         view.configureControls(if (pickerShownAboveSoftwareKeyboard) dpToPx(32f) else hardwareSymKeyHeightPx(colors))
         view.setInputConnection(inputConnection)
 
@@ -1492,7 +1548,8 @@ class StatusBarController(
         val inputConnectionBecameAvailable = lastInputConnectionUsed == null && inputConnection != null
         val theme = activeThemeColors()
         if (lastSymPageRendered == page && lastSymMappingsRendered == symMappings &&
-            lastHardwareSymThemeRendered == theme && !inputConnectionChanged && !inputConnectionBecameAvailable) {
+            lastHardwareSymThemeRendered == theme && !inputConnectionChanged && !inputConnectionBecameAvailable &&
+            lastSymSwitcherRendered == surfaceSwitcherRequested) {
             return
         }
         
@@ -1672,6 +1729,13 @@ class StatusBarController(
                 })
             }
             
+            // The requested IME switcher takes the free trailing cell of the second row, where the
+            // BlackBerry layout keeps its picker; Titan 2 and BlackBerry layouts always show one.
+            if (rowIndex == 1 && surfaceSwitcherRequested) {
+                rowLayout.addView(createKeyboardSelectionButton(keyHeight, fixedKeyWidth),
+                    LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply { marginStart = keySpacing })
+            }
+
             // Per la terza riga, aggiungi placeholder con icona matita a destra
             if (rowIndex == 2) {
                 val rightPlaceholder = createPlaceholderWithPencilButton(keyHeight, page)
@@ -1688,6 +1752,7 @@ class StatusBarController(
 
         // Cache the effective colours too: an asynchronous photo failure changes them.
         lastHardwareSymThemeRendered = theme
+        lastSymSwitcherRendered = surfaceSwitcherRequested
         leaveEmojiPickerBrowseStateIfNeeded(nextPage = page)
         lastSymPageRendered = page
         lastSymMappingsRendered = HashMap(symMappings)
@@ -2807,7 +2872,7 @@ class StatusBarController(
             contentDescription = context.getString(R.string.change_keyboard_button)
         }
         val icon = ImageView(context).apply {
-            setImageResource(R.drawable.ic_globe_24)
+            setImageResource(ImeSwitcherPolicy.ICON)
             setColorFilter(theme.textAndIcons)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             layoutParams = FrameLayout.LayoutParams(
@@ -2816,10 +2881,7 @@ class StatusBarController(
             )
         }
         button.addView(icon)
-        button.setOnClickListener {
-            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.showInputMethodPicker()
-        }
+        button.setOnClickListener { ImeSwitcher.open(context) }
         return button
     }
 
@@ -2839,6 +2901,12 @@ class StatusBarController(
     }
 
     private fun applySurfaceCloseButtonTheme(theme: KeyboardThemeColors) {
+        symSurfaceSwitcherButton?.let { switcher ->
+            (switcher as? ViewGroup)?.let { (it.getChildAt(0) as? ImageView)?.setColorFilter(theme.textAndIcons) }
+            rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.style(switcher,
+                theme.statusBarButton, theme.accent, hardwareSymKeyHeightPx(theme) * theme.chromeCornerRadiusRatio,
+                theme.divider, dpToPx(1f))
+        }
         (symSurfaceCloseButton as? ImageView)?.apply {
             setColorFilter(theme.textAndIcons)
             if ((parent as? View)?.tag == surfaceCloseSlotTag) {
@@ -3268,6 +3336,7 @@ class StatusBarController(
     fun update(snapshot: StatusSnapshot, emojiMapText: String = "", inputConnection: android.view.inputmethod.InputConnection? = null, symMappings: Map<Int, String>? = null) {
         isTitan2Layout = SettingsManager.isTitan2LayoutEnabled(context)
         buttonRegistry.keypadAccessAvailable = snapshot.keypadAccessAvailable
+        buttonRegistry.imeSwitcherShown = snapshot.imeSwitcherShown
         val isFullSoftwareKeyboardMode =
             mode == Mode.INPUT_VIEW &&
                 SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
@@ -3291,6 +3360,15 @@ class StatusBarController(
             !isFullSoftwareKeyboardMode && snapshot.symPage == 0 && !snapshot.clipboardOverlay
         val showSlimMenuButtons = hasConfiguredMenuButtons && !isFullSoftwareKeyboardMode &&
             snapshot.symPage == 0 && !snapshot.clipboardOverlay
+        // The button row of the slim or expanded bar (also above the software keyboard) carries
+        // the shown IME switcher; without one, the suggestions row shows it alone. Hardware
+        // SYM pages and the clipboard overlay replace both rows until they close.
+        val barSymMode = (snapshot.symPage > 0 && !isSoftwareKeyboardOverlayPage) || snapshot.clipboardOverlay
+        val buttonRowCarriesSwitcher = showSlimMenuButtons || barPresentation.actions
+        val imeSwitcherOnly = snapshot.imeSwitcherShown && !buttonRowCarriesSwitcher && !barSymMode
+        // Those surfaces show it themselves: the standard SYM grid in its second row, the emoji
+        // picker in its tab row and the clipboard beside its close control.
+        surfaceSwitcherRequested = snapshot.imeSwitcherShown && barSymMode
         val expansionActive = expansionSuggestions.isNotEmpty()
         val effectiveAddWordCandidate = if (SettingsManager.getSuggestionsAddWordButtonEnabled(context)) {
             snapshot.addWordCandidate
@@ -3318,7 +3396,7 @@ class StatusBarController(
         }
         
         val layout = ensureLayoutCreated(emojiMapText) ?: return
-        if ((!hasSuggestionRow && !showSlimMenuButtons && !barPresentation.actions && !barPresentation.bottomIndicators && !isFullSoftwareKeyboardMode &&
+        if ((!hasSuggestionRow && !showSlimMenuButtons && !imeSwitcherOnly && !barPresentation.actions && !barPresentation.bottomIndicators && !isFullSoftwareKeyboardMode &&
                 snapshot.symPage == 0 && !snapshot.clipboardOverlay && expansionSuggestions.isEmpty()) || snapshot.navModeActive) {
             collapseLayout()
             return
@@ -3388,7 +3466,7 @@ class StatusBarController(
             else -> emptyList()
         }
         fullSuggestionsBar?.setContentEnabled(suggestionsEnabledSetting || expansionActive || sharedVariations.isNotEmpty(),
-            menuButtons = showSlimMenuButtons || (sharedRow && barPresentation.actions))
+            menuButtons = showSlimMenuButtons || (sharedRow && barPresentation.actions), imeSwitcherOnly = imeSwitcherOnly)
         val showFullBar = expansionActive || (sharedRow && barPresentation.actions) || (
             suggestionsEnabledSetting &&
                 (experimentalEnabled || isFullSoftwareKeyboardMode || snapshot.speechPreviewActive) &&
@@ -3479,6 +3557,7 @@ class StatusBarController(
                 surfaceHeight,
                 reserveLedSpace = showLedStrip
             )
+            updateSurfaceSwitcher(surfaceSwitcherRequested)
             if (!symShown && !wasSymActive) {
                 emojiKeyboardView.alpha = 1f
                 emojiKeyboardView.translationY = surfaceHeight.toFloat()
@@ -3595,6 +3674,7 @@ class StatusBarController(
             )
             setSurfaceCloseVisible(snapshot.symPage in listOf(1, 2, 5) ||
                 snapshot.symPage == 3)
+            updateSurfaceSwitcher(surfaceSwitcherRequested && snapshot.symPage == 3)
             if (!symShown && !wasSymActive) {
                 emojiKeyboardView.alpha = 1f // keep black visible immediately
                 emojiKeyboardView.translationY = surfaceHeight.toFloat()
@@ -3812,6 +3892,7 @@ class StatusBarController(
     }
 
     private fun setSurfaceCloseVisible(visible: Boolean) {
+        if (!visible) updateSurfaceSwitcher(false)
         val close = symSurfaceCloseButton ?: return
         val visibility = if (visible) View.VISIBLE else View.GONE
         if (close.visibility == visibility) return
@@ -3820,6 +3901,34 @@ class StatusBarController(
         (slot.parent as? ViewGroup)?.let { row ->
             rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.bind(row,
                 rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry.surfaces(row))
+        }
+    }
+
+    /**
+     * Places the requested IME switcher one cell left of the trailing close control, in the band
+     * the clipboard keeps free for it. Only a close control in a SYM grid slot has no such band.
+     */
+    private fun updateSurfaceSwitcher(visible: Boolean) {
+        val switcher = symSurfaceSwitcherButton ?: return
+        val close = symSurfaceCloseButton
+        val closeParams = close?.layoutParams as? FrameLayout.LayoutParams
+        val show = visible && closeParams != null && close.visibility == View.VISIBLE &&
+            close.parent === symSurfaceContainer
+        val visibility = if (show) View.VISIBLE else View.GONE
+        if (switcher.visibility != visibility) switcher.visibility = visibility
+        if (!show || closeParams == null) return
+        val params = switcher.layoutParams as? FrameLayout.LayoutParams
+            ?: FrameLayout.LayoutParams(0, 0, Gravity.BOTTOM or Gravity.END)
+        val end = closeParams.width + dpToPx(4f)
+        if (params.width != closeParams.width || params.height != closeParams.height ||
+            params.gravity != (Gravity.BOTTOM or Gravity.END) || params.marginEnd != end ||
+            params.bottomMargin != closeParams.bottomMargin) {
+            params.width = closeParams.width
+            params.height = closeParams.height
+            params.gravity = Gravity.BOTTOM or Gravity.END
+            params.marginEnd = end
+            params.bottomMargin = closeParams.bottomMargin
+            switcher.layoutParams = params
         }
     }
 

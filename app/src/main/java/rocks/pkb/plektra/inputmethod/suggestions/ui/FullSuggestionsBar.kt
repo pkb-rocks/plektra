@@ -215,6 +215,9 @@ class FullSuggestionsBar(
                     if (hamburgerMenuView == null) {
                         hamburgerMenuView = HamburgerMenuView(context, buttonRegistry).apply {
                             themeOverride = this@FullSuggestionsBar.themeOverride
+                            rowButtonMetrics = {
+                                HamburgerMenuView.RowButtonMetrics(minimalButtonSizePx(), chromeSpacingPx())
+                            }
                         }
                     }
                 }
@@ -329,15 +332,19 @@ class FullSuggestionsBar(
     val hasMenuButtons: Boolean
         get() = showMinimalUiButtons && configuredMenuButtons().isNotEmpty()
 
-    private fun configuredMenuButtons() = if (lastMinimalUiActive == true) {
-        renderingRegistry.getEnabledSlimButtons(context)
-    } else {
-        renderingRegistry.getEnabledButtons(context)
+    /** Only the IME switcher, for surfaces whose other buttons are not shown. */
+    private var imeSwitcherOnly: Boolean = false
+
+    private fun configuredMenuButtons() = when {
+        imeSwitcherOnly -> listOf(StatusBarButtonRegistry.IME_SWITCHER)
+        lastMinimalUiActive == true -> renderingRegistry.getEnabledSlimButtons(context)
+        else -> renderingRegistry.getEnabledButtons(context)
     }
 
-    fun setContentEnabled(suggestions: Boolean, menuButtons: Boolean) {
+    fun setContentEnabled(suggestions: Boolean, menuButtons: Boolean, imeSwitcherOnly: Boolean = false) {
         contentEnabled = suggestions
-        showMinimalUiButtons = menuButtons
+        this.imeSwitcherOnly = imeSwitcherOnly && !menuButtons
+        showMinimalUiButtons = menuButtons || this.imeSwitcherOnly
         renderMinimalUiButtons()
         if (!suggestions && !hasMenuButtons) {
             hamburgerMenuView?.hide()

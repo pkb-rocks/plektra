@@ -18,11 +18,18 @@ import rocks.pkb.plektra.inputmethod.statusbar.KeyboardBarRowGeometry
 
 /**
  * Overlay menu that replaces the status bar row with fixed buttons.
+ *
+ * Its buttons take their height and spacing from [rowButtonMetrics], the button row the menu
+ * covers, so opening the menu keeps the button size; the width divides the row.
  */
 class HamburgerMenuView(
     private val context: Context,
     private val buttonRegistry: StatusBarButtonRegistry
 ) {
+    /** Height and spacing in px of the buttons in the row the menu covers. */
+    data class RowButtonMetrics(val heightPx: Int, val spacingPx: Int)
+
+    var rowButtonMetrics: (() -> RowButtonMetrics?)? = null
 
 
     private val menuButtonIds = listOf(
@@ -126,6 +133,7 @@ class HamburgerMenuView(
         }
         val rowView = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -233,7 +241,7 @@ class HamburgerMenuView(
         if (totalButtons != expectedButtons) {
             return
         }
-        val spacing = dpToPx(3f)
+        val spacing = rowButtonMetrics?.invoke()?.spacingPx?.takeIf { it >= 0 } ?: dpToPx(3f)
         val availableWidth = rowView.width - rowView.paddingLeft - rowView.paddingRight
         if (availableWidth <= 0) {
             return
@@ -265,7 +273,12 @@ class HamburgerMenuView(
 
     private fun resolveButtonHeight(rowView: LinearLayout): Int {
         val height = rowView.height - rowView.paddingTop - rowView.paddingBottom
-        return if (height > 0) height else dpToPx(39f)
+        val rowButtonHeight = rowButtonMetrics?.invoke()?.heightPx?.takeIf { it > 0 }
+        return when {
+            height > 0 && rowButtonHeight != null -> minOf(height, rowButtonHeight)
+            height > 0 -> height
+            else -> rowButtonHeight ?: dpToPx(39f)
+        }
     }
 
 

@@ -22,6 +22,8 @@ Build and install a Nightly debug APK with the project wrapper:
 
 The Kotlin namespace is `rocks.pkb.plektra`. The four app identities and their update behaviour are defined in `app/build.gradle.kts`.
 
+Screens and keyboard controls follow the [design guidelines](design-guidelines.md), which also list the data-driven defaults a device build extends.
+
 ## Uyghur layout
 
 The bundled `uyghur` layout uses Arabic-script Uyghur (`ug`, `ug_CN`). Settings → Input Languages offers every language with a bundled layout, with or without a dictionary. The layout does not translate the app interface. The software keyboard shows the Uyghur letters in place of the QWERTY labels. Automatic capitalization is disabled for layouts with no cased letters so it cannot select an extra letter at the beginning of a sentence. A field that asks for all caps gets Caps Lock back after switching to a cased layout. Manual Shift and Caps Lock the user turned on remain available.

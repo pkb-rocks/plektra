@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.inputmethod.suggestions
 
+import android.content.Context
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -33,14 +34,13 @@ object SuggestionButtonHandler {
                 return@OnClickListener
             }
 
-            val context = it.context.applicationContext
-            val forceLeadingCapital = AutoCapitalizeHelper.shouldAutoCapitalizeAtCursor(
+            val context = it.context.applicationContext ?: it.context
+            val committed = commitSuggestion(
                 context = context,
                 inputConnection = inputConnection,
+                suggestion = suggestion,
                 shouldDisableAutoCapitalize = shouldDisableAutoCapitalize
-            ) && SettingsManager.getAutoCapitalizeFirstLetter(context)
-
-            val committed = replaceCurrentWord(inputConnection, suggestion, forceLeadingCapital)
+            )
             if (committed) {
                 onSuggestionCommitted?.invoke()
             }
@@ -48,15 +48,40 @@ object SuggestionButtonHandler {
         }
     }
 
+    fun commitSuggestion(
+        context: Context,
+        inputConnection: InputConnection,
+        suggestion: String,
+        shouldDisableAutoCapitalize: Boolean,
+        autoSpaceAfterSuggestion: Boolean = SettingsManager.getAutoSpaceAfterSuggestion(
+            context.applicationContext ?: context
+        )
+    ): Boolean {
+        val appContext = context.applicationContext ?: context
+        val forceLeadingCapital = AutoCapitalizeHelper.shouldAutoCapitalizeAtCursor(
+            context = appContext,
+            inputConnection = inputConnection,
+            shouldDisableAutoCapitalize = shouldDisableAutoCapitalize
+        ) && SettingsManager.getAutoCapitalizeFirstLetter(appContext)
+
+        return replaceCurrentWord(
+            inputConnection = inputConnection,
+            suggestion = suggestion,
+            forceLeadingCapital = forceLeadingCapital,
+            autoSpaceAfterSuggestion = autoSpaceAfterSuggestion
+        )
+    }
+
     /**
      * Replace the word immediately before the cursor with the given suggestion.
      * Deletes up to the nearest whitespace/punctuation boundary and applies basic casing
      * (leading capital only). All-caps input (e.g., CapsLock) will not force the suggestion to uppercase.
      */
-    private fun replaceCurrentWord(
+    internal fun replaceCurrentWord(
         inputConnection: InputConnection,
         suggestion: String,
-        forceLeadingCapital: Boolean
+        forceLeadingCapital: Boolean,
+        autoSpaceAfterSuggestion: Boolean = true
     ): Boolean {
         fun ensureTrailingSpaceAfterSuggestion(): Boolean {
             val beforeAfterCommit = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
@@ -116,7 +141,8 @@ object SuggestionButtonHandler {
         val nextChar = after.getOrNull(end)
         val normalizedNextChar = nextChar?.let { Punctuation.normalizeApostrophe(it) }
         val nextIsWhitespace = normalizedNextChar?.isWhitespace() == true
-        val shouldAppendSpace = !replacement.endsWith("'") &&
+        val shouldAppendSpace = autoSpaceAfterSuggestion &&
+            !replacement.endsWith("'") &&
             !nextIsWhitespace
 
         val deleted = inputConnection.deleteSurroundingText(deleteBefore, deleteAfter)
@@ -127,19 +153,24 @@ object SuggestionButtonHandler {
         }
 
         val committed = inputConnection.commitText(replacement, 1)
-        if (committed && shouldAppendSpace) {
-            val committedWithSpace = inputConnection.commitText(" ", 1)
-            val spaced = if (committedWithSpace) {
-                val textBefore = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
-                if (textBefore.endsWith(" ")) true else ensureTrailingSpaceAfterSuggestion()
+        if (committed) {
+            if (shouldAppendSpace) {
+                val committedWithSpace = inputConnection.commitText(" ", 1)
+                val spaced = if (committedWithSpace) {
+                    val textBefore = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
+                    if (textBefore.endsWith(" ")) true else ensureTrailingSpaceAfterSuggestion()
+                } else {
+                    ensureTrailingSpaceAfterSuggestion()
+                }
+                if (spaced) {
+                    AutoSpaceTracker.markAutoSpace()
+                    Log.d(TAG, "Suggestion auto-space marked")
+                } else {
+                    AutoSpaceTracker.clear()
+                    Log.w(TAG, "Suggestion space could not be enforced")
+                }
             } else {
-                ensureTrailingSpaceAfterSuggestion()
-            }
-            if (spaced) {
-                AutoSpaceTracker.markAutoSpace()
-                Log.d(TAG, "Suggestion auto-space marked")
-            } else {
-                Log.w(TAG, "Suggestion space could not be enforced")
+                AutoSpaceTracker.clear()
             }
         }
         val textToCommit = if (shouldAppendSpace) "$replacement " else replacement

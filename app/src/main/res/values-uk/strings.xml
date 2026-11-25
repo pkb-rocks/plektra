@@ -939,4 +939,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="software_keyboard_key_hints_title">Показувати додаткові підписи</string>
     <string name="software_keyboard_key_hints_description">Показує праворуч угорі альтернативу довгого натискання, а ліворуч унизу — символ Alt або SYM клавіші.</string>
     <string name="kw_on_screen_key_hints">підказки клавіш, кутові підписи, довге натискання, Alt, SYM, додаткові символи</string>
+    <string name="auto_space_after_suggestion_title">Пробіл після підказок</string>
+    <string name="auto_space_after_suggestion_description">Автоматично додавати пробіл після прийняття запропонованого слова.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">підказка, підказки, пробіл, відступ, слово, кома, пунктуація</string>
 </resources>

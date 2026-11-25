@@ -1045,6 +1045,9 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_text_input_backspace_start">backspace, cancella riga, inizio testo</string>
     <string name="kw_keyboards_devices_on_screen">tastiera a schermo, tastiera virtuale, tastiera software</string>
     <string name="kw_on_screen_key_hints">suggerimenti tasti, etichette d\'angolo, pressione prolungata, Alt, SYM, caratteri secondari</string>
+    <string name="auto_space_after_suggestion_title">Spazio dopo i suggerimenti</string>
+    <string name="auto_space_after_suggestion_description">Aggiungi automaticamente uno spazio dopo aver accettato una parola suggerita.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">suggerimento, suggerimenti, spazio, spaziatura, parola, virgola, punteggiatura</string>
     <string name="kw_keyboards_devices_built_in">tastiere integrate, layout, hardware, profili</string>
     <string name="kw_keyboards_devices_accessories">accessori, clicks, cover</string>
     <string name="kw_auto_correction_languages">layout tastiera, lingue di input, layout, dizionari, per lingua</string>

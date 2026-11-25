@@ -938,4 +938,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="software_keyboard_key_hints_title">Afficher les libellés secondaires</string>
     <string name="software_keyboard_key_hints_description">Affiche en haut à droite l\'alternative d\'appui long et en bas à gauche le caractère Alt ou SYM des touches.</string>
     <string name="kw_on_screen_key_hints">indications des touches, libellés d\'angle, appui long, Alt, SYM, caractères secondaires</string>
+    <string name="auto_space_after_suggestion_title">Espace après les suggestions</string>
+    <string name="auto_space_after_suggestion_description">Ajouter automatiquement une espace après avoir accepté un mot suggéré.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">suggestion, suggestions, espace, espacement, mot, virgule, ponctuation</string>
 </resources>

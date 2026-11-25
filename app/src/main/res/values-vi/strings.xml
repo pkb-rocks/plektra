@@ -936,4 +936,7 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="software_keyboard_key_hints_title">Hiện nhãn phụ</string>
     <string name="software_keyboard_key_hints_description">Hiện ký tự thay thế khi nhấn giữ ở góc trên bên phải và ký tự Alt hoặc SYM ở góc dưới bên trái phím.</string>
     <string name="kw_on_screen_key_hints">gợi ý phím, nhãn góc, nhấn giữ, Alt, SYM, ký tự phụ</string>
+    <string name="auto_space_after_suggestion_title">Dấu cách sau gợi ý</string>
+    <string name="auto_space_after_suggestion_description">Tự động thêm dấu cách sau khi chấp nhận một từ gợi ý.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">gợi ý, dấu cách, khoảng trắng, từ, dấu phẩy, dấu câu</string>
 </resources>

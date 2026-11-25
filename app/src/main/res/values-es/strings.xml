@@ -938,4 +938,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="software_keyboard_key_hints_title">Mostrar etiquetas secundarias</string>
     <string name="software_keyboard_key_hints_description">Muestra arriba a la derecha la alternativa de pulsación larga y abajo a la izquierda el carácter Alt o SYM de las teclas.</string>
     <string name="kw_on_screen_key_hints">indicaciones de teclas, etiquetas de esquina, pulsación larga, Alt, SYM, caracteres secundarios</string>
+    <string name="auto_space_after_suggestion_title">Espacio tras sugerencias</string>
+    <string name="auto_space_after_suggestion_description">Añadir un espacio automáticamente tras aceptar una palabra sugerida.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">sugerencia, sugerencias, espacio, espaciado, palabra, coma, puntuación</string>
 </resources>

@@ -937,4 +937,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="software_keyboard_key_hints_title">Ցույց տալ լրացուցիչ նշագրերը</string>
     <string name="software_keyboard_key_hints_description">Ստեղների վերին աջ անկյունում ցույց է տալիս երկար սեղմման այլընտրանքը, իսկ ներքևի ձախում՝ Alt կամ SYM նիշը։</string>
     <string name="kw_on_screen_key_hints">ստեղների հուշումներ, անկյունային նշագրեր, երկար սեղմում, Alt, SYM, լրացուցիչ նիշեր</string>
+    <string name="auto_space_after_suggestion_title">Բացատ առաջարկներից հետո</string>
+    <string name="auto_space_after_suggestion_description">Առաջարկված բառն ընդունելուց հետո ավտոմատ կերպով ավելացնել բացատ։</string>
+    <string name="kw_text_input_auto_space_after_suggestion">առաջարկ, առաջարկներ, բացատ, բառ, ստորակետ, կետադրություն</string>
 </resources>

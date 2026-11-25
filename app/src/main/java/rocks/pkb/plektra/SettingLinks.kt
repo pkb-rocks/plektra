@@ -38,6 +38,7 @@ object SettingLinkIds {
         "text_input.auto_capitalize_restricted_fields"
     const val TEXT_INPUT_AUTO_CAPITALIZE_AFTER_PERIOD = "text_input.auto_capitalize_after_period"
     const val TEXT_INPUT_DOUBLE_SPACE_TO_PERIOD = "text_input.double_space_to_period"
+    const val TEXT_INPUT_AUTO_SPACE_AFTER_SUGGESTION = "text_input.auto_space_after_suggestion"
     const val TEXT_INPUT_AUTO_SPACE_PUNCTUATION = "text_input.auto_space_punctuation"
     const val TEXT_INPUT_COMMA_SPACE = "text_input.comma_space"
     const val TEXT_INPUT_FRENCH_PUNCTUATION_SPACING = "text_input.french_punctuation_spacing"
@@ -394,6 +395,12 @@ object SettingLinkRegistry {
         entry(
             SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION,
             R.string.auto_space_punctuation_title,
+            destination = SettingsDestination.TextInput
+        ),
+        entry(
+            SettingLinkIds.TEXT_INPUT_AUTO_SPACE_AFTER_SUGGESTION,
+            R.string.auto_space_after_suggestion_title,
+            R.string.auto_space_after_suggestion_description,
             destination = SettingsDestination.TextInput
         ),
         entry(
@@ -1033,6 +1040,7 @@ object SettingLinkRegistry {
         SettingLinkIds.MAIN_ACCESSIBILITY to R.string.kw_main_accessibility,
         SettingLinkIds.MAIN_ABOUT to R.string.kw_main_about,
         SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION to R.string.kw_text_input_auto_space_punctuation,
+        SettingLinkIds.TEXT_INPUT_AUTO_SPACE_AFTER_SUGGESTION to R.string.kw_text_input_auto_space_after_suggestion,
         SettingLinkIds.TEXT_INPUT_SPACED_HYPHEN_TO_EN_DASH to R.string.kw_text_input_spaced_hyphen,
         SettingLinkIds.TEXT_INPUT_SMART_QUOTES to R.string.kw_text_input_smart_quotes,
         SettingLinkIds.TEXT_INPUT_EXPERIMENTAL_SMOOTH_CARET to R.string.kw_text_input_smooth_caret,

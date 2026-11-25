@@ -939,4 +939,7 @@ Nav Mode использует физическое положение клави
     <string name="software_keyboard_key_hints_title">Показывать дополнительные подписи</string>
     <string name="software_keyboard_key_hints_description">Показывает справа вверху альтернативу долгого нажатия, а слева внизу — символ Alt или SYM клавиши.</string>
     <string name="kw_on_screen_key_hints">подсказки клавиш, угловые подписи, долгое нажатие, Alt, SYM, дополнительные символы</string>
+    <string name="auto_space_after_suggestion_title">Пробел после подсказок</string>
+    <string name="auto_space_after_suggestion_description">Автоматически добавлять пробел после принятия предложенного слова.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">подсказка, подсказки, пробел, отступ, слово, запятая, пунктуация</string>
 </resources>

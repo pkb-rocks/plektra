@@ -1715,6 +1715,9 @@ QWERTZ σε φυσικό QWERTY
     <string name="kw_text_input_backspace_start">backspace, διαγραφή γραμμής, αρχή κειμένου, delete line, start of text</string>
     <string name="kw_keyboards_devices_on_screen">πληκτρολόγιο οθόνης, software πληκτρολόγιο, virtual πληκτρολόγιο, on-screen keyboard, virtual keyboard</string>
     <string name="kw_on_screen_key_hints">ενδείξεις πλήκτρων, γωνιακές ετικέτες, παρατεταμένο πάτημα, Alt, SYM, δευτερεύοντες χαρακτήρες</string>
+    <string name="auto_space_after_suggestion_title">Κενό μετά από προτάσεις</string>
+    <string name="auto_space_after_suggestion_description">Αυτόματη προσθήκη κενού μετά την αποδοχή μιας προτεινόμενης λέξης.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">πρόταση, προτάσεις, κενό, διάστημα, λέξη, κόμμα, στίξη</string>
     <string name="kw_keyboards_devices_built_in">ενσωματωμένα πληκτρολόγια, διατάξεις, hardware, προφίλ, built-in keyboards, layouts, profiles</string>
     <string name="kw_keyboards_devices_accessories">αξεσουάρ, clicks, θήκη, accessories, cover</string>
     <string name="kw_auto_correction_languages">διάταξη πληκτρολογίου, γλώσσες εισαγωγής, διατάξεις, λεξικά, ανά γλώσσα, keyboard layout, input languages, dictionaries</string>

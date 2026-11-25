@@ -222,6 +222,7 @@ internal object BackupPreferenceContract {
             "french_punctuation_spacing" to PreferenceValueType.BOOLEAN,
             "french_punctuation_only_french" to PreferenceValueType.BOOLEAN,
             "comma_space" to PreferenceValueType.BOOLEAN,
+            "auto_space_after_suggestion" to PreferenceValueType.BOOLEAN,
             "auto_space_punctuation" to PreferenceValueType.STRING,
             "space_after_punctuation" to PreferenceValueType.STRING,
             "smart_quotes" to PreferenceValueType.BOOLEAN,

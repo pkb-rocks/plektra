@@ -45,6 +45,8 @@
     <string name="french_punctuation_only_french_description">Wendet die Abstände nur an, wenn die aktive Eingabesprache Französisch ist.</string>
     <string name="comma_space_title">Leerzeichen nach Komma</string>
     <string name="comma_space_description">Setzt nach Kommas ein Leerzeichen und ersetzt ein Leerzeichen davor.</string>
+    <string name="auto_space_after_suggestion_title">Leerzeichen nach Vorschlägen</string>
+    <string name="auto_space_after_suggestion_description">Nach dem Übernehmen eines vorgeschlagenen Wortes automatisch ein Leerzeichen einfügen.</string>
     <string name="auto_space_punctuation_title">Satzzeichen-Abstände</string>
     <string name="auto_space_punctuation_selected">Ausgewählt:</string>
     <string name="auto_space_punctuation_none_selected">keine</string>
@@ -1464,6 +1466,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kw_main_accessibility">Barrierefreiheit, Verzögerung, Bounce-Tasten, überlappende Tasten, Screenreader</string>
     <string name="kw_main_about">Über, Version, Unterstützung, Ko-fi, Spende</string>
     <string name="kw_text_input_auto_space_punctuation">Abstände, Leerzeichen, Zeichensetzung</string>
+    <string name="kw_text_input_auto_space_after_suggestion">Vorschlag, Vorschläge, Leerzeichen, Abstand, Wort, Komma, Zeichensetzung</string>
     <string name="kw_text_input_spaced_hyphen">Bindestrich, Gedankenstrich, Halbgeviertstrich, Zeichensetzung</string>
     <string name="kw_text_input_smart_quotes">Anführungszeichen, Apostroph, typografische Anführungszeichen</string>
     <string name="kw_text_input_shift_backspace">Umschalt, Shift, Rücktaste, Wort löschen</string>

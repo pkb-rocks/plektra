@@ -939,4 +939,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="software_keyboard_key_hints_title">Pokazuj dodatkowe oznaczenia</string>
     <string name="software_keyboard_key_hints_description">Pokazuje w prawym górnym rogu alternatywę długiego naciśnięcia, a w lewym dolnym znak Alt lub SYM klawisza.</string>
     <string name="kw_on_screen_key_hints">podpowiedzi klawiszy, oznaczenia w rogach, długie naciśnięcie, Alt, SYM, znaki dodatkowe</string>
+    <string name="auto_space_after_suggestion_title">Spacja po podpowiedziach</string>
+    <string name="auto_space_after_suggestion_description">Automatycznie dodawaj spację po zaakceptowaniu podpowiedzianego słowa.</string>
+    <string name="kw_text_input_auto_space_after_suggestion">podpowiedź, podpowiedzi, spacja, odstęp, słowo, przecinek, interpunkcja</string>
 </resources>

@@ -6593,80 +6593,23 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             // Provide visual feedback on the suggestions bar, matching variation press color
             candidatesBarController.flashSuggestionSlot(suggestionIndex)
 
-            val forceLeadingCapital = AutoCapitalizeHelper.shouldAutoCapitalizeAtCursor(
-                context = this,
-                inputConnection = ic,
-                shouldDisableAutoCapitalize = shouldDisableAutoCapitalize
-            ) && SettingsManager.getAutoCapitalizeFirstLetter(this)
-
             Log.d(TAG, "Accepting suggestion '$suggestion' from third=$third (index=$suggestionIndex)")
 
-            // Use the same logic as SuggestionButtonHandler
-            val before = ic.getTextBeforeCursor(64, 0)?.toString().orEmpty()
-            val after = ic.getTextAfterCursor(64, 0)?.toString().orEmpty()
-            fun isBoundaryChar(ch: Char, prev: Char?, next: Char?): Boolean {
-                return rocks.pkb.plektra.core.Punctuation.isWordBoundary(ch, prev, next)
-            }
-
-            // Find start of word in 'before'
-            var start = before.length
-            while (start > 0) {
-                val ch = before[start - 1]
-                val prev = before.getOrNull(start - 2)
-                val next = before.getOrNull(start)
-                if (!isBoundaryChar(ch, prev, next)) {
-                    start--
-                    continue
-                }
-                break
-            }
-
-            // Find end of word in 'after'
-            var end = 0
-            while (end < after.length) {
-                val ch = after[end]
-                val prev = if (end == 0) before.lastOrNull() else after[end - 1]
-                val next = after.getOrNull(end + 1)
-                if (!isBoundaryChar(ch, prev, next)) {
-                    end++
-                    continue
-                }
-                break
-            }
-
-            val wordBeforeCursor = before.substring(start)
-            val wordAfterCursor = after.substring(0, end)
-            val currentWord = wordBeforeCursor + wordAfterCursor
-
-            val deleteBefore = wordBeforeCursor.length
-            val deleteAfter = wordAfterCursor.length
-            val replacement = rocks.pkb.plektra.core.suggestions.CasingHelper.applyCasing(
-                suggestion, currentWord, forceLeadingCapital
+            val committed = rocks.pkb.plektra.inputmethod.suggestions.SuggestionButtonHandler.commitSuggestion(
+                context = this,
+                inputConnection = ic,
+                suggestion = suggestion,
+                shouldDisableAutoCapitalize = shouldDisableAutoCapitalize
             )
-            val shouldAppendSpace = !replacement.endsWith("'")
-
-            ic.deleteSurroundingText(deleteBefore, deleteAfter)
-            val textToCommit = if (shouldAppendSpace) "$replacement " else replacement
-            ic.commitText(textToCommit, 1)
-            if (shiftOneShot) {
+            if (committed && shiftOneShot) {
                 modifierStateController.consumeShiftOneShot()
-            }
-            DebugCaptureStore.recordAutoCorrectionCommit(
-                before = currentWord,
-                after = replacement,
-                trigger = DebugCaptureStore.AutoCorrectionTrigger.SUGGESTION_TAP,
-                source = "UNKNOWN"
-            )
-
-            if (shouldAppendSpace) {
-                rocks.pkb.plektra.core.AutoSpaceTracker.markAutoSpace()
             }
 
             // CRITICAL FIX: Reset tracker after accepting suggestion to prevent duplicate letters
             // The cursor debounce can cause tracker to be out of sync when user types quickly after accepting
             suggestionController.onContextReset()
             NotificationHelper.triggerHapticFeedback(this)
-            Log.d(TAG, "Suggestion '$suggestion' inserted successfully")
+            Log.d(TAG, "Suggestion '$suggestion' inserted successfully (committed=$committed)")
         }
     }
 

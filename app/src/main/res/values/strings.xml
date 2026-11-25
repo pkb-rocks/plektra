@@ -69,6 +69,8 @@
     <string name="french_punctuation_only_french_description">Apply this spacing only while the active input language is French.</string>
     <string name="comma_space_title">Space after comma</string>
     <string name="comma_space_description">Add a space after commas and replace a preceding space.</string>
+    <string name="auto_space_after_suggestion_title">Space after suggestions</string>
+    <string name="auto_space_after_suggestion_description">Add a space automatically after accepting a suggested word.</string>
     <string name="auto_space_punctuation_title">Punctuation spacing</string>
     <string name="auto_space_punctuation_selected">Selected:</string>
     <string name="auto_space_punctuation_none_selected">none</string>
@@ -1802,6 +1804,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_main_accessibility">accessibility, delay, bounce keys, overlapping keys, screen reader</string>
     <string name="kw_main_about">about, version, support, ko-fi, donate</string>
     <string name="kw_text_input_auto_space_punctuation">spacing, space, punctuation</string>
+    <string name="kw_text_input_auto_space_after_suggestion">suggestion, suggestions, space, auto space, spacing, word, comma, punctuation</string>
     <string name="kw_text_input_spaced_hyphen">hyphen, dash, en dash, punctuation</string>
     <string name="kw_text_input_smart_quotes">quotation marks, apostrophe, curly quotes, typography</string>
     <string name="kw_text_input_smooth_caret">cursor, caret, smooth, animation, overlay, experimental</string>

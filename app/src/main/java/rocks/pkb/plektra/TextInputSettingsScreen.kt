@@ -97,6 +97,10 @@ fun TextInputSettingsScreen(
         mutableStateOf(SettingsManager.getCommaSpace(context))
     }
 
+    var autoSpaceAfterSuggestion by remember {
+        mutableStateOf(SettingsManager.getAutoSpaceAfterSuggestion(context))
+    }
+
     var autoSpacePunctuation by remember {
         mutableStateOf(SettingsManager.getAutoSpacePunctuation(context))
     }
@@ -400,6 +404,16 @@ fun TextInputSettingsScreen(
                 ),
                 linkId = SettingLinkIds.TEXT_INPUT_AUTO_SPACE_PUNCTUATION,
                 onClick = { autoSpacePunctuationDialogVisible = true }
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.auto_space_after_suggestion_title),
+                description = stringResource(R.string.auto_space_after_suggestion_description),
+                checked = autoSpaceAfterSuggestion,
+                linkId = SettingLinkIds.TEXT_INPUT_AUTO_SPACE_AFTER_SUGGESTION,
+                onCheckedChange = { enabled ->
+                    autoSpaceAfterSuggestion = enabled
+                    SettingsManager.setAutoSpaceAfterSuggestion(context, enabled)
+                }
             )
             SettingsSwitchRow(
                 title = stringResource(R.string.comma_space_title),

@@ -173,7 +173,8 @@
       "rocks.pkb.plektra.core.suggestions.UserOnlyDictionaryTest",
       "rocks.pkb.plektra.core.suggestions.WordNormalizationTest",
       "rocks.pkb.plektra.dictionaries.StreamingDictionaryValidatorTest",
-      "rocks.pkb.plektra.inputmethod.AddWordCommitHelperTest"
+      "rocks.pkb.plektra.inputmethod.AddWordCommitHelperTest",
+      "rocks.pkb.plektra.inputmethod.suggestions.SuggestionSpacingBehaviorTest"
     ],
     "keys-modifiers": [
       "rocks.pkb.plektra.core.ModifierStateControllerTest",

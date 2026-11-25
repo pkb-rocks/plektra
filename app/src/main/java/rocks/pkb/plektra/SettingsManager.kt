@@ -59,6 +59,7 @@ object SettingsManager {
     private const val KEY_FRENCH_PUNCTUATION_SPACING = "french_punctuation_spacing"
     private const val KEY_FRENCH_PUNCTUATION_ONLY_FRENCH = "french_punctuation_only_french"
     private const val KEY_COMMA_SPACE = "comma_space"
+    private const val KEY_AUTO_SPACE_AFTER_SUGGESTION = "auto_space_after_suggestion"
     private const val KEY_AUTO_SPACE_PUNCTUATION = "auto_space_punctuation"
     private const val KEY_SPACE_AFTER_PUNCTUATION = "space_after_punctuation"
     private const val KEY_SMART_QUOTES = "smart_quotes"
@@ -345,6 +346,7 @@ object SettingsManager {
     private const val DEFAULT_FRENCH_PUNCTUATION_SPACING = false
     private const val DEFAULT_FRENCH_PUNCTUATION_ONLY_FRENCH = false
     private const val DEFAULT_COMMA_SPACE = false
+    private const val DEFAULT_AUTO_SPACE_AFTER_SUGGESTION = true
     private const val DEFAULT_AUTO_SPACE_PUNCTUATION = Punctuation.DEFAULT_AUTO_SPACE
     private const val DEFAULT_SPACE_AFTER_PUNCTUATION = ""
     private const val DEFAULT_SMART_QUOTES = false
@@ -2211,6 +2213,19 @@ object SettingsManager {
     fun setCommaSpace(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_COMMA_SPACE, enabled)
+            .apply()
+    }
+
+    fun getAutoSpaceAfterSuggestion(context: Context): Boolean {
+        return getPreferences(context).getBoolean(
+            KEY_AUTO_SPACE_AFTER_SUGGESTION,
+            DEFAULT_AUTO_SPACE_AFTER_SUGGESTION
+        )
+    }
+
+    fun setAutoSpaceAfterSuggestion(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_AUTO_SPACE_AFTER_SUGGESTION, enabled)
             .apply()
     }
 

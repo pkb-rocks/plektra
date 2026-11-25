@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import kotlinx.coroutines.runBlocking
@@ -335,6 +336,317 @@ class SuggestionSpacingBehaviorTest {
         }
     }
 
+    @Test
+    fun nullPostCommitReadback_allAcceptPathsOnAndOff_writesSingleSpaceWithoutFallbackEvents() {
+        val serviceController = Robolectric.buildService(PhysicalKeyboardInputMethodService::class.java).create()
+        val service = serviceController.get()
+        try {
+            val editorInfo = EditorInfo().apply {
+                inputType = InputType.TYPE_CLASS_TEXT
+                packageName = "rocks.pkb.plektra.test"
+            }
+            SettingsManager.setAutoSpacePunctuation(context, ",")
+
+            val acceptPaths: List<Pair<String, (InputConnection) -> Unit>> = listOf(
+                "tap" to { ic ->
+                    renderSingleSuggestionButton(ic, "hello").performClick()
+                },
+                "keyboard_enter" to { ic ->
+                    val button = renderSingleSuggestionButton(ic, "hello")
+                    val downHandled = button.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+                    val upHandled = button.dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+                    assertTrue("Expected ENTER activation on suggestion button", downHandled || upHandled)
+                },
+                "trackpad_swipe" to { ic ->
+                    bindServiceForSuggestionSwipe(service, ic, editorInfo, listOf("hello"))
+                    invokeAcceptSuggestionAtIndex(service, 1)
+                    shadowOf(android.os.Looper.getMainLooper()).idle()
+                }
+            )
+
+            for ((pathName, accept) in acceptPaths) {
+                // Option ON: writes word + single space; null post-commit readbacks must NOT trigger retry or SPACE key events
+                SettingsManager.setAutoSpaceAfterSuggestion(context, true)
+                AutoSpaceTracker.clear()
+                val icOn = DelayedReadbackEditorInputConnection(
+                    context = context,
+                    initialBefore = "hel",
+                    nullReadbackAfterCommit = true
+                )
+
+                accept(icOn)
+
+                assertEquals("$pathName ON should write exactly one space", "hello ", icOn.text)
+                assertEquals("$pathName ON should commit space once", 1, icOn.spaceCommitAttempts)
+                assertEquals("$pathName ON should not send fallback SPACE key events", 0, icOn.spaceKeyEventCount)
+                assertTrue("$pathName ON should keep AutoSpaceTracker pending after confirmed space write", AutoSpaceTracker.isPending())
+
+                icOn.recoverReadback()
+                commitCommaViaRouter(icOn)
+                assertEquals("$pathName ON should replace auto-space with comma once readback recovers", "hello, ", icOn.text)
+
+                // Option OFF: writes word only, clears stale tracker, no space commits or key events
+                SettingsManager.setAutoSpaceAfterSuggestion(context, false)
+                AutoSpaceTracker.markAutoSpace()
+                val icOff = DelayedReadbackEditorInputConnection(
+                    context = context,
+                    initialBefore = "hel",
+                    nullReadbackAfterCommit = true
+                )
+
+                accept(icOff)
+
+                assertEquals("$pathName OFF should write word without space", "hello", icOff.text)
+                assertEquals("$pathName OFF should not commit space", 0, icOff.spaceCommitAttempts)
+                assertEquals("$pathName OFF should not send SPACE key events", 0, icOff.spaceKeyEventCount)
+                assertFalse("$pathName OFF should clear stale AutoSpaceTracker", AutoSpaceTracker.isPending())
+
+                icOff.recoverReadback()
+                commitCommaViaRouter(icOff)
+                assertEquals("$pathName OFF should attach comma directly", "hello,", icOff.text)
+            }
+        } finally {
+            serviceController.destroy()
+        }
+    }
+
+    @Test
+    fun trailingSpaceRetry_handlesSilentDropFailedCommitAndKeyEventFallback() {
+        SettingsManager.setAutoSpaceAfterSuggestion(context, true)
+
+        // 1. Existing tap-retry case: first space commit returns true but editor silently drops it (non-null readback proves absence)
+        AutoSpaceTracker.clear()
+        val silentDropIc = DelayedReadbackEditorInputConnection(
+            context = context,
+            initialBefore = "hel",
+            spaceCommitMode = { attempt ->
+                if (attempt == 1) SpaceCommitMode.DROP_AND_RETURN_TRUE else SpaceCommitMode.WRITE_AND_SUCCEED
+            }
+        )
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = silentDropIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello ", silentDropIc.text)
+        assertEquals(2, silentDropIc.spaceCommitAttempts)
+        assertEquals(0, silentDropIc.spaceKeyEventCount)
+        assertTrue(AutoSpaceTracker.isPending())
+
+        // 2. Real failure on first commit (returns false) + null readback -> retries commit once; second commit succeeds with null readback
+        AutoSpaceTracker.clear()
+        val firstFailThenNullSuccessIc = DelayedReadbackEditorInputConnection(
+            context = context,
+            initialBefore = "hel",
+            nullReadbackAfterCommit = true,
+            spaceCommitMode = { attempt ->
+                if (attempt == 1) SpaceCommitMode.FAIL_AND_RETURN_FALSE else SpaceCommitMode.WRITE_AND_SUCCEED
+            }
+        )
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = firstFailThenNullSuccessIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello ", firstFailThenNullSuccessIc.text)
+        assertEquals(2, firstFailThenNullSuccessIc.spaceCommitAttempts)
+        assertEquals(0, firstFailThenNullSuccessIc.spaceKeyEventCount)
+        assertTrue(AutoSpaceTracker.isPending())
+
+        // 3. Both space commits fail (return false) -> falls back to SPACE key events and confirms via readback
+        AutoSpaceTracker.clear()
+        val keyEventFallbackIc = DelayedReadbackEditorInputConnection(
+            context = context,
+            initialBefore = "hel",
+            spaceCommitMode = { SpaceCommitMode.FAIL_AND_RETURN_FALSE },
+            handleSpaceKeyEvent = true
+        )
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = keyEventFallbackIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello ", keyEventFallbackIc.text)
+        assertEquals(2, keyEventFallbackIc.spaceCommitAttempts)
+        assertEquals(2, keyEventFallbackIc.spaceKeyEventCount)
+        assertTrue(AutoSpaceTracker.isPending())
+
+        // 4. All space writes fail (commits return false, key events rejected/ignored) -> clears AutoSpaceTracker for both ABSENT and null readback
+        for (nullAfterCommit in listOf(false, true)) {
+            AutoSpaceTracker.markAutoSpace()
+            val totalFailureIc = DelayedReadbackEditorInputConnection(
+                context = context,
+                initialBefore = "hel",
+                nullReadbackAfterCommit = nullAfterCommit,
+                spaceCommitMode = { SpaceCommitMode.FAIL_AND_RETURN_FALSE },
+                handleSpaceKeyEvent = false
+            )
+            assertTrue(
+                SuggestionButtonHandler.commitSuggestion(
+                    context = context,
+                    inputConnection = totalFailureIc,
+                    suggestion = "hello",
+                    shouldDisableAutoCapitalize = true
+                )
+            )
+            assertEquals("hello", totalFailureIc.text)
+            assertEquals(2, totalFailureIc.spaceCommitAttempts)
+            assertEquals(2, totalFailureIc.spaceKeyEventCount)
+            assertFalse("nullAfterCommit=$nullAfterCommit should clear AutoSpaceTracker on failed space write", AutoSpaceTracker.isPending())
+        }
+    }
+
+    @Test
+    fun realEditTextInputConnection_handlesComposingSelectionAndMidWordCursorOnAndOff() {
+        SettingsManager.setAutoSpacePunctuation(context, ",")
+
+        fun createRealEditor(initialText: String, selectionStart: Int, selectionEnd: Int = selectionStart): Pair<EditText, InputConnection> {
+            val editText = EditText(context)
+            editText.setText(initialText)
+            editText.setSelection(selectionStart, selectionEnd)
+            val ic = editText.onCreateInputConnection(EditorInfo())
+            assertNotNull("EditText should provide a real EditableInputConnection", ic)
+            return editText to ic!!
+        }
+
+        // 1. Active composing region ON & OFF
+        SettingsManager.setAutoSpaceAfterSuggestion(context, true)
+        AutoSpaceTracker.clear()
+        val (composingOnEdit, composingOnIc) = createRealEditor("say hel", 7)
+        assertTrue(composingOnIc.setComposingRegion(4, 7))
+        assertEquals(4, BaseInputConnection.getComposingSpanStart(composingOnEdit.editableText))
+        assertEquals(7, BaseInputConnection.getComposingSpanEnd(composingOnEdit.editableText))
+
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = composingOnIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("say hello ", composingOnEdit.text.toString())
+        assertEquals(10, composingOnEdit.selectionStart)
+        assertEquals(10, composingOnEdit.selectionEnd)
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(composingOnEdit.editableText))
+        assertEquals(-1, BaseInputConnection.getComposingSpanEnd(composingOnEdit.editableText))
+        assertTrue(AutoSpaceTracker.isPending())
+        commitCommaViaRouter(composingOnIc)
+        assertEquals("say hello, ", composingOnEdit.text.toString())
+
+        SettingsManager.setAutoSpaceAfterSuggestion(context, false)
+        AutoSpaceTracker.markAutoSpace()
+        val (composingOffEdit, composingOffIc) = createRealEditor("say hel", 7)
+        assertTrue(composingOffIc.setComposingRegion(4, 7))
+
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = composingOffIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("say hello", composingOffEdit.text.toString())
+        assertEquals(9, composingOffEdit.selectionStart)
+        assertEquals(9, composingOffEdit.selectionEnd)
+        assertEquals(-1, BaseInputConnection.getComposingSpanStart(composingOffEdit.editableText))
+        assertEquals(-1, BaseInputConnection.getComposingSpanEnd(composingOffEdit.editableText))
+        assertFalse(AutoSpaceTracker.isPending())
+        commitCommaViaRouter(composingOffIc)
+        assertEquals("say hello,", composingOffEdit.text.toString())
+
+        // 2. Non-collapsed selection (full word and partial word) ON & OFF
+        SettingsManager.setAutoSpaceAfterSuggestion(context, true)
+        AutoSpaceTracker.clear()
+        val (selectedOnEdit, selectedOnIc) = createRealEditor("say hel", 4, 7)
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = selectedOnIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("say hello ", selectedOnEdit.text.toString())
+        assertEquals(10, selectedOnEdit.selectionStart)
+        assertEquals(10, selectedOnEdit.selectionEnd)
+        assertTrue(AutoSpaceTracker.isPending())
+
+        SettingsManager.setAutoSpaceAfterSuggestion(context, false)
+        AutoSpaceTracker.markAutoSpace()
+        val (selectedOffEdit, selectedOffIc) = createRealEditor("say helo", 4, 6)
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = selectedOffIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("say hello", selectedOffEdit.text.toString())
+        assertEquals(9, selectedOffEdit.selectionStart)
+        assertEquals(9, selectedOffEdit.selectionEnd)
+        assertFalse(AutoSpaceTracker.isPending())
+
+        // 3. Collapsed mid-word cursor without and with trailing whitespace
+        SettingsManager.setAutoSpaceAfterSuggestion(context, true)
+        AutoSpaceTracker.clear()
+        val (midWordOnEdit, midWordOnIc) = createRealEditor("helo", 2)
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = midWordOnIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello ", midWordOnEdit.text.toString())
+        assertEquals(6, midWordOnEdit.selectionStart)
+        assertEquals(6, midWordOnEdit.selectionEnd)
+        assertTrue(AutoSpaceTracker.isPending())
+
+        AutoSpaceTracker.markAutoSpace()
+        val (midWordSpaceEdit, midWordSpaceIc) = createRealEditor("helo world", 2)
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = midWordSpaceIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello world", midWordSpaceEdit.text.toString())
+        assertEquals(5, midWordSpaceEdit.selectionStart)
+        assertEquals(5, midWordSpaceEdit.selectionEnd)
+        assertFalse(AutoSpaceTracker.isPending())
+
+        SettingsManager.setAutoSpaceAfterSuggestion(context, false)
+        AutoSpaceTracker.markAutoSpace()
+        val (midWordOffEdit, midWordOffIc) = createRealEditor("helo", 2)
+        assertTrue(
+            SuggestionButtonHandler.commitSuggestion(
+                context = context,
+                inputConnection = midWordOffIc,
+                suggestion = "hello",
+                shouldDisableAutoCapitalize = true
+            )
+        )
+        assertEquals("hello", midWordOffEdit.text.toString())
+        assertEquals(5, midWordOffEdit.selectionStart)
+        assertEquals(5, midWordOffEdit.selectionEnd)
+        assertFalse(AutoSpaceTracker.isPending())
+    }
+
     private fun renderSingleSuggestionButton(
         inputConnection: InputConnection,
         suggestion: String
@@ -361,7 +673,7 @@ class SuggestionSpacingBehaviorTest {
         return buttons.single { it.text.toString() == suggestion }
     }
 
-    private fun commitCommaViaRouter(inputConnection: FakeInputConnection) {
+    private fun commitCommaViaRouter(inputConnection: InputConnection) {
         val router = InputEventRouter(
             context,
             NavModeController(context, ModifierStateController(300L))
@@ -462,6 +774,109 @@ class SuggestionSpacingBehaviorTest {
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
             before.append(text ?: "")
             return true
+        }
+
+        override fun finishComposingText(): Boolean = true
+    }
+
+    private enum class SpaceCommitMode {
+        WRITE_AND_SUCCEED,
+        DROP_AND_RETURN_TRUE,
+        FAIL_AND_RETURN_FALSE
+    }
+
+    private class DelayedReadbackEditorInputConnection(
+        context: Context,
+        initialBefore: String,
+        initialAfter: String = "",
+        private val nullReadbackAfterCommit: Boolean = false,
+        private val spaceCommitMode: (attempt: Int) -> SpaceCommitMode = { SpaceCommitMode.WRITE_AND_SUCCEED },
+        private val handleSpaceKeyEvent: Boolean = true
+    ) : BaseInputConnection(View(context), true) {
+        private val before = StringBuilder(initialBefore)
+        private val after = StringBuilder(initialAfter)
+        private var readbackUnavailable = false
+
+        var spaceCommitAttempts: Int = 0
+            private set
+
+        var spaceKeyEventCount: Int = 0
+            private set
+
+        val text: String
+            get() = before.toString() + after.toString()
+
+        fun recoverReadback() {
+            readbackUnavailable = false
+        }
+
+        override fun getTextBeforeCursor(n: Int, flags: Int): CharSequence? {
+            if (readbackUnavailable) return null
+            return before.takeLast(n)
+        }
+
+        override fun getTextAfterCursor(n: Int, flags: Int): CharSequence? {
+            if (readbackUnavailable) return null
+            return after.take(n)
+        }
+
+        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            if (beforeLength > 0) {
+                val deleteStart = (before.length - beforeLength).coerceAtLeast(0)
+                before.delete(deleteStart, before.length)
+            }
+            if (afterLength > 0) {
+                val deleteEnd = afterLength.coerceAtMost(after.length)
+                after.delete(0, deleteEnd)
+            }
+            return true
+        }
+
+        override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            val committedText = text?.toString().orEmpty()
+            if (committedText == " ") {
+                spaceCommitAttempts++
+                return when (spaceCommitMode(spaceCommitAttempts)) {
+                    SpaceCommitMode.WRITE_AND_SUCCEED -> {
+                        before.append(" ")
+                        if (nullReadbackAfterCommit) {
+                            readbackUnavailable = true
+                        }
+                        true
+                    }
+                    SpaceCommitMode.DROP_AND_RETURN_TRUE -> {
+                        if (nullReadbackAfterCommit) {
+                            readbackUnavailable = true
+                        }
+                        true
+                    }
+                    SpaceCommitMode.FAIL_AND_RETURN_FALSE -> {
+                        if (nullReadbackAfterCommit) {
+                            readbackUnavailable = true
+                        }
+                        false
+                    }
+                }
+            }
+            before.append(committedText)
+            if (nullReadbackAfterCommit) {
+                readbackUnavailable = true
+            }
+            return true
+        }
+
+        override fun sendKeyEvent(event: KeyEvent?): Boolean {
+            if (event?.keyCode == KeyEvent.KEYCODE_SPACE) {
+                spaceKeyEventCount++
+                if (!handleSpaceKeyEvent) {
+                    return false
+                }
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    before.append(" ")
+                }
+                return true
+            }
+            return super.sendKeyEvent(event)
         }
 
         override fun finishComposingText(): Boolean = true

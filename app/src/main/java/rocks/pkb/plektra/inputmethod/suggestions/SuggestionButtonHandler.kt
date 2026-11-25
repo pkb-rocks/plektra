@@ -72,6 +72,41 @@ object SuggestionButtonHandler {
         )
     }
 
+    private enum class TrailingSpaceReadback {
+        PRESENT,
+        ABSENT,
+        UNKNOWN
+    }
+
+    private fun readTrailingSpaceState(inputConnection: InputConnection): TrailingSpaceReadback {
+        val textBefore = inputConnection.getTextBeforeCursor(2, 0) ?: return TrailingSpaceReadback.UNKNOWN
+        return if (textBefore.endsWith(" ")) {
+            TrailingSpaceReadback.PRESENT
+        } else {
+            TrailingSpaceReadback.ABSENT
+        }
+    }
+
+    private fun ensureTrailingSpaceAfterSuggestion(inputConnection: InputConnection): Boolean {
+        val firstCommitted = inputConnection.commitText(" ", 1)
+        when (readTrailingSpaceState(inputConnection)) {
+            TrailingSpaceReadback.PRESENT -> return true
+            TrailingSpaceReadback.UNKNOWN -> if (firstCommitted) return true
+            TrailingSpaceReadback.ABSENT -> Unit
+        }
+
+        val secondCommitted = inputConnection.commitText(" ", 1)
+        when (readTrailingSpaceState(inputConnection)) {
+            TrailingSpaceReadback.PRESENT -> return true
+            TrailingSpaceReadback.UNKNOWN -> if (secondCommitted) return true
+            TrailingSpaceReadback.ABSENT -> Unit
+        }
+
+        inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
+        inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SPACE))
+        return readTrailingSpaceState(inputConnection) == TrailingSpaceReadback.PRESENT
+    }
+
     /**
      * Replace the word immediately before the cursor with the given suggestion.
      * Deletes up to the nearest whitespace/punctuation boundary and applies basic casing
@@ -83,22 +118,6 @@ object SuggestionButtonHandler {
         forceLeadingCapital: Boolean,
         autoSpaceAfterSuggestion: Boolean = true
     ): Boolean {
-        fun ensureTrailingSpaceAfterSuggestion(): Boolean {
-            val beforeAfterCommit = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
-            if (beforeAfterCommit.endsWith(" ")) {
-                return true
-            }
-            inputConnection.commitText(" ", 1)
-            val afterSecondTry = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
-            if (afterSecondTry.endsWith(" ")) {
-                return true
-            }
-            inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
-            inputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_SPACE))
-            val afterKeyEvent = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
-            return afterKeyEvent.endsWith(" ")
-        }
-
         val before = inputConnection.getTextBeforeCursor(64, 0)?.toString().orEmpty()
         val after = inputConnection.getTextAfterCursor(64, 0)?.toString().orEmpty()
         fun isBoundaryChar(ch: Char, prev: Char?, next: Char?): Boolean {
@@ -145,6 +164,7 @@ object SuggestionButtonHandler {
             !replacement.endsWith("'") &&
             !nextIsWhitespace
 
+        inputConnection.finishComposingText()
         val deleted = inputConnection.deleteSurroundingText(deleteBefore, deleteAfter)
         if (deleted) {
             Log.d(TAG, "Deleted ${deleteBefore + deleteAfter} chars ('$currentWord') before inserting suggestion")
@@ -155,13 +175,7 @@ object SuggestionButtonHandler {
         val committed = inputConnection.commitText(replacement, 1)
         if (committed) {
             if (shouldAppendSpace) {
-                val committedWithSpace = inputConnection.commitText(" ", 1)
-                val spaced = if (committedWithSpace) {
-                    val textBefore = inputConnection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
-                    if (textBefore.endsWith(" ")) true else ensureTrailingSpaceAfterSuggestion()
-                } else {
-                    ensureTrailingSpaceAfterSuggestion()
-                }
+                val spaced = ensureTrailingSpaceAfterSuggestion(inputConnection)
                 if (spaced) {
                     AutoSpaceTracker.markAutoSpace()
                     Log.d(TAG, "Suggestion auto-space marked")

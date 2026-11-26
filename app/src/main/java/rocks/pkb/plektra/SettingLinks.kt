@@ -223,7 +223,8 @@ data class SettingEntry(
         SettingAvailability.TextReplacementsEnabled ->
             SettingsManager.getAutoCorrectEnabled(context)
         SettingAvailability.AutoReplaceEnabled ->
-            SettingsManager.getAutoReplaceOnSpaceEnter(context)
+            SettingsManager.isExperimentalSuggestionsEnabled(context) &&
+                SettingsManager.getAutoReplaceOnSpaceEnter(context)
         SettingAvailability.CtrlTapLatchesEnabled ->
             SettingsManager.getCtrlTapLatches(context)
         SettingAvailability.TrackpadShizukuProvider ->

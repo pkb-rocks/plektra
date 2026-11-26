@@ -89,6 +89,8 @@ object SettingLinkIds {
     const val ACCESSIBILITY_LIVE_READ = "accessibility.live_read"
     const val ACCESSIBILITY_READ_SECOND_ROW = "accessibility.read_second_row"
     const val KEYBOARD_BAR_HARDWARE_ONLY = "status_bar.hardware_only"
+    const val KEYBOARD_BAR_HIDE_IME_CAPTION = "keyboard_bar.hide_ime_caption_bar"
+    const val KEYBOARD_BAR_SYSTEM_CONTROLS = "keyboard_bar.system_controls"
     const val ACCESSIBILITY_SUGGESTIONS_DELAY = "accessibility.suggestions_delay"
     const val ACCESSIBILITY_BOUNCE_KEYS = "accessibility.bounce_keys"
     const val ACCESSIBILITY_BOUNCE_KEYS_CHARACTER_KEYS = "accessibility.bounce_keys_character_keys"

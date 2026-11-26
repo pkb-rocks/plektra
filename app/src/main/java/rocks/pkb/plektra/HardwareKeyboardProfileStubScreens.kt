@@ -1189,22 +1189,6 @@ private fun ClicksButtonMappingsScreen(
             state.geminiRemap,
             microphoneChoices
         )
-    val redBindingPending = ClicksButtonBindingSyncPolicy.isPending(
-        state,
-        ClicksButtonBindingTarget.RED,
-        desiredRedButtonBinding
-    )
-    val keyboardBindingPending = ClicksButtonBindingSyncPolicy.isPending(
-        state,
-        ClicksButtonBindingTarget.KEYBOARD,
-        desiredKeyboardButtonBinding
-    )
-    val microphoneBindingPending = ClicksButtonBindingSyncPolicy.isPending(
-        state,
-        ClicksButtonBindingTarget.MICROPHONE,
-        desiredMicrophoneButtonBinding
-    )
-
     val firmwareReadState = ClicksButtonBindingSyncPolicy.readState(state)
 
     HardwareProfileScaffold(
@@ -1244,7 +1228,7 @@ private fun ClicksButtonMappingsScreen(
             choices = if (redSelected.id == "red_custom") redChoices + redSelected else redChoices,
             enabled = CLICKS_BINDING_RED !in inProgress,
             applying = CLICKS_BINDING_RED in inProgress,
-            pending = redBindingPending,
+            pending = desiredRedButtonBinding?.pending == true,
             readState = firmwareReadState,
             onSelected = { choice ->
                 onRedSelected(
@@ -1263,7 +1247,7 @@ private fun ClicksButtonMappingsScreen(
             choices = displayedAltChoices,
             enabled = CLICKS_BINDING_ALT !in inProgress,
             applying = CLICKS_BINDING_ALT in inProgress,
-            pending = keyboardBindingPending,
+            pending = desiredKeyboardButtonBinding?.pending == true,
             readState = firmwareReadState,
             onSelected = { choice ->
                 onAltSelected(
@@ -1282,7 +1266,7 @@ private fun ClicksButtonMappingsScreen(
             choices = displayedMicrophoneChoices,
             enabled = CLICKS_BINDING_MICROPHONE !in inProgress,
             applying = CLICKS_BINDING_MICROPHONE in inProgress,
-            pending = microphoneBindingPending,
+            pending = desiredMicrophoneButtonBinding?.pending == true,
             readState = firmwareReadState,
             onSelected = { choice ->
                 onMicrophoneSelected(

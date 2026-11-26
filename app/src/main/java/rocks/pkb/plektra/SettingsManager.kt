@@ -15,6 +15,7 @@ import rocks.pkb.plektra.commands.CommandSurface
 import rocks.pkb.plektra.commands.PlektraCommandSource
 import rocks.pkb.plektra.core.Punctuation
 import rocks.pkb.plektra.data.layout.BundledLayoutAssets
+import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
@@ -28,6 +29,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.UUID
 import java.util.zip.ZipInputStream
 
 /**
@@ -2608,10 +2610,8 @@ object SettingsManager {
         val choiceId = preferences.getString(choiceKey, null)?.takeIf(String::isNotBlank) ?: return null
         val encodedOutput = preferences.getString(outputKey, null) ?: return null
         val output = encodedOutput.decodeClicksRemapOutput() ?: return null
-        // Bindings stored before the pending marker existed, or restored from a backup, have no
-        // marker for their output. They count as applied so Plektra never replaces a firmware
-        // assignment that was changed in the Clicks app in the meantime.
-        val pending = preferences.getString(clicksPendingButtonBindingKey(target), null) == encodedOutput
+        val marker = preferences.getString(clicksPendingButtonBindingKey(target), null)
+        val pending = isLocalClicksPendingMarker(context, marker, encodedOutput)
         return ClicksDesiredButtonBinding(choiceId, output, pending)
     }
 
@@ -2627,7 +2627,12 @@ object SettingsManager {
         val editor = getPreferences(context).edit()
             .putString(choiceKey, binding.choiceId)
             .putString(outputKey, encodedOutput)
-        if (binding.pending) editor.putString(pendingKey, encodedOutput) else editor.remove(pendingKey)
+        if (binding.pending) {
+            val installationId = requireNotNull(clicksBindingInstallationId(context, create = true))
+            editor.putString(pendingKey, "$installationId:$encodedOutput")
+        } else {
+            editor.remove(pendingKey)
+        }
         editor.apply()
     }
 
@@ -2639,8 +2644,24 @@ object SettingsManager {
     ) {
         val pendingKey = clicksPendingButtonBindingKey(target)
         val preferences = getPreferences(context)
-        if (preferences.getString(pendingKey, null) == output.encodeClicksRemapOutput()) {
+        if (isLocalClicksPendingMarker(context, preferences.getString(pendingKey, null), output.encodeClicksRemapOutput())) {
             preferences.edit().remove(pendingKey).apply()
+        }
+    }
+
+    // Android can restore the complete preference file. Only the installation that stored a
+    // pending selection may write it to firmware. Old, unscoped markers cannot prove ownership.
+    private fun isLocalClicksPendingMarker(context: Context, marker: String?, encodedOutput: String): Boolean =
+        marker?.endsWith(":$encodedOutput") == true &&
+            clicksBindingInstallationId(context) == marker.substringBefore(':')
+
+    @Synchronized
+    private fun clicksBindingInstallationId(context: Context, create: Boolean = false): String? {
+        val file = File(context.noBackupFilesDir, "clicks_button_binding_installation")
+        val existing = if (file.isFile) file.readText().takeIf(String::isNotBlank) else null
+        if (existing != null || !create) return existing
+        return UUID.randomUUID().toString().also { id ->
+            LayoutFileStore.writeAtomically(file, id.toByteArray())
         }
     }
 

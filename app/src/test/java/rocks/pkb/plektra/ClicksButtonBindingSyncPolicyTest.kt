@@ -22,6 +22,15 @@ class ClicksButtonBindingSyncPolicyTest {
     }
 
     @Test
+    fun enabledRemapWithUnreadBytesCannotBeConfirmedAsNative() {
+        val state = writableState(specialKeyEnableFlags = ClicksPowerKeyboardProtocol.FLAG_ALT_REMAP_ENABLED)
+        val target = ClicksButtonBindingTarget.KEYBOARD
+
+        assertNull(ClicksButtonBindingSyncPolicy.currentOutput(state, target))
+        assertFalse(ClicksButtonBindingSyncPolicy.isConfirmed(state, target, ClicksPowerKeyboardProtocol.nativeRemapOutput()))
+    }
+
+    @Test
     fun desiredOutputMustMatchTheTargetRemap() {
         val dictation = ClicksPowerKeyboardProtocol.dictationRemapOutput()
         val state = writableState(geminiRemap = dictation)
@@ -109,7 +118,6 @@ class ClicksButtonBindingSyncPolicyTest {
                 failedInCurrentConnection = false
             )
         )
-        assertFalse(ClicksButtonBindingSyncPolicy.isPending(state, ClicksButtonBindingTarget.KEYBOARD, applied))
         assertNull(ClicksButtonBindingSyncPolicy.displayedBinding(state, ClicksButtonBindingTarget.KEYBOARD, applied))
         assertTrue(
             ClicksButtonBindingSyncPolicy.currentOutput(state, ClicksButtonBindingTarget.KEYBOARD)!!
@@ -158,7 +166,6 @@ class ClicksButtonBindingSyncPolicyTest {
                 )
             )
         )
-        assertTrue(ClicksButtonBindingSyncPolicy.isPending(writableState(), ClicksButtonBindingTarget.KEYBOARD, pending))
         assertSame(
             pending,
             ClicksButtonBindingSyncPolicy.displayedBinding(writableState(), ClicksButtonBindingTarget.KEYBOARD, pending)
@@ -215,7 +222,6 @@ class ClicksButtonBindingSyncPolicyTest {
             ClicksButtonBindingSyncPolicy.reconcileAction(external, ClicksButtonBindingTarget.KEYBOARD, applied, false)
         )
         assertNull(ClicksButtonBindingSyncPolicy.displayedBinding(external, ClicksButtonBindingTarget.KEYBOARD, applied))
-        assertFalse(ClicksButtonBindingSyncPolicy.isPending(external, ClicksButtonBindingTarget.KEYBOARD, applied))
     }
 
     private fun writableState(
@@ -224,7 +230,10 @@ class ClicksButtonBindingSyncPolicyTest {
         tabRemap: ByteArray? = null,
         geminiRemap: ByteArray? = null,
         altRemap: ByteArray? = null,
-        specialKeyEnableFlags: Int = 0
+        specialKeyEnableFlags: Int =
+            (if (tabRemap == null) 0 else ClicksPowerKeyboardProtocol.FLAG_TAB_REMAP_ENABLED) or
+            (if (geminiRemap == null) 0 else ClicksPowerKeyboardProtocol.FLAG_GEMINI_REMAP_ENABLED) or
+            (if (altRemap == null) 0 else ClicksPowerKeyboardProtocol.FLAG_ALT_REMAP_ENABLED)
     ) = ClicksPowerKeyboardState(
         ready = true,
         stale = stale,

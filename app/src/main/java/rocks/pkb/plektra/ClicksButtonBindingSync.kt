@@ -3,7 +3,9 @@ package rocks.pkb.plektra
 internal enum class ClicksButtonBindingTarget(val firmwareCommand: Int) {
     RED(ClicksPowerKeyboardProtocol.COMMAND_TAB_REMAP),
     KEYBOARD(ClicksPowerKeyboardProtocol.COMMAND_ALT_REMAP),
-    MICROPHONE(ClicksPowerKeyboardProtocol.COMMAND_GEMINI_REMAP)
+    MICROPHONE(ClicksPowerKeyboardProtocol.COMMAND_GEMINI_REMAP);
+
+    val enableFlag = requireNotNull(ClicksPowerKeyboardProtocol.remapTarget(firmwareCommand)).enableFlag
 }
 
 /**
@@ -65,10 +67,7 @@ internal object ClicksButtonBindingCompletionPolicy {
 
 internal object ClicksButtonBindingSyncPolicy {
     fun canWrite(state: ClicksPowerKeyboardState): Boolean =
-        state.ready &&
-            state.sessionValidated &&
-            !state.stale &&
-            state.specialKeyEnableFlags != null &&
+        readState(state) == ClicksButtonBindingReadState.CURRENT &&
             state.firmwareVersion?.let(ClicksFirmwareVersionReader::isSupported) == true
 
     fun reconcileAction(
@@ -79,10 +78,10 @@ internal object ClicksButtonBindingSyncPolicy {
         /** A failed write may have changed the firmware without publishing it; see the coordinator. */
         outputUnverified: Boolean = false
     ): ClicksButtonBindingReconcileAction = when {
-        desired == null || !desired.pending || !canWrite(state) -> ClicksButtonBindingReconcileAction.NONE
+        desired == null || !desired.pending -> ClicksButtonBindingReconcileAction.NONE
         !outputUnverified && isConfirmed(state, target, desired.firmwareOutput) ->
             ClicksButtonBindingReconcileAction.MARK_APPLIED
-        failedInCurrentConnection -> ClicksButtonBindingReconcileAction.NONE
+        failedInCurrentConnection || !canWrite(state) -> ClicksButtonBindingReconcileAction.NONE
         else -> ClicksButtonBindingReconcileAction.WRITE
     }
 
@@ -93,12 +92,6 @@ internal object ClicksButtonBindingSyncPolicy {
         else -> ClicksButtonBindingReadState.LAST_KNOWN
     }
 
-    fun isPending(
-        state: ClicksPowerKeyboardState,
-        target: ClicksButtonBindingTarget,
-        desired: ClicksDesiredButtonBinding?
-    ): Boolean = desired?.pending == true && !isConfirmed(state, target, desired.firmwareOutput)
-
     /**
      * Returns the Plektra selection that still describes the keyboard. An applied selection whose
      * output differs from the read firmware state was replaced outside Plektra and is not shown.
@@ -107,19 +100,20 @@ internal object ClicksButtonBindingSyncPolicy {
         state: ClicksPowerKeyboardState,
         target: ClicksButtonBindingTarget,
         desired: ClicksDesiredButtonBinding?
-    ): ClicksDesiredButtonBinding? = desired?.takeIf {
-        it.pending || state.specialKeyEnableFlags == null || isConfirmed(state, target, it.firmwareOutput)
+    ): ClicksDesiredButtonBinding? {
+        val output = currentOutput(state, target)
+        return desired?.takeIf { it.pending || output == null || output.contentEquals(it.firmwareOutput) }
     }
 
     /** The firmware output of [target], or null while its remap state has not been read. */
     fun currentOutput(state: ClicksPowerKeyboardState, target: ClicksButtonBindingTarget): ByteArray? {
-        if (state.specialKeyEnableFlags == null) return null
-        val currentOutput = when (target) {
+        val flags = state.specialKeyEnableFlags ?: return null
+        if (flags and target.enableFlag == 0) return ClicksPowerKeyboardProtocol.nativeRemapOutput()
+        return when (target) {
             ClicksButtonBindingTarget.RED -> state.tabRemap
             ClicksButtonBindingTarget.KEYBOARD -> state.altRemap
             ClicksButtonBindingTarget.MICROPHONE -> state.geminiRemap
         }
-        return currentOutput ?: ClicksPowerKeyboardProtocol.nativeRemapOutput()
     }
 
     fun isConfirmed(
@@ -128,17 +122,7 @@ internal object ClicksButtonBindingSyncPolicy {
         desiredOutput: ByteArray
     ): Boolean {
         require(desiredOutput.size == 2)
-        val currentOutput = when (target) {
-            ClicksButtonBindingTarget.RED -> state.tabRemap
-            ClicksButtonBindingTarget.KEYBOARD -> state.altRemap
-            ClicksButtonBindingTarget.MICROPHONE -> state.geminiRemap
-        }
-        return if (desiredOutput.isNativeOutput()) {
-            currentOutput == null
-        } else {
-            currentOutput?.contentEquals(desiredOutput) == true
-        }
+        return readState(state) == ClicksButtonBindingReadState.CURRENT &&
+            currentOutput(state, target)?.contentEquals(desiredOutput) == true
     }
-
-    private fun ByteArray.isNativeOutput(): Boolean = all { it == 0.toByte() }
 }

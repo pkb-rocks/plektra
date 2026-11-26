@@ -1,6 +1,5 @@
 package rocks.pkb.plektra
 
-import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -248,9 +247,9 @@ internal fun KeyboardBarSettingsScreen(
                 stringResource(R.string.keyboard_bar_variations_summary), "keyboard_bar.variations") {
                 openSettingsChild(context, "customization", "KeyboardBarVariations")
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (ImeCaptionBarSettings.canControlCaptionBar()) {
                 KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_hide_ime_caption_bar), hideImeCaptionBar,
-                    "keyboard_bar.hide_ime_caption_bar", stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
+                    SettingLinkIds.KEYBOARD_BAR_HIDE_IME_CAPTION, stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
                     hideImeCaptionBar = it
                     SettingsManager.setHideImeCaptionBar(context, it)
                 }
@@ -261,7 +260,7 @@ internal fun KeyboardBarSettingsScreen(
                 SettingsManager.setImeSwitcherInBar(context, it)
             }
             KeyboardBarNavigationRow(Icons.Filled.Tune, stringResource(R.string.keyboard_bar_system_controls),
-                stringResource(R.string.keyboard_bar_system_controls_description), "keyboard_bar.system_controls") {
+                stringResource(R.string.keyboard_bar_system_controls_description), SettingLinkIds.KEYBOARD_BAR_SYSTEM_CONTROLS) {
                 ImeCaptionBarSettings.open(context)
             }
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_visibility_section))

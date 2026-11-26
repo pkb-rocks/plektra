@@ -1,7 +1,9 @@
 package rocks.pkb.plektra
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import java.io.File
 import java.util.Locale
 import org.junit.Assert.assertEquals
@@ -22,6 +24,27 @@ class SettingLinkCoverageTest {
     @Before
     fun resetSettings() {
         SettingsManager.getPreferences(context).edit().clear().commit()
+    }
+
+    @Test
+    fun captionBarSearchHidesTheAbsentRowAndSharedLinkTargetsSystemControlsOnAndroid13() {
+        val entry = requireNotNull(SettingLinkRegistry.byId("keyboard_bar.hide_ime_caption_bar"))
+        val results = SettingLinkRegistry.search(context, context.getString(entry.titleRes))
+        val target = SettingLinkRegistry.visibleTarget(context, entry)
+
+        assertFalse(results.any { it.id == entry.id })
+        assertEquals("keyboard_bar.system_controls", target.id)
+        assertEquals(target.route.toSettingsPage(), Intent(Intent.ACTION_VIEW, Uri.parse(SettingLinkRegistry.buildLink(entry.id))).settingsPage())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun captionBarSearchAndSharedLinkTargetTheSwitchOnAndroid14() {
+        val entry = requireNotNull(SettingLinkRegistry.byId("keyboard_bar.hide_ime_caption_bar"))
+        val results = SettingLinkRegistry.search(context, context.getString(entry.titleRes))
+
+        assertTrue(results.any { it.id == entry.id })
+        assertEquals(entry, SettingLinkRegistry.visibleTarget(context, entry))
     }
 
     @Test

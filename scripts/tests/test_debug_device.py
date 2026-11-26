@@ -1,4 +1,5 @@
 import importlib.util
+from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
@@ -21,11 +22,16 @@ def write_tar(path, entries):
             archive.addfile(member, io.BytesIO(data))
 
 
+def is_pidof(args):
+    return args[:2] == ('sh', '-c') and args[2].startswith('pidof ')
+
+
 class FakeApp:
     """Device side of a restore: app files by absolute path, plus a process the test can start."""
 
-    def __init__(self, test, device, on_restored=None):
+    def __init__(self, test, device, on_restored=None, on_selected=None):
         self.test, self.device, self.on_restored = test, device, on_restored
+        self.on_selected = on_selected
         self.files, self.pid, self.calls, self.selected = {}, '', [], 'other.keyboard/Service'
         self.de = '/data/user_de/0/' + device.package
 
@@ -49,11 +55,11 @@ class FakeApp:
             return 'other.keyboard/Service'
         if args[:2] == ('ime', 'set'):
             self.selected = args[2]
+            if self.on_selected and self.selected.startswith(self.device.package + '/'):
+                self.on_selected(self)
         if args[:2] == ('am', 'force-stop'):
             self.pid = ''
-        if args[0] == 'pidof':
-            if not self.pid:
-                raise RuntimeError('ADB operation failed: shell')
+        if is_pidof(args):
             return self.pid
         if args[:3] == ('run-as', self.device.package, 'sh') and 'sha256sum' in args[4]:
             data = self.files.get(self.absolute(args[-1]))
@@ -221,24 +227,43 @@ class DebugDeviceTest(unittest.TestCase):
         device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
         def start_app(app):
             app.pid = '4242'
-            rebuild_snapshot(app)
         with tempfile.TemporaryDirectory() as folder:
             backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>',
-                                                   './cache/tmp': b'regenerable'},
+                                                   './cache/tmp': b'regenerable',
+                                                   './no_backup/clicks_button_binding_installation': b'old-installation'},
                                   {'./files/direct_boot_files/current': OLD_GENERATION.rsplit('/', 1)[1].encode(),
                                    OLD_GENERATION + '/settings.json': b'{"old": 1}',
                                    OLD_GENERATION + '/files/ctrl_key_mappings.json': b'{}',
                                    './shared_prefs/direct_boot_keyboard_config.xml': b'<map/>',
                                    './shared_prefs/de_user_choice.xml': b'<map/>'})
-            app = FakeApp(self, device, on_restored=start_app)
-            app.restore(backup)
+            app = FakeApp(self, device, on_restored=start_app, on_selected=rebuild_snapshot)
+            with redirect_stdout(io.StringIO()) as stdout:
+                app.restore(backup)
+        self.assertIn('Direct Boot keyboard snapshot rebuilt.', stdout.getvalue())
         self.assertEqual(b'<map/>', app.files['/data/data/rocks.pkb.plektra.nightly/shared_prefs/plektra_prefs.xml'])
         self.assertIn(app.de + '/shared_prefs/de_user_choice.xml', app.files)
         self.assertFalse(any('generation-0000' in path or 'direct_boot_keyboard_config' in path or '/cache/' in path
+                             or path.endswith('/clicks_button_binding_installation')
                              for path in app.files))
-        self.assertIn(('am', 'force-stop', device.package), app.calls[app.calls.index(('pidof', device.package)):])
+        first_check = next(i for i, args in enumerate(app.calls) if is_pidof(args))
+        self.assertIn(('am', 'force-stop', device.package), app.calls[first_check:])
         self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
         self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_restore_keeps_old_snapshot_without_claiming_a_rebuild(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        app = FakeApp(self, device)
+        generation = OLD_GENERATION.rsplit('/', 1)[1].encode()
+        pointer = app.de + '/files/direct_boot_files/current'
+        app.files[pointer] = generation
+        app.files[app.de + OLD_GENERATION.removeprefix('.') + '/settings.json'] = b'{"hardware_only_mode":true}'
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            with redirect_stdout(io.StringIO()) as stdout, patch.object(debug.sys, 'stderr', io.StringIO()) as stderr:
+                app.restore(backup)
+        self.assertEqual(generation, app.files[pointer])
+        self.assertNotIn('Direct Boot keyboard snapshot rebuilt.', stdout.getvalue())
+        self.assertIn('no new Direct Boot keyboard snapshot was verified', stderr.getvalue())
 
     def test_missing_user_file_is_named_and_permissions_and_ime_are_still_restored(self):
         device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
@@ -266,7 +291,7 @@ class DebugDeviceTest(unittest.TestCase):
         app = FakeApp(self, device)
         original = app.shell
         def shell(*args, **kwargs):
-            if args[0] == 'pidof':
+            if is_pidof(args):
                 app.pid = '7'
             return original(*args, **kwargs)
         app.shell = shell
@@ -274,6 +299,24 @@ class DebugDeviceTest(unittest.TestCase):
             backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
             with self.assertRaisesRegex(RuntimeError, 'kept starting'):
                 app.restore(backup)
+        self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_process_check_transport_error_is_reported_after_restore_cleanup(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        app = FakeApp(self, device, on_restored=lambda app: setattr(app, 'pid', '4242'))
+        original = app.shell
+
+        def shell(*args, **kwargs):
+            if is_pidof(args):
+                raise RuntimeError('ADB operation failed: shell')
+            return original(*args, **kwargs)
+
+        app.shell = shell
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./shared_prefs/plektra_prefs.xml': b'<map/>'}, {})
+            with self.assertRaisesRegex(RuntimeError, 'ADB operation failed: shell'):
+                app.restore(backup)
+        self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
         self.assertEqual(device.package + '/.KeyboardService', app.selected)
 
     def test_every_recoverable_data_failure_still_restores_permissions_and_backup_ime(self):
@@ -329,6 +372,8 @@ class DebugDeviceTest(unittest.TestCase):
 
     def test_backup_never_archives_regenerable_data(self):
         self.assertIn('--exclude=./files/direct_boot_files', debug.tar_excludes(debug.DEVICE_DATA))
+        self.assertIn('--exclude=./no_backup/clicks_button_binding_installation', debug.tar_excludes(debug.CREDENTIAL_DATA))
+        self.assertTrue(debug.regenerable(debug.CREDENTIAL_DATA, './no_backup/clicks_button_binding_installation'))
         self.assertTrue(debug.regenerable(debug.DEVICE_DATA, './files/direct_boot_files/current'))
         self.assertFalse(debug.regenerable(debug.DEVICE_DATA, './files/direct_boot_files_user.json'))
         self.assertFalse(debug.regenerable(debug.CREDENTIAL_DATA, './files/direct_boot_files/current'))

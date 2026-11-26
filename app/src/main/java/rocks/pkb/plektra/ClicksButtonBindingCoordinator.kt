@@ -62,7 +62,7 @@ internal class ClicksButtonBindingCoordinator(
         val writeInProgress = target in writesInProgress
         val status = when {
             !writeInProgress && isVerified(state, target, binding.firmwareOutput) -> {
-                if (ClicksButtonBindingSyncPolicy.canWrite(state)) store.markApplied(target, binding.firmwareOutput)
+                store.markApplied(target, binding.firmwareOutput)
                 ClicksButtonBindingRequestStatus.CONFIRMED
             }
             !ClicksButtonBindingSyncPolicy.canWrite(state) || writer() == null ->

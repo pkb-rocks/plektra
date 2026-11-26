@@ -549,7 +549,6 @@ fun KeyboardSetupScreen(
         CustomTopBar(
             background = MainBackgroundPreferences.resolve(backgroundPreference),
             textEvent = textMotionEvent,
-            hardwareEvent = rawLastKeyEvent,
             onSettingsClick = {
                 val settingsIntent = Intent(context, SettingsActivity::class.java)
                 context.startActivity(settingsIntent)

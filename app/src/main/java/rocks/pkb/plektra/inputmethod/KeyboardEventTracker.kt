@@ -9,6 +9,11 @@ import androidx.compose.runtime.mutableStateOf
  * Allows input method service to communicate events to MainActivity.
  */
 object KeyboardEventTracker {
+    private val listeners = linkedSetOf<(KeyEventInfo) -> Unit>()
+
+    fun addListener(listener: (KeyEventInfo) -> Unit) { listeners += listener }
+    fun removeListener(listener: (KeyEventInfo) -> Unit) { listeners -= listener }
+
     private var _keyEventState: MutableState<KeyEventInfo?>? = null
     val keyEventState: MutableState<KeyEventInfo?>?
         get() = _keyEventState
@@ -147,6 +152,7 @@ object KeyboardEventTracker {
                 outputKeyCodeName = outputKeyCodeName,
                 eventTimeUptimeMs = event.eventTime
             )
+            listeners.toList().forEach { it(keyEventInfo) }
             _keyEventState?.value = keyEventInfo
         }
     }

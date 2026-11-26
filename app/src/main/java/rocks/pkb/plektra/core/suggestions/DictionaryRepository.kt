@@ -18,6 +18,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.SerializationException
 import java.io.File
+import rocks.pkb.plektra.core.initializeUserDefaultsFile
 import java.io.FileInputStream
 import java.io.InputStream
 import kotlin.math.pow
@@ -662,15 +663,10 @@ class AndroidDictionaryRepository(
         val fileName = "user_defaults.json"
         val file = context.getFileStreamPath(fileName)
         
-        // Ensure we have a local editable copy if asset exists
-        if (!file.exists()) {
-            try {
-                assets.open("common/dictionaries/$fileName").use { input ->
-                    file.outputStream().use { output -> input.copyTo(output) }
-                }
-            } catch (_: Exception) {
-                // No asset; leave file absent
-            }
+        try {
+            initializeUserDefaultsFile(file) { assets.open("common/dictionaries/$fileName") }
+        } catch (_: Exception) {
+            // Read from the asset below. A later load can retry the local copy.
         }
         
         return try {

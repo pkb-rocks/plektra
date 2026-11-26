@@ -4,10 +4,12 @@
 Script to convert dictionary .txt files to JSON format matching it_base.json structure
 """
 
+import argparse
 import json
+import math
 import os
 
-def convert_txt_to_json(txt_file, json_file):
+def convert_txt_to_json(txt_file, json_file, scale_frequencies=False):
     """
     Convert a .txt dictionary file to JSON format.
     Expected format: word frequency (space-separated, one per line)
@@ -25,8 +27,7 @@ def convert_txt_to_json(txt_file, json_file):
             # Split by whitespace - word is everything except last token (frequency)
             parts = line.split()
             if len(parts) < 2:
-                print(f"Warning: Line {line_num} has invalid format: {line}")
-                continue
+                raise ValueError(f"Line {line_num}: expected word frequency")
             
             # Last part is frequency, everything else is the word
             frequency = parts[-1]
@@ -34,11 +35,20 @@ def convert_txt_to_json(txt_file, json_file):
             
             try:
                 freq_int = int(frequency)
+                if not 1 <= freq_int <= 2147483647:
+                    raise ValueError("frequency must be between 1 and 2147483647")
                 entries.append({"w": word, "f": freq_int})
-            except ValueError:
-                print(f"Warning: Line {line_num} has invalid frequency: {frequency}")
-                continue
+            except ValueError as error:
+                raise ValueError(f"Line {line_num}: invalid frequency {frequency}: {error}") from error
     
+    if not entries:
+        raise ValueError("Input contains no dictionary entries")
+
+    if scale_frequencies:
+        maximum = max(entry["f"] for entry in entries)
+        for entry in entries:
+            entry["f"] = 1 + round(254 * math.log1p(entry["f"]) / math.log1p(maximum))
+
     print(f"Writing {json_file} with {len(entries)} entries...")
     with open(json_file, 'w', encoding='utf-8') as f:
         f.write('[\n')
@@ -54,6 +64,24 @@ def convert_txt_to_json(txt_file, json_file):
     print(f"Conversion complete: {len(entries)} entries written to {json_file}")
 
 def main():
+    parser = argparse.ArgumentParser(description="Convert UTF-8 word/frequency lines to dictionary JSON")
+    parser.add_argument("input", nargs="?", help="Word/frequency text file")
+    parser.add_argument("output", nargs="?", help="Output JSON file, e.g. ro_base.json")
+    parser.add_argument("--scale-frequencies", action="store_true",
+                        help="Log-scale corpus counts to the runtime ranking range 1–255")
+    args = parser.parse_args()
+    if args.input or args.output:
+        if not args.input or not args.output:
+            parser.error("input and output must be supplied together")
+        try:
+            convert_txt_to_json(args.input, args.output, args.scale_frequencies)
+        except (OSError, ValueError) as error:
+            parser.exit(1, f"Error: {error}\n")
+        return
+
+    if args.scale_frequencies:
+        parser.error("--scale-frequencies requires input and output")
+
     base_dir = "app/src/main/assets/common/dictionaries"
     
     # Mapping of input files to output files

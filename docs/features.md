@@ -27,6 +27,16 @@ Plektra focuses on efficient text input on Android devices with physical keyboar
 - Cursor and selection gestures
 - Local Markdown notes with editing, split and preview views
 
+## Share target
+
+Plektra appears in Android's share menu for text, links, pictures and other files, including several at once. It offers only the actions that fit the shared items:
+
+- **Copy to clipboard** for a single item. Text is copied as text. A file or picture is copied as a private copy that other apps can read with its type until the clipboard changes; Plektra then removes the copy. Very long text is refused with a hint to save it as a file.
+- **Save as file** keeps the original bytes and name. Files go to Downloads unless Settings → Advanced → Location for shared files points to a folder you chose. If that folder becomes unavailable, Plektra says so and offers Downloads instead. Existing names are kept; the new file gets a numbered name.
+- **Add to gallery** for pictures Android can decode. They appear as the newest entries in Pictures, or in Pictures/Plektra with Settings → Advanced → Own album for shared pictures.
+
+Plektra reads only the items the sharing app grants it and needs no storage permission. Each item reports its own result, and a running copy can be cancelled without leaving partial files.
+
 ## Languages
 
 German, English and Italian dictionaries are bundled. Download other base dictionaries from Installed dictionaries. User words remain available without a base dictionary. Installing or removing a package refreshes the active keyboard.

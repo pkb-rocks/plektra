@@ -6,4 +6,7 @@
     <cache-path
         name="sbom"
         path="sbom/" />
+    <cache-path
+        name="share_clipboard"
+        path="share-clipboard/" />
 </paths>

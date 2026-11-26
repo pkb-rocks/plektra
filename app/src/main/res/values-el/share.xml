@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Κοινοποίηση στο Plektra</string>
+    <string name="share_nothing_received">Τίποτα για παραλαβή. Το Plektra διαβάζει μόνο περιεχόμενο που του παραχωρεί η εφαρμογή κοινοποίησης.</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d κοινοποιημένο στοιχείο</item>
+        <item quantity="other">%d κοινοποιημένα στοιχεία</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">%d στοιχείο αγνοήθηκε επειδή δεν κοινοποιήθηκε μέσω του συστήματος αδειών του Android.</item>
+        <item quantity="other">%d στοιχεία αγνοήθηκαν επειδή δεν κοινοποιήθηκαν μέσω του συστήματος αδειών του Android.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Κείμενο · %d χαρακτήρας</item>
+        <item quantity="other">Κείμενο · %d χαρακτήρες</item>
+    </plurals>
+    <string name="share_action_clipboard">Αντιγραφή στο πρόχειρο</string>
+    <string name="share_action_save_file">Αποθήκευση ως αρχείο</string>
+    <string name="share_action_save_files">Αποθήκευση ως αρχεία</string>
+    <string name="share_action_gallery_one">Προσθήκη εικόνας στη συλλογή</string>
+    <string name="share_action_gallery_many">Προσθήκη εικόνων στη συλλογή</string>
+    <string name="share_action_save_downloads_instead">Αποθήκευση στις Λήψεις</string>
+    <string name="share_destination">Προορισμός: %s</string>
+    <string name="share_gallery_partial">%1$d από %2$d στοιχεία είναι εικόνες · προορισμός: %3$s</string>
+    <string name="share_change_destinations">Αλλαγή τοποθεσιών</string>
+    <string name="share_folder_downloads">Λήψεις</string>
+    <string name="share_folder_unnamed">Επιλεγμένος φάκελος</string>
+    <string name="share_folder_access_lost">Το Plektra δεν έχει πλέον πρόσβαση στον επιλεγμένο φάκελο. Επιλέξτε τον ξανά στην Αλλαγή τοποθεσιών.</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">%d στοιχείο δεν ήταν δυνατό να διεκπεραιωθεί. Δείτε τη λίστα παρακάτω.</item>
+        <item quantity="other">%d στοιχεία δεν ήταν δυνατό να διεκπεραιωθούν. Δείτε τη λίστα παρακάτω.</item>
+    </plurals>
+    <string name="share_progress">%1$d από %2$d ολοκληρώθηκαν</string>
+    <string name="share_cancel">Ακύρωση</string>
+    <string name="share_close">Κλείσιμο</string>
+    <string name="share_cancelled">Ακυρώθηκε. Τα στοιχεία που επισημάνθηκαν ως αποθηκευμένα παραμένουν αποθηκευμένα.</string>
+    <string name="share_result_saved">Αποθηκεύτηκε ως %1$s στο %2$s</string>
+    <string name="share_result_copied">Αντιγράφηκε στο πρόχειρο</string>
+    <string name="share_done_clipboard">Αντιγράφηκε στο πρόχειρο</string>
+    <plurals name="share_done_files">
+        <item quantity="one">%1$d αρχείο αποθηκεύτηκε στο %2$s</item>
+        <item quantity="other">%1$d αρχεία αποθηκεύτηκαν στο %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">%1$d εικόνα προστέθηκε στο %2$s</item>
+        <item quantity="other">%1$d εικόνες προστέθηκαν στο %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">Η εφαρμογή κοινοποίησης δεν επιτρέπει πλέον την ανάγνωση αυτού του στοιχείου.</string>
+    <string name="share_error_folder_access_revoked">Δεν υπάρχει πρόσβαση στον επιλεγμένο φάκελο. Επιλέξτε τον ξανά ή αποθηκεύστε στις Λήψεις.</string>
+    <string name="share_error_folder_unavailable">Ο επιλεγμένος φάκελος δεν είναι διαθέσιμος.</string>
+    <string name="share_error_not_an_image">Το Android δεν μπορεί να διαβάσει αυτό το στοιχείο ως εικόνα.</string>
+    <string name="share_error_too_large_for_clipboard">Πολύ μεγάλο για το πρόχειρο. Αποθηκεύστε το ως αρχείο.</string>
+    <string name="share_error_clipboard_rejected">Το πρόχειρο δεν δέχτηκε αυτό το στοιχείο.</string>
+    <string name="share_error_write_failed">Η αποθήκευση απέτυχε. Ο χώρος αποθήκευσης μπορεί να είναι πλήρης ή μη εγγράψιμος.</string>
+    <string name="share_clip_label">Κοινοποιήθηκε στο Plektra</string>
+    <string name="share_text_file_name">Κοινοποιημένο κείμενο %s</string>
+    <string name="share_file_fallback_name">Κοινοποιημένο αρχείο</string>
+    <string name="share_image_fallback_name">Κοινοποιημένη εικόνα</string>
+    <string name="share_save_folder_title">Τοποθεσία για κοινοποιημένα αρχεία</string>
+    <string name="share_save_folder_description">Εδώ αποθηκεύονται τα αρχεία από το μενού κοινοποίησης του Android</string>
+    <string name="share_save_folder_choose">Επιλογή φακέλου…</string>
+    <string name="share_save_folder_use_downloads">Χρήση των Λήψεων</string>
+    <string name="share_save_folder_dialog_message">Τα κοινοποιημένα αρχεία αποθηκεύονται τώρα στο %s.</string>
+    <string name="share_save_folder_choose_failed">Το Plektra δεν μπόρεσε να διατηρήσει την πρόσβαση σε αυτόν τον φάκελο. Επιλέξτε άλλον φάκελο.</string>
+    <string name="share_gallery_album_title">Ξεχωριστό άλμπουμ για κοινοποιημένες εικόνες</string>
+    <string name="share_gallery_album_description">Αποθηκεύει τις εικόνες στο Pictures/Plektra αντί για το Pictures</string>
+    <string name="kw_share_save_folder">κοινοποίηση αποθήκευση αρχείο φάκελος λήψεις τοποθεσία share downloads</string>
+    <string name="kw_share_gallery_album">κοινοποίηση εικόνες φωτογραφίες συλλογή άλμπουμ share gallery</string>
+</resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Partager avec Plektra</string>
+    <string name="share_nothing_received">Rien à reprendre. Plektra lit uniquement le contenu que l\'app de partage lui transmet.</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d élément partagé</item>
+        <item quantity="other">%d éléments partagés</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">%d élément a été ignoré, car il n\'a pas été partagé via le système d\'autorisations d\'Android.</item>
+        <item quantity="other">%d éléments ont été ignorés, car ils n\'ont pas été partagés via le système d\'autorisations d\'Android.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Texte · %d caractère</item>
+        <item quantity="other">Texte · %d caractères</item>
+    </plurals>
+    <string name="share_action_clipboard">Copier dans le presse-papiers</string>
+    <string name="share_action_save_file">Enregistrer comme fichier</string>
+    <string name="share_action_save_files">Enregistrer comme fichiers</string>
+    <string name="share_action_gallery_one">Ajouter l\'image à la galerie</string>
+    <string name="share_action_gallery_many">Ajouter les images à la galerie</string>
+    <string name="share_action_save_downloads_instead">Enregistrer dans Téléchargements</string>
+    <string name="share_destination">Destination : %s</string>
+    <string name="share_gallery_partial">%1$d éléments sur %2$d sont des images · destination : %3$s</string>
+    <string name="share_change_destinations">Modifier les emplacements</string>
+    <string name="share_folder_downloads">Téléchargements</string>
+    <string name="share_folder_unnamed">Dossier choisi</string>
+    <string name="share_folder_access_lost">Plektra n\'a plus accès au dossier choisi. Choisissez-le à nouveau sous Modifier les emplacements.</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">%d élément n\'a pas pu être traité. Voir la liste ci-dessous.</item>
+        <item quantity="other">%d éléments n\'ont pas pu être traités. Voir la liste ci-dessous.</item>
+    </plurals>
+    <string name="share_progress">%1$d sur %2$d terminés</string>
+    <string name="share_cancel">Annuler</string>
+    <string name="share_close">Fermer</string>
+    <string name="share_cancelled">Annulé. Les éléments indiqués comme enregistrés restent enregistrés.</string>
+    <string name="share_result_saved">Enregistré sous %1$s dans %2$s</string>
+    <string name="share_result_copied">Copié dans le presse-papiers</string>
+    <string name="share_done_clipboard">Copié dans le presse-papiers</string>
+    <plurals name="share_done_files">
+        <item quantity="one">%1$d fichier enregistré dans %2$s</item>
+        <item quantity="other">%1$d fichiers enregistrés dans %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">%1$d image ajoutée à %2$s</item>
+        <item quantity="other">%1$d images ajoutées à %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">L\'app de partage ne permet plus de lire cet élément.</string>
+    <string name="share_error_folder_access_revoked">Pas d\'accès au dossier choisi. Choisissez-le à nouveau ou enregistrez dans Téléchargements.</string>
+    <string name="share_error_folder_unavailable">Le dossier choisi n\'est pas disponible.</string>
+    <string name="share_error_not_an_image">Android ne peut pas lire cet élément comme une image.</string>
+    <string name="share_error_too_large_for_clipboard">Trop volumineux pour le presse-papiers. Enregistrez-le plutôt comme fichier.</string>
+    <string name="share_error_clipboard_rejected">Le presse-papiers n\'a pas accepté cet élément.</string>
+    <string name="share_error_write_failed">Échec de l\'enregistrement. Le stockage est peut-être plein ou protégé en écriture.</string>
+    <string name="share_clip_label">Partagé avec Plektra</string>
+    <string name="share_text_file_name">Texte partagé %s</string>
+    <string name="share_file_fallback_name">Fichier partagé</string>
+    <string name="share_image_fallback_name">Image partagée</string>
+    <string name="share_save_folder_title">Emplacement des fichiers partagés</string>
+    <string name="share_save_folder_description">Les fichiers enregistrés depuis le menu de partage d\'Android arrivent ici</string>
+    <string name="share_save_folder_choose">Choisir un dossier…</string>
+    <string name="share_save_folder_use_downloads">Utiliser Téléchargements</string>
+    <string name="share_save_folder_dialog_message">Les fichiers partagés arrivent actuellement dans %s.</string>
+    <string name="share_save_folder_choose_failed">Plektra n\'a pas pu conserver l\'accès à ce dossier. Choisissez un autre dossier.</string>
+    <string name="share_gallery_album_title">Album dédié aux images partagées</string>
+    <string name="share_gallery_album_description">Range les images dans Pictures/Plektra au lieu de Pictures</string>
+    <string name="kw_share_save_folder">partager partage enregistrer fichier dossier téléchargements emplacement répertoire share downloads</string>
+    <string name="kw_share_gallery_album">partager partage images photos galerie album share gallery</string>
+</resources>

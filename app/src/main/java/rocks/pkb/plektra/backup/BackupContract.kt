@@ -421,6 +421,8 @@ internal object BackupPreferenceContract {
             "titan2_elite_top_corner_multiplier" to PreferenceValueType.INT,
             "titan2_elite_max_icon_shrink" to PreferenceValueType.INT,
             "experimental_candidates_view_enabled" to PreferenceValueType.BOOLEAN,
+            // The share folder URI stays local: its grant belongs to this installation.
+            "share_gallery_album" to PreferenceValueType.BOOLEAN,
             "experimental_smooth_caret" to PreferenceValueType.BOOLEAN,
             "alt_shift_layout_switch" to PreferenceValueType.BOOLEAN,
             "ctrl_space_layout_switch" to PreferenceValueType.BOOLEAN,

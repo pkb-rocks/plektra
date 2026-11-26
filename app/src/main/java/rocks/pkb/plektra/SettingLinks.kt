@@ -108,6 +108,8 @@ object SettingLinkIds {
     const val ADVANCED_EXPERIMENTAL_CANDIDATES_VIEW = "advanced.experimental_candidates_view"
     const val ADVANCED_SHOW_TUTORIAL = "advanced.show_tutorial"
     const val ADVANCED_SHOW_RELEASE_NOTES_TUTORIAL = "advanced.show_release_notes_tutorial"
+    const val ADVANCED_SHARE_SAVE_FOLDER = "advanced.share_save_folder"
+    const val ADVANCED_SHARE_GALLERY_ALBUM = "advanced.share_gallery_album"
 
     // Trackpad gesture screen
     const val TRACKPAD_GESTURES_ENABLED = "trackpad.gestures_enabled"
@@ -726,6 +728,18 @@ object SettingLinkRegistry {
             destination = SettingsDestination.Advanced
         ),
         entry(
+            SettingLinkIds.ADVANCED_SHARE_SAVE_FOLDER,
+            R.string.share_save_folder_title,
+            R.string.share_save_folder_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
+            SettingLinkIds.ADVANCED_SHARE_GALLERY_ALBUM,
+            R.string.share_gallery_album_title,
+            R.string.share_gallery_album_description,
+            destination = SettingsDestination.Advanced
+        ),
+        entry(
             SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD,
             R.string.swipe_incremental_threshold_title,
             destination = SettingsDestination.Advanced
@@ -1120,6 +1134,8 @@ object SettingLinkRegistry {
         SettingLinkIds.AUTO_CORRECTION_EXACT_TYPING to R.string.kw_auto_correction_exact_typing,
         SettingLinkIds.ACCESSIBILITY_SUGGESTIONS_DELAY to R.string.kw_accessibility_suggestions_delay,
         SettingLinkIds.ADVANCED_SWIPE_INCREMENTAL_THRESHOLD to R.string.kw_advanced_swipe_threshold,
+        SettingLinkIds.ADVANCED_SHARE_SAVE_FOLDER to R.string.kw_share_save_folder,
+        SettingLinkIds.ADVANCED_SHARE_GALLERY_ALBUM to R.string.kw_share_gallery_album,
         SettingLinkIds.MODIFIERS_LONG_PRESS_MODIFIER to R.string.kw_modifiers_long_press_modifier,
         SettingLinkIds.MODIFIERS_LONG_PRESS_THRESHOLD to R.string.kw_modifiers_long_press_threshold,
         SettingLinkIds.MODIFIERS_INDICATORS to R.string.kw_modifier_indicators,

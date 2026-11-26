@@ -192,6 +192,25 @@
             </intent-filter>
         </activity>
         
+        <!-- Share target: copies, saves or adds shared text, files and pictures on request.
+             It reads only the content URIs the sender granted and needs no storage permission. -->
+        <activity
+            android:name=".share.ShareReceiverActivity"
+            android:exported="true"
+            android:label="${appLabel}"
+            android:theme="@style/Theme.Plektra">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
         <!-- Activity per gestire le lingue degli input method subtypes -->
         <activity
             android:name=".LanguagesActivity"

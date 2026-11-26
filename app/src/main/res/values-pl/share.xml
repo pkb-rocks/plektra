@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Udostępnij do Plektra</string>
+    <string name="share_nothing_received">Nie ma nic do przejęcia. Plektra odczytuje tylko treści, które udostępnia mu aplikacja udostępniająca.</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d udostępniony element</item>
+        <item quantity="few">%d udostępnione elementy</item>
+        <item quantity="many">%d udostępnionych elementów</item>
+        <item quantity="other">%d udostępnionego elementu</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">Pominięto %d element, ponieważ nie udostępniono go przez system uprawnień Androida.</item>
+        <item quantity="few">Pominięto %d elementy, ponieważ nie udostępniono ich przez system uprawnień Androida.</item>
+        <item quantity="many">Pominięto %d elementów, ponieważ nie udostępniono ich przez system uprawnień Androida.</item>
+        <item quantity="other">Pominięto %d elementu, ponieważ nie udostępniono ich przez system uprawnień Androida.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Tekst · %d znak</item>
+        <item quantity="few">Tekst · %d znaki</item>
+        <item quantity="many">Tekst · %d znaków</item>
+        <item quantity="other">Tekst · %d znaku</item>
+    </plurals>
+    <string name="share_action_clipboard">Kopiuj do schowka</string>
+    <string name="share_action_save_file">Zapisz jako plik</string>
+    <string name="share_action_save_files">Zapisz jako pliki</string>
+    <string name="share_action_gallery_one">Dodaj obraz do galerii</string>
+    <string name="share_action_gallery_many">Dodaj obrazy do galerii</string>
+    <string name="share_action_save_downloads_instead">Zapisz zamiast tego w Pobranych</string>
+    <string name="share_destination">Cel: %s</string>
+    <string name="share_gallery_partial">Obrazy: %1$d z %2$d elementów · cel: %3$s</string>
+    <string name="share_change_destinations">Zmień lokalizacje</string>
+    <string name="share_folder_downloads">Pobrane</string>
+    <string name="share_folder_unnamed">Wybrany folder</string>
+    <string name="share_folder_access_lost">Plektra nie ma już dostępu do wybranego folderu. Wybierz go ponownie w Zmień lokalizacje.</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">Nie udało się obsłużyć %d elementu. Szczegóły na liście poniżej.</item>
+        <item quantity="few">Nie udało się obsłużyć %d elementów. Szczegóły na liście poniżej.</item>
+        <item quantity="many">Nie udało się obsłużyć %d elementów. Szczegóły na liście poniżej.</item>
+        <item quantity="other">Nie udało się obsłużyć %d elementu. Szczegóły na liście poniżej.</item>
+    </plurals>
+    <string name="share_progress">Gotowe: %1$d z %2$d</string>
+    <string name="share_cancel">Anuluj</string>
+    <string name="share_close">Zamknij</string>
+    <string name="share_cancelled">Anulowano. Elementy oznaczone jako zapisane pozostają zapisane.</string>
+    <string name="share_result_saved">Zapisano jako %1$s w %2$s</string>
+    <string name="share_result_copied">Skopiowano do schowka</string>
+    <string name="share_done_clipboard">Skopiowano do schowka</string>
+    <plurals name="share_done_files">
+        <item quantity="one">Zapisano %1$d plik w %2$s</item>
+        <item quantity="few">Zapisano %1$d pliki w %2$s</item>
+        <item quantity="many">Zapisano %1$d plików w %2$s</item>
+        <item quantity="other">Zapisano %1$d pliku w %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">Dodano %1$d obraz do %2$s</item>
+        <item quantity="few">Dodano %1$d obrazy do %2$s</item>
+        <item quantity="many">Dodano %1$d obrazów do %2$s</item>
+        <item quantity="other">Dodano %1$d obrazu do %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">Aplikacja udostępniająca nie pozwala już odczytać tego elementu.</string>
+    <string name="share_error_folder_access_revoked">Brak dostępu do wybranego folderu. Wybierz go ponownie lub zapisz w Pobranych.</string>
+    <string name="share_error_folder_unavailable">Wybrany folder jest niedostępny.</string>
+    <string name="share_error_not_an_image">Android nie może odczytać tego elementu jako obrazu.</string>
+    <string name="share_error_too_large_for_clipboard">Zbyt duże dla schowka. Zapisz to jako plik.</string>
+    <string name="share_error_clipboard_rejected">Schowek nie przyjął tego elementu.</string>
+    <string name="share_error_write_failed">Nie udało się zapisać. Pamięć może być pełna lub niezapisywalna.</string>
+    <string name="share_clip_label">Udostępnione do Plektra</string>
+    <string name="share_text_file_name">Udostępniony tekst %s</string>
+    <string name="share_file_fallback_name">Udostępniony plik</string>
+    <string name="share_image_fallback_name">Udostępniony obraz</string>
+    <string name="share_save_folder_title">Lokalizacja udostępnionych plików</string>
+    <string name="share_save_folder_description">Tutaj trafiają pliki zapisane z menu udostępniania Androida</string>
+    <string name="share_save_folder_choose">Wybierz folder…</string>
+    <string name="share_save_folder_use_downloads">Użyj Pobranych</string>
+    <string name="share_save_folder_dialog_message">Udostępnione pliki trafiają obecnie do: %s.</string>
+    <string name="share_save_folder_choose_failed">Plektra nie mógł zachować dostępu do tego folderu. Wybierz inny folder.</string>
+    <string name="share_gallery_album_title">Osobny album na udostępnione obrazy</string>
+    <string name="share_gallery_album_description">Zapisuje obrazy w Pictures/Plektra zamiast w Pictures</string>
+    <string name="kw_share_save_folder">udostępnij udostępnianie zapisz plik folder pobrane lokalizacja katalog share downloads</string>
+    <string name="kw_share_gallery_album">udostępnij udostępnianie obrazy zdjęcia galeria album share gallery</string>
+</resources>

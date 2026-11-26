@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Έξυπνη εναλλαγή: το Alt απενεργοποιείται μετά από άνοιγμα</string>
+    <string name="smart_alt_off_description">Με κλειδωμένο Alt, η πληκτρολόγηση ανοιχτών εισαγωγικών ή παρένθεσης με Alt (\" ( [ {) απενεργοποιεί το Alt, ώστε οι λέξεις μέσα να γράφονται ως γράμματα</string>
+    <string name="smart_ctrl_off_title">Έξυπνη εναλλαγή: το Ctrl απενεργοποιείται μετά από συντόμευση</string>
+    <string name="smart_ctrl_off_description">Ένα πατημένο Ctrl απενεργοποιείται μετά από μία συντόμευση όπως αντιγραφή, επικόλληση ή αναίρεση· οι κινήσεις κέρσορα και επιλογής το κρατούν ενεργό</string>
+</resources>

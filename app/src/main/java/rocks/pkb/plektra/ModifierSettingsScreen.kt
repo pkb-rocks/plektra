@@ -64,6 +64,8 @@ fun ModifierSettingsScreen(
     var altLatchStaysOnSpace by remember { mutableStateOf(SettingsManager.getAltLatchStaysOnSpace(context)) }
     var ctrlTapLatches by remember { mutableStateOf(SettingsManager.getCtrlTapLatches(context)) }
     var ctrlLatchStaysOnSpace by remember { mutableStateOf(SettingsManager.getCtrlLatchStaysOnSpace(context)) }
+    var smartAltOff by remember { mutableStateOf(SettingsManager.getSmartAltOffAfterOpening(context)) }
+    var smartCtrlOff by remember { mutableStateOf(SettingsManager.getSmartCtrlOffAfterShortcut(context)) }
 
     var showSymShortcutCompatibilityInfo by remember { mutableStateOf(false) }
     var longPressExpanded by remember { mutableStateOf(false) }
@@ -216,6 +218,15 @@ fun ModifierSettingsScreen(
                 altLatchStaysOnSpace = it
                 SettingsManager.setAltLatchStaysOnSpace(context, it)
             }
+            ModifierSwitchRow(
+                title = stringResource(R.string.smart_alt_off_title),
+                description = stringResource(R.string.smart_alt_off_description),
+                checked = smartAltOff,
+                linkId = SettingLinkIds.MODIFIERS_SMART_ALT_OFF
+            ) {
+                smartAltOff = it
+                SettingsManager.setSmartAltOffAfterOpening(context, it)
+            }
 
             SettingsSectionDivider(stringResource(R.string.modifiers_section_control))
             ModifierNavigationRow(
@@ -264,6 +275,16 @@ fun ModifierSettingsScreen(
                 ) {
                     ctrlLatchStaysOnSpace = it
                     SettingsManager.setCtrlLatchStaysOnSpace(context, it)
+                }
+                ModifierSwitchRow(
+                    title = stringResource(R.string.smart_ctrl_off_title),
+                    description = stringResource(R.string.smart_ctrl_off_description),
+                    checked = smartCtrlOff,
+                    indent = true,
+                    linkId = SettingLinkIds.MODIFIERS_SMART_CTRL_OFF
+                ) {
+                    smartCtrlOff = it
+                    SettingsManager.setSmartCtrlOffAfterShortcut(context, it)
                 }
             }
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Chuyển thông minh: Alt tắt sau dấu mở</string>
+    <string name="smart_alt_off_description">Khi Alt bị khóa, gõ dấu ngoặc kép hoặc ngoặc mở bằng Alt (\" ( [ {) sẽ tắt Alt, để các từ bên trong được gõ thành chữ cái</string>
+    <string name="smart_ctrl_off_title">Chuyển thông minh: Ctrl tắt sau phím tắt</string>
+    <string name="smart_ctrl_off_description">Ctrl đã chạm sẽ tắt sau một phím tắt như sao chép, dán hoặc hoàn tác; di chuyển con trỏ và vùng chọn giữ nó bật</string>
+</resources>

@@ -89,6 +89,9 @@ class InputEventRouterModifierE2ETest {
         SettingsManager.setMidWordQuoteToApostrophe(context, false)
         SettingsManager.setAutoSpacePunctuation(context, "")
         SettingsManager.setFrenchPunctuationSpacing(context, false)
+        SettingsManager.setSmartAltOffAfterOpening(context, false)
+        SettingsManager.setSmartCtrlOffAfterShortcut(context, false)
+        SettingsManager.setCtrlTapLatches(context, false)
         AutoSpaceTracker.clear()
     }
 
@@ -967,6 +970,85 @@ class InputEventRouterModifierE2ETest {
         assertTrue(routeKeyDown(KeyEvent.KEYCODE_Q, keyDown(KeyEvent.KEYCODE_Q), callbacks) is InputEventRouter.EditableFieldRoutingResult.Consume)
         routeKeyDown(KeyEvent.KEYCODE_Q, keyDown(KeyEvent.KEYCODE_Q, KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON), callbacks)
         assertEquals(listOf(";", ":"), inputConnectionRecorder.committedTexts)
+    }
+
+    @Test
+    fun smartAlt_latchedAltOpeningBracket_switchesAltOff() {
+        SettingsManager.setSmartAltOffAfterOpening(context, true)
+        modifierStateController.altLatchActive = true
+        inputConnectionRecorder.textBeforeCursor = "say "
+
+        val result = routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_J,
+            event = keyDown(KeyEvent.KEYCODE_J),
+            callbacks = TestCallbacks(modifierStateController),
+            altMappingsOverride = mapOf(KeyEvent.KEYCODE_J to "(")
+        )
+
+        assertTrue(result is InputEventRouter.EditableFieldRoutingResult.Consume)
+        assertEquals(listOf("("), inputConnectionRecorder.committedTexts)
+        assertFalse(modifierStateController.altLatchActive)
+    }
+
+    @Test
+    fun smartAlt_offByDefault_andAClosingQuoteKeepsAltLatched() {
+        modifierStateController.altLatchActive = true
+        routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_J,
+            event = keyDown(KeyEvent.KEYCODE_J),
+            callbacks = TestCallbacks(modifierStateController),
+            altMappingsOverride = mapOf(KeyEvent.KEYCODE_J to "(")
+        )
+        assertTrue(modifierStateController.altLatchActive)
+
+        // A straight quote after a word closes it: words don't come next
+        SettingsManager.setSmartAltOffAfterOpening(context, true)
+        inputConnectionRecorder.textBeforeCursor = "word"
+        routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_K,
+            event = keyDown(KeyEvent.KEYCODE_K),
+            callbacks = TestCallbacks(modifierStateController),
+            altMappingsOverride = mapOf(KeyEvent.KEYCODE_K to "\"")
+        )
+        assertTrue(modifierStateController.altLatchActive)
+    }
+
+    @Test
+    fun smartCtrl_tapLatchedCtrl_switchesOffAfterAShortcutButNotAfterACursorMove() {
+        SettingsManager.setCtrlTapLatches(context, true)
+        SettingsManager.setSmartCtrlOffAfterShortcut(context, true)
+        modifierStateController.ctrlLatchActive = true
+
+        // Ctrl+S moves the cursor left (DPAD_LEFT): the latch stays for the next move
+        routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_S,
+            event = keyDown(KeyEvent.KEYCODE_S),
+            callbacks = TestCallbacks(modifierStateController)
+        )
+        assertTrue(modifierStateController.ctrlLatchActive)
+
+        // Ctrl+A selects all: one shortcut was what the tap was for
+        val result = routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_A,
+            event = keyDown(KeyEvent.KEYCODE_A),
+            callbacks = TestCallbacks(modifierStateController)
+        )
+        assertTrue(result is InputEventRouter.EditableFieldRoutingResult.Consume)
+        assertFalse(modifierStateController.ctrlLatchActive)
+    }
+
+    @Test
+    fun smartCtrl_neverEndsADoubleTapLockWhenTapLatchesAreOff() {
+        SettingsManager.setSmartCtrlOffAfterShortcut(context, true)
+        modifierStateController.ctrlLatchActive = true
+
+        routeKeyDown(
+            keyCode = KeyEvent.KEYCODE_A,
+            event = keyDown(KeyEvent.KEYCODE_A),
+            callbacks = TestCallbacks(modifierStateController)
+        )
+
+        assertTrue(modifierStateController.ctrlLatchActive)
     }
 
     private fun routeKeyDown(

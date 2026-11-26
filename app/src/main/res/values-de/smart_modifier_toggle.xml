@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Intelligentes Umschalten: Alt aus nach einer Öffnung</string>
+    <string name="smart_alt_off_description">Bei gesperrtem Alt schaltet ein mit Alt getipptes öffnendes Anführungszeichen oder eine öffnende Klammer (\" ( [ {) Alt aus, damit die Wörter darin als Buchstaben erscheinen</string>
+    <string name="smart_ctrl_off_title">Intelligentes Umschalten: Ctrl aus nach einem Kürzel</string>
+    <string name="smart_ctrl_off_description">Ein angetipptes Ctrl geht nach einem Kürzel wie Kopieren, Einfügen oder Rückgängig aus; Cursor- und Auswahlbewegungen lassen es an</string>
+</resources>

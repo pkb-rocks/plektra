@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Inteligentne przełączanie: Alt wyłącza się po otwarciu</string>
+    <string name="smart_alt_off_description">Przy zablokowanym Alt wpisanie z Alt cudzysłowu lub nawiasu otwierającego (\" ( [ {) wyłącza Alt, aby słowa w środku wpisywały się jako litery</string>
+    <string name="smart_ctrl_off_title">Inteligentne przełączanie: Ctrl wyłącza się po skrócie</string>
+    <string name="smart_ctrl_off_description">Dotknięty Ctrl wyłącza się po jednym skrócie, np. kopiuj, wklej lub cofnij; ruchy kursora i zaznaczenia go nie wyłączają</string>
+</resources>

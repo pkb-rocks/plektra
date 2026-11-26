@@ -154,6 +154,8 @@ object SettingsManager {
     private const val KEY_CTRL_TAP_LATCHES = "ctrl_tap_latches"
     private const val KEY_ALT_LATCH_STAYS_ON_SPACE = "alt_latch_stays_on_space"
     private const val KEY_CTRL_LATCH_STAYS_ON_SPACE = "ctrl_latch_stays_on_space"
+    private const val KEY_SMART_ALT_OFF_AFTER_OPENING = "smart_alt_off_after_opening"
+    private const val KEY_SMART_CTRL_OFF_AFTER_SHORTCUT = "smart_ctrl_off_after_shortcut"
     private const val KEY_EMOJI_PICKER_EXPANDED_HEIGHT = "emoji_picker_expanded_height"
     private const val KEY_EMOJI_PICKER_STAYS_OPEN = "emoji_picker_stays_open" // Full emoji picker stays open after an emoji
     private const val KEY_DISMISSED_RELEASES = "dismissed_releases" // Set of release tag_names that were dismissed
@@ -1830,6 +1832,22 @@ object SettingsManager {
         getPreferences(context).edit()
             .putBoolean(KEY_CTRL_LATCH_STAYS_ON_SPACE, enabled)
             .apply()
+    }
+
+    /** Smart toggle: a latched Alt switches off after an opening quote or bracket typed with Alt. */
+    fun getSmartAltOffAfterOpening(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SMART_ALT_OFF_AFTER_OPENING, false)
+
+    fun setSmartAltOffAfterOpening(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SMART_ALT_OFF_AFTER_OPENING, enabled).apply()
+    }
+
+    /** Smart toggle: a tap-latched Ctrl switches off after one shortcut (not after cursor moves). */
+    fun getSmartCtrlOffAfterShortcut(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SMART_CTRL_OFF_AFTER_SHORTCUT, false)
+
+    fun setSmartCtrlOffAfterShortcut(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SMART_CTRL_OFF_AFTER_SHORTCUT, enabled).apply()
     }
     
     /**

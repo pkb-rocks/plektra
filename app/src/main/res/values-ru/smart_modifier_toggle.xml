@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Умное переключение: Alt выключается после открывающего знака</string>
+    <string name="smart_alt_off_description">При зафиксированном Alt ввод открывающей кавычки или скобки с Alt (\" ( [ {) выключает Alt, чтобы слова внутри вводились буквами</string>
+    <string name="smart_ctrl_off_title">Умное переключение: Ctrl выключается после сочетания</string>
+    <string name="smart_ctrl_off_description">Нажатый Ctrl выключается после одного сочетания, например копирования, вставки или отмены; перемещение курсора и выделения его не выключает</string>
+</resources>

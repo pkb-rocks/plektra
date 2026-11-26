@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Bascule intelligente : Alt désactivé après une ouverture</string>
+    <string name="smart_alt_off_description">Avec Alt verrouillé, taper un guillemet ou une parenthèse ouvrante avec Alt (\" ( [ {) désactive Alt, pour que les mots à l’intérieur sortent en lettres</string>
+    <string name="smart_ctrl_off_title">Bascule intelligente : Ctrl désactivé après un raccourci</string>
+    <string name="smart_ctrl_off_description">Un Ctrl touché se désactive après un raccourci comme copier, coller ou annuler ; les déplacements du curseur et de la sélection le gardent actif</string>
+</resources>

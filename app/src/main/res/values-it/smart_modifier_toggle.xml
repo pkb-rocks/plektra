@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Attivazione intelligente: Alt si spegne dopo un’apertura</string>
+    <string name="smart_alt_off_description">Con Alt bloccato, digitare con Alt una virgoletta o parentesi di apertura (\" ( [ {) spegne Alt, così le parole all’interno escono come lettere</string>
+    <string name="smart_ctrl_off_title">Attivazione intelligente: Ctrl si spegne dopo una scorciatoia</string>
+    <string name="smart_ctrl_off_description">Un Ctrl toccato si spegne dopo una scorciatoia come copia, incolla o annulla; gli spostamenti di cursore e selezione lo lasciano attivo</string>
+</resources>

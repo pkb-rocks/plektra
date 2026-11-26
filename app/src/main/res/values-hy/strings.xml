@@ -969,7 +969,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="keyboard_backlight_outcome_unrestorable">Ընթացիկ ժամանակը հետագայում հնարավոր չէր լինի ճշգրիտ վերականգնել, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_service_unverified">Արտադրողի լուսավորության ծառայությունը չի համապատասխանում ստուգված տարբերակին, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_read_failed">Լուսավորության կարգավորումը հնարավոր չեղավ կարդալ, ուստի ոչինչ չի փոխվել։</string>
-    <string name="keyboard_backlight_outcome_record_failed">Պահպանված ժամանակը հնարավոր չեղավ թարմացնել, ուստի ոչինչ չի փոխվել։</string>
+    <string name="keyboard_backlight_outcome_record_failed">Պահպանված ժամանակը հնարավոր չեղավ թարմացնել։</string>
     <string name="keyboard_backlight_outcome_write_failed">Սարքը չընդունեց փոփոխությունը։</string>
     <string name="keyboard_backlight_outcome_uncertain">Փոփոխությունը հնարավոր չեղավ հաստատել, և այն դեռ կարող է ուժի մեջ մտնել։ Նախորդ ժամանակը պահպանված է։ Հաջորդ փոփոխությունից առաջ վերագործարկեք հեռախոսը։</string>
 </resources>

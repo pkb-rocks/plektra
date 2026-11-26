@@ -51,7 +51,7 @@ internal enum class BacklightOutcome {
     UnsupportedFirmware,
     ReadFailed,
 
-    /** The recovery record could not be saved, updated or removed, so nothing was changed. */
+    /** The recovery record could not be saved, updated or removed. */
     RecordFailed,
 
     /** The write completed but the read-back shows another value. */
@@ -59,7 +59,7 @@ internal enum class BacklightOutcome {
 
     /**
      * A write was not confirmed and may still take effect. The recovery record is kept and no
-     * further write is made until the value is read back or the phone has restarted.
+     * further write is made while that call may still be in flight, until the phone has restarted.
      */
     Uncertain
 }

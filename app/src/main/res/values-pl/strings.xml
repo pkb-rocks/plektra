@@ -971,7 +971,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="keyboard_backlight_outcome_unrestorable">Bieżącego czasu nie dałoby się później dokładnie przywrócić, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Usługa podświetlenia producenta nie odpowiada zweryfikowanej wersji, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_read_failed">Nie udało się odczytać ustawienia podświetlenia, więc nic nie zmieniono.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Nie udało się zaktualizować zapisanego czasu, więc nic nie zmieniono.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Nie udało się zaktualizować zapisanego czasu.</string>
     <string name="keyboard_backlight_outcome_write_failed">Urządzenie nie przyjęło zmiany.</string>
     <string name="keyboard_backlight_outcome_uncertain">Nie udało się potwierdzić zmiany i może ona jeszcze zadziałać. Poprzedni czas pozostaje zapisany. Uruchom telefon ponownie przed kolejną zmianą.</string>
 </resources>

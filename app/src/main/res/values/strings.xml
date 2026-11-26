@@ -2119,7 +2119,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_backlight_outcome_unrestorable">The current timeout could not be restored exactly later, so nothing was changed.</string>
     <string name="keyboard_backlight_outcome_service_unverified">The vendor backlight service does not match the verified version, so nothing was changed.</string>
     <string name="keyboard_backlight_outcome_read_failed">The backlight setting could not be read, so nothing was changed.</string>
-    <string name="keyboard_backlight_outcome_record_failed">The saved timeout could not be updated, so nothing was changed.</string>
+    <string name="keyboard_backlight_outcome_record_failed">The saved timeout could not be updated.</string>
     <string name="keyboard_backlight_outcome_write_failed">The device did not accept the change.</string>
     <string name="keyboard_backlight_outcome_uncertain">The change could not be confirmed and may still take effect. The previous timeout remains saved. Restart the phone before trying another change.</string>
 </resources>

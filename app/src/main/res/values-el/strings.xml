@@ -1812,7 +1812,7 @@ QWERTZ σε φυσικό QWERTY
     <string name="keyboard_backlight_outcome_unrestorable">Ο τρέχων χρόνος δεν θα μπορούσε να επανέλθει ακριβώς αργότερα, οπότε δεν άλλαξε τίποτα.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Η υπηρεσία φωτισμού του κατασκευαστή δεν αντιστοιχεί στην επαληθευμένη έκδοση, οπότε δεν άλλαξε τίποτα.</string>
     <string name="keyboard_backlight_outcome_read_failed">Δεν ήταν δυνατή η ανάγνωση της ρύθμισης φωτισμού, οπότε δεν άλλαξε τίποτα.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Δεν ήταν δυνατή η ενημέρωση του αποθηκευμένου χρόνου, οπότε δεν άλλαξε τίποτα.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Δεν ήταν δυνατή η ενημέρωση του αποθηκευμένου χρόνου.</string>
     <string name="keyboard_backlight_outcome_write_failed">Η συσκευή δεν δέχτηκε την αλλαγή.</string>
     <string name="keyboard_backlight_outcome_uncertain">Δεν ήταν δυνατή η επιβεβαίωση της αλλαγής, η οποία μπορεί ακόμη να εφαρμοστεί. Ο προηγούμενος χρόνος παραμένει αποθηκευμένος. Επανεκκινήστε το τηλέφωνο πριν από άλλη αλλαγή.</string>
 </resources>

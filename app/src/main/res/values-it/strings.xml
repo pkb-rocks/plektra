@@ -1148,7 +1148,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="keyboard_backlight_outcome_unrestorable">Il tempo attuale non potrebbe essere ripristinato esattamente in seguito, quindi non è stato modificato nulla.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Il servizio di retroilluminazione del produttore non corrisponde alla versione verificata, quindi non è stato modificato nulla.</string>
     <string name="keyboard_backlight_outcome_read_failed">Impossibile leggere l’impostazione della retroilluminazione, quindi non è stato modificato nulla.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Impossibile aggiornare il tempo salvato, quindi non è stato modificato nulla.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Impossibile aggiornare il tempo salvato.</string>
     <string name="keyboard_backlight_outcome_write_failed">Il dispositivo non ha accettato la modifica.</string>
     <string name="keyboard_backlight_outcome_uncertain">Impossibile confermare la modifica, che potrebbe ancora avere effetto. Il tempo precedente resta salvato. Riavvia il telefono prima di un’altra modifica.</string>
 </resources>

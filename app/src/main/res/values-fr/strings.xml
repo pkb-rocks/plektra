@@ -970,7 +970,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="keyboard_backlight_outcome_unrestorable">Le délai actuel ne pourrait pas être rétabli exactement plus tard ; rien n’a été modifié.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Le service de rétroéclairage du fabricant ne correspond pas à la version vérifiée ; rien n’a été modifié.</string>
     <string name="keyboard_backlight_outcome_read_failed">Le réglage du rétroéclairage n’a pas pu être lu ; rien n’a été modifié.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Le délai enregistré n’a pas pu être mis à jour ; rien n’a été modifié.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Le délai enregistré n’a pas pu être mis à jour.</string>
     <string name="keyboard_backlight_outcome_write_failed">L’appareil n’a pas accepté la modification.</string>
     <string name="keyboard_backlight_outcome_uncertain">La modification n’a pas pu être confirmée et peut encore prendre effet. Le délai précédent reste enregistré. Redémarrez le téléphone avant une autre modification.</string>
 </resources>

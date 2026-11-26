@@ -968,7 +968,7 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="keyboard_backlight_outcome_unrestorable">Thời gian hiện tại không thể khôi phục chính xác sau này nên không có gì thay đổi.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Dịch vụ đèn nền của nhà sản xuất không khớp với phiên bản đã xác minh nên không có gì thay đổi.</string>
     <string name="keyboard_backlight_outcome_read_failed">Không thể đọc cài đặt đèn nền nên không có gì thay đổi.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Không thể cập nhật thời gian đã lưu nên không có gì thay đổi.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Không thể cập nhật thời gian đã lưu.</string>
     <string name="keyboard_backlight_outcome_write_failed">Thiết bị không chấp nhận thay đổi.</string>
     <string name="keyboard_backlight_outcome_uncertain">Không thể xác nhận thay đổi và nó vẫn có thể có hiệu lực. Thời gian trước đó vẫn được lưu. Hãy khởi động lại điện thoại trước khi thay đổi tiếp.</string>
 </resources>

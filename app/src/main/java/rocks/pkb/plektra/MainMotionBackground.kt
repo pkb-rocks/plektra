@@ -236,7 +236,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
 
     fun acceptHardwareEvent(event: KeyboardEventTracker.KeyEventInfo) {
         val label = keyCodeLabel(event.keyCode)
-        val identity = event.deviceId to (event.scanCode.takeIf { it != 0 } ?: -event.keyCode)
+        val identity = event.deviceId to (event.scanCode.takeIf { it != 0 } ?: -event.rawKeyCode)
         val now = SystemClock.uptimeMillis()
         lastInputMs = now
         when (event.action) {

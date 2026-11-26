@@ -24,7 +24,7 @@ object KeyboardEventTracker {
     // Only match across these two routes; consecutive IME repeats remain distinct.
     private val imeEdges = ArrayDeque<Edge>()
 
-    fun notifyHardwareEdge(event: KeyEvent?, fromIme: Boolean) {
+    fun notifyHardwareEdge(event: KeyEvent?, fromIme: Boolean, displayKeyCode: Int = event?.keyCode ?: KeyEvent.KEYCODE_UNKNOWN) {
         if (event == null || listeners.isEmpty() || event.flags and KeyEvent.FLAG_SOFT_KEYBOARD != 0) return
         val edge = Edge(event.deviceId, event.scanCode, event.keyCode, event.action,
             event.downTime, event.eventTime, event.repeatCount)
@@ -32,7 +32,7 @@ object KeyboardEventTracker {
             if (imeEdges.size == 64) imeEdges.removeFirst()
             imeEdges.addLast(edge)
         } else if (imeEdges.remove(edge)) return
-        val info = describeEdge(event.keyCode, event, if (event.action == KeyEvent.ACTION_DOWN) "KEY_DOWN" else "KEY_UP",
+        val info = describeEdge(displayKeyCode, event, if (event.action == KeyEvent.ACTION_DOWN) "KEY_DOWN" else "KEY_UP",
             if (fromIme) "ime_service" else "activity")
         listeners.toList().forEach { it(info) }
     }
@@ -66,7 +66,8 @@ object KeyboardEventTracker {
         val resolvedLayout: String? = null,
         val outputKeyCode: Int? = null,
         val outputKeyCodeName: String? = null,
-        val eventTimeUptimeMs: Long = 0L
+        val eventTimeUptimeMs: Long = 0L,
+        val rawKeyCode: Int = keyCode
     )
 
     
@@ -181,7 +182,8 @@ object KeyboardEventTracker {
             isAltPressed = event.isAltPressed,
             isShiftPressed = event.isShiftPressed,
             isCtrlPressed = event.isCtrlPressed,
-            eventTimeUptimeMs = event.eventTime
+            eventTimeUptimeMs = event.eventTime,
+            rawKeyCode = event.keyCode
         )
     }
 

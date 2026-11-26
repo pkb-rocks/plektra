@@ -69,6 +69,26 @@ class MainKeyboardEventFlowTest {
         } finally { KeyboardEventTracker.unregisterState() }
     }
 
+    @Test fun q25ActivityUsesProfileLabelsWhenTheAppReceivesHardwareInputDirectly() {
+        val activity = org.robolectric.Robolectric.buildActivity(MainActivity::class.java).get()
+        SettingsManager.setPhysicalKeyboardProfileOverride(activity, "Q25")
+        val view = MotionBackgroundView(activity)
+        val listener = view::acceptHardwareEvent
+        KeyboardEventTracker.addListener(listener)
+        try {
+            for ((key, scan, label) in listOf(Triple(KeyEvent.KEYCODE_SHIFT_RIGHT, 54, "Fn"),
+                    Triple(KeyEvent.KEYCODE_ALT_RIGHT, 100, "Sym"))) {
+                activity.onKeyDown(key, KeyEvent(1000, 1000, KeyEvent.ACTION_DOWN, key, 0, 0, 7, scan))
+                assertEquals(setOf(label), view.heldLabels())
+                activity.onKeyUp(key, KeyEvent(1000, 1010, KeyEvent.ACTION_UP, key, 0, 0, 7, scan))
+                assertTrue(view.heldLabels().isEmpty())
+            }
+        } finally {
+            KeyboardEventTracker.removeListener(listener)
+            SettingsManager.setPhysicalKeyboardProfileOverride(activity, "auto")
+        }
+    }
+
     @Test fun overlappingModifiersRepeatCancelAndFocusLoss() {
         val view = MotionBackgroundView(RuntimeEnvironment.getApplication())
         val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = view::acceptHardwareEvent

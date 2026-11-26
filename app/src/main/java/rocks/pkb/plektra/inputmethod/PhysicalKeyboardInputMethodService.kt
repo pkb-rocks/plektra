@@ -4958,12 +4958,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         )
     }
 
-    private fun remapHardwareEvent(keyCode: Int, event: KeyEvent?): ClicksPowerButtonEventMapper.Result {
-        val remapped = DeviceSpecific.remapHardwareKeyEvent(
-            keyCode,
-            event,
-            physicalKeyboardProfileOverride
-        )
+    private fun remapClicksPowerEvent(
+        remapped: DeviceSpecific.RemappedHardwareEvent,
+        event: KeyEvent?
+    ): ClicksPowerButtonEventMapper.Result {
         val isClicksPowerKeyboard = !dispatchingClicksAccessibilityKeyEvent &&
             (event
                 ?.takeIf { it.deviceId >= 0 }
@@ -5111,7 +5109,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 configuration = accidentalInput.configuration
             )?.let { return true }
         }
-        val remapped = remapHardwareEvent(keyCode_, event_)
+        val profileEvent = DeviceSpecific.remapHardwareKeyEvent(keyCode_, event_, physicalKeyboardProfileOverride)
+        val remapped = remapClicksPowerEvent(profileEvent, event_)
         if (remapped.consume) return true
         val keyCode = remapped.keyCode
         val event = remapped.event
@@ -5139,7 +5138,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyDown(keyCode_: Int, event_: KeyEvent?): Boolean {
-        if (!replayingProtectedNumberKey) KeyboardEventTracker.notifyHardwareEdge(event_, fromIme = true)
+        val profileEvent = DeviceSpecific.remapHardwareKeyEvent(keyCode_, event_, physicalKeyboardProfileOverride)
+        if (!replayingProtectedNumberKey) {
+            KeyboardEventTracker.notifyHardwareEdge(event_, fromIme = true, displayKeyCode = profileEvent.keyCode)
+        }
         if (liveSpeechEditor != null && (event_?.unicodeChar?.let { it != 0 } == true ||
             keyCode_ in listOf(KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_FORWARD_DEL, KeyEvent.KEYCODE_ENTER,
                 KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN))) {
@@ -5165,7 +5167,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 return true
             }
         }
-        val remapped = remapHardwareEvent(keyCode_, event_)
+        val remapped = remapClicksPowerEvent(profileEvent, event_)
         if (remapped.consume) {
             remapped.directAction?.let { ClicksButtonDirectActionExecutor.execute(this, it) }
             return true
@@ -5997,7 +5999,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     }
 
     override fun onKeyUp(keyCode_: Int, event_: KeyEvent?): Boolean {
-        if (!replayingProtectedNumberKey) KeyboardEventTracker.notifyHardwareEdge(event_, fromIme = true)
+        val profileEvent = DeviceSpecific.remapHardwareKeyEvent(keyCode_, event_, physicalKeyboardProfileOverride)
+        if (!replayingProtectedNumberKey) {
+            KeyboardEventTracker.notifyHardwareEdge(event_, fromIme = true, displayKeyCode = profileEvent.keyCode)
+        }
         if (!replayingProtectedNumberKey) {
             when (val result = accidentalKeyPressFilter.onKeyUp(keyCode_, event_)) {
                 is AccidentalKeyPressFilter.KeyUpResult.Suppressed -> {
@@ -6018,7 +6023,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             }
         }
         if (consumedLanguageSwitchKeys.remove(keyCode_)) return true
-        val remapped = remapHardwareEvent(keyCode_, event_)
+        val remapped = remapClicksPowerEvent(profileEvent, event_)
         if (remapped.consume) return true
         val keyCode = remapped.keyCode
         val event = remapped.event

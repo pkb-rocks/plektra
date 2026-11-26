@@ -70,10 +70,10 @@ class ReplacementAfterUndoKeysTest {
         type("im ")
         assertEquals("so I'm ", text)
         press(KeyEvent.KEYCODE_DEL)
-        assertEquals("so im", text)
+        assertEquals("so im ", text)
 
-        // Space leaves the word as it was put back; after another word it is replaced again
-        type(" e im ")
+        // After another word it is replaced again
+        type("e im ")
         assertEquals("so im e I'm ", text)
     }
 
@@ -87,6 +87,16 @@ class ReplacementAfterUndoKeysTest {
 
         // An ordinary Backspace (whoever deletes the space): the replacement stays
         assertEquals("so I'm", text.trimEnd())
+    }
+
+    @Test
+    fun withAutoReplaceOffBackspaceStillUndoesATextReplacement() {
+        // As by default: text replacements on, auto-replace off
+        SettingsManager.setAutoReplaceOnSpaceEnter(context, false)
+        type("im ")
+        assertEquals("so I'm ", text)
+        press(KeyEvent.KEYCODE_DEL)
+        assertEquals("so im ", text)
     }
 
     private fun type(keys: String) = keys.forEach { key -> press(keyCodeOf(key)) }

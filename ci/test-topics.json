@@ -183,6 +183,7 @@
       "rocks.pkb.plektra.AutoCorrectionSubstitutionStoreTest",
       "rocks.pkb.plektra.core.AutoCorrectionManagerTest",
       "rocks.pkb.plektra.core.suggestions.AutoReplaceControllerLogicTest",
+      "rocks.pkb.plektra.core.suggestions.BackspaceUndoTest",
       "rocks.pkb.plektra.core.suggestions.CasingHelperTest",
       "rocks.pkb.plektra.core.suggestions.CurrentWordTrackerTest",
       "rocks.pkb.plektra.core.suggestions.DictionaryRepositoryTest",

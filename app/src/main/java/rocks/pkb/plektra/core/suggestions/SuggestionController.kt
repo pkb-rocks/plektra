@@ -425,7 +425,7 @@ class SuggestionController(
      * lets a word whose replacement was undone be replaced again.
      */
     fun onTypingContinued(text: CharSequence) {
-        if (!isEnabled()) return
+        // With the suggestion engine off too: text replacements, and their undo, still work then
         autoReplaceController.clearLastReplacement()
         if (text.any { it.isLetterOrDigit() }) {
             autoReplaceController.clearRejectedWords()
@@ -433,6 +433,7 @@ class SuggestionController(
     }
 
     fun onCharacterCommitted(text: CharSequence, inputConnection: InputConnection?) {
+        onTypingContinued(text)
         if (!isEnabled()) return
         if (debugLogging) {
             val caller = Throwable().stackTrace.getOrNull(1)?.let { "${it.className}#${it.methodName}:${it.lineNumber}" }
@@ -446,16 +447,12 @@ class SuggestionController(
             .replace("'", "'")
             .replace("'", "'")
             .replace("ʼ", "'")
-        
-        // Clear last replacement if user types new characters
-        autoReplaceController.clearLastReplacement()
-        
-        // Clear rejected words when user types a new letter (allows re-correction)
-        if (normalizedText.isNotEmpty() && normalizedText.any { it.isLetterOrDigit() }) {
-            autoReplaceController.clearRejectedWords()
+
+        // A new letter also withdraws the offer to add the word before it
+        if (normalizedText.any { it.isLetterOrDigit() }) {
             pendingAddUserWord = null
         }
-        
+
         tracker.onCharacterCommitted(normalizedText)
     }
 
@@ -750,7 +747,7 @@ class SuggestionController(
     }
 
     fun handleBackspaceUndo(keyCode: Int, inputConnection: InputConnection?): Boolean {
-        if (!isEnabled()) return false
+        // Text replacements apply with the suggestion engine off too, so their undo does as well
         val undone = autoReplaceController.handleBackspaceUndo(keyCode, inputConnection)
         if (undone) {
             val original = autoReplaceController.consumeLastUndoOriginalWord()

@@ -912,10 +912,9 @@ class InputEventRouter(
             AutoSpaceTracker.clear()
         }
 
-        // Try new dictionary-based auto-replace undo first (if experimental suggestions enabled)
-        if (keyCode == KeyEvent.KEYCODE_DEL && 
-            SettingsManager.isExperimentalSuggestionsEnabled(context) &&
-            SettingsManager.getAutoReplaceOnSpaceEnter(context)) {
+        // Any replacement can be undone: an auto-replace, and a text replacement, which applies with
+        // auto-replace and the suggestion engine off too
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
             
             val sc = suggestionController
             if (sc != null) {

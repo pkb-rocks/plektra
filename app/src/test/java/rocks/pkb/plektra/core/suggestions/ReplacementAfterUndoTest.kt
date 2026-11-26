@@ -105,14 +105,12 @@ class ReplacementAfterUndoTest {
         assertEquals("I'm ", input.text)
     }
 
-    /** "im" replaced by "I'm", put back with Backspace, and left as typed by the next space. */
+    /** "im" replaced by "I'm" and put back with Backspace, the space after it kept. */
     private fun undoAReplacementOfIm(controller: SuggestionController, input: FakeInputConnection) {
         input.commitText("im", 1)
         assertTrue(controller.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, input).replaced)
         assertEquals("I'm ", input.text)
         assertTrue(controller.handleBackspaceUndo(KeyEvent.KEYCODE_DEL, input))
-        assertEquals("im", input.text)
-        assertFalse(controller.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, input).replaced)
         assertEquals("im ", input.text)
     }
 

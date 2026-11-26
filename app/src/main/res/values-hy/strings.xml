@@ -971,5 +971,5 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="keyboard_backlight_outcome_read_failed">Լուսավորության կարգավորումը հնարավոր չեղավ կարդալ, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_record_failed">Պահպանված ժամանակը հնարավոր չեղավ թարմացնել, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_write_failed">Սարքը չընդունեց փոփոխությունը։</string>
-    <string name="keyboard_backlight_outcome_uncertain">Փոփոխությունը հնարավոր չեղավ հաստատել, և այն դեռ կարող է ուժի մեջ մտնել։ Նախորդ ժամանակը պահպանված է. Plektra-ն ոչինչ չի փոխում, մինչև արդյունքը հնարավոր լինի կարդալ կամ հեռախոսը վերագործարկվի։</string>
+    <string name="keyboard_backlight_outcome_uncertain">Փոփոխությունը հնարավոր չեղավ հաստատել, և այն դեռ կարող է ուժի մեջ մտնել։ Նախորդ ժամանակը պահպանված է։ Հաջորդ փոփոխությունից առաջ վերագործարկեք հեռախոսը։</string>
 </resources>

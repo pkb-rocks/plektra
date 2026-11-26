@@ -317,7 +317,7 @@ class KeyboardBacklightControllerTest {
         assertEquals("-1", store.readRecord()?.unconfirmedWrite?.value)
 
         // An immediate read of the old value proves nothing: the record stays, writes stay blocked.
-        assertEquals(BacklightOutcome.None, controller.refresh().outcome)
+        assertEquals(BacklightOutcome.Uncertain, controller.refresh().outcome)
         assertNotNull(store.readRecord()?.unconfirmedWrite)
         assertEquals(BacklightOutcome.Uncertain, controller.enable().outcome)
         assertEquals(BacklightOutcome.Uncertain, controller.disable().outcome)
@@ -325,6 +325,8 @@ class KeyboardBacklightControllerTest {
 
         shell.completeDelayedWrite()
         shell.delayWrites = false
+        assertEquals(BacklightOutcome.Uncertain, controller.disable().outcome)
+        boot = 8
         val restored = controller.disable()
 
         assertEquals(BacklightOutcome.Disabled, restored.outcome)
@@ -364,7 +366,7 @@ class KeyboardBacklightControllerTest {
     }
 
     @Test
-    fun anUnconfirmedRestoreKeepsTheRecordUntilTheOriginalIsRead() = runBlocking {
+    fun anUnconfirmedRestoreKeepsTheRecordUntilTheDeviceReboots() = runBlocking {
         shell.timeout = "10000"
         val controller = controller()
         controller.enable()
@@ -374,6 +376,8 @@ class KeyboardBacklightControllerTest {
         assertEquals("10000", store.readRecord()?.unconfirmedWrite?.value)
 
         shell.completeDelayedWrite()
+        assertEquals(BacklightOutcome.Uncertain, controller.refresh().outcome)
+        boot = 8
         assertNull(controller.refresh().recovery)
         assertNull(store.readRecord())
     }
@@ -408,6 +412,53 @@ class KeyboardBacklightControllerTest {
         assertEquals(BacklightOutcome.NoOriginalToRestore, result.outcome)
         assertNull(result.recovery)
         assertTrue(shell.writes.isEmpty())
+    }
+
+    @Test
+    fun matchingExternalValueCannotReleaseAnUnconfirmedEnable() = runBlocking {
+        shell.timeout = "30000"
+        shell.delayWrites = true
+        controller().enable()
+        shell.timeout = "-1" // Another writer matches the pending value before that call completes.
+        shell.delayWrites = false
+        val restartedController = controller()
+
+        assertEquals(BacklightOutcome.Uncertain, restartedController.disable().outcome)
+        assertEquals("30000", store.readRecord()?.originalTimeout)
+        assertEquals(listOf("-1"), shell.writes)
+        shell.completeDelayedWrite()
+        assertEquals(BacklightOutcome.Uncertain, restartedController.disable().outcome)
+        assertNotNull(store.readRecord())
+    }
+
+    @Test
+    fun matchingExternalValueCannotReleaseAnUnconfirmedRestore() = runBlocking {
+        shell.timeout = "30000"
+        controller().enable()
+        shell.delayWrites = true
+        controller().disable()
+        shell.timeout = "30000"
+        shell.delayWrites = false
+
+        assertEquals(BacklightOutcome.Uncertain, controller().enable().outcome)
+        shell.timeout = "5000"
+        assertEquals(BacklightOutcome.Uncertain, controller().enable().outcome)
+        assertEquals(listOf("-1", "30000"), shell.writes)
+        assertEquals("30000", store.readRecord()?.originalTimeout)
+    }
+
+    @Test
+    fun failedRecoveryDeletionIsReportedAfterRestoreAndOnRefresh() = runBlocking {
+        shell.timeout = "30000"
+        controller().enable()
+        store.failClears = true
+
+        val disabled = controller().disable()
+        assertEquals("30000", shell.timeout)
+        assertEquals(BacklightObservation.Fresh("30000", now), disabled.observation)
+        assertEquals(BacklightOutcome.RecordFailed, disabled.outcome)
+        assertNotNull(store.readRecord())
+        assertEquals(BacklightOutcome.RecordFailed, controller().refresh().outcome)
     }
 
     private fun record(original: String, phase: BacklightRecoveryRecord.Phase) =

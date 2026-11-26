@@ -1805,5 +1805,5 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_backlight_outcome_read_failed">Die Beleuchtungseinstellung konnte nicht gelesen werden, daher wurde nichts geändert.</string>
     <string name="keyboard_backlight_outcome_record_failed">Die gespeicherte Zeit konnte nicht aktualisiert werden, daher wurde nichts geändert.</string>
     <string name="keyboard_backlight_outcome_write_failed">Das Gerät hat die Änderung nicht übernommen.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Die Änderung ließ sich nicht bestätigen und kann noch wirksam werden. Die vorherige Zeit bleibt gespeichert; Plektra ändert nichts, bis sich das Ergebnis lesen lässt oder das Telefon neu gestartet wurde.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Die Änderung ließ sich nicht bestätigen und kann noch wirksam werden. Die vorherige Zeit bleibt gespeichert. Starte das Telefon vor einer weiteren Änderung neu.</string>
 </resources>

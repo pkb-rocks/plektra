@@ -1814,5 +1814,5 @@ QWERTZ σε φυσικό QWERTY
     <string name="keyboard_backlight_outcome_read_failed">Δεν ήταν δυνατή η ανάγνωση της ρύθμισης φωτισμού, οπότε δεν άλλαξε τίποτα.</string>
     <string name="keyboard_backlight_outcome_record_failed">Δεν ήταν δυνατή η ενημέρωση του αποθηκευμένου χρόνου, οπότε δεν άλλαξε τίποτα.</string>
     <string name="keyboard_backlight_outcome_write_failed">Η συσκευή δεν δέχτηκε την αλλαγή.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Δεν ήταν δυνατή η επιβεβαίωση της αλλαγής, η οποία μπορεί ακόμη να εφαρμοστεί. Ο προηγούμενος χρόνος παραμένει αποθηκευμένος· το Plektra δεν αλλάζει τίποτα μέχρι να διαβαστεί το αποτέλεσμα ή να γίνει επανεκκίνηση του τηλεφώνου.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Δεν ήταν δυνατή η επιβεβαίωση της αλλαγής, η οποία μπορεί ακόμη να εφαρμοστεί. Ο προηγούμενος χρόνος παραμένει αποθηκευμένος. Επανεκκινήστε το τηλέφωνο πριν από άλλη αλλαγή.</string>
 </resources>

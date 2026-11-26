@@ -32,7 +32,7 @@ internal data class BacklightRecoveryRecord(
     /**
      * Killing a `service call` client does not cancel a binder transaction the vendor service has
      * already received, so a later read of the old value does not prove the write is gone. The
-     * entry is dropped only once [value] is read back, or after a reboot ([bootCount] changed),
+     * entry is dropped only after a completed reply, or after a reboot ([bootCount] changed),
      * which ends every pending transaction.
      */
     data class UnconfirmedWrite(val value: String, val bootCount: Int?)
@@ -178,9 +178,8 @@ internal class FileBacklightRecoveryStore(
         }
     }
 
-    /** Creates missing directories and syncs each parent that received a new entry. */
+    /** Re-establish parent-entry durability even after a previous creation sync failed. */
     private fun ensureDirectory() {
-        if (directory.isDirectory) return
         val parent = directory.absoluteFile.parentFile ?: throw IOException("no parent directory")
         if (!parent.isDirectory) {
             if (!parent.mkdirs()) throw IOException("cannot create $parent")

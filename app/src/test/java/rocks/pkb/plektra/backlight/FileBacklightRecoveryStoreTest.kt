@@ -104,6 +104,26 @@ class FileBacklightRecoveryStoreTest {
     }
 
     @Test
+    fun failedParentSyncIsRetriedEvenForAnExistingDirectoryAndANewStore() {
+        val parent = folder.root.absoluteFile
+        var attempts = 0
+        val sync: (File) -> Unit = { directory ->
+            if (directory == parent) {
+                attempts++
+                throw java.io.IOException("parent fsync")
+            }
+        }
+        val record = BacklightRecoveryRecord(binding, "30000", BacklightRecoveryRecord.Phase.Enabling, 1L)
+        val first = FileBacklightRecoveryStore(directory, sync)
+        assertFalse(first.writeVerified(BacklightVerifiedReading(binding, "30000", 1L)))
+        assertTrue(directory.isDirectory)
+        assertFalse(first.writeRecord(record))
+        assertFalse(FileBacklightRecoveryStore(directory, sync).writeRecord(record))
+        assertEquals(3, attempts)
+        assertNull(first.readRecord())
+    }
+
+    @Test
     fun theDefaultDirectorySyncWorksOnARealDirectory() {
         assertTrue(store().writeRecord(BacklightRecoveryRecord(binding, "0", BacklightRecoveryRecord.Phase.Enabled, 1L)))
         assertTrue(store().clearRecord())

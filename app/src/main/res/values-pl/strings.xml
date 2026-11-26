@@ -973,5 +973,5 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="keyboard_backlight_outcome_read_failed">Nie udało się odczytać ustawienia podświetlenia, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_record_failed">Nie udało się zaktualizować zapisanego czasu, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_write_failed">Urządzenie nie przyjęło zmiany.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Nie udało się potwierdzić zmiany i może ona jeszcze zadziałać. Poprzedni czas pozostaje zapisany; Plektra nic nie zmienia, dopóki nie da się odczytać wyniku lub telefon nie zostanie uruchomiony ponownie.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Nie udało się potwierdzić zmiany i może ona jeszcze zadziałać. Poprzedni czas pozostaje zapisany. Uruchom telefon ponownie przed kolejną zmianą.</string>
 </resources>

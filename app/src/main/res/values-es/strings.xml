@@ -972,5 +972,5 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="keyboard_backlight_outcome_read_failed">No se pudo leer el ajuste de retroiluminación, así que no se cambió nada.</string>
     <string name="keyboard_backlight_outcome_record_failed">No se pudo actualizar el tiempo guardado, así que no se cambió nada.</string>
     <string name="keyboard_backlight_outcome_write_failed">El dispositivo no aceptó el cambio.</string>
-    <string name="keyboard_backlight_outcome_uncertain">No se pudo confirmar el cambio y aún puede aplicarse. El tiempo anterior sigue guardado; Plektra no cambia nada hasta que pueda leerse el resultado o el teléfono se haya reiniciado.</string>
+    <string name="keyboard_backlight_outcome_uncertain">No se pudo confirmar el cambio y aún puede aplicarse. El tiempo anterior sigue guardado. Reinicia el teléfono antes de realizar otro cambio.</string>
 </resources>

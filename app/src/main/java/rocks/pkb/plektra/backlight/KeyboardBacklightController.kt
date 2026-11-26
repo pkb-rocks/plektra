@@ -81,8 +81,9 @@ internal data class BacklightSnapshot(
  * the display turns on. Plektra runs nothing in the background for it.
  *
  * The original timeout is persisted before the first write and restored exactly on disable.
- * Every write is announced in the record before it is sent; only a completed reply or a read-back
- * of the written value confirms it. Only read values update the shown state.
+ * Every write is announced before it is sent. Only a completed reply confirms that call;
+ * after uncertainty, an intervening device reboot ends its possible execution. Read values alone
+ * update the shown state, not the completion guarantee.
  */
 internal class KeyboardBacklightController(
     private val shell: BacklightShell,
@@ -102,7 +103,8 @@ internal class KeyboardBacklightController(
     }
 
     suspend fun refresh(): BacklightSnapshot = operate { context ->
-        context.snapshot(context.readAndReconcile().outcome)
+        val read = context.readAndReconcile()
+        context.snapshot(context.blockingOutcome() ?: read.outcome)
     }
 
     suspend fun enable(): BacklightSnapshot = operate { context ->
@@ -177,8 +179,8 @@ internal class KeyboardBacklightController(
 
         /** A write that could not be ruled out, or a record that could not be updated, blocks writes. */
         fun blockingOutcome(): BacklightOutcome? = when {
-            record?.unconfirmedWrite != null -> BacklightOutcome.Uncertain
             recordOutOfDate -> BacklightOutcome.RecordFailed
+            record?.unconfirmedWrite != null -> BacklightOutcome.Uncertain
             else -> null
         }
 
@@ -209,7 +211,8 @@ internal class KeyboardBacklightController(
 
         /**
          * While a write is unconfirmed, the record is only ever kept or narrowed: the entry is
-         * cleared when its value is read back or the phone has restarted since. Without one, the
+         * cleared only after the phone has restarted since. Another writer can select the same
+         * value while the original Binder call remains in flight. Without uncertainty, the
          * record is removed when the original value is in effect again, or when someone replaced
          * the verified `-1` with another value outside Plektra.
          */
@@ -217,12 +220,11 @@ internal class KeyboardBacklightController(
             var current = record ?: return
             val followsDisplay = timeout == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY
             current.unconfirmedWrite?.let { unconfirmed ->
-                val landed = timeout == unconfirmed.value
                 val rebooted = unconfirmed.bootCount != null && bootCount()?.let { it != unconfirmed.bootCount } == true
-                if (!landed && !rebooted) return
+                if (!rebooted) return
                 val settled = current.copy(
                     unconfirmedWrite = null,
-                    phase = if (landed && followsDisplay) BacklightRecoveryRecord.Phase.Enabled else current.phase
+                    phase = if (followsDisplay) BacklightRecoveryRecord.Phase.Enabled else current.phase
                 )
                 if (!store.writeRecord(settled)) {
                     recordOutOfDate = true
@@ -239,7 +241,7 @@ internal class KeyboardBacklightController(
                 followsDisplay && current.phase == BacklightRecoveryRecord.Phase.Enabling -> {
                     val enabled = current.copy(phase = BacklightRecoveryRecord.Phase.Enabled)
                     // If this fails, the Enabling record still restores the same original.
-                    if (store.writeRecord(enabled)) record = enabled
+                    if (store.writeRecord(enabled)) record = enabled else recordOutOfDate = true
                 }
             }
         }
@@ -264,17 +266,19 @@ internal class KeyboardBacklightController(
                 val returned = result.succeeded && UnihertzVendorParcel.hasReply(result.output)
                 if (returned) {
                     val settled = announced.copy(unconfirmedWrite = null)
-                    if (store.writeRecord(settled)) record = settled
+                    if (store.writeRecord(settled)) record = settled else recordOutOfDate = true
                 }
                 val after = readAndReconcile()
                 snapshot(
                     when {
+                        recordOutOfDate -> BacklightOutcome.RecordFailed
+                        record?.unconfirmedWrite != null -> BacklightOutcome.Uncertain
                         after.timeout == target -> if (target == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY) {
                             BacklightOutcome.Enabled
                         } else {
                             BacklightOutcome.Disabled
                         }
-                        record?.unconfirmedWrite != null || after.timeout == null -> BacklightOutcome.Uncertain
+                        after.timeout == null -> BacklightOutcome.Uncertain
                         else -> BacklightOutcome.WriteFailed
                     }
                 )

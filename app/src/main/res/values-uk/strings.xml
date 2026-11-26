@@ -973,5 +973,5 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="keyboard_backlight_outcome_read_failed">Не вдалося прочитати налаштування підсвічування, тому нічого не змінено.</string>
     <string name="keyboard_backlight_outcome_record_failed">Не вдалося оновити збережений час, тому нічого не змінено.</string>
     <string name="keyboard_backlight_outcome_write_failed">Пристрій не прийняв зміну.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Не вдалося підтвердити зміну, і вона ще може набути чинності. Попередній час збережено; Plektra нічого не змінює, доки результат не можна прочитати або телефон не перезапущено.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Не вдалося підтвердити зміну, і вона ще може набути чинності. Попередній час збережено. Перезапустіть телефон перед наступною зміною.</string>
 </resources>

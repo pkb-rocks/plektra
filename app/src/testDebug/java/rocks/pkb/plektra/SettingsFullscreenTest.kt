@@ -37,6 +37,10 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -177,6 +181,29 @@ class SettingsFullscreenTest {
         compose.displayed(appearanceTitle).assertIsDisplayed()
         compose.onNodeWithContentDescription(search).assertIsFocused()
         assertEquals(scrolled, scrollValue(), 0.5f)
+    }
+
+    @Test
+    fun globalSearchKeepsTheLocalDictionaryQueryOutOfItsFocusOrder() {
+        fullscreen(true)
+        scenario = ActivityScenario.launch<SettingsActivity>(
+            Intent(context, SettingsActivity::class.java)
+                .putSettingsPage(SettingsPage(SettingsDestination.AutoCorrection))
+                .putExtra("settings.child.autocorrection", "UserDictionary")
+        )
+        compose.onNodeWithContentDescription(context.getString(R.string.auto_correct_search_description)).performClick()
+        val editable = SemanticsMatcher.keyIsDefined(SemanticsProperties.EditableText)
+        compose.onNode(editable).performTextInput("localword")
+        compose.onNodeWithContentDescription(search).performClick()
+        compose.waitForIdle()
+        val field = compose.onNode(editable)
+        field.performTouchInput { click() }
+        field.performKeyInput { pressKey(androidx.compose.ui.input.key.Key.Tab) }
+        field.performTouchInput { click() }
+        field.assertIsFocused().performTextInput("globalword")
+        compose.onNodeWithText("localword").assertDoesNotExist()
+        compose.onNodeWithContentDescription(closeSearch).performClick()
+        compose.onNodeWithText("localword").assertIsDisplayed()
     }
 
     @Test

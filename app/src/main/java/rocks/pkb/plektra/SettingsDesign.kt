@@ -393,7 +393,16 @@ internal fun PlektraSettingsHeader(
             )
             if (bottom != null) {
                 Box(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                    Box(if (searching) Modifier.clearAndSetSemantics {} else Modifier) { bottom() }
+                    if (searching) {
+                        // Keep the page's header height without placing its local controls in the search window.
+                        androidx.compose.ui.layout.Layout(content = { Box { bottom() } },
+                            modifier = Modifier.clearAndSetSemantics {}) { measurables, constraints ->
+                            val measured = measurables.single().measure(constraints)
+                            layout(measured.width, measured.height) {}
+                        }
+                    } else {
+                        bottom()
+                    }
                 }
             }
             if (style == AppSettingsStyle.COMPACT_DIVIDERS) {

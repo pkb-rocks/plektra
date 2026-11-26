@@ -388,9 +388,10 @@ class AndroidDictionaryRepository(
         if (!isReady) return 0
         val normalized = normalize(word)
         val bucket = normalizedIndex[normalized] ?: return 0
+        val exact = WordNormalization.normalizeApostrophes(word)
         // Find exact match (case-insensitive) and return max frequency
         return bucket
-            .filter { it.word.equals(word, ignoreCase = true) }
+            .filter { WordNormalization.normalizeApostrophes(it.word).equals(exact, ignoreCase = true) }
             .maxOfOrNull { if (usePersonalization || it.source != SuggestionSource.USER) it.frequency else 1 } ?: 0
     }
 
@@ -861,3 +862,7 @@ class AndroidDictionaryRepository(
         neutralCommonEntriesCache = null
     }
 }
+
+/** A spelling may be promoted only once every active dictionary can rule out an exact match. */
+internal fun Iterable<DictionaryRepository>.allowsAccentPromotion(word: String, personalized: Boolean): Boolean =
+    all { it.isReady && it.getExactWordFrequency(word, personalized) == 0 }

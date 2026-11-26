@@ -99,6 +99,10 @@ class SuggestionController(
             suggestionEngine = suggestionEngine,
             settingsProvider = settingsProvider,
             knownWordProvider = { word -> isKnownWordInActiveDictionaries(word) },
+            accentPromotionAllowed = { word, personalized ->
+                (listOf(dictionaryRepository) + activeExtraSuggestionEngines().map { it.repository })
+                    .allowsAccentPromotion(word, personalized)
+            },
             exactReplacementProvider = { word, boundaryChar ->
                 val boundary = boundaryChar ?: ' '
                 AutoCorrector.processText(
@@ -316,7 +320,9 @@ class SuggestionController(
         if (!shouldLaunch) return
 
         val personalizedSnapshot = activeSettings.personalizationEnabled
-        val extraRepositories = activeExtraSuggestionEngines().mapNotNull { extra ->
+        val extraEngines = activeExtraSuggestionEngines()
+        val activeRepositories = listOf(primaryRepository) + extraEngines.map { it.repository }
+        val extraRepositories = extraEngines.mapNotNull { extra ->
             if (!extra.repository.isReady) {
                 scheduleRepositoryLoad(extra.repository, refreshAfterLoad = true)
                 null
@@ -330,6 +336,7 @@ class SuggestionController(
             delay(40)
             if (generation != suggestionGeneration.get()) return@launch
             if (personalizedSnapshot && !settingsProvider().personalizationEnabled) return@launch
+            val promoteAccent = activeSettings.accentMatching && activeRepositories.allowsAccentPromotion(wordSnapshot, personalizedSnapshot)
             val primary = if (primaryRepository.isReady) {
                 SuggestionEngine(primaryRepository, locale = localeSnapshot, debugLogging = debugLogging).apply {
                     setKeyboardLayout(layoutSnapshot)
@@ -339,7 +346,8 @@ class SuggestionController(
                     activeSettings.accentMatching,
                     activeSettings.useKeyboardProximity,
                     activeSettings.useEditTypeRanking,
-                    personalizedSnapshot
+                    personalizedSnapshot,
+                    allowAccentPromotion = promoteAccent
                 )
             } else {
                 emptyList()
@@ -356,7 +364,8 @@ class SuggestionController(
                     activeSettings.accentMatching,
                     activeSettings.useKeyboardProximity,
                     activeSettings.useEditTypeRanking,
-                    personalizedSnapshot
+                    personalizedSnapshot,
+                    allowAccentPromotion = promoteAccent
                 )
             }
 

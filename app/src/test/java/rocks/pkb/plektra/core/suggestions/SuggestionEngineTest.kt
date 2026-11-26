@@ -145,6 +145,37 @@ class SuggestionEngineTest {
     }
 
     @Test
+    fun completeFrenchElisionsKeepTheirUnboostedRanking() {
+        for ((root, accented) in listOf("amuse" to "amusé", "incline" to "incliné", "exile" to "exilé")) {
+            val word = "s’$root"
+            val repo = FakeDictionaryRepository().apply {
+                isReady = true
+                addTestEntry(word, 150)
+                addTestEntry(accented, 120)
+                addTestEntry(root + "r", 200)
+            }
+            val french = SuggestionEngine(repo, locale = Locale.FRENCH)
+            assertEquals(french.suggest(word, allowAccentPromotion = false), french.suggest(word))
+        }
+    }
+
+    @Test
+    fun englishFurPreventsTheGermanAccentBonus() {
+        val english = FakeDictionaryRepository().apply { isReady = true; addTestEntry("fur", 130) }
+        val german = FakeDictionaryRepository().apply {
+            isReady = true
+            addTestEntry("für", 210)
+            addTestEntry("furchtbar", 130)
+        }
+        val germanEngine = SuggestionEngine(german, locale = Locale.GERMAN)
+        val promote = listOf(english, german).allowsAccentPromotion("fur", false)
+        assertTrue(!promote)
+        assertEquals(germanEngine.suggest("fur", allowAccentPromotion = false),
+            germanEngine.suggest("fur", allowAccentPromotion = promote))
+        assertEquals("für", germanEngine.suggest("fur").first().candidate)
+    }
+
+    @Test
     fun accentlessFrenchWordSuggestsAccentedDictionaryEntry() {
         fakeRepo.isReady = true
         fakeRepo.addTestEntry("derrière", 200)

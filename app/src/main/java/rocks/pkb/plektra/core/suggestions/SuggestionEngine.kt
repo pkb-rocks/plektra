@@ -334,11 +334,14 @@ class SuggestionEngine(
         includeAccentMatching: Boolean = true,
         useKeyboardProximity: Boolean = true,
         useEditTypeRanking: Boolean = true,
-        usePersonalization: Boolean = true
+        usePersonalization: Boolean = true,
+        allowAccentPromotion: Boolean = true
     ): List<SuggestionResult> {
         if (currentWord.isBlank() || currentWord.length > 48) return emptyList()
         if (!repository.isReady) return emptyList()
 
+        val promoteAccent = includeAccentMatching && allowAccentPromotion &&
+            repository.getExactWordFrequency(currentWord, usePersonalization) == 0
         // Apostrophe branch: split and suggest on the root to avoid over-corrections.
         val apostropheSplit = splitApostropheWord(currentWord)
         if (apostropheSplit != null) {
@@ -348,7 +351,8 @@ class SuggestionEngine(
                 includeAccentMatching = includeAccentMatching,
                 useKeyboardProximity = useKeyboardProximity,
                 useEditTypeRanking = useEditTypeRanking,
-                usePersonalization = usePersonalization
+                usePersonalization = usePersonalization,
+                allowAccentPromotion = promoteAccent
             )
             val filtered = rootResults
                 .filter { it.distance <= 1 } // stay conservative on apostrophated forms
@@ -368,7 +372,8 @@ class SuggestionEngine(
             includeAccentMatching = includeAccentMatching,
             useKeyboardProximity = useKeyboardProximity,
             useEditTypeRanking = useEditTypeRanking,
-            usePersonalization = usePersonalization
+            usePersonalization = usePersonalization,
+            allowAccentPromotion = promoteAccent
         )
     }
 
@@ -378,7 +383,8 @@ class SuggestionEngine(
         includeAccentMatching: Boolean,
         useKeyboardProximity: Boolean,
         useEditTypeRanking: Boolean,
-        usePersonalization: Boolean
+        usePersonalization: Boolean,
+        allowAccentPromotion: Boolean
     ): List<SuggestionResult> {
         val normalizedWord = normalize(currentWord)
         val normalizedWordBare = normalizedWord.replace("'", "")
@@ -750,7 +756,7 @@ class SuggestionEngine(
         }
 
         // Two letters at least, like auto-correction's orthographic fixes ("ja" -> "já").
-        val orthographic = if (includeAccentMatching && currentWord.length >= 2 &&
+        val orthographic = if (allowAccentPromotion && currentWord.length >= 2 &&
             repository.getExactWordFrequency(currentWord, usePersonalization) == 0) {
             AutoReplaceController.orthographicVariant(repository, currentWord, usePersonalization)
         } else null

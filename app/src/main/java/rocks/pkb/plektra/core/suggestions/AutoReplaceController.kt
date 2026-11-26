@@ -14,7 +14,10 @@ class AutoReplaceController(
     private val suggestionEngine: SuggestionEngine,
     private val settingsProvider: () -> SuggestionSettings,
     private val knownWordProvider: ((String) -> Boolean)? = null,
-    private val exactReplacementProvider: ((String, Char?) -> String?)? = null
+    private val exactReplacementProvider: ((String, Char?) -> String?)? = null,
+    private val accentPromotionAllowed: (String, Boolean) -> Boolean = { word, personalized ->
+        repository.getExactWordFrequency(word, personalized) == 0
+    }
 ) {
     private fun triggerFromBoundaryChar(boundaryChar: Char?): DebugCaptureStore.AutoCorrectionTrigger {
         return when (boundaryChar) {
@@ -419,7 +422,9 @@ class AutoReplaceController(
             }
         }
 
-        val orthographicEntry = if (settings.accentMatching) {
+        val promoteAccent = settings.accentMatching && accentPromotionAllowed(word, settings.personalizationEnabled) &&
+            (word == lookupWord || accentPromotionAllowed(lookupWord, settings.personalizationEnabled))
+        val orthographicEntry = if (promoteAccent) {
             orthographicVariant(repository, lookupWord, settings.personalizationEnabled)
         } else null
         val topRaw = orthographicEntry?.let { entry ->
@@ -430,7 +435,8 @@ class AutoReplaceController(
             includeAccentMatching = settings.accentMatching,
             useKeyboardProximity = settings.useKeyboardProximity,
             useEditTypeRanking = settings.useEditTypeRanking,
-            usePersonalization = settings.personalizationEnabled
+            usePersonalization = settings.personalizationEnabled,
+            allowAccentPromotion = promoteAccent
         ).firstOrNull()
         // Suggestion ranking can assign zero distance to completions. Replacement safety
         // uses the actual distance of the dictionary root before restoring its prefix.
@@ -473,6 +479,7 @@ class AutoReplaceController(
         )
 
         val shouldReplace = top != null
+            && (!isOrthographicVariant || promoteAccent)
             && (!isKnownWord || (isCaseVariant && !hasExactPrimaryCase) || (isOrthographicVariant && !isExactKnownWord)) // Allow case/orthographic fixes
             && !isRejected // Don't auto-correct if user has rejected this word
             && isSafeCandidate

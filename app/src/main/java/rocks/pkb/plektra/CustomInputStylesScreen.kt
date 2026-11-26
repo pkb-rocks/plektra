@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
-import android.app.Activity
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectableGroup
@@ -1035,7 +1034,7 @@ internal fun appLanguageChoiceLabels(context: Context, tag: String?, uiLocale: L
 
 internal fun setApplicationLanguage(context: Context, languageTag: String?) {
     SettingsManager.setAppLanguageTag(context, languageTag)
-    (context as? Activity)?.recreate()
+    context.settingsActivity().recreate()
 }
 
 /**

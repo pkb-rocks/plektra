@@ -261,10 +261,7 @@ internal fun PlektraSettingsHeader(
     }
     BackHandler(enabled = searching) { closeSearch() }
     LaunchedEffect(searching) {
-        if (searching) {
-            searchFieldFocus.requestFocus()
-            keyboardController?.show()
-        } else if (returnFocus) {
+        if (!searching && returnFocus) {
             returnFocus = false
             runCatching { searchButtonFocus.requestFocus() }
         }
@@ -292,7 +289,7 @@ internal fun PlektraSettingsHeader(
             }
         }
     } else null
-    SettingsHeaderWithPanel(modifier = modifier, panel = resultsPanel) {
+    SettingsHeaderWithPanel(modifier, searching, ::closeSearch, resultsPanel) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -370,6 +367,11 @@ internal fun PlektraSettingsHeader(
                 },
                 middle = {
                     if (searching) {
+                        val inputMethod = LocalSoftwareKeyboardController.current
+                        LaunchedEffect(Unit) {
+                            searchFieldFocus.requestFocus()
+                            inputMethod?.show()
+                        }
                         SettingsSearchField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
@@ -391,7 +393,7 @@ internal fun PlektraSettingsHeader(
             )
             if (bottom != null) {
                 Box(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                    bottom()
+                    Box(if (searching) Modifier.clearAndSetSemantics {} else Modifier) { bottom() }
                 }
             }
             if (style == AppSettingsStyle.COMPACT_DIVIDERS) {

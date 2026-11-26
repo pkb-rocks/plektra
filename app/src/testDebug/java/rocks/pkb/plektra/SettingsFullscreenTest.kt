@@ -236,11 +236,11 @@ class SettingsHeaderCutoutTest {
 
     private var cutouts by mutableStateOf<List<Rect>>(emptyList())
 
-    private fun show() {
+    private fun show(subtitle: String? = null) {
         compose.setContent {
             PlektraTheme(settingsWindow = true) {
                 CompositionLocalProvider(LocalDisplayCutoutRects provides cutouts) {
-                    PlektraSettingsHeader(title = "Kill Switch", onBack = {}, actions = {
+                    PlektraSettingsHeader(title = "Kill Switch", subtitle = subtitle, onBack = {}, actions = {
                         IconButton(onClick = {}) { Icon(Icons.Filled.Refresh, contentDescription = action) }
                     })
                 }
@@ -252,6 +252,14 @@ class SettingsHeaderCutoutTest {
     private fun bounds(description: String) = compose.onNodeWithContentDescription(description).getBoundsInRoot()
     private fun titleBounds() = compose.onNodeWithText("Kill Switch").getBoundsInRoot()
     private fun px(dp: Dp) = (dp.value * 2).toInt()
+
+    @Test
+    fun aCutoutBelowTheMinimumHeightClearsTheBackButtonInATallHeader() {
+        show(subtitle = "First line\nSecond line\nThird line\nFourth line")
+        cutouts = listOf(Rect(0, px(60.dp), px(65.dp), px(90.dp)))
+        compose.waitForIdle()
+        assertTrue(bounds(back).left >= 65.dp)
+    }
 
     @Test
     fun onlyTheElementsMeetingACutoutMove() {

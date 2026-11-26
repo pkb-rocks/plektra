@@ -57,6 +57,25 @@ class SettingsTwoPaneTest {
     }
 
     @Test
+    @Config(sdk = [33], qualifiers = "w720dp-h800dp")
+    fun foldingAndRecreatingKeepsTheSelectedCategoryAndItsBackDestination() {
+        launch()
+        val category = context.getString(R.string.settings_category_auto_correction)
+        val detail = context.getString(R.string.auto_correct_section_suggestions)
+        compose.onNodeWithText(category).performClick()
+        org.robolectric.RuntimeEnvironment.setQualifiers("w411dp-h800dp")
+        scenario!!.recreate()
+        compose.waitForIdle()
+        compose.onNodeWithText(detail).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription(back).performClick()
+        compose.onNodeWithText(context.getString(R.string.settings_group_typing)).assertIsDisplayed()
+        org.robolectric.RuntimeEnvironment.setQualifiers("w720dp-h800dp")
+        scenario!!.recreate()
+        compose.waitForIdle()
+        compose.onAllNodesWithText(category)[0].assertIsSelected()
+    }
+
+    @Test
     @Config(sdk = [33], qualifiers = "w411dp-h800dp")
     fun aNarrowWindowOpensTheCategoryInPlaceWithBackToTheList() {
         launch()

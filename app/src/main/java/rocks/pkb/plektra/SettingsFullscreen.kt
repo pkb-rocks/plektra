@@ -22,7 +22,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.zIndex
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
@@ -203,7 +210,11 @@ internal fun SettingsHeaderRow(
     end: @Composable () -> Unit
 ) {
     var origin by remember { mutableStateOf(Offset.Zero) }
-    val track = if (cutouts.isEmpty()) Modifier else Modifier.onPlaced { origin = it.positionInWindow() }
+    var placedHeight by remember { mutableStateOf(0) }
+    val track = if (cutouts.isEmpty()) Modifier else Modifier.onPlaced {
+        origin = it.positionInWindow()
+        placedHeight = it.size.height
+    }
     val gap = with(LocalDensity.current) { 4.dp.roundToPx() }
     val none: @Composable () -> Unit = {}
     // The reference is only measured; it must not reach accessibility or tests either.
@@ -231,7 +242,7 @@ internal fun SettingsHeaderRow(
             val spans = cutouts.mapNotNull { rect ->
                 val top = rect.top - origin.y
                 val bottom = rect.bottom - origin.y
-                if (bottom <= 0 || top >= rowHeight) return@mapNotNull null
+                if (bottom <= 0 || top >= max(rowHeight, placedHeight)) return@mapNotNull null
                 val left = (rect.left - origin.x).toInt()
                 val right = (rect.right - origin.x).toInt()
                 // Arranged left to right as in LTR; RTL mirrors the cutout instead.
@@ -275,25 +286,33 @@ internal fun SettingsHeaderRow(
 @Composable
 internal fun SettingsHeaderWithPanel(
     modifier: Modifier,
+    searching: Boolean,
+    onClose: () -> Unit,
     panel: (@Composable () -> Unit)?,
     header: @Composable () -> Unit
 ) {
-    val view = LocalView.current
-    var top by remember { mutableStateOf(0f) }
-    Layout(
-        contents = listOf(header, panel ?: {}),
-        modifier = modifier.then(
-            if (panel != null) Modifier.zIndex(1f).onPlaced { top = it.positionInWindow().y } else Modifier
-        )
-    ) { (headerMeasurables, panelMeasurables), constraints ->
-        val headers = headerMeasurables.map { it.measure(constraints) }
-        val width = headers.maxOfOrNull { it.width } ?: constraints.minWidth
-        val height = headers.maxOfOrNull { it.height } ?: constraints.minHeight
-        val panelHeight = (view.rootView.height - top - height).toInt().coerceAtLeast(0)
-        val panels = panelMeasurables.map { it.measure(Constraints.fixed(width, panelHeight)) }
-        layout(width, height) {
-            headers.forEach { it.place(0, 0) }
-            panels.forEach { it.place(0, height) }
+    val host = LocalView.current
+    var headerHeight by remember { mutableStateOf(0) }
+    val measure = Modifier.onSizeChanged { headerHeight = it.height }
+    if (!searching) {
+        Box(modifier.then(measure)) { header() }
+        return
+    }
+
+    // Search owns both keyboard and accessibility focus until its window closes.
+    DisposableEffect(host) {
+        val previous = host.importantForAccessibility
+        host.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        onDispose { host.importantForAccessibility = previous }
+    }
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val width = maxWidth
+        Spacer(Modifier.height(with(LocalDensity.current) { headerHeight.toDp() }))
+        Popup(onDismissRequest = onClose, properties = PopupProperties(focusable = true)) {
+            Column(Modifier.width(width).fillMaxHeight()) {
+                Box(measure) { header() }
+                panel?.invoke()
+            }
         }
     }
 }

@@ -3457,16 +3457,24 @@ class StatusBarController(
         // Sized like the separate variations row: static lists in full, dynamic ones by the
         // configured slot count.
         val dynamicSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
-        val sharedVariations = if (sharedRow && barPresentation.actions && !expansionActive) {
-            if (sharedDynamicVariations) snapshot.variations.take(dynamicSlotCount)
-            else if (!suggestionsAvailable) variationBarView?.resolveStaticVariations(snapshot).orEmpty()
-            else emptyList()
-        } else emptyList()
+        val sharedContent = if (sharedRow && barPresentation.actions && !expansionActive) {
+            SharedRowPriority.select(
+                suggestionsAvailable = suggestionsAvailable,
+                dynamicVariationsAvailable = sharedDynamicVariations,
+                variationsFirst = SettingsManager.getSharedRowVariationsFirst(context)
+            )
+        } else null
+        val sharedDynamicShown = sharedContent == SharedRowContent.DYNAMIC_VARIATIONS
+        val sharedVariations = when (sharedContent) {
+            SharedRowContent.DYNAMIC_VARIATIONS -> snapshot.variations.take(dynamicSlotCount)
+            SharedRowContent.STATIC_VARIATIONS -> variationBarView?.resolveStaticVariations(snapshot).orEmpty()
+            SharedRowContent.SUGGESTIONS, null -> emptyList()
+        }
         val sharedVariationSlots = sharedVariations.takeIf { it.isNotEmpty() }?.let {
             rocks.pkb.plektra.inputmethod.suggestions.ui.VariationSlots(
-                slotCount = if (sharedDynamicVariations && !SettingsManager.getDynamicVariationBarResizeToContent(context))
+                slotCount = if (sharedDynamicShown && !SettingsManager.getDynamicVariationBarResizeToContent(context))
                     dynamicSlotCount else it.size,
-                dynamic = sharedDynamicVariations
+                dynamic = sharedDynamicShown
             )
         }
         val rowContent = when {
@@ -3505,7 +3513,7 @@ class StatusBarController(
             when {
                 expansionActive -> { _, suggestion -> onExpansionSuggestionSelected?.invoke(suggestion) }
                 sharedVariations.isNotEmpty() -> { _, variation ->
-                    val click = if (sharedDynamicVariations)
+                    val click = if (sharedDynamicShown)
                         VariationButtonHandler.createVariationClickListener(variation, inputConnection, context, onVariationSelectedListener)
                     else VariationButtonHandler.createStaticVariationClickListener(variation, inputConnection, context, onVariationSelectedListener)
                     click.onClick(fullSuggestionsBar?.ensureView())

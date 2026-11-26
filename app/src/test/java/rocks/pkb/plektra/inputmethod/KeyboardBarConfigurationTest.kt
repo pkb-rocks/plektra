@@ -415,23 +415,91 @@ class KeyboardBarConfigurationTest {
         assertEquals("Snippet choice", selected)
     }
 
-    @Test fun sharedRowPrefersDynamicVariationsOverWordSuggestions() {
-        SettingsManager.setSuggestionsEnabled(context, true)
+    private fun sharedRowController(suggestions: Boolean = true): StatusBarController {
+        SettingsManager.setSuggestionsEnabled(context, suggestions)
         SettingsManager.setExperimentalSuggestionsEnabled(context, true)
         SettingsManager.setStatusBarVariationsEnabled(context, true)
+        SettingsManager.setStaticVariationBarModeEnabled(context, false)
         KeyboardBarConfiguration.setArrangement(context, rocks.pkb.plektra.KeyboardBarArrangement.SHARED)
-        val controller = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+        return StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+    }
+
+    @Test fun sharedRowKeepsWordSuggestionsAheadOfDynamicVariationsByDefault() {
+        val controller = sharedRowController()
         controller.update(snapshot().copy(variations = listOf("à", "â"), suggestions = listOf("alphabet")))
-        val labels = mutableListOf<String>()
-        fun collect(view: View) {
-            if (view.visibility != View.VISIBLE) return
-            if (view is android.widget.TextView) labels.add(view.text.toString())
-            if (view is android.view.ViewGroup) for (index in 0 until view.childCount) collect(view.getChildAt(index))
-        }
-        collect(controller.getLayout()!!)
-        assertTrue(labels.contains("à"))
-        assertTrue(labels.contains("â"))
+        val labels = visibleLabels(controller.getLayout()!!)
+        assertTrue(labels.contains("alphabet"))
+        assertFalse(labels.contains("à"))
+        assertFalse(labels.contains("â"))
+    }
+
+    @Test fun sharedRowShowsDynamicVariationsFirstWhenEnabled() {
+        val controller = sharedRowController()
+        SettingsManager.setSharedRowVariationsFirst(context, true)
+        val variations = listOf("à", "â")
+        val recorder = RecordingConnection()
+        controller.update(snapshot().copy(variations = variations, suggestions = listOf("alphabet")),
+            inputConnection = recorder.connection)
+        val root = controller.getLayout()!!
+        val labels = visibleLabels(root)
+        assertTrue(labels.containsAll(variations))
         assertFalse(labels.contains("alphabet"))
+        slotViews(root, variations).first().performClick()
+        assertEquals(listOf("delete:1,0", "commit:à"), recorder.calls)
+    }
+
+    /** Without word suggestions the row keeps every variation in order, whatever the precedence. */
+    @Test fun sharedRowShowsAllDynamicVariationsWhenSuggestionsAreOff() {
+        val variations = listOf("à", "á", "ä", "â", "ã", "å", "ą")
+        listOf(false, true).forEach { variationsFirst ->
+            val controller = sharedRowController(suggestions = false)
+            SettingsManager.setSharedRowVariationsFirst(context, variationsFirst)
+            controller.update(snapshot().copy(variations = variations, suggestions = listOf("alphabet")))
+            val root = controller.getLayout()!!
+            assertEquals(variations, variationSlotTexts(root.getChildAt(0), variations))
+            assertFalse(visibleLabels(root).contains("alphabet"))
+        }
+    }
+
+    @Test fun sharedRowFallsBackToVariationsAndThenStaticCharactersWithoutSuggestions() {
+        val controller = sharedRowController()
+        val recorder = RecordingConnection()
+        controller.update(snapshot().copy(variations = listOf("é", "è")), inputConnection = recorder.connection)
+        val root = controller.getLayout()!!
+        assertTrue(visibleLabels(root).containsAll(listOf("é", "è")))
+
+        // Neither suggestions nor dynamic variations: the static characters fill the row.
+        SettingsManager.setStaticVariationBarPreset(context, SettingsManager.STATIC_VARIATION_PRESET_DEV_CHOICE)
+        controller.update(snapshot(), inputConnection = recorder.connection)
+        assertEquals(DEV_CHOICE, variationSlotTexts(root.getChildAt(0), DEV_CHOICE))
+        recorder.calls.clear()
+        slotViews(root, DEV_CHOICE).first().performClick()
+        assertEquals(listOf("commit:»"), recorder.calls)
+    }
+
+    /** Switching content kinds rebinds each slot to its own action, so no character or word goes astray. */
+    @Test fun sharedRowSwitchesBetweenSuggestionsAndVariationsWithMatchingActions() {
+        val controller = sharedRowController()
+        val recorder = RecordingConnection()
+        val words = listOf("fête", "femme", "fenêtre")
+        val variations = listOf("è", "é", "ê")
+        controller.update(snapshot().copy(variations = variations, suggestions = words), inputConnection = recorder.connection)
+        val root = controller.getLayout()!!
+        assertFalse(visibleLabels(root).contains("é"))
+        recorder.calls.clear()
+        slotViews(root, listOf("fenêtre"))[1].performClick()
+        assertEquals(listOf("delete:0,0", "commit:fête", "commit: "), recorder.calls)
+
+        controller.update(snapshot().copy(variations = variations), inputConnection = recorder.connection)
+        assertTrue(visibleLabels(root).containsAll(variations))
+        recorder.calls.clear()
+        slotViews(root, variations)[1].performClick()
+        assertEquals(listOf("delete:1,0", "commit:é"), recorder.calls)
+
+        controller.update(snapshot().copy(variations = variations, suggestions = words), inputConnection = recorder.connection)
+        val labels = visibleLabels(root)
+        assertTrue(labels.containsAll(words))
+        assertFalse(labels.contains("é"))
     }
 
     @Test fun modifiersShareOneGrowingMenuButtonAndHandBackTheOuterEdge() {

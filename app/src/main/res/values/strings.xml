@@ -1774,6 +1774,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="dynamic_variation_slot_count_description">Aim to show %1$d dynamic entries between the keyboard bar buttons.</string>
     <string name="dynamic_variation_resize_to_content_title">Resize dynamic variations</string>
     <string name="dynamic_variation_resize_to_content_description">When enabled, dynamic entries fill the available row based on how many are shown. When off, entries keep the slot size from the slider and stay left-aligned.</string>
+    <string name="shared_row_variations_first_title">Variations before suggestions</string>
+    <string name="shared_row_variations_first_description">Shows the variations of the last letter instead of word suggestions while there are any. Off: variations appear only when there are no suggestions.</string>
     <string name="modifier_indicators_title">Modifier indicators</string>
     <string name="modifier_indicators_description">Choose where Shift, Ctrl, Alt, and SYM state appears for the hardware keyboard.</string>
     <string name="modifier_indicators_bottom_strip">Bottom Strip LEDs</string>
@@ -1913,7 +1915,6 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_bar_swap">Swap row order</string>
     <string name="keyboard_bar_drag">Drag to reorder; tap to swap</string>
     <string name="keyboard_bar_arrange_help">Hold and drag a handle to reorder. Tap a menu icon to edit it.</string>
-    <string name="keyboard_bar_shared_behavior">Character variations replace suggestions while available.</string>
     <string name="keyboard_bar_sample_suggestions">Preview suggestions</string>
     <string name="keyboard_bar_sample_variations">Preview character variations</string>
     <string name="keyboard_bar_buttons_shared">Tap an icon to change or remove it. These buttons are shared by both profiles.</string>

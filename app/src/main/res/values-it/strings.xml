@@ -983,6 +983,8 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="dynamic_variation_slot_count_description">Punta a mostrare %1$d voci dinamiche tra i pulsanti della barra di stato.</string>
     <string name="dynamic_variation_resize_to_content_title">Ridimensiona variazioni dinamiche</string>
     <string name="dynamic_variation_resize_to_content_description">Se attivo, le voci dinamiche riempiono la riga disponibile in base a quante sono mostrate. Se disattivato, mantengono la dimensione slot dello slider e restano allineate a sinistra.</string>
+    <string name="shared_row_variations_first_title">Variazioni prima dei suggerimenti</string>
+    <string name="shared_row_variations_first_description">Mostra le variazioni dell\'ultima lettera al posto dei suggerimenti di parole finché ce ne sono. Disattivato: compaiono solo se non ci sono suggerimenti.</string>
     <string name="status_bar_state_on">Attivo</string>
     <string name="status_bar_state_off">Disattivo</string>
     <string name="status_bar_button_clipboard_state_empty">Vuoto</string>

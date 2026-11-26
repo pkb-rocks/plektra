@@ -53,6 +53,8 @@ class FullSuggestionsBar(
 ) {
 
     companion object {
+        internal const val SUGGESTION_PADDING_DP = 12f
+        internal const val SHARED_ROW_SUGGESTION_PADDING_DP = 4f
         private val PRESSED_BLUE = Color.rgb(100, 150, 255) // Align with variation bar press state
         private val DEFAULT_SUGGESTION_COLOR = Color.argb(100, 17, 17, 17)
         private const val FLASH_DURATION_MS = 160L
@@ -723,7 +725,13 @@ class FullSuggestionsBar(
         val maxTextSp = (14f * heightScale).coerceIn(12f, 20f).toInt()
         val minTextSp = (7f * heightScale).coerceIn(7f, 12f).toInt()
         val padV = dpToPx(3f * heightScale)
-        val padH = if (variationSlots != null) 0 else dpToPx(12f)
+        // Menu buttons in the same row leave each word slot little width; wide side padding
+        // would shrink even short words to the minimum text size.
+        val padH = when {
+            variationSlots != null -> 0
+            hasMenuButtons -> dpToPx(SHARED_ROW_SUGGESTION_PADDING_DP)
+            else -> dpToPx(SUGGESTION_PADDING_DP)
+        }
 
         val addOnly = variationSlots == null && addWordCandidate != null &&
             slots[0]?.equals(addWordCandidate, ignoreCase = true) == true &&

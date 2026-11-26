@@ -353,6 +353,7 @@ internal object BackupPreferenceContract {
             "status_bar_variations_visible" to PreferenceValueType.BOOLEAN,
             "dynamic_variation_bar_slot_count" to PreferenceValueType.INT,
             "dynamic_variation_bar_resize_to_content" to PreferenceValueType.BOOLEAN,
+            "shared_row_variations_first" to PreferenceValueType.BOOLEAN,
             "launcher_shortcuts" to PreferenceValueType.STRING,
             "launcher_shortcuts_enabled" to PreferenceValueType.BOOLEAN,
             "quick_launcher_auto_start_single" to PreferenceValueType.BOOLEAN,

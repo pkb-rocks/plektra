@@ -256,6 +256,7 @@
     <string name="auto_correct_edit_type_ranking_title">Κατάταξη τύπου επεξεργασίας</string>
     <string name="auto_correct_edit_type_ranking_description">Κατατάσσει προτάσεις κατά τύπο επεξεργασίας (εισαγωγή > αντικατάσταση > διαγραφή)</string>
     <string name="clear">Εκκαθάριση</string>
+    <string name="auto_correct_auto_replace_requires_suggestions">Απαιτεί να είναι ενεργοποιημένες οι Πειραματικές προτάσεις παραπάνω.</string>
     <string name="experimental_suggestions_title">Πειραματικές προτάσεις</string>
     <string name="experimental_suggestions_subtitle">Ενεργοποίηση της νέας μηχανής λεξικού/προτάσεων (beta)</string>
 

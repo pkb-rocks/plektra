@@ -9,6 +9,7 @@ import android.util.Log
  */
 object TextSelectionHelper {
     private const val TAG = "TextSelectionHelper"
+    private const val WORD_CONTEXT_CHARS = 1000
 
     private data class SelectionAnchorState(
         val anchor: Int,
@@ -25,11 +26,12 @@ object TextSelectionHelper {
 
     /**
      * The field's text and selection. An app may hand over only part of a long field ([text]
-     * starting at [offset]); the selection is given in the whole field's positions, as
-     * setSelection takes them.
+     * starting at [offset]). Store selection positions relative to the entire field.
      */
     private class Extracted(val text: String?, val offset: Int, val selectionStart: Int, val selectionEnd: Int) {
         val end: Int get() = offset + (text?.length ?: 0)
+        val firstSelectionEdge: Int get() = minOf(selectionStart, selectionEnd)
+        val lastSelectionEdge: Int get() = maxOf(selectionStart, selectionEnd)
         /** [position] in the whole field, as a position in [text]. */
         fun local(position: Int): Int = (position - offset).coerceIn(0, text?.length ?: 0)
     }
@@ -44,8 +46,43 @@ object TextSelectionHelper {
         return Extracted(extracted.text?.toString(), offset, whole(extracted.selectionStart), whole(extracted.selectionEnd))
     }
 
-    private fun clearSelectionAnchor() {
+    fun clearSelectionAnchor() {
         selectionAnchorState = null
+    }
+
+    private fun Extracted.hasCharacterAfter(connection: InputConnection, position: Int): Boolean =
+        position < end ||
+            (position == lastSelectionEdge && !connection.getTextAfterCursor(1, 0).isNullOrEmpty())
+
+    private fun Extracted.wordStartToLeft(connection: InputConnection, position: Int): Int {
+        val value = text ?: return position
+        val localStart = previousWordStart(value, local(position))
+        if (localStart > 0 || offset == 0) return offset + localStart
+
+        val earlier = connection.getTextBeforeCursor(WORD_CONTEXT_CHARS, 0)?.toString()
+            ?: return offset
+        val firstSelected = local(firstSelectionEdge)
+        if (earlier.length <= firstSelected) return offset
+        val context = earlier + value.substring(firstSelected, local(position))
+        return position - (context.length - previousWordStart(context, context.length))
+    }
+
+    private fun Extracted.wordBoundaryToRight(
+        connection: InputConnection,
+        position: Int,
+        extendSelection: Boolean
+    ): Int {
+        val value = text ?: return position
+        val findBoundary = if (extendSelection) ::nextWordEnd else ::nextWordStart
+        val boundary = findBoundary(value, local(position))
+        if (boundary < value.length) return offset + boundary
+
+        val later = connection.getTextAfterCursor(WORD_CONTEXT_CHARS, 0)?.toString()
+            ?: return end
+        val lastSelected = local(lastSelectionEdge)
+        if (later.length <= value.length - lastSelected) return end
+        val context = value.substring(local(position), lastSelected) + later
+        return position + findBoundary(context, 0)
     }
 
     private fun selectionAnchor(
@@ -75,14 +112,14 @@ object TextSelectionHelper {
         newMovingEdge: Int
     ): Boolean {
         if (newMovingEdge == anchor) {
-            inputConnection.setSelection(anchor, anchor)
+            if (!inputConnection.setSelection(anchor, anchor)) return false
             clearSelectionAnchor()
             return true
         }
 
         val newStart = minOf(anchor, newMovingEdge)
         val newEnd = maxOf(anchor, newMovingEdge)
-        inputConnection.setSelection(newStart, newEnd)
+        if (!inputConnection.setSelection(newStart, newEnd)) return false
         selectionAnchorState = SelectionAnchorState(
             anchor = anchor,
             selectionStart = newStart,
@@ -216,17 +253,10 @@ object TextSelectionHelper {
                 return false
             }
             
-            // Where the field ends (an app may hand over only part of it)
-            val textLength = extractedText.end
-            
             val anchor = selectionAnchor(selectionStart, selectionEnd, SelectionDirection.Right)
             val movingEdge = movingSelectionEdge(selectionStart, selectionEnd, anchor)
+            if (!extractedText.hasCharacterAfter(inputConnection, movingEdge)) return false
             val newMovingEdge = movingEdge + 1
-            if (newMovingEdge > textLength) {
-                Log.d(TAG, "expandSelectionRight: selection already at end of text (movingEdge: $movingEdge, textLength: $textLength), can't move edge right")
-                return false
-            }
-
             val handled = applySelectionMove(inputConnection, anchor, newMovingEdge)
             Log.d(TAG, "expandSelectionRight: selection moved from [$selectionStart, $selectionEnd] to edge $newMovingEdge with anchor $anchor")
             return handled
@@ -337,26 +367,10 @@ object TextSelectionHelper {
                 return false
             }
             
-            // Where the field ends (an app may hand over only part of it)
-            val textLength = extractedText.end
-            
-            // If there's a selection, collapse it to the end position first
-            val currentPos = if (selectionStart != selectionEnd) {
-                selectionEnd // Collapse selection to end
-            } else {
-                selectionEnd // Already at cursor position
-            }
-            
-            // Can't move right if already at end
-            if (currentPos >= textLength) {
-                Log.d(TAG, "moveCursorRight: cursor already at end of text (pos: $currentPos, length: $textLength)")
-                return false
-            }
-            
+            val currentPos = extractedText.lastSelectionEdge
+            if (!extractedText.hasCharacterAfter(inputConnection, currentPos)) return false
             val newPos = currentPos + 1
-            
-            // Move cursor without creating selection (same start and end)
-            inputConnection.setSelection(newPos, newPos)
+            if (!inputConnection.setSelection(newPos, newPos)) return false
             clearSelectionAnchor()
             Log.d(TAG, "moveCursorRight: cursor moved from $currentPos to $newPos")
             return true
@@ -383,11 +397,10 @@ object TextSelectionHelper {
             val selectionEnd = extractedText.selectionEnd
             if (selectionStart < 0 || selectionEnd < 0) return false
 
-            val text = extractedText.text ?: return false
-            val currentPosition = if (selectionStart != selectionEnd) selectionStart else selectionStart
-            val newPosition = extractedText.offset + previousWordStart(text, extractedText.local(currentPosition))
+            val currentPosition = extractedText.firstSelectionEdge
+            val newPosition = extractedText.wordStartToLeft(inputConnection, currentPosition)
             if (newPosition == currentPosition) return false
-            inputConnection.setSelection(newPosition, newPosition)
+            if (!inputConnection.setSelection(newPosition, newPosition)) return false
             clearSelectionAnchor()
             Log.d(TAG, "moveCursorWordLeft: cursor moved from $currentPosition to $newPosition")
             return true
@@ -417,11 +430,10 @@ object TextSelectionHelper {
             val selectionEnd = extractedText.selectionEnd
             if (selectionStart < 0 || selectionEnd < 0) return false
 
-            val text = extractedText.text ?: return false
-            val currentPosition = if (selectionStart != selectionEnd) selectionEnd else selectionEnd
-            val newPosition = extractedText.offset + nextWordStart(text, extractedText.local(currentPosition))
+            val currentPosition = extractedText.lastSelectionEdge
+            val newPosition = extractedText.wordBoundaryToRight(inputConnection, currentPosition, extendSelection = false)
             if (newPosition == currentPosition) return false
-            inputConnection.setSelection(newPosition, newPosition)
+            if (!inputConnection.setSelection(newPosition, newPosition)) return false
             clearSelectionAnchor()
             Log.d(TAG, "moveCursorWordRight: cursor moved from $currentPosition to $newPosition")
             return true
@@ -439,10 +451,9 @@ object TextSelectionHelper {
             val selectionEnd = extractedText.selectionEnd
             if (selectionStart < 0 || selectionEnd < 0) return false
 
-            val text = extractedText.text ?: return false
             val anchor = selectionAnchor(selectionStart, selectionEnd, SelectionDirection.Left)
             val movingEdge = movingSelectionEdge(selectionStart, selectionEnd, anchor)
-            val newMovingEdge = extractedText.offset + previousWordStart(text, extractedText.local(movingEdge))
+            val newMovingEdge = extractedText.wordStartToLeft(inputConnection, movingEdge)
             if (newMovingEdge == movingEdge) return false
             val handled = applySelectionMove(inputConnection, anchor, newMovingEdge)
             Log.d(TAG, "expandSelectionWordLeft: selection moved from [$selectionStart, $selectionEnd] to edge $newMovingEdge with anchor $anchor")
@@ -461,10 +472,9 @@ object TextSelectionHelper {
             val selectionEnd = extractedText.selectionEnd
             if (selectionStart < 0 || selectionEnd < 0) return false
 
-            val text = extractedText.text ?: return false
             val anchor = selectionAnchor(selectionStart, selectionEnd, SelectionDirection.Right)
             val movingEdge = movingSelectionEdge(selectionStart, selectionEnd, anchor)
-            val newMovingEdge = extractedText.offset + nextWordEnd(text, extractedText.local(movingEdge))
+            val newMovingEdge = extractedText.wordBoundaryToRight(inputConnection, movingEdge, extendSelection = true)
             if (newMovingEdge == movingEdge) return false
             val handled = applySelectionMove(inputConnection, anchor, newMovingEdge)
             Log.d(TAG, "expandSelectionWordRight: selection moved from [$selectionStart, $selectionEnd] to edge $newMovingEdge with anchor $anchor")

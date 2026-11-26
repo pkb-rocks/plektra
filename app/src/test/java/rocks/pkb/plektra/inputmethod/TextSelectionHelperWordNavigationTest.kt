@@ -141,13 +141,43 @@ class TextSelectionHelperWordNavigationTest {
     }
 
     @Test
-    fun moveCursorRight_atTheEndOfAPartialExtract_stillMovesWithinTheField() {
-        // The extract ends mid-field; the cursor at its last character moves one on
-        val inputConnection = inputConnectionWithText("alpha beta", 9, 9, startOffset = 1000)
+    fun moveCursorRight_atTheExtractBoundary_crossesIntoTheRemainingField() {
+        val inputConnection = inputConnectionWithText("alpha beta", 10, 10, startOffset = 1000)
+        `when`(inputConnection.getTextAfterCursor(anyInt(), anyInt())).thenReturn(" gamma")
 
         assertTrue(TextSelectionHelper.moveCursorRight(inputConnection))
 
-        verify(inputConnection).setSelection(1010, 1010)
+        verify(inputConnection).setSelection(1011, 1011)
+    }
+
+    @Test
+    fun expandSelectionRight_atTheExtractBoundary_crossesIntoTheRemainingField() {
+        val inputConnection = inputConnectionWithText("alpha beta", 10, 10, startOffset = 1000)
+        `when`(inputConnection.getTextAfterCursor(anyInt(), anyInt())).thenReturn(" gamma")
+
+        assertTrue(TextSelectionHelper.expandSelectionRight(inputConnection))
+
+        verify(inputConnection).setSelection(1010, 1011)
+    }
+
+    @Test
+    fun moveCursorWordRight_atTheExtractBoundary_crossesIntoTheRemainingField() {
+        val inputConnection = inputConnectionWithText("alpha beta ga", 13, 13, startOffset = 1000)
+        `when`(inputConnection.getTextAfterCursor(anyInt(), anyInt())).thenReturn("mma delta")
+
+        assertTrue(TextSelectionHelper.moveCursorWordRight(inputConnection))
+
+        verify(inputConnection).setSelection(1017, 1017)
+    }
+
+    @Test
+    fun expandSelectionWordRight_inAClippedWord_reachesItsActualEnd() {
+        val inputConnection = inputConnectionWithText("alpha beta ga", 11, 11, startOffset = 1000)
+        `when`(inputConnection.getTextAfterCursor(anyInt(), anyInt())).thenReturn("gamma delta")
+
+        assertTrue(TextSelectionHelper.expandSelectionWordRight(inputConnection))
+
+        verify(inputConnection).setSelection(1011, 1016)
     }
 
     private fun inputConnectionWithText(

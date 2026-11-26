@@ -4031,6 +4031,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         pendingKeyboardSurfaceTransition?.let(uiHandler::removeCallbacks)
         pendingKeyboardSurfaceTransition = null
         if (!restarting) {
+            TextSelectionHelper.clearSelectionAnchor()
             cancelSpeechRecognition()
             ++speechEditorSession
         }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
@@ -334,7 +335,7 @@ internal fun PlektraSettingsHeader(
                         }
                         IconButton(
                             onClick = { searchOpen = true },
-                            modifier = if (searching) Modifier else Modifier.focusRequester(searchButtonFocus)
+                            modifier = if (searching) Modifier else Modifier.focusProperties { canFocus = true }.focusRequester(searchButtonFocus)
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Search,

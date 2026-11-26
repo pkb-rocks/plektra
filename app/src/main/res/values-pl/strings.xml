@@ -956,6 +956,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="keyboard_backlight_state_on">Włączone: podświetlenie świeci do wyłączenia ekranu</string>
     <string name="keyboard_backlight_state_off_timeout">Wyłączone: podświetlenie gaśnie po %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Wyłączone: podświetlenie klawiatury jest wyłączone</string>
+    <string name="keyboard_backlight_read_at">%1$s (odczyt o %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (ostatni odczyt %2$s; mogło się od tego czasu zmienić)</string>
     <string name="keyboard_backlight_shizuku_not_running">Uruchom Shizuku, aby odczytać i zmienić to ustawienie.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Zezwól aplikacji Plektra w Shizuku, aby odczytać i zmienić to ustawienie.</string>
@@ -970,7 +971,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="keyboard_backlight_outcome_unrestorable">Bieżącego czasu nie dałoby się później dokładnie przywrócić, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Usługa podświetlenia producenta nie odpowiada zweryfikowanej wersji, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_read_failed">Nie udało się odczytać ustawienia podświetlenia, więc nic nie zmieniono.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Nie udało się zapisać poprzedniego czasu, więc nic nie zmieniono.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Nie udało się zaktualizować zapisanego czasu, więc nic nie zmieniono.</string>
     <string name="keyboard_backlight_outcome_write_failed">Urządzenie nie przyjęło zmiany.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Nie udało się potwierdzić zmiany. Poprzedni czas pozostaje zapisany; sprawdź ponownie.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Nie udało się potwierdzić zmiany i może ona jeszcze zadziałać. Poprzedni czas pozostaje zapisany; Plektra nic nie zmienia, dopóki nie da się odczytać wyniku lub telefon nie zostanie uruchomiony ponownie.</string>
 </resources>

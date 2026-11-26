@@ -30,6 +30,7 @@ class KeyboardBacklightControllerTest {
     private lateinit var store: RecordingStore
     private var binding = verified
     private var now = 1_000L
+    private var boot: Int? = 7
 
     @Before
     fun setUp() {
@@ -41,6 +42,7 @@ class KeyboardBacklightControllerTest {
         shell = shell,
         store = store,
         binding = { binding },
+        bootCount = { boot },
         clock = { now },
         ioDispatcher = Dispatchers.Unconfined
     )
@@ -52,7 +54,7 @@ class KeyboardBacklightControllerTest {
         val result = controller().enable()
 
         assertEquals(BacklightOutcome.Enabled, result.outcome)
-        assertEquals(BacklightObservation.Fresh("-1"), result.observation)
+        assertEquals(BacklightObservation.Fresh("-1", now), result.observation)
         assertEquals("30000", shell.recordOriginalAtFirstWrite)
         assertEquals(BacklightRecoveryRecord.Phase.Enabled, store.readRecord()?.phase)
         assertEquals("30000", store.readRecord()?.originalTimeout)
@@ -105,7 +107,7 @@ class KeyboardBacklightControllerTest {
 
         val refreshed = controller().refresh()
 
-        assertEquals(BacklightObservation.Fresh("-1"), refreshed.observation)
+        assertEquals(BacklightObservation.Fresh("-1", now), refreshed.observation)
         assertEquals(BacklightRecoveryRecord.Phase.Enabled, store.readRecord()?.phase)
         assertEquals("15000", store.readRecord()?.originalTimeout)
         assertTrue(shell.writes.isEmpty())
@@ -231,7 +233,7 @@ class KeyboardBacklightControllerTest {
 
         shell.failReadsAfterWrite = false
         val settled = controller.refresh()
-        assertEquals(BacklightObservation.Fresh("-1"), settled.observation)
+        assertEquals(BacklightObservation.Fresh("-1", now), settled.observation)
         assertEquals(BacklightRecoveryRecord.Phase.Enabled, store.readRecord()?.phase)
     }
 
@@ -243,7 +245,7 @@ class KeyboardBacklightControllerTest {
         val result = controller().enable()
 
         assertEquals(BacklightOutcome.WriteFailed, result.outcome)
-        assertEquals(BacklightObservation.Fresh("30000"), result.observation)
+        assertEquals(BacklightObservation.Fresh("30000", now), result.observation)
         assertNull(store.readRecord())
     }
 
@@ -301,14 +303,124 @@ class KeyboardBacklightControllerTest {
         assertEquals("30000", record?.originalTimeout)
     }
 
+    @Test
+    fun anUnconfirmedEnableKeepsTheOriginalWhenTheWriteLandsLate() = runBlocking {
+        shell.timeout = "30000"
+        shell.delayWrites = true
+        val controller = controller()
+
+        val first = controller.enable()
+
+        assertEquals(BacklightOutcome.Uncertain, first.outcome)
+        assertEquals(BacklightObservation.Fresh("30000", now), first.observation)
+        assertEquals("30000", store.readRecord()?.originalTimeout)
+        assertEquals("-1", store.readRecord()?.unconfirmedWrite?.value)
+
+        // An immediate read of the old value proves nothing: the record stays, writes stay blocked.
+        assertEquals(BacklightOutcome.None, controller.refresh().outcome)
+        assertNotNull(store.readRecord()?.unconfirmedWrite)
+        assertEquals(BacklightOutcome.Uncertain, controller.enable().outcome)
+        assertEquals(BacklightOutcome.Uncertain, controller.disable().outcome)
+        assertEquals(listOf("-1"), shell.writes)
+
+        shell.completeDelayedWrite()
+        shell.delayWrites = false
+        val restored = controller.disable()
+
+        assertEquals(BacklightOutcome.Disabled, restored.outcome)
+        assertEquals("30000", shell.timeout)
+        assertEquals(listOf("-1", "30000"), shell.writes)
+        assertNull(store.readRecord())
+    }
+
+    @Test
+    fun anUnconfirmedWriteIsReleasedOnlyByAReboot() = runBlocking {
+        shell.timeout = "30000"
+        shell.delayWrites = true
+        val controller = controller()
+        controller.enable()
+        shell.delayWrites = false
+
+        boot = 8
+        val afterReboot = controller.refresh()
+
+        assertNull(afterReboot.recovery)
+        assertNull(store.readRecord())
+        assertEquals(BacklightOutcome.Enabled, controller.enable().outcome)
+        assertEquals("30000", store.readRecord()?.originalTimeout)
+    }
+
+    @Test
+    fun withoutABootCountAnUnconfirmedWriteStaysBlocking() = runBlocking {
+        boot = null
+        shell.timeout = "30000"
+        shell.delayWrites = true
+        val controller = controller()
+        controller.enable()
+        shell.delayWrites = false
+
+        assertEquals(BacklightOutcome.Uncertain, controller.enable().outcome)
+        assertEquals(listOf("-1"), shell.writes)
+    }
+
+    @Test
+    fun anUnconfirmedRestoreKeepsTheRecordUntilTheOriginalIsRead() = runBlocking {
+        shell.timeout = "10000"
+        val controller = controller()
+        controller.enable()
+        shell.delayWrites = true
+
+        assertEquals(BacklightOutcome.Uncertain, controller.disable().outcome)
+        assertEquals("10000", store.readRecord()?.unconfirmedWrite?.value)
+
+        shell.completeDelayedWrite()
+        assertNull(controller.refresh().recovery)
+        assertNull(store.readRecord())
+    }
+
+    @Test
+    fun aFailedDeletionBlocksANewEnableInsteadOfReusingASupersededOriginal() = runBlocking {
+        shell.timeout = "30000"
+        val controller = controller()
+        controller.enable()
+        shell.timeout = "5000"
+        store.failClears = true
+
+        val result = controller.enable()
+
+        assertEquals(BacklightOutcome.RecordFailed, result.outcome)
+        assertEquals(listOf("-1"), shell.writes)
+        assertEquals("5000", shell.timeout)
+    }
+
+    @Test
+    fun aRecordFromAnotherBuildOfThisDeviceIsNeverRestored() = runBlocking {
+        shell.timeout = "-1"
+        store.writeRecord(
+            record("15000", BacklightRecoveryRecord.Phase.Enabled).copy(
+                binding = verified.copy(buildFingerprint = "other-build")
+            )
+        )
+
+        val result = controller().disable()
+
+        assertEquals(BacklightSupport.Supported, result.support)
+        assertEquals(BacklightOutcome.NoOriginalToRestore, result.outcome)
+        assertNull(result.recovery)
+        assertTrue(shell.writes.isEmpty())
+    }
+
     private fun record(original: String, phase: BacklightRecoveryRecord.Phase) =
         BacklightRecoveryRecord(verified, original, phase, createdAtMillis = 1L)
 
     private class RecordingStore(private val delegate: BacklightRecoveryStore) : BacklightRecoveryStore by delegate {
         var failWrites = false
+        var failClears = false
 
         override fun writeRecord(record: BacklightRecoveryRecord): Boolean =
             !failWrites && delegate.writeRecord(record)
+
+        override fun clearRecord(): Boolean = !failClears && delegate.clearRecord()
     }
 
     /** Simulates the vendor key-value store behind `agui_common` and the shell around it. */
@@ -319,6 +431,10 @@ class KeyboardBacklightControllerTest {
         var readFails = false
         var failReadsAfterWrite = false
         var rejectWrites = false
+
+        /** The write reaches the vendor service only later and the client reports no result. */
+        var delayWrites = false
+        private var delayedValue: String? = null
         var onWrite: () -> Unit = {}
         var recordOriginalAtFirstWrite: String? = null
         val writes = mutableListOf<String>()
@@ -347,9 +463,23 @@ class KeyboardBacklightControllerTest {
                 writes += value
                 written = true
                 onWrite()
-                if (!rejectWrites) timeout = value
-                BacklightShellResult(true, 0, "Result: Parcel(\t00000000    '....')\n")
+                when {
+                    delayWrites -> {
+                        delayedValue = value
+                        BacklightShellResult(false, null, "")
+                    }
+                    rejectWrites -> BacklightShellResult(true, 0, "Result: Parcel(ffffffb5 '....')\n")
+                    else -> {
+                        timeout = value
+                        BacklightShellResult(true, 0, "Result: Parcel(\t00000000    '....')\n")
+                    }
+                }
             }
+        }
+
+        fun completeDelayedWrite() {
+            timeout = requireNotNull(delayedValue)
+            delayedValue = null
         }
 
         private fun parcel(value: String?): String {

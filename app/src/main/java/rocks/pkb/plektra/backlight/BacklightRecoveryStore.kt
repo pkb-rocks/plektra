@@ -3,7 +3,9 @@ package rocks.pkb.plektra.backlight
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.channels.FileChannel
 import java.nio.file.Files
+import java.nio.file.StandardOpenOption
 import java.nio.file.StandardCopyOption
 import java.util.Properties
 
@@ -17,14 +19,24 @@ internal data class BacklightDeviceBinding(
 /**
  * The timeout to restore. It is written before the first mutation and removed only after the
  * restored value was read back, or when a fresh read shows the vendor value no longer depends on
- * it.
+ * it. It is trusted only on the device and build in [binding].
  */
 internal data class BacklightRecoveryRecord(
     val binding: BacklightDeviceBinding,
     val originalTimeout: String,
     val phase: Phase,
-    val createdAtMillis: Long
+    val createdAtMillis: Long,
+    /** A write that was sent but not confirmed, and may therefore still take effect. */
+    val unconfirmedWrite: UnconfirmedWrite? = null
 ) {
+    /**
+     * Killing a `service call` client does not cancel a binder transaction the vendor service has
+     * already received, so a later read of the old value does not prove the write is gone. The
+     * entry is dropped only once [value] is read back, or after a reboot ([bootCount] changed),
+     * which ends every pending transaction.
+     */
+    data class UnconfirmedWrite(val value: String, val bootCount: Int?)
+
     enum class Phase {
         /** Persisted before writing `-1`; the write may or may not have happened. */
         Enabling,
@@ -55,7 +67,10 @@ internal interface BacklightRecoveryStore {
  * Stores both files in `noBackupFilesDir`, which Android excludes from cloud backup and device
  * transfer, and binds them to [BacklightDeviceBinding] so a copied file is never trusted.
  */
-internal class FileBacklightRecoveryStore(private val directory: File) : BacklightRecoveryStore {
+internal class FileBacklightRecoveryStore(
+    private val directory: File,
+    private val syncDirectory: (File) -> Unit = ::syncDirectoryChannel
+) : BacklightRecoveryStore {
     private val recordFile get() = File(directory, "recovery.properties")
     private val verifiedFile get() = File(directory, "last_verified.properties")
 
@@ -69,7 +84,16 @@ internal class FileBacklightRecoveryStore(private val directory: File) : Backlig
             ?.let { name -> BacklightRecoveryRecord.Phase.entries.firstOrNull { it.name == name } }
             ?: return null
         val createdAt = properties.getProperty(KEY_TIME)?.toLongOrNull() ?: return null
-        return BacklightRecoveryRecord(binding, original, phase, createdAt)
+        val unconfirmed = properties.getProperty(KEY_UNCONFIRMED_VALUE)?.let { value ->
+            if (value != UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY &&
+                !UnihertzBacklightVendorCommand.isRestorableTimeout(value)
+            ) {
+                return null
+            }
+            val boot = properties.getProperty(KEY_UNCONFIRMED_BOOT)
+            BacklightRecoveryRecord.UnconfirmedWrite(value, boot?.let { it.toIntOrNull() ?: return null })
+        }
+        return BacklightRecoveryRecord(binding, original, phase, createdAt, unconfirmed)
     }
 
     override fun writeRecord(record: BacklightRecoveryRecord): Boolean {
@@ -80,11 +104,25 @@ internal class FileBacklightRecoveryStore(private val directory: File) : Backlig
             setProperty(KEY_ORIGINAL, record.originalTimeout)
             setProperty(KEY_PHASE, record.phase.name)
             setProperty(KEY_TIME, record.createdAtMillis.toString())
+            record.unconfirmedWrite?.let { unconfirmed ->
+                setProperty(KEY_UNCONFIRMED_VALUE, unconfirmed.value)
+                unconfirmed.bootCount?.let { setProperty(KEY_UNCONFIRMED_BOOT, it.toString()) }
+            }
         }
         return save(recordFile, properties) && readRecord() == record
     }
 
-    override fun clearRecord(): Boolean = !recordFile.exists() || recordFile.delete()
+    override fun clearRecord(): Boolean {
+        val file = recordFile
+        if (!file.exists()) return true
+        return try {
+            Files.delete(file.toPath())
+            syncDirectory(directory)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     override fun readVerified(): BacklightVerifiedReading? {
         val properties = load(verifiedFile) ?: return null
@@ -113,11 +151,14 @@ internal class FileBacklightRecoveryStore(private val directory: File) : Backlig
         null
     }
 
-    /** Writes a synced temporary file and moves it over the target in one step. */
+    /**
+     * Writes a synced temporary file, moves it over the target in one step and syncs the
+     * directory, so the new entry survives a power loss before the caller relies on it.
+     */
     private fun save(file: File, properties: Properties): Boolean {
         val temporary = File(directory, "${file.name}.tmp")
         return try {
-            if (!directory.isDirectory && !directory.mkdirs()) return false
+            ensureDirectory()
             FileOutputStream(temporary).use { stream ->
                 properties.store(stream, null)
                 stream.flush()
@@ -129,11 +170,24 @@ internal class FileBacklightRecoveryStore(private val directory: File) : Backlig
                 StandardCopyOption.ATOMIC_MOVE,
                 StandardCopyOption.REPLACE_EXISTING
             )
+            syncDirectory(directory)
             true
         } catch (_: Exception) {
             temporary.delete()
             false
         }
+    }
+
+    /** Creates missing directories and syncs each parent that received a new entry. */
+    private fun ensureDirectory() {
+        if (directory.isDirectory) return
+        val parent = directory.absoluteFile.parentFile ?: throw IOException("no parent directory")
+        if (!parent.isDirectory) {
+            if (!parent.mkdirs()) throw IOException("cannot create $parent")
+            parent.parentFile?.let(syncDirectory)
+        }
+        if (!directory.mkdir() && !directory.isDirectory) throw IOException("cannot create $directory")
+        syncDirectory(parent)
     }
 
     private fun Properties.binding(): BacklightDeviceBinding? {
@@ -156,5 +210,12 @@ internal class FileBacklightRecoveryStore(private val directory: File) : Backlig
         const val KEY_PHASE = "phase"
         const val KEY_TIMEOUT = "timeout"
         const val KEY_TIME = "time"
+        const val KEY_UNCONFIRMED_VALUE = "unconfirmed_value"
+        const val KEY_UNCONFIRMED_BOOT = "unconfirmed_boot"
     }
+}
+
+/** fsync of a directory; throws when the directory entry cannot be made durable. */
+internal fun syncDirectoryChannel(directory: File) {
+    FileChannel.open(directory.toPath(), StandardOpenOption.READ).use { it.force(true) }
 }

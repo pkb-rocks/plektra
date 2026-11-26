@@ -956,6 +956,7 @@ Nav Mode использует физическое положение клави
     <string name="keyboard_backlight_state_on">Вкл.: подсветка горит до выключения экрана</string>
     <string name="keyboard_backlight_state_off_timeout">Выкл.: подсветка гаснет через %1$s с</string>
     <string name="keyboard_backlight_state_off_light_disabled">Выкл.: подсветка клавиатуры выключена</string>
+    <string name="keyboard_backlight_read_at">%1$s (прочитано в %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (последнее чтение %2$s; могло измениться)</string>
     <string name="keyboard_backlight_shizuku_not_running">Запустите Shizuku, чтобы читать и менять эту настройку.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Разрешите Plektra в Shizuku, чтобы читать и менять эту настройку.</string>
@@ -970,7 +971,7 @@ Nav Mode использует физическое положение клави
     <string name="keyboard_backlight_outcome_unrestorable">Текущее время нельзя было бы потом точно восстановить, поэтому ничего не изменено.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Служба подсветки производителя не соответствует проверенной версии, поэтому ничего не изменено.</string>
     <string name="keyboard_backlight_outcome_read_failed">Не удалось прочитать настройку подсветки, поэтому ничего не изменено.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Не удалось сохранить прежнее время, поэтому ничего не изменено.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Не удалось обновить сохранённое время, поэтому ничего не изменено.</string>
     <string name="keyboard_backlight_outcome_write_failed">Устройство не приняло изменение.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Не удалось подтвердить изменение. Прежнее время сохранено; проверьте снова.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Не удалось подтвердить изменение, и оно ещё может вступить в силу. Прежнее время сохранено; Plektra ничего не меняет, пока результат нельзя прочитать или телефон не перезапущен.</string>
 </resources>

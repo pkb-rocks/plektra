@@ -12,7 +12,7 @@ import rocks.pkb.plektra.ShizukuStatus
 internal enum class BacklightSupport {
     Supported,
 
-    /** Unverified build, but a recovery record from a verified build of this device exists. */
+    /** Unverified build, but a recovery record from another build of this device exists. */
     FirmwareChanged,
     Unsupported
 }
@@ -22,7 +22,8 @@ internal sealed class BacklightObservation {
     abstract val timeout: String?
     val followsDisplay: Boolean get() = timeout == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY
 
-    data class Fresh(override val timeout: String) : BacklightObservation()
+    /** Read during the operation that produced the snapshot, at [readAtMillis]. */
+    data class Fresh(override val timeout: String, val readAtMillis: Long) : BacklightObservation()
 
     /** Last value read on this device and build; it may have changed since. */
     data class LastVerified(override val timeout: String, val verifiedAtMillis: Long) : BacklightObservation()
@@ -50,13 +51,16 @@ internal enum class BacklightOutcome {
     UnsupportedFirmware,
     ReadFailed,
 
-    /** The recovery record could not be made durable, so nothing was changed. */
+    /** The recovery record could not be saved, updated or removed, so nothing was changed. */
     RecordFailed,
 
-    /** The write was rejected; the read-back shows the previous value. */
+    /** The write completed but the read-back shows another value. */
     WriteFailed,
 
-    /** The value after the write could not be read; the recovery record is kept. */
+    /**
+     * A write was not confirmed and may still take effect. The recovery record is kept and no
+     * further write is made until the value is read back or the phone has restarted.
+     */
     Uncertain
 }
 
@@ -77,12 +81,14 @@ internal data class BacklightSnapshot(
  * the display turns on. Plektra runs nothing in the background for it.
  *
  * The original timeout is persisted before the first write and restored exactly on disable.
- * Every change is followed by a read-back, and only read values update the shown state.
+ * Every write is announced in the record before it is sent; only a completed reply or a read-back
+ * of the written value confirms it. Only read values update the shown state.
  */
 internal class KeyboardBacklightController(
     private val shell: BacklightShell,
     private val store: BacklightRecoveryStore,
     private val binding: () -> BacklightDeviceBinding,
+    private val bootCount: () -> Int?,
     private val clock: () -> Long = System::currentTimeMillis,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
@@ -92,7 +98,7 @@ internal class KeyboardBacklightController(
     fun isOffered(): Boolean {
         val currentBinding = binding()
         return UnihertzBacklightFirmware.isVerified(currentBinding.buildFingerprint) ||
-            boundRecord(currentBinding) != null
+            sameDeviceRecord(currentBinding) != null
     }
 
     suspend fun refresh(): BacklightSnapshot = operate { context ->
@@ -102,76 +108,59 @@ internal class KeyboardBacklightController(
     suspend fun enable(): BacklightSnapshot = operate { context ->
         val read = context.readAndReconcile()
         val current = read.timeout ?: return@operate context.snapshot(read.outcome)
-        var record = context.record
+        context.blockingOutcome()?.let { return@operate context.snapshot(it) }
+        val existing = context.record
         if (current == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY) {
             return@operate context.snapshot(
-                if (record != null) BacklightOutcome.Enabled else BacklightOutcome.AlreadyFollowingWithoutOriginal
+                if (existing != null) BacklightOutcome.Enabled else BacklightOutcome.AlreadyFollowingWithoutOriginal
             )
         }
         // A record left by an interrupted enable keeps its original; it is never overwritten.
-        if (record == null) {
+        val base = existing ?: run {
             if (!UnihertzBacklightVendorCommand.isRestorableTimeout(current)) {
                 return@operate context.snapshot(BacklightOutcome.UnrestorableCurrentValue)
             }
-            record = BacklightRecoveryRecord(
+            BacklightRecoveryRecord(
                 binding = context.binding,
                 originalTimeout = current,
                 phase = BacklightRecoveryRecord.Phase.Enabling,
                 createdAtMillis = clock()
             )
-            if (!store.writeRecord(record)) return@operate context.snapshot(BacklightOutcome.RecordFailed)
-            context.record = record
         }
-        withContext(NonCancellable) {
-            shell.run(UnihertzBacklightVendorCommand.WriteTimeout.followDisplay())
-            val after = context.readAndReconcile()
-            context.snapshot(
-                when (after.timeout) {
-                    UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY -> BacklightOutcome.Enabled
-                    null -> BacklightOutcome.Uncertain
-                    else -> BacklightOutcome.WriteFailed
-                }
-            )
-        }
+        context.write(base, UnihertzBacklightVendorCommand.WriteTimeout.followDisplay())
     }
 
     suspend fun disable(): BacklightSnapshot = operate { context ->
         val read = context.readAndReconcile()
         val current = read.timeout ?: return@operate context.snapshot(read.outcome)
-        val record = context.record
+        context.blockingOutcome()?.let { return@operate context.snapshot(it) }
         if (current != UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY) {
             return@operate context.snapshot(BacklightOutcome.Disabled)
         }
+        val record = context.record
         val restore = record?.let { UnihertzBacklightVendorCommand.WriteTimeout.restore(it.originalTimeout) }
             ?: return@operate context.snapshot(BacklightOutcome.NoOriginalToRestore)
-        withContext(NonCancellable) {
-            shell.run(restore)
-            val after = context.readAndReconcile()
-            context.snapshot(
-                when (after.timeout) {
-                    record.originalTimeout -> BacklightOutcome.Disabled
-                    null -> BacklightOutcome.Uncertain
-                    else -> BacklightOutcome.WriteFailed
-                }
-            )
-        }
+        context.write(record, restore)
     }
 
     private suspend fun operate(block: suspend (OperationContext) -> BacklightSnapshot): BacklightSnapshot =
         mutex.withLock {
             withContext(ioDispatcher) {
                 val currentBinding = binding()
-                val context = OperationContext(currentBinding, boundRecord(currentBinding))
-                block(context)
+                block(OperationContext(currentBinding, trustedRecord(currentBinding)))
             }
         }
 
-    private fun boundRecord(currentBinding: BacklightDeviceBinding): BacklightRecoveryRecord? =
+    /** Only a record from this device and this build may drive a write. */
+    private fun trustedRecord(currentBinding: BacklightDeviceBinding): BacklightRecoveryRecord? =
+        store.readRecord()?.takeIf { it.binding == currentBinding }
+
+    private fun sameDeviceRecord(currentBinding: BacklightDeviceBinding): BacklightRecoveryRecord? =
         store.readRecord()?.takeIf { it.binding.deviceKey == currentBinding.deviceKey }
 
-    private fun support(currentBinding: BacklightDeviceBinding, record: BacklightRecoveryRecord?) = when {
+    private fun support(currentBinding: BacklightDeviceBinding) = when {
         UnihertzBacklightFirmware.isVerified(currentBinding.buildFingerprint) -> BacklightSupport.Supported
-        record != null -> BacklightSupport.FirmwareChanged
+        sameDeviceRecord(currentBinding) != null -> BacklightSupport.FirmwareChanged
         else -> BacklightSupport.Unsupported
     }
 
@@ -181,16 +170,24 @@ internal class KeyboardBacklightController(
         val binding: BacklightDeviceBinding,
         var record: BacklightRecoveryRecord?
     ) {
-        private var fresh: String? = null
+        private var fresh: BacklightObservation.Fresh? = null
+
+        /** Set when the record no longer matches the device state and could not be updated. */
+        private var recordOutOfDate = false
+
+        /** A write that could not be ruled out, or a record that could not be updated, blocks writes. */
+        fun blockingOutcome(): BacklightOutcome? = when {
+            record?.unconfirmedWrite != null -> BacklightOutcome.Uncertain
+            recordOutOfDate -> BacklightOutcome.RecordFailed
+            else -> null
+        }
 
         /**
          * Reads the timeout after the guards pass and settles the recovery record against it.
-         * The record is removed when the original value is in effect again, or when someone
-         * replaced the verified `-1` with another value outside Plektra.
          */
         fun readAndReconcile(): ReadResult {
             fresh = null
-            if (support(binding, record) != BacklightSupport.Supported) {
+            if (support(binding) != BacklightSupport.Supported) {
                 return ReadResult(null, BacklightOutcome.UnsupportedFirmware)
             }
             if (shell.status() != ShizukuStatus.Connected) return ReadResult(null, BacklightOutcome.ShizukuUnavailable)
@@ -203,19 +200,41 @@ internal class KeyboardBacklightController(
             val result = shell.run(UnihertzBacklightVendorCommand.ReadTimeout)
             val timeout = result.takeIf { it.succeeded }?.let { UnihertzVendorParcel.parseString(it.output) }
                 ?: return ReadResult(null, BacklightOutcome.ReadFailed)
-            fresh = timeout
-            store.writeVerified(BacklightVerifiedReading(binding, timeout, clock()))
+            val now = clock()
+            fresh = BacklightObservation.Fresh(timeout, now)
+            store.writeVerified(BacklightVerifiedReading(binding, timeout, now))
             reconcile(timeout)
             return ReadResult(timeout, BacklightOutcome.None)
         }
 
+        /**
+         * While a write is unconfirmed, the record is only ever kept or narrowed: the entry is
+         * cleared when its value is read back or the phone has restarted since. Without one, the
+         * record is removed when the original value is in effect again, or when someone replaced
+         * the verified `-1` with another value outside Plektra.
+         */
         private fun reconcile(timeout: String) {
-            val current = record ?: return
+            var current = record ?: return
             val followsDisplay = timeout == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY
+            current.unconfirmedWrite?.let { unconfirmed ->
+                val landed = timeout == unconfirmed.value
+                val rebooted = unconfirmed.bootCount != null && bootCount()?.let { it != unconfirmed.bootCount } == true
+                if (!landed && !rebooted) return
+                val settled = current.copy(
+                    unconfirmedWrite = null,
+                    phase = if (landed && followsDisplay) BacklightRecoveryRecord.Phase.Enabled else current.phase
+                )
+                if (!store.writeRecord(settled)) {
+                    recordOutOfDate = true
+                    return
+                }
+                current = settled
+                record = settled
+            }
             when {
                 timeout == current.originalTimeout ||
                     (!followsDisplay && current.phase == BacklightRecoveryRecord.Phase.Enabled) -> {
-                    if (store.clearRecord()) record = null
+                    if (store.clearRecord()) record = null else recordOutOfDate = true
                 }
                 followsDisplay && current.phase == BacklightRecoveryRecord.Phase.Enabling -> {
                     val enabled = current.copy(phase = BacklightRecoveryRecord.Phase.Enabled)
@@ -225,14 +244,54 @@ internal class KeyboardBacklightController(
             }
         }
 
+        /**
+         * Announces [command] in the record, sends it and reads back. Only a completed `service
+         * call` with a reply parcel proves the vendor call has returned; anything else keeps the
+         * announcement so a late completion cannot strand the device without its original.
+         */
+        suspend fun write(
+            base: BacklightRecoveryRecord,
+            command: UnihertzBacklightVendorCommand.WriteTimeout
+        ): BacklightSnapshot {
+            val target = command.argv().last()
+            val announced = base.copy(
+                unconfirmedWrite = BacklightRecoveryRecord.UnconfirmedWrite(target, bootCount())
+            )
+            if (!store.writeRecord(announced)) return snapshot(BacklightOutcome.RecordFailed)
+            record = announced
+            return withContext(NonCancellable) {
+                val result = shell.run(command)
+                val returned = result.succeeded && UnihertzVendorParcel.hasReply(result.output)
+                if (returned) {
+                    val settled = announced.copy(unconfirmedWrite = null)
+                    if (store.writeRecord(settled)) record = settled
+                }
+                val after = readAndReconcile()
+                snapshot(
+                    when {
+                        after.timeout == target -> if (target == UnihertzBacklightVendorCommand.TIMEOUT_FOLLOW_DISPLAY) {
+                            BacklightOutcome.Enabled
+                        } else {
+                            BacklightOutcome.Disabled
+                        }
+                        record?.unconfirmedWrite != null || after.timeout == null -> BacklightOutcome.Uncertain
+                        else -> BacklightOutcome.WriteFailed
+                    }
+                )
+            }
+        }
+
         fun snapshot(outcome: BacklightOutcome): BacklightSnapshot {
             val shizukuStatus = if (fresh != null) ShizukuStatus.Connected else shell.status()
-            val observation = fresh?.let { BacklightObservation.Fresh(it) }
+            val observation = fresh
                 ?: store.readVerified()
                     ?.takeIf { it.binding == binding }
                     ?.let { BacklightObservation.LastVerified(it.timeout, it.verifiedAtMillis) }
                 ?: BacklightObservation.Unknown
-            return BacklightSnapshot(support(binding, record), shizukuStatus, observation, record, outcome)
+            val support = support(binding)
+            // After a firmware change the earlier record is shown, but never used for a write.
+            val shown = record ?: sameDeviceRecord(binding).takeIf { support == BacklightSupport.FirmwareChanged }
+            return BacklightSnapshot(support, shizukuStatus, observation, shown, outcome)
         }
     }
 }

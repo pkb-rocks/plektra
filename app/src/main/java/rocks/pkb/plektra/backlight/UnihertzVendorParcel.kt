@@ -39,6 +39,12 @@ internal object UnihertzVendorParcel {
         return out.toString().takeIf { it.length == length }
     }
 
+    /**
+     * True when the output contains a reply parcel at all, with or without an exception: the
+     * client only prints it after the synchronous binder call has returned.
+     */
+    fun hasReply(raw: String?): Boolean = hexWords(raw)?.isNotEmpty() == true
+
     /** True for a reply whose exception code is zero, which is how a void call reports success. */
     fun isSuccessfulVoidReply(raw: String?): Boolean {
         val words = hexWords(raw) ?: return false

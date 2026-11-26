@@ -61,4 +61,51 @@ class FileBacklightRecoveryStoreTest {
         assertNull(store.readRecord())
         assertEquals(BacklightVerifiedReading(binding, "-1", 2L), store.readVerified())
     }
+
+    @Test
+    fun anUnconfirmedWriteSurvivesANewStoreInstance() {
+        val record = BacklightRecoveryRecord(
+            binding, "30000", BacklightRecoveryRecord.Phase.Enabling, 1L,
+            BacklightRecoveryRecord.UnconfirmedWrite("-1", 12)
+        )
+
+        assertTrue(store().writeRecord(record))
+
+        assertEquals(record, store().readRecord())
+    }
+
+    @Test
+    fun newDirectoriesAndEveryReplacementAndDeletionAreSynced() {
+        val synced = mutableListOf<File>()
+        val store = FileBacklightRecoveryStore(directory) { synced += it }
+        val record = BacklightRecoveryRecord(binding, "30000", BacklightRecoveryRecord.Phase.Enabling, 1L)
+
+        assertTrue(store.writeRecord(record))
+        assertEquals(listOf(folder.root.absoluteFile, directory), synced)
+
+        synced.clear()
+        assertTrue(store.clearRecord())
+        assertEquals(listOf(directory), synced)
+    }
+
+    @Test
+    fun aDirectorySyncFailureIsReportedAsAFailedWriteOrDeletion() {
+        var failing = false
+        val store = FileBacklightRecoveryStore(directory) { if (failing) throw java.io.IOException("fsync") }
+        val record = BacklightRecoveryRecord(binding, "30000", BacklightRecoveryRecord.Phase.Enabling, 1L)
+
+        failing = true
+        assertFalse(store.writeRecord(record))
+
+        failing = false
+        assertTrue(store.writeRecord(record))
+        failing = true
+        assertFalse(store.clearRecord())
+    }
+
+    @Test
+    fun theDefaultDirectorySyncWorksOnARealDirectory() {
+        assertTrue(store().writeRecord(BacklightRecoveryRecord(binding, "0", BacklightRecoveryRecord.Phase.Enabled, 1L)))
+        assertTrue(store().clearRecord())
+    }
 }

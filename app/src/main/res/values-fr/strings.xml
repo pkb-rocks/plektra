@@ -955,6 +955,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="keyboard_backlight_state_on">Activé : l’éclairage reste allumé jusqu’à l’extinction de l’écran</string>
     <string name="keyboard_backlight_state_off_timeout">Désactivé : l’éclairage s’éteint après %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Désactivé : l’éclairage du clavier est éteint</string>
+    <string name="keyboard_backlight_read_at">%1$s (lu à %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (dernière lecture %2$s ; peut avoir changé depuis)</string>
     <string name="keyboard_backlight_shizuku_not_running">Démarrez Shizuku pour lire et modifier ce réglage.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Autorisez Plektra dans Shizuku pour lire et modifier ce réglage.</string>
@@ -969,7 +970,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="keyboard_backlight_outcome_unrestorable">Le délai actuel ne pourrait pas être rétabli exactement plus tard ; rien n’a été modifié.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Le service de rétroéclairage du fabricant ne correspond pas à la version vérifiée ; rien n’a été modifié.</string>
     <string name="keyboard_backlight_outcome_read_failed">Le réglage du rétroéclairage n’a pas pu être lu ; rien n’a été modifié.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Le délai précédent n’a pas pu être enregistré ; rien n’a été modifié.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Le délai enregistré n’a pas pu être mis à jour ; rien n’a été modifié.</string>
     <string name="keyboard_backlight_outcome_write_failed">L’appareil n’a pas accepté la modification.</string>
-    <string name="keyboard_backlight_outcome_uncertain">La modification n’a pas pu être confirmée. Le délai précédent reste enregistré ; vérifiez à nouveau.</string>
+    <string name="keyboard_backlight_outcome_uncertain">La modification n’a pas pu être confirmée et peut encore prendre effet. Le délai précédent reste enregistré ; Plektra ne modifie rien tant que le résultat ne peut pas être lu ou que le téléphone n’a pas redémarré.</string>
 </resources>

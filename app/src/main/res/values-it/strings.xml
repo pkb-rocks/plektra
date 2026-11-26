@@ -1133,6 +1133,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="keyboard_backlight_state_on">Attiva: la luce resta accesa finché lo schermo non si spegne</string>
     <string name="keyboard_backlight_state_off_timeout">Disattiva: la luce si spegne dopo %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Disattiva: la luce della tastiera è spenta</string>
+    <string name="keyboard_backlight_read_at">%1$s (letto alle %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (ultima lettura %2$s; potrebbe essere cambiato nel frattempo)</string>
     <string name="keyboard_backlight_shizuku_not_running">Avvia Shizuku per leggere e modificare questa impostazione.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Consenti Plektra in Shizuku per leggere e modificare questa impostazione.</string>
@@ -1147,7 +1148,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="keyboard_backlight_outcome_unrestorable">Il tempo attuale non potrebbe essere ripristinato esattamente in seguito, quindi non è stato modificato nulla.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Il servizio di retroilluminazione del produttore non corrisponde alla versione verificata, quindi non è stato modificato nulla.</string>
     <string name="keyboard_backlight_outcome_read_failed">Impossibile leggere l’impostazione della retroilluminazione, quindi non è stato modificato nulla.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Impossibile salvare il tempo precedente, quindi non è stato modificato nulla.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Impossibile aggiornare il tempo salvato, quindi non è stato modificato nulla.</string>
     <string name="keyboard_backlight_outcome_write_failed">Il dispositivo non ha accettato la modifica.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Impossibile confermare la modifica. Il tempo precedente resta salvato; controlla di nuovo.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Impossibile confermare la modifica, che potrebbe ancora avere effetto. Il tempo precedente resta salvato; Plektra non modifica nulla finché il risultato non è leggibile o il telefono non è stato riavviato.</string>
 </resources>

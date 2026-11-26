@@ -956,6 +956,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="keyboard_backlight_state_on">Увімк.: підсвічування світить до вимкнення екрана</string>
     <string name="keyboard_backlight_state_off_timeout">Вимк.: підсвічування гасне через %1$s с</string>
     <string name="keyboard_backlight_state_off_light_disabled">Вимк.: підсвічування клавіатури вимкнено</string>
+    <string name="keyboard_backlight_read_at">%1$s (прочитано о %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (останнє читання %2$s; могло змінитися)</string>
     <string name="keyboard_backlight_shizuku_not_running">Запустіть Shizuku, щоб читати й змінювати це налаштування.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Дозвольте Plektra в Shizuku, щоб читати й змінювати це налаштування.</string>
@@ -970,7 +971,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="keyboard_backlight_outcome_unrestorable">Поточний час не можна було б згодом точно відновити, тому нічого не змінено.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Служба підсвічування виробника не відповідає перевіреній версії, тому нічого не змінено.</string>
     <string name="keyboard_backlight_outcome_read_failed">Не вдалося прочитати налаштування підсвічування, тому нічого не змінено.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Не вдалося зберегти попередній час, тому нічого не змінено.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Не вдалося оновити збережений час, тому нічого не змінено.</string>
     <string name="keyboard_backlight_outcome_write_failed">Пристрій не прийняв зміну.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Не вдалося підтвердити зміну. Попередній час збережено; перевірте знову.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Не вдалося підтвердити зміну, і вона ще може набути чинності. Попередній час збережено; Plektra нічого не змінює, доки результат не можна прочитати або телефон не перезапущено.</string>
 </resources>

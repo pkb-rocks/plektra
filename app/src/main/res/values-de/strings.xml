@@ -1788,6 +1788,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_backlight_state_on">An: Die Beleuchtung bleibt an, bis sich das Display ausschaltet</string>
     <string name="keyboard_backlight_state_off_timeout">Aus: Die Beleuchtung erlischt nach %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Aus: Die Tastaturbeleuchtung ist ausgeschaltet</string>
+    <string name="keyboard_backlight_read_at">%1$s (gelesen um %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (zuletzt gelesen %2$s; kann sich seither geändert haben)</string>
     <string name="keyboard_backlight_shizuku_not_running">Starte Shizuku, um diese Einstellung zu lesen und zu ändern.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Erlaube Plektra in Shizuku, um diese Einstellung zu lesen und zu ändern.</string>
@@ -1802,7 +1803,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_backlight_outcome_unrestorable">Die aktuelle Zeit ließe sich später nicht exakt wiederherstellen, daher wurde nichts geändert.</string>
     <string name="keyboard_backlight_outcome_service_unverified">Der Beleuchtungsdienst des Herstellers entspricht nicht der geprüften Version, daher wurde nichts geändert.</string>
     <string name="keyboard_backlight_outcome_read_failed">Die Beleuchtungseinstellung konnte nicht gelesen werden, daher wurde nichts geändert.</string>
-    <string name="keyboard_backlight_outcome_record_failed">Die vorherige Zeit konnte nicht gespeichert werden, daher wurde nichts geändert.</string>
+    <string name="keyboard_backlight_outcome_record_failed">Die gespeicherte Zeit konnte nicht aktualisiert werden, daher wurde nichts geändert.</string>
     <string name="keyboard_backlight_outcome_write_failed">Das Gerät hat die Änderung nicht übernommen.</string>
-    <string name="keyboard_backlight_outcome_uncertain">Die Änderung ließ sich nicht bestätigen. Die vorherige Zeit bleibt gespeichert; prüfe erneut.</string>
+    <string name="keyboard_backlight_outcome_uncertain">Die Änderung ließ sich nicht bestätigen und kann noch wirksam werden. Die vorherige Zeit bleibt gespeichert; Plektra ändert nichts, bis sich das Ergebnis lesen lässt oder das Telefon neu gestartet wurde.</string>
 </resources>

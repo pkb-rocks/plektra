@@ -2104,6 +2104,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_backlight_state_on">On: the light stays on until the display turns off</string>
     <string name="keyboard_backlight_state_off_timeout">Off: the light turns off after %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Off: the keyboard light is switched off</string>
+    <string name="keyboard_backlight_read_at">%1$s (read at %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (last read %2$s; it may have changed since)</string>
     <string name="keyboard_backlight_shizuku_not_running">Start Shizuku to read and change this setting.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Allow Plektra in Shizuku to read and change this setting.</string>
@@ -2118,7 +2119,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_backlight_outcome_unrestorable">The current timeout could not be restored exactly later, so nothing was changed.</string>
     <string name="keyboard_backlight_outcome_service_unverified">The vendor backlight service does not match the verified version, so nothing was changed.</string>
     <string name="keyboard_backlight_outcome_read_failed">The backlight setting could not be read, so nothing was changed.</string>
-    <string name="keyboard_backlight_outcome_record_failed">The previous timeout could not be saved, so nothing was changed.</string>
+    <string name="keyboard_backlight_outcome_record_failed">The saved timeout could not be updated, so nothing was changed.</string>
     <string name="keyboard_backlight_outcome_write_failed">The device did not accept the change.</string>
-    <string name="keyboard_backlight_outcome_uncertain">The change could not be confirmed. The previous timeout stays saved; check again.</string>
+    <string name="keyboard_backlight_outcome_uncertain">The change could not be confirmed and may still take effect. The previous timeout stays saved, and Plektra changes nothing until the result can be read or the phone has restarted.</string>
 </resources>

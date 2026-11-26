@@ -954,6 +954,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="keyboard_backlight_state_on">Միացված է. լույսը վառ է մինչև էկրանի անջատումը</string>
     <string name="keyboard_backlight_state_off_timeout">Անջատված է. լույսը մարում է %1$s վ հետո</string>
     <string name="keyboard_backlight_state_off_light_disabled">Անջատված է. ստեղնաշարի լույսն անջատված է</string>
+    <string name="keyboard_backlight_read_at">%1$s (կարդացվել է %2$s-ին)</string>
     <string name="keyboard_backlight_last_read">%1$s (վերջին ընթերցումը՝ %2$s. կարող է փոխված լինել)</string>
     <string name="keyboard_backlight_shizuku_not_running">Գործարկեք Shizuku-ն՝ այս կարգավորումը կարդալու և փոխելու համար։</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Թույլատրեք Plektra-ն Shizuku-ում՝ այս կարգավորումը կարդալու և փոխելու համար։</string>
@@ -968,7 +969,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="keyboard_backlight_outcome_unrestorable">Ընթացիկ ժամանակը հետագայում հնարավոր չէր լինի ճշգրիտ վերականգնել, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_service_unverified">Արտադրողի լուսավորության ծառայությունը չի համապատասխանում ստուգված տարբերակին, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_read_failed">Լուսավորության կարգավորումը հնարավոր չեղավ կարդալ, ուստի ոչինչ չի փոխվել։</string>
-    <string name="keyboard_backlight_outcome_record_failed">Նախորդ ժամանակը հնարավոր չեղավ պահպանել, ուստի ոչինչ չի փոխվել։</string>
+    <string name="keyboard_backlight_outcome_record_failed">Պահպանված ժամանակը հնարավոր չեղավ թարմացնել, ուստի ոչինչ չի փոխվել։</string>
     <string name="keyboard_backlight_outcome_write_failed">Սարքը չընդունեց փոփոխությունը։</string>
-    <string name="keyboard_backlight_outcome_uncertain">Փոփոխությունը հնարավոր չեղավ հաստատել։ Նախորդ ժամանակը պահպանված է. նորից ստուգեք։</string>
+    <string name="keyboard_backlight_outcome_uncertain">Փոփոխությունը հնարավոր չեղավ հաստատել, և այն դեռ կարող է ուժի մեջ մտնել։ Նախորդ ժամանակը պահպանված է. Plektra-ն ոչինչ չի փոխում, մինչև արդյունքը հնարավոր լինի կարդալ կամ հեռախոսը վերագործարկվի։</string>
 </resources>

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
+import android.system.Os
+import android.system.OsConstants
 import java.io.File
 import java.security.MessageDigest
 
@@ -18,15 +20,33 @@ internal object KeyboardBacklightFeature {
             controller ?: run {
                 val appContext = context.applicationContext
                 KeyboardBacklightController(
-                    shell = ShizukuBacklightShell,
-                    store = FileBacklightRecoveryStore(File(appContext.noBackupFilesDir, "keyboard_backlight")),
-                    binding = { deviceBinding(appContext) }
+                    shell = ShizukuBacklightShell(),
+                    store = FileBacklightRecoveryStore(
+                        File(appContext.noBackupFilesDir, "keyboard_backlight"),
+                        ::syncDirectoryWithOs
+                    ),
+                    binding = { deviceBinding(appContext) },
+                    bootCount = { bootCount(appContext) }
                 ).also { controller = it }
             }
         }
     }
 
     fun isOffered(context: Context): Boolean = controller(context).isOffered()
+
+    /** Changes with every boot; null when the platform does not provide it. */
+    private fun bootCount(context: Context): Int? =
+        Settings.Global.getInt(context.contentResolver, Settings.Global.BOOT_COUNT, -1).takeIf { it >= 0 }
+
+    /** fsync of the directory entry through the platform's own file descriptor calls. */
+    private fun syncDirectoryWithOs(directory: File) {
+        val descriptor = Os.open(directory.absolutePath, OsConstants.O_RDONLY, 0)
+        try {
+            Os.fsync(descriptor)
+        } finally {
+            Os.close(descriptor)
+        }
+    }
 
     /**
      * ANDROID_ID differs per device, user, signing key and factory reset; the build properties

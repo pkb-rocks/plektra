@@ -22,7 +22,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +58,8 @@ internal fun KeyboardBacklightSection() {
     val scope = rememberCoroutineScope()
     var snapshot by remember { mutableStateOf<BacklightSnapshot?>(null) }
     var busy by remember { mutableStateOf(false) }
+    // A refresh requested while another operation runs is repeated once it has finished.
+    var refreshRequested by remember { mutableStateOf(false) }
 
     fun launchOperation(action: suspend () -> BacklightSnapshot) {
         if (busy) return
@@ -66,22 +67,39 @@ internal fun KeyboardBacklightSection() {
         scope.launch {
             try {
                 snapshot = action()
+                while (refreshRequested) {
+                    refreshRequested = false
+                    snapshot = controller.refresh()
+                }
             } finally {
                 busy = false
             }
         }
     }
 
-    LifecycleResumeEffect(Unit) {
-        launchOperation { controller.refresh() }
-        onPauseOrDispose { }
+    fun requestRefresh() {
+        if (busy) refreshRequested = true else launchOperation { controller.refresh() }
     }
-    DisposableEffect(Unit) {
-        val listener = Shizuku.OnRequestPermissionResultListener { requestCode, _ ->
-            if (requestCode == SHIZUKU_PERMISSION_REQUEST_CODE) launchOperation { controller.refresh() }
+
+    // Shizuku may start, stop or change its permission while this screen stays visible, for
+    // example in multi-window. The listeners exist only while the screen is resumed.
+    LifecycleResumeEffect(Unit) {
+        val binderReceived = Shizuku.OnBinderReceivedListener { requestRefresh() }
+        val binderDead = Shizuku.OnBinderDeadListener { requestRefresh() }
+        val permissionResult = Shizuku.OnRequestPermissionResultListener { requestCode, _ ->
+            if (requestCode == SHIZUKU_PERMISSION_REQUEST_CODE) requestRefresh()
         }
-        Shizuku.addRequestPermissionResultListener(listener)
-        onDispose { Shizuku.removeRequestPermissionResultListener(listener) }
+        // The sticky variant reports an already received binder immediately, which covers the
+        // refresh on resume; without a binder the last read state is loaded directly.
+        Shizuku.addBinderReceivedListenerSticky(binderReceived)
+        Shizuku.addBinderDeadListener(binderDead)
+        Shizuku.addRequestPermissionResultListener(permissionResult)
+        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) requestRefresh()
+        onPauseOrDispose {
+            Shizuku.removeBinderReceivedListener(binderReceived)
+            Shizuku.removeBinderDeadListener(binderDead)
+            Shizuku.removeRequestPermissionResultListener(permissionResult)
+        }
     }
 
     val current = snapshot
@@ -151,8 +169,11 @@ internal fun KeyboardBacklightSection() {
                 Text(stringResource(R.string.keyboard_backlight_shizuku_allow))
             }
         }
-        if (current.outcome == BacklightOutcome.Uncertain || current.outcome == BacklightOutcome.ReadFailed) {
-            TextButton(onClick = { launchOperation { controller.refresh() } }, enabled = !busy) {
+        if (current.outcome == BacklightOutcome.Uncertain ||
+            current.outcome == BacklightOutcome.ReadFailed ||
+            current.recovery?.unconfirmedWrite != null
+        ) {
+            TextButton(onClick = { requestRefresh() }, enabled = !busy) {
                 Text(stringResource(R.string.keyboard_backlight_check_again))
             }
         }
@@ -170,6 +191,11 @@ private fun observationText(context: Context, observation: BacklightObservation)
         else -> stateText(context, timeout)
     }
     return when (observation) {
+        is BacklightObservation.Fresh -> context.getString(
+            R.string.keyboard_backlight_read_at,
+            state,
+            DateUtils.formatDateTime(context, observation.readAtMillis, DateUtils.FORMAT_SHOW_TIME)
+        )
         is BacklightObservation.LastVerified -> context.getString(
             R.string.keyboard_backlight_last_read,
             state,
@@ -179,7 +205,7 @@ private fun observationText(context: Context, observation: BacklightObservation)
                 DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
             )
         )
-        else -> state
+        BacklightObservation.Unknown -> state
     }
 }
 
@@ -204,7 +230,9 @@ private fun statusMessages(context: Context, snapshot: BacklightSnapshot): List<
             ShizukuStatus.Connected -> Unit
         }
     }
-    outcomeRes(snapshot.outcome)?.let { add(context.getString(it)) }
+    val outcome = snapshot.outcome.takeUnless { it == BacklightOutcome.None }
+        ?: BacklightOutcome.Uncertain.takeIf { snapshot.recovery?.unconfirmedWrite != null }
+    outcome?.let(::outcomeRes)?.let { add(context.getString(it)) }
     snapshot.recovery?.let { record ->
         add(
             if (record.originalTimeout == "0") {

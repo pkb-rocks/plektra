@@ -955,6 +955,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="keyboard_backlight_state_on">Activada: la luz permanece encendida hasta que se apaga la pantalla</string>
     <string name="keyboard_backlight_state_off_timeout">Desactivada: la luz se apaga tras %1$s s</string>
     <string name="keyboard_backlight_state_off_light_disabled">Desactivada: la luz del teclado está apagada</string>
+    <string name="keyboard_backlight_read_at">%1$s (leído a las %2$s)</string>
     <string name="keyboard_backlight_last_read">%1$s (última lectura %2$s; puede haber cambiado desde entonces)</string>
     <string name="keyboard_backlight_shizuku_not_running">Inicia Shizuku para leer y cambiar este ajuste.</string>
     <string name="keyboard_backlight_shizuku_not_authorized">Permite Plektra en Shizuku para leer y cambiar este ajuste.</string>
@@ -969,7 +970,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="keyboard_backlight_outcome_unrestorable">El tiempo actual no podría restaurarse exactamente más tarde, así que no se cambió nada.</string>
     <string name="keyboard_backlight_outcome_service_unverified">El servicio de retroiluminación del fabricante no coincide con la versión verificada, así que no se cambió nada.</string>
     <string name="keyboard_backlight_outcome_read_failed">No se pudo leer el ajuste de retroiluminación, así que no se cambió nada.</string>
-    <string name="keyboard_backlight_outcome_record_failed">No se pudo guardar el tiempo anterior, así que no se cambió nada.</string>
+    <string name="keyboard_backlight_outcome_record_failed">No se pudo actualizar el tiempo guardado, así que no se cambió nada.</string>
     <string name="keyboard_backlight_outcome_write_failed">El dispositivo no aceptó el cambio.</string>
-    <string name="keyboard_backlight_outcome_uncertain">No se pudo confirmar el cambio. El tiempo anterior sigue guardado; comprueba de nuevo.</string>
+    <string name="keyboard_backlight_outcome_uncertain">No se pudo confirmar el cambio y aún puede aplicarse. El tiempo anterior sigue guardado; Plektra no cambia nada hasta que pueda leerse el resultado o el teléfono se haya reiniciado.</string>
 </resources>

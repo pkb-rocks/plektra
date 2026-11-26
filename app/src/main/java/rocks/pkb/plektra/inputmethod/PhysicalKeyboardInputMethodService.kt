@@ -4044,7 +4044,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             // Text context alone cannot identify a field: every empty editor looks like "|".
             clearAutoCapSuppression()
         }
-        DeferredPunctuationSpaceTracker.clear()
+        DeferredPunctuationSpaceTracker.startField(info)
         bounceKeyFilter.reset()
         clicksPowerShiftTapFilter.reset()
         accidentalKeyPressFilter.reset()

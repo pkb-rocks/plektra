@@ -1,0 +1,19 @@
+<resources>
+    <string name="keyboard_launcher_title">Launcher Plektra</string>
+    <string name="keyboard_launcher_hint">Przytrzymaj wybrany klawisz i naciśnij literę krótko lub długo. Zwolnij go, aby pisać. Fn przytrzymaj do wibracji; dwa szybkie naciśnięcia nadal blokują Nav. Przypisany Shift służy tylko skrótom; do wielkich liter użyj drugiego.</string>
+    <string name="keyboard_launcher_left_shift">Lewy Shift</string>
+    <string name="keyboard_launcher_right_shift">Prawy Shift</string>
+    <string name="keyboard_launcher_fn">Fn</string>
+    <string name="keyboard_launcher_search">Szukaj działań</string>
+    <string name="keyboard_launcher_remove">Usuń przypisanie</string>
+    <string name="keyboard_launcher_selected">Wybrany skrót</string>
+    <string name="keyboard_launcher_missing_command">Skrót niedostępny</string>
+    <string name="keyboard_launcher_short">Krótkie naciśnięcie</string>
+    <string name="keyboard_launcher_long">Długie naciśnięcie</string>
+    <string name="keyboard_launcher_delay">Czas przytrzymania: %1$d ms</string>
+    <string name="keyboard_launcher_access_title">Skróty we wszystkich aplikacjach</string>
+    <string name="keyboard_launcher_summary">Otwieraj aplikacje i działania, przytrzymując klawisz i naciskając literę krótko lub długo.</string>
+    <string name="keyboard_launcher_access_hint">Aby używać skrótów poza polami tekstowymi, włącz usługę ułatwień dostępu Plektra Launcher / Clicks. Tryb Nav jest niezależny. Jeśli Android blokuje włączenie, najpierw zezwól na ustawienia z ograniczonym dostępem w informacjach o tej aplikacji.</string>
+    <string name="keyboard_launcher_service_description">Obsługuje jawnie włączone skróty i zgodne przypisania przycisków Clicks. Nie pobiera zawartości ekranu.</string>
+    <string name="keyboard_launcher_service_label">Launcher Plektra / Clicks</string>
+</resources>

@@ -93,6 +93,21 @@ class AutoReplaceController(
             return normalizedInput == normalizedCandidate
         }
 
+        /**
+         * The most frequent dictionary word that differs from [word] only in accents and has its
+         * length ("tres" → "très"). Auto-correction commits it for unknown words, and the
+         * suggestion ranking puts it first, so both agree.
+         */
+        internal fun orthographicVariant(
+            repository: DictionaryRepository,
+            word: String,
+            usePersonalization: Boolean
+        ): DictionaryEntry? = repository.topByNormalized(
+            WordNormalization.normalizeForDictionary(word, Locale.ROOT),
+            limit = 8,
+            usePersonalization = usePersonalization
+        ).firstOrNull { entry -> entry.word.length == word.length && isAccentOnlyVariant(word, entry.word) }
+
         internal fun isCaseOnlyVariant(input: String, candidate: String): Boolean {
             if (input.isEmpty() || candidate.isEmpty()) return false
             return input != candidate && input.equals(candidate, ignoreCase = true)
@@ -405,13 +420,7 @@ class AutoReplaceController(
         }
 
         val orthographicEntry = if (settings.accentMatching) {
-            repository.topByNormalized(
-                WordNormalization.normalizeForDictionary(lookupWord, Locale.ROOT),
-                limit = 8,
-                usePersonalization = settings.personalizationEnabled
-            ).firstOrNull { entry ->
-                entry.word.length == lookupWord.length && isAccentOnlyVariant(lookupWord, entry.word)
-            }
+            orthographicVariant(repository, lookupWord, settings.personalizationEnabled)
         } else null
         val topRaw = orthographicEntry?.let { entry ->
             SuggestionResult(entry.word, 0, Double.MAX_VALUE, entry.source, SuggestionKind.CURRENT_WORD)

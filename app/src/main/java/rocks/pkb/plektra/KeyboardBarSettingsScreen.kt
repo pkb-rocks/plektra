@@ -51,20 +51,8 @@ internal object KeyboardBarSharedRowSettings {
 @Composable
 internal fun KeyboardBarCheckRow(label: String, checked: Boolean, linkId: String,
     description: String? = null, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().settingRow(linkId)
-            .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onChange)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.bodyLarge,
-                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
-            if (description != null) Text(description, style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Switch(checked = checked, enabled = enabled, onCheckedChange = null)
-    }
+    SettingsToggleRow(title = label, description = description, checked = checked,
+        onCheckedChange = onChange, enabled = enabled, linkId = linkId)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -385,61 +373,23 @@ internal fun KeyboardBarSettingsScreen(
                     }
                 }
 
-                Surface(modifier = Modifier.fillMaxWidth().settingRow("status_bar.resize_variations")) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.dynamic_variation_resize_to_content_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = stringResource(R.string.dynamic_variation_resize_to_content_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Switch(
-                            checked = dynamicVariationsResizeToContent,
-                            onCheckedChange = { enabled ->
-                                dynamicVariationsResizeToContent = enabled
-                                SettingsManager.setDynamicVariationBarResizeToContent(context, enabled)
-                            }
-                        )
+                SettingsToggleRow(
+                    title = stringResource(R.string.dynamic_variation_resize_to_content_title),
+                    description = stringResource(R.string.dynamic_variation_resize_to_content_description),
+                    checked = dynamicVariationsResizeToContent,
+                    linkId = "status_bar.resize_variations",
+                    onCheckedChange = { enabled ->
+                        dynamicVariationsResizeToContent = enabled
+                        SettingsManager.setDynamicVariationBarResizeToContent(context, enabled)
                     }
-                }
+                )
 
-                Surface(
-                    modifier = Modifier.fillMaxWidth().settingRow("customization.variations", onCustomizeVariations)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Tune,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.variation_customize_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                SettingsNavigationRow(
+                    title = stringResource(R.string.variation_customize_title),
+                    icon = Icons.Filled.Tune,
+                    linkId = "customization.variations",
+                    onClick = onCustomizeVariations
+                )
             }
         }
 
@@ -521,9 +471,5 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
 @Composable
 internal fun KeyboardBarNavigationRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String,
     summary: String? = null, linkId: String, onClick: () -> Unit) {
-    ListItem(modifier = Modifier.fillMaxWidth().settingRow(linkId, onClick).clickable(onClick = onClick),
-        leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
-        headlineContent = { Text(title) },
-        supportingContent = summary?.let { { Text(it) } },
-        trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) })
+    SettingsNavigationRow(title = title, description = summary, icon = icon, linkId = linkId, onClick = onClick)
 }

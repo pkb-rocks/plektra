@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardTab
 import androidx.compose.material.icons.filled.BatteryChargingFull
@@ -374,7 +375,7 @@ fun ClicksPowerKeyboardSettingsScreen(
         onBack = onBack,
         scrollState = mainScrollState
     ) {
-        StubSection(stringResource(R.string.clicks_section_device))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_device))
         ClicksDeviceInfoRow(
             icon = Icons.Filled.Bluetooth,
             title = stringResource(R.string.clicks_device_status_title),
@@ -460,7 +461,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             onClick = { openClicksFirmwareUpdates(context) }
         )
 
-        StubSection(stringResource(R.string.clicks_section_keyboard_behavior))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_keyboard_behavior))
         ClicksDeviceInfoRow(
             icon = Icons.Filled.CheckCircle,
             title = stringResource(R.string.clicks_recommended_settings_title),
@@ -588,7 +589,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             infoText = stringResource(R.string.clicks_cursor_mode_help)
         )
 
-        StubSection(stringResource(R.string.clicks_section_key_mappings))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_key_mappings))
         ClicksDeviceInfoRow(
             icon = Icons.Filled.Edit,
             title = stringResource(R.string.clicks_button_bindings_title),
@@ -620,7 +621,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             description = stringResource(R.string.clicks_all_key_mappings_description)
         )
 
-        StubSection(stringResource(R.string.clicks_section_backlight_power))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_backlight_power))
         ClicksSettingsSwitchRow(
             title = stringResource(R.string.clicks_backlight_title),
             linkId = "clicks.backlight",
@@ -662,7 +663,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             onSelected = { gattClient?.setIdleTimeout(it * 60) }
         )
 
-        StubSection(stringResource(R.string.clicks_section_wireless_charging))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_wireless_charging))
         ClicksSettingsSwitchRow(
             title = stringResource(R.string.clicks_charging_automation_title),
             linkId = "clicks.charging_automation",
@@ -793,7 +794,7 @@ fun ClicksPowerKeyboardSettingsScreen(
             infoText = stringResource(R.string.clicks_charging_connection_boundary_description),
             onCheckedChange = { ClicksPowerKeyboardController.setManualChargingOverride(it) }
         )
-        StubSection(stringResource(R.string.clicks_section_automation))
+        SettingsSectionDivider(stringResource(R.string.clicks_section_automation))
         ClicksSettingsSwitchRow(
             title = stringResource(R.string.clicks_show_keyboard_only_with_text_focus_title),
             linkId = "clicks.show_keyboard_only_with_text_focus",
@@ -868,7 +869,7 @@ private fun ClicksButtonMappingsScreen(
     val plektraShortcutCategory = stringResource(R.string.clicks_binding_category_plektra_shortcut)
     val keyCategory = stringResource(R.string.clicks_binding_category_key)
     val shortcutCategory = stringResource(R.string.clicks_binding_category_shortcut)
-    fun groupedLabel(category: String, action: String) = "$category · $action"
+    fun groupedLabel(category: String, action: String) = "$category: $action"
 
     val redNative = ClicksButtonBindingChoice(
         id = "red_native",
@@ -1354,7 +1355,7 @@ private fun hasClicksBluetoothPermission(context: android.content.Context): Bool
         PackageManager.PERMISSION_GRANTED
 }
 
-private fun isClicksLauncherInterceptionEnabled(context: android.content.Context): Boolean {
+internal fun isClicksLauncherInterceptionEnabled(context: android.content.Context): Boolean {
     if (!BuildConfig.ENABLE_ACCESSIBILITY_SERVICE) return false
     return AccessibilitySettingsLauncher.isEnabled(
         context, ComponentName(context, ClicksLauncherButtonAccessibilityService::class.java)
@@ -1384,31 +1385,8 @@ private fun ClicksDeviceInfoRow(
     description: String,
     onClick: (() -> Unit)? = null
 ) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .settingRow(linkId, onClick)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
+    SettingsRow(title = title, description = description, icon = icon,
+        modifier = Modifier.settingRow(linkId, onClick))
 }
 
 private fun applyClicksRemaps(
@@ -1473,40 +1451,15 @@ private fun ClicksSettingsSwitchRow(
     onCheckedChange: (Boolean) -> Unit,
     infoText: String? = null
 ) {
-    var showInfo by remember { mutableStateOf(false) }
-    if (showInfo && infoText != null) {
-        AlertDialog(
-            onDismissRequest = { showInfo = false },
-            text = { Text(infoText) },
-            confirmButton = {
-                TextButton(onClick = { showInfo = false }) { Text(stringResource(android.R.string.ok)) }
-            }
-        )
-    }
-    Surface(modifier = Modifier.settingRow(linkId).fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            if (infoText != null) {
-                IconButton(onClick = { showInfo = true }) {
-                    Icon(Icons.Filled.Info, contentDescription = null)
-                }
-            }
-            Switch(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
-        }
-    }
+    SettingsToggleRow(
+        title = title,
+        description = description,
+        info = infoText,
+        checked = checked,
+        enabled = enabled,
+        onCheckedChange = onCheckedChange,
+        linkId = linkId
+    )
 }
 
 @Composable
@@ -1516,25 +1469,12 @@ private fun ClicksValueRow(
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-            Text(
-                value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (enabled) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(20.dp))
-        }
-    }
+    SettingsRow(
+        title = title,
+        enabled = enabled,
+        modifier = Modifier.clickable(enabled = enabled, onClick = onClick),
+        trailing = { SettingsValueText(value) }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1553,31 +1493,17 @@ private fun ClicksRemapDropdownRow(
                 current
             )
     } ?: presets.first()
-    ExposedDropdownMenuBox(
+    SettingsDropdownRow(
+        title = title,
+        value = selected.label,
+        options = presets.map { it.bytes to it.label },
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        OutlinedTextField(
-            value = selected.label,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(title) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            presets.forEach { preset ->
-                DropdownMenuItem(
-                    text = { Text(preset.label) },
-                    onClick = {
-                        expanded = false
-                        onSelected(preset.bytes)
-                    }
-                )
-            }
+        onSelected = { bytes ->
+            expanded = false
+            onSelected(bytes)
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1592,32 +1518,19 @@ private fun ClicksIntDropdownRow(
     onSelected: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
+    SettingsDropdownRow(
+        title = title,
+        value = selected?.let { label(it) } ?: "–",
+        options = options.map { it to label(it) },
         expanded = expanded,
-        onExpandedChange = { if (enabled) expanded = it },
-        modifier = Modifier.settingRow(linkId).fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        OutlinedTextField(
-            value = selected?.let { label(it) } ?: "–",
-            onValueChange = {},
-            readOnly = true,
-            enabled = enabled,
-            label = { Text(title) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(label(option)) },
-                    onClick = {
-                        expanded = false
-                        onSelected(option)
-                    }
-                )
-            }
-        }
-    }
+        onExpandedChange = { expanded = it },
+        onSelected = { option ->
+            expanded = false
+            onSelected(option)
+        },
+        enabled = enabled,
+        linkId = linkId
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1717,7 +1630,7 @@ private fun ClicksButtonBindingRow(
     }
 }
 
-private fun ClicksButtonBindingChoice.compactLabel(): String = label.substringAfter(" · ")
+private fun ClicksButtonBindingChoice.compactLabel(): String = label.substringAfter(": ")
 
 private fun ClicksButtonBindingChoice.bindingIcon(): ImageVector = when {
     id.endsWith("_native") -> Icons.Filled.Restore
@@ -1787,32 +1700,19 @@ private fun ClicksNumberRowInputModeRow(
     onSelected: (SettingsManager.ClicksNumberRowInputMode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
+    SettingsDropdownRow(
+        title = stringResource(R.string.clicks_number_row_input_mode_title),
+        description = stringResource(R.string.clicks_number_row_input_mode_description),
+        value = clicksNumberRowInputModeLabel(selected),
+        options = SettingsManager.ClicksNumberRowInputMode.entries.map { it to clicksNumberRowInputModeLabel(it) },
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = Modifier.settingRow("clicks.number_row_input_mode").fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        OutlinedTextField(
-            value = clicksNumberRowInputModeLabel(selected),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.clicks_number_row_input_mode_title)) },
-            supportingText = { Text(stringResource(R.string.clicks_number_row_input_mode_description)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            SettingsManager.ClicksNumberRowInputMode.entries.forEach { mode ->
-                DropdownMenuItem(
-                    text = { Text(clicksNumberRowInputModeLabel(mode)) },
-                    onClick = {
-                        expanded = false
-                        onSelected(mode)
-                    }
-                )
-            }
-        }
-    }
+        onSelected = { mode ->
+            expanded = false
+            onSelected(mode)
+        },
+        linkId = "clicks.number_row_input_mode"
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1822,32 +1722,19 @@ private fun ClicksOverlappingKeysModeRow(
     onSelected: (SettingsManager.ClicksOverlappingKeysMode) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
+    SettingsDropdownRow(
+        title = stringResource(R.string.clicks_release_order_title),
+        description = stringResource(R.string.clicks_release_order_description),
+        value = clicksOverlappingKeysModeLabel(selected),
+        options = SettingsManager.ClicksOverlappingKeysMode.entries.map { it to clicksOverlappingKeysModeLabel(it) },
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = Modifier.settingRow("clicks.release_order").fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        OutlinedTextField(
-            value = clicksOverlappingKeysModeLabel(selected),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.clicks_release_order_title)) },
-            supportingText = { Text(stringResource(R.string.clicks_release_order_description)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            SettingsManager.ClicksOverlappingKeysMode.entries.forEach { mode ->
-                DropdownMenuItem(
-                    text = { Text(clicksOverlappingKeysModeLabel(mode)) },
-                    onClick = {
-                        expanded = false
-                        onSelected(mode)
-                    }
-                )
-            }
-        }
-    }
+        onSelected = { mode ->
+            expanded = false
+            onSelected(mode)
+        },
+        linkId = "clicks.release_order"
+    )
 }
 
 @Composable
@@ -1908,28 +1795,18 @@ private fun ClicksSliderRow(
     onValueChange: (Float) -> Unit,
     onValueChangeFinished: () -> Unit
 ) {
-    Column(modifier = Modifier.settingRow(linkId).fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(valueLabel, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        }
-        description?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-        Slider(
-            value = value.coerceIn(range.start, range.endInclusive),
-            onValueChange = onValueChange,
-            onValueChangeFinished = onValueChangeFinished,
-            valueRange = range,
-            steps = steps,
-            enabled = enabled
-        )
-    }
+    SettingsSliderRow(
+        title = title,
+        valueLabel = valueLabel,
+        description = description,
+        value = value.coerceIn(range.start, range.endInclusive),
+        onValueChange = onValueChange,
+        onValueChangeFinished = onValueChangeFinished,
+        valueRange = range,
+        steps = steps,
+        enabled = enabled,
+        linkId = linkId
+    )
 }
 
 @Composable
@@ -2105,7 +1982,7 @@ private fun ClicksNumberRemapDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.clicks_number_row_title)) },
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            SettingsSectionScrollColumn(modifier = Modifier) {
                 Text("SYM + ${keyIndex + 1}", style = MaterialTheme.typography.titleMedium)
                 presets.forEach { preset ->
                     val isSelected = selected.bytes.contentEquals(preset.bytes)
@@ -2155,7 +2032,7 @@ fun DeviceSymLayerEditorStubScreen(
         description = stringResource(R.string.alt_key_editor_stub_description),
         onBack = onBack
     ) {
-        StubSection(stringResource(R.string.alt_key_editor_create_section))
+        SettingsSectionDivider(stringResource(R.string.alt_key_editor_create_section))
         PlannedSettingsRow(
             icon = Icons.Filled.Edit,
             title = stringResource(R.string.alt_key_editor_blank_profile_title),
@@ -2167,7 +2044,7 @@ fun DeviceSymLayerEditorStubScreen(
             description = stringResource(R.string.alt_key_editor_clone_profile_description)
         )
 
-        StubSection(stringResource(R.string.alt_key_editor_scope_section))
+        SettingsSectionDivider(stringResource(R.string.alt_key_editor_scope_section))
         PlannedSettingsRow(
             icon = Icons.Filled.Settings,
             title = stringResource(R.string.alt_key_editor_matching_title),
@@ -2198,35 +2075,7 @@ private fun HardwareProfileScaffold(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = title, onBack = onBack)
         }
     ) { paddingValues ->
         Column(
@@ -2247,64 +2096,11 @@ private fun HardwareProfileScaffold(
 }
 
 @Composable
-private fun StubSection(title: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
-        )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
-}
-
-@Composable
 private fun PlannedSettingsRow(
     icon: ImageVector,
     title: String,
     description: String
 ) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            FeatureStatusIcon(FeatureStatus.Construction)
-        }
-    }
+    SettingsRow(title = title, description = description, icon = icon,
+        trailing = { FeatureStatusIcon(FeatureStatus.Construction) })
 }

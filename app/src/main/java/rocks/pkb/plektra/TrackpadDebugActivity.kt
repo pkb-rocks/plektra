@@ -369,7 +369,7 @@ private fun TrackpadCoordinatePanel(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${state.source} · ${state.rangeSource}",
+                        text = "${state.source}, ${state.rangeSource}",
                         color = androidx.compose.ui.graphics.Color.Green.copy(alpha = 0.7f),
                         style = MaterialTheme.typography.labelSmall
                     )

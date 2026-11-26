@@ -88,38 +88,11 @@ fun KeyboardLayoutViewerScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Column(modifier = Modifier.padding(start = 8.dp)) {
-                        Text(
-                            text = stringResource(R.string.keyboard_layout_viewer_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = stringResource(R.string.keyboard_layout_viewer_subtitle, layoutName),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+            PlektraSettingsHeader(
+                title = stringResource(R.string.keyboard_layout_viewer_title),
+                subtitle = stringResource(R.string.keyboard_layout_viewer_subtitle, layoutName),
+                onBack = onBack
+            )
         }
     ) { paddingValues ->
         Column(

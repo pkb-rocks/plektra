@@ -295,37 +295,7 @@ fun AutoCorrectSettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.settings_back_content_description)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.auto_correct_settings_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.auto_correct_settings_title), onBack = onBack)
         }
         ) { paddingValues ->
             AnimatedContent(

@@ -82,4 +82,19 @@
     <string name="quick_launcher_animation_duration_title">Czas animacji otwierania</string>
     <string name="titan2_elite_rounded_corners_description">Zaokrągla dolne narożniki paska klawiatury, dopasowując je do ekranu.</string>
     <string name="titan2_elite_rounded_corners_title">Zaokrąglone narożniki ekranu</string>
+    <string name="app_appearance_layout_style_title">Styl układu</string>
+    <string name="app_appearance_layout_style_description">Przełączaj między kompaktowymi liniami podziału a miękkimi powierzchniami Material.</string>
+    <string name="app_appearance_layout_style_compact_dividers">Kompaktowy z liniami</string>
+    <string name="app_appearance_layout_style_compact_dividers_description">Nagłówki wyrównane do lewej z subtelnymi liniami</string>
+    <string name="app_appearance_layout_style_material">Material</string>
+    <string name="app_appearance_layout_style_material_description">Tonalne ikony i miękkie powierzchnie sekcji</string>
+    <string name="app_appearance_summary_material">Material</string>
+    <string name="kw_app_appearance_settings_style">Styl układu, kompaktowy, linie, layout style, compact, dividers, material</string>
+    <string name="settings_section_expanded">Rozwinięte</string>
+    <string name="settings_section_collapsed">Zwinięte</string>
+    <string name="settings_info_content_description">Szczegóły: %1$s</string>
+    <string name="custom_input_styles_list_title">Języki wprowadzania</string>
+    <string name="quick_launcher_choose_color">Kolor wpisu</string>
+    <string name="quick_launcher_entry_appearance_title">Wygląd wpisów</string>
+    <string name="settings_style_label">Styl</string>
 </resources>

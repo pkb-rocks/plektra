@@ -82,4 +82,19 @@
     <string name="quick_launcher_animation_duration_title">Բացման անիմացիայի տևողություն</string>
     <string name="titan2_elite_rounded_corners_description">Ստեղնաշարի գոտու ներքևի անկյունները կլորացնում է՝ համապատասխանեցնելով էկրանի անկյուններին։</string>
     <string name="titan2_elite_rounded_corners_title">Էկրանի կլորացված անկյուններ</string>
+    <string name="app_appearance_layout_style_title">Դասավորության ոճ</string>
+    <string name="app_appearance_layout_style_description">Փոխարկեք կոմպակտ բաժանիչ գծերի և փափուկ Material մակերեսների միջև։</string>
+    <string name="app_appearance_layout_style_compact_dividers">Կոմպակտ բաժանիչներով</string>
+    <string name="app_appearance_layout_style_compact_dividers_description">Ձախից հավասարեցված վերնագրեր նուրբ բաժանիչ գծերով</string>
+    <string name="app_appearance_layout_style_material">Material</string>
+    <string name="app_appearance_layout_style_material_description">Երանգավորված պատկերակներ և փափուկ բաժինների մակերեսներ</string>
+    <string name="app_appearance_summary_material">Material</string>
+    <string name="kw_app_appearance_settings_style">Դասավորության ոճ, կոմպակտ, բաժանիչներ, layout style, compact, dividers, material</string>
+    <string name="settings_section_expanded">Բացված</string>
+    <string name="settings_section_collapsed">Ծալված</string>
+    <string name="settings_info_content_description">Մանրամասներ %1$s-ի համար</string>
+    <string name="custom_input_styles_list_title">Մուտքագրման լեզուներ</string>
+    <string name="quick_launcher_choose_color">Տարրի գույն</string>
+    <string name="quick_launcher_entry_appearance_title">Տարրերի տեսք</string>
+    <string name="settings_style_label">Ոճ</string>
 </resources>

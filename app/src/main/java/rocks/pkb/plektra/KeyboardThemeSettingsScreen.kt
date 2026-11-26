@@ -1,5 +1,10 @@
 package rocks.pkb.plektra
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+
 import android.content.Context
 import android.graphics.Color as AndroidColor
 import android.os.Build
@@ -424,46 +429,22 @@ fun KeyboardThemeScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = {
-                            if (assignmentScreenTarget != null) {
-                                context.settingsActivity().finish()
-                            } else {
-                                onBack()
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
+            PlektraSettingsHeader(
+                title = assignmentScreenTarget?.let { target ->
+                    if (target == SettingsManager.KeyboardThemeTarget.SOFTWARE) {
+                        stringResource(R.string.keyboard_theme_assignment_software_title)
+                    } else {
+                        stringResource(R.string.keyboard_theme_assignment_hardware_title)
                     }
-                    Text(
-                        text = assignmentScreenTarget?.let { target ->
-                            if (target == SettingsManager.KeyboardThemeTarget.SOFTWARE) {
-                                stringResource(R.string.keyboard_theme_assignment_software_title)
-                            } else {
-                                stringResource(R.string.keyboard_theme_assignment_hardware_title)
-                            }
-                        } ?: stringResource(R.string.keyboard_theme_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+                } ?: stringResource(R.string.keyboard_theme_title),
+                onBack = {
+                    if (assignmentScreenTarget != null) {
+                        context.settingsActivity().finish()
+                    } else {
+                        onBack()
+                    }
                 }
-            }
+            )
         }
     ) { paddingValues ->
         Column(
@@ -2585,24 +2566,23 @@ private fun KeyboardThemeColorRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1
+                fontWeight = FontWeight.Medium
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                KeyboardThemeSwatchButton(color = color, onColorChanged = onColorChanged)
+                KeyboardThemeSwatchButton(color = color, label = label, onColorChanged = onColorChanged)
                 Text(
                     text = color.toHexColorLabel(),
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
                 )
                 IconButton(
                     onClick = { onColorChanged(presetColor) },
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.RestartAlt,
@@ -2643,12 +2623,11 @@ private fun KeyboardThemeSliderRow(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                    modifier = Modifier.weight(1f)
                 )
                 IconButton(
                     onClick = { onValueChanged(presetValue) },
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.RestartAlt,
@@ -2691,12 +2670,11 @@ private fun KeyboardThemeSwitchRow(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(1f),
-                maxLines = 1
+                modifier = Modifier.weight(1f)
             )
             IconButton(
                 onClick = { onCheckedChanged(presetChecked) },
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Filled.RestartAlt,
@@ -2717,12 +2695,25 @@ private fun KeyboardThemeSwitchRow(
 private fun KeyboardThemeSwatchButton(
     color: Int,
     onColorChanged: (Int) -> Unit,
+    label: String? = null,
     showColor: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(false) }
     var pickerColor by remember(color) { mutableStateOf(color) }
     val shape = MaterialTheme.shapes.small
-    Box {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .semantics {
+                if (label != null) contentDescription = label
+                role = Role.Button
+            }
+            .clickable {
+                pickerColor = color
+                expanded = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -2730,11 +2721,7 @@ private fun KeyboardThemeSwatchButton(
                     if (showColor) Color(color) else MaterialTheme.colorScheme.surface,
                     shape
                 )
-                .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f), shape)
-                .clickable {
-                    pickerColor = color
-                    expanded = true
-                },
+                .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f), shape),
             contentAlignment = Alignment.Center
         ) {
             if (!showColor) {

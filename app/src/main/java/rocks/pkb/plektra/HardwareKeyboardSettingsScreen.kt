@@ -32,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,10 +79,13 @@ fun HardwareKeyboardSettingsScreen(
             onBack = onBack,
             onDeviceSymLayerEditor = { destination = HardwareKeyboardDestination.DeviceSymLayerEditor }
         )
-        HardwareKeyboardDestination.DeviceSymLayerEditor -> DeviceSymLayerEditorStubScreen(
-            modifier = modifier,
-            onBack = { destination = HardwareKeyboardDestination.Main }
-        )
+        // A subpage keeps its Back even when this screen is the root of a detail pane.
+        HardwareKeyboardDestination.DeviceSymLayerEditor -> CompositionLocalProvider(LocalSettingsDetailRoot provides false) {
+            DeviceSymLayerEditorStubScreen(
+                modifier = modifier,
+                onBack = { destination = HardwareKeyboardDestination.Main }
+            )
+        }
     }
 }
 
@@ -123,39 +127,13 @@ private fun HardwareKeyboardListScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.hardware_keyboards_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.hardware_keyboards_title), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = stringResource(R.string.hardware_keyboards_description),
@@ -164,7 +142,7 @@ private fun HardwareKeyboardListScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
-            HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_detected_device_title))
+            SettingsSectionDivider(stringResource(R.string.hardware_keyboard_detected_device_title))
 
             Text(
                 text = stringResource(R.string.hardware_keyboard_detected_device_summary, DeviceSpecific.deviceName(), detectedProfile),
@@ -179,7 +157,7 @@ private fun HardwareKeyboardListScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_curated_profiles_title))
+            SettingsSectionDivider(stringResource(R.string.hardware_keyboard_curated_profiles_title))
 
             val selectedProfileLabel = hardwareKeyboardProfiles
                 .firstOrNull { it.first == selectedProfile }
@@ -230,7 +208,7 @@ private fun HardwareKeyboardListScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
+            SettingsSectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
             Text(
                 text = stringResource(R.string.hardware_keyboard_custom_profiles_empty),
                 style = MaterialTheme.typography.bodySmall,
@@ -246,7 +224,7 @@ private fun HardwareKeyboardListScreen(
                 onClick = onDeviceSymLayerEditor
             )
 
-            HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_behavior_title))
+            SettingsSectionDivider(stringResource(R.string.hardware_keyboard_behavior_title))
 
             // Mircea Horea IONICĂ (mionica), pastiera 3a43af1132; selected device profile.
             val profile = SettingsManager.getPhysicalKeyboardProfileOverride(context)
@@ -329,32 +307,6 @@ private fun HardwareKeyboardSectionTitle(text: String) {
 }
 
 @Composable
-private fun HardwareKeyboardSectionDivider(text: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
-        )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
-}
-
-@Composable
 private fun HardwareKeyboardNavigationRow(
     title: String,
     linkId: String? = null,
@@ -363,44 +315,8 @@ private fun HardwareKeyboardNavigationRow(
     status: FeatureStatus? = null,
     onClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .settingRow(linkId, onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            status?.let { FeatureStatusIcon(it) }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    SettingsNavigationRow(title = title, description = description, icon = icon, linkId = linkId,
+        onClick = onClick, trailing = status?.let { { FeatureStatusIcon(it) } })
 }
 
 @Composable
@@ -411,33 +327,6 @@ private fun HardwareKeyboardSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(modifier = Modifier.settingRow(linkId).fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Keyboard,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, linkId = linkId)
 }

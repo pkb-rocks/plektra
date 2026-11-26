@@ -1,5 +1,10 @@
 package rocks.pkb.plektra
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -22,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
@@ -244,7 +250,10 @@ fun CustomizationSettingsScreen(
     fun navigateTo(destination: CustomizationDestination) {
         openSettingsChild(context, "customization", destination.name)
     }
-    fun navigateBack() { context.settingsActivity().finish() }
+    // A child page is its own Activity; the page root leaves through its caller, which may be a pane.
+    fun navigateBack() {
+        if (settingsChild(context, "customization") != null) context.settingsActivity().finish() else onBack()
+    }
 
 
     val destination = currentDestination
@@ -258,174 +267,48 @@ fun CustomizationSettingsScreen(
                         )
                     }
                 ) { paddingValues ->
-                    Column(
+                    SettingsSectionScrollColumn(
                         modifier = modifier
                             .fillMaxWidth()
                             .padding(paddingValues)
-                            .verticalScroll(rememberScrollState())
                     ) {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(72.dp)
-                                .settingRow(SettingLinkIds.CUSTOMIZATION_APP_ICON) {
-                                    navigateTo(CustomizationDestination.AppIcon)
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Apps,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.app_icon_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.app_icon_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.app_icon_title),
+                            description = stringResource(R.string.app_icon_description),
+                            icon = Icons.Filled.Apps,
+                            linkId = SettingLinkIds.CUSTOMIZATION_APP_ICON,
+                            onClick = {
+                                navigateTo(CustomizationDestination.AppIcon)
                             }
-                        }
+                        )
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(72.dp)
-                                .settingRow("customization.main_background") {
-                                    navigateTo(CustomizationDestination.MainBackground)
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Waves,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.main_background_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.main_background_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.main_background_title),
+                            description = stringResource(R.string.main_background_description),
+                            icon = Icons.Filled.Waves,
+                            linkId = "customization.main_background",
+                            onClick = {
+                                navigateTo(CustomizationDestination.MainBackground)
                             }
-                        }
+                        )
 
                         // Variations Customization
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow("customization.variations") { navigateTo(CustomizationDestination.Variations) }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Tune,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.variation_customize_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.variation_customize_title),
+                            icon = Icons.Filled.Tune,
+                            linkId = "customization.variations",
+                            onClick = { navigateTo(CustomizationDestination.Variations) }
+                        )
 
 
                         // Sound Settings
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow("customization.sounds") { navigateTo(CustomizationDestination.Sounds) }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.settings_category_sounds),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_sounds_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.settings_category_sounds),
+                            description = stringResource(R.string.settings_sounds_description),
+                            icon = Icons.AutoMirrored.Filled.VolumeUp,
+                            linkId = "customization.sounds",
+                            onClick = { navigateTo(CustomizationDestination.Sounds) }
+                        )
 
                     }
                 }
@@ -683,61 +566,18 @@ private fun StarterLauncherShortcutsSettingsScreen(
     }
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.starter_launcher_shortcuts_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.starter_launcher_shortcuts_title), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+                .padding(vertical = 8.dp)
         ) {
-            Text(
-                text = stringResource(R.string.starter_launcher_shortcuts_intro),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
+            SettingsSupportingText(stringResource(R.string.starter_launcher_shortcuts_intro))
             if (quickLauncherDefaultBlocked) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = stringResource(R.string.quick_launcher_default_blocked_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
+                SettingsSupportingText(stringResource(R.string.quick_launcher_default_blocked_hint))
             }
 
             LauncherShortcutTriggerRow(
@@ -745,8 +585,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         imageVector = Icons.Filled.LineWeight,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.enabled",
@@ -761,8 +600,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         imageVector = Icons.Filled.Bolt,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.sym_shortcuts",
@@ -771,9 +609,10 @@ private fun StarterLauncherShortcutsSettingsScreen(
                 checked = powerShortcutsEnabled,
                 onCheckedChange = onPowerShortcutsEnabledChanged
             )
-            if (powerShortcutsEnabled) {
+            run {
                 LauncherShortcutTriggerRow(
-                    icon = {},
+                    enabled = powerShortcutsEnabled,
+                    icon = null,
                     title = stringResource(R.string.key_shortcuts_allow_in_text_fields_title),
                     linkId = "quick_launcher.sym_in_text_fields",
                     description = stringResource(R.string.sym_shortcuts_in_text_fields_description),
@@ -788,8 +627,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         painter = painterResource(R.drawable.keyboard_option_key_24),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.alt_shortcuts",
@@ -798,9 +636,10 @@ private fun StarterLauncherShortcutsSettingsScreen(
                 checked = altKeyShortcutsEnabled,
                 onCheckedChange = onAltKeyShortcutsEnabledChanged
             )
-            if (altKeyShortcutsEnabled) {
+            run {
                 LauncherShortcutTriggerRow(
-                    icon = {},
+                    enabled = altKeyShortcutsEnabled,
+                    icon = null,
                     title = stringResource(R.string.key_shortcuts_allow_in_text_fields_title),
                     linkId = "quick_launcher.alt_in_text_fields",
                     description = stringResource(R.string.alt_shortcuts_in_text_fields_description),
@@ -810,9 +649,10 @@ private fun StarterLauncherShortcutsSettingsScreen(
                 )
             }
 
-            if (altKeyShortcutsEnabled && altShortcutsInTextFields) {
+            run {
                 LauncherShortcutTriggerRow(
-                    icon = {},
+                    enabled = altKeyShortcutsEnabled && altShortcutsInTextFields,
+                    icon = null,
                     title = stringResource(R.string.quick_launcher_alt_space_text_fields_title),
                     description = stringResource(R.string.quick_launcher_alt_space_text_fields_description),
                     linkId = "quick_launcher.alt_space_in_text_fields",
@@ -827,8 +667,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         imageVector = Icons.Filled.Tune,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.behavior",
@@ -842,8 +681,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ManageSearch,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.appearance",
@@ -857,8 +695,7 @@ private fun StarterLauncherShortcutsSettingsScreen(
                     Icon(
                         imageVector = Icons.Filled.SmartButton,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(24.dp)
                     )
                 },
                 linkId = "quick_launcher.assignments",
@@ -908,61 +745,21 @@ private fun StarterLauncherBehaviorScreen(
         title = stringResource(R.string.quick_launcher_behaviour_title),
         onBack = onBack
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.provider"),
-            tonalElevation = 1.dp,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.quick_launcher_provider_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(R.string.quick_launcher_provider_description),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                ExposedDropdownMenuBox(
-                    expanded = behaviorMenuExpanded,
-                    onExpandedChange = { behaviorMenuExpanded = !behaviorMenuExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = quickLauncherBehaviorLabel(quickLauncherBehavior),
-                        onValueChange = {},
-                        readOnly = true,
-                        singleLine = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = behaviorMenuExpanded)
-                        },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = behaviorMenuExpanded,
-                        onDismissRequest = { behaviorMenuExpanded = false }
-                    ) {
-                        behaviorOptions.forEach { behavior ->
-                            DropdownMenuItem(
-                                text = { Text(quickLauncherBehaviorLabel(behavior)) },
-                                onClick = {
-                                    behaviorMenuExpanded = false
-                                    onQuickLauncherBehaviorChanged(behavior)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        SettingsDropdownRow(
+            title = stringResource(R.string.quick_launcher_provider_title),
+            description = stringResource(R.string.quick_launcher_provider_description),
+            value = quickLauncherBehaviorLabel(quickLauncherBehavior),
+            options = behaviorOptions.map { it to quickLauncherBehaviorLabel(it) },
+            expanded = behaviorMenuExpanded,
+            onExpandedChange = { behaviorMenuExpanded = it },
+            onSelected = { behavior ->
+                behaviorMenuExpanded = false
+                onQuickLauncherBehaviorChanged(behavior)
+            },
+            linkId = "quick_launcher.provider"
+        )
         LauncherShortcutTriggerRow(
-            icon = { SettingsRowKeyboardIcon() },
+            icon = null,
             linkId = "quick_launcher.auto_start_single",
             title = stringResource(R.string.quick_launcher_auto_start_single_title),
             description = stringResource(R.string.quick_launcher_auto_start_single_description),
@@ -970,7 +767,7 @@ private fun StarterLauncherBehaviorScreen(
             onCheckedChange = onQuickLauncherAutoStartSingleChanged
         )
         LauncherShortcutTriggerRow(
-            icon = { SettingsRowKeyboardIcon() },
+            icon = null,
             linkId = "quick_launcher.limit_results",
             title = stringResource(R.string.quick_launcher_limit_results_title),
             description = stringResource(R.string.quick_launcher_limit_results_description),
@@ -978,7 +775,7 @@ private fun StarterLauncherBehaviorScreen(
             onCheckedChange = onQuickLauncherLimitResultsChanged
         )
         LauncherShortcutTriggerRow(
-            icon = { SettingsRowKeyboardIcon() },
+            icon = null,
             linkId = "quick_launcher.respect_keyboard_layout",
             title = stringResource(R.string.quick_launcher_respect_keyboard_layout_title),
             description = stringResource(R.string.quick_launcher_respect_keyboard_layout_description),
@@ -986,71 +783,38 @@ private fun StarterLauncherBehaviorScreen(
             onCheckedChange = onQuickLauncherRespectKeyboardLayoutChanged
         )
         LauncherShortcutTriggerRow(
-            icon = { SettingsRowKeyboardIcon() },
+            icon = null,
             linkId = "quick_launcher.typo_tolerant_ranking",
             title = stringResource(R.string.quick_launcher_typo_tolerant_ranking_title),
             description = stringResource(R.string.quick_launcher_typo_tolerant_ranking_description),
             checked = quickLauncherTypoTolerantRanking,
-            onCheckedChange = onQuickLauncherTypoTolerantRankingChanged
-        )
-        TextButton(
-            onClick = { showRankingInfo = true },
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Info,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(stringResource(R.string.quick_launcher_ranking_info_button))
-        }
-        Surface(
-            modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.animation_duration"),
-            tonalElevation = 1.dp,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.quick_launcher_animation_duration_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(
-                        R.string.quick_launcher_animation_duration_value,
-                        quickLauncherAnimationDurationMs
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Slider(
-                    value = quickLauncherAnimationDurationMs.toFloat(),
-                    onValueChange = { value ->
-                        val rounded = (value / 20f).toInt() * 20
-                        onQuickLauncherAnimationDurationChanged(rounded)
-                    },
-                    valueRange = SettingsManager.QUICK_LAUNCHER_ANIMATION_DURATION_MIN_MS.toFloat()..
-                        SettingsManager.QUICK_LAUNCHER_ANIMATION_DURATION_MAX_MS.toFloat(),
-                    steps = 15
-                )
+            onCheckedChange = onQuickLauncherTypoTolerantRankingChanged,
+            extra = {
+                IconButton(onClick = { showRankingInfo = true }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = stringResource(R.string.quick_launcher_ranking_info_button)
+                    )
+                }
             }
-        }
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(
-                text = stringResource(R.string.quick_launcher_text_field_shortcuts_hint),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(12.dp)
-            )
-        }
+        )
+        SettingsSliderRow(
+            title = stringResource(R.string.quick_launcher_animation_duration_title),
+            valueLabel = stringResource(
+                R.string.quick_launcher_animation_duration_value,
+                quickLauncherAnimationDurationMs
+            ),
+            value = quickLauncherAnimationDurationMs.toFloat(),
+            onValueChange = { value ->
+                val rounded = (value / 20f).toInt() * 20
+                onQuickLauncherAnimationDurationChanged(rounded)
+            },
+            valueRange = SettingsManager.QUICK_LAUNCHER_ANIMATION_DURATION_MIN_MS.toFloat()..
+                SettingsManager.QUICK_LAUNCHER_ANIMATION_DURATION_MAX_MS.toFloat(),
+            steps = 15,
+            linkId = "quick_launcher.animation_duration"
+        )
+        SettingsSupportingText(stringResource(R.string.quick_launcher_text_field_shortcuts_hint))
     }
 
     if (showRankingInfo) {
@@ -1103,80 +867,32 @@ private fun QuickLauncherDisplayedEntriesSection(
         )
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.entries"),
-        tonalElevation = 1.dp,
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ManageSearch,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.setting_link_quick_launcher_entries),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "Choose which sources appear in Plektra search.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+    SettingsSectionDivider(
+        stringResource(R.string.setting_link_quick_launcher_entries),
+        modifier = Modifier.settingRow("quick_launcher.entries")
+    )
+    SettingsSupportingText("Choose which sources appear in Plektra search.")
+    visibility.forEach { item ->
+        SettingsToggleRow(
+            title = sourceLabels[item.sourceId] ?: item.sourceId,
+            checked = item.quickLauncherEnabled,
+            onCheckedChange = { update(item.sourceId, it) },
+            linkId = when (item.sourceId) {
+                CommandSourceId.Apps.storageValue -> "quick_launcher.source.apps"
+                CommandSourceId.Plektra.storageValue -> "quick_launcher.source.plektra"
+                CommandSourceId.AppActions.storageValue -> "quick_launcher.source.app_actions"
+                CommandSourceId.DeviceControl.storageValue -> "quick_launcher.source.device_control"
+                CommandSourceId.NavActions.storageValue -> "quick_launcher.source.nav_actions"
+                else -> null
             }
-            visibility.forEach { item ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
-                        .settingRow(when (item.sourceId) {
-                            CommandSourceId.Apps.storageValue -> "quick_launcher.source.apps"
-                            CommandSourceId.Plektra.storageValue -> "quick_launcher.source.plektra"
-                            CommandSourceId.AppActions.storageValue -> "quick_launcher.source.app_actions"
-                            CommandSourceId.DeviceControl.storageValue -> "quick_launcher.source.device_control"
-                            CommandSourceId.NavActions.storageValue -> "quick_launcher.source.nav_actions"
-                            else -> null
-                        }),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = sourceLabels[item.sourceId] ?: item.sourceId,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Switch(
-                        checked = item.quickLauncherEnabled,
-                        onCheckedChange = { update(item.sourceId, it) }
-                    )
-                }
-            }
-            Button(
-                onClick = { showCustomizeDialog = true },
-                modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.customize_entries")
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Customize entries")
-            }
-        }
+        )
     }
+    SettingsNavigationRow(
+        title = "Customize entries",
+        icon = Icons.Filled.Edit,
+        linkId = "quick_launcher.customize_entries",
+        onClick = { showCustomizeDialog = true }
+    )
 
     if (showCustomizeDialog) {
         QuickLauncherCommandCustomizationDialog(
@@ -1566,6 +1282,7 @@ private fun CommandCustomizationRow(
                     )
                 }
                 ColorSwatchButton(
+                    label = stringResource(R.string.quick_launcher_choose_color),
                     color = customization.color,
                     dynamicColor = commandPickerDynamicColor(command),
                     showDynamic = true,
@@ -1614,35 +1331,17 @@ private fun StarterLauncherCosmeticScreen(
         title = stringResource(R.string.quick_launcher_cosmetic_title),
         onBack = onBack
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.width"),
-            tonalElevation = 1.dp,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.quick_launcher_width_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(R.string.quick_launcher_width_value, quickLauncherWidthPercent),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Slider(
-                    value = quickLauncherWidthPercent.toFloat(),
-                    onValueChange = { onQuickLauncherWidthPercentChanged(it.toInt()) },
-                    valueRange = 50f..100f,
-                    steps = 9
-                )
-            }
-        }
+        SettingsSliderRow(
+            title = stringResource(R.string.quick_launcher_width_title),
+            valueLabel = stringResource(R.string.quick_launcher_width_value, quickLauncherWidthPercent),
+            value = quickLauncherWidthPercent.toFloat(),
+            onValueChange = { onQuickLauncherWidthPercentChanged(it.toInt()) },
+            valueRange = 50f..100f,
+            steps = 9,
+            linkId = "quick_launcher.width"
+        )
         LauncherShortcutTriggerRow(
-            icon = { SettingsRowKeyboardIcon() },
+            icon = null,
             linkId = "quick_launcher.pill_mode",
             title = stringResource(R.string.quick_launcher_pill_mode_title),
             description = stringResource(R.string.quick_launcher_pill_mode_description),
@@ -1685,105 +1384,60 @@ private fun QuickLauncherFavoriteAppearanceSection(
     staticTopHighlightColor: Int,
     onStaticTopHighlightColorChanged: (Int) -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 1.dp,
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text(
-                text = "Entry appearance",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.highlight_favorites"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val favoriteHighlightColor = favoriteColor.takeUnless {
-                    it == SettingsManager.QUICK_LAUNCHER_DYNAMIC_FAVORITE_COLOR
-                }
-                Text(
-                    text = stringResource(R.string.setting_link_quick_launcher_highlight_favorites),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                ColorSwatchButton(
-                    linkId = "quick_launcher.favorite_color",
-                    color = favoriteHighlightColor,
-                    showDynamic = true,
-                    onColorChanged = {
-                        onFavoriteColorChanged(
-                            it ?: SettingsManager.QUICK_LAUNCHER_DYNAMIC_FAVORITE_COLOR
-                        )
-                    }
-                )
-                Switch(
-                    checked = highlightFavorites,
-                    onCheckedChange = onHighlightFavoritesChanged
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.icon_colors"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_link_quick_launcher_icon_colors),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Switch(
-                    checked = iconColors,
-                    onCheckedChange = onIconColorsChanged
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.static_top_highlight"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_link_quick_launcher_static_top_highlight),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                ColorSwatchButton(
-                    linkId = "quick_launcher.top_match_color",
-                    color = staticTopHighlightColor,
-                    showDynamic = false,
-                    onColorChanged = { it?.let(onStaticTopHighlightColorChanged) }
-                )
-                Switch(
-                    checked = staticTopHighlight,
-                    onCheckedChange = onStaticTopHighlightChanged
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth().settingRow("quick_launcher.alias_first"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_link_quick_launcher_alias_first),
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Switch(
-                    checked = showAliasFirst,
-                    onCheckedChange = onShowAliasFirstChanged
-                )
-            }
-        }
+    SettingsSectionDivider(stringResource(R.string.quick_launcher_entry_appearance_title))
+    val favoriteHighlightColor = favoriteColor.takeUnless {
+        it == SettingsManager.QUICK_LAUNCHER_DYNAMIC_FAVORITE_COLOR
     }
+    // The color swatch is a second target in the row; the switch row stays one target.
+    SettingsToggleRow(
+        title = stringResource(R.string.setting_link_quick_launcher_highlight_favorites),
+        checked = highlightFavorites,
+        onCheckedChange = onHighlightFavoritesChanged,
+        linkId = "quick_launcher.highlight_favorites",
+        extra = {
+            ColorSwatchButton(
+                label = stringResource(R.string.setting_link_quick_launcher_favorite_color),
+                linkId = "quick_launcher.favorite_color",
+                color = favoriteHighlightColor,
+                showDynamic = true,
+                onColorChanged = {
+                    onFavoriteColorChanged(it ?: SettingsManager.QUICK_LAUNCHER_DYNAMIC_FAVORITE_COLOR)
+                }
+            )
+        }
+    )
+    SettingsToggleRow(
+        title = stringResource(R.string.setting_link_quick_launcher_icon_colors),
+        checked = iconColors,
+        onCheckedChange = onIconColorsChanged,
+        linkId = "quick_launcher.icon_colors"
+    )
+    SettingsToggleRow(
+        title = stringResource(R.string.setting_link_quick_launcher_static_top_highlight),
+        checked = staticTopHighlight,
+        onCheckedChange = onStaticTopHighlightChanged,
+        linkId = "quick_launcher.static_top_highlight",
+        extra = {
+            ColorSwatchButton(
+                label = stringResource(R.string.setting_link_quick_launcher_top_match_color),
+                linkId = "quick_launcher.top_match_color",
+                color = staticTopHighlightColor,
+                showDynamic = false,
+                onColorChanged = { it?.let(onStaticTopHighlightColorChanged) }
+            )
+        }
+    )
+    SettingsToggleRow(
+        title = stringResource(R.string.setting_link_quick_launcher_alias_first),
+        checked = showAliasFirst,
+        onCheckedChange = onShowAliasFirstChanged,
+        linkId = "quick_launcher.alias_first"
+    )
 }
 
 @Composable
 private fun ColorSwatchButton(
+    label: String,
     linkId: String? = null,
     color: Int?,
     dynamicColor: Int? = null,
@@ -1792,10 +1446,20 @@ private fun ColorSwatchButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val shape = MaterialTheme.shapes.small
-    Box {
+    // The visible swatch stays small; its touch target is a full 48 dp and announces its purpose.
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .semantics {
+                contentDescription = label
+                role = Role.Button
+            }
+            .settingRow(linkId) { expanded = true },
+        contentAlignment = Alignment.Center
+    ) {
         Box(
             modifier = Modifier
-                .size(36.dp)
+                .size(32.dp)
                 .background(
                     brush = if (showDynamic && color == null) {
                         Brush.sweepGradient(dynamicSwatchColors())
@@ -1814,7 +1478,6 @@ private fun ColorSwatchButton(
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f),
                     shape = shape
                 )
-                .settingRow(linkId) { expanded = true }
         )
         DropdownMenu(
             expanded = expanded,
@@ -1984,32 +1647,7 @@ private fun StarterLauncherSubScreen(
 ) {
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp).settingRow(linkId)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = title, onBack = onBack)
         }
     ) { paddingValues ->
         Column(
@@ -2017,8 +1655,7 @@ private fun StarterLauncherSubScreen(
                 .fillMaxWidth()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+                .padding(vertical = 8.dp),
             content = content
         )
     }
@@ -2026,54 +1663,18 @@ private fun StarterLauncherSubScreen(
 
 @Composable
 private fun LauncherShortcutTriggerRow(
-    icon: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)?,
     title: String,
     description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     indent: Boolean = false,
-    linkId: String? = null
+    linkId: String? = null,
+    enabled: Boolean = true,
+    extra: (@Composable () -> Unit)? = null
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().settingRow(linkId),
-        tonalElevation = 1.dp,
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = if (indent) 48.dp else 12.dp,
-                    end = 12.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (!indent) {
-                icon()
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3
-                )
-            }
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange
-            )
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked, leading = icon,
+        onCheckedChange = onCheckedChange, dependent = indent, enabled = enabled, linkId = linkId, extra = extra)
 }
 
 @Composable
@@ -2084,51 +1685,12 @@ private fun StarterLauncherNavigationRow(
     description: String,
     onClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .settingRow(linkId, onClick),
-        tonalElevation = 1.dp,
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            icon()
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2
-                )
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun SettingsRowKeyboardIcon() {
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.ManageSearch,
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.size(24.dp)
+    SettingsNavigationRow(
+        title = title,
+        description = description,
+        leading = icon,
+        linkId = linkId,
+        onClick = onClick
     )
 }
 
@@ -2176,39 +1738,13 @@ private fun SoundSettingsScreen(
 ) {
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.settings_category_sounds),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp).settingRow("customization.sounds")
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.settings_category_sounds), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
             TypingSoundSettingsRow()
         }

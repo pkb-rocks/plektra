@@ -282,38 +282,16 @@ fun SymCustomizationScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = {
-                        onBack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = when (editingLayerPage) {
-                            1 -> stringResource(R.string.sym_edit_emoji_layer_title)
-                            2 -> stringResource(R.string.sym_edit_symbols_layer_title)
-                            else -> stringResource(R.string.sym_customize_title)
-                        },
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
+            PlektraSettingsHeader(
+                title = when (editingLayerPage) {
+                    1 -> stringResource(R.string.sym_edit_emoji_layer_title)
+                    2 -> stringResource(R.string.sym_edit_symbols_layer_title)
+                    else -> stringResource(R.string.sym_customize_title)
+                },
+                onBack = {
+                    onBack()
                 }
-            }
+            )
         }
     ) { paddingValues ->
         Column(
@@ -522,88 +500,30 @@ fun SymCustomizationScreen(
 
         SettingsSectionDivider(stringResource(R.string.sym_behavior_section_title))
 
-        Surface(
-            modifier = Modifier.settingRow("sym.edit_shortcuts")
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.sym_edit_shortcuts_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.sym_edit_shortcuts_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = symEditShortcuts,
-                    onCheckedChange = { enabled ->
-                        symEditShortcuts = enabled
-                        SettingsManager.setSymEditShortcutsEnabled(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.sym_edit_shortcuts_title),
+            description = stringResource(R.string.sym_edit_shortcuts_description),
+            icon = Icons.Filled.Keyboard,
+            checked = symEditShortcuts,
+            linkId = "sym.edit_shortcuts",
+            onCheckedChange = { enabled ->
+                symEditShortcuts = enabled
+                SettingsManager.setSymEditShortcutsEnabled(context, enabled)
             }
-        }
+        )
 
         // Auto-Close SYM Layout option (in alto)
-        Surface(
-            modifier = Modifier.settingRow("sym.auto_close")
-                .fillMaxWidth()
-                .height(64.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.sym_auto_close_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = stringResource(R.string.sym_auto_close_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2
-                    )
-                }
-                Switch(
-                    checked = symAutoClose,
-                    onCheckedChange = { enabled ->
-                        symAutoClose = enabled
-                        SettingsManager.setSymAutoClose(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.sym_auto_close_title),
+            description = stringResource(R.string.sym_auto_close_description),
+            icon = Icons.Filled.Keyboard,
+            checked = symAutoClose,
+            linkId = "sym.auto_close",
+            onCheckedChange = { enabled ->
+                symAutoClose = enabled
+                SettingsManager.setSymAutoClose(context, enabled)
             }
-        }
+        )
 
         Surface(
             modifier = Modifier.settingRow("sym.auto_close_touch")
@@ -742,89 +662,31 @@ fun SymCustomizationScreen(
 
         if (editingLayerPage == null) {
 
-        Surface(
-            modifier = Modifier.settingRow("sym.emoji_height")
-                .fillMaxWidth()
-                .height(64.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.emoji_picker_expanded_height_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1
-                    )
-                    Text(
-                        text = stringResource(R.string.emoji_picker_expanded_height_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2
-                    )
-                }
-                Switch(
-                    checked = emojiPickerExpandedHeight,
-                    onCheckedChange = { enabled ->
-                        emojiPickerExpandedHeight = enabled
-                        SettingsManager.setEmojiPickerExpandedHeight(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.emoji_picker_expanded_height_title),
+            description = stringResource(R.string.emoji_picker_expanded_height_description),
+            icon = Icons.Filled.Keyboard,
+            checked = emojiPickerExpandedHeight,
+            linkId = "sym.emoji_height",
+            onCheckedChange = { enabled ->
+                emojiPickerExpandedHeight = enabled
+                SettingsManager.setEmojiPickerExpandedHeight(context, enabled)
             }
-        }
+        )
 
         HorizontalDivider()
 
-        Surface(
-            modifier = Modifier.settingRow("sym.emoji_picker_stays_open")
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.emoji_picker_stays_open_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.emoji_picker_stays_open_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = emojiPickerStaysOpen,
-                    onCheckedChange = { enabled ->
-                        emojiPickerStaysOpen = enabled
-                        SettingsManager.setEmojiPickerStaysOpen(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.emoji_picker_stays_open_title),
+            description = stringResource(R.string.emoji_picker_stays_open_description),
+            icon = Icons.Filled.Keyboard,
+            checked = emojiPickerStaysOpen,
+            linkId = "sym.emoji_picker_stays_open",
+            onCheckedChange = { enabled ->
+                emojiPickerStaysOpen = enabled
+                SettingsManager.setEmojiPickerStaysOpen(context, enabled)
             }
-        }
+        )
 
         HorizontalDivider()
 

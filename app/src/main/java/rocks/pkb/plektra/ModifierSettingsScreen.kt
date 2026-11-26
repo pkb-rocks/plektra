@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -95,29 +96,11 @@ fun ModifierSettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.settings_back_content_description))
-                    }
-                    Text(
-                        text = stringResource(R.string.modifiers_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.modifiers_title), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier.fillMaxWidth().padding(paddingValues).verticalScroll(rememberScrollState())
+        SettingsSectionScrollColumn(
+            modifier = modifier.fillMaxWidth().padding(paddingValues)
         ) {
             ModifierNavigationRow(
                 iconRes = R.drawable.modifier_keys_24,
@@ -254,12 +237,13 @@ fun ModifierSettingsScreen(
                 ctrlTapLatches = it
                 SettingsManager.setCtrlTapLatches(context, it)
             }
-            if (ctrlTapLatches) {
+            run {
                 ModifierSwitchRow(
                     title = stringResource(R.string.ctrl_latch_stays_on_space_title),
                     description = stringResource(R.string.ctrl_latch_stays_on_space_description),
                     checked = ctrlLatchStaysOnSpace,
                     indent = true,
+                    enabled = ctrlTapLatches,
                     linkId = SettingLinkIds.MODIFIERS_CTRL_LATCH_STAYS_ON_SPACE
                 ) {
                     ctrlLatchStaysOnSpace = it
@@ -291,46 +275,24 @@ private fun ModifierLongPressThresholdRow(
     linkId: String? = null,
     onThresholdChanged: (Long) -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().settingRow(linkId)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Timer,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+    SettingsSliderRow(
+        title = stringResource(R.string.long_press_title),
+        valueLabel = stringResource(R.string.keyboard_timing_long_press_value, threshold),
+        icon = Icons.Filled.Timer,
+        value = threshold.toFloat(),
+        onValueChange = { value ->
+            onThresholdChanged(
+                value.toLong().coerceIn(
+                    SettingsManager.getMinLongPressThreshold(),
+                    SettingsManager.getMaxLongPressThreshold()
+                )
             )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.long_press_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(R.string.keyboard_timing_long_press_value, threshold),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Slider(
-                    value = threshold.toFloat(),
-                    onValueChange = { value ->
-                        onThresholdChanged(
-                            value.toLong().coerceIn(
-                                SettingsManager.getMinLongPressThreshold(),
-                                SettingsManager.getMaxLongPressThreshold()
-                            )
-                        )
-                    },
-                    valueRange = SettingsManager.getMinLongPressThreshold().toFloat()..
-                        SettingsManager.getMaxLongPressThreshold().toFloat(),
-                    steps = 18
-                )
-            }
-        }
-    }
+        },
+        valueRange = SettingsManager.getMinLongPressThreshold().toFloat()..
+            SettingsManager.getMaxLongPressThreshold().toFloat(),
+        steps = 18,
+        linkId = linkId
+    )
 }
 
 @Composable
@@ -342,43 +304,23 @@ private fun ModifierNavigationRow(
     onClick: () -> Unit,
     onInfoClick: (() -> Unit)? = null
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().settingRow(linkId, onClick)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(
-                    description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            onInfoClick?.let { infoClick ->
-                IconButton(onClick = infoClick, modifier = Modifier.size(40.dp)) {
+    SettingsNavigationRow(
+        title = title,
+        description = description,
+        iconPainter = painterResource(iconRes),
+        linkId = linkId,
+        onClick = onClick,
+        trailing = onInfoClick?.let { infoClick ->
+            {
+                IconButton(onClick = infoClick) {
                     Icon(
-                        imageVector = Icons.Filled.Info,
-                        contentDescription = stringResource(R.string.sym_shortcuts_compatibility_info),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = stringResource(R.string.sym_shortcuts_compatibility_info)
                     )
                 }
             }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
-    }
+    )
 }
 
 @Composable
@@ -393,28 +335,17 @@ private fun <T> ModifierDropdownRow(
     onSelected: (T) -> Unit,
     description: String? = null
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().settingRow(linkId, onExpand)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(Icons.Filled.Keyboard, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                description?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(value, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-            }
-            Icon(Icons.Filled.ArrowDropDown, null)
-            DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
-                options.forEach { (id, label) ->
-                    DropdownMenuItem(text = { Text(label) }, onClick = { onSelected(id) })
-                }
-            }
-        }
-    }
+    SettingsDropdownRow(
+        title = title,
+        description = description,
+        value = value,
+        icon = Icons.Filled.Keyboard,
+        options = options,
+        expanded = expanded,
+        onExpandedChange = { if (it) onExpand() else onDismiss() },
+        onSelected = onSelected,
+        linkId = linkId
+    )
 }
 
 @Composable
@@ -427,22 +358,7 @@ private fun ModifierSwitchRow(
     linkId: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).settingRow(linkId)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(start = if (indent) 52.dp else 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (!indent) {
-                Icon(Icons.Filled.Keyboard, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.38f))
-                Text(description, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (enabled) 1f else 0.38f))
-            }
-            Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        icon = Icons.Filled.Keyboard.takeIf { !indent },
+        onCheckedChange = onCheckedChange, enabled = enabled, dependent = indent, linkId = linkId)
 }

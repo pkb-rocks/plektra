@@ -7,6 +7,7 @@ import android.os.Build
 import android.app.Activity
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
@@ -96,58 +98,32 @@ fun CustomInputStylesScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            PlektraSettingsHeader(title = stringResource(R.string.custom_input_styles_title), onBack = onBack) {
+                IconButton(
+                    onClick = {
+                        context.startActivity(
+                            Intent(context, InstalledDictionariesActivity::class.java)
+                        )
+                    }
                 ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.custom_input_styles_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.MenuBook,
+                        contentDescription = stringResource(R.string.custom_input_styles_installed_dictionaries)
                     )
-                    IconButton(
-                        onClick = {
-                            context.startActivity(
-                                Intent(context, InstalledDictionariesActivity::class.java)
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.MenuBook,
-                            contentDescription = stringResource(R.string.custom_input_styles_installed_dictionaries)
-                        )
+                }
+                IconButton(
+                    onClick = {
+                        editStyle = null
+                        lastDialogLocale = null
+                        lastDialogLayout = null
+                        lastDialogSuggestionLocales = null
+                        showAddDialog = true
                     }
-                    IconButton(
-                        onClick = {
-                            editStyle = null
-                            lastDialogLocale = null
-                            lastDialogLayout = null
-                            lastDialogSuggestionLocales = null
-                            showAddDialog = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.custom_input_styles_add)
-                        )
-                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.custom_input_styles_add)
+                    )
                 }
             }
         },
@@ -157,8 +133,7 @@ fun CustomInputStylesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
                 LanguageLayoutModeCard()
@@ -166,6 +141,10 @@ fun CustomInputStylesScreen(
 
             item {
                 LayoutSwitchShortcutsCard()
+            }
+
+            item {
+                SettingsSectionDivider(stringResource(R.string.custom_input_styles_list_title))
             }
 
             if (inputStyles.isEmpty()) {
@@ -360,48 +339,20 @@ private fun LanguageLayoutModeCard() {
         mutableStateOf(SettingsManager.isKeyboardLayoutAutoByLocale(context))
     }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .settingRow(SettingLinkIds.CUSTOM_INPUT_STYLES_LAYOUT_MODE)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Language,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.keyboard_layout_mode_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = if (automaticLayoutMode) {
-                        stringResource(R.string.keyboard_layout_mode_auto_description)
-                    } else {
-                        stringResource(R.string.keyboard_layout_mode_manual_description)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Switch(
-                checked = automaticLayoutMode,
-                onCheckedChange = { enabled ->
-                    automaticLayoutMode = enabled
-                    SettingsManager.setKeyboardLayoutAutoByLocale(context, enabled)
-                }
-            )
+    SettingsToggleRow(
+        title = stringResource(R.string.keyboard_layout_mode_title),
+        description = if (automaticLayoutMode) {
+            stringResource(R.string.keyboard_layout_mode_auto_description)
+        } else {
+            stringResource(R.string.keyboard_layout_mode_manual_description)
+        },
+        checked = automaticLayoutMode,
+        linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_LAYOUT_MODE,
+        onCheckedChange = { enabled ->
+            automaticLayoutMode = enabled
+            SettingsManager.setKeyboardLayoutAutoByLocale(context, enabled)
         }
-    }
+    )
 }
 
 @Composable
@@ -431,89 +382,66 @@ private fun LayoutSwitchShortcutsCard() {
         mutableStateOf(SettingsManager.isToastOnLayoutSwitchEnabled(context))
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = stringResource(R.string.layout_switch_shortcuts_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.alt_shift_layout_switch_title),
-                description = stringResource(R.string.alt_shift_layout_switch_description),
-                checked = altShiftLayoutSwitch,
-                linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_ALT_SHIFT_LAYOUT_SWITCH,
-                onCheckedChange = { enabled ->
-                    altShiftLayoutSwitch = enabled
-                    SettingsManager.setAltShiftLayoutSwitchEnabled(context, enabled)
-                }
-            )
-
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.alt_enter_layout_switch_title),
-                description = stringResource(R.string.alt_enter_layout_switch_description),
-                checked = altEnterLayoutSwitch,
-                linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_ALT_ENTER_LAYOUT_SWITCH,
-                onCheckedChange = { enabled ->
-                    altEnterLayoutSwitch = enabled
-                    SettingsManager.setAltEnterLayoutSwitchEnabled(context, enabled)
-                }
-            )
-
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.ctrl_space_layout_switch_title),
-                description = stringResource(R.string.ctrl_space_layout_switch_description),
-                checked = ctrlSpaceLayoutSwitch,
-                linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_CTRL_SPACE_LAYOUT_SWITCH,
-                onCheckedChange = { enabled ->
-                    ctrlSpaceLayoutSwitch = enabled
-                    SettingsManager.setCtrlSpaceLayoutSwitchEnabled(context, enabled)
-                }
-            )
-
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.alt_space_previous_language_title),
-                description = stringResource(R.string.alt_space_previous_language_description),
-                checked = altSpacePrevious,
-                linkId = "custom_input_styles.alt_space_previous_language",
-                onCheckedChange = { enabled -> SettingsManager.setAltSpacePreviousLanguageEnabled(context, enabled) }
-            )
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.ctrl_language_previous_title),
-                description = stringResource(R.string.ctrl_language_previous_description),
-                checked = ctrlLanguagePrevious,
-                linkId = "custom_input_styles.ctrl_language_previous",
-                onCheckedChange = { enabled -> SettingsManager.setCtrlLanguagePreviousEnabled(context, enabled) }
-            )
-
-            LayoutSwitchShortcutRow(
-                title = stringResource(R.string.toast_on_layout_switch_title),
-                description = stringResource(R.string.toast_on_layout_switch_description),
-                checked = toastOnLayoutSwitch,
-                linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_LAYOUT_SWITCH_TOAST,
-                onCheckedChange = { enabled ->
-                    toastOnLayoutSwitch = enabled
-                    SettingsManager.setToastOnLayoutSwitchEnabled(context, enabled)
-                }
-            )
+    SettingsSectionDivider(stringResource(R.string.layout_switch_shortcuts_title))
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.alt_shift_layout_switch_title),
+        description = stringResource(R.string.alt_shift_layout_switch_description),
+        checked = altShiftLayoutSwitch,
+        linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_ALT_SHIFT_LAYOUT_SWITCH,
+        onCheckedChange = { enabled ->
+            altShiftLayoutSwitch = enabled
+            SettingsManager.setAltShiftLayoutSwitchEnabled(context, enabled)
         }
-    }
+    )
+
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.alt_enter_layout_switch_title),
+        description = stringResource(R.string.alt_enter_layout_switch_description),
+        checked = altEnterLayoutSwitch,
+        linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_ALT_ENTER_LAYOUT_SWITCH,
+        onCheckedChange = { enabled ->
+            altEnterLayoutSwitch = enabled
+            SettingsManager.setAltEnterLayoutSwitchEnabled(context, enabled)
+        }
+    )
+
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.ctrl_space_layout_switch_title),
+        description = stringResource(R.string.ctrl_space_layout_switch_description),
+        checked = ctrlSpaceLayoutSwitch,
+        linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_CTRL_SPACE_LAYOUT_SWITCH,
+        onCheckedChange = { enabled ->
+            ctrlSpaceLayoutSwitch = enabled
+            SettingsManager.setCtrlSpaceLayoutSwitchEnabled(context, enabled)
+        }
+    )
+
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.alt_space_previous_language_title),
+        description = stringResource(R.string.alt_space_previous_language_description),
+        checked = altSpacePrevious,
+        linkId = "custom_input_styles.alt_space_previous_language",
+        onCheckedChange = { enabled -> SettingsManager.setAltSpacePreviousLanguageEnabled(context, enabled) }
+    )
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.ctrl_language_previous_title),
+        description = stringResource(R.string.ctrl_language_previous_description),
+        checked = ctrlLanguagePrevious,
+        linkId = "custom_input_styles.ctrl_language_previous",
+        onCheckedChange = { enabled -> SettingsManager.setCtrlLanguagePreviousEnabled(context, enabled) }
+    )
+
+    LayoutSwitchShortcutRow(
+        title = stringResource(R.string.toast_on_layout_switch_title),
+        description = stringResource(R.string.toast_on_layout_switch_description),
+        checked = toastOnLayoutSwitch,
+        linkId = SettingLinkIds.CUSTOM_INPUT_STYLES_LAYOUT_SWITCH_TOAST,
+        onCheckedChange = { enabled ->
+            toastOnLayoutSwitch = enabled
+            SettingsManager.setToastOnLayoutSwitchEnabled(context, enabled)
+        }
+    )
+
 }
 
 @Composable
@@ -524,35 +452,14 @@ private fun LayoutSwitchShortcutRow(
     linkId: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().settingRow(linkId),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, linkId = linkId)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AppLanguageSelectorCard() {
     val context = LocalContext.current
-    var expanded by remember { mutableStateOf(false) }
     var selectedTag by remember { mutableStateOf(getCurrentAppLanguageTag(context)) }
 
     val options = remember {
@@ -571,77 +478,21 @@ internal fun AppLanguageSelectorCard() {
         )
     }
 
-    val selectedLabel = if (selectedTag == null) {
-        stringResource(R.string.app_language_system_default)
-    } else {
-        getLanguageOptionLabel(context, selectedTag!!)
-    }
 
-    Card(
-        modifier = Modifier.fillMaxWidth().settingRow(SettingLinkIds.MAIN_APP_LANGUAGE)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.translate_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = stringResource(R.string.app_language_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Text(
-                text = stringResource(R.string.app_language_description),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) {
-                OutlinedTextField(
-                    value = selectedLabel,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.app_language_label)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    options.forEach { tag ->
-                        val label = if (tag == null) {
-                            context.getString(R.string.app_language_system_default)
-                        } else {
-                            getLanguageOptionLabel(context, tag)
-                        }
-                        DropdownMenuItem(
-                            text = { Text(label) },
-                            onClick = {
-                                setApplicationLanguage(context, tag)
-                                selectedTag = tag
-                                expanded = false
-                            }
-                        )
-                    }
+    val uiLocale = context.resources.configuration.locales[0]
+    Column(Modifier.fillMaxWidth().selectableGroup().settingRow(SettingLinkIds.MAIN_APP_LANGUAGE)) {
+        options.forEach { tag ->
+            val (title, subtitle) = appLanguageChoiceLabels(context, tag, uiLocale)
+            SettingsRadioChoice(
+                label = title,
+                description = subtitle,
+                selected = selectedTag == tag,
+                leading = { LanguageMark(tag) },
+                onSelect = {
+                    setApplicationLanguage(context, tag)
+                    selectedTag = tag
                 }
-            }
+            )
         }
     }
 }
@@ -661,64 +512,25 @@ private fun CustomInputStyleItem(
     val missing = remember(style, revision) {
         (listOf(style.locale) + style.additionalSuggestionLocales).filterNot { hasDictionaryForLocale(context, it) }
     }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = style.displayName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    if (style.isSystemLocale) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = MaterialTheme.shapes.extraSmall
-                        ) {
-                            Text(
-                                text = stringResource(R.string.custom_input_styles_system_badge),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-                }
-                if (missing.isNotEmpty()) {
-                    Text(stringResource(R.string.dictionary_pack_missing, missing.joinToString(", ")),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error)
-                }
-                Text(
-                    text = "${style.locale} - ${style.layout}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            when {
-                !style.isSystemLocale -> {
+    val details = listOfNotNull(
+        stringResource(R.string.custom_input_styles_system_badge).takeIf { style.isSystemLocale },
+        style.locale,
+        style.layout
+    ).joinToString(", ")
+    Column(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        SettingsRow(
+            title = style.displayName,
+            description = details,
+            enabled = !style.isHidden,
+            trailing = {
+                if (!style.isSystemLocale) {
                     IconButton(onClick = onDelete) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.custom_input_styles_delete),
-                            tint = MaterialTheme.colorScheme.error
+                            contentDescription = stringResource(R.string.custom_input_styles_delete)
                         )
                     }
-                }
-                else -> {
+                } else {
                     IconButton(onClick = onHideSystemLocale) {
                         Icon(
                             imageVector = if (style.isHidden) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
@@ -726,16 +538,19 @@ private fun CustomInputStyleItem(
                                 stringResource(R.string.custom_input_styles_show_system_locale)
                             } else {
                                 stringResource(R.string.custom_input_styles_hide_system_locale)
-                            },
-                            tint = if (style.isHidden) {
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
                             }
                         )
                     }
                 }
             }
+        )
+        if (missing.isNotEmpty()) {
+            Text(
+                stringResource(R.string.dictionary_pack_missing, missing.joinToString(", ")),
+                style = SettingsTypography.rowDescription(),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(start = SettingsSpace.edge, end = SettingsSpace.edge, bottom = SettingsSpace.rowVertical)
+            )
         }
     }
 }
@@ -1181,27 +996,41 @@ internal fun getCurrentAppLanguageTag(context: Context): String? {
     return SettingsManager.getAppLanguageTag(context)
 }
 
-internal fun getLanguageOptionLabel(context: Context, languageTag: String): String {
-    return try {
-        val languageLocale = Locale.forLanguageTag(languageTag)
-        val uiLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
-
-        val nativeName = languageLocale.getDisplayLanguage(languageLocale)
-        val uiName = languageLocale.getDisplayLanguage(uiLocale)
-
-        if (nativeName.equals(uiName, ignoreCase = true)) {
-            nativeName
-        } else {
-            "$nativeName - $uiName"
-        }
-    } catch (_: Exception) {
-        languageTag
+/** Decorative mark of an app language; regional flags stand for the language's main region. */
+@Composable
+private fun LanguageMark(tag: String?) {
+    val mark = when (tag) {
+        null -> "🌐"
+        "en" -> "🇬🇧"
+        "it" -> "🇮🇹"
+        "de" -> "🇩🇪"
+        "es" -> "🇪🇸"
+        "fr" -> "🇫🇷"
+        "pl" -> "🇵🇱"
+        "ru" -> "🇷🇺"
+        "uk" -> "🇺🇦"
+        "vi" -> "🇻🇳"
+        "hy" -> "🇦🇲"
+        else -> "🌐"
     }
+    Text(mark, fontSize = 24.sp)
+}
+
+/**
+ * Title and subtitle of an app language choice: the language in its own words,
+ * then in the current app language. System default names the language it follows.
+ */
+internal fun appLanguageChoiceLabels(context: Context, tag: String?, uiLocale: Locale): Pair<String, String?> {
+    fun nameIn(locale: Locale, display: Locale) =
+        locale.getDisplayLanguage(display).replaceFirstChar { it.titlecase(display) }
+    if (tag == null) {
+        val device = android.content.res.Resources.getSystem().configuration.locales[0]
+        return context.getString(R.string.app_language_system_default) to nameIn(device, device)
+    }
+    val locale = Locale.forLanguageTag(tag)
+    val native = nameIn(locale, locale)
+    val inUi = nameIn(locale, uiLocale)
+    return native to inUi.takeUnless { it.equals(native, ignoreCase = true) }
 }
 
 internal fun setApplicationLanguage(context: Context, languageTag: String?) {

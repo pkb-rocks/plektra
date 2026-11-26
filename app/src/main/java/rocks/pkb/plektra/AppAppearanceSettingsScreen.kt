@@ -13,46 +13,41 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.ViewAgenda
+import androidx.compose.material.icons.filled.ViewStream
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import rocks.pkb.plektra.ui.theme.AppAppearancePreferences
 import rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle
+import rocks.pkb.plektra.ui.theme.AppSettingsStyle
 import rocks.pkb.plektra.ui.theme.AppThemeMode
 import rocks.pkb.plektra.ui.theme.AppThemeResolver
 import rocks.pkb.plektra.ui.theme.LocalResolvedAppTheme
@@ -77,234 +72,209 @@ fun AppAppearanceSettingsScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .consumeWindowInsets(paddingValues)
-                .verticalScroll(rememberScrollState())
                 .navigationBarsPadding()
-                .padding(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Spacer(Modifier.height(8.dp))
             AppearancePreviewCard(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = SettingsSpace.edge),
                 preferences = preferences,
                 resolvedDark = resolvedTheme.useDarkTheme,
                 resolvedOled = resolvedTheme.useOledBlack,
-                resolvedDynamic = resolvedTheme.useDynamicColor
+                resolvedDynamic = resolvedTheme.useDynamicColor,
+                resolvedStyle = resolvedTheme.settingsStyle
+            )
+
+            // Layout style section (Compact with dividers / Material)
+            SettingsSectionDivider(
+                label = stringResource(R.string.app_appearance_layout_style_title),
+                accentRole = SettingsAccentRole.TERTIARY
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .settingRow(SettingLinkIds.APP_APPEARANCE_SETTINGS_STYLE)
+                    .selectableGroup()
+            ) {
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_layout_style_compact_dividers),
+                    description = stringResource(R.string.app_appearance_layout_style_compact_dividers_description),
+                    selected = preferences.settingsStyle == AppSettingsStyle.COMPACT_DIVIDERS,
+                    onSelect = {
+                        SettingsManager.setAppSettingsStyle(context, AppSettingsStyle.COMPACT_DIVIDERS)
+                    },
+                    trailingRadio = true,
+                    leading = {
+                        Icon(
+                            imageVector = Icons.Filled.ViewStream,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                )
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_layout_style_material),
+                    description = stringResource(R.string.app_appearance_layout_style_material_description),
+                    selected = preferences.settingsStyle == AppSettingsStyle.MATERIAL,
+                    onSelect = {
+                        SettingsManager.setAppSettingsStyle(context, AppSettingsStyle.MATERIAL)
+                    },
+                    trailingRadio = true,
+                    leading = {
+                        Icon(
+                            imageVector = Icons.Filled.ViewAgenda,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                )
+            }
+            SettingsToggleRow(
+                title = stringResource(R.string.app_appearance_settings_fullscreen_title),
+                description = stringResource(R.string.app_appearance_settings_fullscreen_description),
+                icon = Icons.Filled.Fullscreen,
+                checked = preferences.settingsFullscreen,
+                linkId = SettingLinkIds.APP_APPEARANCE_SETTINGS_FULLSCREEN,
+                onCheckedChange = { SettingsManager.setSettingsFullscreenEnabled(context, it) }
             )
 
             // Theme mode section (System / Light / Dark)
-            Column {
-                AppearanceSectionHeader(
-                    title = stringResource(R.string.app_appearance_mode_title),
-                    description = stringResource(R.string.app_appearance_mode_description)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_THEME_MODE)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectableGroup()
-                    ) {
-                        AppearanceRadioRow(
-                            title = stringResource(R.string.app_appearance_mode_system),
-                            description = stringResource(R.string.app_appearance_mode_system_description),
-                            selected = preferences.themeMode == AppThemeMode.SYSTEM,
-                            enabled = true,
-                            onClick = { SettingsManager.setAppThemeMode(context, AppThemeMode.SYSTEM) },
-                            leading = {
-                                Icon(
-                                    imageVector = Icons.Filled.BrightnessAuto,
-                                    contentDescription = null,
-                                    tint = if (preferences.themeMode == AppThemeMode.SYSTEM) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        )
-                        AppearanceRadioRow(
-                            title = stringResource(R.string.app_appearance_mode_light),
-                            description = stringResource(R.string.app_appearance_mode_light_description),
-                            selected = preferences.themeMode == AppThemeMode.LIGHT,
-                            enabled = true,
-                            onClick = { SettingsManager.setAppThemeMode(context, AppThemeMode.LIGHT) },
-                            leading = {
-                                Icon(
-                                    imageVector = Icons.Filled.LightMode,
-                                    contentDescription = null,
-                                    tint = if (preferences.themeMode == AppThemeMode.LIGHT) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        )
-                        AppearanceRadioRow(
-                            title = stringResource(R.string.app_appearance_mode_dark),
-                            description = stringResource(R.string.app_appearance_mode_dark_description),
-                            selected = preferences.themeMode == AppThemeMode.DARK,
-                            enabled = true,
-                            onClick = { SettingsManager.setAppThemeMode(context, AppThemeMode.DARK) },
-                            leading = {
-                                Icon(
-                                    imageVector = Icons.Filled.DarkMode,
-                                    contentDescription = null,
-                                    tint = if (preferences.themeMode == AppThemeMode.DARK) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
+            SettingsSectionDivider(
+                label = stringResource(R.string.app_appearance_mode_title),
+                accentRole = SettingsAccentRole.PRIMARY
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .settingRow(SettingLinkIds.APP_APPEARANCE_THEME_MODE)
+                    .selectableGroup()
+            ) {
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_mode_system),
+                    description = stringResource(R.string.app_appearance_mode_system_description),
+                    selected = preferences.themeMode == AppThemeMode.SYSTEM,
+                    onSelect = { SettingsManager.setAppThemeMode(context, AppThemeMode.SYSTEM) },
+                    trailingRadio = true,
+                    leading = {
+                        Icon(
+                            imageVector = Icons.Filled.BrightnessAuto,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                }
+                )
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_mode_light),
+                    description = stringResource(R.string.app_appearance_mode_light_description),
+                    selected = preferences.themeMode == AppThemeMode.LIGHT,
+                    onSelect = { SettingsManager.setAppThemeMode(context, AppThemeMode.LIGHT) },
+                    trailingRadio = true,
+                    leading = {
+                        Icon(
+                            imageVector = Icons.Filled.LightMode,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                )
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_mode_dark),
+                    description = stringResource(R.string.app_appearance_mode_dark_description),
+                    selected = preferences.themeMode == AppThemeMode.DARK,
+                    onSelect = { SettingsManager.setAppThemeMode(context, AppThemeMode.DARK) },
+                    trailingRadio = true,
+                    leading = {
+                        Icon(
+                            imageVector = Icons.Filled.DarkMode,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                )
             }
 
             // Dark surface style section (Gray / OLED black)
-            Column {
-                AppearanceSectionHeader(
-                    title = stringResource(R.string.app_appearance_dark_surface_title),
-                    description = stringResource(
-                        if (darkSurfaceEnabled) {
-                            R.string.app_appearance_dark_surface_description
-                        } else {
-                            R.string.app_appearance_dark_surface_light_hint
-                        }
-                    )
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_DARK_SURFACE)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectableGroup()
-                    ) {
-                        AppearanceRadioRow(
-                            title = stringResource(R.string.app_appearance_dark_surface_gray),
-                            description = stringResource(R.string.app_appearance_dark_surface_gray_description),
-                            selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.STANDARD,
-                            enabled = darkSurfaceEnabled,
-                            onClick = {
-                                SettingsManager.setAppDarkSurfaceStyle(context, AppDarkSurfaceStyle.STANDARD)
-                            },
-                            leading = {
-                                DarkSurfaceSwatch(
-                                    canvasColor = Color(0xFF222028),
-                                    cardColor = Color(0xFF3A3742),
-                                    selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.STANDARD
-                                )
-                            }
-                        )
-                        AppearanceRadioRow(
-                            title = stringResource(R.string.app_appearance_dark_surface_oled),
-                            description = stringResource(R.string.app_appearance_dark_surface_oled_description),
-                            selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.OLED,
-                            enabled = darkSurfaceEnabled,
-                            onClick = {
-                                SettingsManager.setAppDarkSurfaceStyle(context, AppDarkSurfaceStyle.OLED)
-                            },
-                            leading = {
-                                DarkSurfaceSwatch(
-                                    canvasColor = AppThemeResolver.OledCanvas,
-                                    cardColor = AppThemeResolver.OledSurfaceContainerHigh,
-                                    selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.OLED
-                                )
-                            }
+            SettingsSectionDivider(
+                label = stringResource(R.string.app_appearance_dark_surface_title),
+                accentRole = SettingsAccentRole.PRIMARY
+            )
+            if (!darkSurfaceEnabled) {
+                SettingsSupportingText(stringResource(R.string.app_appearance_dark_surface_light_hint))
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .settingRow(SettingLinkIds.APP_APPEARANCE_DARK_SURFACE)
+                    .selectableGroup()
+            ) {
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_dark_surface_gray),
+                    description = stringResource(R.string.app_appearance_dark_surface_gray_description),
+                    selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.STANDARD,
+                    enabled = darkSurfaceEnabled,
+                    onSelect = {
+                        SettingsManager.setAppDarkSurfaceStyle(context, AppDarkSurfaceStyle.STANDARD)
+                    },
+                    trailingRadio = true,
+                    leading = {
+                        DarkSurfaceSwatch(
+                            canvasColor = Color(0xFF222028),
+                            cardColor = Color(0xFF3A3742),
+                            selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.STANDARD
                         )
                     }
-                }
+                )
+                SettingsRadioChoice(
+                    label = stringResource(R.string.app_appearance_dark_surface_oled),
+                    description = stringResource(R.string.app_appearance_dark_surface_oled_description),
+                    selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.OLED,
+                    enabled = darkSurfaceEnabled,
+                    onSelect = {
+                        SettingsManager.setAppDarkSurfaceStyle(context, AppDarkSurfaceStyle.OLED)
+                    },
+                    trailingRadio = true,
+                    leading = {
+                        DarkSurfaceSwatch(
+                            canvasColor = AppThemeResolver.OledCanvas,
+                            cardColor = AppThemeResolver.OledSurfaceContainerHigh,
+                            selected = preferences.darkSurfaceStyle == AppDarkSurfaceStyle.OLED
+                        )
+                    }
+                )
             }
 
             // Dynamic system color toggle
-            Column {
-                AppearanceSectionHeader(
-                    title = stringResource(R.string.app_appearance_color_title)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .settingRow(SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR)
-                ) {
-                    val checked = preferences.dynamicColor && dynamicColorSupported
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 64.dp)
-                            .toggleable(
-                                value = checked,
-                                enabled = dynamicColorSupported,
-                                role = Role.Switch,
-                                onValueChange = { enabled ->
-                                    SettingsManager.setAppDynamicColorEnabled(context, enabled)
-                                }
-                            )
-                            .alpha(if (dynamicColorSupported) 1f else 0.55f)
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ColorLens,
-                            contentDescription = null,
-                            tint = if (checked) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.app_appearance_dynamic_color_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(
-                                    if (dynamicColorSupported) {
-                                        R.string.app_appearance_dynamic_color_description
-                                    } else {
-                                        R.string.app_appearance_dynamic_color_unavailable
-                                    }
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Switch(
-                            checked = checked,
-                            onCheckedChange = null,
-                            enabled = dynamicColorSupported
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = stringResource(R.string.app_appearance_scope_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            SettingsSectionDivider(
+                label = stringResource(R.string.app_appearance_color_title),
+                accentRole = SettingsAccentRole.TERTIARY
             )
+            val dynamicChecked = preferences.dynamicColor && dynamicColorSupported
+            SettingsToggleRow(
+                title = stringResource(R.string.app_appearance_dynamic_color_title),
+                description = stringResource(
+                    if (dynamicColorSupported) {
+                        R.string.app_appearance_dynamic_color_description
+                    } else {
+                        R.string.app_appearance_dynamic_color_unavailable
+                    }
+                ),
+                icon = Icons.Filled.ColorLens,
+                accentRole = SettingsAccentRole.TERTIARY,
+                checked = dynamicChecked,
+                enabled = dynamicColorSupported,
+                alwaysInlineDescription = true,
+                linkId = SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR,
+                onCheckedChange = { enabled ->
+                    SettingsManager.setAppDynamicColorEnabled(context, enabled)
+                }
+            )
+
+            SettingsSupportingText(stringResource(R.string.app_appearance_scope_note))
+            SettingsBottomSpacer()
         }
     }
 }
@@ -315,7 +285,8 @@ private fun AppearancePreviewCard(
     preferences: AppAppearancePreferences,
     resolvedDark: Boolean,
     resolvedOled: Boolean,
-    resolvedDynamic: Boolean
+    resolvedDynamic: Boolean,
+    resolvedStyle: AppSettingsStyle
 ) {
     val context = LocalContext.current
     val colorScheme = MaterialTheme.colorScheme
@@ -336,17 +307,17 @@ private fun AppearancePreviewCard(
             .clearAndSetSemantics {
                 contentDescription = previewAccessibility
             },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(SettingsSpace.cardCorner),
         color = colorScheme.surfaceContainerLow,
         border = BorderStroke(1.dp, colorScheme.outlineVariant)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Miniature surface sample using the active Material 3 colorScheme tokens
+            // Miniature preview reflecting active color scheme AND layout style
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
@@ -357,31 +328,27 @@ private fun AppearancePreviewCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.weight(1f),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(10.dp)
-                                    .clip(CircleShape)
-                                    .background(colorScheme.primary)
+                        Box(
+                            modifier = Modifier
+                                .width(56.dp)
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(colorScheme.primary)
+                        )
+                        if (resolvedStyle == AppSettingsStyle.COMPACT_DIVIDERS) {
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                color = colorScheme.outlineVariant
                             )
-                            Box(
-                                modifier = Modifier
-                                    .width(72.dp)
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(colorScheme.onSurface.copy(alpha = 0.75f))
-                            )
+                        } else {
+                            Spacer(Modifier.weight(1f))
                         }
                         Surface(
                             shape = RoundedCornerShape(999.dp),
@@ -392,63 +359,87 @@ private fun AppearancePreviewCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
                             )
                         }
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        val tileColor = if (resolvedStyle == AppSettingsStyle.MATERIAL) {
+                            colorScheme.surfaceContainer
+                        } else {
+                            colorScheme.background
+                        }
+                        val tileBorder = if (resolvedStyle == AppSettingsStyle.COMPACT_DIVIDERS) {
+                            BorderStroke(0.5.dp, colorScheme.outlineVariant.copy(alpha = 0.6f))
+                        } else {
+                            null
+                        }
                         Surface(
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
-                            color = colorScheme.surfaceContainer
+                            shape = RoundedCornerShape(if (resolvedStyle == AppSettingsStyle.MATERIAL) 12.dp else 6.dp),
+                            color = tileColor,
+                            border = tileBorder
                         ) {
-                            Column(
-                                modifier = Modifier.padding(10.dp),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth(0.75f)
-                                        .height(7.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(colorScheme.onSurface.copy(alpha = 0.72f))
+                                        .size(if (resolvedStyle == AppSettingsStyle.MATERIAL) 18.dp else 10.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (resolvedStyle == AppSettingsStyle.MATERIAL) colorScheme.primaryContainer
+                                            else colorScheme.primary
+                                        )
                                 )
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.55f)
-                                        .height(6.dp)
-                                        .clip(RoundedCornerShape(3.dp))
-                                        .background(colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                                )
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.75f)
+                                            .height(6.dp)
+                                            .clip(RoundedCornerShape(3.dp))
+                                            .background(colorScheme.onSurface.copy(alpha = 0.72f))
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.55f)
+                                            .height(5.dp)
+                                            .clip(RoundedCornerShape(3.dp))
+                                            .background(colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                                    )
+                                }
                             }
                         }
                         Surface(
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
-                            color = colorScheme.surfaceContainerHigh
+                            shape = RoundedCornerShape(if (resolvedStyle == AppSettingsStyle.MATERIAL) 12.dp else 6.dp),
+                            color = if (resolvedStyle == AppSettingsStyle.MATERIAL) colorScheme.surfaceContainerHigh else tileColor,
+                            border = tileBorder
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(10.dp),
+                                    .padding(8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .width(42.dp)
-                                        .height(7.dp)
-                                        .clip(RoundedCornerShape(4.dp))
+                                        .height(6.dp)
+                                        .clip(RoundedCornerShape(3.dp))
                                         .background(colorScheme.onSurface.copy(alpha = 0.72f))
                                 )
                                 Box(
                                     modifier = Modifier
-                                        .width(26.dp)
-                                        .height(14.dp)
+                                        .width(24.dp)
+                                        .height(13.dp)
                                         .clip(RoundedCornerShape(7.dp))
                                         .background(colorScheme.primary)
                                         .padding(2.dp),
@@ -456,7 +447,7 @@ private fun AppearancePreviewCard(
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .size(10.dp)
+                                            .size(9.dp)
                                             .clip(CircleShape)
                                             .background(colorScheme.onPrimary)
                                     )
@@ -482,9 +473,9 @@ private fun AppearancePreviewCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     AccentSwatchDot(color = colorScheme.primary)
-                    AccentSwatchDot(color = colorScheme.secondary)
+                    AccentSwatchDot(color = colorScheme.tertiary)
                     AccentSwatchDot(
-                        color = if (resolvedDynamic) colorScheme.tertiary else colorScheme.surfaceContainerHighest
+                        color = if (resolvedDynamic) colorScheme.secondary else colorScheme.surfaceContainerHighest
                     )
                 }
             }
@@ -516,86 +507,19 @@ private fun DarkSurfaceSwatch(
     }
     Box(
         modifier = Modifier
-            .size(28.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .size(26.dp)
+            .clip(RoundedCornerShape(7.dp))
             .background(canvasColor)
-            .border(if (selected) 2.dp else 1.dp, borderColor, RoundedCornerShape(8.dp)),
+            .border(if (selected) 2.dp else 1.dp, borderColor, RoundedCornerShape(7.dp)),
         contentAlignment = Alignment.BottomCenter
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(12.dp)
+                .height(11.dp)
                 .padding(horizontal = 3.dp, vertical = 3.dp)
                 .clip(RoundedCornerShape(3.dp))
                 .background(cardColor)
-        )
-    }
-}
-
-@Composable
-private fun AppearanceSectionHeader(
-    title: String,
-    description: String? = null
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SettingsSectionLabel(title)
-        if (description != null) {
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun AppearanceRadioRow(
-    title: String,
-    description: String,
-    selected: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    leading: @Composable () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .selectable(
-                selected = selected,
-                enabled = enabled,
-                role = Role.RadioButton,
-                onClick = onClick
-            )
-            .alpha(if (enabled) 1f else 0.5f)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        leading()
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        RadioButton(
-            selected = selected,
-            onClick = null,
-            enabled = enabled
         )
     }
 }
@@ -617,6 +541,9 @@ fun currentAppAppearanceSummary(
     }
     if (preferences.dynamicColor && AppThemeResolver.isDynamicColorSupported()) {
         parts += context.getString(R.string.app_appearance_summary_dynamic)
+    }
+    if (preferences.settingsStyle == AppSettingsStyle.MATERIAL) {
+        parts += context.getString(R.string.app_appearance_summary_material)
     }
     return parts.joinToString(", ")
 }

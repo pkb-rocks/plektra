@@ -53,62 +53,28 @@ fun DisplayGeometryScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
         // A stored choice stays reachable even on a display without rounded corners.
         if (DisplayCorners.hasRoundedDisplay(context) || titan2EliteRoundedCornerInsetsEnabled) {
         SettingsSectionDivider(stringResource(R.string.device_specific_interface_section))
-        Surface(modifier = Modifier.fillMaxWidth().settingRow("status_bar.rounded_corners")) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.titan2_elite_rounded_corners_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.titan2_elite_rounded_corners_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = titan2EliteRoundedCornerInsetsEnabled,
-                    onCheckedChange = { enabled ->
-                        titan2EliteRoundedCornerInsetsEnabled = enabled
-                        SettingsManager.setTitan2EliteRoundedCornerInsetsEnabled(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.titan2_elite_rounded_corners_title),
+            description = stringResource(R.string.titan2_elite_rounded_corners_description),
+            checked = titan2EliteRoundedCornerInsetsEnabled,
+            linkId = "status_bar.rounded_corners",
+            onCheckedChange = { enabled ->
+                titan2EliteRoundedCornerInsetsEnabled = enabled
+                SettingsManager.setTitan2EliteRoundedCornerInsetsEnabled(context, enabled)
             }
-        }
+        )
 
         if (titan2EliteRoundedCornerInsetsEnabled) {
-            Surface(modifier = Modifier.fillMaxWidth().settingRow("status_bar.fill_bottom_corners")) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.titan2_elite_fill_bottom_corners_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.titan2_elite_fill_bottom_corners_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = titan2EliteFillBottomCorners,
-                        onCheckedChange = { enabled ->
-                            titan2EliteFillBottomCorners = enabled
-                            SettingsManager.setTitan2EliteFillBottomCorners(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.titan2_elite_fill_bottom_corners_title),
+                description = stringResource(R.string.titan2_elite_fill_bottom_corners_description),
+                checked = titan2EliteFillBottomCorners,
+                linkId = "status_bar.fill_bottom_corners",
+                onCheckedChange = { enabled ->
+                    titan2EliteFillBottomCorners = enabled
+                    SettingsManager.setTitan2EliteFillBottomCorners(context, enabled)
                 }
-            }
+            )
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
                 ListItem(modifier = Modifier.fillMaxWidth().settingRow("status_bar.top_corner").clickable { cornerSizeDialog = true },
                     headlineContent = { Text(stringResource(R.string.keyboard_bar_corner_size)) },

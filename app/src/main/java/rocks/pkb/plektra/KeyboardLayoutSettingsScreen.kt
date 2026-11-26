@@ -187,80 +187,58 @@ fun KeyboardLayoutSettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
+            PlektraSettingsHeader(
+                title = stringResource(R.string.keyboard_layout_title),
+                subtitle = getLocaleDisplayNameForTitle(locale),
+                onBack = { navigateBack() }
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { navigateBack() }) {
+                // Import layout (JSON) button with local/cloud options
+                Box {
+                    IconButton(onClick = { showAddMenu = true }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.layout_import_content_description)
                         )
                     }
-                    Text(
-                        text = "${stringResource(R.string.keyboard_layout_title)} - ${getLocaleDisplayNameForTitle(locale)}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
-                    )
-                    // Import layout (JSON) button with local/cloud options
-                    Box {
-                        IconButton(onClick = { showAddMenu = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.layout_import_content_description)
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showAddMenu,
-                            onDismissRequest = { showAddMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.layout_import_from_file)) },
-                                onClick = {
-                                    showAddMenu = false
-                                    launchLocalImport()
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.layout_download_from_cloud)) },
-                                onClick = {
-                                    showAddMenu = false
-                                    val intent = Intent(context, OnlineLayoutsActivity::class.java)
-                                    context.startActivity(intent)
-                                }
-                            )
-                        }
-                    }
-                    if (!pickerMode) {
-                        IconButton(
+                    DropdownMenu(
+                        expanded = showAddMenu,
+                        onDismissRequest = { showAddMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.layout_import_from_file)) },
                             onClick = {
-                                // One Direct Boot snapshot for the whole selection.
-                                DirectBootKeyboardConfig.changeSources(context) {
-                                    SettingsManager.setKeyboardLayoutAutoByLocale(context, automaticLayoutMode)
-                                    if (!automaticLayoutMode) {
-                                        SettingsManager.setKeyboardLayout(context, selectedLayout)
-                                    }
-                                    onLayoutSelected(locale, selectedLayout)
-                                }
-                                onBack()
+                                showAddMenu = false
+                                launchLocalImport()
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Save,
-                                contentDescription = stringResource(R.string.layout_save_content_description)
-                            )
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.layout_download_from_cloud)) },
+                            onClick = {
+                                showAddMenu = false
+                                val intent = Intent(context, OnlineLayoutsActivity::class.java)
+                                context.startActivity(intent)
+                            }
+                        )
+                    }
+                }
+                if (!pickerMode) {
+                    IconButton(
+                        onClick = {
+                            // One Direct Boot snapshot for the whole selection.
+                            DirectBootKeyboardConfig.changeSources(context) {
+                                SettingsManager.setKeyboardLayoutAutoByLocale(context, automaticLayoutMode)
+                                if (!automaticLayoutMode) {
+                                    SettingsManager.setKeyboardLayout(context, selectedLayout)
+                                }
+                                onLayoutSelected(locale, selectedLayout)
+                            }
+                            onBack()
                         }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Save,
+                            contentDescription = stringResource(R.string.layout_save_content_description)
+                        )
                     }
                 }
             }

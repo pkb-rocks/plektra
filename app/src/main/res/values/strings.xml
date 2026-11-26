@@ -27,10 +27,10 @@
     <string name="settings_back_content_description">Back</string>
     
     <!-- Long Press Section -->
-    <string name="long_press_title">Long Press</string>
+    <string name="long_press_title">Long press delay</string>
     <string name="keyboard_timing_long_press_value">%1$dms</string>
     <string name="long_press_duration">Long Press Duration: %1$dms</string>
-    <string name="long_press_description">Wait time before a long press is recognized. A lower value makes long press more responsive, while a higher value requires a longer press.</string>
+    <string name="long_press_description">Wait time before a long press registers</string>
     <string name="setting_applied_immediately">Setting applied immediately</string>
     
     <!-- Text Input Sections -->
@@ -61,8 +61,8 @@
     <!-- Smart punctuation Section -->
     <string name="spaced_hyphen_to_en_dash_title">Hyphen to dash</string>
     <string name="spaced_hyphen_to_en_dash_description">Turn “word - word” into a dash.</string>
-    <string name="mid_word_quote_to_apostrophe_title">Quotes inside words</string>
-    <string name="mid_word_quote_to_apostrophe_description">Turn straight quotes inside words into an apostrophe.</string>
+    <string name="mid_word_quote_to_apostrophe_title">Apostrophe inside words</string>
+    <string name="mid_word_quote_to_apostrophe_description">Convert straight quotes inside words to an apostrophe</string>
     <string name="french_punctuation_spacing_title">French punctuation spacing</string>
     <string name="french_punctuation_spacing_description">Insert non-breaking spacing before ; : ! ? and guillemets.</string>
     <string name="french_punctuation_only_french_title">Only for French layouts</string>
@@ -91,8 +91,8 @@
     <string name="clear_alt_on_space_description">Clear one-shot Alt and Alt-Lock, unless “Keep Alt-Lock” is enabled below.</string>
     
     <!-- Swipe to Delete Section -->
-    <string name="swipe_to_delete_title">Enable Swipe to Delete</string>
-    <string name="swipe_to_delete_description">Delete the previous word with a left swipe on supported trackpad input.</string>
+    <string name="swipe_to_delete_title">Swipe to delete</string>
+    <string name="swipe_to_delete_description">Swipe left on the trackpad to delete the previous word</string>
     <string name="swipe_to_delete_provider_title">Swipe to Delete Provider</string>
     <string name="swipe_to_delete_provider_titan2_keycode">Titan 2 keycode workaround</string>
     <string name="swipe_to_delete_provider_native_ime">Native IME events</string>
@@ -113,7 +113,7 @@
     
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Show keyboard automatically</string>
-    <string name="auto_show_keyboard_description">Show the on-screen keyboard automatically in text fields.</string>
+    <string name="auto_show_keyboard_description">Open the on-screen keyboard when entering a text field</string>
     <string name="auto_show_respect_app_visibility_title">Respect app display defaults</string>
     <string name="auto_show_respect_app_visibility_description">Leave it to Android and the app whether the keyboard opens when a field is entered. Tapping the field or pressing a key still opens it.</string>
     <string name="hardware_keypad_auto_open_title">Open keypad automatically with a hardware keyboard</string>
@@ -130,8 +130,8 @@
     <string name="software_keyboard_choice_device" translatable="false">Sym</string>
     
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
-    <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl / BlackBerry Alt+0 for speech input</string>
-    <string name="alt_ctrl_speech_shortcut_description">Start speech input with Alt+Ctrl / BlackBerry Alt+0.</string>
+    <string name="alt_ctrl_speech_shortcut_title">Speech input shortcut</string>
+    <string name="alt_ctrl_speech_shortcut_description">Start dictation with Alt+Ctrl or BlackBerry Alt+0</string>
 
     <!-- Static Variation Bar Mode -->
     <string name="static_variation_bar_mode_title">Static Variation Bar</string>
@@ -274,7 +274,7 @@
     <string name="auto_correct_auto_replace_description">Use dictionary suggestions to fix likely typos when pressing Space or Enter.</string>
     <string name="auto_correct_max_distance_title">Maximum correction distance</string>
     <string name="auto_correct_max_distance_off">Off</string>
-    <string name="auto_correct_max_distance_description">Maximum number of character differences allowed for auto-correction. 0 = disabled, 1-3 = increasing tolerance.</string>
+    <string name="auto_correct_max_distance_description">Allowed character differences (0 = off, 1–3 = more tolerant)</string>
     <string name="auto_correct_manage_user_dict_title">Personal dictionary</string>
     <string name="auto_correct_manage_user_dict_description">Words Plektra should know and suggest, without creating replacement rules.</string>
     <string name="auto_correct_keyboard_proximity_title">Keyboard Proximity Ranking</string>
@@ -296,24 +296,24 @@
     <!-- SYM Customization Screen -->
     <string name="sym_customize_title">Customize SYM Keyboard</string>
     <!-- Sym+C/V/X/A edit shortcuts toggle -->
-    <string name="sym_edit_shortcuts_title">Sym+C/V/X/A: copy, paste, cut, select all</string>
-    <string name="sym_edit_shortcuts_description">In a text field, Sym with C, V, X or A edits the text instead of typing a symbol or launching an app. Off, those four chords go back to the SYM layer.</string>
-    <string name="sym_auto_close_title">Auto-Close SYM Layout</string>
-    <string name="sym_auto_close_description">Automatically close SYM layout after inserting a character, pressing Alt, or pressing Enter. Does not close with Control or Shift.</string>
-    <string name="sym_auto_close_touch_title">Also close after on-screen SYM keys</string>
-    <string name="sym_auto_close_touch_description">Close the SYM layout after tapping a symbol key on the on-screen SYM keyboard.</string>
-    <string name="sym_enable_emoji_page_title">Enable Emoji Page</string>
-    <string name="sym_enable_emoji_page_description">Show the emoji SYM layout when cycling.</string>
-    <string name="sym_enable_symbols_page_title">Enable Symbols Page</string>
-    <string name="sym_enable_symbols_page_description">Show the symbols SYM layout when cycling.</string>
-    <string name="sym_enable_clipboard_page_title">Enable Clipboard Page</string>
-    <string name="sym_enable_clipboard_page_description">Show the clipboard history when cycling.</string>
-    <string name="sym_enable_emoji_picker_page_title">Enable Emoji Picker Page</string>
-    <string name="sym_enable_emoji_picker_page_description">Show the full emoji picker when cycling.</string>
+    <string name="sym_edit_shortcuts_title">Edit text with SYM+C/V/X/A</string>
+    <string name="sym_edit_shortcuts_description">Copy, paste, cut, and select all in text fields instead of typing symbols</string>
+    <string name="sym_auto_close_title">Close SYM after typing</string>
+    <string name="sym_auto_close_description">Closes after a character, Alt, or Enter; stays open for Ctrl and Shift</string>
+    <string name="sym_auto_close_touch_title">Also close after touch SYM keys</string>
+    <string name="sym_auto_close_touch_description">Close after tapping a symbol on screen</string>
+    <string name="sym_enable_emoji_page_title">Emoji key page</string>
+    <string name="sym_enable_emoji_page_description">Include the emoji key grid in the SYM cycle</string>
+    <string name="sym_enable_symbols_page_title">Symbols page</string>
+    <string name="sym_enable_symbols_page_description">Include the symbols grid in the SYM cycle</string>
+    <string name="sym_enable_clipboard_page_title">Clipboard page</string>
+    <string name="sym_enable_clipboard_page_description">Include clipboard history in the SYM cycle</string>
+    <string name="sym_enable_emoji_picker_page_title">Emoji picker page</string>
+    <string name="sym_enable_emoji_picker_page_description">Include the full emoji picker in the SYM cycle</string>
     <string name="emoji_picker_expanded_height_title">Larger emoji picker</string>
     <string name="emoji_picker_expanded_height_description">Use about 1.5x height for the emoji search page; other SYM pages keep their normal height.</string>
-    <string name="emoji_picker_stays_open_title">Keep the emoji picker open after typing an emoji</string>
-    <string name="emoji_picker_stays_open_description">After an emoji or skin tone, the emoji picker stays open for the next one. Independent of the SYM auto-close settings.</string>
+    <string name="emoji_picker_stays_open_title">Keep emoji picker open</string>
+    <string name="emoji_picker_stays_open_description">Stay open after inserting an emoji, independent of SYM auto-close</string>
     <string name="sym_swap_pages_title">Arrange SYM pages order</string>
     <string name="sym_swap_pages_description">Drag or use the arrows to set the cycle order. The switch only controls whether an item appears in the cycle.</string>
     <string name="sym_cycle_device_layer">Device SYM Layer</string>
@@ -325,9 +325,9 @@
     <string name="sym_cycle_type_panel">Panel</string>
     <string name="sym_move_up">Move up</string>
     <string name="sym_move_down">Move down</string>
-    <string name="alt_binding_title">Alt modifier binding</string>
-    <string name="alt_binding_description">Choose which SYM mapping the Alt modifier triggers. SYM cycle visibility remains independent.</string>
-    <string name="alt_binding_current_device">Device SYM Layer · Current input source</string>
+    <string name="alt_binding_title">Alt modifier layer</string>
+    <string name="alt_binding_description">SYM mapping triggered by Alt; SYM cycle stays independent</string>
+    <string name="alt_binding_current_device">Device SYM Layer, Current input source</string>
     <string name="alt_binding_first_key_layer">First key layer in SYM order</string>
     <string name="modifiers_title">Modifiers</string>
     <string name="modifiers_description">SYM layers, long press, modifier behaviour, and indicators</string>
@@ -368,8 +368,8 @@
     <string name="modifier_ctrl">CTRL</string>
     
     <!-- Long Press Modifier Section -->
-    <string name="long_press_modifier_title">Long Press Modifier</string>
-    <string name="long_press_modifier_description">Choose whether long press opens a SYM layer or Variations, or applies Shift.</string>
+    <string name="long_press_modifier_title">Long press action</string>
+    <string name="long_press_modifier_description">Open a SYM layer, show variations, or apply Shift</string>
     <string name="long_press_modifier_alt">Device SYM Layer (formerly Alt)</string>
     <string name="long_press_modifier_shift">Shift</string>
     <string name="long_press_modifier_variations">Variations</string>
@@ -381,12 +381,12 @@
     <string name="shift_tap_latches_description">Tap Shift once to lock caps instead of one-shot uppercase.</string>
     <string name="alt_tap_latches_title">Single-tap locks Alt</string>
     <string name="alt_tap_latches_description">Tap Alt once to keep the Device SYM layer active until Alt is tapped again.</string>
-    <string name="alt_latch_stays_on_space_title">Keep Alt-Lock</string>
-    <string name="alt_latch_stays_on_space_description">Space and Enter clear one-shot Alt but keep Alt-Lock active.</string>
+    <string name="alt_latch_stays_on_space_title">Keep Alt locked on Space and Enter</string>
+    <string name="alt_latch_stays_on_space_description">Space and Enter clear one-shot Alt only</string>
     <string name="ctrl_tap_latches_title">Single-tap locks Ctrl</string>
     <string name="ctrl_tap_latches_description">Tap Ctrl once to keep Ctrl active until Ctrl is tapped again.</string>
-    <string name="ctrl_latch_stays_on_space_title">Keep locked Ctrl after Ctrl+Space</string>
-    <string name="ctrl_latch_stays_on_space_description">After switching layouts with Ctrl+Space, keep Ctrl locked instead of ending the lock.</string>
+    <string name="ctrl_latch_stays_on_space_title">Keep Ctrl locked after layout switch</string>
+    <string name="ctrl_latch_stays_on_space_description">Keep Ctrl active after pressing Ctrl+Space</string>
     <string name="typing_sound_title">Typing Sounds</string>
     <string name="typing_sound_off">Off</string>
     <string name="typing_sound_click">Keyboard click</string>
@@ -429,10 +429,10 @@
     <string name="keyboard_layout_mode_manual_description">OFF: use one manually selected layout for all locales.</string>
     <string name="alt_shift_layout_switch_title">Alt+Shift Layout Switch</string>
     <string name="alt_shift_layout_switch_description">Cycle languages/layouts with Alt+Shift.</string>
-    <string name="alt_enter_layout_switch_title">Alt+Enter Layout Switch</string>
-    <string name="alt_enter_layout_switch_description">Cycle languages/layouts with Alt+Enter.</string>
-    <string name="ctrl_space_layout_switch_title">Ctrl+Space Layout Switch</string>
-    <string name="ctrl_space_layout_switch_description">Cycle languages/layouts with Ctrl+Space.</string>
+    <string name="alt_enter_layout_switch_title">Switch layout with Alt+Enter</string>
+    <string name="alt_enter_layout_switch_description">Cycle active keyboard layouts</string>
+    <string name="ctrl_space_layout_switch_title">Switch layout with Ctrl+Space</string>
+    <string name="ctrl_space_layout_switch_description">Cycle active keyboard layouts</string>
     <string name="layout_switch_shortcuts_title">Layout Switch Shortcuts</string>
     <string name="toast_on_layout_switch_title">Layout Switch Toast</string>
     <string name="toast_on_layout_switch_description">Show a toast when switching languages/layouts.</string>
@@ -451,7 +451,7 @@
     <string name="hardware_keyboards_title">Built-in Keyboards</string>
     <string name="hardware_keyboards_description">Device-bound profiles for keyboards built into or permanently attached to this phone.</string>
     <string name="hardware_keyboard_detected_device_title">Detected device</string>
-    <string name="hardware_keyboard_detected_device_summary">%1$s · %2$s</string>
+    <string name="hardware_keyboard_detected_device_summary">%1$s, %2$s</string>
     <string name="hardware_keyboard_device_bound">Device-bound</string>
     <string name="keyboard_profile_option_clicks_razr">Clicks for Razr | Razrberry</string>
     <string name="keyboard_profile_option_clicks_pixel">Clicks for Pixel 9/9 Pro | Clixel</string>
@@ -466,17 +466,17 @@
     <string name="clicks_power_keyboard_summary">Keys, backlight, power saving, charging, and automation.</string>
     <string name="clicks_power_keyboard_stub_description">Planned controls for the BLE Power Keyboard.</string>
     <string name="clicks_power_keyboard_description">Direct BLE control of the Clicks Power Keyboard. Settings are stored in the keyboard.</string>
-    <string name="clicks_device_status_with_firmware_and_battery">Connected · Slot %1$s · Firmware %2$s · Keyboard battery %3$s%%</string>
+    <string name="clicks_device_status_with_firmware_and_battery">Connected, Slot %1$s, Firmware %2$s, Keyboard battery %3$s%%</string>
     <string name="clicks_gatt_identity_title">GATT identity</string>
-    <string name="clicks_gatt_identity_value">Model %1$s · Serial number %2$s</string>
+    <string name="clicks_gatt_identity_value">Model %1$s, Serial number %2$s</string>
     <string name="clicks_host_slots_title">Paired device slots</string>
     <string name="clicks_host_slots_description">View paired slots and rename each device directly.</string>
     <string name="clicks_host_name_unnamed">Unnamed device</string>
-    <string name="clicks_host_slots_value">Active slot %1$s · Occupied: %2$s</string>
+    <string name="clicks_host_slots_value">Active slot %1$s, Occupied: %2$s</string>
     <string name="clicks_host_slots_none">none</string>
     <string name="clicks_host_name_dialog_title">Edit paired device name</string>
     <string name="clicks_host_slot_label">Slot %1$d</string>
-    <string name="clicks_host_slot_active_label">Slot %1$d · Active</string>
+    <string name="clicks_host_slot_active_label">Slot %1$d, Active</string>
     <string name="clicks_host_name_label">Device name</string>
     <string name="clicks_host_name_limit">Stored as up to 30 UTF-8 bytes in the keyboard.</string>
     <string name="clicks_number_row_title">Number row shortcuts</string>
@@ -496,14 +496,14 @@
     <string name="clicks_number_preset_end">End</string>
     <string name="clicks_number_preset_left_bracket">Left bracket</string>
     <string name="clicks_number_preset_right_bracket">Right bracket</string>
-    <string name="clicks_sticky_alt_title">SYM Lock</string>
-    <string name="clicks_sticky_alt_description">Allow the keyboard firmware to lock its SYM layer.</string>
+    <string name="clicks_sticky_alt_title">Firmware SYM lock</string>
+    <string name="clicks_sticky_alt_description">Allow the keyboard firmware to latch its SYM layer</string>
     <string name="clicks_sticky_shift_title">Caps Lock</string>
     <string name="clicks_sticky_shift_description">Allow the keyboard firmware to lock Shift.</string>
-    <string name="clicks_soft_return_title">Soft Return</string>
-    <string name="clicks_soft_return_description">Use the keyboard firmware’s soft-return behaviour.</string>
-    <string name="clicks_cursor_mode_title">Cursor Mode</string>
-    <string name="clicks_cursor_mode_description">Enable the keyboard firmware’s cursor navigation mode.</string>
+    <string name="clicks_soft_return_title">Firmware soft return</string>
+    <string name="clicks_soft_return_description">Use the keyboard firmware’s soft-return behavior</string>
+    <string name="clicks_cursor_mode_title">Cursor mode</string>
+    <string name="clicks_cursor_mode_description">Use the keyboard firmware’s built-in cursor navigation</string>
     <string name="clicks_recommended_settings_title">Apply recommended settings</string>
     <string name="clicks_recommended_settings_description">Restore native Tab and Alt outputs; assign the microphone button to Plektra dictation; assign the red Clicks button and Launcher button directly to QuickLauncher; and disable Caps Lock and Cursor Mode.</string>
     <string name="clicks_recommended_settings_success">Recommended Clicks settings applied.</string>
@@ -513,18 +513,18 @@
     <string name="clicks_cursor_mode_help">The Clicks firmware uses the SYM combinations W, A, S, and D for cursor movement when Cursor Mode is enabled.</string>
     <string name="clicks_soft_return_help">This is a firmware option exposed by the keyboard. Its exact behaviour is not yet documented reliably, so leave it unchanged unless you are testing it.</string>
     <string name="clicks_backlight_brightness_title">Brightness</string>
-    <string name="clicks_timeouts_values">Dim after %1$s s · Sleep after %2$s min</string>
+    <string name="clicks_timeouts_values">Dim after %1$s s, Sleep after %2$s min</string>
     <string name="clicks_charging_reserve_title">Keyboard battery reserve</string>
-    <string name="clicks_charging_reserve_soc_live">Keyboard SOC %1$d%% · live</string>
-    <string name="clicks_charging_reserve_soc_last_known">Keyboard SOC %1$d%% · last known</string>
-    <string name="clicks_charging_reserve_soc_live_unavailable">Keyboard SOC unavailable · live</string>
-    <string name="clicks_charging_reserve_soc_last_known_unavailable">Keyboard SOC unavailable · last known</string>
-    <string name="clicks_charging_reserve_projection_live">Keyboard SOC %1$d%% · Phone SOC %2$d%% · %3$d keyboard points until reserve ≈ +%4$d phone points</string>
-    <string name="clicks_charging_reserve_projection_last_known">Keyboard SOC %1$d%% (last known) · Phone SOC %2$d%% · %3$d keyboard points until reserve ≈ +%4$d phone points</string>
-    <string name="clicks_charging_reserve_projection_live_without_phone">Keyboard SOC %1$d%% · %2$d keyboard points until reserve ≈ +%3$d phone points</string>
-    <string name="clicks_charging_reserve_projection_last_known_without_phone">Keyboard SOC %1$d%% (last known) · %2$d keyboard points until reserve ≈ +%3$d phone points</string>
-    <string name="clicks_charging_reserve_calibration_live">Keyboard SOC %1$d%% · %2$d points until reserve · Calibration %3$d/%4$d measurements, %5$d/%6$d keyboard points</string>
-    <string name="clicks_charging_reserve_calibration_last_known">Keyboard SOC %1$d%% (last known) · %2$d points until reserve · Calibration %3$d/%4$d measurements, %5$d/%6$d keyboard points</string>
+    <string name="clicks_charging_reserve_soc_live">Keyboard SOC %1$d%%, live</string>
+    <string name="clicks_charging_reserve_soc_last_known">Keyboard SOC %1$d%%, last known</string>
+    <string name="clicks_charging_reserve_soc_live_unavailable">Keyboard SOC unavailable, live</string>
+    <string name="clicks_charging_reserve_soc_last_known_unavailable">Keyboard SOC unavailable, last known</string>
+    <string name="clicks_charging_reserve_projection_live">Keyboard SOC %1$d%%, Phone SOC %2$d%%, %3$d keyboard points until reserve ≈ +%4$d phone points</string>
+    <string name="clicks_charging_reserve_projection_last_known">Keyboard SOC %1$d%% (last known), Phone SOC %2$d%%, %3$d keyboard points until reserve ≈ +%4$d phone points</string>
+    <string name="clicks_charging_reserve_projection_live_without_phone">Keyboard SOC %1$d%%, %2$d keyboard points until reserve ≈ +%3$d phone points</string>
+    <string name="clicks_charging_reserve_projection_last_known_without_phone">Keyboard SOC %1$d%% (last known), %2$d keyboard points until reserve ≈ +%3$d phone points</string>
+    <string name="clicks_charging_reserve_calibration_live">Keyboard SOC %1$d%%, %2$d points until reserve, Calibration %3$d/%4$d measurements, %5$d/%6$d keyboard points</string>
+    <string name="clicks_charging_reserve_calibration_last_known">Keyboard SOC %1$d%% (last known), %2$d points until reserve, Calibration %3$d/%4$d measurements, %5$d/%6$d keyboard points</string>
     <string name="clicks_backlight_timeout_dialog_title">Dim backlight after</string>
     <string name="clicks_idle_timeout_dialog_title">Put keyboard to sleep after</string>
     <string name="clicks_seconds_value">%1$d s</string>
@@ -532,8 +532,8 @@
     <string name="clicks_apply">Apply</string>
     <string name="clicks_remap_native_number_action">Native number-row action</string>
     <string name="clicks_remap_custom_value">Current custom mapping (%1$s)</string>
-    <string name="clicks_button_bindings_title">Launcher and special buttons</string>
-    <string name="clicks_button_bindings_description">Configure the red Clicks button, Launcher button, Keyboard button, and microphone button in one place.</string>
+    <string name="clicks_button_bindings_title">Special buttons</string>
+    <string name="clicks_button_bindings_description">Red Clicks, Launcher, Keyboard, and microphone buttons</string>
     <string name="clicks_button_bindings_screen_description">Choose whether each physical button keeps its original function, directly invokes a Plektra function, or sends a key or key combination.</string>
     <string name="clicks_binding_category_original">Original function</string>
     <string name="clicks_binding_category_function">Plektra function</string>
@@ -572,7 +572,7 @@
     <string name="clicks_launcher_interception_service_label">Plektra Clicks button interception</string>
     <string name="clicks_launcher_interception_service_description">Intercepts only explicitly configured buttons of a supported Clicks Power Keyboard.</string>
     <string name="clicks_launcher_interception_title">Android Clicks-button interception</string>
-    <string name="clicks_launcher_interception_enabled">Enabled · Only explicitly configured buttons of a supported Clicks Power Keyboard are filtered.</string>
+    <string name="clicks_launcher_interception_enabled">Enabled. Only explicitly configured buttons of a supported Clicks Power Keyboard are filtered.</string>
     <string name="clicks_launcher_interception_disabled">Required for software-assigned Clicks buttons. Tap to enable it in Android Accessibility settings.</string>
     <string name="clicks_button_mode_native">Native</string>
     <string name="clicks_button_mode_native_description">Keep the button’s original Android key event.</string>
@@ -601,18 +601,18 @@
     <string name="clicks_section_device">Device</string>
     <string name="clicks_device_status_title">Connection and device information</string>
     <string name="clicks_device_status_description">Connection state, keyboard battery, and firmware version.</string>
-    <string name="clicks_device_status_connected">Connected · Slot %1$s</string>
+    <string name="clicks_device_status_connected">Connected, Slot %1$s</string>
     <string name="clicks_device_status_disconnected">Not connected</string>
-    <string name="clicks_device_status_last_known">Not connected · Last known device data: %1$s</string>
-    <string name="clicks_device_status_with_firmware">Connected · Slot %1$s · Firmware %2$s</string>
-    <string name="clicks_device_status_with_battery">Connected · Slot %1$s · Keyboard battery %2$d%%</string>
-    <string name="clicks_device_status_firmware_loading">Connected · Slot %1$s · Reading firmware…</string>
-    <string name="clicks_device_status_firmware_permission">Connected · Slot %1$s · Tap to read firmware version</string>
-    <string name="clicks_device_status_firmware_unavailable">Connected · Slot %1$s · Firmware version unavailable</string>
+    <string name="clicks_device_status_last_known">Not connected. Last known device data: %1$s</string>
+    <string name="clicks_device_status_with_firmware">Connected, Slot %1$s, Firmware %2$s</string>
+    <string name="clicks_device_status_with_battery">Connected, Slot %1$s, Keyboard battery %2$d%%</string>
+    <string name="clicks_device_status_firmware_loading">Connected, Slot %1$s, Reading firmware…</string>
+    <string name="clicks_device_status_firmware_permission">Connected, Slot %1$s, Tap to read firmware version</string>
+    <string name="clicks_device_status_firmware_unavailable">Connected, Slot %1$s, Firmware version unavailable</string>
     <string name="clicks_firmware_status_title">Firmware requirement</string>
     <string name="clicks_firmware_minimum_description">Older firmware sends the Ctrl key as a global input-language switch instead of a Ctrl modifier. Update the keyboard in the Clicks app.</string>
-    <string name="clicks_firmware_status_supported">Firmware %1$s installed · All set. Ctrl works as a proper modifier.</string>
-    <string name="clicks_firmware_status_update_required">Firmware %1$s installed · Update to at least 1.0.9. Older firmware sends Ctrl as a global input-language switch.</string>
+    <string name="clicks_firmware_status_supported">Firmware %1$s installed. Ctrl works as a proper modifier.</string>
+    <string name="clicks_firmware_status_update_required">Firmware %1$s installed. Update to at least 1.0.9 for proper Ctrl support.</string>
     <string name="clicks_firmware_updates_title">Firmware updates</string>
     <string name="clicks_firmware_updates_open_app">Open the Clicks app to check for and install firmware updates.</string>
     <string name="clicks_firmware_updates_install_app">Install the Clicks app from Google Play to update the keyboard firmware.</string>
@@ -642,12 +642,12 @@
     <string name="clicks_all_key_mappings_description">Plektra-side Alt, Ctrl, modifier, and action assignments for every key.</string>
     <string name="clicks_section_backlight_power">Backlight and power saving</string>
     <string name="clicks_backlight_title">Backlight</string>
-    <string name="clicks_backlight_description">Enable state and brightness from 0–100%.</string>
+    <string name="clicks_backlight_description">Keyboard illumination and brightness (0–100%)</string>
     <string name="clicks_timeouts_title">Dim and idle timeouts</string>
     <string name="clicks_timeouts_description">Backlight dim delay and BLE sleep timeout.</string>
     <string name="clicks_section_wireless_charging">Wireless charging</string>
     <string name="clicks_wireless_charging_title">Charging and reserve</string>
-    <string name="clicks_wireless_charging_description">Enable wireless charging and choose the keyboard battery reserve.</string>
+    <string name="clicks_wireless_charging_description">Wireless charging and keyboard battery reserve</string>
     <string name="clicks_manual_wireless_charging_title">Charge for 15 minutes</string>
     <string name="clicks_manual_wireless_charging_description">Temporarily override the automatic thresholds.</string>
     <string name="clicks_charging_connection_boundary_title">Evaluated while connected</string>
@@ -764,15 +764,15 @@
     <string name="quick_launcher_auto_start_single_description">When the quick launcher search leaves only one app, launch it without pressing Enter.</string>
     <string name="quick_launcher_limit_results_title">Show only top search results</string>
     <string name="quick_launcher_limit_results_description">Do not render the full alphabetical app list. The quick launcher stays empty until you type and then shows only the top three matches.</string>
-    <string name="quick_launcher_text_field_shortcuts_title">Allow SYM+Space in text fields</string>
-    <string name="quick_launcher_text_field_shortcuts_description">When enabled, the QuickLauncher can also open while the cursor is inside an app text field.</string>
+    <string name="quick_launcher_text_field_shortcuts_title">SYM+Space in text fields</string>
+    <string name="quick_launcher_text_field_shortcuts_description">Open QuickLauncher while typing in a text field</string>
     <string name="quick_launcher_text_field_shortcuts_hint">In text fields, hold SYM and press Space. SYM latch cannot trigger this because tapping SYM cycles the SYM pages.</string>
-    <string name="quick_launcher_alt_space_text_fields_title">Allow Alt+Space in text fields</string>
-    <string name="quick_launcher_alt_space_text_fields_description">Open QuickLauncher with Alt+Space. Enabling this disables Alt+Space for the previous input language.</string>
+    <string name="quick_launcher_alt_space_text_fields_title">Alt+Space in text fields</string>
+    <string name="quick_launcher_alt_space_text_fields_description">Open QuickLauncher with Alt+Space (disables previous-language shortcut)</string>
     <string name="quick_launcher_alt_shortcuts_outside_fields_title">Allow Alt shortcuts outside text fields</string>
     <string name="quick_launcher_alt_shortcuts_outside_fields_description">Use Alt with an assigned key to launch the same app or action as its SYM key shortcut.</string>
     <string name="quick_launcher_respect_keyboard_layout_title">Use active keyboard layout</string>
-    <string name="quick_launcher_respect_keyboard_layout_description">When enabled, search input follows the current Plektra layout instead of Android’s raw QWERTY key output.</string>
+    <string name="quick_launcher_respect_keyboard_layout_description">Follow Plektra’s active layout instead of raw QWERTY</string>
     <string name="quick_launcher_typo_tolerant_ranking_title">Typo-tolerant search</string>
     <string name="quick_launcher_typo_tolerant_ranking_description">Also match app names with small typing mistakes. Existing prefix and abbreviation matches still rank higher.</string>
     <string name="quick_launcher_provider_title">QuickLauncher behaviour</string>
@@ -816,7 +816,7 @@
     <string name="keyboard_theme_name">Theme name</string>
     <string name="keyboard_theme_name_exists">A saved theme or draft already uses this name.</string>
     <string name="keyboard_theme_create_draft">Create draft</string>
-    <string name="keyboard_theme_draft_progress">Draft · %1$d/%2$d sections</string>
+    <string name="keyboard_theme_draft_progress">Draft, %1$d/%2$d sections</string>
     <string name="keyboard_theme_wizard_step">Step %1$d of %2$d</string>
     <string name="keyboard_theme_wizard_core_colors">Core colors</string>
     <string name="keyboard_theme_wizard_core_colors_description">Set the keyboard surface, keys, dividers, and readable foreground colors.</string>
@@ -969,8 +969,8 @@ When held Ctrl is passed to apps, this optional setting can translate Ctrl+lette
 
 Overrides
 Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrides to solve app-specific conflicts without changing the whole mode.</string>
-    <string name="nav_mode_enable_title">Enable Nav Mode</string>
-    <string name="nav_mode_enable_description">Double-tap Ctrl to activate navigation mode</string>
+    <string name="nav_mode_enable_title">Nav Mode</string>
+    <string name="nav_mode_enable_description">Double-tap Ctrl to use letter keys for navigation</string>
     <string name="nav_mode_ctrl_hold_title">Ctrl-hold navigation</string>
     <string name="nav_mode_ctrl_hold_description">When enabled, text fields use Nav Mode mappings while Ctrl is held. When off, Ctrl shortcuts are passed to the app. Keys set to Native Ctrl are always passed through as real Ctrl shortcuts.</string>
     <string name="layout_aware_ctrl_shortcuts_title">App shortcuts follow the keyboard layout</string>
@@ -1080,7 +1080,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="app_enter_behaviour_show_manual_override">Manual override</string>
     <string name="app_enter_behaviour_hide_manual_override">Hide manual fields</string>
     <string name="app_enter_behaviour_manual_override_note">The curated strategy is usually the better default. Override only for app updates or special cases.</string>
-    <string name="app_enter_behaviour_manual_summary">%1$s · %2$s</string>
+    <string name="app_enter_behaviour_manual_summary">%1$s, %2$s</string>
     <string name="app_enter_behaviour_manual_additional_shortcut_summary">Additional shortcut: %1$s</string>
     <string name="app_enter_behaviour_option_app_default">App default</string>
     <string name="app_enter_behaviour_option_send_shift_newline">Enter sends, Shift+Enter newline</string>
@@ -1185,8 +1185,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="settings_group_utility">Utility</string>
     <string name="settings_group_plektra">About</string>
     <string name="settings_about_version_summary">v%1$s</string>
-    <string name="settings_accessibility_live_read_title">Live reading for keyboard bar changes</string>
-    <string name="settings_accessibility_live_read_description">When enabled, TalkBack can announce language/layout and keyboard bar changes automatically.</string>
+    <string name="settings_accessibility_live_read_title">Announce keyboard bar changes</string>
+    <string name="settings_accessibility_live_read_description">Let TalkBack read language, layout, and bar changes aloud</string>
     <string name="settings_accessibility_second_row_title">Read second row (quick settings and variations)</string>
     <string name="settings_accessibility_second_row_description">When disabled, TalkBack will skip the lower row and keep word suggestions separate.</string>
     <string name="settings_accessibility_suggestions_delay_title">Suggestions read delay</string>
@@ -1286,7 +1286,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="debug_recorder_share">Share</string>
     <string name="debug_recorder_share_chooser">Share debug report</string>
     <string name="debug_recorder_copied">Copied debug report (%1$d events)</string>
-    <string name="debug_recorder_status">Recorder: %1$s · Events: %2$d</string>
+    <string name="debug_recorder_status">Recorder: %1$s, Events: %2$d</string>
     <string name="debug_recorder_status_recording">recording</string>
     <string name="debug_recorder_status_stopped">stopped</string>
     <string name="debug_recorder_started_at">Started at: </string>
@@ -1442,8 +1442,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="tutorial_show_release_notes">Show release notes tutorial</string>
     <string name="tutorial_show_release_notes_description">Preview the update intro without installing an upgrade</string>
 
-    <string name="slim_mode_title">Slim Mode</string>
-    <string name="slim_mode_description">Toggle minimal ui</string>
+    <string name="slim_mode_title">Slim mode</string>
+    <string name="slim_mode_description">Compact single-row keyboard bar</string>
     <string name="software_keyboard_mode_title">Keyboard Mode</string>
     <string name="software_keyboard_mode_description">Separate from Slim. Controls hardware vs virtual keyboard behaviour.</string>
     <string name="software_keyboard_mode_auto_current">Auto (current: %1$s)</string>
@@ -1511,12 +1511,12 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_switching_auto_title">Automatic keyboard switching</string>
     <string name="keyboard_switching_auto_description">Switch between the on-screen and physical keyboard when hardware connects or disconnects.</string>
     <string name="keyboard_switching_current_title">Current keyboard</string>
-    <string name="keyboard_switching_status_override_virtual">On-screen · Temporary override</string>
-    <string name="keyboard_switching_status_override_hardware">Physical · Temporary override</string>
-    <string name="keyboard_switching_status_no_physical">On-screen · No physical keyboard detected</string>
-    <string name="keyboard_switching_status_virtual">On-screen · Selected manually</string>
-    <string name="keyboard_switching_status_clicks">Physical · Clicks Power Keyboard connected</string>
-    <string name="keyboard_switching_status_built_in">Physical · Built-in keyboard</string>
+    <string name="keyboard_switching_status_override_virtual">On-screen, Temporary override</string>
+    <string name="keyboard_switching_status_override_hardware">Physical, Temporary override</string>
+    <string name="keyboard_switching_status_no_physical">On-screen, No physical keyboard detected</string>
+    <string name="keyboard_switching_status_virtual">On-screen, Selected manually</string>
+    <string name="keyboard_switching_status_clicks">Physical, Clicks Power Keyboard connected</string>
+    <string name="keyboard_switching_status_built_in">Physical, Built-in keyboard</string>
     <string name="keyboard_source_on_screen">On-screen</string>
     <string name="keyboard_source_physical">Physical</string>
     <string name="keyboard_switching_override_shortcut">Temporary override: %1$s</string>
@@ -1529,16 +1529,16 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="on_screen_keyboard_section_appearance">Appearance</string>
     <string name="built_in_keyboards_title">Built-in Keyboards</string>
     <string name="keyboard_accessories_title">Keyboard Accessories</string>
-    <string name="keyboard_source_active">Virtual · Active</string>
-    <string name="keyboard_source_standby">Virtual · Standby</string>
-    <string name="keyboard_source_device_bound">Device-bound · No supported device detected</string>
-    <string name="keyboard_source_device_bound_detected">Device-bound · Detected</string>
-    <string name="keyboard_accessory_clicks_connected">Clicks Power Keyboard · Connected · Slot %1$s</string>
-    <string name="keyboard_accessory_clicks_disconnected">Clicks Power Keyboard · Not connected</string>
+    <string name="keyboard_source_active">Virtual, Active</string>
+    <string name="keyboard_source_standby">Virtual, Standby</string>
+    <string name="keyboard_source_device_bound">Device-bound, No supported device detected</string>
+    <string name="keyboard_source_device_bound_detected">Device-bound, Detected</string>
+    <string name="keyboard_accessory_clicks_connected">Clicks Power Keyboard, Connected, Slot %1$s</string>
+    <string name="keyboard_accessory_clicks_disconnected">Clicks Power Keyboard, Not connected</string>
     <string name="keyboard_custom_profiles_binding_description">Custom profiles can be bound to this phone, a specific input device, or any external keyboard. Curated profiles can be cloned as templates.</string>
     <string name="custom_input_styles_description">Add additional languages and keyboard layouts that are not tied to system locale</string>
-    <string name="app_language_title">App Language</string>
-    <string name="app_language_description">Choose the language used for app interface texts.</string>
+    <string name="app_language_title">App language</string>
+    <string name="app_language_description">Language for settings and menus</string>
     <string name="app_language_label">Language</string>
     <string name="app_language_system_default">System default</string>
     <string name="app_language_system_default_with_detected">System default (%1$s)</string>
@@ -1640,9 +1640,9 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <!-- Trackpad Gesture Settings -->
     <string name="trackpad_gestures_title">Trackpad Gesture Suggestions</string>
     <string name="trackpad_gestures_description">Swipe up on the trackpad to accept suggestions</string>
-    <string name="trackpad_gestures_enabled_title">Enable Trackpad Gestures</string>
+    <string name="trackpad_gestures_enabled_title">Trackpad gestures</string>
     <string name="trackpad_titan2_elite_scroll_assistant_note">For native trackpad gestures on the Titan 2 Elite, enable Unihertz Scroll assistant in Settings → Gestures → Keyboard gestures.</string>
-    <string name="trackpad_gestures_enabled_description">Swipe up on trackpad to accept word suggestions</string>
+    <string name="trackpad_gestures_enabled_description">Swipe up on the trackpad to accept word suggestions</string>
     <string name="trackpad_gesture_add_word_title">Add words with gestures</string>
     <string name="trackpad_gesture_add_word_description">Allow the suggestion gesture to activate the dictionary add button.</string>
     <string name="trackpad_gesture_add_word_full_width_title">Full-width add-word swipe</string>
@@ -1670,7 +1670,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="trackpad_debug_show_y_axis">Show Y axis</string>
     <string name="trackpad_debug_range_motion">InputDevice.MotionRange</string>
     <string name="trackpad_debug_range_display">Display fallback</string>
-    <string name="trackpad_debug_axis_value_third">%1$s = %2$.2f · third %3$d</string>
+    <string name="trackpad_debug_axis_value_third">%1$s = %2$.2f, third %3$d</string>
     <string name="trackpad_debug_axis_value">%1$s = %2$.2f</string>
     <string name="trackpad_swipe_threshold_title">Trackpad Swipe Sensitivity</string>
     <string name="trackpad_swipe_threshold_description">Adjust how far you need to swipe up to accept a suggestion.</string>
@@ -1767,15 +1767,15 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="status_bar_button_undo_description">Send Ctrl+Z</string>
     <string name="status_bar_button_redo">Redo</string>
     <string name="status_bar_button_redo_description">Send Ctrl+Y</string>
-    <string name="status_bar_variations_visible_title">Show variations</string>
-    <string name="status_bar_variations_visible_description">Show the configured variation row between the keyboard bar buttons. When off, buttons use the full keyboard bar; swipe cursor control still works.</string>
+    <string name="status_bar_variations_visible_title">Show variation row</string>
+    <string name="status_bar_variations_visible_description">Display variations between bar buttons; swipe cursor still works when off</string>
     <string name="status_bar_swipe_cursor_info">Swipe across the keyboard bar to move the cursor.</string>
     <string name="dynamic_variation_slot_count_title">Dynamic variation slots</string>
     <string name="dynamic_variation_slot_count_description">Aim to show %1$d dynamic entries between the keyboard bar buttons.</string>
-    <string name="dynamic_variation_resize_to_content_title">Resize dynamic variations</string>
-    <string name="dynamic_variation_resize_to_content_description">When enabled, dynamic entries fill the available row based on how many are shown. When off, entries keep the slot size from the slider and stay left-aligned.</string>
     <string name="shared_row_variations_first_title">Variations before suggestions</string>
     <string name="shared_row_variations_first_description">Shows the variations of the last letter instead of word suggestions while there are any. Off: variations appear only when there are no suggestions.</string>
+    <string name="dynamic_variation_resize_to_content_title">Fill row with dynamic variations</string>
+    <string name="dynamic_variation_resize_to_content_description">Stretch active variations across the row instead of fixed slot widths</string>
     <string name="modifier_indicators_title">Modifier indicators</string>
     <string name="modifier_indicators_description">Choose where Shift, Ctrl, Alt, and SYM state appears for the hardware keyboard.</string>
     <string name="modifier_indicators_bottom_strip">Bottom Strip LEDs</string>
@@ -1795,8 +1795,8 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="text_expansion_title">Text expansion</string>
     <string name="text_expansion_description">Configure snippets and typed emoji or symbol shortcodes.</string>
     <string name="snippets_title">Snippets</string>
-    <string name="snippets_enable_title">Enable snippets</string>
-    <string name="snippets_enable_description">Expand global text snippets after a shared prefix.</string>
+    <string name="snippets_enable_title">Text snippets</string>
+    <string name="snippets_enable_description">Expand global shortcuts after a shared prefix</string>
     <string name="snippets_prefix_title">Snippet prefix</string>
     <string name="snippets_prefix_description">One printable symbol. A colon is reserved for emoji and symbol shortcodes.</string>
     <string name="snippets_prefix_error">Choose one non-whitespace symbol other than a colon.</string>
@@ -1823,10 +1823,10 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="expansion_enter_title">Accept with Enter</string>
     <string name="expansion_enter_description">Use Enter to accept the highlighted or unique exact match.</string>
     <string name="emoji_symbols_title">Emoji &amp; symbols</string>
-    <string name="emoji_shortcodes_enable_title">Enable emoji shortcodes</string>
-    <string name="emoji_shortcodes_enable_description">Type :name to search Unicode emoji.</string>
-    <string name="symbol_shortcodes_enable_title">Enable symbol shortcodes</string>
-    <string name="symbol_shortcodes_enable_description">Type :name to search typographic and mathematical symbols.</string>
+    <string name="emoji_shortcodes_enable_title">Emoji shortcodes</string>
+    <string name="emoji_shortcodes_enable_description">Type :name to search Unicode emoji</string>
+    <string name="symbol_shortcodes_enable_title">Symbol shortcodes</string>
+    <string name="symbol_shortcodes_enable_description">Type :name to search typographic and math symbols</string>
     <string name="emoji_symbols_close_title">Expand :name:</string>
     <string name="emoji_symbols_close_description">A closing colon expands a unique exact match. Collisions stay selectable.</string>
 
@@ -1906,7 +1906,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_bar_actions_first">Variations and menu above suggestions</string>
     <string name="keyboard_bar_shared">Combined row</string>
     <string name="keyboard_bar_geometry">Display geometry</string>
-    <string name="keyboard_bar_preview">Preview · top to bottom</string>
+    <string name="keyboard_bar_preview">Preview, top to bottom</string>
     <string name="keyboard_bar_empty">No persistent bar below the app</string>
     <string name="keyboard_bar_active_normal">Currently active: Normal</string>
     <string name="keyboard_bar_active_slim">Currently active: Slim</string>
@@ -1928,7 +1928,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_bar_reset_action">Reset</string>
     <string name="keyboard_bar_layout_section">Layout</string>
     <string name="keyboard_bar_visibility_section">Visibility</string>
-    <string name="keyboard_bar_buttons_summary">Left: %1$s · Right: %2$s</string>
+    <string name="keyboard_bar_buttons_summary">Left: %1$s, Right: %2$s</string>
     <string name="keyboard_bar_variations_summary">Characters, number of slots and sizing</string>
     <string name="keyboard_bar_requires_suggestions">Requires suggestions</string>
     <string name="keyboard_bar_geometry_unavailable">Corner adjustments are available on displays with rounded corners.</string>
@@ -1973,7 +1973,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="speech_error_http">Speech recognition failed (HTTP %1$d).</string>
     <string name="speech_usage_title">Usage</string>
     <string name="speech_usage_empty">No recordings yet</string>
-    <string name="speech_usage_summary">%1$d recordings · %2$d words · %3$s min · %4$s words/min</string>
+    <string name="speech_usage_summary">%1$d recordings, %2$d words, %3$s min, %4$s words/min</string>
     <string name="speech_cost_unknown">Cost not reported by the provider.</string>
     <string name="speech_cost_known">Reported cost: $%1$s (%2$d of %3$d recordings)</string>
     <string name="speech_processing">Transcribing… Tap to cancel.</string>
@@ -1987,7 +1987,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="speech_key_hide">Hide entered key</string>
     <string name="speech_usage_count">%1$d recordings</string>
     <string name="speech_legend_recording">Recording</string>
-    <string name="speech_legend_pause">Pause · %1$d</string>
+    <string name="speech_legend_pause">Pause, %1$d</string>
     <string name="speech_legend_processing">Processing</string>
     <string name="speech_help_title">How recording works</string>
     <string name="speech_help_description">OpenAI supports realtime transcription with GPT Live Transcribe. Text appears while you speak. Tap the microphone again to stop recording. While processing, tap to cancel. Cloud recordings end after the selected pause or after 60 seconds. If you switch text fields, voice input stops.</string>
@@ -2003,7 +2003,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="clipboard_retention_days">%1$d days</string>
     <string name="clipboard_sensitive_retention_title">Sensitive clipboard retention</string>
     <string name="clipboard_sensitive_retention_description">Passwords and other marked sensitive contents expire separately and cannot be pinned.</string>
-    <string name="clipboard_sensitive_preview">•••••••• · Sensitive content — tap to paste</string>
+    <string name="clipboard_sensitive_preview">••••••••, sensitive content — tap to paste</string>
     <string name="clipboard_retention_24_hours">24 hours</string>
 
     <string name="speech_preview_title">Dictation preview</string>
@@ -2027,10 +2027,10 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="software_ctrl_shortcut_icons_corner_letters">Large icons, gray letters at bottom left</string>
     <string name="software_ctrl_shortcut_corner_icons">Letters with corner icons</string>
     <string name="software_ctrl_shortcut_letters_only">Letters only</string>
-    <string name="alt_space_previous_language_title">Alt+Space: previous input language</string>
-    <string name="alt_space_previous_language_description">Switch backwards through visible input languages. Enabling this disables Alt+Space for the Quick Launcher; enabling the launcher shortcut disables this option.</string>
-    <string name="ctrl_language_previous_title">Ctrl+language button: previous input language</string>
-    <string name="ctrl_language_previous_description">On the software keyboard, hold or activate Ctrl and tap the keyboard language button to switch backwards.</string>
+    <string name="alt_space_previous_language_title">Previous language with Alt+Space</string>
+    <string name="alt_space_previous_language_description">Switch backwards through input languages (disables QuickLauncher on Alt+Space)</string>
+    <string name="ctrl_language_previous_title">Previous language with Ctrl</string>
+    <string name="ctrl_language_previous_description">Hold or latch Ctrl and tap the on-screen language key</string>
     <!-- Modifier badge beside the text cursor -->
     <string name="caret_modifier_badge_title">Show modifiers at the cursor</string>
     <string name="caret_modifier_badge_description">Shift, Alt, Ctrl and Sym appear next to the text cursor whenever they are on. Only works in apps that report where the cursor is.</string>
@@ -2070,9 +2070,9 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
 
     <!-- App appearance settings -->
     <string name="app_appearance_title">Appearance</string>
-    <string name="app_appearance_description">Theme mode, dark surface style, and dynamic colors</string>
+    <string name="app_appearance_description">Layout style, theme mode, dark surfaces, and dynamic colors</string>
     <string name="app_appearance_mode_title">Theme mode</string>
-    <string name="app_appearance_mode_description">Choose whether Plektra follows your device theme or stays light or dark.</string>
+    <string name="app_appearance_mode_description">Follow device theme or stay light or dark.</string>
     <string name="app_appearance_mode_system">System</string>
     <string name="app_appearance_mode_system_description">Follow device theme</string>
     <string name="app_appearance_mode_light">Light</string>
@@ -2080,7 +2080,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="app_appearance_mode_dark">Dark</string>
     <string name="app_appearance_mode_dark_description">Always use dark surfaces</string>
     <string name="app_appearance_dark_surface_title">Dark surfaces</string>
-    <string name="app_appearance_dark_surface_description">Choose standard Material dark gray or pure black for OLED displays.</string>
+    <string name="app_appearance_dark_surface_description">Standard dark gray or pure OLED black.</string>
     <string name="app_appearance_dark_surface_light_hint">Applies when Dark or System dark theme is active.</string>
     <string name="app_appearance_dark_surface_gray">Gray</string>
     <string name="app_appearance_dark_surface_gray_description">Regular Material dark surface</string>
@@ -2088,15 +2088,19 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="app_appearance_dark_surface_oled_description">Pure black background with subtly elevated dark surfaces</string>
     <string name="app_appearance_color_title">Colors</string>
     <string name="app_appearance_dynamic_color_title">Dynamic system colors</string>
-    <string name="app_appearance_dynamic_color_description">Adapt app accent and surface tones to your wallpaper.</string>
+    <string name="app_appearance_dynamic_color_description">Match accent and surface colors to your wallpaper.</string>
     <string name="app_appearance_dynamic_color_unavailable">Requires Android 12 or newer.</string>
     <string name="app_appearance_summary_dynamic">Dynamic</string>
     <string name="app_appearance_preview_content_description">Appearance preview: %1$s</string>
     <string name="app_appearance_scope_note">Applies to Plektra app screens and dialogs. Keyboard themes are configured separately.</string>
-    <string name="kw_main_app_appearance">appearance, app theme, dark mode, light mode, system, oled, amoled, black, gray, grey, dynamic colors, material you, wallpaper</string>
+    <string name="kw_main_app_appearance">appearance, layout style, dividers, material, app theme, dark mode, light mode, system, oled, amoled, black, gray, grey, dynamic colors, material you, wallpaper</string>
     <string name="kw_app_appearance_theme_mode">theme mode, system, light, dark, night mode, day mode</string>
     <string name="kw_app_appearance_dark_surface">dark surface, oled, amoled, pure black, true black, pitch black, gray, grey, surface</string>
     <string name="kw_app_appearance_dynamic_color">dynamic color, dynamic colors, material you, wallpaper, monet, system colors</string>
+    <string name="app_appearance_settings_fullscreen_title">Full-screen settings</string>
+    <string name="app_appearance_settings_fullscreen_description">Hides the status bar in settings. The page title and actions use the top row. Swipe down from the top edge to show the status bar briefly.</string>
+    <string name="kw_app_appearance_settings_fullscreen">full screen, fullscreen, status bar, hide, immersive, header, top row, notch, cutout</string>
+    <string name="settings_search_close">Close search</string>
     <string name="keyboard_backlight_section_title">Keyboard backlight</string>
     <string name="keyboard_backlight_follows_display_title">Backlight follows display</string>
     <string name="keyboard_backlight_follows_display_description">Keeps the keyboard light on until the display turns off and lights it again when the display turns on. Uses the device setting; Plektra runs nothing in the background.</string>
@@ -2123,4 +2127,19 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="keyboard_backlight_outcome_record_failed">The saved timeout could not be updated.</string>
     <string name="keyboard_backlight_outcome_write_failed">The device did not accept the change.</string>
     <string name="keyboard_backlight_outcome_uncertain">The change could not be confirmed and may still take effect. The previous timeout remains saved. Restart the phone before trying another change.</string>
+    <string name="app_appearance_layout_style_title">Layout style</string>
+    <string name="app_appearance_layout_style_description">Switch between compact divider lines and soft Material surfaces.</string>
+    <string name="app_appearance_layout_style_compact_dividers">Compact with dividers</string>
+    <string name="app_appearance_layout_style_compact_dividers_description">Left-aligned headings with subtle divider lines</string>
+    <string name="app_appearance_layout_style_material">Material</string>
+    <string name="app_appearance_layout_style_material_description">Tonal icon accents and soft section surfaces</string>
+    <string name="app_appearance_summary_material">Material</string>
+    <string name="kw_app_appearance_settings_style">layout style, compact, dividers, lines, material, cards, surfaces, density</string>
+    <string name="settings_section_expanded">Expanded</string>
+    <string name="settings_section_collapsed">Collapsed</string>
+    <string name="settings_info_content_description">Details for %1$s</string>
+    <string name="custom_input_styles_list_title">Input languages</string>
+    <string name="quick_launcher_choose_color">Entry color</string>
+    <string name="quick_launcher_entry_appearance_title">Entry appearance</string>
+    <string name="settings_style_label">Style</string>
 </resources>

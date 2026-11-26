@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -149,46 +150,26 @@ private fun CaretBadgeSwitchRow(
     onCheckedChange: (Boolean) -> Unit,
     onGrantOverlay: () -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().settingRow(SettingLinkIds.MODIFIERS_CARET_BADGE)) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Filled.Keyboard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.caret_modifier_badge_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.caret_modifier_badge_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(checked = checked, onCheckedChange = onCheckedChange)
-            }
-            // Drawing beside the cursor means drawing over the app being typed into, which Android
-            // gates behind a permission the user grants themselves - no ADB, no developer options.
-            if (checked && !overlayGranted) {
-                Column(modifier = Modifier.padding(start = 52.dp, end = 16.dp, bottom = 12.dp)) {
-                    Text(
-                        text = stringResource(R.string.caret_modifier_badge_needs_overlay),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = onGrantOverlay) {
-                        Text(stringResource(R.string.caret_modifier_badge_grant_overlay))
-                    }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SettingsToggleRow(
+            title = stringResource(R.string.caret_modifier_badge_title),
+            description = stringResource(R.string.caret_modifier_badge_description),
+            icon = Icons.Filled.Keyboard,
+            checked = checked,
+            linkId = SettingLinkIds.MODIFIERS_CARET_BADGE,
+            onCheckedChange = onCheckedChange
+        )
+        // Drawing beside the cursor means drawing over the app being typed into, which Android
+        // gates behind a permission the user grants themselves - no ADB, no developer options.
+        if (checked && !overlayGranted) {
+            SettingsSupportingText(
+                text = stringResource(R.string.caret_modifier_badge_needs_overlay),
+                dependent = true,
+                isError = true
+            )
+            Column(modifier = Modifier.padding(start = SettingsSpace.textInsetWithIcon, end = SettingsSpace.edge, bottom = 8.dp)) {
+                Button(onClick = onGrantOverlay) {
+                    Text(stringResource(R.string.caret_modifier_badge_grant_overlay))
                 }
             }
         }
@@ -203,23 +184,18 @@ private fun CaretBadgeColorRow(
     linkId: String,
     onClick: () -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth().settingRow(linkId).clickable(onClick = onClick)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 52.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+    SettingsNavigationRow(
+        title = title,
+        description = description,
+        dependent = true,
+        linkId = linkId,
+        onClick = onClick,
+        trailing = {
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier.clearAndSetSemantics { }
+            ) {
+                ColorSwatch(argb = argb, selected = false, size = 32.dp)
             }
-            ColorSwatch(argb = argb, selected = false, size = 32.dp)
         }
-    }
+    )
 }

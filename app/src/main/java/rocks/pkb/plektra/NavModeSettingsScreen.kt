@@ -153,169 +153,88 @@ fun NavModeSettingsScreen(
 
     // Handle system back button
 
+    Scaffold(
+        topBar = {
+            PlektraSettingsHeader(
+                title = stringResource(R.string.nav_mode_title),
+                onBack = onBack,
+                actions = {
+                    IconButton(onClick = { showNavModeGuide = true }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                            contentDescription = stringResource(R.string.nav_mode_guide_title)
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .padding(paddingValues)
+            .consumeWindowInsets(paddingValues)
             .verticalScroll(rememberScrollState())
+            .navigationBarsPadding()
     ) {
-        // Header
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars),
-            tonalElevation = 1.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.settings_back_content_description)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.nav_mode_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
-                )
-                IconButton(onClick = { showNavModeGuide = true }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                        contentDescription = stringResource(R.string.nav_mode_guide_title)
-                    )
-                }
-            }
-        }
-
         // Enable/Disable toggle
-        Surface(
-            modifier = Modifier.fillMaxWidth().settingRow("nav_mode.enabled")
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.nav_mode_enable_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.nav_mode_enable_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = navModeEnabled,
-                    onCheckedChange = { enabled ->
-                        navModeEnabled = enabled
-                        SettingsManager.setNavModeEnabled(context, enabled)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.nav_mode_enable_title),
+            description = stringResource(R.string.nav_mode_enable_description),
+            checked = navModeEnabled,
+            accentRole = SettingsAccentRole.SECONDARY,
+            alwaysInlineDescription = true,
+            linkId = "nav_mode.enabled",
+            onCheckedChange = { enabled ->
+                navModeEnabled = enabled
+                SettingsManager.setNavModeEnabled(context, enabled)
             }
-        }
+        )
 
         if (navModeEnabled) {
             val layoutAwareCtrlShortcutsAvailable = !navModeCtrlHoldEnabled
 
-            Surface(
-                modifier = Modifier.fillMaxWidth().settingRow("nav_mode.ctrl_hold")
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.nav_mode_ctrl_hold_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.nav_mode_ctrl_hold_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = navModeCtrlHoldEnabled,
-                        onCheckedChange = { enabled ->
-                            navModeCtrlHoldEnabled = enabled
-                            SettingsManager.setNavModeCtrlHoldEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.nav_mode_ctrl_hold_title),
+                description = stringResource(R.string.nav_mode_ctrl_hold_description),
+                checked = navModeCtrlHoldEnabled,
+                accentRole = SettingsAccentRole.SECONDARY,
+                alwaysInlineDescription = true,
+                linkId = "nav_mode.ctrl_hold",
+                onCheckedChange = { enabled ->
+                    navModeCtrlHoldEnabled = enabled
+                    SettingsManager.setNavModeCtrlHoldEnabled(context, enabled)
                 }
-            }
+            )
 
-            Surface(
-                modifier = Modifier.fillMaxWidth().settingRow("nav_mode.layout_aware_ctrl_shortcuts")
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(R.string.layout_aware_ctrl_shortcuts_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = if (layoutAwareCtrlShortcutsAvailable) {
-                                    MaterialTheme.colorScheme.onSurface
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
-                            IconButton(
-                                onClick = { showLayoutAwareCtrlInfo = true },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = stringResource(R.string.layout_aware_ctrl_shortcuts_info_title),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                        Text(
-                            text = stringResource(
-                                if (layoutAwareCtrlShortcutsAvailable) {
-                                    R.string.layout_aware_ctrl_shortcuts_description
-                                } else {
-                                    R.string.layout_aware_ctrl_shortcuts_disabled_description
-                                }
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+            SettingsToggleRow(
+                title = stringResource(R.string.layout_aware_ctrl_shortcuts_title),
+                description = stringResource(
+                    if (layoutAwareCtrlShortcutsAvailable) {
+                        R.string.layout_aware_ctrl_shortcuts_description
+                    } else {
+                        R.string.layout_aware_ctrl_shortcuts_disabled_description
+                    }
+                ),
+                checked = layoutAwareCtrlShortcutsEnabled,
+                enabled = layoutAwareCtrlShortcutsAvailable,
+                accentRole = SettingsAccentRole.SECONDARY,
+                alwaysInlineDescription = true,
+                linkId = "nav_mode.layout_aware_ctrl_shortcuts",
+                extra = {
+                    IconButton(onClick = { showLayoutAwareCtrlInfo = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = stringResource(R.string.layout_aware_ctrl_shortcuts_info_title),
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    Switch(
-                        checked = layoutAwareCtrlShortcutsEnabled,
-                        enabled = layoutAwareCtrlShortcutsAvailable,
-                        onCheckedChange = { enabled ->
-                            layoutAwareCtrlShortcutsEnabled = enabled
-                            SettingsManager.setLayoutAwareCtrlShortcutsEnabled(context, enabled)
-                        }
-                    )
+                },
+                onCheckedChange = { enabled ->
+                    layoutAwareCtrlShortcutsEnabled = enabled
+                    SettingsManager.setLayoutAwareCtrlShortcutsEnabled(context, enabled)
                 }
-            }
+            )
         }
 
         if (showLayoutAwareCtrlInfo) {
@@ -430,27 +349,24 @@ fun NavModeSettingsScreen(
                 }
             }
             // Revert to default button
-            Surface(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                OutlinedButton(
+                    onClick = {
+                        SettingsManager.resetNavModeKeyMappings(context)
+                        keyMappings = loadAllKeyMappings(context)
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            SettingsManager.resetNavModeKeyMappings(context)
-                            keyMappings = loadAllKeyMappings(context)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.nav_mode_revert_to_default))
-                    }
+                    Text(stringResource(R.string.nav_mode_revert_to_default))
                 }
             }
         }
+    }
     }
 
     // Key configuration dialog

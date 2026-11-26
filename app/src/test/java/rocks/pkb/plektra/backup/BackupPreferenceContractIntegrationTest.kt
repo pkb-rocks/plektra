@@ -281,6 +281,7 @@ class BackupPreferenceContractIntegrationTest {
             "nav_mode_ctrl_hold_enabled" to PreferenceValueType.BOOLEAN,
             "dynamic_variation_bar_resize_to_content" to PreferenceValueType.BOOLEAN,
             "shared_row_variations_first" to PreferenceValueType.BOOLEAN,
+            "app_settings_fullscreen" to PreferenceValueType.BOOLEAN,
             "typing_sound_mode" to PreferenceValueType.STRING,
             "typing_sound_output_mode" to PreferenceValueType.STRING,
             "typing_sound_custom_file_name" to PreferenceValueType.STRING,

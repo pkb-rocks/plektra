@@ -13,7 +13,7 @@ class KeyboardLayoutActivity : LocalizedComponentActivity() {
         enableEdgeToEdge()
         val locale = intent.getStringExtra("locale") ?: return finish()
         setContent {
-            PlektraTheme {
+            PlektraTheme(settingsWindow = true) {
                 KeyboardLayoutSettingsScreen(
                     locale = locale,
                     initialLayout = intent.getStringExtra("layout"),

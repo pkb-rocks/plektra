@@ -809,7 +809,7 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="debug_recorder_share">Udostępnij</string>
     <string name="debug_recorder_share_chooser">Udostępnij raport debugowania</string>
     <string name="debug_recorder_copied">Skopiowano raport debugowania (%1$d zdarzeń)</string>
-    <string name="debug_recorder_status">Rejestrator: %1$s · Zdarzenia: %2$d</string>
+    <string name="debug_recorder_status">Rejestrator: %1$s, Zdarzenia: %2$d</string>
     <string name="debug_recorder_status_recording">nagrywanie</string>
     <string name="debug_recorder_status_stopped">zatrzymano</string>
     <string name="debug_recorder_started_at">Uruchomiono o: </string>
@@ -950,6 +950,10 @@ Każdy klawisz można skonfigurować jako Keycode, Akcja, Native Ctrl lub Brak. 
     <string name="kw_auto_correction_starter_words">słowa początkowe, puste pole, nowe zdanie, pierwsze słowo, częste słowa, słownik, podpowiedzi</string>
     <string name="clicks_button_binding_reading">Odczytywanie bieżącego przypisania z klawiatury…</string>
     <string name="clicks_button_binding_last_known">Ostatnie znane przypisanie; klawiatura nie jest połączona.</string>
+    <string name="app_appearance_settings_fullscreen_title">Ustawienia na pełnym ekranie</string>
+    <string name="app_appearance_settings_fullscreen_description">Ukrywa pasek stanu w ustawieniach. Tytuł strony i akcje zajmują górny wiersz. Przesuń w dół od górnej krawędzi, aby na chwilę pokazać pasek stanu.</string>
+    <string name="kw_app_appearance_settings_fullscreen">pełny ekran, pasek stanu, ukryj, immersyjny, nagłówek, górny wiersz, notch, wycięcie</string>
+    <string name="settings_search_close">Zamknij wyszukiwanie</string>
     <string name="keyboard_backlight_section_title">Podświetlenie klawiatury</string>
     <string name="keyboard_backlight_follows_display_title">Podświetlenie podąża za ekranem</string>
     <string name="keyboard_backlight_follows_display_description">Utrzymuje podświetlenie klawiatury do wyłączenia ekranu i włącza je ponownie razem z ekranem. Korzysta z ustawienia urządzenia; Plektra nie działa w tym celu w tle.</string>

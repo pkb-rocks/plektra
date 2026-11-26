@@ -149,7 +149,10 @@ fun AdvancedSettingsScreen(
     fun navigateTo(destination: AdvancedDestination) {
         openSettingsChild(context, "advanced", when (destination) { AdvancedDestination.Main -> "Main"; AdvancedDestination.TrackpadGestures -> "TrackpadGestures" })
     }
-    fun navigateBack() { context.settingsActivity().finish() }
+    // A child page is its own Activity; the page root leaves through its caller, which may be a pane.
+    fun navigateBack() {
+        if (settingsChild(context, "advanced") != null) context.settingsActivity().finish() else onBack()
+    }
 
 
     fun defaultBackupName(): String {
@@ -265,40 +268,14 @@ fun AdvancedSettingsScreen(
             AdvancedDestination.Main -> {
                 Scaffold(
                     topBar = {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .windowInsetsPadding(WindowInsets.statusBars),
-                            tonalElevation = 1.dp
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                IconButton(onClick = { navigateBack() }) {
-                                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = stringResource(R.string.settings_back_content_description)
-                                    )
-                                }
-                                Text(
-                                    text = stringResource(R.string.settings_category_advanced),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(start = 8.dp)
-                                )
-                            }
-                        }
-                    },
+            PlektraSettingsHeader(title = stringResource(R.string.settings_category_advanced), onBack = { navigateBack() })
+        },
                     snackbarHost = { SnackbarHost(snackbarHostState) }
                 ) { paddingValues ->
-                    Column(
+                    SettingsSectionScrollColumn(
                         modifier = modifier
                             .fillMaxWidth()
                             .padding(paddingValues)
-                            .verticalScroll(rememberScrollState())
                     ) {
                         // Trackpad Gesture Settings
                         Surface(
@@ -390,92 +367,26 @@ fun AdvancedSettingsScreen(
                         }
 
                         // Backup
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.ADVANCED_BACKUP) {
-                                    backupLauncher.launch(defaultBackupName())
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Backup,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.backup_now),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.backup_now_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.backup_now),
+                            description = stringResource(R.string.backup_now_description),
+                            icon = Icons.Filled.Backup,
+                            linkId = SettingLinkIds.ADVANCED_BACKUP,
+                            onClick = {
+                                backupLauncher.launch(defaultBackupName())
                             }
-                        }
+                        )
 
                         // Restore
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.ADVANCED_RESTORE) {
-                                    restoreLauncher.launch(arrayOf("application/zip"))
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.History,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.restore_from_file),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.restore_from_file_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.restore_from_file),
+                            description = stringResource(R.string.restore_from_file_description),
+                            icon = Icons.Filled.History,
+                            linkId = SettingLinkIds.ADVANCED_RESTORE,
+                            onClick = {
+                                restoreLauncher.launch(arrayOf("application/zip"))
                             }
-                        }
+                        )
 
                         // Swipe Incremental Threshold
                         Surface(
@@ -555,42 +466,16 @@ fun AdvancedSettingsScreen(
                             modifier = Modifier.settingRow(SettingLinkIds.ADVANCED_SENSITIVE_CLIPBOARD_RETENTION_TIME)
                         )
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .settingRow(SettingLinkIds.ADVANCED_EXPERIMENTAL_CANDIDATES_VIEW)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.weight(1f),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.experimental_candidates_view_title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.experimental_candidates_view_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = experimentalCandidatesViewEnabled,
-                                    onCheckedChange = { enabled ->
-                                        experimentalCandidatesViewEnabled = enabled
-                                        SettingsManager.setExperimentalCandidatesViewEnabled(context, enabled)
-                                    }
-                                )
+                        SettingsToggleRow(
+                            title = stringResource(R.string.experimental_candidates_view_title),
+                            description = stringResource(R.string.experimental_candidates_view_description),
+                            checked = experimentalCandidatesViewEnabled,
+                            linkId = SettingLinkIds.ADVANCED_EXPERIMENTAL_CANDIDATES_VIEW,
+                            onCheckedChange = { enabled ->
+                                experimentalCandidatesViewEnabled = enabled
+                                SettingsManager.setExperimentalCandidatesViewEnabled(context, enabled)
                             }
-                        }
+                        )
 
                         if (rocks.pkb.plektra.inputmethod.DisplayCorners.hasRoundedDisplay(context) ||
                             SettingsManager.getTitan2EliteRoundedCornerInsetsEnabled(context)) {
@@ -619,98 +504,32 @@ fun AdvancedSettingsScreen(
                         DebugShowcaseExportSetting()
 
                         // Show Tutorial
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.ADVANCED_SHOW_TUTORIAL) {
-                                    SettingsManager.resetTutorialCompleted(context)
-                                    val intent = Intent(context, TutorialActivity::class.java)
-                                    context.startActivity(intent)
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.tutorial_show),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.tutorial_review_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.tutorial_show),
+                            description = stringResource(R.string.tutorial_review_description),
+                            icon = Icons.Filled.Info,
+                            linkId = SettingLinkIds.ADVANCED_SHOW_TUTORIAL,
+                            onClick = {
+                                SettingsManager.resetTutorialCompleted(context)
+                                val intent = Intent(context, TutorialActivity::class.java)
+                                context.startActivity(intent)
                             }
-                        }
+                        )
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp)
-                                .settingRow(SettingLinkIds.ADVANCED_SHOW_RELEASE_NOTES_TUTORIAL) {
-                                    val intent = Intent(context, TutorialActivity::class.java).apply {
-                                        putExtra(TutorialActivity.EXTRA_UPDATE_TUTORIAL, true)
-                                        putExtra(TutorialActivity.EXTRA_PREVIEW_UPDATE_TUTORIAL, true)
-                                        putExtra(TutorialActivity.EXTRA_PREVIOUS_VERSION, "0.84beta")
-                                    }
-                                    context.startActivity(intent)
+                        SettingsNavigationRow(
+                            title = stringResource(R.string.tutorial_show_release_notes),
+                            description = stringResource(R.string.tutorial_show_release_notes_description),
+                            icon = Icons.Filled.History,
+                            linkId = SettingLinkIds.ADVANCED_SHOW_RELEASE_NOTES_TUTORIAL,
+                            onClick = {
+                                val intent = Intent(context, TutorialActivity::class.java).apply {
+                                    putExtra(TutorialActivity.EXTRA_UPDATE_TUTORIAL, true)
+                                    putExtra(TutorialActivity.EXTRA_PREVIEW_UPDATE_TUTORIAL, true)
+                                    putExtra(TutorialActivity.EXTRA_PREVIOUS_VERSION, "0.84beta")
                                 }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.History,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.tutorial_show_release_notes),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.tutorial_show_release_notes_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                context.startActivity(intent)
                             }
-                        }
+                        )
                     }
                 }
             }

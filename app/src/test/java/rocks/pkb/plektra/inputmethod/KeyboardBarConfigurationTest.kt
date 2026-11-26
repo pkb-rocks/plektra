@@ -99,6 +99,135 @@ class KeyboardBarConfigurationTest {
         assertEquals(View.VISIBLE, root.getChildAt(1).visibility)
     }
 
+    @Test fun liveSlimSwitchSharesVariationsAndMenuWithoutKeepingTheNormalActionsRow() {
+        SettingsManager.setSuggestionsEnabled(context, true)
+        SettingsManager.setExperimentalSuggestionsEnabled(context, true)
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        SettingsManager.setSlimStatusBarSlotsLeft(context, listOf("language"))
+        SettingsManager.setSlimStatusBarSlotsRight(context, listOf("hamburger"))
+        KeyboardBarConfiguration.setSlimProfile(context,
+            rocks.pkb.plektra.KeyboardBarProfile(false, true, true, true, false))
+        val controller = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+        val state = snapshot().copy(variations = listOf("à", "â"), suggestions = listOf("alphabet"))
+        fun visibleLabels(view: View): List<String> {
+            if (view.visibility != View.VISIBLE) return emptyList()
+            if (view is android.widget.TextView) return listOf(view.text.toString())
+            return if (view is android.view.ViewGroup)
+                (0 until view.childCount).flatMap { visibleLabels(view.getChildAt(it)) }
+            else emptyList()
+        }
+        for (slim in listOf(false, true, false, true)) {
+            controller.setSlimModeActive(slim)
+            controller.update(state)
+            val root = controller.getLayout()!!
+            assertEquals(View.VISIBLE, root.getChildAt(0).visibility)
+            assertEquals(if (slim) View.GONE else View.VISIBLE, root.getChildAt(1).visibility)
+            if (slim) {
+                val labels = visibleLabels(root)
+                assertTrue(labels.contains("à"))
+                assertTrue(labels.contains("â"))
+                assertFalse(labels.contains("alphabet"))
+            }
+        }
+    }
+
+    @Test fun slimPresentationAlwaysCombinesRowsAndKeepsTheNormalArrangement() {
+        for (arrangement in rocks.pkb.plektra.KeyboardBarArrangement.entries) {
+            val config = KeyboardBarConfiguration(true, true, true, true, true, arrangement)
+            assertEquals(rocks.pkb.plektra.KeyboardBarArrangement.SHARED, config.presentation(true).arrangement)
+            assertEquals(arrangement, config.presentation(false).arrangement)
+        }
+    }
+
+    private fun visibleLabels(view: View): List<String> {
+        if (view.visibility != View.VISIBLE) return emptyList()
+        if (view is android.widget.TextView) return listOf(view.text.toString())
+        return if (view is android.view.ViewGroup)
+            (0 until view.childCount).flatMap { visibleLabels(view.getChildAt(it)) }
+        else emptyList()
+    }
+
+    private fun measuredHeight(root: View): Int {
+        root.measure(View.MeasureSpec.makeMeasureSpec(1076, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        return root.measuredHeight
+    }
+
+    /** The reported device configuration: static variations, Slim without suggestions. */
+    @Test fun liveSlimSwitchWithStaticVariationsKeepsOneRowInEveryArrangement() {
+        SettingsManager.setSuggestionsEnabled(context, false)
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        SettingsManager.setStaticVariationBarModeEnabled(context, true)
+        SettingsManager.setStatusBarSlotsLeft(context, listOf(SettingsManager.STATUS_BAR_BUTTON_HAMBURGER))
+        SettingsManager.setStatusBarSlotsRight(context, listOf("emoji", "microphone"))
+        KeyboardBarConfiguration.setSlimProfile(context,
+            rocks.pkb.plektra.KeyboardBarProfile(false, true, true, true, false))
+        for (arrangement in rocks.pkb.plektra.KeyboardBarArrangement.entries) {
+            KeyboardBarConfiguration.setArrangement(context, arrangement)
+            val controller = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+            val variationsRowIndex = if (arrangement == rocks.pkb.plektra.KeyboardBarArrangement.ACTIONS_FIRST) 0 else 1
+            for (slim in listOf(false, true, false, true)) {
+                controller.setSlimModeActive(slim)
+                controller.update(snapshot())
+                val root = controller.getLayout()!!
+                val variationsRow = root.getChildAt(variationsRowIndex)
+                val combinedRow = root.getChildAt(1 - variationsRowIndex)
+                if (slim || arrangement == rocks.pkb.plektra.KeyboardBarArrangement.SHARED) {
+                    assertEquals("$arrangement slim=$slim", View.VISIBLE, combinedRow.visibility)
+                    assertEquals("$arrangement slim=$slim", View.GONE, variationsRow.visibility)
+                    assertTrue("$arrangement slim=$slim", visibleLabels(combinedRow).isNotEmpty())
+                } else {
+                    // Normal profile without suggestions: only the configured actions row.
+                    assertEquals("$arrangement slim=$slim", View.VISIBLE, variationsRow.visibility)
+                    assertEquals("$arrangement slim=$slim", View.GONE, combinedRow.visibility)
+                }
+            }
+        }
+    }
+
+    @Test fun slimWithoutVariationsStillShowsItsMenuRowOnce() {
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        SettingsManager.setStaticVariationBarModeEnabled(context, false)
+        SettingsManager.setSlimStatusBarSlotsLeft(context, listOf("language"))
+        SettingsManager.setSlimStatusBarSlotsRight(context, listOf("hamburger"))
+        KeyboardBarConfiguration.setSlimProfile(context,
+            rocks.pkb.plektra.KeyboardBarProfile(false, true, true, true, false))
+        val controller = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+        controller.setSlimModeActive(true)
+        // The first render sizes the buttons; the second one is the settled Slim bar.
+        controller.update(snapshot())
+        controller.update(snapshot())
+        val root = controller.getLayout()!!
+        assertEquals(View.VISIBLE, root.visibility)
+        assertEquals(View.VISIBLE, root.getChildAt(0).visibility)
+        assertEquals(View.GONE, root.getChildAt(1).visibility)
+        val slimHeight = measuredHeight(root)
+        repeat(2) {
+            controller.setSlimModeActive(false)
+            controller.update(snapshot().copy(variations = listOf("à", "â")))
+            assertEquals(View.VISIBLE, root.getChildAt(1).visibility)
+            assertTrue(measuredHeight(root) > slimHeight)
+            controller.setSlimModeActive(true)
+            controller.update(snapshot())
+            assertEquals(View.GONE, root.getChildAt(1).visibility)
+            assertEquals(slimHeight, measuredHeight(root))
+        }
+    }
+
+    @Test fun slimSoftwareKeyboardAndSymKeepTheirOwnRows() {
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        KeyboardBarConfiguration.setSlimProfile(context,
+            rocks.pkb.plektra.KeyboardBarProfile(false, true, true, true, false))
+        val controller = StatusBarController(context, StatusBarController.Mode.CANDIDATES_ONLY)
+        controller.setSlimModeActive(true)
+        controller.update(snapshot().copy(symPage = 1))
+        val root = controller.getLayout()!!
+        assertEquals(View.GONE, root.getChildAt(0).visibility)
+        controller.update(snapshot())
+        assertEquals(View.VISIBLE, root.getChildAt(0).visibility)
+        assertEquals(View.GONE, root.getChildAt(1).visibility)
+    }
+
     @Test fun sharedRowCommitsSnippetAndSuppressesSeparateActionsRow() {
         SettingsManager.setStatusBarVariationsEnabled(context, true)
         KeyboardBarConfiguration.setArrangement(context, rocks.pkb.plektra.KeyboardBarArrangement.SHARED)

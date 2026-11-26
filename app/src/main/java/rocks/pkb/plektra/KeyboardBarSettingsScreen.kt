@@ -233,7 +233,10 @@ internal fun KeyboardBarSettingsScreen(
             }
             KeyboardTextScaleSettingsCard()
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_layout_section))
-            KeyboardBarArrangementField(arrangement, displayedSuggestions && displayedActions) {
+            // Slim always combines its rows (KeyboardBarConfiguration.presentation).
+            KeyboardBarArrangementField(if (editingSlim) KeyboardBarArrangement.SHARED else arrangement,
+                !editingSlim && displayedSuggestions && displayedActions,
+                showBehavior = displayedSuggestions && displayedActions) {
                 arrangement = it
                 KeyboardBarConfiguration.setArrangement(context, it)
             }
@@ -461,7 +464,8 @@ internal fun KeyboardBarSettingsScreen(
 
 }
 @Composable
-private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, onChange: (KeyboardBarArrangement) -> Unit) {
+private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, showBehavior: Boolean = enabled,
+    onChange: (KeyboardBarArrangement) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     fun label(choice: KeyboardBarArrangement) = when (choice) {
         KeyboardBarArrangement.SUGGESTIONS_FIRST -> R.string.keyboard_bar_suggestions_first
@@ -475,7 +479,7 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
             colors = ListItemDefaults.colors(headlineColor = if (enabled) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)))
-        if (enabled && value == KeyboardBarArrangement.SHARED) {
+        if (showBehavior && value == KeyboardBarArrangement.SHARED) {
             Text(stringResource(R.string.keyboard_bar_shared_behavior), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

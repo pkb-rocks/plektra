@@ -184,6 +184,9 @@ class SettingsFullscreenTest {
     }
 
     @Test
+    @Config(sdk = [33])
+    @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
     fun globalSearchKeepsTheLocalDictionaryQueryOutOfItsFocusOrder() {
         fullscreen(true)
         scenario = ActivityScenario.launch<SettingsActivity>(
@@ -193,17 +196,33 @@ class SettingsFullscreenTest {
         )
         compose.onNodeWithContentDescription(context.getString(R.string.auto_correct_search_description)).performClick()
         val editable = SemanticsMatcher.keyIsDefined(SemanticsProperties.EditableText)
-        compose.onNode(editable).performTextInput("localword")
-        compose.onNodeWithContentDescription(search).performClick()
-        compose.waitForIdle()
         val field = compose.onNode(editable)
         field.performTouchInput { click() }
-        field.performKeyInput { pressKey(androidx.compose.ui.input.key.Key.Tab) }
+        field.performTextInput("localword")
+        val localMatch = editable and hasText("localword")
+        val originalBounds = compose.onNode(localMatch).fetchSemanticsNode().boundsInRoot
+        val trigger = compose.onNodeWithContentDescription(search)
+        trigger.performClick()
+        field.assertIsFocused()
+        val oldPosition = originalBounds.center - field.fetchSemanticsNode().boundsInRoot.topLeft
+        field.performTouchInput { click(oldPosition) }
+        fun assertLocalFieldUnfocused() {
+            val localFields = compose.onAllNodes(localMatch, useUnmergedTree = true).fetchSemanticsNodes()
+            assertTrue(localFields.none { it.config.contains(SemanticsProperties.Focused) && it.config[SemanticsProperties.Focused] })
+        }
+        assertLocalFieldUnfocused()
+        field.performTouchInput { click() }
+        repeat(4) {
+            field.performKeyInput { pressKey(androidx.compose.ui.input.key.Key.Tab) }
+            assertLocalFieldUnfocused()
+        }
         field.performTouchInput { click() }
         field.assertIsFocused().performTextInput("globalword")
-        compose.onNodeWithText("localword").assertDoesNotExist()
+        compose.onNode(editable and hasText("globalword")).assertIsDisplayed()
         compose.onNodeWithContentDescription(closeSearch).performClick()
-        compose.onNodeWithText("localword").assertIsDisplayed()
+        compose.waitForIdle()
+        trigger.assertIsFocused()
+        assertEquals(originalBounds, compose.onNode(localMatch).fetchSemanticsNode().boundsInRoot)
     }
 
     @Test

@@ -260,12 +260,6 @@ internal fun PlektraSettingsHeader(
         returnFocus = true
     }
     BackHandler(enabled = searching) { closeSearch() }
-    LaunchedEffect(searching) {
-        if (!searching && returnFocus) {
-            returnFocus = false
-            runCatching { searchButtonFocus.requestFocus() }
-        }
-    }
     // Results lie over the unchanged page below the header, so closing finds it as it was.
     val resultsPanel: (@Composable () -> Unit)? = if (searching && searchQuery.isNotBlank()) {
         {
@@ -331,6 +325,13 @@ internal fun PlektraSettingsHeader(
             val pageActions: @Composable () -> Unit = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (searchAvailable) {
+                        if (!searching && returnFocus) {
+                            LaunchedEffect(Unit) {
+                                androidx.compose.runtime.withFrameNanos { }
+                                searchButtonFocus.requestFocus()
+                                returnFocus = false
+                            }
+                        }
                         IconButton(
                             onClick = { searchOpen = true },
                             modifier = if (searching) Modifier else Modifier.focusRequester(searchButtonFocus)

@@ -1,18 +1,26 @@
 package rocks.pkb.plektra
 
+import android.os.Looper
 import android.view.KeyEvent
 import androidx.compose.runtime.mutableStateOf
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import rocks.pkb.plektra.inputmethod.KeyboardEventTracker
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class MainKeyboardEventFlowTest {
+    // Writing the tracker's snapshot state outside a composition schedules Compose's global apply on
+    // the main looper. Robolectric drops that queue at teardown, which leaves Compose's shared
+    // AndroidUiDispatcher waiting forever, so no later Compose test in this sandbox becomes idle.
+    @After fun deliverPendingSnapshotApply() { shadowOf(Looper.getMainLooper()).idle() }
+
     @Test fun burstReleasesEveryKeyBeforeComposeCanRender() {
         val view = MotionBackgroundView(RuntimeEnvironment.getApplication())
         val state = mutableStateOf<KeyboardEventTracker.KeyEventInfo?>(null)

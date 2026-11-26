@@ -38,10 +38,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = re.compile(r'rocks\.pkb\.plektra(?:\.unsovereign)?(?:\.nightly)?')
 PROVIDERS = {'OPENAI': 'OPENAI_API_KEY', 'OPENROUTER': 'OPENROUTER_API_KEY'}
 CREDENTIAL_DATA, DEVICE_DATA = 'credential-data.tar', 'device-data.tar'
+CLICKS_INSTALLATION_KEY = 'no_backup/clicks_button_binding_installation'
 # Local or regenerable members per archive. The Direct Boot snapshot (DirectBootKeyboardConfig) is a
 # projection of credential-protected data; the app can publish a new generation as soon as it starts.
 REGENERABLE = {
-    CREDENTIAL_DATA: ('cache', 'code_cache', 'no_backup/clicks_button_binding_installation'),
+    CREDENTIAL_DATA: ('cache', 'code_cache', CLICKS_INSTALLATION_KEY),
     DEVICE_DATA: ('cache', 'code_cache', 'files/direct_boot_files', 'shared_prefs/direct_boot_keyboard_config.xml'),
 }
 SNAPSHOT_ROOT = 'files/direct_boot_files'
@@ -310,6 +311,7 @@ class Device:
         try:
             with self.stopped():
                 try:
+                    self.shell('run-as', self.package, 'rm', '-f', CLICKS_INSTALLATION_KEY)
                     self.restore_data(backup)
                 except RECOVERABLE as error:
                     failure = error

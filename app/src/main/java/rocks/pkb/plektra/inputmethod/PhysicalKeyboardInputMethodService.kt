@@ -6044,7 +6044,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             )
             return true
         }
-        if (consumedSymEditKeys.remove(keyCode_)) return true
+        if (consumedSymEditKeys.remove(keyCode_)) {
+            notifyDebugKeyEvent(keyCode, event, "KEY_UP", origin = "ime_service")
+            return true
+        }
 
         // Check if we have an editable field at the start (same logic as onKeyDown)
         val info = currentInputEditorInfo

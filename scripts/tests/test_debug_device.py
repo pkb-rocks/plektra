@@ -59,6 +59,9 @@ class FakeApp:
                 self.on_selected(self)
         if args[:2] == ('am', 'force-stop'):
             self.pid = ''
+        if args[:4] == ('run-as', self.device.package, 'rm', '-f'):
+            self.test.assertFalse(self.pid)
+            self.files.pop(self.absolute(args[4]), None)
         if is_pidof(args):
             return self.pid
         if args[:3] == ('run-as', self.device.package, 'sh') and 'sha256sum' in args[4]:
@@ -249,6 +252,21 @@ class DebugDeviceTest(unittest.TestCase):
         self.assertIn(('am', 'force-stop', device.package), app.calls[first_check:])
         self.assertIn(('pm', 'grant', device.package, 'android.permission.RECORD_AUDIO'), app.calls)
         self.assertEqual(device.package + '/.KeyboardService', app.selected)
+
+    def test_in_place_restore_invalidates_existing_clicks_pending_marker_and_keeps_choice(self):
+        device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')
+        key = debug.CLICKS_INSTALLATION_KEY
+        prefs = (b'<map><string name="clicks_red_button_binding_choice">alt_alt</string>'
+                 b'<string name="clicks_red_button_binding_output">04</string>'
+                 b'<string name="clicks_red_button_binding_pending_output">old-id:04</string></map>')
+        app = FakeApp(self, device, on_selected=rebuild_snapshot)
+        app.pid = '1234'
+        app.files[app.absolute(key)] = b'old-id'
+        with tempfile.TemporaryDirectory() as folder:
+            backup = write_backup(device, folder, {'./' + key: b'old-id', './shared_prefs/plektra_prefs.xml': prefs}, {})
+            app.restore(backup)
+        self.assertNotIn(app.absolute(key), app.files)
+        self.assertEqual(prefs, app.files[app.absolute('shared_prefs/plektra_prefs.xml')])
 
     def test_restore_keeps_old_snapshot_without_claiming_a_rebuild(self):
         device = debug.Device('synthetic-device', 'rocks.pkb.plektra.nightly')

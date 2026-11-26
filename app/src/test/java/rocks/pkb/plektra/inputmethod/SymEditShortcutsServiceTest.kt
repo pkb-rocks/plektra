@@ -70,6 +70,27 @@ class SymEditShortcutsServiceTest {
         verify(connection, never()).sendKeyEvent(any(KeyEvent::class.java))
     }
 
+    @Test fun consumedSelectAllReleasesTheHeaderKeyExactlyOnce() {
+        val view = rocks.pkb.plektra.MotionBackgroundView(context)
+        val events = mutableListOf<String>()
+        val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = { event ->
+            view.acceptHardwareEvent(event)
+            if (event.keyCode == KeyEvent.KEYCODE_A) events += event.action
+        }
+        KeyboardEventTracker.addListener(listener)
+        try {
+            down(KeyEvent.KEYCODE_SYM)
+            assertTrue(down(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))
+            assertTrue("A" in view.heldLabels())
+            assertTrue(up(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))
+            up(KeyEvent.KEYCODE_SYM)
+            org.junit.Assert.assertFalse("A" in view.heldLabels())
+            org.junit.Assert.assertEquals(listOf("KEY_DOWN", "KEY_UP"), events)
+        } finally {
+            KeyboardEventTracker.removeListener(listener)
+        }
+    }
+
     @Test fun repeatsWhileSymIsHeldDoNotReplaceTheSelection() {
         down(KeyEvent.KEYCODE_SYM)
         assertTrue(down(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))

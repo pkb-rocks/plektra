@@ -661,4 +661,31 @@ class KeyboardBarConfigurationTest {
         assertTrue("LED clearance must not depend on the timing of window insets", chrome.contourIntegratedIndicators)
     }
 
+    @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
+    @Config(sdk = [33], qualifiers = "w478dp-h533dp-360dpi")
+    @Test fun slimStaticVariationsRemainReadableWithRequestedSwitcherAndRoundedInsets() {
+        SettingsManager.setStaticVariationBarPreset(context, SettingsManager.STATIC_VARIATION_PRESET_DEV_CHOICE)
+        SettingsManager.setTitan2EliteRoundedCornerInsetsEnabled(context, true)
+        val controller = slimVariationsController()
+        val state = snapshot().copy(imeSwitcherShown = true)
+        controller.update(state)
+        val root = controller.getLayout()!!
+        repeat(4) {
+            controller.update(state)
+            root.measure(
+                View.MeasureSpec.makeMeasureSpec(1076, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            root.layout(0, 0, 1076, root.measuredHeight)
+            root.viewTreeObserver.dispatchOnPreDraw()
+            val bitmap = android.graphics.Bitmap.createBitmap(1076, root.height, android.graphics.Bitmap.Config.ARGB_8888)
+            try { root.draw(android.graphics.Canvas(bitmap)) } finally { bitmap.recycle() }
+        }
+        val slots = slotViews(root, DEV_CHOICE)
+        assertEquals(DEV_CHOICE, slots.map { it.text.toString() })
+        slots.forEach { slot ->
+            assertTrue("Variation ${slot.text} must remain readable", slot.layout != null && slot.layout.getEllipsisCount(0) == 0)
+        }
+    }
+
 }

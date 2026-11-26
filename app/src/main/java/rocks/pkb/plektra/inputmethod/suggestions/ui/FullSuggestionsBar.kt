@@ -723,7 +723,7 @@ class FullSuggestionsBar(
         val maxTextSp = (14f * heightScale).coerceIn(12f, 20f).toInt()
         val minTextSp = (7f * heightScale).coerceIn(7f, 12f).toInt()
         val padV = dpToPx(3f * heightScale)
-        val padH = dpToPx(12f)
+        val padH = if (variationSlots != null) 0 else dpToPx(12f)
 
         val addOnly = variationSlots == null && addWordCandidate != null &&
             slots[0]?.equals(addWordCandidate, ignoreCase = true) == true &&

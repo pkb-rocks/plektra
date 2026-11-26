@@ -21,6 +21,12 @@ class MainKeyboardEventFlowTest {
     // AndroidUiDispatcher waiting forever, so no later Compose test in this sandbox becomes idle.
     @After fun deliverPendingSnapshotApply() { shadowOf(Looper.getMainLooper()).idle() }
 
+    private fun sendTracked(event: KeyEvent) {
+        KeyboardEventTracker.notifyHardwareEdge(event, fromIme = true)
+        KeyboardEventTracker.notifyKeyEvent(event.keyCode, event,
+            if (event.action == KeyEvent.ACTION_DOWN) "KEY_DOWN" else "KEY_UP")
+    }
+
     @Test fun burstReleasesEveryKeyBeforeComposeCanRender() {
         val view = MotionBackgroundView(RuntimeEnvironment.getApplication())
         val state = mutableStateOf<KeyboardEventTracker.KeyEventInfo?>(null)
@@ -29,13 +35,13 @@ class MainKeyboardEventFlowTest {
         KeyboardEventTracker.addListener(listener)
         try {
             for (code in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z) {
-                KeyboardEventTracker.notifyKeyEvent(code, KeyEvent(0, 10, KeyEvent.ACTION_DOWN, code, 0), "KEY_DOWN")
+                sendTracked(KeyEvent(0, 10, KeyEvent.ACTION_DOWN, code, 0))
             }
             assertEquals(26, view.heldLabels().size)
             org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMinutes(2))
             assertEquals(26, view.heldLabels().size)
             for (code in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z) {
-                KeyboardEventTracker.notifyKeyEvent(code, KeyEvent(0, 20, KeyEvent.ACTION_UP, code, 0), "KEY_UP")
+                sendTracked(KeyEvent(0, 20, KeyEvent.ACTION_UP, code, 0))
             }
             assertTrue(view.heldLabels().isEmpty())
             // The old state-only transport exposes just Z-Up after this burst.
@@ -52,11 +58,11 @@ class MainKeyboardEventFlowTest {
         KeyboardEventTracker.registerState(state)
         try {
             for (code in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z) {
-                KeyboardEventTracker.notifyKeyEvent(code, KeyEvent(0, 10, KeyEvent.ACTION_DOWN, code, 0), "KEY_DOWN")
+                sendTracked(KeyEvent(0, 10, KeyEvent.ACTION_DOWN, code, 0))
                 view.acceptHardwareEvent(state.value!!)
             }
             for (code in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z) {
-                KeyboardEventTracker.notifyKeyEvent(code, KeyEvent(0, 20, KeyEvent.ACTION_UP, code, 0), "KEY_UP")
+                sendTracked(KeyEvent(0, 20, KeyEvent.ACTION_UP, code, 0))
             }
             view.acceptHardwareEvent(state.value!!)
             assertEquals(25, view.heldLabels().size)
@@ -68,9 +74,7 @@ class MainKeyboardEventFlowTest {
         val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = view::acceptHardwareEvent
         KeyboardEventTracker.addListener(listener)
         fun send(code: Int, action: Int, flags: Int = 0, repeats: Int = 0) {
-            KeyboardEventTracker.notifyKeyEvent(code,
-                KeyEvent(0, 10, action, code, repeats, 0, 2, 0, flags),
-                if (action == KeyEvent.ACTION_DOWN) "KEY_DOWN" else "KEY_UP")
+            sendTracked(KeyEvent(0, 10, action, code, repeats, 0, 2, 0, flags))
         }
         try {
             send(KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.ACTION_DOWN)

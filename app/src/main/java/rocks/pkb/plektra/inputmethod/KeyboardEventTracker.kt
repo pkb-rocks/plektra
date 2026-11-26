@@ -12,7 +12,30 @@ object KeyboardEventTracker {
     private val listeners = linkedSetOf<(KeyEventInfo) -> Unit>()
 
     fun addListener(listener: (KeyEventInfo) -> Unit) { listeners += listener }
-    fun removeListener(listener: (KeyEventInfo) -> Unit) { listeners -= listener }
+    fun removeListener(listener: (KeyEventInfo) -> Unit) {
+        listeners -= listener
+        if (listeners.isEmpty()) imeEdges.clear()
+    }
+
+    private data class Edge(val device: Int, val scan: Int, val key: Int, val action: Int,
+                            val downTime: Long, val time: Long, val repeat: Int)
+
+    // Android may forward the same event to the Activity after the IME sees it.
+    // Only match across these two routes; consecutive IME repeats remain distinct.
+    private val imeEdges = ArrayDeque<Edge>()
+
+    fun notifyHardwareEdge(event: KeyEvent?, fromIme: Boolean) {
+        if (event == null || listeners.isEmpty() || event.flags and KeyEvent.FLAG_SOFT_KEYBOARD != 0) return
+        val edge = Edge(event.deviceId, event.scanCode, event.keyCode, event.action,
+            event.downTime, event.eventTime, event.repeatCount)
+        if (fromIme) {
+            if (imeEdges.size == 64) imeEdges.removeFirst()
+            imeEdges.addLast(edge)
+        } else if (imeEdges.remove(edge)) return
+        val info = describeEdge(event.keyCode, event, if (event.action == KeyEvent.ACTION_DOWN) "KEY_DOWN" else "KEY_UP",
+            if (fromIme) "ime_service" else "activity")
+        listeners.toList().forEach { it(info) }
+    }
 
     private var _keyEventState: MutableState<KeyEventInfo?>? = null
     val keyEventState: MutableState<KeyEventInfo?>?
@@ -122,26 +145,11 @@ object KeyboardEventTracker {
         outputKeyCodeName: String? = null,
         unicodeCharOverride: Int? = null
     ) {
-        if (event != null) {
-            val rawUnicodeChar = event.unicodeChar
-            val effectiveUnicodeChar = unicodeCharOverride ?: rawUnicodeChar
-            val keyEventInfo = KeyEventInfo(
-                keyCode = keyCode,
-                keyCodeName = getKeyCodeName(keyCode),
-                origin = origin,
-                action = action,
-                scanCode = event.scanCode,
-                deviceId = event.deviceId,
-                source = event.source,
-                flags = event.flags,
-                repeatCount = event.repeatCount,
-                metaState = event.metaState,
-                unicodeChar = effectiveUnicodeChar,
-                rawUnicodeChar = rawUnicodeChar,
-                effectiveUnicodeChar = effectiveUnicodeChar,
-                isAltPressed = event.isAltPressed,
-                isShiftPressed = event.isShiftPressed,
-                isCtrlPressed = event.isCtrlPressed,
+        if (event != null && _keyEventState != null) {
+            val raw = describeEdge(keyCode, event, action, origin)
+            _keyEventState?.value = raw.copy(
+                unicodeChar = unicodeCharOverride ?: raw.rawUnicodeChar,
+                effectiveUnicodeChar = unicodeCharOverride ?: raw.rawUnicodeChar,
                 altLatchActive = altLatchActive,
                 altOneShot = altOneShot,
                 shiftLatchActive = shiftLatchActive,
@@ -150,13 +158,33 @@ object KeyboardEventTracker {
                 resolvedLayout = resolvedLayout,
                 outputKeyCode = outputKeyCode,
                 outputKeyCodeName = outputKeyCodeName,
-                eventTimeUptimeMs = event.eventTime
             )
-            listeners.toList().forEach { it(keyEventInfo) }
-            _keyEventState?.value = keyEventInfo
         }
     }
-    
+
+    private fun describeEdge(keyCode: Int, event: KeyEvent, action: String, origin: String): KeyEventInfo {
+        val rawUnicodeChar = event.unicodeChar
+        return KeyEventInfo(
+            keyCode = keyCode,
+            keyCodeName = getKeyCodeName(keyCode),
+            origin = origin,
+            action = action,
+            scanCode = event.scanCode,
+            deviceId = event.deviceId,
+            source = event.source,
+            flags = event.flags,
+            repeatCount = event.repeatCount,
+            metaState = event.metaState,
+            unicodeChar = rawUnicodeChar,
+            rawUnicodeChar = rawUnicodeChar,
+            effectiveUnicodeChar = rawUnicodeChar,
+            isAltPressed = event.isAltPressed,
+            isShiftPressed = event.isShiftPressed,
+            isCtrlPressed = event.isCtrlPressed,
+            eventTimeUptimeMs = event.eventTime
+        )
+    }
+
     private fun getKeyCodeName(keyCode: Int): String {
         return when (keyCode) {
             KeyEvent.KEYCODE_Q -> "KEYCODE_Q"

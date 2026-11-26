@@ -322,6 +322,16 @@ class AutoReplaceController(
         val lookupWord = apostropheSplit?.root ?: word
         val wordLower = word.lowercase()
 
+        // A word whose replacement was undone stays as typed only until typing moves on: once
+        // another word is finished, it is replaced again. Not every way of typing reports its
+        // letters (SuggestionController.onCharacterCommitted), and an undone word that was only
+        // forgiven there was never replaced again until the keyboard restarted.
+        if (rejectedWords.isNotEmpty() &&
+            wordLower !in rejectedWords && lookupWord.lowercase() !in rejectedWords
+        ) {
+            rejectedWords.clear()
+        }
+
         val exactReplacement = if (settings.textReplacementsEnabled) {
             exactReplacementProvider?.invoke(word, boundaryChar)
         } else {

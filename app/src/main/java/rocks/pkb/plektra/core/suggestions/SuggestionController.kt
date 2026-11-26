@@ -418,6 +418,20 @@ class SuggestionController(
     }
     var suggestionsListener: ((List<SuggestionResult>) -> Unit)? = onSuggestionsUpdated
 
+    /**
+     * Something was typed that the word tracker follows by the cursor: a letter on a key with a
+     * long-press layer, which with the default long press is nearly every letter. What a
+     * replacement's undo keeps follows it here: typing accepts the last replacement, and a letter
+     * lets a word whose replacement was undone be replaced again.
+     */
+    fun onTypingContinued(text: CharSequence) {
+        if (!isEnabled()) return
+        autoReplaceController.clearLastReplacement()
+        if (text.any { it.isLetterOrDigit() }) {
+            autoReplaceController.clearRejectedWords()
+        }
+    }
+
     fun onCharacterCommitted(text: CharSequence, inputConnection: InputConnection?) {
         if (!isEnabled()) return
         if (debugLogging) {

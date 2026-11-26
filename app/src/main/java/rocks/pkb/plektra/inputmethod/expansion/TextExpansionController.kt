@@ -223,7 +223,7 @@ class TextExpansionController(
     }
 
     private fun hasVisibleMatches(): Boolean =
-        activeConfig?.presentation != ExpansionPresentation.OFF && activeMatches.isNotEmpty()
+        activeMatches.isNotEmpty() && (suggestionBarVisible || popup?.isShowing() == true)
 
     private fun moveSelection(delta: Int): Boolean {
         if (activeMatches.isEmpty()) return false

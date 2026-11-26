@@ -10,12 +10,14 @@ import android.text.Editable
 import android.text.InputType
 import android.text.Selection
 import android.text.TextWatcher
+import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.Gravity
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputConnectionWrapper
@@ -1503,7 +1505,13 @@ class EmojiPickerView(
         val desiredYOffset = -(popupHeight + anchor.height)
         val minYOffset = -(anchorY + anchor.height)
         val yOffset = maxOf(desiredYOffset, minYOffset)
-        popup.showAsDropDown(anchor, xOffset, yOffset)
+        if (!anchor.isAttachedToWindow) return
+        try {
+            popup.showAsDropDown(anchor, xOffset, yOffset)
+        } catch (error: WindowManager.BadTokenException) {
+            popup.dismiss()
+            Log.w(TAG, "Variants popup not shown: the keyboard window closed", error)
+        }
     }
 
     private fun dpToPx(dp: Float): Int {
@@ -1796,6 +1804,7 @@ class EmojiPickerView(
     }
 
     companion object {
+        private const val TAG = "EmojiPickerView"
         private const val COMPACT_HEIGHT_DP = 177f
         /** Space the search field overlays at the bottom of the result grid. */
         private const val SEARCH_PANEL_RESERVE_DP = 44f

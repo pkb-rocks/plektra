@@ -244,7 +244,7 @@ private fun HardwareKeyboardListScreen(
             // Bound to verified firmware, not to the selected keyboard profile.
             val keyboardBacklightOffered = remember { KeyboardBacklightFeature.isOffered(context) }
             if (keyboardBacklightOffered) {
-                HardwareKeyboardSectionDivider(stringResource(R.string.keyboard_backlight_section_title))
+                SettingsSectionDivider(stringResource(R.string.keyboard_backlight_section_title))
                 KeyboardBacklightSection()
             }
             if (DeviceSpecific.hasBlackberryKeyboard(profile)) {

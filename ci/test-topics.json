@@ -63,9 +63,11 @@
       "rocks.pkb.plektra.clipboard.ClipboardHistoryPrivacyTest",
       "rocks.pkb.plektra.clipboard.ClipboardHistoryTest",
       "rocks.pkb.plektra.clipboard.ClipboardUnreadableClipTest",
+      "rocks.pkb.plektra.clipboard.ShareCopyKeyboardPruneTest",
       "rocks.pkb.plektra.share.ShareContentTest",
       "rocks.pkb.plektra.share.ShareImageVerificationTest",
-      "rocks.pkb.plektra.share.ShareReviewRegressionTest"
+      "rocks.pkb.plektra.share.ShareReviewRegressionTest",
+      "rocks.pkb.plektra.share.ShareSaveRecoveryTest"
     ],
     "ui-settings": [
       "rocks.pkb.plektra.AccessibilitySettingsLauncherTest",

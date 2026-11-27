@@ -6,7 +6,7 @@ import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
@@ -18,6 +18,8 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.RandomAccessFile
+import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -153,13 +155,21 @@ internal object ShareOperations {
      * Records a freshly created target before any byte is written, so a target abandoned by a
      * killed process can still be removed later (see [ShareTargetJournal.recover]).
      */
-    private fun journal(context: Context, kind: ShareTargetJournal.Kind, target: Uri): ShareTargetJournal.Entry =
-        try {
-            ShareTargetJournal.begin(context, kind, target)
-        } catch (e: IOException) {
-            ShareTargetJournal.deleteTarget(context, kind, target)
-            throw ShareOperationException(ShareFailure.WriteFailed, e)
+    private fun journal(
+        context: Context,
+        kind: ShareTargetJournal.Kind,
+        target: Uri,
+        temporaryName: String? = null
+    ): ShareTargetJournal.Entry = try {
+        ShareTargetJournal.begin(context, kind, target, temporaryName)
+    } catch (e: IOException) {
+        // Not recorded, so remove it now: this process knows it is incomplete.
+        runCatching {
+            if (kind == ShareTargetJournal.Kind.Document) DocumentsContract.deleteDocument(context.contentResolver, target)
+            else context.contentResolver.delete(target, null, null)
         }
+        throw ShareOperationException(ShareFailure.WriteFailed, e)
+    }
 
     /**
      * Writes a MediaStore row as pending and publishes it only after every byte arrived, so other
@@ -198,6 +208,7 @@ internal object ShareOperations {
     }
 
     suspend fun saveToDownloads(context: Context, item: SharedItem): ShareItemResult = runOperation {
+        ShareCleanupWorker.scheduleRecovery(context)
         val name = suggestedName(context, item)
         val finalName = insertIntoMediaStore(
             context,
@@ -215,6 +226,7 @@ internal object ShareOperations {
             if (!ShareSettings.hasPersistedWriteAccess(context, treeUri)) {
                 throw ShareOperationException(ShareFailure.FolderAccessRevoked)
             }
+            ShareCleanupWorker.scheduleRecovery(context)
             val resolver = context.contentResolver
             val parent = try {
                 DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
@@ -222,53 +234,108 @@ internal object ShareOperations {
                 throw ShareOperationException(ShareFailure.FolderUnavailable, e)
             }
             val name = suggestedName(context, item)
+            val saved = createInFolder(context, parent, mimeOf(item), name) { document ->
+                guarded { writeTo(resolver, { openSource(resolver, item) }, document) }
+            }
+            ShareItemResult.Saved(displayNameOf(resolver, saved, name), folderLabel)
+        }
+
+    private fun createDocument(resolver: ContentResolver, parent: Uri, mimeType: String, name: String): Uri = try {
+        DocumentsContract.createDocument(resolver, parent, mimeType, name)
+    } catch (e: SecurityException) {
+        throw ShareOperationException(ShareFailure.FolderAccessRevoked, e)
+    } catch (e: FileNotFoundException) {
+        throw ShareOperationException(ShareFailure.FolderUnavailable, e)
+    } catch (e: IllegalArgumentException) {
+        throw ShareOperationException(ShareFailure.FolderUnavailable, e)
+    } catch (e: IllegalStateException) {
+        throw ShareOperationException(ShareFailure.FolderUnavailable, e)
+    } ?: throw ShareOperationException(ShareFailure.FolderUnavailable)
+
+    private fun documentNameAndFlags(resolver: ContentResolver, document: Uri): Pair<String?, Int> = runCatching {
+        resolver.query(
+            document,
+            arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_FLAGS),
+            null,
+            null,
+            null
+        )?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) to cursor.getInt(1) else null }
+    }.getOrNull() ?: (null to 0)
+
+    /**
+     * Creates a complete document in [parent]. When the provider can rename, the bytes go to a
+     * hidden document with a unique temporary name that is recorded in [ShareTargetJournal] and
+     * renamed to [name] only once complete, so recovery can tell a partial file apart from any
+     * final or replaced one. Without rename support the final document is written directly and
+     * not recorded: an in-process failure still deletes it, a crash leaves it in place.
+     */
+    private suspend fun createInFolder(
+        context: Context,
+        parent: Uri,
+        mimeType: String,
+        name: String,
+        write: suspend (Uri) -> Unit
+    ): Uri {
+        val resolver = context.contentResolver
+        val temporary = createDocument(resolver, parent, mimeType, ".plektra-partial-${UUID.randomUUID()}")
+        val (temporaryName, flags) = documentNameAndFlags(resolver, temporary)
+        if (temporaryName == null || flags and DocumentsContract.Document.FLAG_SUPPORTS_RENAME == 0) {
+            runCatching { DocumentsContract.deleteDocument(resolver, temporary) }
             // Document providers resolve name collisions themselves, e.g. "name (1).ext".
-            val document = try {
-                DocumentsContract.createDocument(resolver, parent, mimeOf(item), name)
-            } catch (e: SecurityException) {
-                throw ShareOperationException(ShareFailure.FolderAccessRevoked, e)
-            } catch (e: FileNotFoundException) {
-                throw ShareOperationException(ShareFailure.FolderUnavailable, e)
-            } catch (e: IllegalArgumentException) {
-                throw ShareOperationException(ShareFailure.FolderUnavailable, e)
-            } catch (e: IllegalStateException) {
-                throw ShareOperationException(ShareFailure.FolderUnavailable, e)
-            } ?: throw ShareOperationException(ShareFailure.FolderUnavailable)
-            val entry = journal(context, ShareTargetJournal.Kind.Document, document)
+            val document = createDocument(resolver, parent, mimeType, name)
             var complete = false
             try {
-                guarded { writeTo(resolver, { openSource(resolver, item) }, document) }
+                write(document)
                 complete = true
-                ShareTargetJournal.complete(context, entry)
             } finally {
-                if (!complete) ShareTargetJournal.discard(context, entry)
+                if (!complete) runCatching { DocumentsContract.deleteDocument(resolver, document) }
             }
-            ShareItemResult.Saved(displayNameOf(resolver, document, name), folderLabel)
+            return document
         }
+        val entry = journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName)
+        var complete = false
+        try {
+            write(temporary)
+            val renamed = guarded { DocumentsContract.renameDocument(resolver, temporary, name) } ?: temporary
+            complete = true
+            ShareTargetJournal.complete(context, entry)
+            return renamed
+        } finally {
+            if (!complete) ShareTargetJournal.discard(context, entry)
+        }
+    }
 
     /** Largest edge of the bitmap decoded to prove a picture is readable; bounds its memory. */
     private const val VERIFY_MAX_EDGE = 2048
 
     /**
-     * The format of [file] when Android can decode its pixels, otherwise null. Bounds alone only
-     * prove a valid header, so the picture is decoded for real, subsampled to limit memory.
+     * The format of [file] when Android can decode all of its pixels, otherwise null. A valid
+     * header proves little, and BitmapFactory returns a partly grey bitmap for a truncated JPEG,
+     * so ImageDecoder decodes it for real, subsampled to limit memory, and rejects partial images.
      */
     internal fun decodableImageType(file: File): String? {
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeFile(file.path, bounds)
-        val mimeType = bounds.outMimeType?.let(ShareMimeTypes::normalize)
-            ?.takeIf { it.startsWith("image/") && bounds.outWidth > 0 && bounds.outHeight > 0 }
-            ?: return null
-        var sampleSize = 1
-        while (maxOf(bounds.outWidth, bounds.outHeight) / sampleSize > VERIFY_MAX_EDGE) sampleSize *= 2
-        val bitmap = BitmapFactory.decodeFile(file.path, BitmapFactory.Options().apply { inSampleSize = sampleSize })
-            ?: return null
+        var mimeType: String? = null
+        val bitmap = try {
+            // A memory-mapped buffer: no copy on the heap, and the same bytes that get published.
+            val buffer = RandomAccessFile(file, "r").use { it.channel.map(FileChannel.MapMode.READ_ONLY, 0, it.length()) }
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(buffer)) { decoder, info, _ ->
+                mimeType = info.mimeType
+                var sampleSize = 1
+                while (maxOf(info.size.width, info.size.height) / sampleSize > VERIFY_MAX_EDGE) sampleSize *= 2
+                decoder.setTargetSampleSize(sampleSize)
+                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                decoder.setOnPartialImageListener { false }
+            }
+        } catch (e: IOException) {
+            return null
+        }
         bitmap.recycle()
-        return mimeType
+        return mimeType?.let(ShareMimeTypes::normalize)?.takeIf { it.startsWith("image/") }
     }
 
     suspend fun saveToGallery(context: Context, item: SharedItem): ShareItemResult = runOperation {
         if (item !is SharedItem.Stream || !item.isImage) throw ShareOperationException(ShareFailure.NotAnImage)
+        ShareCleanupWorker.scheduleRecovery(context)
         // The verified bytes are the ones published: a second read of the sender's URI could differ.
         val staged = guarded { ShareStaging.newFile(context) }
         try {
@@ -312,6 +379,8 @@ internal object ShareOperations {
                 ShareItemResult.Copied
             }
             is SharedItem.Stream -> {
+                // Before the copy starts, so a copy abandoned by a killed process also expires.
+                ShareCleanupWorker.scheduleClipboardExpiry(context)
                 val file = guarded { ShareClipboardCache.newCopy(context, suggestedName(context, item), item.mimeType) }
                 var placed = false
                 try {
@@ -325,7 +394,7 @@ internal object ShareOperations {
                     val clip = ClipData(ClipDescription(label, arrayOf(item.mimeType)), ClipData.Item(uri))
                     ShareClipboardCache.place(context, file) { setClip(clipboard, clip); clip }
                     placed = true
-                    ShareCleanupWorker.schedule(context)
+                    ShareCleanupWorker.scheduleClipboardExpiry(context)
                     ShareItemResult.Copied
                 } finally {
                     if (!placed) ShareClipboardCache.release(file)
@@ -403,7 +472,7 @@ internal object ShareClipboardCache {
         synchronized(lock) {
             try {
                 val clip = setClip()
-                pruneLocked(context, clip, clipKnown = true, now = System.currentTimeMillis())
+                pruneLocked(context, clip, now = System.currentTimeMillis())
             } finally {
                 file?.parentFile?.let { inFlight -= it.name }
             }
@@ -413,23 +482,18 @@ internal object ShareClipboardCache {
     fun hasCopies(context: Context): Boolean = root(context).list()?.isNotEmpty() == true
 
     /**
-     * Deletes copies that are expired or, when [clipKnown], no longer referenced by the clip that
-     * [readClip] returns. The clip is read under the lock so it cannot be stale against [place].
-     * Without a readable clip (a background job of an app that is not the keyboard) only expired
-     * copies go.
+     * Deletes copies that are expired or no longer referenced by the clip that [readClip]
+     * returns. The clip is read under the lock so it cannot be stale against [place]. A null
+     * clip is unknown, not empty: Android also returns null without read access or while the
+     * device is locked, so then only expired copies go.
      */
-    fun prune(
-        context: Context,
-        clipKnown: Boolean,
-        now: Long = System.currentTimeMillis(),
-        readClip: () -> ClipData?
-    ) {
+    fun prune(context: Context, now: Long = System.currentTimeMillis(), readClip: () -> ClipData?) {
         synchronized(lock) {
-            pruneLocked(context, readClip(), clipKnown, now)
+            pruneLocked(context, readClip(), now)
         }
     }
 
-    private fun pruneLocked(context: Context, currentClip: ClipData?, clipKnown: Boolean, now: Long) {
+    private fun pruneLocked(context: Context, currentClip: ClipData?, now: Long) {
         val referenced = buildSet {
             if (currentClip != null) {
                 val authority = authority(context)
@@ -444,7 +508,7 @@ internal object ShareClipboardCache {
         root(context).listFiles()?.forEach { directory ->
             if (directory.name in inFlight) return@forEach
             val expired = now - directory.lastModified() >= MAX_AGE_MILLIS
-            val unreferenced = (clipKnown || currentClip != null) && directory.name !in referenced
+            val unreferenced = currentClip != null && directory.name !in referenced
             if (expired || unreferenced) directory.deleteRecursively()
         }
     }

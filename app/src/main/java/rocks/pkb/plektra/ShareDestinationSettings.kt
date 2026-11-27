@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,16 +45,27 @@ import rocks.pkb.plektra.share.ShareSettings
 @Composable
 internal fun ShareDestinationSettings() {
     val context = LocalContext.current
-    // Folder metadata comes from another app's DocumentsProvider and may be slow: never on main.
-    var folder by remember { mutableStateOf<ShareSettings.SaveFolder?>(null) }
+    // The chosen URI comes from local preferences and drives every action. Its label and grant
+    // state come from another app's DocumentsProvider, which may be slow: loaded off main, and
+    // only the newest request may update the screen.
+    var folderUri by remember { mutableStateOf(ShareSettings.storedFolderUri(context)) }
+    var folderInfo by remember { mutableStateOf<ShareSettings.SaveFolder.Tree?>(null) }
+    val folderRequests = remember { AtomicInteger() }
     var albumEnabled by remember { mutableStateOf(ShareSettings.galleryAlbumEnabled(context)) }
     var showFolderDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    // Choices are applied one after another in the order the user made them.
+    val selections = remember { Dispatchers.IO.limitedParallelism(1) }
     val prefs = remember { SettingsManager.getPreferences(context) }
     val localPrefs = remember { ShareSettings.localPreferences(context) }
 
     fun reloadFolder() {
-        scope.launch { folder = withContext(Dispatchers.IO) { ShareSettings.saveFolder(context) } }
+        val request = folderRequests.incrementAndGet()
+        folderUri = ShareSettings.storedFolderUri(context)
+        scope.launch {
+            val info = withContext(Dispatchers.IO) { ShareSettings.saveFolder(context) }
+            if (request == folderRequests.get()) folderInfo = info as? ShareSettings.SaveFolder.Tree
+        }
     }
 
     DisposableEffect(prefs, localPrefs) {
@@ -79,7 +91,7 @@ internal fun ShareDestinationSettings() {
     val folderPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
             scope.launch {
-                val kept = withContext(Dispatchers.IO) {
+                val kept = withContext(selections) {
                     runCatching { ShareSettings.selectSaveFolder(context, uri) }.isSuccess
                 }
                 if (!kept) {
@@ -89,27 +101,27 @@ internal fun ShareDestinationSettings() {
             }
         }
     }
-    val currentFolder = folder
-    val folderSummary = when (currentFolder) {
-        null -> null
-        ShareSettings.SaveFolder.Downloads -> stringResource(R.string.share_folder_downloads)
-        is ShareSettings.SaveFolder.Tree -> when {
-            !currentFolder.accessible -> stringResource(R.string.share_folder_access_lost)
-            currentFolder.label == null -> stringResource(R.string.share_error_folder_unavailable)
-            else -> currentFolder.label
-        }
+    val currentUri = folderUri
+    val info = folderInfo?.takeIf { it.uri == currentUri }
+    val folderSummary = when {
+        currentUri == null -> stringResource(R.string.share_folder_downloads)
+        info == null -> stringResource(R.string.share_folder_unnamed)
+        !info.accessible -> stringResource(R.string.share_folder_access_lost)
+        info.label == null -> stringResource(R.string.share_error_folder_unavailable)
+        else -> info.label
     }
-    val folderInaccessible = (currentFolder as? ShareSettings.SaveFolder.Tree)?.usable == false
+    val folderInaccessible = info?.usable == false
+    val pickerStart = if (currentUri == null) ShareSettings.SaveFolder.Downloads
+    else info ?: ShareSettings.SaveFolder.Tree(currentUri, accessible = true, label = null)
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .settingRow(SettingLinkIds.ADVANCED_SHARE_SAVE_FOLDER) {
-                when (currentFolder) {
-                    null -> Unit
-                    ShareSettings.SaveFolder.Downloads ->
-                        folderPicker.launch(ShareSettings.pickerStartUri(currentFolder))
-                    is ShareSettings.SaveFolder.Tree -> showFolderDialog = true
+                if (currentUri == null) {
+                    folderPicker.launch(ShareSettings.pickerStartUri(pickerStart))
+                } else {
+                    showFolderDialog = true
                 }
             }
     ) {
@@ -137,13 +149,11 @@ internal fun ShareDestinationSettings() {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                if (folderSummary != null) {
-                    Text(
-                        text = folderSummary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (folderInaccessible) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                    )
-                }
+                Text(
+                    text = folderSummary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (folderInaccessible) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                )
             }
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -196,7 +206,7 @@ internal fun ShareDestinationSettings() {
         }
     }
 
-    if (showFolderDialog && currentFolder != null && folderSummary != null) {
+    if (showFolderDialog && currentUri != null) {
         AlertDialog(
             onDismissRequest = { showFolderDialog = false },
             title = { Text(stringResource(R.string.share_save_folder_title)) },
@@ -209,14 +219,14 @@ internal fun ShareDestinationSettings() {
             confirmButton = {
                 TextButton(onClick = {
                     showFolderDialog = false
-                    folderPicker.launch(ShareSettings.pickerStartUri(currentFolder))
+                    folderPicker.launch(ShareSettings.pickerStartUri(pickerStart))
                 }) { Text(stringResource(R.string.share_save_folder_choose)) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showFolderDialog = false
                     scope.launch {
-                        withContext(Dispatchers.IO) { ShareSettings.useDownloads(context) }
+                        withContext(selections) { ShareSettings.useDownloads(context) }
                         reloadFolder()
                     }
                 }) { Text(stringResource(R.string.share_save_folder_use_downloads)) }

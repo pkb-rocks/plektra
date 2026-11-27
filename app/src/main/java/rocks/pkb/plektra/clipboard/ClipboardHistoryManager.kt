@@ -133,8 +133,8 @@ class ClipboardHistoryManager internal constructor(
         if (!ShareClipboardCache.hasCopies(context)) return
         val clipboard = clipboardManager
         thread(name = "share-clipboard-prune") {
-            // The keyboard may read the clipboard, so an empty result means an empty clipboard.
-            runCatching { ShareClipboardCache.prune(context, clipKnown = true) { clipboard.primaryClip } }
+            // A null clip is unknown (no access, locked device): then only expired copies go.
+            runCatching { ShareClipboardCache.prune(context) { clipboard.primaryClip } }
         }
     }
 

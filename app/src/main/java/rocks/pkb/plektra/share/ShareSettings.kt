@@ -30,10 +30,13 @@ object ShareSettings {
         }
     }
 
+    /** The chosen folder from local preferences only; null means Downloads. Cheap enough for main. */
+    fun storedFolderUri(context: Context): Uri? =
+        localPreferences(context).getString(KEY_SAVE_FOLDER_URI, null)?.let { runCatching { Uri.parse(it) }.getOrNull() }
+
+    /** Includes the grant check and the provider's folder label: call off the main thread. */
     fun saveFolder(context: Context): SaveFolder {
-        val stored = localPreferences(context).getString(KEY_SAVE_FOLDER_URI, null)
-            ?: return SaveFolder.Downloads
-        val uri = runCatching { Uri.parse(stored) }.getOrNull() ?: return SaveFolder.Downloads
+        val uri = storedFolderUri(context) ?: return SaveFolder.Downloads
         val accessible = hasPersistedWriteAccess(context, uri)
         return SaveFolder.Tree(uri, accessible, if (accessible) treeLabel(context, uri) else null)
     }

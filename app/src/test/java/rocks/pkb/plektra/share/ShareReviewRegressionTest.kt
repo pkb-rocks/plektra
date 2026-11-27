@@ -80,7 +80,7 @@ class ShareReviewRegressionTest {
                 firstRead = false
                 val copy = ShareClipboardCache.root(context).listFiles()!!.single()
                 copy.setLastModified(System.currentTimeMillis() - ShareClipboardCache.MAX_AGE_MILLIS - 1)
-                ShareClipboardCache.prune(context, clipKnown = true) { null }
+                ShareClipboardCache.prune(context) { null }
                 buffer[offset] = 42
                 return 1
             }
@@ -110,7 +110,7 @@ class ShareReviewRegressionTest {
         val writing = ShareClipboardCache.newCopy(context, "writing.png", "image/png").apply { writeText("w") }
         second.parentFile!!.setLastModified(System.currentTimeMillis() - ShareClipboardCache.MAX_AGE_MILLIS)
         // A background run cannot read the clipboard; the deadline still applies.
-        ShareClipboardCache.prune(context, clipKnown = false) { null }
+        ShareClipboardCache.prune(context) { null }
         assertFalse("A copy must not outlive its deadline", second.exists())
         assertTrue(writing.exists())
         ShareClipboardCache.release(writing)
@@ -119,7 +119,7 @@ class ShareReviewRegressionTest {
     @Test
     fun unreadableClipboardKeepsCopiesWithinTheirDeadline() {
         val current = placedCopy("current.png")
-        ShareClipboardCache.prune(context, clipKnown = false) { null }
+        ShareClipboardCache.prune(context) { null }
         assertTrue(current.exists())
     }
 
@@ -128,75 +128,6 @@ class ShareReviewRegressionTest {
         val uri = FileProvider.getUriForFile(context, ShareClipboardCache.authority(context), file)
         ShareClipboardCache.place(context, file) { ClipData.newRawUri("", uri) }
         return file
-    }
-
-    // 4. Targets abandoned by a killed process or a failed delete are removed later.
-    @Test
-    fun documentAbandonedByAKilledProcessIsDeletedOnRecovery() {
-        val documents = installProvider("org.example.documents", FakeDocumentsProvider())
-        val document = DocumentsContract.buildDocumentUri("org.example.documents", "partial.bin")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, document)
-        ShareTargetJournal.forgetActiveForTest() // The process ended before finally ran.
-
-        ShareTargetJournal.recover(context)
-
-        assertEquals(listOf("partial.bin"), documents.deleted)
-        assertTrue(ShareTargetJournal.root(context).listFiles().orEmpty().isEmpty())
-    }
-
-    @Test
-    fun recoveryDeletesOnlyStillPendingMediaStoreRows() {
-        val media = installProvider("media", FakeMediaStore())
-        val pending = Uri.parse("content://media/external_primary/downloads/1")
-        val published = Uri.parse("content://media/external_primary/downloads/2")
-        media.pending += pending.lastPathSegment!!
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.MediaStore, pending)
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.MediaStore, published)
-        ShareTargetJournal.forgetActiveForTest()
-
-        ShareTargetJournal.recover(context)
-
-        assertEquals(listOf("1"), media.deleted)
-        assertTrue(media.lastQueryMatchedPending)
-        assertTrue(ShareTargetJournal.root(context).listFiles().orEmpty().isEmpty())
-    }
-
-    @Test
-    fun failedDeleteIsRetriedByRecoveryAndActiveTargetsAreLeftAlone() = runBlocking {
-        val documents = installProvider("org.example.documents", FakeDocumentsProvider().apply { failDeletes = true })
-        val tree = DocumentsContract.buildTreeDocumentUri("org.example.documents", "root")
-        context.contentResolver.takePersistableUriPermission(
-            tree,
-            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        val source = Uri.parse("content://org.example.files/broken.bin")
-        shadowOf(context.contentResolver).registerInputStream(source, object : InputStream() {
-            override fun read(): Int = throw IOException("synthetic source failure")
-            override fun read(b: ByteArray, off: Int, len: Int): Int = throw IOException("synthetic source failure")
-        })
-
-        val result = ShareOperations.saveToFolder(
-            context,
-            SharedItem.Stream(0, source, "application/octet-stream", "broken.bin", null),
-            tree,
-            "Folder"
-        )
-
-        assertEquals(ShareItemResult.Failed(ShareFailure.SourceUnreadable), result)
-        assertTrue("The failed delete must stay recorded", documents.deleted.isEmpty())
-        assertEquals(1, ShareTargetJournal.root(context).listFiles().orEmpty().size)
-
-        documents.failDeletes = false
-        ShareTargetJournal.recover(context)
-        assertEquals(listOf(documents.created.single()), documents.deleted)
-        assertTrue(ShareTargetJournal.root(context).listFiles().orEmpty().isEmpty())
-
-        // A target of the running process is never recovered.
-        val active = ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document,
-            DocumentsContract.buildDocumentUri("org.example.documents", "active.bin"))
-        ShareTargetJournal.recover(context)
-        assertFalse("active.bin" in documents.deleted)
-        ShareTargetJournal.complete(context, active)
     }
 
     // 6. The type a reader gets from Plektra's provider is the one the clip announces.
@@ -257,84 +188,5 @@ class ShareReviewRegressionTest {
             }
         }
         return excluded
-    }
-
-    private fun <T : ContentProvider> installProvider(authority: String, provider: T): T {
-        provider.attachInfo(context, ProviderInfo().apply { this.authority = authority })
-        ShadowContentResolver.registerProviderInternal(authority, provider)
-        return provider
-    }
-
-    class FakeDocumentsProvider : ContentProvider() {
-        val created = mutableListOf<String>()
-        val deleted = mutableListOf<String>()
-        var failDeletes = false
-        private val files = mutableMapOf<String, File>()
-
-        override fun onCreate() = true
-
-        override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
-            val uri = extras?.getParcelable<Uri>("uri") ?: return null
-            return when (method) {
-                "android:createDocument" -> {
-                    val id = "doc-${created.size}"
-                    created += id
-                    files[id] = File.createTempFile("share-doc", ".bin", context!!.cacheDir)
-                    Bundle().apply {
-                        putParcelable("uri", DocumentsContract.buildDocumentUriUsingTree(uri, id))
-                    }
-                }
-                "android:deleteDocument" -> {
-                    if (failDeletes) throw IllegalStateException("synthetic transient failure")
-                    val id = DocumentsContract.getDocumentId(uri)
-                    deleted += id
-                    files.remove(id)?.delete()
-                    Bundle()
-                }
-                else -> null
-            }
-        }
-
-        override fun openFile(uri: Uri, mode: String): android.os.ParcelFileDescriptor {
-            val file = files.getOrPut(DocumentsContract.getDocumentId(uri)) {
-                File.createTempFile("share-doc", ".bin", context!!.cacheDir)
-            }
-            return android.os.ParcelFileDescriptor.open(file, android.os.ParcelFileDescriptor.parseMode(mode))
-        }
-
-        override fun query(uri: Uri, p: Array<out String>?, s: String?, a: Array<out String>?, o: String?): Cursor =
-            MatrixCursor(arrayOf("_display_name")).apply { addRow(arrayOf(DocumentsContract.getDocumentId(uri))) }
-        override fun getType(uri: Uri) = "application/octet-stream"
-        override fun insert(uri: Uri, values: ContentValues?): Uri? = null
-        override fun delete(uri: Uri, s: String?, a: Array<out String>?) = 0
-        override fun update(uri: Uri, v: ContentValues?, s: String?, a: Array<out String>?) = 0
-    }
-
-    class FakeMediaStore : ContentProvider() {
-        val pending = mutableSetOf<String>()
-        val deleted = mutableListOf<String>()
-        var lastQueryMatchedPending = false
-
-        override fun onCreate() = true
-
-        override fun query(uri: Uri, projection: Array<out String>?, args: Bundle?, signal: CancellationSignal?): Cursor {
-            lastQueryMatchedPending = args?.getInt(MediaStore.QUERY_ARG_MATCH_PENDING) == MediaStore.MATCH_INCLUDE
-            val id = uri.lastPathSegment!!
-            return MatrixCursor(arrayOf(MediaStore.MediaColumns.IS_PENDING)).apply {
-                if (id !in deleted) addRow(arrayOf(if (id in pending) 1 else 0))
-            }
-        }
-
-        override fun query(uri: Uri, p: Array<out String>?, s: String?, a: Array<out String>?, o: String?): Cursor =
-            query(uri, p, null as Bundle?, null)
-
-        override fun delete(uri: Uri, s: String?, a: Array<out String>?): Int {
-            deleted += uri.lastPathSegment!!
-            return 1
-        }
-
-        override fun getType(uri: Uri): String? = null
-        override fun insert(uri: Uri, values: ContentValues?): Uri? = null
-        override fun update(uri: Uri, v: ContentValues?, s: String?, a: Array<out String>?) = 0
     }
 }

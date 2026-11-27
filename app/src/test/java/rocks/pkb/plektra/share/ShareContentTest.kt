@@ -39,6 +39,9 @@ class ShareContentTest {
         SettingsManager.getPreferences(context).edit().clear().commit()
         ShareSettings.localPreferences(context).edit().clear().commit()
         ShareClipboardCache.root(context).deleteRecursively()
+        // AndroidX caches path strategies across Robolectric methods, whose cache paths differ.
+        androidx.core.content.FileProvider::class.java.getDeclaredField("sCache").apply { isAccessible = true }
+            .let { (it.get(null) as MutableMap<*, *>).clear() }
         context.getSystemService(ClipboardManager::class.java).clearPrimaryClip()
         // Robolectric starts with an empty extension table.
         shadowOf(MimeTypeMap.getSingleton()).apply {
@@ -202,16 +205,6 @@ class ShareContentTest {
             ShareItemResult.Failed(ShareFailure.FolderAccessRevoked),
             ShareOperations.saveToFolder(context, item, tree, "Shared")
         )
-    }
-
-    @Test
-    fun galleryRejectsNonPicturesBeforeWriting() = runBlocking {
-        val source = Uri.parse("content://org.example.files/fake.png")
-        shadowOf(context.contentResolver).registerInputStream(source, ByteArrayInputStream("not a picture".toByteArray()))
-        val item = SharedItem.Stream(0, source, "image/png", "fake.png", null)
-        assertEquals(ShareItemResult.Failed(ShareFailure.NotAnImage), ShareOperations.saveToGallery(context, item))
-        val text = SharedItem.Text(1, "Synthetic", null, null)
-        assertEquals(ShareItemResult.Failed(ShareFailure.NotAnImage), ShareOperations.saveToGallery(context, text))
     }
 
     @Test

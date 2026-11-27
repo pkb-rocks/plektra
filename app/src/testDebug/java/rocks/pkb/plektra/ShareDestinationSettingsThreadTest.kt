@@ -10,12 +10,19 @@ import android.database.MatrixCursor
 import android.net.Uri
 import android.os.Looper
 import android.provider.DocumentsContract
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import java.util.Collections
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,19 +31,29 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowContentResolver
 import rocks.pkb.plektra.share.ShareSettings
 
-/** 7. Folder metadata comes from another app's provider and must never be queried on main. */
+/** Share folder settings with a slow DocumentsProvider (review rounds 2 and 3). */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class ShareDestinationSettingsThreadTest {
     @get:Rule val compose = createComposeRule()
     private val context: Context = ApplicationProvider.getApplicationContext()
+    private val provider = RecordingDocumentsProvider()
 
-    @Test
-    fun folderLabelIsLoadedOffTheMainThread() {
-        val provider = RecordingDocumentsProvider()
+    @Before
+    fun setUp() {
         provider.attachInfo(context, ProviderInfo().apply { authority = AUTHORITY })
         ShadowContentResolver.registerProviderInternal(AUTHORITY, provider)
-        val tree = DocumentsContract.buildTreeDocumentUri(AUTHORITY, "root")
+        ShareSettings.localPreferences(context).edit().clear().commit()
+        ShareSettings.setGalleryAlbumEnabled(context, false)
+    }
+
+    @After
+    fun tearDown() {
+        provider.gates.values.forEach { it.countDown() }
+    }
+
+    private fun choose(folderId: String): Uri {
+        val tree = DocumentsContract.buildTreeDocumentUri(AUTHORITY, folderId)
         context.contentResolver.takePersistableUriPermission(
             tree,
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -44,11 +61,16 @@ class ShareDestinationSettingsThreadTest {
         ShareSettings.localPreferences(context).edit()
             .putString(ShareSettings.KEY_SAVE_FOLDER_URI, tree.toString())
             .commit()
+        return tree
+    }
 
-        compose.setContent { ShareDestinationSettings() }
-        compose.waitUntil(timeoutMillis = 5_000) {
-            compose.onAllNodesWithText("Synthetic folder").fetchSemanticsNodes().isNotEmpty()
-        }
+    private fun shown(text: String) = compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
+
+    @Test
+    fun folderLabelIsLoadedOffTheMainThread() {
+        choose("a")
+        compose.setContent { Column { ShareDestinationSettings() } }
+        compose.waitUntil(timeoutMillis = 5_000) { shown("Folder a") }
 
         assertTrue(provider.queryThreads.isNotEmpty())
         assertFalse(
@@ -57,14 +79,53 @@ class ShareDestinationSettingsThreadTest {
         )
     }
 
+    @Test
+    fun actionsDoNotWaitForTheFolderLabel() {
+        provider.gates["a"] = CountDownLatch(1)
+        choose("a")
+        compose.setContent { Column { ShareDestinationSettings() } }
+
+        compose.onNodeWithText(context.getString(R.string.share_save_folder_title)).performClick()
+
+        compose.waitUntil(timeoutMillis = 5_000) { shown(context.getString(R.string.share_save_folder_use_downloads)) }
+        assertFalse(shown("Folder a"))
+    }
+
+    @Test
+    fun newestFolderWinsOverAnOlderSlowLabel() {
+        provider.gates["a"] = CountDownLatch(1)
+        choose("a")
+        compose.setContent { Column { ShareDestinationSettings() } }
+        compose.waitUntil(timeoutMillis = 5_000) { provider.started.contains("a") }
+
+        compose.runOnIdle { choose("b") }
+        compose.waitUntil(timeoutMillis = 5_000) { shown("Folder b") }
+        provider.gates.getValue("a").countDown()
+        compose.waitUntil(timeoutMillis = 5_000) { provider.finished.contains("a") }
+        compose.waitForIdle()
+
+        assertTrue(shown("Folder b"))
+        assertFalse("A late answer for the previous folder replaced the newest", shown("Folder a"))
+    }
+
     class RecordingDocumentsProvider : ContentProvider() {
         val queryThreads: MutableList<Thread> = Collections.synchronizedList(mutableListOf())
+        val gates: MutableMap<String, CountDownLatch> = Collections.synchronizedMap(mutableMapOf())
+        val started: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())
+        val finished: MutableSet<String> = Collections.synchronizedSet(mutableSetOf())
+
         override fun onCreate() = true
+
         override fun query(uri: Uri, p: Array<out String>?, s: String?, a: Array<out String>?, o: String?): Cursor {
             queryThreads += Thread.currentThread()
+            val id = DocumentsContract.getDocumentId(uri)
+            started += id
+            gates[id]?.await(10, TimeUnit.SECONDS)
+            finished += id
             return MatrixCursor(arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
-                .apply { addRow(arrayOf("Synthetic folder")) }
+                .apply { addRow(arrayOf("Folder $id")) }
         }
+
         override fun getType(uri: Uri): String? = null
         override fun insert(uri: Uri, values: ContentValues?): Uri? = null
         override fun delete(uri: Uri, s: String?, a: Array<out String>?) = 0

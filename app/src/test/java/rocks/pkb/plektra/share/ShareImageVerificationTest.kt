@@ -3,14 +3,18 @@ package rocks.pkb.plektra.share
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.work.Operation
+import androidx.work.impl.OperationImpl
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,6 +29,18 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class ShareImageVerificationTest {
     private val context: Context get() = RuntimeEnvironment.getApplication()
+
+    private val originalScheduler = ShareCleanupWorker.scheduler
+
+    @Before
+    fun completeRecoveryEnqueue() {
+        ShareCleanupWorker.scheduler = { _, _ -> OperationImpl().apply { markState(Operation.SUCCESS) } }
+    }
+
+    @After
+    fun restoreScheduler() {
+        ShareCleanupWorker.scheduler = originalScheduler
+    }
 
     private fun png(): ByteArray = ByteArrayOutputStream().also {
         Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.PNG, 100, it)

@@ -207,8 +207,18 @@ internal object ShareOperations {
         }
     }
 
+    private suspend fun ensureRecoveryScheduled(context: Context) {
+        try {
+            ShareCleanupWorker.scheduleRecovery(context)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw ShareOperationException(ShareFailure.WriteFailed, e)
+        }
+    }
+
     suspend fun saveToDownloads(context: Context, item: SharedItem): ShareItemResult = runOperation {
-        ShareCleanupWorker.scheduleRecovery(context)
+        ensureRecoveryScheduled(context)
         val name = suggestedName(context, item)
         val finalName = insertIntoMediaStore(
             context,
@@ -226,7 +236,7 @@ internal object ShareOperations {
             if (!ShareSettings.hasPersistedWriteAccess(context, treeUri)) {
                 throw ShareOperationException(ShareFailure.FolderAccessRevoked)
             }
-            ShareCleanupWorker.scheduleRecovery(context)
+            ensureRecoveryScheduled(context)
             val resolver = context.contentResolver
             val parent = try {
                 DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri))
@@ -349,7 +359,7 @@ internal object ShareOperations {
 
     suspend fun saveToGallery(context: Context, item: SharedItem): ShareItemResult = runOperation {
         if (item !is SharedItem.Stream || !item.isImage) throw ShareOperationException(ShareFailure.NotAnImage)
-        ShareCleanupWorker.scheduleRecovery(context)
+        ensureRecoveryScheduled(context)
         // The verified bytes are the ones published: a second read of the sender's URI could differ.
         val staged = guarded { ShareStaging.newFile(context) }
         try {

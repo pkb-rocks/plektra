@@ -5,9 +5,11 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.await
 import java.util.concurrent.TimeUnit
 
 /**
@@ -43,25 +45,27 @@ class ShareCleanupWorker(context: Context, params: WorkerParameters) : Worker(co
             return ShareTargetJournal.hasRecords(context)
         }
 
-        /** Replaceable in tests, which have no WorkManager. */
-        internal var scheduler: (Context, Run) -> Unit = { context, run ->
-            runCatching {
-                WorkManager.getInstance(context).enqueueUniqueWork(
-                    run.workName,
-                    run.policy,
-                    OneTimeWorkRequestBuilder<ShareCleanupWorker>()
-                        .setInitialDelay(run.delayMillis, TimeUnit.MILLISECONDS)
-                        .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
-                        .build()
-                )
-            }
+        /** Replaceable in tests to control completion of the WorkManager transaction. */
+        internal var scheduler: (Context, Run) -> Operation = { context, run ->
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                run.workName,
+                run.policy,
+                OneTimeWorkRequestBuilder<ShareCleanupWorker>()
+                    .setInitialDelay(run.delayMillis, TimeUnit.MILLISECONDS)
+                    .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
+                    .build()
+            )
         }
 
-        /** Called before a save writes anything, so a crash during the write is cleaned up too. */
-        fun scheduleRecovery(context: Context) = scheduler(context, Run.Recovery)
+        /** Wait until WorkManager stores the recovery request before creating a save target. */
+        suspend fun scheduleRecovery(context: Context) {
+            scheduler(context, Run.Recovery).await()
+        }
 
         /** Called before a clipboard copy is written. */
-        fun scheduleClipboardExpiry(context: Context) = scheduler(context, Run.ClipboardExpiry)
+        fun scheduleClipboardExpiry(context: Context) {
+            runCatching { scheduler(context, Run.ClipboardExpiry) }
+        }
 
         /**
          * Removes leftovers of earlier processes. A clipboard that cannot be read, which is the

@@ -16,13 +16,18 @@ import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.DocumentsContract.Document
 import android.provider.MediaStore
+import androidx.work.Operation
+import androidx.work.impl.OperationImpl
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -49,7 +54,10 @@ class ShareSaveRecoveryTest {
     fun reset() {
         ShareTargetJournal.root(context).deleteRecursively()
         ShareTargetJournal.forgetActiveForTest()
-        ShareCleanupWorker.scheduler = { _, run -> scheduled += run }
+        ShareCleanupWorker.scheduler = { _, run ->
+            scheduled += run
+            OperationImpl().apply { markState(Operation.SUCCESS) }
+        }
     }
 
     @After
@@ -224,6 +232,39 @@ class ShareSaveRecoveryTest {
         assertTrue(ShareCleanupWorker.Run.Recovery in scheduledWhileWriting)
     }
 
+    @Test
+    fun folderSaveCreatesNothingUntilWorkManagerStoresTheRecoveryJob() = runBlocking {
+        val documents = FakeDocumentsProvider()
+        val tree = grantedTree(documents)
+        val enqueue = OperationImpl()
+        ShareCleanupWorker.scheduler = { _, _ -> enqueue }
+        val item = SharedItem.Stream(0, source("waiting.bin", byteArrayOf(1)), "application/octet-stream", "waiting.bin", null)
+
+        val save = async(start = CoroutineStart.UNDISPATCHED) {
+            ShareOperations.saveToFolder(context, item, tree, "Folder")
+        }
+        assertFalse(save.isCompleted)
+        assertTrue(documents.names().isEmpty())
+        assertTrue(records().isEmpty())
+
+        enqueue.markState(Operation.SUCCESS)
+        assertEquals(ShareItemResult.Saved("waiting.bin", "Folder"), save.await())
+    }
+
+    @Test
+    fun folderSaveCreatesNothingWhenWorkManagerRejectsTheRecoveryJob() = runBlocking {
+        val documents = FakeDocumentsProvider()
+        val tree = grantedTree(documents)
+        ShareCleanupWorker.scheduler = { _, _ ->
+            OperationImpl().apply { markState(Operation.State.FAILURE(IOException("Unable to schedule"))) }
+        }
+        val item = SharedItem.Stream(0, source("unscheduled.bin", byteArrayOf(1)), "application/octet-stream", "unscheduled.bin", null)
+
+        assertEquals(ShareItemResult.Failed(ShareFailure.WriteFailed), ShareOperations.saveToFolder(context, item, tree, "Folder"))
+        assertTrue(documents.names().isEmpty())
+        assertTrue(records().isEmpty())
+    }
+
     // Round 3, finding 3: a slow recovery never delays a fresh share.
     @Test
     fun freshShareLoadsWhileRecoveryIsBlocked() {
@@ -257,12 +298,15 @@ class ShareSaveRecoveryTest {
         installProvider("media", FakeMediaStore().apply { pendingByDefault = true })
         val failures = Collections.synchronizedList(mutableListOf<Throwable>())
         val entries = Collections.synchronizedList(mutableListOf<ShareTargetJournal.Entry>())
-        var running = true
-        val recoverer = thread {
-            while (running) runCatching { ShareTargetJournal.recover(context) }.onFailure { failures += it }
+        val running = AtomicBoolean(true)
+        val recoverer = thread(isDaemon = true) {
+            while (running.get()) {
+                runCatching { ShareTargetJournal.recover(context) }.onFailure { failures += it }
+                Thread.sleep(1)
+            }
         }
         val writers = (0 until 4).map { worker ->
-            thread {
+            thread(isDaemon = true) {
                 repeat(100) { index ->
                     runCatching {
                         entries += ShareTargetJournal.begin(
@@ -274,10 +318,14 @@ class ShareSaveRecoveryTest {
                 }
             }
         }
-        writers.forEach { it.join() }
-        running = false
-        recoverer.join()
-
+        try {
+            writers.forEach { it.join(5_000) }
+            assertFalse("Journal writers did not finish", writers.any { it.isAlive })
+        } finally {
+            running.set(false)
+            recoverer.join(5_000)
+        }
+        assertFalse("Recovery did not finish", recoverer.isAlive)
         assertTrue("begin or recover failed: $failures", failures.isEmpty())
         assertEquals(400, entries.size)
         val present = records().toSet()

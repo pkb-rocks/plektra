@@ -33,7 +33,7 @@ class ShareCleanupWorker(context: Context, params: WorkerParameters) : Worker(co
     companion object {
         /** When a save last asked for recovery, as System.nanoTime(); read by a running job. */
         @Volatile
-        private var lastRecoveryRequest = Long.MIN_VALUE
+        private var lastRecoveryRequest: Long? = null
 
         /**
          * Cleans up once and tells whether another run is needed: records stay when a provider
@@ -42,7 +42,8 @@ class ShareCleanupWorker(context: Context, params: WorkerParameters) : Worker(co
          */
         internal fun runOnce(context: Context, startedAt: Long): Boolean {
             runCatching { cleanUp(context) }
-            return ShareTargetJournal.hasRecords(context) || lastRecoveryRequest - startedAt >= 0
+            val requestedDuringRun = lastRecoveryRequest?.let { it - startedAt >= 0 } == true
+            return ShareTargetJournal.hasRecords(context) || requestedDuringRun
         }
 
         /** Replaceable in tests, which have no WorkManager. */

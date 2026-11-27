@@ -16,6 +16,7 @@ import androidx.core.view.DisplayCutoutCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.File
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -49,6 +50,7 @@ class NotesCompactRenderTest {
     private var width = 1076
     private var height = 1200
     private var cutout = Rect(0, 0, 123, 123)
+    private var expectedDirection = View.LAYOUT_DIRECTION_LTR
 
     @Before
     fun resetState() {
@@ -104,15 +106,20 @@ class NotesCompactRenderTest {
 
     @Test
     @Config(qualifiers = "ldrtl-w360dp-h640dp-360dpi")
-    fun renderNarrowRightToLeftWindowWithCentredCutout() = renderNarrow("narrow360-centred-rtl", 810, 1440, Rect(369, 0, 441, 72))
+    fun renderNarrowRightToLeftWindowWithCentredCutout() = renderNarrow("narrow360-centred-rtl", 810, 1440, Rect(369, 0, 441, 72), rtl = true)
 
-    private fun renderNarrow(name: String, w: Int, h: Int, camera: Rect) {
+    @Test
+    @Config(qualifiers = "ldrtl-w320dp-h640dp-360dpi")
+    fun renderNarrowRightToLeftWindowWithCornerCutout() = renderNarrow("narrow320-corner-rtl", 720, 1440, Rect(0, 0, 124, 124), rtl = true)
+
+    private fun renderNarrow(name: String, w: Int, h: Int, camera: Rect, rtl: Boolean = false) {
         val out = System.getenv("PLEKTRA_NOTES_RENDER")?.let(::File)
         assumeTrue("Set PLEKTRA_NOTES_RENDER to an output directory", out != null)
         out!!.mkdirs()
         width = w
         height = h
         cutout = camera
+        expectedDirection = if (rtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
         for (keyboard in listOf(false, true)) {
             val bitmap = render(Screen.EDIT, AppThemeMode.LIGHT, AppDarkSurfaceStyle.STANDARD, fullscreen = true, keyboard = keyboard)
             File(out, "$name-light-edit-${if (keyboard) "bar" else "nobar"}.png").outputStream().use {
@@ -238,6 +245,7 @@ class NotesCompactRenderTest {
             .setDisplayCutout(DisplayCutoutCompat(Rect(0, cutout.bottom, 0, 0), listOf(cutout)))
             .build()
         val decor = activity.window.decorView
+        decor.layoutDirection = expectedDirection
         repeat(3) {
             ViewCompat.dispatchApplyWindowInsets(root, insets)
             decor.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
@@ -246,6 +254,9 @@ class NotesCompactRenderTest {
             decor.viewTreeObserver.dispatchOnGlobalLayout()
             decor.viewTreeObserver.dispatchOnPreDraw()
         }
+        assertEquals("Render root must use the requested direction", expectedDirection, root.layoutDirection)
+        val header = activity.findViewById<View>(R.id.notes_markdown_toggle).parent as View
+        assertEquals("Render header must use the requested direction", expectedDirection, header.layoutDirection)
     }
 
     private companion object {

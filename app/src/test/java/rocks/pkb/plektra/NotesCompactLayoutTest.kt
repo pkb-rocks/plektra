@@ -105,13 +105,13 @@ class NotesCompactLayoutTest {
     @Test
     @Config(qualifiers = "ldrtl-w360dp-h640dp-360dpi")
     fun centredCutoutInARightToLeftWindowKeepsEveryActionVisibleAndSeparate() {
-        verifyCrowdedHeader(CENTRED_360, fontScale = 1f)
+        verifyCrowdedHeader(CENTRED_360, fontScale = 1f, rtl = true)
     }
 
     @Test
     @Config(qualifiers = "ldrtl-w320dp-h640dp-360dpi")
     fun cornerCutoutInARightToLeftWindowKeepsBackAndActionsApart() {
-        verifyCrowdedHeader(CORNER_320, fontScale = 1.3f)
+        verifyCrowdedHeader(CORNER_320, fontScale = 1.3f, rtl = true)
     }
 
     @Test
@@ -218,12 +218,16 @@ class NotesCompactLayoutTest {
         assertTrue("Header and tools below the status bar may use at most $MAX_CHROME px, used $chrome", chrome <= MAX_CHROME)
     }
 
-    private fun verifyCrowdedHeader(window: Window, fontScale: Float) {
+    private fun verifyCrowdedHeader(window: Window, fontScale: Float, rtl: Boolean = false) {
         setFontScale(fontScale)
         SettingsManager.setSettingsFullscreenEnabled(context, true)
         val activity = launch()
         activity.findViewById<EditText>(R.id.notes_heading).setText("Shopping list for the weekend")
+        val direction = if (rtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+        activity.window.decorView.layoutDirection = direction
         layout(activity, window)
+        assertEquals("Root must exercise the requested layout direction", direction, rootOf(activity).layoutDirection)
+        assertEquals("Header must exercise the requested layout direction", direction, headerOf(activity).layoutDirection)
         verifyActions(activity, window, forbidden = listOf(window.cutout))
         val tools = windowRect(formatBarOf(activity))
         assertTrue("Formatting tools must start below the camera: $tools", tools.top >= window.cutout.bottom)

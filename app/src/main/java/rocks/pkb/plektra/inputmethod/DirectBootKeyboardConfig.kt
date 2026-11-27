@@ -261,6 +261,7 @@ internal class DirectBootKeyboardConfig(private val context: Context) {
                 "alt_modifier_binding", "long_press_modifier", "long_press_threshold",
                 "shift_tap_latches", "alt_tap_latches", "ctrl_tap_latches", "clear_alt_on_space",
                 "alt_latch_stays_on_space", "ctrl_latch_stays_on_space",
+                "smart_alt_off_after_opening", "smart_ctrl_off_after_shortcut",
                 "shift_backspace_delete", "alt_backspace_delete", "backspace_at_start_delete",
                 "alt_shift_layout_switch", "alt_enter_layout_switch", "ctrl_space_layout_switch",
                 "alt_space_previous_language", "ctrl_language_previous", "toast_on_layout_switch",

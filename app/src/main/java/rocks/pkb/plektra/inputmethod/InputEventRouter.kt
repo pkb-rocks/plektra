@@ -11,6 +11,7 @@ import android.view.inputmethod.InputConnection
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.core.NavModeController
+import rocks.pkb.plektra.core.SmartModifierToggle
 import rocks.pkb.plektra.data.mappings.KeyMappingLoader
 import android.os.Handler
 import android.os.Looper
@@ -505,6 +506,17 @@ class InputEventRouter(
                     callSuperWithKey = callbacks.callSuperWithKey
                 )
             ) {
+                // Smart toggle: a latched Alt and an opening quote or bracket mean words come next
+                if (altLatchActive && SettingsManager.getSmartAltOffAfterOpening(context)) {
+                    val typed = controllers.alternateCharacterManager.resolveAltText(keyCode, params.altMappingsOverride)
+                    val before = ic?.getTextBeforeCursor(2, 0)?.let { text ->
+                        if (typed != null && text.endsWith(typed)) text.dropLast(typed.length) else text
+                    }
+                    if (typed != null && SmartModifierToggle.opensQuoteOrBracket(typed, before)) {
+                        controllers.modifierStateController.clearAltState()
+                        callbacks.updateStatusBar()
+                    }
+                }
                 return EditableFieldRoutingResult.Consume
             }
         }
@@ -529,6 +541,18 @@ class InputEventRouter(
                     toggleMinimalUi = callbacks.toggleMinimalUi
                 )
             ) {
+                // Smart toggle: a tap-latched Ctrl is done after one shortcut (cursor moves keep it)
+                val ctrlMapping = params.ctrlKeyMap[keyCode]
+                if (
+                    params.ctrlLatchActive && !params.ctrlLatchFromNavMode &&
+                    event?.isCtrlPressed != true && !params.ctrlPressed && !params.ctrlPhysicallyPressed &&
+                    !SmartModifierToggle.isNavigation(ctrlMapping?.type, ctrlMapping?.value) &&
+                    SettingsManager.getCtrlTapLatches(context) &&
+                    SettingsManager.getSmartCtrlOffAfterShortcut(context)
+                ) {
+                    controllers.modifierStateController.clearCtrlState()
+                    callbacks.updateStatusBar()
+                }
                 return EditableFieldRoutingResult.Consume
             }
         }

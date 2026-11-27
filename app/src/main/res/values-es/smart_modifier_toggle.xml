@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Cambio inteligente: Alt se desactiva tras una apertura</string>
+    <string name="smart_alt_off_description">Con Alt bloqueado, escribir unas comillas o un paréntesis de apertura con Alt (\" ( [ {) desactiva Alt, para que las palabras de dentro salgan como letras</string>
+    <string name="smart_ctrl_off_title">Cambio inteligente: Ctrl se desactiva tras un atajo</string>
+    <string name="smart_ctrl_off_description">Un Ctrl tocado se desactiva tras un atajo como copiar, pegar o deshacer; los movimientos de cursor y selección lo mantienen activo</string>
+</resources>

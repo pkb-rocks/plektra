@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Smart toggle: Alt off after an opening</string>
+    <string name="smart_alt_off_description">With Alt locked, typing an opening quote or bracket with Alt (\" ( [ {) switches Alt off, so the words inside come out as letters</string>
+    <string name="smart_ctrl_off_title">Smart toggle: Ctrl off after a shortcut</string>
+    <string name="smart_ctrl_off_description">A tapped Ctrl switches off after one shortcut such as copy, paste or undo; cursor and selection moves keep it on</string>
+</resources>

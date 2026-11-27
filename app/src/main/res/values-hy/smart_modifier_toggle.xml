@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Խելացի փոխարկում․ Alt-ն անջատվում է բացվող նշանից հետո</string>
+    <string name="smart_alt_off_description">Կողպված Alt-ով բացվող չակերտ կամ փակագիծ մուտքագրելը Alt-ով (\" ( [ {) անջատում է Alt-ը, որպեսզի ներսի բառերը մուտքագրվեն տառերով</string>
+    <string name="smart_ctrl_off_title">Խելացի փոխարկում․ Ctrl-ն անջատվում է դյուրանցումից հետո</string>
+    <string name="smart_ctrl_off_description">Հպված Ctrl-ն անջատվում է մեկ դյուրանցումից հետո, օրինակ՝ պատճենել, տեղադրել կամ չեղարկել․ կուրսորի և ընտրության շարժումները այն միացված են պահում</string>
+</resources>

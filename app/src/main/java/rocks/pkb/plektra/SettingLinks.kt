@@ -139,6 +139,8 @@ object SettingLinkIds {
     const val MODIFIERS_ALT_LATCH_STAYS_ON_SPACE = "modifiers.alt_latch_stays_on_space"
     const val MODIFIERS_CTRL_TAP_LATCHES = "modifiers.ctrl_tap_latches"
     const val MODIFIERS_CTRL_LATCH_STAYS_ON_SPACE = "modifiers.ctrl_latch_stays_on_space"
+    const val MODIFIERS_SMART_ALT_OFF = "modifiers.smart_alt_off"
+    const val MODIFIERS_SMART_CTRL_OFF = "modifiers.smart_ctrl_off"
     // Custom input styles screen
     const val CUSTOM_INPUT_STYLES_LAYOUT_MODE = "custom_input_styles.layout_mode"
     const val CUSTOM_INPUT_STYLES_ALT_SHIFT_LAYOUT_SWITCH =
@@ -909,6 +911,20 @@ object SettingLinkRegistry {
             SettingLinkIds.MODIFIERS_CTRL_LATCH_STAYS_ON_SPACE,
             R.string.ctrl_latch_stays_on_space_title,
             R.string.ctrl_latch_stays_on_space_description,
+            destination = SettingsDestination.Modifiers,
+            availability = SettingAvailability.CtrlTapLatchesEnabled,
+            unavailableFallbackId = SettingLinkIds.MODIFIERS_CTRL_TAP_LATCHES
+        ),
+        entry(
+            SettingLinkIds.MODIFIERS_SMART_ALT_OFF,
+            R.string.smart_alt_off_title,
+            R.string.smart_alt_off_description,
+            destination = SettingsDestination.Modifiers
+        ),
+        entry(
+            SettingLinkIds.MODIFIERS_SMART_CTRL_OFF,
+            R.string.smart_ctrl_off_title,
+            R.string.smart_ctrl_off_description,
             destination = SettingsDestination.Modifiers,
             availability = SettingAvailability.CtrlTapLatchesEnabled,
             unavailableFallbackId = SettingLinkIds.MODIFIERS_CTRL_TAP_LATCHES

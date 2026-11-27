@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="smart_alt_off_title">Розумне перемикання: Alt вимикається після відкривного знака</string>
+    <string name="smart_alt_off_description">Із зафіксованим Alt введення відкривних лапок або дужки з Alt (\" ( [ {) вимикає Alt, щоб слова всередині вводилися літерами</string>
+    <string name="smart_ctrl_off_title">Розумне перемикання: Ctrl вимикається після сполучення</string>
+    <string name="smart_ctrl_off_description">Натиснутий Ctrl вимикається після одного сполучення, як-от копіювання, вставлення чи скасування; переміщення курсора й виділення його не вимикають</string>
+</resources>

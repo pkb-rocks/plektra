@@ -415,6 +415,8 @@ internal object BackupPreferenceContract {
             "ctrl_tap_latches" to PreferenceValueType.BOOLEAN,
             "alt_latch_stays_on_space" to PreferenceValueType.BOOLEAN,
             "ctrl_latch_stays_on_space" to PreferenceValueType.BOOLEAN,
+            "smart_alt_off_after_opening" to PreferenceValueType.BOOLEAN,
+            "smart_ctrl_off_after_shortcut" to PreferenceValueType.BOOLEAN,
             "use_keyboard_proximity" to PreferenceValueType.BOOLEAN,
             "use_edit_type_ranking" to PreferenceValueType.BOOLEAN,
             "custom_input_styles" to PreferenceValueType.STRING,

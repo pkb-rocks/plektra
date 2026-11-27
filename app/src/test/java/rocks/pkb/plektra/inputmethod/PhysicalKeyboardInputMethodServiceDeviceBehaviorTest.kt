@@ -754,6 +754,67 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     }
 
     @Test
+    fun appEnter_manualEditorAction_honorsAdvertisedSearchActionDespiteNoEnterFlag() {
+        configureAppEnterOverride(
+            packageName = "ai.perplexity.app.android",
+            strategy = SettingsManager.ENTER_SEND_STRATEGY_EDITOR_ACTION,
+            imeOptions = EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_ENTER_ACTION
+        )
+        recorder.performEditorActionResult = true
+
+        val handled = service.onKeyDown(
+            KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_785L, 2_785L)
+        )
+
+        assertTrue(handled)
+        assertEquals(listOf(EditorInfo.IME_ACTION_SEARCH), recorder.editorActions)
+        assertTrue(recorder.sentKeyEvents.isEmpty())
+        assertFalse(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
+    fun appEnter_manualEditorAction_honorsCustomActionId() {
+        configureAppEnterOverride(
+            packageName = "com.example.ai.composer",
+            strategy = SettingsManager.ENTER_SEND_STRATEGY_EDITOR_ACTION,
+            imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION,
+            actionId = 42
+        )
+        recorder.performEditorActionResult = true
+
+        val handled = service.onKeyDown(
+            KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_790L, 2_790L)
+        )
+
+        assertTrue(handled)
+        assertEquals(listOf(42), recorder.editorActions)
+        assertTrue(recorder.sentKeyEvents.isEmpty())
+        assertFalse(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
+    fun appEnter_manualEditorAction_rejectedAdvertisedActionConsumesWithoutNewlineOrFallback() {
+        configureAppEnterOverride(
+            packageName = "ai.perplexity.app.android",
+            strategy = SettingsManager.ENTER_SEND_STRATEGY_EDITOR_ACTION,
+            imeOptions = EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_ENTER_ACTION
+        )
+        recorder.performEditorActionResult = false
+
+        val handled = service.onKeyDown(
+            KeyEvent.KEYCODE_ENTER,
+            keyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 2_795L, 2_795L)
+        )
+
+        assertTrue(handled)
+        assertEquals(listOf(EditorInfo.IME_ACTION_SEARCH), recorder.editorActions)
+        assertTrue(recorder.sentKeyEvents.isEmpty())
+        assertFalse(recorder.committedTexts.contains("\n"))
+    }
+
+    @Test
     fun capWords_allAutoCapDisabled_clicksPowerAltPThenAStaysLowercase() {
         val context = RuntimeEnvironment.getApplication()
         SettingsManager.setAutoCapitalizeFirstLetter(context, false)
@@ -2192,13 +2253,17 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
     private fun focusNewField(
         newRecorder: RecordingInputConnection,
         inputType: Int = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
-        packageName: String = "rocks.pkb.plektra.test"
+        packageName: String = "rocks.pkb.plektra.test",
+        imeOptions: Int = 0,
+        actionId: Int = 0
     ) {
         recorder = newRecorder
         inputConnection = recorder.asProxy()
         editorInfo = EditorInfo().apply {
             this.inputType = inputType
             this.packageName = packageName
+            this.imeOptions = imeOptions
+            this.actionId = actionId
         }
         setField(service, "mInputConnection", inputConnection)
         setField(service, "mStartedInputConnection", inputConnection)
@@ -2206,7 +2271,12 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         service.onStartInput(editorInfo, false)
     }
 
-    private fun configureAppEnterOverride(packageName: String, strategy: String) {
+    private fun configureAppEnterOverride(
+        packageName: String,
+        strategy: String,
+        imeOptions: Int = 0,
+        actionId: Int = 0
+    ) {
         val context = RuntimeEnvironment.getApplication()
         SettingsManager.setAppEnterBehaviorEnabled(context, true)
         SettingsManager.setAppEnterBehaviorOverrides(
@@ -2222,7 +2292,9 @@ class PhysicalKeyboardInputMethodServiceDeviceBehaviorTest {
         focusNewField(
             newRecorder = RecordingInputConnection(),
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
-            packageName = packageName
+            packageName = packageName,
+            imeOptions = imeOptions,
+            actionId = actionId
         )
     }
 

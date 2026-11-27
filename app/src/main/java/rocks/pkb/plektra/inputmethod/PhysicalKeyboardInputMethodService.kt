@@ -1123,6 +1123,27 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         }
     }
 
+    /**
+     * Resolves the editor action to dispatch when the user explicitly configured
+     * [SettingsManager.ENTER_SEND_STRATEGY_EDITOR_ACTION] for an app. Unlike [resolveEditorAction],
+     * this honors custom [EditorInfo.actionId] values and advertised actions even when a multiline
+     * editor also sets [EditorInfo.IME_FLAG_NO_ENTER_ACTION], falling back to [EditorInfo.IME_ACTION_SEND].
+     */
+    private fun resolveConfiguredSendEditorAction(info: EditorInfo?): Int {
+        if (info == null) return EditorInfo.IME_ACTION_SEND
+        if (info.actionId != 0) return info.actionId
+        val maskedAction = info.imeOptions and EditorInfo.IME_MASK_ACTION
+        return when (maskedAction) {
+            EditorInfo.IME_ACTION_GO,
+            EditorInfo.IME_ACTION_SEARCH,
+            EditorInfo.IME_ACTION_SEND,
+            EditorInfo.IME_ACTION_NEXT,
+            EditorInfo.IME_ACTION_DONE,
+            EditorInfo.IME_ACTION_PREVIOUS -> maskedAction
+            else -> EditorInfo.IME_ACTION_SEND
+        }
+    }
+
     private fun resolveAppEnterBehavior(info: EditorInfo?): String? {
         val packageName = info?.packageName ?: return null
         if (!SettingsManager.getAppEnterBehaviorEnabled(this)) return null
@@ -1374,7 +1395,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     ): Boolean {
         return when (resolveAppEnterSendStrategy(info)) {
             SettingsManager.ENTER_SEND_STRATEGY_EDITOR_ACTION -> {
-                val actionId = resolveEditorAction(info) ?: EditorInfo.IME_ACTION_SEND
+                val actionId = resolveConfiguredSendEditorAction(info)
                 performEnterEditorAction(
                     keyCode = keyCode,
                     actionId = actionId,

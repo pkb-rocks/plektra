@@ -43,6 +43,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import rocks.pkb.plektra.R
+import rocks.pkb.plektra.core.initializeUserDefaultsFile
+import rocks.pkb.plektra.core.writeSettingsFileAtomically
+import rocks.pkb.plektra.inputmethod.DirectBootKeyboardConfig
 import android.content.Intent
 import android.content.Context
 import org.json.JSONArray
@@ -754,89 +757,81 @@ private fun UserDictWordDialog(
 
 
 
-private data class DefaultUserWord(val word: String, val frequency: Int)
+internal data class DefaultUserWord(val word: String, val frequency: Int)
 
 /**
  * Handles editable default user dictionary stored in app-private storage.
  * Uses JSON format aligned with assets/common/dictionaries/user_defaults.json.
  */
-private class DefaultUserDefaultsStore(private val context: Context) {
+internal class DefaultUserDefaultsStore(private val context: Context) {
     private val fileName = "user_defaults.json"
     private val assetPath = "common/dictionaries/$fileName"
 
-    private fun ensureLocalFile(): java.io.File {
-        val file = context.getFileStreamPath(fileName)
-        if (!file.exists()) {
-            try {
-                context.assets.open(assetPath).use { input ->
-                    file.outputStream().use { output -> input.copyTo(output) }
-                }
-            } catch (_: Exception) {
-                // Asset missing; create empty file
-                file.parentFile?.mkdirs()
-                file.writeText("[]")
-            }
-        }
-        return file
+    private val file get() = context.getFileStreamPath(fileName)
+
+    private fun ensureLocalFile() {
+        initializeUserDefaultsFile(file, useEmptyFallback = true) { context.assets.open(assetPath) }
     }
 
-    fun loadEntries(): List<DefaultUserWord> {
-        val file = ensureLocalFile()
-        return try {
-            val jsonString = file.readText()
-            val jsonArray = JSONArray(jsonString)
-            buildList {
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-                    val word = obj.getString("w")
-                    val freq = obj.optInt("f", 1)
-                    add(DefaultUserWord(word, freq))
-                }
-            }
-        } catch (_: Exception) {
-            emptyList()
-        }
+    fun loadEntries(): List<DefaultUserWord> = try {
+        ensureLocalFile()
+        readEntries()
+    } catch (_: Exception) {
+        emptyList()
     }
 
-    fun addOrBump(word: String, baseFrequency: Int = 10) {
-        val file = ensureLocalFile()
-        val entries = loadEntries().toMutableList()
-        val existingIndex = entries.indexOfFirst { it.word.equals(word, ignoreCase = true) }
+    private fun readEntries(): List<DefaultUserWord> = try {
+        val jsonArray = JSONArray(file.readText())
+        buildList {
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val word = obj.getString("w")
+                val freq = obj.optInt("f", 1)
+                add(DefaultUserWord(word, freq))
+            }
+        }
+    } catch (_: org.json.JSONException) {
+        emptyList()
+    }
+
+    fun addOrBump(word: String, baseFrequency: Int = 10) = editEntries { entries ->
+        val updated = entries.toMutableList()
+        val existingIndex = updated.indexOfFirst { it.word.equals(word, ignoreCase = true) }
         if (existingIndex >= 0) {
-            val existing = entries[existingIndex]
-            entries[existingIndex] = existing.copy(frequency = existing.frequency + 1)
+            val existing = updated[existingIndex]
+            updated[existingIndex] = existing.copy(frequency = existing.frequency + 1)
         } else {
-            entries.add(DefaultUserWord(word, baseFrequency))
+            updated.add(DefaultUserWord(word, baseFrequency))
         }
-        persist(entries, file)
+        updated
     }
 
-    fun remove(word: String) {
-        val file = ensureLocalFile()
-        val entries = loadEntries().filterNot { it.word.equals(word, ignoreCase = true) }
-        persist(entries, file)
+    fun remove(word: String) = editEntries { entries ->
+        entries.filterNot { it.word.equals(word, ignoreCase = true) }
     }
 
-    fun update(oldWord: String, newWord: String) {
-        val file = ensureLocalFile()
-        val entries = loadEntries().map {
+    fun update(oldWord: String, newWord: String) = editEntries { entries ->
+        entries.map {
             if (it.word.equals(oldWord, ignoreCase = true)) it.copy(word = newWord) else it
         }
-        persist(entries, file)
     }
 
-    private fun persist(entries: List<DefaultUserWord>, file: java.io.File) {
+    private fun editEntries(update: (List<DefaultUserWord>) -> List<DefaultUserWord>) {
         try {
-            val array = JSONArray()
-            entries.forEach { entry ->
-                val obj = JSONObject()
-                obj.put("w", entry.word)
-                obj.put("f", entry.frequency)
-                array.put(obj)
+            // Serialize the read/modify/write with first-run copies and restore.
+            synchronized(DirectBootKeyboardConfig.SOURCE_LOCK) {
+                ensureLocalFile()
+                val array = JSONArray()
+                update(readEntries()).forEach { entry ->
+                    val obj = JSONObject()
+                    obj.put("w", entry.word)
+                    obj.put("f", entry.frequency)
+                    array.put(obj)
+                }
+                file.writeSettingsFileAtomically(array.toString())
             }
-            file.writeText(array.toString())
         } catch (_: Exception) {
-            // Ignore persistence errors; UI will just not reflect changes
+            // Ignore persistence errors; UI will just not reflect changes.
         }
     }
 }

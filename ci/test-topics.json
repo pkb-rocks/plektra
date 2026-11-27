@@ -55,6 +55,7 @@
       "rocks.pkb.plektra.backup.BackupPreferenceContractIntegrationTest",
       "rocks.pkb.plektra.backup.KeyboardTextScaleBackupTest",
       "rocks.pkb.plektra.backup.NotesAndDictionaryBackupTest",
+      "rocks.pkb.plektra.core.SettingsFileWriterTest",
       "rocks.pkb.plektra.backup.PastieraBackupImportTest",
       "rocks.pkb.plektra.backup.RestoreManagerAndBackupContractTest",
       "rocks.pkb.plektra.backup.RestoreManagerIntegrationTest",

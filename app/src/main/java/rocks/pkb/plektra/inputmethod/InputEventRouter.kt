@@ -677,6 +677,10 @@ class InputEventRouter(
                 val shouldTrackImmediately = longPressMode == "shift"
                 if (shouldTrackImmediately && trackedChar.isNotEmpty() && trackedChar[0].isLetter()) {
                     suggestionController?.onCharacterCommitted(trackedChar, ic)
+                } else if (trackedChar.isNotEmpty()) {
+                    // The word tracker follows these by the cursor (a long press may still swap
+                    // the character), but a replacement's undo has to hear of them now
+                    suggestionController?.onTypingContinued(trackedChar)
                 }
                 Handler(Looper.getMainLooper()).postDelayed({
                     callbacks.updateStatusBar()

@@ -239,6 +239,8 @@ internal object BackupPreferenceContract {
             "app_theme_mode" to PreferenceValueType.STRING,
             "app_dark_surface_style" to PreferenceValueType.STRING,
             "app_dynamic_color" to PreferenceValueType.BOOLEAN,
+            "app_settings_fullscreen" to PreferenceValueType.BOOLEAN,
+            "app_settings_style" to PreferenceValueType.STRING,
             "app_enter_behavior_enabled" to PreferenceValueType.BOOLEAN,
             "app_enter_behavior_preset" to PreferenceValueType.STRING,
             "app_enter_behavior_overrides" to PreferenceValueType.STRING,

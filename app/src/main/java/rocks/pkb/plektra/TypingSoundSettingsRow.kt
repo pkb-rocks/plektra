@@ -244,47 +244,17 @@ fun TypingSoundSettingsRow() {
         }
     }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth().settingRow("sounds.system_haptics")
-            .height(72.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Keyboard,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.tap_haptic_system_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1
-                )
-                Text(
-                    text = stringResource(R.string.tap_haptic_system_description),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2
-                )
-            }
-            Switch(
-                checked = tapHapticUseSystem,
-                onCheckedChange = { enabled ->
-                    tapHapticUseSystem = enabled
-                    SettingsManager.setTapHapticUseSystem(context, enabled)
-                }
-            )
+    SettingsToggleRow(
+        title = stringResource(R.string.tap_haptic_system_title),
+        description = stringResource(R.string.tap_haptic_system_description),
+        icon = Icons.Filled.Keyboard,
+        checked = tapHapticUseSystem,
+        linkId = "sounds.system_haptics",
+        onCheckedChange = { enabled ->
+            tapHapticUseSystem = enabled
+            SettingsManager.setTapHapticUseSystem(context, enabled)
         }
-    }
+    )
 
     if (!tapHapticUseSystem) {
         Surface(

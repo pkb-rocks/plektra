@@ -7,8 +7,13 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -62,207 +67,82 @@ fun AboutScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.about_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(
+                title = stringResource(R.string.about_title),
+                onBack = onBack
+            )
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .consumeWindowInsets(paddingValues)
+                .navigationBarsPadding()
         ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.about_imprint_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    TextButton(onClick = {
-                        openUrl(context, "https://pzauner.de/Notes/.hidden/Impressum.pdf")
-                    }) {
-                        Text(stringResource(R.string.about_imprint_current_pdf))
-                    }
-                    Text(
-                        text = stringResource(R.string.about_imprint_details),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    TextButton(onClick = {
-                        openUrl(context, "mailto:pzauner@pastiera.eu")
-                    }) {
-                        Text("pzauner@pastiera.eu")
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .settingRow(SettingLinkIds.ABOUT_SUPPORT_OPEN_COLLECTIVE) {
-                        openUrl(context, "https://opencollective.com/plektra")
-                    },
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.VolunteerActivism,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column {
-                        Text(
-                            text = stringResource(R.string.settings_support_open_collective),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_support_open_collective_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
+            SettingsSectionDivider(
+                label = stringResource(R.string.settings_group_plektra),
+                accentRole = SettingsAccentRole.TERTIARY
+            )
+            SettingsNavigationRow(
+                title = stringResource(R.string.settings_support_open_collective),
+                description = stringResource(R.string.settings_support_open_collective_description),
+                icon = Icons.Filled.VolunteerActivism,
+                accentRole = SettingsAccentRole.TERTIARY,
+                linkId = SettingLinkIds.ABOUT_SUPPORT_OPEN_COLLECTIVE,
+                onClick = { openUrl(context, "https://opencollective.com/plektra") }
+            )
+            SettingsNavigationRow(
+                title = stringResource(R.string.about_plektra_github_title),
+                description = stringResource(R.string.about_plektra_github_description),
+                icon = Icons.Filled.Star,
+                accentRole = SettingsAccentRole.TERTIARY,
+                linkId = SettingLinkIds.ABOUT_PLEKTRA_GITHUB,
+                onClick = { openUrl(context, "https://github.com/pkb-rocks/plektra") }
+            )
 
             if (BuildConfig.DISTRIBUTION_CHANNEL == "play") {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(R.string.about_play_build_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.about_play_build_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        TextButton(onClick = {
-                            openUrl(context, "https://github.com/pkb-rocks/plektra/releases")
-                        }) {
-                            Text(stringResource(R.string.about_canonical_downloads))
-                        }
-                        TextButton(onClick = {
-                            openUrl(context, "https://github.com/pkb-rocks/plektra/tree/main/docs")
-                        }) {
-                            Text(stringResource(R.string.about_signing_attestations))
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+                SettingsSectionDivider(
+                    label = stringResource(R.string.about_play_build_title),
+                    accentRole = SettingsAccentRole.SECONDARY
+                )
+                SettingsSupportingText(stringResource(R.string.about_play_build_description))
+                SettingsNavigationRow(
+                    title = stringResource(R.string.about_canonical_downloads),
+                    icon = Icons.Filled.Download,
+                    accentRole = SettingsAccentRole.SECONDARY,
+                    onClick = { openUrl(context, "https://github.com/pkb-rocks/plektra/releases") }
+                )
+                SettingsNavigationRow(
+                    title = stringResource(R.string.about_signing_attestations),
+                    icon = Icons.Filled.VerifiedUser,
+                    accentRole = SettingsAccentRole.SECONDARY,
+                    onClick = { openUrl(context, "https://github.com/pkb-rocks/plektra/tree/main/docs") }
+                )
             }
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .settingRow(SettingLinkIds.ABOUT_PLEKTRA_GITHUB) {
-                        openUrl(context, "https://github.com/pkb-rocks/plektra")
-                    },
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column {
-                        Text(
-                            text = stringResource(R.string.about_plektra_github_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.about_plektra_github_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.about_build_info),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = BuildInfo.getBuildInfoString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.settings_device_keyboard_info,
-                            DeviceSpecific.deviceName(),
-                            DeviceSpecific.keyboardName()
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
+            SettingsSectionDivider(
+                label = stringResource(R.string.about_build_info),
+                accentRole = SettingsAccentRole.SECONDARY
+            )
+            SettingsRow(
+                title = BuildInfo.getBuildInfoString(),
+                description = stringResource(
+                    R.string.settings_device_keyboard_info,
+                    DeviceSpecific.deviceName(),
+                    DeviceSpecific.keyboardName()
+                ),
+                icon = Icons.Filled.Info,
+                accentRole = SettingsAccentRole.SECONDARY,
+                alwaysInlineDescription = true
+            )
             if (remember(context) {
                     runCatching { context.assets.open("plektra-sbom.cdx.json").close() }.isSuccess
                 }) {
-                TextButton(
+                SettingsNavigationRow(
+                    title = stringResource(R.string.about_sbom_export),
+                    icon = Icons.Filled.Share,
+                    accentRole = SettingsAccentRole.SECONDARY,
                     onClick = {
                         runCatching {
                             val file = File(context.cacheDir, "sbom/plektra-sbom.cdx.json")
@@ -282,34 +162,54 @@ fun AboutScreen(
                         }.onFailure { error ->
                             android.util.Log.e("AboutScreen", "Unable to share SBOM", error)
                         }
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(stringResource(R.string.about_sbom_export))
+                    }
+                )
+            }
+
+            SettingsSectionDivider(
+                label = stringResource(R.string.about_imprint_title),
+                accentRole = SettingsAccentRole.SECONDARY
+            )
+            SettingsSupportingText(stringResource(R.string.about_imprint_details))
+            SettingsNavigationRow(
+                title = stringResource(R.string.about_imprint_current_pdf),
+                icon = Icons.Filled.Description,
+                accentRole = SettingsAccentRole.SECONDARY,
+                onClick = { openUrl(context, "https://pzauner.de/Notes/.hidden/Impressum.pdf") }
+            )
+            SettingsNavigationRow(
+                title = "pzauner@pastiera.eu",
+                icon = Icons.Filled.Email,
+                accentRole = SettingsAccentRole.SECONDARY,
+                onClick = { openUrl(context, "mailto:pzauner@pastiera.eu") }
+            )
+
+            SettingsSectionDivider(
+                label = stringResource(R.string.about_title),
+                accentRole = SettingsAccentRole.SECONDARY
+            )
+            Column(modifier = Modifier.padding(horizontal = SettingsSpace.edge, vertical = 8.dp)) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(32.dp)
+                    )
+                } else {
+                    markdownContent?.let { content ->
+                        MarkdownContent(
+                            markdown = content,
+                            context = context,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } ?: Text(
+                        text = context.getString(R.string.about_credits_error),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(32.dp)
-                )
-            } else {
-                markdownContent?.let { content ->
-                    MarkdownContent(
-                        markdown = content,
-                        context = context,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } ?: Text(
-                    text = context.getString(R.string.about_credits_error),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
+            SettingsBottomSpacer()
         }
     }
 }

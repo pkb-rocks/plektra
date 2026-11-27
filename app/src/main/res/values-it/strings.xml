@@ -679,7 +679,7 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="debug_recorder_share">Condividi</string>
     <string name="debug_recorder_share_chooser">Condividi report debug</string>
     <string name="debug_recorder_copied">Report debug copiato (%1$d eventi)</string>
-    <string name="debug_recorder_status">Registratore: %1$s · Eventi: %2$d</string>
+    <string name="debug_recorder_status">Registratore: %1$s, Eventi: %2$d</string>
     <string name="debug_recorder_status_recording">registrazione</string>
     <string name="debug_recorder_status_stopped">fermato</string>
     <string name="debug_recorder_started_at">Avviato alle: </string>
@@ -1127,6 +1127,10 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="kw_auto_correction_starter_words">parole iniziali, campo vuoto, nuova frase, prima parola, parole comuni, dizionario, suggerimenti</string>
     <string name="clicks_button_binding_reading">Lettura dell’assegnazione attuale dalla tastiera…</string>
     <string name="clicks_button_binding_last_known">Ultima assegnazione nota; la tastiera non è connessa.</string>
+    <string name="app_appearance_settings_fullscreen_title">Impostazioni a schermo intero</string>
+    <string name="app_appearance_settings_fullscreen_description">Nasconde la barra di stato nelle impostazioni. Il titolo della pagina e le azioni usano la riga superiore. Scorri verso il basso dal bordo superiore per mostrare brevemente la barra di stato.</string>
+    <string name="kw_app_appearance_settings_fullscreen">schermo intero, barra di stato, nascondere, immersivo, intestazione, riga superiore, notch, foro fotocamera</string>
+    <string name="settings_search_close">Chiudi ricerca</string>
     <string name="keyboard_backlight_section_title">Retroilluminazione tastiera</string>
     <string name="keyboard_backlight_follows_display_title">La retroilluminazione segue lo schermo</string>
     <string name="keyboard_backlight_follows_display_description">Mantiene accesa la luce della tastiera finché lo schermo non si spegne e la riaccende con lo schermo. Usa l’impostazione del dispositivo; Plektra non resta attivo in background per questo.</string>

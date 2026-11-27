@@ -152,14 +152,13 @@ private fun KeyboardsDevicesMainScreen(
     }
     val shortcut = shortcutKeyCode?.let { "Ctrl+${KeyEvent.keyCodeToString(it).removePrefix("KEYCODE_")}" }
 
-    Scaffold(topBar = { SettingsSubscreenHeader(stringResource(R.string.keyboards_devices_title), onBack) }) { paddingValues ->
-        Column(
+    Scaffold(topBar = { PlektraSettingsHeader(stringResource(R.string.keyboards_devices_title), onBack) }) { paddingValues ->
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
-            SectionDivider(stringResource(R.string.keyboard_switching_section_title))
+            SettingsSectionDivider(stringResource(R.string.keyboard_switching_section_title))
             SwitchRow(
                 title = stringResource(R.string.keyboard_switching_auto_title),
                 description = stringResource(R.string.keyboard_switching_auto_description),
@@ -209,7 +208,7 @@ private fun KeyboardsDevicesMainScreen(
                 }
             )
 
-            SectionDivider(stringResource(R.string.keyboard_sources_section_title))
+            SettingsSectionDivider(stringResource(R.string.keyboard_sources_section_title))
             NavigationRow(
                 icon = Icons.Filled.Keyboard,
                 title = stringResource(R.string.on_screen_keyboard_title),
@@ -237,7 +236,7 @@ private fun KeyboardsDevicesMainScreen(
                 onClick = onPowerKeyboard
             )
 
-            SectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
+            SettingsSectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
             Text(
                 text = stringResource(R.string.keyboard_custom_profiles_binding_description),
                 style = MaterialTheme.typography.bodySmall,
@@ -249,37 +248,6 @@ private fun KeyboardsDevicesMainScreen(
 }
 
 @Composable
-private fun SettingsSubscreenHeader(title: String, onBack: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
-        tonalElevation = 1.dp
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.settings_back_content_description))
-            }
-            Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 8.dp))
-        }
-    }
-}
-
-@Composable
-private fun SectionDivider(title: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        HorizontalDivider(Modifier.weight(1f))
-        Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        HorizontalDivider(Modifier.weight(1f))
-    }
-}
-
-@Composable
 private fun NavigationRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
@@ -287,20 +255,7 @@ private fun NavigationRow(
     linkId: String? = null,
     onClick: () -> Unit
 ) {
-    Surface(Modifier.fillMaxWidth().settingRow(linkId, onClick)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
+    SettingsNavigationRow(title = title, description = description, icon = icon, linkId = linkId, onClick = onClick)
 }
 
 @Composable
@@ -311,26 +266,11 @@ private fun SwitchRow(
     linkId: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(Modifier.fillMaxWidth().settingRow(linkId)) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Switch(checked, onCheckedChange)
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, linkId = linkId)
 }
 
 @Composable
 private fun InfoRow(title: String, description: String, value: String) {
-    Surface(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Text(value, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        }
-    }
+    SettingsRow(title = title, description = description, trailing = { SettingsValueText(value) })
 }

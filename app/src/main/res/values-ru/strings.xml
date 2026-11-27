@@ -809,7 +809,7 @@ Nav Mode использует физическое положение клави
     <string name="debug_recorder_share">Поделиться</string>
     <string name="debug_recorder_share_chooser">Поделиться отладочным отчетом</string>
     <string name="debug_recorder_copied">Отладочный отчет скопирован (%1$d событий)</string>
-    <string name="debug_recorder_status">Регистратор: %1$s · Событий: %2$d</string>
+    <string name="debug_recorder_status">Регистратор: %1$s, Событий: %2$d</string>
     <string name="debug_recorder_status_recording">запись</string>
     <string name="debug_recorder_status_stopped">остановлен</string>
     <string name="debug_recorder_started_at">Запущено в: </string>
@@ -950,6 +950,10 @@ Nav Mode использует физическое положение клави
     <string name="kw_auto_correction_starter_words">начальные слова, пустое поле, новое предложение, первое слово, частые слова, словарь, подсказки</string>
     <string name="clicks_button_binding_reading">Чтение текущего назначения с клавиатуры…</string>
     <string name="clicks_button_binding_last_known">Последнее известное назначение; клавиатура не подключена.</string>
+    <string name="app_appearance_settings_fullscreen_title">Настройки на весь экран</string>
+    <string name="app_appearance_settings_fullscreen_description">Скрывает строку состояния в настройках. Заголовок страницы и действия занимают верхнюю строку. Проведите вниз от верхнего края, чтобы ненадолго показать строку состояния.</string>
+    <string name="kw_app_appearance_settings_fullscreen">весь экран, полноэкранный, строка состояния, скрыть, заголовок, верхняя строка, вырез, камера</string>
+    <string name="settings_search_close">Закрыть поиск</string>
     <string name="keyboard_backlight_section_title">Подсветка клавиатуры</string>
     <string name="keyboard_backlight_follows_display_title">Подсветка следует за экраном</string>
     <string name="keyboard_backlight_follows_display_description">Подсветка клавиатуры остаётся включённой до выключения экрана и снова включается вместе с ним. Используется настройка устройства; Plektra для этого не работает в фоне.</string>

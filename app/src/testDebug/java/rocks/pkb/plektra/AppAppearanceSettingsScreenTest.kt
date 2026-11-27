@@ -43,6 +43,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import rocks.pkb.plektra.ui.theme.AppAppearancePreferences
 import rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle
+import rocks.pkb.plektra.ui.theme.AppSettingsStyle
 import rocks.pkb.plektra.ui.theme.AppThemeMode
 import java.util.Locale
 
@@ -86,15 +87,17 @@ class AppAppearanceSettingsScreenTest {
         compose.onNodeWithText(title).performClick()
         compose.waitForIdle()
 
+        // The category opens in the same Activity, so folding and unfolding keep it open.
         scenario!!.onActivity { activity ->
-            val started = shadowOf(activity).nextStartedActivity
-            assertEquals(SettingsDestination.AppAppearance, started.settingsPage().destination)
+            assertEquals(null, shadowOf(activity).nextStartedActivity)
         }
+        compose.onNodeWithText(context.getString(R.string.app_appearance_mode_title)).assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.app_appearance_layout_style_title)).assertIsDisplayed()
     }
 
     @Test
     fun searchIndexFindsAppearanceControlsInEnglishAndGerman() {
-        val enQueries = listOf("Appearance", "OLED", "Dynamic", "Dark surfaces")
+        val enQueries = listOf("Appearance", "OLED", "Dynamic", "Dark surfaces", "Layout style", "dividers")
         enQueries.forEach { query ->
             val results = SettingLinkRegistry.search(context, query)
             assertTrue(
@@ -102,12 +105,16 @@ class AppAppearanceSettingsScreenTest {
                 results.any { it.route.destination == SettingsDestination.AppAppearance }
             )
         }
+        assertTrue(
+            SettingLinkRegistry.search(context, "Layout style")
+                .any { it.id == SettingLinkIds.APP_APPEARANCE_SETTINGS_STYLE }
+        )
 
         val deConfig = Configuration(context.resources.configuration).apply {
             setLocale(Locale.GERMAN)
         }
         val deContext = context.createConfigurationContext(deConfig)
-        val deQueries = listOf("Darstellung", "OLED", "Dynamische", "Dunkle Flächen")
+        val deQueries = listOf("Darstellung", "OLED", "Dynamische", "Dunkle Flächen", "Darstellungsstil", "Trennlinien")
         deQueries.forEach { query ->
             val results = SettingLinkRegistry.search(deContext, query)
             assertTrue(
@@ -115,18 +122,24 @@ class AppAppearanceSettingsScreenTest {
                 results.any { it.route.destination == SettingsDestination.AppAppearance }
             )
         }
+        assertTrue(
+            SettingLinkRegistry.search(deContext, "Darstellungsstil")
+                .any { it.id == SettingLinkIds.APP_APPEARANCE_SETTINGS_STYLE }
+        )
     }
 
     @Test
-    fun selectingDarkOledAndDisablingDynamicColorPersistsAcrossRecreation() {
+    fun selectingDarkOledMaterialStyleAndDisablingDynamicColorPersistsAcrossRecreation() {
         launchAppearanceSettings()
 
         // Defaults selected initially
+        compose.onNodeWithText(context.getString(R.string.app_appearance_layout_style_compact_dividers)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_mode_system)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dark_surface_gray)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dynamic_color_title)).assertIsOn()
 
-        // Switch to Dark + OLED black + Dynamic off
+        // Switch to Material style + Dark + OLED black + Dynamic off
+        compose.onNodeWithText(context.getString(R.string.app_appearance_layout_style_material)).performScrollTo().performClick()
         compose.onNodeWithText(context.getString(R.string.app_appearance_mode_dark)).performScrollTo().performClick()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dark_surface_oled)).performScrollTo().performClick()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dynamic_color_title)).performScrollTo().performClick()
@@ -136,7 +149,8 @@ class AppAppearanceSettingsScreenTest {
             AppAppearancePreferences(
                 themeMode = AppThemeMode.DARK,
                 darkSurfaceStyle = AppDarkSurfaceStyle.OLED,
-                dynamicColor = false
+                dynamicColor = false,
+                settingsStyle = AppSettingsStyle.MATERIAL
             ),
             SettingsManager.getAppAppearancePreferences(context)
         )
@@ -153,6 +167,7 @@ class AppAppearanceSettingsScreenTest {
         scenario!!.recreate()
         compose.waitForIdle()
 
+        compose.onNodeWithText(context.getString(R.string.app_appearance_layout_style_material)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_mode_dark)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dark_surface_oled)).assertIsSelected()
         compose.onNodeWithText(context.getString(R.string.app_appearance_dynamic_color_title)).assertIsOff()
@@ -218,6 +233,8 @@ class AppAppearanceSettingsScreenTest {
         launchAppearanceSettings()
 
         listOf(
+            R.string.app_appearance_layout_style_compact_dividers,
+            R.string.app_appearance_layout_style_material,
             R.string.app_appearance_mode_system,
             R.string.app_appearance_mode_light,
             R.string.app_appearance_mode_dark,

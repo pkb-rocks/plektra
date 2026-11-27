@@ -160,48 +160,19 @@ fun VariationCustomizationScreen(
     
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
+            PlektraSettingsHeader(
+                title = stringResource(R.string.variation_customize_title),
+                onBack = onBack,
+                modifier = Modifier.settingRow("customization.variations")
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.settings_back_content_description)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.variation_customize_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(start = 8.dp).settingRow("customization.variations")
+                // Reset to default button (only if custom variations exist)
+                if (SettingsManager.hasCustomVariations(context)) {
+                    IconButton(onClick = { showResetConfirmDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(R.string.variation_reset_to_default),
+                            tint = MaterialTheme.colorScheme.error
                         )
-                    }
-                    
-                    // Reset to default button (only if custom variations exist)
-                    if (SettingsManager.hasCustomVariations(context)) {
-                        IconButton(
-                            onClick = { showResetConfirmDialog = true }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Refresh,
-                                contentDescription = stringResource(R.string.variation_reset_to_default),
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
                     }
                 }
             }
@@ -314,47 +285,17 @@ fun VariationCustomizationScreen(
             }
 
             // Sticky layer toggle
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth().settingRow("variations.sticky_layer")
-                    .height(64.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TextFields,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.static_variation_layer_sticky_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = stringResource(R.string.static_variation_layer_sticky_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2
-                        )
-                    }
-                    Switch(
-                        checked = staticVariationLayerSticky,
-                        onCheckedChange = { enabled ->
-                            staticVariationLayerSticky = enabled
-                            SettingsManager.setStaticVariationBarLayerStickyEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.static_variation_layer_sticky_title),
+                description = stringResource(R.string.static_variation_layer_sticky_description),
+                icon = Icons.Filled.TextFields,
+                checked = staticVariationLayerSticky,
+                linkId = "variations.sticky_layer",
+                onCheckedChange = { enabled ->
+                    staticVariationLayerSticky = enabled
+                    SettingsManager.setStaticVariationBarLayerStickyEnabled(context, enabled)
                 }
-            }
+            )
             
             Surface(
                 modifier = Modifier.fillMaxWidth().settingRow("variations.layout_override")

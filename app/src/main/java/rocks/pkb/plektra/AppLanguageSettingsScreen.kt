@@ -32,39 +32,14 @@ fun AppLanguageSettingsScreen(
 ) {
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                androidx.compose.foundation.layout.Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.app_language_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.app_language_title), onBack = onBack)
         }
     ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(vertical = 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             AppLanguageSelectorCard()
@@ -74,6 +49,7 @@ fun AppLanguageSettingsScreen(
 
 fun currentAppLanguageLabel(context: Context): String {
     val tag = getCurrentAppLanguageTag(context)
-    return tag?.let { getLanguageOptionLabel(context, it) }
+    // The language in its own words; System default stays as the plain choice name.
+    return tag?.let { appLanguageChoiceLabels(context, it, context.resources.configuration.locales[0]).first }
         ?: context.getString(R.string.app_language_system_default)
 }

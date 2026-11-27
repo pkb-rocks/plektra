@@ -16,6 +16,7 @@ import org.robolectric.annotation.Config
 import rocks.pkb.plektra.SettingsManager
 import rocks.pkb.plektra.ui.theme.AppAppearancePreferences
 import rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle
+import rocks.pkb.plektra.ui.theme.AppSettingsStyle
 import rocks.pkb.plektra.ui.theme.AppThemeMode
 import java.io.File
 import java.io.FileInputStream
@@ -36,7 +37,8 @@ class AppAppearanceBackupRoundTripTest {
         val expected = AppAppearancePreferences(
             themeMode = AppThemeMode.DARK,
             darkSurfaceStyle = AppDarkSurfaceStyle.OLED,
-            dynamicColor = false
+            dynamicColor = false,
+            settingsStyle = AppSettingsStyle.MATERIAL
         )
         SettingsManager.setAppAppearancePreferences(context, expected)
 
@@ -49,6 +51,7 @@ class AppAppearanceBackupRoundTripTest {
             assertEquals("dark", exportedEntries.getJSONObject(SettingsManager.KEY_APP_THEME_MODE).getString("value"))
             assertEquals("oled", exportedEntries.getJSONObject(SettingsManager.KEY_APP_DARK_SURFACE_STYLE).getString("value"))
             assertFalse(exportedEntries.getJSONObject(SettingsManager.KEY_APP_DYNAMIC_COLOR).getBoolean("value"))
+            assertEquals("material", exportedEntries.getJSONObject(SettingsManager.KEY_APP_SETTINGS_STYLE).getString("value"))
 
             // Wipe preferences and confirm defaults are active before restore
             SettingsManager.getPreferences(context).edit().clear().commit()
@@ -99,7 +102,8 @@ class AppAppearanceBackupRoundTripTest {
                 "plektra_prefs" to mapOf(
                     SettingsManager.KEY_APP_THEME_MODE to PreferenceValue(PreferenceValueType.STRING, "sepia"),
                     SettingsManager.KEY_APP_DARK_SURFACE_STYLE to PreferenceValue(PreferenceValueType.STRING, "neon"),
-                    SettingsManager.KEY_APP_DYNAMIC_COLOR to PreferenceValue(PreferenceValueType.BOOLEAN, true)
+                    SettingsManager.KEY_APP_DYNAMIC_COLOR to PreferenceValue(PreferenceValueType.BOOLEAN, true),
+                    SettingsManager.KEY_APP_SETTINGS_STYLE to PreferenceValue(PreferenceValueType.STRING, "glass")
                 )
             )
         )
@@ -107,6 +111,7 @@ class AppAppearanceBackupRoundTripTest {
         assertEquals(AppThemeMode.SYSTEM, SettingsManager.getAppThemeMode(context))
         assertEquals(AppDarkSurfaceStyle.STANDARD, SettingsManager.getAppDarkSurfaceStyle(context))
         assertTrue(SettingsManager.getAppDynamicColorEnabled(context))
+        assertEquals(AppSettingsStyle.COMPACT_DIVIDERS, SettingsManager.getAppSettingsStyle(context))
     }
 
     private fun readPlektraPrefsEntries(zipFile: File): JSONObject {

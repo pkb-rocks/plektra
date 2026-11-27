@@ -218,6 +218,8 @@ object SettingsManager {
     const val KEY_APP_THEME_MODE = "app_theme_mode"
     const val KEY_APP_DARK_SURFACE_STYLE = "app_dark_surface_style"
     const val KEY_APP_DYNAMIC_COLOR = "app_dynamic_color"
+    const val KEY_APP_SETTINGS_FULLSCREEN = "app_settings_fullscreen"
+    const val KEY_APP_SETTINGS_STYLE = "app_settings_style"
     private const val KEY_APP_ENTER_BEHAVIOR_ENABLED = "app_enter_behavior_enabled"
     private const val KEY_APP_ENTER_BEHAVIOR_PRESET = "app_enter_behavior_preset"
     private const val KEY_APP_ENTER_BEHAVIOR_OVERRIDES = "app_enter_behavior_overrides"
@@ -625,6 +627,17 @@ object SettingsManager {
             .apply()
     }
 
+    fun getAppSettingsStyle(context: Context): rocks.pkb.plektra.ui.theme.AppSettingsStyle =
+        rocks.pkb.plektra.ui.theme.AppSettingsStyle.fromStorage(
+            getPreferences(context).getString(KEY_APP_SETTINGS_STYLE, null)
+        )
+
+    fun setAppSettingsStyle(context: Context, style: rocks.pkb.plektra.ui.theme.AppSettingsStyle) {
+        getPreferences(context).edit()
+            .putString(KEY_APP_SETTINGS_STYLE, style.storageValue)
+            .apply()
+    }
+
     fun getAppAppearancePreferences(context: Context): rocks.pkb.plektra.ui.theme.AppAppearancePreferences {
         val prefs = getPreferences(context)
         return rocks.pkb.plektra.ui.theme.AppAppearancePreferences(
@@ -634,8 +647,16 @@ object SettingsManager {
             darkSurfaceStyle = rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle.fromStorage(
                 prefs.getString(KEY_APP_DARK_SURFACE_STYLE, null)
             ),
-            dynamicColor = prefs.getBoolean(KEY_APP_DYNAMIC_COLOR, true)
+            dynamicColor = prefs.getBoolean(KEY_APP_DYNAMIC_COLOR, true),
+            settingsFullscreen = prefs.getBoolean(KEY_APP_SETTINGS_FULLSCREEN, false),
+            settingsStyle = rocks.pkb.plektra.ui.theme.AppSettingsStyle.fromStorage(
+                prefs.getString(KEY_APP_SETTINGS_STYLE, null)
+            )
         )
+    }
+
+    fun setSettingsFullscreenEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_APP_SETTINGS_FULLSCREEN, enabled).apply()
     }
 
     fun setAppAppearancePreferences(
@@ -646,6 +667,7 @@ object SettingsManager {
             .putString(KEY_APP_THEME_MODE, preferences.themeMode.storageValue)
             .putString(KEY_APP_DARK_SURFACE_STYLE, preferences.darkSurfaceStyle.storageValue)
             .putBoolean(KEY_APP_DYNAMIC_COLOR, preferences.dynamicColor)
+            .putString(KEY_APP_SETTINGS_STYLE, preferences.settingsStyle.storageValue)
             .apply()
     }
 

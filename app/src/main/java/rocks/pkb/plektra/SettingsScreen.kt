@@ -83,7 +83,7 @@ enum class SettingsDestination {
 }
 
 /** The destination payload of one SettingsActivity, also used by deep links. */
-internal data class SettingsPage(
+data class SettingsPage(
     val destination: SettingsDestination,
     val customizationDestination: String? = null,
     val keyboardThemeTarget: String? = null,
@@ -109,27 +109,33 @@ fun SettingsScreen(
     initialDestination: String? = null,
     initialCustomizationDestination: String? = null,
     initialKeyboardThemeTarget: String? = null,
-    settingLinkRequest: SettingLinkRequest? = null
+    settingLinkRequest: SettingLinkRequest? = null,
+    page: SettingsPage? = null,
+    onOpenPage: ((SettingsPage) -> Unit)? = null,
+    onExit: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val activity = context as? ComponentActivity
 
     var checkingForUpdates by remember { mutableStateOf(false) }
-    val currentEntry = remember { context.settingsActivity().intent.settingsPage() }
+    val currentEntry = page ?: remember { context.settingsActivity().intent.settingsPage() }
     val currentDestination = currentEntry.destination
     var highlightSettingId by rememberSaveable { mutableStateOf<String?>(null) }
     var linkSheetEntry by remember { mutableStateOf<SettingEntry?>(null) }
 
-    fun navigateTo(destination: SettingsDestination) {
-        openSettingsPage(context, SettingsPage(destination))
+    fun open(target: SettingsPage) {
+        if (onOpenPage != null) onOpenPage(target) else openSettingsPage(context, target)
     }
-    fun navigateBack() { context.settingsActivity().finish() }
+    fun navigateTo(destination: SettingsDestination) {
+        open(SettingsPage(destination))
+    }
+    fun navigateBack() { if (onExit != null) onExit() else context.settingsActivity().finish() }
     fun openCustomization(destination: String?, keyboardThemeTarget: String? = null, keyboardThemeTab: String? = null) {
-        openSettingsPage(context, SettingsPage(SettingsDestination.Customization,
+        open(SettingsPage(SettingsDestination.Customization,
             destination, keyboardThemeTarget, keyboardThemeTab))
     }
     fun navigateToNavMode(keyCode: Int?) {
-        openSettingsPage(context, SettingsPage(SettingsDestination.NavMode, navModeKeyCode = keyCode))
+        open(SettingsPage(SettingsDestination.NavMode, navModeKeyCode = keyCode))
     }
 
     /**
@@ -194,7 +200,8 @@ fun SettingsScreen(
 
     CompositionLocalProvider(
         LocalSettingHighlightId provides highlightSettingId,
-        LocalSettingLinkLongPress provides ({ id -> linkSheetEntry = SettingLinkRegistry.byId(id) })
+        LocalSettingLinkLongPress provides ({ id -> linkSheetEntry = SettingLinkRegistry.byId(id) }),
+        LocalSettingEntryNavigator provides ::openSettingEntry
     ) {
     val entry = currentEntry
         when (entry.destination) {
@@ -403,26 +410,29 @@ private fun SettingsMainScreen(
                 color = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
+                SettingsHeaderRow(
+                    cutouts = settingsHeaderCutouts(rocks.pkb.plektra.ui.theme.LocalResolvedAppTheme.current.settingsFullscreen),
+                    padStart = 16.dp,
+                    padEnd = 16.dp,
+                    minHeight = 0.dp,
+                    padVertical = 12.dp,
+                    start = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.settings_back_content_description)
+                            )
+                        }
+                    },
+                    middle = {
+                        SettingsSearchField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier.padding(start = 8.dp)
                         )
-                    }
-                    SettingsSearchField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 8.dp)
-                    )
-                }
+                    },
+                    end = {}
+                )
             }
         }
     ) { paddingValues ->
@@ -434,254 +444,272 @@ private fun SettingsMainScreen(
                 .imePadding()
         ) {
             if (searchQuery.isNotBlank()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    if (searchResults.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.settings_search_no_results),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                        )
-                    } else {
-                        searchResults.forEach { entry ->
-                            SettingSearchResultRow(
-                                entry = entry,
-                                onClick = {
-                                    keyboardController?.hide()
-                                    searchQuery = ""
-                                    onOpenSettingEntry(entry)
-                                }
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                SettingsSearchResultList(
+                    results = searchResults,
+                    onOpen = { entry ->
+                        keyboardController?.hide()
+                        searchQuery = ""
+                        onOpenSettingEntry(entry)
+                    },
+                    modifier = Modifier.navigationBarsPadding()
+                )
             } else {
-                Column(
+                SettingsSectionScrollColumn(
                     modifier = modifier
                         .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
+                        .navigationBarsPadding()
                 ) {
-            SettingsGroupDivider(stringResource(R.string.settings_group_typing))
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.Keyboard,
-                title = stringResource(R.string.keyboards_devices_title),
-                linkId = SettingLinkIds.MAIN_KEYBOARDS_DEVICES,
-                onClick = onKeyboardsDevicesClick
-            )
-            SettingsCategoryRow(
-                iconRes = R.drawable.modifier_keys_24,
-                title = stringResource(R.string.modifiers_title),
-                description = stringResource(R.string.modifiers_description),
-                linkId = SettingLinkIds.MAIN_MODIFIERS,
-                onClick = onModifiersClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.Language,
-                title = stringResource(R.string.custom_input_styles_title),
-                linkId = SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES,
-                onClick = onCustomInputStylesClick
-            )
-
-            SettingsGroupDivider(stringResource(R.string.settings_group_smart_features))
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.TextFields,
-                title = stringResource(R.string.settings_category_text_input),
-                linkId = SettingLinkIds.MAIN_TEXT_INPUT,
-                onClick = onTextInputClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.Spellcheck,
-                title = stringResource(R.string.settings_category_auto_correction),
-                linkId = SettingLinkIds.MAIN_AUTO_CORRECTION,
-                onClick = onAutoCorrectionClick
-            )
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.Mic,
-                title = stringResource(R.string.speech_settings_title),
-                linkId = "main.speech_recognition",
-                onClick = onSpeechRecognitionClick
-            )
-
-            SettingsGroupDivider(stringResource(R.string.settings_group_customization))
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.Palette,
-                title = stringResource(R.string.keyboard_theme_title),
-                linkId = SettingLinkIds.MAIN_KEYBOARD_THEME,
-                onClick = onKeyboardThemeClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.Contrast,
-                title = stringResource(R.string.app_appearance_title),
-                description = currentAppAppearanceSummary(context, appAppearancePreferences),
-                linkId = SettingLinkIds.MAIN_APP_APPEARANCE,
-                onClick = onAppAppearanceClick
-            )
-            SettingsCategoryRow(
-                icon = ImageVector.vectorResource(R.drawable.translate_24),
-                title = stringResource(R.string.app_language_title),
-                description = currentAppLanguageLabel(context),
-                linkId = SettingLinkIds.MAIN_APP_LANGUAGE,
-                onClick = onAppLanguageClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.SmartButton,
-                title = stringResource(R.string.status_bar_buttons_title),
-                description = stringResource(R.string.status_bar_buttons_description),
-                linkId = SettingLinkIds.MAIN_STATUS_BAR_BUTTONS,
-                onClick = onStatusBarButtonsClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.RoundedCorner,
-                title = stringResource(R.string.keyboard_bar_geometry),
-                linkId = "keyboard_bar.geometry",
-                onClick = onDisplayGeometryClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.Tune,
-                title = stringResource(R.string.settings_category_customization),
-                linkId = SettingLinkIds.MAIN_CUSTOMIZATION,
-                onClick = onCustomizationClick
-            )
-
-            SettingsGroupDivider(stringResource(R.string.settings_group_utility))
-
-            SettingsCategoryRow(
-                icon = Icons.AutoMirrored.Filled.ManageSearch,
-                title = stringResource(R.string.starter_launcher_shortcuts_title),
-                description = stringResource(R.string.starter_launcher_shortcuts_description),
-                linkId = SettingLinkIds.MAIN_LAUNCHER_SHORTCUTS,
-                onClick = onQuickLauncherClick
-            )
-            SettingsCategoryRow(
-                icon = ImageVector.vectorResource(R.drawable.navigation_24),
-                title = stringResource(R.string.nav_mode_title),
-                description = stringResource(R.string.settings_nav_mode_configure),
-                linkId = SettingLinkIds.MAIN_NAV_MODE,
-                onClick = onNavModeClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.AutoMirrored.Filled.KeyboardReturn,
-                title = stringResource(R.string.app_enter_behaviour_title),
-                description = stringResource(R.string.app_enter_behaviour_description),
-                linkId = SettingLinkIds.MAIN_APP_ENTER_BEHAVIOR,
-                onClick = onEnterBehaviorClick
-            )
-
-            SettingsGroupDivider(stringResource(R.string.settings_group_system))
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.Engineering,
-                title = stringResource(R.string.settings_category_advanced),
-                linkId = SettingLinkIds.MAIN_ADVANCED,
-                onClick = onAdvancedClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.TouchApp,
-                title = stringResource(R.string.settings_category_accessibility),
-                linkId = SettingLinkIds.MAIN_ACCESSIBILITY,
-                onClick = onAccessibilityClick
-            )
-
-            SettingsGroupDivider(stringResource(R.string.settings_group_plektra))
-
-            SettingsCategoryRow(
-                icon = Icons.Filled.Info,
-                title = stringResource(R.string.about_title),
-                description = stringResource(
-                    R.string.settings_about_version_summary,
-                    BuildConfig.VERSION_NAME
-                ),
-                linkId = SettingLinkIds.MAIN_ABOUT,
-                onClick = onAboutClick
-            )
-            SettingsCategoryRow(
-                icon = Icons.Filled.VolunteerActivism,
-                title = stringResource(R.string.settings_support_open_collective),
-                description = stringResource(R.string.settings_support_open_collective_description),
-                onClick = {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://pkb.rocks/donate")
-                        )
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_typing),
+                        accentRole = SettingsAccentRole.PRIMARY
                     )
-                }
-            )
 
-            if (shouldUseGithubUpdateChecks(context)) {
-                SettingsCategoryRow(
-                    icon = ImageVector.vectorResource(R.drawable.plektra_open_monochrome_24),
-                    title = if (checkingForUpdates) {
-                        stringResource(
-                            if (BuildConfig.RELEASE_CHANNEL == "stable") {
-                                R.string.settings_stable_update_checking
-                            } else {
-                                R.string.settings_update_checking
-                            }
-                        )
-                    } else {
-                        stringResource(
-                            if (BuildConfig.RELEASE_CHANNEL == "stable") {
-                                R.string.settings_stable_update_section_title
-                            } else {
-                                R.string.settings_update_section_title
-                            }
-                        )
-                    },
-                    description = stringResource(
-                        if (BuildConfig.RELEASE_CHANNEL == "stable") {
-                            R.string.settings_stable_update_section_description
-                        } else {
-                            R.string.settings_update_section_description
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Keyboard,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.keyboards_devices_title),
+                        linkId = SettingLinkIds.MAIN_KEYBOARDS_DEVICES,
+                        onClick = onKeyboardsDevicesClick
+                    )
+                    SettingsCategoryRow(
+                        iconRes = R.drawable.modifier_keys_24,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.modifiers_title),
+                        description = stringResource(R.string.modifiers_description),
+                        linkId = SettingLinkIds.MAIN_MODIFIERS,
+                        onClick = onModifiersClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Language,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.custom_input_styles_title),
+                        linkId = SettingLinkIds.MAIN_CUSTOM_INPUT_STYLES,
+                        onClick = onCustomInputStylesClick
+                    )
+
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_smart_features),
+                        accentRole = SettingsAccentRole.PRIMARY
+                    )
+
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.TextFields,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.settings_category_text_input),
+                        linkId = SettingLinkIds.MAIN_TEXT_INPUT,
+                        onClick = onTextInputClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Spellcheck,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.settings_category_auto_correction),
+                        linkId = SettingLinkIds.MAIN_AUTO_CORRECTION,
+                        onClick = onAutoCorrectionClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Mic,
+                        accentRole = SettingsAccentRole.PRIMARY,
+                        title = stringResource(R.string.speech_settings_title),
+                        linkId = "main.speech_recognition",
+                        onClick = onSpeechRecognitionClick
+                    )
+
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_customization),
+                        accentRole = SettingsAccentRole.TERTIARY
+                    )
+
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Palette,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.keyboard_theme_title),
+                        linkId = SettingLinkIds.MAIN_KEYBOARD_THEME,
+                        onClick = onKeyboardThemeClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Contrast,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.app_appearance_title),
+                        description = currentAppAppearanceSummary(context, appAppearancePreferences),
+                        linkId = SettingLinkIds.MAIN_APP_APPEARANCE,
+                        onClick = onAppAppearanceClick
+                    )
+                    SettingsCategoryRow(
+                        icon = ImageVector.vectorResource(R.drawable.translate_24),
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.app_language_title),
+                        description = currentAppLanguageLabel(context),
+                        linkId = SettingLinkIds.MAIN_APP_LANGUAGE,
+                        onClick = onAppLanguageClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.SmartButton,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.status_bar_buttons_title),
+                        description = stringResource(R.string.status_bar_buttons_description),
+                        linkId = SettingLinkIds.MAIN_STATUS_BAR_BUTTONS,
+                        onClick = onStatusBarButtonsClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.RoundedCorner,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.keyboard_bar_geometry),
+                        linkId = "keyboard_bar.geometry",
+                        onClick = onDisplayGeometryClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Tune,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.settings_category_customization),
+                        linkId = SettingLinkIds.MAIN_CUSTOMIZATION,
+                        onClick = onCustomizationClick
+                    )
+
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_utility),
+                        accentRole = SettingsAccentRole.SECONDARY
+                    )
+
+                    SettingsCategoryRow(
+                        icon = Icons.AutoMirrored.Filled.ManageSearch,
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.starter_launcher_shortcuts_title),
+                        description = stringResource(R.string.starter_launcher_shortcuts_description),
+                        linkId = SettingLinkIds.MAIN_LAUNCHER_SHORTCUTS,
+                        onClick = onQuickLauncherClick
+                    )
+                    SettingsCategoryRow(
+                        icon = ImageVector.vectorResource(R.drawable.navigation_24),
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.nav_mode_title),
+                        description = stringResource(R.string.settings_nav_mode_configure),
+                        linkId = SettingLinkIds.MAIN_NAV_MODE,
+                        onClick = onNavModeClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.AutoMirrored.Filled.KeyboardReturn,
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.app_enter_behaviour_title),
+                        description = stringResource(R.string.app_enter_behaviour_description),
+                        linkId = SettingLinkIds.MAIN_APP_ENTER_BEHAVIOR,
+                        onClick = onEnterBehaviorClick
+                    )
+
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_system),
+                        accentRole = SettingsAccentRole.SECONDARY
+                    )
+
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Engineering,
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.settings_category_advanced),
+                        linkId = SettingLinkIds.MAIN_ADVANCED,
+                        onClick = onAdvancedClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.TouchApp,
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.settings_category_accessibility),
+                        linkId = SettingLinkIds.MAIN_ACCESSIBILITY,
+                        onClick = onAccessibilityClick
+                    )
+
+                    SettingsSectionDivider(
+                        label = stringResource(R.string.settings_group_plektra),
+                        accentRole = SettingsAccentRole.SECONDARY
+                    )
+
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.Info,
+                        accentRole = SettingsAccentRole.SECONDARY,
+                        title = stringResource(R.string.about_title),
+                        description = stringResource(
+                            R.string.settings_about_version_summary,
+                            BuildConfig.VERSION_NAME
+                        ),
+                        linkId = SettingLinkIds.MAIN_ABOUT,
+                        onClick = onAboutClick
+                    )
+                    SettingsCategoryRow(
+                        icon = Icons.Filled.VolunteerActivism,
+                        accentRole = SettingsAccentRole.TERTIARY,
+                        title = stringResource(R.string.settings_support_open_collective),
+                        description = stringResource(R.string.settings_support_open_collective_description),
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://pkb.rocks/donate")
+                                )
+                            )
                         }
-                    ),
-                    enabled = !checkingForUpdates,
-                    onClick = {
-                        onCheckingForUpdatesChange(true)
-                        val onResult: (rocks.pkb.plektra.update.UpdateCheckResult) -> Unit = { result ->
-                            onCheckingForUpdatesChange(false)
-                            when {
-                                result.hasAnnouncement -> showReleaseNotice(context, result)
-                                !result.successful -> Toast.makeText(
-                                    context,
-                                    context.getString(R.string.settings_update_check_failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                else -> Toast.makeText(
-                                    context,
-                                    context.getString(
-                                        if (BuildConfig.RELEASE_CHANNEL == "stable") {
-                                            R.string.settings_stable_update_up_to_date
-                                        } else {
-                                            R.string.settings_update_up_to_date
-                                        }
-                                    ),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                    )
+
+                    if (shouldUseGithubUpdateChecks(context)) {
+                        SettingsCategoryRow(
+                            icon = ImageVector.vectorResource(R.drawable.plektra_open_monochrome_24),
+                            accentRole = SettingsAccentRole.SECONDARY,
+                            title = if (checkingForUpdates) {
+                                stringResource(
+                                    if (BuildConfig.RELEASE_CHANNEL == "stable") {
+                                        R.string.settings_stable_update_checking
+                                    } else {
+                                        R.string.settings_update_checking
+                                    }
+                                )
+                            } else {
+                                stringResource(
+                                    if (BuildConfig.RELEASE_CHANNEL == "stable") {
+                                        R.string.settings_stable_update_section_title
+                                    } else {
+                                        R.string.settings_update_section_title
+                                    }
+                                )
+                            },
+                            description = stringResource(
+                                if (BuildConfig.RELEASE_CHANNEL == "stable") {
+                                    R.string.settings_stable_update_section_description
+                                } else {
+                                    R.string.settings_update_section_description
+                                }
+                            ),
+                            enabled = !checkingForUpdates,
+                            onClick = {
+                                onCheckingForUpdatesChange(true)
+                                val onResult: (rocks.pkb.plektra.update.UpdateCheckResult) -> Unit = { result ->
+                                    onCheckingForUpdatesChange(false)
+                                    when {
+                                        result.hasAnnouncement -> showReleaseNotice(context, result)
+                                        !result.successful -> Toast.makeText(
+                                            context,
+                                            context.getString(R.string.settings_update_check_failed),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        else -> Toast.makeText(
+                                            context,
+                                            context.getString(
+                                                if (BuildConfig.RELEASE_CHANNEL == "stable") {
+                                                    R.string.settings_stable_update_up_to_date
+                                                } else {
+                                                    R.string.settings_update_up_to_date
+                                                }
+                                            ),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                                checkForUpdateNotices(
+                                    context = context,
+                                    releaseChannel = BuildConfig.RELEASE_CHANNEL,
+                                    ignoreDismissedReleases = false,
+                                    callback = onResult
+                                )
                             }
-                        }
-                        checkForUpdateNotices(
-                            context = context,
-                            releaseChannel = BuildConfig.RELEASE_CHANNEL,
-                            ignoreDismissedReleases = false,
-                            callback = onResult
                         )
                     }
-                )
-            }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    SettingsBottomSpacer()
                 }
             }
         }
@@ -692,94 +720,22 @@ private fun SettingsMainScreen(
 private fun SettingsCategoryRow(
     icon: ImageVector? = null,
     iconRes: Int? = null,
+    accentRole: SettingsAccentRole = SettingsAccentRole.PRIMARY,
     title: String,
     description: String? = null,
     enabled: Boolean = true,
     linkId: String? = null,
     onClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(if (description == null) 56.dp else 64.dp)
-            .settingRow(linkId?.takeIf { enabled }, onClick.takeIf { enabled })
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val iconTint = if (enabled) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSurfaceVariant
-            if (iconRes != null) {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = if (enabled) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    maxLines = 1
-                )
-                if (description != null) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
-                    )
-                }
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun SettingsGroupDivider(label: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
-        )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
+    SettingsNavigationRow(
+        title = title,
+        description = description,
+        icon = icon,
+        iconPainter = iconRes?.let { painterResource(it) },
+        accentRole = accentRole,
+        useIconBadge = true,
+        enabled = enabled,
+        linkId = linkId,
+        onClick = onClick
+    )
 }

@@ -809,7 +809,7 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="debug_recorder_share">Partager</string>
     <string name="debug_recorder_share_chooser">Partager le rapport de debug</string>
     <string name="debug_recorder_copied">Rapport de debug copié (%1$d événements)</string>
-    <string name="debug_recorder_status">Enregistreur : %1$s · Événements : %2$d</string>
+    <string name="debug_recorder_status">Enregistreur : %1$s, Événements : %2$d</string>
     <string name="debug_recorder_status_recording">enregistrement</string>
     <string name="debug_recorder_status_stopped">arrêté</string>
     <string name="debug_recorder_started_at">Démarré à : </string>
@@ -949,6 +949,10 @@ Chaque touche peut être configurée comme Keycode, Action, Native Ctrl ou Aucun
     <string name="kw_auto_correction_starter_words">mots de départ, champ vide, nouvelle phrase, premier mot, mots courants, dictionnaire, suggestions</string>
     <string name="clicks_button_binding_reading">Lecture de l’attribution actuelle depuis le clavier…</string>
     <string name="clicks_button_binding_last_known">Dernière attribution connue ; le clavier n’est pas connecté.</string>
+    <string name="app_appearance_settings_fullscreen_title">Paramètres en plein écran</string>
+    <string name="app_appearance_settings_fullscreen_description">Masque la barre d’état dans les paramètres. Le titre de la page et les actions occupent la ligne du haut. Balayez vers le bas depuis le bord supérieur pour afficher brièvement la barre d’état.</string>
+    <string name="kw_app_appearance_settings_fullscreen">plein écran, barre d’état, masquer, immersif, en-tête, ligne du haut, encoche, découpe</string>
+    <string name="settings_search_close">Fermer la recherche</string>
     <string name="keyboard_backlight_section_title">Rétroéclairage du clavier</string>
     <string name="keyboard_backlight_follows_display_title">Le rétroéclairage suit l’écran</string>
     <string name="keyboard_backlight_follows_display_description">Garde le clavier éclairé jusqu’à l’extinction de l’écran et le rallume avec l’écran. Utilise le réglage de l’appareil ; Plektra ne tourne pas en arrière-plan pour cela.</string>

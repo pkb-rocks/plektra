@@ -108,34 +108,35 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
     }
 
     Scaffold(topBar = {
-        Surface(modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars)) {
-            Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.settings_back_content_description)) }
-                Text(stringResource(R.string.speech_settings_title), style = MaterialTheme.typography.headlineSmall)
-            }
-        }
+        PlektraSettingsHeader(title = stringResource(R.string.speech_settings_title), onBack = onBack)
     }) { padding ->
-        Column(modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).imePadding(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-          Column(Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-              verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(stringResource(R.string.speech_language_description), style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            SpeechCard {
-                ListItem(
-                    modifier = Modifier.settingRow(SettingLinkIds.TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT),
-                    headlineContent = { Text(stringResource(R.string.alt_ctrl_speech_shortcut_title)) },
-                    supportingContent = { Text(stringResource(R.string.alt_ctrl_speech_shortcut_description)) },
-                    leadingContent = { Icon(Icons.Default.Keyboard, null) },
-                    trailingContent = { Switch(checked = altCtrlSpeechShortcut, onCheckedChange = {
+        SettingsSectionScrollColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .imePadding()
+                .navigationBarsPadding()
+        ) {
+            Column(
+                Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(vertical = 8.dp)
+            ) {
+                SettingsSupportingText(stringResource(R.string.speech_language_description))
+                SettingsToggleRow(
+                    title = stringResource(R.string.alt_ctrl_speech_shortcut_title),
+                    description = stringResource(R.string.alt_ctrl_speech_shortcut_description),
+                    icon = Icons.Default.Keyboard,
+                    checked = altCtrlSpeechShortcut,
+                    alwaysInlineDescription = true,
+                    linkId = SettingLinkIds.TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT,
+                    onCheckedChange = {
                         altCtrlSpeechShortcut = it
                         SettingsManager.setAltCtrlSpeechShortcutEnabled(context, it)
-                    }) }
+                    }
                 )
-            }
-            SpeechCard(Modifier.settingRow("speech.provider")) {
-                SpeechSectionTitle(stringResource(R.string.speech_provider_title))
-                BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
+                SpeechCard(Modifier.settingRow("speech.provider")) {
+                    SettingsSectionDivider(stringResource(R.string.speech_provider_title))
+                BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = SettingsSpace.edge, vertical = 8.dp)) {
                     val columns = if (maxWidth >= 600.dp) 4 else 2
                     Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         SpeechProvider.entries.chunked(columns).forEach { providers ->
@@ -183,7 +184,7 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
                                         selectedModel = model; SpeechSettings.setModel(context, provider, model); modelPicker = false
                                     }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                                         RadioButton(selectedModel.id == model.id, onClick = null)
-                                        Column(Modifier.padding(start = 8.dp)) {
+                                        Column(Modifier.padding(start = SettingsSpace.controlGap)) {
                                             Text(model.name)
                                             Text(stringResource(when (model.protocol) {
                                                 SpeechProtocol.AUDIO_CHAT -> R.string.speech_model_audio
@@ -233,7 +234,7 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
                     }
                 }
                 else -> SpeechCard {
-                    SpeechSectionTitle(stringResource(R.string.speech_api_key_title))
+                    SettingsSectionDivider(stringResource(R.string.speech_api_key_title))
                     key(provider) { SpeechCredentialEditor(provider, client) }
                     if (provider == SpeechProvider.OPENROUTER) Row(
                         Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -263,7 +264,7 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
                     durationPicker = false
                 }, verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(maxDurationMs == value, onClick = null)
-                    Text(durationName(value), Modifier.padding(start = 8.dp))
+                    Text(durationName(value), Modifier.padding(start = SettingsSpace.controlGap))
                 }
             }
             SpeechNote(stringResource(R.string.speech_duration_description))
@@ -281,7 +282,7 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
                 }, verticalAlignment = Alignment.CenterVertically) {
                     RadioButton(continuousPreview == continuous, onClick = null)
                     Text(stringResource(if (continuous) R.string.speech_preview_continuous else R.string.speech_preview_three_words),
-                        Modifier.padding(start = 8.dp))
+                        Modifier.padding(start = SettingsSpace.controlGap))
                 }
             }
             SpeechNote(stringResource(R.string.speech_preview_description))
@@ -291,39 +292,27 @@ fun SpeechSettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
         text = { Column { listOf(1500L, 3000L, 5000L, 0L).forEach { value ->
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).selectable(selected = silenceMs == value, role = Role.RadioButton) { silenceMs = value; SpeechSettings.setSilenceMs(context, value); silencePicker = false },
                 verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(silenceMs == value, onClick = null); Text(pauseName(value), Modifier.padding(start = 8.dp))
+                RadioButton(silenceMs == value, onClick = null); Text(pauseName(value), Modifier.padding(start = SettingsSpace.controlGap))
             }
         } } }, confirmButton = { TextButton(onClick = { silencePicker = false }) { Text(stringResource(android.R.string.cancel)) } })
 }
 
 @Composable
-private fun SpeechSectionTitle(title: String) {
-    Text(title, Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
-        style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-}
-
-@Composable
 private fun SpeechNote(text: String) {
-    Text(text, Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    SettingsSupportingText(text)
 }
 
 @Composable
 private fun SpeechSettingRow(title: String, subtitle: String?, icon: ImageVector,
     modifier: Modifier = Modifier, expanded: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
-    ListItem(modifier = modifier.alpha(if (enabled) 1f else 0.38f).clickable(enabled = enabled, onClick = onClick),
-        leadingContent = { Icon(icon, contentDescription = null) },
-        headlineContent = { Text(title) },
-        supportingContent = subtitle?.let { { Text(it) } },
-        trailingContent = { Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ChevronRight, contentDescription = null) })
+    SettingsNavigationRow(title = title, value = subtitle, icon = icon, enabled = enabled,
+        modifier = modifier, onClick = onClick)
 }
 
+/** Groups related rows; settings pages use plain full-width rows instead of cards. */
 @Composable
 private fun SpeechCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
-        Column(Modifier.padding(vertical = 8.dp), content = content)
-    }
+    Column(modifier.fillMaxWidth(), content = content)
 }
 
 @Composable

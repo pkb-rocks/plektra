@@ -32,11 +32,13 @@ class AppThemeResolverTest {
         assertEquals(AppThemeMode.SYSTEM, prefs.themeMode)
         assertEquals(AppDarkSurfaceStyle.STANDARD, prefs.darkSurfaceStyle)
         assertTrue(prefs.dynamicColor)
+        assertEquals(AppSettingsStyle.COMPACT_DIVIDERS, prefs.settingsStyle)
 
         val resolvedLight = AppThemeResolver.resolve(prefs, systemInDarkTheme = false, sdkInt = Build.VERSION_CODES.S)
         assertFalse(resolvedLight.useDarkTheme)
         assertFalse(resolvedLight.useOledBlack)
         assertTrue(resolvedLight.useDynamicColor)
+        assertEquals(AppSettingsStyle.COMPACT_DIVIDERS, resolvedLight.settingsStyle)
 
         val resolvedDark = AppThemeResolver.resolve(prefs, systemInDarkTheme = true, sdkInt = Build.VERSION_CODES.S)
         assertTrue(resolvedDark.useDarkTheme)
@@ -154,12 +156,14 @@ class AppThemeResolverTest {
         SettingsManager.getPreferences(context).edit()
             .putString(SettingsManager.KEY_APP_THEME_MODE, "invalid_mode")
             .putString(SettingsManager.KEY_APP_DARK_SURFACE_STYLE, "unknown_surface")
+            .putString(SettingsManager.KEY_APP_SETTINGS_STYLE, "unknown_style")
             .commit()
 
         val prefs = SettingsManager.getAppAppearancePreferences(context)
         assertEquals(AppThemeMode.SYSTEM, prefs.themeMode)
         assertEquals(AppDarkSurfaceStyle.STANDARD, prefs.darkSurfaceStyle)
         assertTrue(prefs.dynamicColor)
+        assertEquals(AppSettingsStyle.COMPACT_DIVIDERS, prefs.settingsStyle)
     }
 
     @Test

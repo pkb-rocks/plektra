@@ -142,32 +142,11 @@ fun LauncherShortcutsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // Header
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars),
-            tonalElevation = 1.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.settings_back_content_description)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.launcher_shortcuts_screen_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(start = 8.dp).settingRow("quick_launcher.assignments")
-                )
-            }
-        }
+        PlektraSettingsHeader(
+            title = stringResource(R.string.launcher_shortcuts_screen_title),
+            onBack = onBack,
+            modifier = Modifier.settingRow("quick_launcher.assignments")
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

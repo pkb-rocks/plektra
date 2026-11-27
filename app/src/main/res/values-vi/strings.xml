@@ -809,7 +809,7 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="debug_recorder_share">Chia sẻ</string>
     <string name="debug_recorder_share_chooser">Chia sẻ báo cáo debug</string>
     <string name="debug_recorder_copied">Đã sao chép báo cáo debug (%1$d sự kiện)</string>
-    <string name="debug_recorder_status">Trình ghi: %1$s · Sự kiện: %2$d</string>
+    <string name="debug_recorder_status">Trình ghi: %1$s, Sự kiện: %2$d</string>
     <string name="debug_recorder_status_recording">đang ghi</string>
     <string name="debug_recorder_status_stopped">đã dừng</string>
     <string name="debug_recorder_started_at">Bắt đầu lúc: </string>
@@ -947,6 +947,10 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="kw_auto_correction_starter_words">từ mở đầu, ô trống, câu mới, từ đầu tiên, từ phổ biến, từ điển, gợi ý</string>
     <string name="clicks_button_binding_reading">Đang đọc gán phím hiện tại từ bàn phím…</string>
     <string name="clicks_button_binding_last_known">Gán phím đã biết gần nhất; bàn phím chưa được kết nối.</string>
+    <string name="app_appearance_settings_fullscreen_title">Cài đặt toàn màn hình</string>
+    <string name="app_appearance_settings_fullscreen_description">Ẩn thanh trạng thái trong phần cài đặt. Tiêu đề trang và các thao tác dùng hàng trên cùng. Vuốt xuống từ cạnh trên để hiện thanh trạng thái trong giây lát.</string>
+    <string name="kw_app_appearance_settings_fullscreen">toàn màn hình, thanh trạng thái, ẩn, tiêu đề, hàng trên cùng, tai thỏ, lỗ camera</string>
+    <string name="settings_search_close">Đóng tìm kiếm</string>
     <string name="keyboard_backlight_section_title">Đèn nền bàn phím</string>
     <string name="keyboard_backlight_follows_display_title">Đèn nền theo màn hình</string>
     <string name="keyboard_backlight_follows_display_description">Giữ đèn bàn phím sáng cho đến khi màn hình tắt và bật lại khi màn hình bật. Dùng cài đặt của thiết bị; Plektra không chạy nền cho việc này.</string>

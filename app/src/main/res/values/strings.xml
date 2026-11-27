@@ -2098,7 +2098,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="kw_app_appearance_dark_surface">dark surface, oled, amoled, pure black, true black, pitch black, gray, grey, surface</string>
     <string name="kw_app_appearance_dynamic_color">dynamic color, dynamic colors, material you, wallpaper, monet, system colors</string>
     <string name="app_appearance_settings_fullscreen_title">Full-screen settings</string>
-    <string name="app_appearance_settings_fullscreen_description">Hides the status bar in settings. The page title and actions use the top row. Swipe down from the top edge to show the status bar briefly.</string>
+    <string name="app_appearance_settings_fullscreen_description">Hides the status bar in settings and notes. The page title and actions use the top row. Swipe down from the top edge to show the status bar briefly.</string>
     <string name="kw_app_appearance_settings_fullscreen">full screen, fullscreen, status bar, hide, immersive, header, top row, notch, cutout</string>
     <string name="settings_search_close">Close search</string>
     <string name="keyboard_backlight_section_title">Keyboard backlight</string>

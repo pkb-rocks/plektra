@@ -83,6 +83,8 @@
       "rocks.pkb.plektra.MainStatusBarScrollTest",
       "rocks.pkb.plektra.NavModeKeyMappingDialogTest",
       "rocks.pkb.plektra.NotesAppearanceTest",
+      "rocks.pkb.plektra.NotesCompactLayoutTest",
+      "rocks.pkb.plektra.NotesCompactRenderTest",
       "rocks.pkb.plektra.SettingLinkCoverageTest",
       "rocks.pkb.plektra.SettingLinkRegistryTest",
       "rocks.pkb.plektra.SettingsSectionScrollTest",

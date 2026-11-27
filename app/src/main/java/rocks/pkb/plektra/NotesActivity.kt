@@ -30,6 +30,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
@@ -64,6 +65,8 @@ open class NotesActivity : Activity() {
     private lateinit var formatBar: HorizontalScrollView
     private lateinit var panes: LinearLayout
     private lateinit var paneDivider: View
+    private lateinit var header: NotesHeaderRow
+    private lateinit var toolsDivider: View
     private lateinit var modeTabGroup: LinearLayout
     private val modeTabDividers = mutableListOf<View>()
     private var savedIndicator: TextView? = null
@@ -81,7 +84,6 @@ open class NotesActivity : Activity() {
     private var appliedTheme: ResolvedAppTheme? = null
     private enum class ViewMode { MARKDOWN, BOTH, PREVIEW }
     private var restoreHeadingFocus = false
-    private var horizontalGutter = 24
     private lateinit var markwon: Markwon
 
     override fun onCreate(state: Bundle?) {
@@ -96,23 +98,46 @@ open class NotesActivity : Activity() {
         dividerColor = if (dark) Color.rgb(65, 66, 68) else Color.rgb(218, 219, 216)
         markwon = buildMarkwon()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        // The window reaches into the status bar and cutout area; the views below handle
+        // the insets themselves, so full-screen notes can use the row beside the camera.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            }
+        } else {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
         root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(paper)
             descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
-            setPadding(dp(24), dp(12), dp(24), dp(8))
+            setPadding(dp(EDGE), 0, dp(EDGE), 0)
+        }
+        header = NotesHeaderRow(this).apply {
+            id = R.id.notes_header
+            minRowHeight = dp(HEADER_HEIGHT)
+            cutoutGap = dp(4)
+            setPaddingRelative(0, 0, dp(4), 0)
         }
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // The top follows the status bar only: a hidden status bar leaves the camera row
+            // to the header, which moves its elements around the cutout itself.
+            val top = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            val sides = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
-            view.setPadding(dp(horizontalGutter) + bars.left, dp(12) + bars.top, dp(horizontalGutter) + bars.right, dp(8) + maxOf(bars.bottom, ime.bottom))
+            view.setPadding(dp(EDGE) + sides.left, top, dp(EDGE) + sides.right, maxOf(sides.bottom, ime.bottom))
+            header.cutouts = insets.displayCutout?.boundingRects.orEmpty()
+            // The header's cutout spans depend on the top padding set above.
+            header.requestLayout()
             insets
         }
-        val navigation = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
-        navigation.addView(iconAction(R.drawable.ic_notes_back, R.string.settings_back_content_description) { finish() })
+        header.start = iconAction(R.drawable.ic_notes_back, R.string.settings_back_content_description) { finish() }
         heading = EditText(this).apply {
             id = R.id.notes_heading
-            textSize = 22f
+            textSize = 20f
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             setTextColor(inkColor)
             setHintTextColor(mutedInkColor)
@@ -124,9 +149,9 @@ open class NotesActivity : Activity() {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
             setText(selectedNote.title)
-            setPadding(dp(8), dp(8), 0, dp(8))
+            setPadding(dp(8), 0, dp(8), 0)
         }
-        navigation.addView(heading, LinearLayout.LayoutParams(0, dp(56), 1f))
+        header.middle = heading
         if (resources.configuration.screenWidthDp >= 600) {
             savedIndicator = TextView(this).apply {
                 text = "✓ ${getString(R.string.notes_saved)}"
@@ -134,12 +159,12 @@ open class NotesActivity : Activity() {
                 textSize = 12f
                 setPadding(dp(12), 0, dp(12), 0)
             }
-            navigation.addView(savedIndicator)
+            header.addEnd(savedIndicator!!)
         }
-        root.addView(navigation)
+        root.addView(header, LinearLayout.LayoutParams(-1, -2))
         modeTabGroup = LinearLayout(this).apply {
             background = GradientDrawable().apply {
-                cornerRadius = dp(4).toFloat()
+                cornerRadius = dp(6).toFloat()
                 setStroke(dp(1), dividerColor)
             }
             clipToOutline = true
@@ -153,9 +178,9 @@ open class NotesActivity : Activity() {
             if (index > 0) {
                 val divider = View(this).apply { setBackgroundColor(dividerColor) }
                 modeTabDividers += divider
-                modeTabGroup.addView(divider, LinearLayout.LayoutParams(dp(1), dp(48)))
+                modeTabGroup.addView(divider, LinearLayout.LayoutParams(dp(1), -1))
             }
-            val tab = iconAction(icon, label) { setViewMode(mode, showInput = true) }
+            val tab = iconAction(icon, label, width = MODE_TAB_WIDTH, height = MODE_TAB_HEIGHT) { setViewMode(mode, showInput = true) }
             tab.id = when (mode) {
                 ViewMode.MARKDOWN -> R.id.notes_markdown_toggle
                 ViewMode.BOTH -> R.id.notes_both_toggle
@@ -164,25 +189,25 @@ open class NotesActivity : Activity() {
             modeTabs += mode to tab
             modeTabGroup.addView(tab)
         }
-        navigation.addView(modeTabGroup, LinearLayout.LayoutParams(-2, dp(48)))
-        navigation.addView(iconAction(R.drawable.ic_notes_add, R.string.notes_new) { switchNote(notes.create(), focusHeading = true) }
+        header.addEnd(modeTabGroup.apply { layoutParams = ViewGroup.LayoutParams(-2, dp(MODE_TAB_HEIGHT)) })
+        header.addEnd(iconAction(R.drawable.ic_notes_add, R.string.notes_new, width = END_ACTION_WIDTH) {
+            switchNote(notes.create(), focusHeading = true)
+        }
             .apply { id = R.id.notes_new })
-        navigation.addView(iconAction(R.drawable.ic_notes_more, R.string.notes_title) { showNotes() })
+        header.addEnd(iconAction(R.drawable.ic_notes_more, R.string.notes_title, width = END_ACTION_WIDTH) { showNotes() })
         var titleOnSeparateLine = false
+        // A title squeezed by the actions moves to its own line below them.
         root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val leftInset = root.paddingLeft - dp(horizontalGutter)
-            val rightInset = root.paddingRight - dp(horizontalGutter)
-            val narrow = root.width - leftInset - rightInset < dp(400)
-            val gutter = if (narrow) 8 else 24
-            if (horizontalGutter != gutter) {
-                horizontalGutter = gutter
-                root.setPadding(dp(gutter) + leftInset, root.paddingTop, dp(gutter) + rightInset, root.paddingBottom)
-            }
+            val narrow = header.middleCapacity < dp(TITLE_MIN_WIDTH)
             if (narrow != titleOnSeparateLine) {
                 val headingHadFocus = heading.hasFocus()
-                (heading.parent as ViewGroup).removeView(heading)
-                if (narrow) root.addView(heading, 0, LinearLayout.LayoutParams(-1, dp(56)))
-                else navigation.addView(heading, 1, LinearLayout.LayoutParams(0, dp(56), 1f))
+                if (narrow) {
+                    header.middle = null
+                    root.addView(heading, 1, LinearLayout.LayoutParams(-1, dp(HEADER_HEIGHT)))
+                } else {
+                    (heading.parent as ViewGroup).removeView(heading)
+                    header.middle = heading
+                }
                 titleOnSeparateLine = narrow
                 if (headingHadFocus || (viewMode != ViewMode.PREVIEW && restoreHeadingFocus && currentFocus == null)) {
                     heading.requestFocus()
@@ -220,16 +245,22 @@ open class NotesActivity : Activity() {
             gravity = Gravity.TOP
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             setText(selectedNote.body)
-            setPadding(dp(44), dp(16), dp(16), dp(16))
+            setPadding(dp(44), dp(8), dp(16), dp(8))
             setLineSpacing(dp(4).toFloat(), 1f)
+        }
+        // A keyboard bar that opens shortens the editor; the writing position stays in view.
+        editor.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (editor.hasFocus() && bottom - top != oldBottom - oldTop && editor.layout != null) {
+                editor.bringPointIntoView(editor.selectionEnd.coerceAtLeast(0))
+            }
         }
 
         preview = TextView(this).apply {
             id = R.id.notes_preview_body
-            textSize = 17f
+            textSize = 16f
             setTextColor(inkColor)
             setTextIsSelectable(true)
-            setPadding(dp(20), dp(16), dp(8), dp(16))
+            setPadding(dp(16), dp(8), dp(16), dp(8))
             setOnTouchListener { _, event ->
                 val layout = layout
                 val source = text as? android.text.Spanned
@@ -248,13 +279,13 @@ open class NotesActivity : Activity() {
 
         val formats = LinearLayout(this)
         fun format(icon: Int, label: Int, before: String, after: String = "") {
-            formats.addView(iconAction(icon, label) { insertMarkup(before, after) })
+            formats.addView(tool(icon, label) { insertMarkup(before, after) })
         }
-        undoButton = iconAction(R.drawable.ic_undo_24, R.string.notes_undo) { restoreHistory(undo, redo) }.apply { id = R.id.notes_undo_button }
-        redoButton = iconAction(R.drawable.ic_redo_24, R.string.notes_redo) { restoreHistory(redo, undo) }.apply { id = R.id.notes_redo_button }
+        undoButton = tool(R.drawable.ic_undo_24, R.string.notes_undo) { restoreHistory(undo, redo) }.apply { id = R.id.notes_undo_button }
+        redoButton = tool(R.drawable.ic_redo_24, R.string.notes_redo) { restoreHistory(redo, undo) }.apply { id = R.id.notes_redo_button }
         formats.addView(undoButton)
         formats.addView(redoButton)
-        val headingButton = iconAction(R.drawable.ic_notes_heading, R.string.notes_format_heading) {}
+        val headingButton = tool(R.drawable.ic_notes_heading, R.string.notes_format_heading) {}
         headingButton.setOnClickListener {
             PopupMenu(this, headingButton).apply {
                 (1..3).forEach { menu.add(0, it, it, "H$it") }
@@ -266,21 +297,24 @@ open class NotesActivity : Activity() {
         format(R.drawable.ic_notes_bold, R.string.notes_format_bold, "**", "**")
         format(R.drawable.ic_notes_italic, R.string.notes_format_italic, "*", "*")
         format(R.drawable.ic_notes_strike, R.string.notes_strike, "~~", "~~")
-        formats.addView(iconAction(R.drawable.ic_notes_list, R.string.notes_format_list) { toggleList(MarkdownListEditing.Kind.BULLET) })
-        formats.addView(iconAction(R.drawable.ic_notes_numbered, R.string.notes_numbered) { toggleList(MarkdownListEditing.Kind.NUMBERED) })
-        formats.addView(iconAction(R.drawable.ic_notes_checklist, R.string.notes_checklist) { toggleList(MarkdownListEditing.Kind.CHECKBOX) })
-        formats.addView(iconAction(R.drawable.ic_notes_quote, R.string.notes_quote) { prefixLines("> ") })
-        formats.addView(iconAction(R.drawable.ic_notes_link, R.string.notes_format_link) { insertMarkup("[", "](https://)") })
-        formats.addView(iconAction(R.drawable.ic_notes_code, R.string.notes_format_code) { insertMarkup("`", "`") })
+        formats.addView(tool(R.drawable.ic_notes_list, R.string.notes_format_list) { toggleList(MarkdownListEditing.Kind.BULLET) })
+        formats.addView(tool(R.drawable.ic_notes_numbered, R.string.notes_numbered) { toggleList(MarkdownListEditing.Kind.NUMBERED) })
+        formats.addView(tool(R.drawable.ic_notes_checklist, R.string.notes_checklist) { toggleList(MarkdownListEditing.Kind.CHECKBOX) })
+        formats.addView(tool(R.drawable.ic_notes_quote, R.string.notes_quote) { prefixLines("> ") })
+        formats.addView(tool(R.drawable.ic_notes_link, R.string.notes_format_link) { insertMarkup("[", "](https://)") })
+        formats.addView(tool(R.drawable.ic_notes_code, R.string.notes_format_code) { insertMarkup("`", "`") })
         format(R.drawable.ic_notes_code_block, R.string.notes_code_block, "\n```\n", "\n```\n")
-        formats.addView(iconAction(R.drawable.ic_notes_table, R.string.notes_table) { insertMarkup("\n| Column | Column |\n| --- | --- |\n| ", " |  |\n") })
+        formats.addView(tool(R.drawable.ic_notes_table, R.string.notes_table) { insertMarkup("\n| Column | Column |\n| --- | --- |\n| ", " |  |\n") })
         formatBar = HorizontalScrollView(this).apply {
+            id = R.id.notes_format_bar
             addView(formats)
             isHorizontalScrollBarEnabled = true
             isScrollbarFadingEnabled = false
         }
         updateHistoryButtons()
-        root.addView(formatBar)
+        root.addView(formatBar, LinearLayout.LayoutParams(-1, dp(TOOL_SIZE)))
+        toolsDivider = View(this).apply { setBackgroundColor(dividerColor) }
+        root.addView(toolsDivider, LinearLayout.LayoutParams(-1, 1))
         panes = LinearLayout(this).apply {
             orientation = if (resources.configuration.screenWidthDp >= 600) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
         }
@@ -359,6 +393,8 @@ open class NotesActivity : Activity() {
         closeRemovedNote()
         if (!isFinishing) {
             syncAppearanceIfNeeded()
+            // Other windows or the system may have shown the status bar meanwhile.
+            appliedTheme?.let { applySystemBars(it.settingsFullscreen) }
         }
     }
 
@@ -394,7 +430,7 @@ open class NotesActivity : Activity() {
         heading.setHintTextColor(mutedInkColor)
         savedIndicator?.setTextColor(mutedInkColor)
         modeTabGroup.background = GradientDrawable().apply {
-            cornerRadius = dp(4).toFloat()
+            cornerRadius = dp(6).toFloat()
             setStroke(dp(1), dividerColor)
         }
         modeTabDividers.forEach { it.setBackgroundColor(dividerColor) }
@@ -403,6 +439,7 @@ open class NotesActivity : Activity() {
         editor.invalidate()
         preview.setTextColor(inkColor)
         paneDivider.setBackgroundColor(dividerColor)
+        toolsDivider.setBackgroundColor(dividerColor)
 
         val selectedModeTab = modeTabs.firstOrNull { it.first == viewMode }?.second
         actionIcons.forEach { (button, glyph) ->
@@ -421,6 +458,7 @@ open class NotesActivity : Activity() {
             isAppearanceLightStatusBars = !dark
             isAppearanceLightNavigationBars = !dark
         }
+        applySystemBars(resolvedTheme.settingsFullscreen)
 
         if (refreshMarkdown && viewMode != ViewMode.MARKDOWN) {
             val previousText = preview.text.toString()
@@ -592,20 +630,31 @@ open class NotesActivity : Activity() {
         }
     }
 
-    private fun tintedIcon(resource: Int) = getDrawable(resource)?.mutate()?.apply {
+    private fun tintedIcon(resource: Int, size: Int) = getDrawable(resource)?.mutate()?.apply {
         setTint(inkColor)
-        setBounds(0, 0, dp(24), dp(24))
+        setBounds(0, 0, dp(size), dp(size))
     }
 
-    private fun iconAction(icon: Int, description: Int, onClick: () -> Unit): TextView =
-        action("", getString(description), inkColor, onClick).apply {
-            val glyph = requireNotNull(tintedIcon(icon))
+    private fun iconAction(
+        icon: Int,
+        description: Int,
+        width: Int = ACTION_SIZE,
+        height: Int = ACTION_SIZE,
+        iconSize: Int = 24,
+        onClick: () -> Unit
+    ): TextView =
+        action("", getString(description), inkColor, width, height, onClick).apply {
+            val glyph = requireNotNull(tintedIcon(icon, iconSize))
             actionIcons[this] = glyph
             foreground = LayerDrawable(arrayOf(glyph)).apply {
-                setLayerSize(0, dp(24), dp(24))
+                setLayerSize(0, dp(iconSize), dp(iconSize))
                 setLayerGravity(0, Gravity.CENTER)
             }
         }
+
+    /** A formatting tool: denser than the header actions, like a compact toolbar. */
+    private fun tool(icon: Int, description: Int, onClick: () -> Unit): TextView =
+        iconAction(icon, description, width = TOOL_SIZE, height = TOOL_SIZE, iconSize = 20, onClick = onClick)
 
     private fun actionBackground(): Drawable {
         val selected = GradientDrawable().apply {
@@ -629,17 +678,24 @@ open class NotesActivity : Activity() {
         editor.setSelection(end + prefix.length * (content.count { it == '\n' } + 1))
     }
 
-    private fun action(label: String, description: String, color: Int, onClick: () -> Unit): TextView = TextView(this).apply {
+    private fun action(
+        label: String,
+        description: String,
+        color: Int,
+        width: Int,
+        height: Int,
+        onClick: () -> Unit
+    ): TextView = TextView(this).apply {
         text = label
         contentDescription = description
         textSize = 14f
         includeFontPadding = false
         setTextColor(color)
         gravity = Gravity.CENTER
-        minHeight = dp(48)
+        minHeight = dp(height)
         setPadding(0, 0, 0, 0)
-        minimumWidth = dp(48)
-        layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
+        minimumWidth = dp(width)
+        layoutParams = LinearLayout.LayoutParams(dp(width), dp(height))
         background = actionBackground()
         isClickable = true
         isFocusable = false
@@ -648,4 +704,30 @@ open class NotesActivity : Activity() {
     }
 
     protected fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    /** Full-screen notes follow the full-screen settings: the header takes the status bar row. */
+    private fun applySystemBars(fullscreen: Boolean) {
+        WindowCompat.getInsetsController(window, root).run {
+            if (fullscreen) {
+                systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                hide(WindowInsetsCompat.Type.statusBars())
+            } else {
+                show(WindowInsetsCompat.Type.statusBars())
+            }
+        }
+    }
+
+    private companion object {
+        /** Side margin of header and tools; text has its own padding. */
+        const val EDGE = 4
+        const val HEADER_HEIGHT = 48
+        const val ACTION_SIZE = 48
+        /** Narrower than Back, so the title keeps room between them on small phones. */
+        const val END_ACTION_WIDTH = 44
+        const val MODE_TAB_WIDTH = 40
+        const val MODE_TAB_HEIGHT = 40
+        const val TOOL_SIZE = 40
+        /** Below this width the title moves to its own line under the header. */
+        const val TITLE_MIN_WIDTH = 96
+    }
 }

@@ -23,11 +23,16 @@ data class KeyboardBarConfiguration(
     val slimProfile: KeyboardBarProfile = KeyboardBarProfile(
         suggestions, false, bottomIndicators, androidIndicators, inlineIndicators)
 ) {
+    /**
+     * Slim always uses the combined row: its menu buttons live in that row, so a separate actions
+     * row would stack a second, full-size bar with the normal profile's buttons.
+     */
     fun presentation(slim: Boolean): KeyboardBarPresentation {
         val profile = if (slim) slimProfile else KeyboardBarProfile(
             suggestions, actions, bottomIndicators, androidIndicators, inlineIndicators)
         return KeyboardBarPresentation(profile.suggestions, profile.actions, profile.bottomIndicators,
-            profile.inlineIndicators && profile.suggestions, profile.androidIndicators, arrangement)
+            profile.inlineIndicators && profile.suggestions, profile.androidIndicators,
+            if (slim) KeyboardBarArrangement.SHARED else arrangement)
     }
 
     companion object {

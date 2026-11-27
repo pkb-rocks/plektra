@@ -36,6 +36,8 @@ class ClicksButtonBindingScreenSyncTest {
         // Robolectric creates a new Application per test; the process singleton must not keep
         // a previous test's preference store. Production has only one Application instance.
         resetControllerInitialization()
+        SettingsManager.getPreferences(context).edit().clear().commit()
+        ClicksPowerKeyboardController.initialize(context)
     }
 
     private fun resetControllerInitialization() {
@@ -53,8 +55,6 @@ class ClicksButtonBindingScreenSyncTest {
 
     @Test
     fun appliedSelectionYieldsToFirmwareAssignmentReadLaterInTheSameScreen() {
-        context.getSharedPreferences("plektra_prefs", Context.MODE_PRIVATE).edit().clear().commit()
-        ClicksPowerKeyboardController.initialize(context)
         val keyboard = CompletingKeyboard()
         ClicksPowerKeyboardController.simulateKeyboardSessionForTest(keyboard, writableKeyboardState(tabRemap = null))
         compose.setContent {
@@ -88,6 +88,27 @@ class ClicksButtonBindingScreenSyncTest {
         assertEquals(1, keyboard.writes.size)
     }
 
+    @Test
+    fun matchingLastKnownAssignmentShowsPendingUntilReadAgain() {
+        val keyboard = CompletingKeyboard()
+        val alt = ClicksPowerKeyboardProtocol.leftAltRemapOutput()
+        val fresh = writableKeyboardState(tabRemap = alt)
+        SettingsManager.setClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.RED, ClicksDesiredButtonBinding("red_alt", alt))
+        ClicksPowerKeyboardController.simulateKeyboardSessionForTest(keyboard, fresh.copy(stale = true, sessionValidated = false))
+        compose.setContent {
+            CompositionLocalProvider(LocalSettingHighlightId provides "clicks.buttons.red_button") {
+                ClicksPowerKeyboardSettingsScreen(onBack = {})
+            }
+        }
+        compose.onNodeWithText(pendingHint).assertExists()
+
+        ClicksPowerKeyboardController.simulateKeyboardSessionForTest(keyboard, fresh)
+        compose.waitForIdle()
+
+        compose.onNodeWithText(pendingHint).assertDoesNotExist()
+        assertTrue(keyboard.writes.isEmpty())
+    }
+
     /** Applies each write like the GATT client: publish the new state, then complete. */
     private class CompletingKeyboard : ClicksButtonRemapWriter {
         val writes = mutableListOf<ByteArray>()
@@ -116,7 +137,7 @@ class ClicksButtonBindingScreenSyncTest {
             ready = true,
             sessionValidated = true,
             firmwareVersion = "1.0.9",
-            specialKeyEnableFlags = 0,
+            specialKeyEnableFlags = if (tabRemap == null) 0 else ClicksPowerKeyboardProtocol.FLAG_TAB_REMAP_ENABLED,
             tabRemap = tabRemap
         )
     }

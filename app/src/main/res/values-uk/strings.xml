@@ -809,7 +809,7 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="debug_recorder_share">Поділитися</string>
     <string name="debug_recorder_share_chooser">Поділитися звітом налагодження</string>
     <string name="debug_recorder_copied">Звіт налагодження скопійовано (%1$d подій)</string>
-    <string name="debug_recorder_status">Реєстратор: %1$s · Подій: %2$d</string>
+    <string name="debug_recorder_status">Реєстратор: %1$s, Подій: %2$d</string>
     <string name="debug_recorder_status_recording">запис</string>
     <string name="debug_recorder_status_stopped">зупинено</string>
     <string name="debug_recorder_started_at">Запущено о: </string>
@@ -878,6 +878,8 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="dynamic_variation_slot_count_description">Прагнути показувати %1$d динамічних елементів між кнопками панелі стану.</string>
     <string name="dynamic_variation_resize_to_content_title">Змінювати розмір динамічних варіацій</string>
     <string name="dynamic_variation_resize_to_content_description">Якщо ввімкнено, динамічні елементи заповнюють доступний рядок залежно від їх кількості. Якщо вимкнено, вони зберігають розмір слота зі слайдера й лишаються вирівняними ліворуч.</string>
+    <string name="shared_row_variations_first_title">Варіації перед підказками</string>
+    <string name="shared_row_variations_first_description">Показує варіації останньої літери замість підказок слів, поки вони є. Вимкнено: варіації з’являються, лише якщо підказок немає.</string>
     <string name="keyboard_theme_tab_colors">Кольори</string>
     <string name="keyboard_theme_tab_keys">Клавіші</string>
 
@@ -948,6 +950,10 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="kw_auto_correction_starter_words">початкові слова, порожнє поле, нове речення, перше слово, поширені слова, словник, підказки</string>
     <string name="clicks_button_binding_reading">Зчитування поточного призначення з клавіатури…</string>
     <string name="clicks_button_binding_last_known">Останнє відоме призначення; клавіатуру не під’єднано.</string>
+    <string name="app_appearance_settings_fullscreen_title">Налаштування на весь екран</string>
+    <string name="app_appearance_settings_fullscreen_description">Приховує рядок стану в налаштуваннях. Заголовок сторінки й дії займають верхній рядок. Проведіть донизу від верхнього краю, щоб ненадовго показати рядок стану.</string>
+    <string name="kw_app_appearance_settings_fullscreen">весь екран, повноекранний, рядок стану, приховати, заголовок, верхній рядок, виріз, камера</string>
+    <string name="settings_search_close">Закрити пошук</string>
     <string name="keyboard_backlight_section_title">Підсвічування клавіатури</string>
     <string name="keyboard_backlight_follows_display_title">Підсвічування слідує за екраном</string>
     <string name="keyboard_backlight_follows_display_description">Підсвічування клавіатури лишається увімкненим до вимкнення екрана й знову вмикається разом з ним. Використовується налаштування пристрою; Plektra для цього не працює у фоні.</string>

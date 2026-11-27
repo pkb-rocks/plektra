@@ -335,7 +335,9 @@ fun SettingsSearchField(
                     Text(
                         text = stringResource(R.string.settings_search_hint),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                 }
                 BasicTextField(

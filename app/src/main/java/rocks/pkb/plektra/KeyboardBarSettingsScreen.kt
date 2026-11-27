@@ -1,6 +1,5 @@
 package rocks.pkb.plektra
 
-import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -35,23 +34,25 @@ private enum class KeyboardBarEditorMode { Normal, Slim }
 
 internal enum class KeyboardBarSettingsPage { Contents, Buttons, Variations, Indicators }
 
+internal object KeyboardBarSharedRowSettings {
+    /** The precedence between suggestions and variations only matters when both share one row. */
+    fun precedenceApplies(suggestions: Boolean, actions: Boolean, arrangement: KeyboardBarArrangement): Boolean =
+        suggestions && actions && arrangement == KeyboardBarArrangement.SHARED
+
+    /** Mirrors the profile the settings page opens with. */
+    fun precedenceApplies(context: android.content.Context): Boolean {
+        val configuration = KeyboardBarConfiguration.read(context)
+        return if (SettingsManager.getStatusBarPresentationMode(context) == SettingsManager.StatusBarPresentationMode.SLIM) {
+            precedenceApplies(configuration.slimProfile.suggestions, configuration.slimProfile.actions, KeyboardBarArrangement.SHARED)
+        } else precedenceApplies(configuration.suggestions, configuration.actions, configuration.arrangement)
+    }
+}
+
 @Composable
 internal fun KeyboardBarCheckRow(label: String, checked: Boolean, linkId: String,
     description: String? = null, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().settingRow(linkId)
-            .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onChange)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.bodyLarge,
-                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
-            if (description != null) Text(description, style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Switch(checked = checked, enabled = enabled, onCheckedChange = null)
-    }
+    SettingsToggleRow(title = label, description = description, checked = checked,
+        onCheckedChange = onChange, enabled = enabled, linkId = linkId)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +84,7 @@ internal fun KeyboardBarSettingsScreen(
     var dynamicVariationsResizeToContent by remember {
         mutableStateOf(SettingsManager.getDynamicVariationBarResizeToContent(context))
     }
+    var sharedRowVariationsFirst by remember { mutableStateOf(SettingsManager.getSharedRowVariationsFirst(context)) }
     var editorMode by rememberSaveable {
         mutableStateOf(
             if (
@@ -116,6 +118,7 @@ internal fun KeyboardBarSettingsScreen(
             hardwareOnly = SettingsManager.getHardwareOnlyMode(context)
             dynamicVariationSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
             dynamicVariationsResizeToContent = SettingsManager.getDynamicVariationBarResizeToContent(context)
+            sharedRowVariationsFirst = SettingsManager.getSharedRowVariationsFirst(context)
         }
         preferences.registerOnSharedPreferenceChangeListener(listener)
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -234,9 +237,20 @@ internal fun KeyboardBarSettingsScreen(
             }
             KeyboardTextScaleSettingsCard()
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_layout_section))
-            KeyboardBarArrangementField(arrangement, displayedSuggestions && displayedActions) {
+            // Slim always combines its rows (KeyboardBarConfiguration.presentation).
+            KeyboardBarArrangementField(if (editingSlim) KeyboardBarArrangement.SHARED else arrangement,
+                !editingSlim && displayedSuggestions && displayedActions) {
                 arrangement = it
                 KeyboardBarConfiguration.setArrangement(context, it)
+            }
+            if (KeyboardBarSharedRowSettings.precedenceApplies(displayedSuggestions, displayedActions,
+                    if (editingSlim) KeyboardBarArrangement.SHARED else arrangement)) {
+                KeyboardBarCheckRow(stringResource(R.string.shared_row_variations_first_title), sharedRowVariationsFirst,
+                    SettingLinkIds.KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST,
+                    stringResource(R.string.shared_row_variations_first_description)) {
+                    sharedRowVariationsFirst = it
+                    SettingsManager.setSharedRowVariationsFirst(context, it)
+                }
             }
             KeyboardBarNavigationRow(Icons.Filled.SmartButton, stringResource(R.string.status_bar_buttons_section),
                 stringResource(R.string.keyboard_bar_buttons_summary,
@@ -248,9 +262,9 @@ internal fun KeyboardBarSettingsScreen(
                 stringResource(R.string.keyboard_bar_variations_summary), "keyboard_bar.variations") {
                 openSettingsChild(context, "customization", "KeyboardBarVariations")
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (ImeCaptionBarSettings.canControlCaptionBar()) {
                 KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_hide_ime_caption_bar), hideImeCaptionBar,
-                    "keyboard_bar.hide_ime_caption_bar", stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
+                    SettingLinkIds.KEYBOARD_BAR_HIDE_IME_CAPTION, stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
                     hideImeCaptionBar = it
                     SettingsManager.setHideImeCaptionBar(context, it)
                 }
@@ -261,7 +275,7 @@ internal fun KeyboardBarSettingsScreen(
                 SettingsManager.setImeSwitcherInBar(context, it)
             }
             KeyboardBarNavigationRow(Icons.Filled.Tune, stringResource(R.string.keyboard_bar_system_controls),
-                stringResource(R.string.keyboard_bar_system_controls_description), "keyboard_bar.system_controls") {
+                stringResource(R.string.keyboard_bar_system_controls_description), SettingLinkIds.KEYBOARD_BAR_SYSTEM_CONTROLS) {
                 ImeCaptionBarSettings.open(context)
             }
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_visibility_section))
@@ -359,61 +373,23 @@ internal fun KeyboardBarSettingsScreen(
                     }
                 }
 
-                Surface(modifier = Modifier.fillMaxWidth().settingRow("status_bar.resize_variations")) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.dynamic_variation_resize_to_content_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = stringResource(R.string.dynamic_variation_resize_to_content_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Switch(
-                            checked = dynamicVariationsResizeToContent,
-                            onCheckedChange = { enabled ->
-                                dynamicVariationsResizeToContent = enabled
-                                SettingsManager.setDynamicVariationBarResizeToContent(context, enabled)
-                            }
-                        )
+                SettingsToggleRow(
+                    title = stringResource(R.string.dynamic_variation_resize_to_content_title),
+                    description = stringResource(R.string.dynamic_variation_resize_to_content_description),
+                    checked = dynamicVariationsResizeToContent,
+                    linkId = "status_bar.resize_variations",
+                    onCheckedChange = { enabled ->
+                        dynamicVariationsResizeToContent = enabled
+                        SettingsManager.setDynamicVariationBarResizeToContent(context, enabled)
                     }
-                }
+                )
 
-                Surface(
-                    modifier = Modifier.fillMaxWidth().settingRow("customization.variations", onCustomizeVariations)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Tune,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.variation_customize_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                SettingsNavigationRow(
+                    title = stringResource(R.string.variation_customize_title),
+                    icon = Icons.Filled.Tune,
+                    linkId = "customization.variations",
+                    onClick = onCustomizeVariations
+                )
             }
         }
 
@@ -462,7 +438,8 @@ internal fun KeyboardBarSettingsScreen(
 
 }
 @Composable
-private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, onChange: (KeyboardBarArrangement) -> Unit) {
+private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean,
+    onChange: (KeyboardBarArrangement) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     fun label(choice: KeyboardBarArrangement) = when (choice) {
         KeyboardBarArrangement.SUGGESTIONS_FIRST -> R.string.keyboard_bar_suggestions_first
@@ -476,10 +453,6 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
             colors = ListItemDefaults.colors(headlineColor = if (enabled) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)))
-        if (enabled && value == KeyboardBarArrangement.SHARED) {
-            Text(stringResource(R.string.keyboard_bar_shared_behavior), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
     }
     if (expanded) AlertDialog(onDismissRequest = { expanded = false },
         title = { Text(stringResource(R.string.keyboard_bar_arrangement)) },
@@ -498,9 +471,5 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
 @Composable
 internal fun KeyboardBarNavigationRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String,
     summary: String? = null, linkId: String, onClick: () -> Unit) {
-    ListItem(modifier = Modifier.fillMaxWidth().settingRow(linkId, onClick).clickable(onClick = onClick),
-        leadingContent = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
-        headlineContent = { Text(title) },
-        supportingContent = summary?.let { { Text(it) } },
-        trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) })
+    SettingsNavigationRow(title = title, description = summary, icon = icon, linkId = linkId, onClick = onClick)
 }

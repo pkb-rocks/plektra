@@ -70,6 +70,74 @@ class SymEditShortcutsServiceTest {
         verify(connection, never()).sendKeyEvent(any(KeyEvent::class.java))
     }
 
+    @Test fun forwardedShiftAndItsRepeatReachTheHeaderOnceWhileActivityOnlyKeysStillArrive() {
+        val activity = Robolectric.buildActivity(rocks.pkb.plektra.MainActivity::class.java).get()
+        val seen = mutableListOf<Pair<String, Int>>()
+        val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = { seen += it.action to it.repeatCount }
+        KeyboardEventTracker.addListener(listener)
+        try {
+            val shift = KeyEvent.KEYCODE_SHIFT_LEFT
+            for (repeat in 0..1) {
+                val event = KeyEvent(1000, 1100L + repeat, KeyEvent.ACTION_DOWN, shift, repeat)
+                service.onKeyDown(shift, event)
+                activity.onKeyDown(shift, KeyEvent(event))
+            }
+            val release = KeyEvent(1000, 1200, KeyEvent.ACTION_UP, shift, 0)
+            service.onKeyUp(shift, release)
+            activity.onKeyUp(shift, KeyEvent(release))
+            val letter = KeyEvent.KEYCODE_A
+            activity.onKeyDown(letter, KeyEvent(1300, 1300, KeyEvent.ACTION_DOWN, letter, 0))
+            activity.onKeyUp(letter, KeyEvent(1300, 1400, KeyEvent.ACTION_UP, letter, 0))
+            org.junit.Assert.assertEquals(listOf("KEY_DOWN" to 0, "KEY_DOWN" to 1, "KEY_UP" to 0,
+                "KEY_DOWN" to 0, "KEY_UP" to 0), seen)
+        } finally {
+            KeyboardEventTracker.removeListener(listener)
+        }
+    }
+
+    @Test fun symbolChordThatCommitsTextStillReleasesItsPhysicalKey() {
+        val symbols = service.javaClass.getDeclaredField("symLayoutController").let {
+            it.isAccessible = true
+            it.get(service) as rocks.pkb.plektra.core.SymLayoutController
+        }
+        assertTrue(symbols.openSymbolsPage())
+        val key = (KeyEvent.KEYCODE_E..KeyEvent.KEYCODE_U).first { symbols.resolveChordSymbol(it, false) != null }
+        val symbol = symbols.resolveChordSymbol(key, false)
+        val actions = mutableListOf<String>()
+        val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = { if (it.keyCode == key) actions += it.action }
+        KeyboardEventTracker.addListener(listener)
+        try {
+            down(KeyEvent.KEYCODE_SYM)
+            assertTrue(down(key, KeyEvent.META_SYM_ON))
+            verify(connection).commitText(symbol, 1)
+            up(key, KeyEvent.META_SYM_ON)
+            org.junit.Assert.assertEquals(listOf("KEY_DOWN", "KEY_UP"), actions)
+        } finally {
+            KeyboardEventTracker.removeListener(listener)
+        }
+    }
+
+    @Test fun consumedSelectAllReleasesTheHeaderKeyExactlyOnce() {
+        val view = rocks.pkb.plektra.MotionBackgroundView(context)
+        val events = mutableListOf<String>()
+        val listener: (KeyboardEventTracker.KeyEventInfo) -> Unit = { event ->
+            view.acceptHardwareEvent(event)
+            if (event.keyCode == KeyEvent.KEYCODE_A) events += event.action
+        }
+        KeyboardEventTracker.addListener(listener)
+        try {
+            down(KeyEvent.KEYCODE_SYM)
+            assertTrue(down(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))
+            assertTrue("A" in view.heldLabels())
+            assertTrue(up(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))
+            up(KeyEvent.KEYCODE_SYM)
+            org.junit.Assert.assertFalse("A" in view.heldLabels())
+            org.junit.Assert.assertEquals(listOf("KEY_DOWN", "KEY_UP"), events)
+        } finally {
+            KeyboardEventTracker.removeListener(listener)
+        }
+    }
+
     @Test fun repeatsWhileSymIsHeldDoNotReplaceTheSelection() {
         down(KeyEvent.KEYCODE_SYM)
         assertTrue(down(KeyEvent.KEYCODE_A, KeyEvent.META_SYM_ON))

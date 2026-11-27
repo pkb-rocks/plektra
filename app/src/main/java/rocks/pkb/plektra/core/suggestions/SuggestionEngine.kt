@@ -1,7 +1,6 @@
 package rocks.pkb.plektra.core.suggestions
 
 import kotlin.math.min
-import java.text.Normalizer
 import java.util.Locale
 import android.util.Log
 
@@ -29,7 +28,6 @@ class SuggestionEngine(
     private val debugLogging: Boolean = false
 ) {
 
-    private val accentCache: MutableMap<String, String> = mutableMapOf()
     private val tag = "SuggestionEngine"
     private val wordNormalizeCache: MutableMap<String, String> = mutableMapOf()
     private val accentChars = setOf('à', 'è', 'é', 'ì', 'ò', 'ó', 'ù', 'À', 'È', 'É', 'Ì', 'Ò', 'Ó', 'Ù')
@@ -336,11 +334,14 @@ class SuggestionEngine(
         includeAccentMatching: Boolean = true,
         useKeyboardProximity: Boolean = true,
         useEditTypeRanking: Boolean = true,
-        usePersonalization: Boolean = true
+        usePersonalization: Boolean = true,
+        allowAccentPromotion: Boolean = true
     ): List<SuggestionResult> {
         if (currentWord.isBlank() || currentWord.length > 48) return emptyList()
         if (!repository.isReady) return emptyList()
 
+        val promoteAccent = includeAccentMatching && allowAccentPromotion &&
+            repository.getExactWordFrequency(currentWord, usePersonalization) == 0
         // Apostrophe branch: split and suggest on the root to avoid over-corrections.
         val apostropheSplit = splitApostropheWord(currentWord)
         if (apostropheSplit != null) {
@@ -350,7 +351,8 @@ class SuggestionEngine(
                 includeAccentMatching = includeAccentMatching,
                 useKeyboardProximity = useKeyboardProximity,
                 useEditTypeRanking = useEditTypeRanking,
-                usePersonalization = usePersonalization
+                usePersonalization = usePersonalization,
+                allowAccentPromotion = promoteAccent
             )
             val filtered = rootResults
                 .filter { it.distance <= 1 } // stay conservative on apostrophated forms
@@ -370,7 +372,8 @@ class SuggestionEngine(
             includeAccentMatching = includeAccentMatching,
             useKeyboardProximity = useKeyboardProximity,
             useEditTypeRanking = useEditTypeRanking,
-            usePersonalization = usePersonalization
+            usePersonalization = usePersonalization,
+            allowAccentPromotion = promoteAccent
         )
     }
 
@@ -380,7 +383,8 @@ class SuggestionEngine(
         includeAccentMatching: Boolean,
         useKeyboardProximity: Boolean,
         useEditTypeRanking: Boolean,
-        usePersonalization: Boolean
+        usePersonalization: Boolean,
+        allowAccentPromotion: Boolean
     ): List<SuggestionResult> {
         val normalizedWord = normalize(currentWord)
         val normalizedWordBare = normalizedWord.replace("'", "")
@@ -431,18 +435,8 @@ class SuggestionEngine(
                 usePersonalization = usePersonalization
             )
         }
-        val symResultsAccent = if (includeAccentMatching && inputLen > 1) {
-            val normalizedAccentless = stripAccents(normalizedWord)
-            if (normalizedAccentless != normalizedWord) {
-                repository.symSpellLookup(
-                    normalizedAccentless,
-                    maxSuggestions = limit * 2,
-                    usePersonalization = usePersonalization
-                )
-            } else emptyList()
-        } else emptyList()
-
-        val allSymResults = (symResultsPrimary + symResultsAccent)
+        // The normalized input carries no accents, so this lookup already matches accented words.
+        val allSymResults = symResultsPrimary
         val elisionPrefixEntries = if (inputLen == 1) {
             repository.lookupByPrefixMerged(
                 "${normalizedWord}'",
@@ -761,7 +755,28 @@ class SuggestionEngine(
             consider(item.term, item.distance, item.frequency)
         }
 
-        return top
+        // Two letters at least, like auto-correction's orthographic fixes ("ja" -> "já").
+        val orthographic = if (allowAccentPromotion && currentWord.length >= 2 &&
+            repository.getExactWordFrequency(currentWord, usePersonalization) == 0) {
+            AutoReplaceController.orthographicVariant(repository, currentWord, usePersonalization)
+        } else null
+        return if (orthographic == null) top else withLeadingOrthographicVariant(top, orthographic, limit)
+    }
+
+    /**
+     * An unknown word with an accent-only dictionary form ("tres", "fete") would otherwise rank
+     * that form below longer completions ("trésor", "fêtes") or drop it. It goes first, matching
+     * what auto-correction commits; known words such as "wurde" or "ou" keep their ranking.
+     */
+    private fun withLeadingOrthographicVariant(
+        top: List<SuggestionResult>,
+        entry: DictionaryEntry,
+        limit: Int
+    ): List<SuggestionResult> {
+        val key = entry.word.lowercase(locale)
+        val score = (top.maxOfOrNull { it.score } ?: 0.0) + ORTHOGRAPHIC_VARIANT_LEAD
+        val leading = SuggestionResult(candidate = entry.word, distance = 0, score = score, source = entry.source)
+        return (listOf(leading) + top.filterNot { it.candidate.lowercase(locale) == key }).take(limit)
     }
 
     internal fun editDistance(input: String, candidate: String, maxDistance: Int): Int =
@@ -815,10 +830,8 @@ class SuggestionEngine(
         return wordNormalizeCache.getOrPut(word) { normalize(word) }
     }
 
-    private fun stripAccents(input: String): String {
-        return accentCache.getOrPut(input) {
-            Normalizer.normalize(input, Normalizer.Form.NFD)
-                .replace("\\p{Mn}".toRegex(), "")
-        }
+    private companion object {
+        /** Keeps the accent-only form ahead of the strongest other candidate. */
+        const val ORTHOGRAPHIC_VARIANT_LEAD = 0.01
     }
 }

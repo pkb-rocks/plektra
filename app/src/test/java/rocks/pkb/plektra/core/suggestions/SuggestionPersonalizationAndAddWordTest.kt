@@ -147,6 +147,53 @@ class SuggestionPersonalizationAndAddWordTest {
     }
 
     @Test
+    fun neutralStartersUseTheLiveEditorAfterTheDictionaryLoads() {
+        val starters = listOf("hello", "ich", "help")
+        for ((beforeCursor, expected) in listOf("ich " to emptyList(), "" to starters, "Ich. " to starters)) {
+            snapshots.clear()
+            fakeRepository.isReady = false
+            fakeRepository.isLoadStarted = false
+            val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
+
+            controller.readInitialContext(textBeforeCursor(beforeCursor))
+
+            assertEquals(beforeCursor, expected, waitForSuggestionCandidates(*expected.toTypedArray()).map { it.candidate })
+            assertTrue(fakeRepository.isReady)
+        }
+    }
+
+    @Test
+    fun neutralStartersRemainAfterASpaceFollowingAFullStop() {
+        val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
+        val editor = RecordingInputConnection(context, "Ich.")
+        val starters = listOf("hello", "ich", "help")
+        controller.readInitialContext(editor)
+        assertEquals(starters, controller.currentSuggestions().map { it.candidate })
+
+        controller.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, editor, ' ')
+
+        assertEquals("Ich. ", editor.text)
+        assertEquals(starters, controller.currentSuggestions().map { it.candidate })
+        controller.onBoundaryKey(KeyEvent.KEYCODE_SLASH, null, editor, '/')
+        assertTrue(controller.currentSuggestions().isEmpty())
+    }
+
+    @Test
+    fun neutralStartersAppearWhenTheDictionaryFinishesLoadingAfterASentenceEnd() {
+        fakeRepository.isReady = false
+        fakeRepository.isLoadStarted = true
+        val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
+        val editor = RecordingInputConnection(context, "Ich")
+
+        controller.onBoundaryKey(KeyEvent.KEYCODE_PERIOD, null, editor, '.')
+
+        assertTrue(controller.currentSuggestions().isEmpty())
+        fakeRepository.isLoadStarted = false
+        controller.preloadDictionary()
+        assertEquals(listOf("hello", "ich", "help"), waitForSuggestionCandidates("hello", "ich", "help").map { it.candidate })
+    }
+
+    @Test
     fun starterWordsWithoutPersonalizationFollowTheEditorTextOnRefreshes() {
         val controller = newController(personalizationProvider = { false }, starterWordsProvider = { true })
         typeWord(controller, "ich")

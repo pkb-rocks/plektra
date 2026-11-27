@@ -53,7 +53,6 @@ import rocks.pkb.plektra.TextMotionEvent
 import rocks.pkb.plektra.T2eCornerCalibration
 import rocks.pkb.plektra.T2eCornerGeometry
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
-import rocks.pkb.plektra.inputmethod.KeyboardEventTracker
 import kotlin.math.abs
 
 private val PlektraBrown = Color(0xFF332515)
@@ -63,7 +62,6 @@ internal fun CustomTopBar(
     onSettingsClick: () -> Unit,
     background: MainBackgroundPreference,
     textEvent: TextMotionEvent?,
-    hardwareEvent: KeyboardEventTracker.KeyEventInfo?,
     modifier: Modifier = Modifier
 ) {
     val statusBarInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -136,7 +134,6 @@ internal fun CustomTopBar(
             MainMotionBackground(
                 preference = displayedBackground,
                 textEvent = textEvent,
-                hardwareEvent = hardwareEvent,
                 modifier = Modifier.matchParentSize()
             )
             Box(

@@ -92,7 +92,6 @@ internal class IdlePlaybackCursor(
 internal fun MainMotionBackground(
     preference: MainBackgroundPreference,
     textEvent: TextMotionEvent?,
-    hardwareEvent: KeyboardEventTracker.KeyEventInfo?,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -113,7 +112,6 @@ internal fun MainMotionBackground(
             view.mode = MainBackgroundPreferences.resolve(preference)
             view.active = active
             textEvent?.let(view::acceptTextEvent)
-            hardwareEvent?.let(view::acceptHardwareEvent)
         }
     )
 }
@@ -160,7 +158,12 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
     private var energy = 0f
     private var flow = 0f
     private var lastTextToken = Long.MIN_VALUE
-    private var lastHardwareSignature = Long.MIN_VALUE
+    private val heldKeys = mutableMapOf<Pair<Int, Int>, String>()
+    private val hardwareListener: (KeyboardEventTracker.KeyEventInfo) -> Unit = { event ->
+        if (active && isShown && hasWindowFocus()) acceptHardwareEvent(event)
+    }
+
+    internal fun heldLabels(): Set<String> = keys.filter { it.down }.map { it.id }.toSet()
     private var lastHardwareStrikeMs = Long.MIN_VALUE
     private var lastHardwareLabel = ""
     private var lastInputMs = Long.MIN_VALUE
@@ -171,7 +174,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
     private val altKeyForCharacter = buildMap {
         AltModifierMappingResolver.resolve(context.assets, context).forEach { (keyCode, output) ->
             val character = output.singleOrNull() ?: return@forEach
-            val label = KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
+            val label = ('A'.code + keyCode - KeyEvent.KEYCODE_A).toChar().toString()
             if (label.length == 1 && label[0] in 'A'..'Z') put(character, label)
         }
     }
@@ -189,6 +192,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        KeyboardEventTracker.addListener(hardwareListener)
         requestApplyInsets()
         updateFrameSubscription()
     }
@@ -205,6 +209,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
 
     override fun onDetachedFromWindow() {
         stopFrames()
+        KeyboardEventTracker.removeListener(hardwareListener)
         super.onDetachedFromWindow()
     }
 
@@ -230,23 +235,35 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
     }
 
     fun acceptHardwareEvent(event: KeyboardEventTracker.KeyEventInfo) {
-        val signature = event.eventTimeUptimeMs xor (event.keyCode.toLong() shl 32) xor event.action.hashCode().toLong()
-        if (signature == lastHardwareSignature) return
-        lastHardwareSignature = signature
-        val label = keyCodeLabel(event.keyCode) ?: return
+        val label = keyCodeLabel(event.keyCode)
+        val identity = event.deviceId to (event.scanCode.takeIf { it != 0 } ?: -event.rawKeyCode)
         val now = SystemClock.uptimeMillis()
         lastInputMs = now
-        val down = event.action.contains("DOWN")
-        val key = keyForLabel(label) ?: return
-        if (down) {
-            key.down = true
-            key.lastStrike = now
-            lastHardwareStrikeMs = now
-            lastHardwareLabel = label
-        } else {
-            key.down = false
-            key.lastStrike = now
+        when (event.action) {
+            "KEY_DOWN", "KEY_DOWN_SUPPRESSED" -> {
+                if (event.flags and KeyEvent.FLAG_CANCELED != 0) heldKeys.remove(identity)
+                else if (label != null) heldKeys[identity] = label
+                lastHardwareStrikeMs = now
+                lastHardwareLabel = label.orEmpty()
+            }
+            "KEY_UP", "KEY_UP_SUPPRESSED" -> heldKeys.remove(identity)
+            else -> return
         }
+        keys.forEach { key ->
+            val wasDown = key.down
+            key.down = heldKeys.values.any { it == key.id }
+            if (key.down || wasDown) key.lastStrike = now
+        }
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (!hasWindowFocus) clearHeldKeys()
+    }
+
+    private fun clearHeldKeys() {
+        heldKeys.clear()
+        keys.forEach { it.down = false; it.until = 0L }
     }
 
     private fun updateFrameSubscription() {
@@ -263,7 +280,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
         if (framePosted) Choreographer.getInstance().removeFrameCallback(this)
         framePosted = false
         lastFrameNanos = 0L
-        keys.forEach { it.down = false }
+        clearHeldKeys()
     }
 
     override fun doFrame(frameTimeNanos: Long) {
@@ -344,7 +361,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
     private fun strikeKey(label: String, now: Long, held: Boolean) {
         keyForLabel(label)?.let { key ->
             key.lastStrike = now
-            key.down = held
+            if (held) key.down = true
             if (!held) key.until = now + 150L
         }
     }
@@ -563,7 +580,7 @@ internal class MotionBackgroundView(context: Context) : View(context), Choreogra
     }
 
     private fun keyCodeLabel(keyCode: Int): String? = when (keyCode) {
-        in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
+        in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_Z -> ('A'.code + keyCode - KeyEvent.KEYCODE_A).toChar().toString()
         KeyEvent.KEYCODE_SPACE -> "Space"
         KeyEvent.KEYCODE_ENTER -> "Enter"
         KeyEvent.KEYCODE_DEL -> "Backspace"

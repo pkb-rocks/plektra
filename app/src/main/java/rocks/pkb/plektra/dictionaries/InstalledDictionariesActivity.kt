@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.dictionaries
 
+import rocks.pkb.plektra.PlektraSettingsHeader
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -80,7 +81,7 @@ class InstalledDictionariesActivity : LocalizedComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PlektraTheme {
+            PlektraTheme(settingsWindow = true) {
                 InstalledDictionariesScreen(
                     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
                     onBack = { finish() }
@@ -246,51 +247,28 @@ fun InstalledDictionariesScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
+            PlektraSettingsHeader(
+                title = stringResource(R.string.installed_dictionaries_title),
+                onBack = onBack
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.installed_dictionaries_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
+                if (isLoadingManifest) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
                     )
-                    if (isLoadingManifest) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        IconButton(onClick = { refreshManifest() }) {
-                            Icon(
-                                imageVector = Icons.Filled.Refresh,
-                                contentDescription = stringResource(R.string.installed_dictionaries_refresh)
-                            )
-                        }
-                    }
-                    IconButton(onClick = { importLauncher.launch(arrayOf("*/*")) }) {
+                } else {
+                    IconButton(onClick = { refreshManifest() }) {
                         Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.installed_dictionaries_import)
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(R.string.installed_dictionaries_refresh)
                         )
                     }
+                }
+                IconButton(onClick = { importLauncher.launch(arrayOf("*/*")) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.installed_dictionaries_import)
+                    )
                 }
             }
         },

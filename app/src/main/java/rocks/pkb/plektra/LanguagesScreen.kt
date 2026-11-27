@@ -66,34 +66,10 @@ fun LanguagesScreen(
     
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { 
-                        (context as? android.app.Activity)?.finish() 
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.languages_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(
+                title = stringResource(R.string.languages_title),
+                onBack = { (context as? android.app.Activity)?.finish() }
+            )
         }
     ) { paddingValues ->
         Column(

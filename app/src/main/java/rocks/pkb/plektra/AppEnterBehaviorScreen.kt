@@ -114,70 +114,28 @@ fun AppEnterBehaviorScreen(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars),
-            tonalElevation = 1.dp
+        PlektraSettingsHeader(
+            title = stringResource(R.string.app_enter_behaviour_title),
+            onBack = onBack
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.settings_back_content_description)
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.app_enter_behaviour_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
+            IconButton(onClick = { showAddDialog = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.app_enter_behaviour_add_app)
                 )
-                IconButton(onClick = { showAddDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.app_enter_behaviour_add_app)
-                    )
-                }
             }
         }
 
-        Surface(modifier = Modifier.fillMaxWidth().settingRow("app_enter_behavior.enabled")) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.app_enter_behaviour_enable_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.app_enter_behaviour_enable_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Switch(
-                    checked = enabled,
-                    onCheckedChange = {
-                        enabled = it
-                        SettingsManager.setAppEnterBehaviorEnabled(context, it)
-                    }
-                )
+        SettingsToggleRow(
+            title = stringResource(R.string.app_enter_behaviour_enable_title),
+            description = stringResource(R.string.app_enter_behaviour_enable_description),
+            checked = enabled,
+            linkId = "app_enter_behavior.enabled",
+            onCheckedChange = {
+                enabled = it
+                SettingsManager.setAppEnterBehaviorEnabled(context, it)
             }
-        }
+        )
 
         EnterPresetSelector(
             preset = preset,

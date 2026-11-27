@@ -187,6 +187,28 @@ class ImeSwitcherButtonTest {
         assertEquals("back in the bar, the surface accessory is gone", View.GONE, surfaceSwitcher(controller).visibility)
     }
 
+    /** The reported configuration: Slim with variations and menu, static variations, no suggestions. */
+    @Test fun slimWithActionsShowsTheSwitcherOnlyWhenShownAndThenOnce() {
+        SettingsManager.setSuggestionsEnabled(context, false)
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        SettingsManager.setStaticVariationBarModeEnabled(context, true)
+        SettingsManager.setSlimStatusBarSlotsLeft(context, listOf(SettingsManager.STATUS_BAR_BUTTON_LANGUAGE))
+        SettingsManager.setSlimStatusBarSlotsRight(context, listOf(SettingsManager.STATUS_BAR_BUTTON_HAMBURGER))
+        KeyboardBarConfiguration.setSlimProfile(context, KeyboardBarProfile(false, true, true, true, false))
+        val controller = hardwareController()
+        for (shown in listOf(false, true, false)) {
+            for (slim in listOf(false, true, false, true)) {
+                controller.setSlimModeActive(slim)
+                for (step in listOf(snapshot(shown), snapshot(shown, symPage = 1),
+                        snapshot(shown, clipboardOverlay = true), snapshot(shown))) {
+                    controller.update(step, symMappings = symMappings)
+                    assertEquals("shown=$shown slim=$slim page ${step.symPage} overlay ${step.clipboardOverlay}",
+                        if (shown) 1 else 0, visibleSwitchers(controller))
+                }
+            }
+        }
+    }
+
     @Test fun navModeShowsNoSurfaceAndOpensNothing() {
         val controller = hardwareController()
         controller.update(snapshot(requested = true), symMappings = symMappings)

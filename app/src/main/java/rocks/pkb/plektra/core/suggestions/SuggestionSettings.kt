@@ -7,6 +7,10 @@ data class SuggestionSettings(
     /** Start words fill an empty field; without personalization they come from the bundled dictionary only. */
     val starterWordsEnabled: Boolean = true,
     val showAddWordButton: Boolean = true,
+    /**
+     * Accent-only fixes of unknown words ("tres" → "très"): auto-correction commits them and the
+     * suggestions rank them first. Matching itself always ignores accents ("eco" finds "école").
+     */
     val accentMatching: Boolean = true,
     val autoReplaceOnSpaceEnter: Boolean = false,
     val maxAutoReplaceDistance: Int = 1,

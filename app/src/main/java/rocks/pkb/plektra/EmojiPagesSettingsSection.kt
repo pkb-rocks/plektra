@@ -136,21 +136,8 @@ private fun SwitchRow(
     description: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(modifier = Modifier.settingRow(id).fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                description?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, dependent = true, linkId = id)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -161,13 +148,16 @@ private fun ChoiceRow(
     description: String? = null,
     chips: @Composable () -> Unit
 ) {
-    Surface(modifier = Modifier.settingRow(id).fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, top = 10.dp, bottom = 6.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-            description?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { chips() }
+    Column(
+        modifier = Modifier.settingRow(id).fillMaxWidth().padding(
+            start = SettingsSpace.textInsetWithIcon, end = SettingsSpace.edge,
+            top = SettingsSpace.rowVertical, bottom = 4.dp
+        )
+    ) {
+        Text(title, style = SettingsTypography.rowTitle())
+        description?.let {
+            Text(it, style = SettingsTypography.rowDescription(), color = SettingsColors.supportingText())
         }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { chips() }
     }
 }

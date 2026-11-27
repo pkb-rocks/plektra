@@ -34,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.SettingsSystemBars
 
 internal val DarkColorScheme: ColorScheme = darkColorScheme(
     primary = Purple80,
@@ -106,8 +107,11 @@ fun PlektraTheme(
     darkTheme: Boolean? = null,
     darkSurfaceStyle: AppDarkSurfaceStyle? = null,
     dynamicColor: Boolean? = null,
+    settingsStyle: AppSettingsStyle? = null,
     applySystemBars: Boolean = true,
     statusBarOnDarkSurface: Boolean = false,
+    /** A settings window: the full-screen setting hides its status bar. */
+    settingsWindow: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -121,7 +125,9 @@ fun PlektraTheme(
             null -> storedPreferences.themeMode
         },
         darkSurfaceStyle = darkSurfaceStyle ?: storedPreferences.darkSurfaceStyle,
-        dynamicColor = dynamicColor ?: storedPreferences.dynamicColor
+        dynamicColor = dynamicColor ?: storedPreferences.dynamicColor,
+        settingsStyle = settingsStyle ?: storedPreferences.settingsStyle,
+        settingsFullscreen = settingsWindow && applySystemBars && storedPreferences.settingsFullscreen
     )
     val resolved = AppThemeResolver.resolve(
         preferences = effectivePreferences,
@@ -173,6 +179,11 @@ fun PlektraTheme(
                 isAppearanceLightNavigationBars = useLightNavigationBar
             }
             window.setBackgroundDrawable(ColorDrawable(colorScheme.background.toArgb()))
+        }
+    }
+    if (settingsWindow && applySystemBars && !view.isInEditMode) {
+        context.findActivity()?.window?.let { window ->
+            SettingsSystemBars(window, view, effectivePreferences.settingsFullscreen)
         }
     }
 

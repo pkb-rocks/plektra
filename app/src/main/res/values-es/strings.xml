@@ -809,7 +809,7 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="debug_recorder_share">Compartir</string>
     <string name="debug_recorder_share_chooser">Compartir informe de depuración</string>
     <string name="debug_recorder_copied">Informe de depuración copiado (%1$d eventos)</string>
-    <string name="debug_recorder_status">Grabador: %1$s · Eventos: %2$d</string>
+    <string name="debug_recorder_status">Grabador: %1$s, Eventos: %2$d</string>
     <string name="debug_recorder_status_recording">grabando</string>
     <string name="debug_recorder_status_stopped">detenido</string>
     <string name="debug_recorder_started_at">Iniciado a las: </string>
@@ -878,6 +878,8 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="dynamic_variation_slot_count_description">Intenta mostrar %1$d entradas dinámicas entre los botones de la barra de estado.</string>
     <string name="dynamic_variation_resize_to_content_title">Redimensionar variaciones dinámicas</string>
     <string name="dynamic_variation_resize_to_content_description">Si está activado, las entradas dinámicas llenan la fila disponible según cuántas se muestren. Si está desactivado, conservan el tamaño de espacio del control deslizante y quedan alineadas a la izquierda.</string>
+    <string name="shared_row_variations_first_title">Variaciones antes que sugerencias</string>
+    <string name="shared_row_variations_first_description">Muestra las variaciones de la última letra en lugar de las sugerencias de palabras mientras las haya. Desactivado: solo aparecen si no hay sugerencias.</string>
     <string name="keyboard_theme_tab_colors">Colores</string>
     <string name="keyboard_theme_tab_keys">Teclas</string>
 
@@ -947,6 +949,10 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="kw_auto_correction_starter_words">palabras iniciales, campo vacío, nueva frase, primera palabra, palabras frecuentes, diccionario, sugerencias</string>
     <string name="clicks_button_binding_reading">Leyendo la asignación actual del teclado…</string>
     <string name="clicks_button_binding_last_known">Última asignación conocida; el teclado no está conectado.</string>
+    <string name="app_appearance_settings_fullscreen_title">Ajustes a pantalla completa</string>
+    <string name="app_appearance_settings_fullscreen_description">Oculta la barra de estado en los ajustes. El título de la página y las acciones usan la fila superior. Desliza hacia abajo desde el borde superior para ver la barra de estado un momento.</string>
+    <string name="kw_app_appearance_settings_fullscreen">pantalla completa, barra de estado, ocultar, inmersivo, cabecera, fila superior, muesca, recorte</string>
+    <string name="settings_search_close">Cerrar búsqueda</string>
     <string name="keyboard_backlight_section_title">Retroiluminación del teclado</string>
     <string name="keyboard_backlight_follows_display_title">La retroiluminación sigue a la pantalla</string>
     <string name="keyboard_backlight_follows_display_description">Mantiene la luz del teclado encendida hasta que se apaga la pantalla y la vuelve a encender con la pantalla. Usa el ajuste del dispositivo; Plektra no se ejecuta en segundo plano para ello.</string>

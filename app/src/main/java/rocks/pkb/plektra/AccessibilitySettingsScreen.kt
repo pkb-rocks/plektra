@@ -85,32 +85,7 @@ fun AccessibilitySettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.settings_category_accessibility),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.settings_category_accessibility), onBack = onBack)
         }
     ) { paddingValues ->
         Column(
@@ -119,89 +94,29 @@ fun AccessibilitySettingsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(96.dp)
-                    .settingRow(SettingLinkIds.ACCESSIBILITY_LIVE_READ)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TouchApp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_live_read_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_live_read_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = liveAnnouncementsEnabled,
-                        onCheckedChange = { enabled ->
-                            liveAnnouncementsEnabled = enabled
-                            SettingsManager.setAccessibilityLiveAnnouncementsEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_accessibility_live_read_title),
+                description = stringResource(R.string.settings_accessibility_live_read_description),
+                icon = Icons.Filled.TouchApp,
+                checked = liveAnnouncementsEnabled,
+                linkId = SettingLinkIds.ACCESSIBILITY_LIVE_READ,
+                onCheckedChange = { enabled ->
+                    liveAnnouncementsEnabled = enabled
+                    SettingsManager.setAccessibilityLiveAnnouncementsEnabled(context, enabled)
                 }
-            }
+            )
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(84.dp)
-                    .settingRow(SettingLinkIds.ACCESSIBILITY_READ_SECOND_ROW)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TouchApp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_second_row_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_second_row_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = readSecondRowEnabled,
-                        onCheckedChange = { enabled ->
-                            readSecondRowEnabled = enabled
-                            SettingsManager.setAccessibilityReadSecondRowEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_accessibility_second_row_title),
+                description = stringResource(R.string.settings_accessibility_second_row_description),
+                icon = Icons.Filled.TouchApp,
+                checked = readSecondRowEnabled,
+                linkId = SettingLinkIds.ACCESSIBILITY_READ_SECOND_ROW,
+                onCheckedChange = { enabled ->
+                    readSecondRowEnabled = enabled
+                    SettingsManager.setAccessibilityReadSecondRowEnabled(context, enabled)
                 }
-            }
+            )
 
             Surface(
                 modifier = Modifier
@@ -281,47 +196,17 @@ fun AccessibilitySettingsScreen(
                 }
             }
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(96.dp)
-                    .settingRow(SettingLinkIds.ACCESSIBILITY_BOUNCE_KEYS)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TouchApp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_bounce_keys_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_bounce_keys_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = bounceKeysEnabled,
-                        onCheckedChange = { enabled ->
-                            bounceKeysEnabled = enabled
-                            SettingsManager.setBounceKeysEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_accessibility_bounce_keys_title),
+                description = stringResource(R.string.settings_accessibility_bounce_keys_description),
+                icon = Icons.Filled.TouchApp,
+                checked = bounceKeysEnabled,
+                linkId = SettingLinkIds.ACCESSIBILITY_BOUNCE_KEYS,
+                onCheckedChange = { enabled ->
+                    bounceKeysEnabled = enabled
+                    SettingsManager.setBounceKeysEnabled(context, enabled)
                 }
-            }
+            )
 
             Surface(
                 modifier = Modifier
@@ -429,46 +314,17 @@ fun AccessibilitySettingsScreen(
                 }
             )
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 104.dp)
-                    .settingRow(SettingLinkIds.ACCESSIBILITY_OVERLAPPING_KEYS)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TouchApp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_overlapping_keys_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_accessibility_overlapping_keys_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = overlappingKeysEnabled,
-                        onCheckedChange = { enabled ->
-                            overlappingKeysEnabled = enabled
-                            SettingsManager.setOverlappingKeysEnabled(context, enabled)
-                        }
-                    )
+            SettingsToggleRow(
+                title = stringResource(R.string.settings_accessibility_overlapping_keys_title),
+                description = stringResource(R.string.settings_accessibility_overlapping_keys_description),
+                icon = Icons.Filled.TouchApp,
+                checked = overlappingKeysEnabled,
+                linkId = SettingLinkIds.ACCESSIBILITY_OVERLAPPING_KEYS,
+                onCheckedChange = { enabled ->
+                    overlappingKeysEnabled = enabled
+                    SettingsManager.setOverlappingKeysEnabled(context, enabled)
                 }
-            }
+            )
         }
     }
 }
@@ -482,42 +338,6 @@ private fun BounceKeyToggleRow(
     linkId: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(76.dp)
-            .settingRow(linkId)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    color = if (enabled) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Switch(
-                checked = checked,
-                enabled = enabled,
-                onCheckedChange = onCheckedChange
-            )
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, enabled = enabled, linkId = linkId)
 }

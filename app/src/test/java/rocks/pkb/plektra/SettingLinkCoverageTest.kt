@@ -1,7 +1,9 @@
 package rocks.pkb.plektra
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import java.io.File
 import java.util.Locale
 import org.junit.Assert.assertEquals
@@ -22,6 +24,27 @@ class SettingLinkCoverageTest {
     @Before
     fun resetSettings() {
         SettingsManager.getPreferences(context).edit().clear().commit()
+    }
+
+    @Test
+    fun captionBarSearchHidesTheAbsentRowAndSharedLinkTargetsSystemControlsOnAndroid13() {
+        val entry = requireNotNull(SettingLinkRegistry.byId("keyboard_bar.hide_ime_caption_bar"))
+        val results = SettingLinkRegistry.search(context, context.getString(entry.titleRes))
+        val target = SettingLinkRegistry.visibleTarget(context, entry)
+
+        assertFalse(results.any { it.id == entry.id })
+        assertEquals("keyboard_bar.system_controls", target.id)
+        assertEquals(target.route.toSettingsPage(), Intent(Intent.ACTION_VIEW, Uri.parse(SettingLinkRegistry.buildLink(entry.id))).settingsPage())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun captionBarSearchAndSharedLinkTargetTheSwitchOnAndroid14() {
+        val entry = requireNotNull(SettingLinkRegistry.byId("keyboard_bar.hide_ime_caption_bar"))
+        val results = SettingLinkRegistry.search(context, context.getString(entry.titleRes))
+
+        assertTrue(results.any { it.id == entry.id })
+        assertEquals(entry, SettingLinkRegistry.visibleTarget(context, entry))
     }
 
     @Test
@@ -194,6 +217,26 @@ class SettingLinkCoverageTest {
             assertTrue("Profile keyword missing for $language",
                 SettingLinkRegistry.search(localizedContext, query).any { it.id == "status_bar.presentation" })
         }
+    }
+
+    @Test
+    fun sharedRowPrecedenceLinkTargetsItsSwitchOnlyWhileBothShareOneRow() {
+        val entry = requireNotNull(SettingLinkRegistry.byId(SettingLinkIds.KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST))
+        SettingsManager.setStatusBarPresentationMode(context, SettingsManager.StatusBarPresentationMode.FULL_STATUS_BAR)
+        SettingsManager.setSuggestionsEnabled(context, true)
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        KeyboardBarConfiguration.setArrangement(context, KeyboardBarArrangement.SUGGESTIONS_FIRST)
+        assertFalse(entry.isAvailable(context))
+        assertEquals("keyboard_bar.row_layout", SettingLinkRegistry.visibleTarget(context, entry).id)
+
+        KeyboardBarConfiguration.setArrangement(context, KeyboardBarArrangement.SHARED)
+        assertTrue(entry.isAvailable(context))
+        val target = SettingLinkRegistry.visibleTarget(context, entry)
+        assertEquals(entry.id, target.id)
+        assertEquals("status_bar_buttons", target.route.toSettingsPage().customizationDestination)
+
+        SettingsManager.setSuggestionsEnabled(context, false)
+        assertFalse(entry.isAvailable(context))
     }
 
     @Test

@@ -95,38 +95,15 @@ private fun AppSelectionListScreen(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars),
-            tonalElevation = 1.dp
+        PlektraSettingsHeader(
+            title = stringResource(titleRes),
+            onBack = onBack
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.settings_back_content_description)
-                    )
-                }
-                Text(
-                    text = stringResource(titleRes),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
+            IconButton(onClick = { showPicker = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.app_enter_behaviour_add_app)
                 )
-                IconButton(onClick = { showPicker = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.app_enter_behaviour_add_app)
-                    )
-                }
             }
         }
 

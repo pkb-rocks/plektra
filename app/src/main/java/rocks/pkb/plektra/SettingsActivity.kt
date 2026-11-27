@@ -51,15 +51,14 @@ class SettingsActivity : LocalizedComponentActivity() {
             null
         }
         setContent {
-            PlektraTheme {
+            PlektraTheme(settingsWindow = true) {
                 val linkRequest by settingLinkRequest
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
-                    SettingsScreen(
-                        modifier = Modifier.fillMaxSize(),
+                    SettingsAdaptiveRoot(
                         initialDestination = intent.getStringExtra(EXTRA_DESTINATION),
                         initialCustomizationDestination = intent.getStringExtra(EXTRA_CUSTOMIZATION_DESTINATION),
                         initialKeyboardThemeTarget = intent.getStringExtra(EXTRA_KEYBOARD_THEME_TARGET),

@@ -292,39 +292,13 @@ fun TextInputSettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.settings_category_text_input),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.settings_category_text_input), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
             SettingsNavigationRow(
                 title = stringResource(R.string.text_expansion_title),
@@ -333,7 +307,7 @@ fun TextInputSettingsScreen(
                 onClick = { openSettingsChild(context, "text", "expansion") }
             )
 
-            SettingsSectionLabel(text = stringResource(R.string.text_input_section_capitalization))
+            SettingsSectionDivider(stringResource(R.string.text_input_section_capitalization))
             SettingsSwitchRow(
                 title = stringResource(R.string.auto_capitalize_title),
                 description = stringResource(R.string.auto_capitalize_description),
@@ -381,7 +355,7 @@ fun TextInputSettingsScreen(
                 }
             )
 
-            SettingsSectionLabel(text = stringResource(R.string.text_input_section_spacing_punctuation))
+            SettingsSectionDivider(stringResource(R.string.text_input_section_spacing_punctuation))
             SettingsSwitchRow(
                 title = stringResource(R.string.double_space_to_period_title),
                 description = stringResource(R.string.double_space_to_period_description),
@@ -448,7 +422,7 @@ fun TextInputSettingsScreen(
                 )
             }
 
-            SettingsSectionLabel(text = stringResource(R.string.text_input_section_typography))
+            SettingsSectionDivider(stringResource(R.string.text_input_section_typography))
             SettingsDropdownSwitchRow(
                 title = stringResource(R.string.spaced_hyphen_to_en_dash_title),
                 checked = spacedHyphenToEnDash,
@@ -504,7 +478,7 @@ fun TextInputSettingsScreen(
                 }
             )
 
-            SettingsSectionLabel(text = stringResource(R.string.text_input_section_keyboard_behavior))
+            SettingsSectionDivider(stringResource(R.string.text_input_section_keyboard_behavior))
             SettingsSwitchRow(
                 title = stringResource(R.string.auto_show_keyboard_title),
                 description = stringResource(R.string.auto_show_keyboard_description),
@@ -515,12 +489,13 @@ fun TextInputSettingsScreen(
                     SettingsManager.setAutoShowKeyboard(context, enabled)
                 }
             )
-            if (autoShowKeyboard) {
+            run {
                 SettingsSwitchRow(
                     title = stringResource(R.string.auto_show_respect_app_visibility_title),
                     description = stringResource(R.string.auto_show_respect_app_visibility_description),
                     checked = autoShowRespectAppVisibility,
                     dependent = true,
+                    enabled = autoShowKeyboard,
                     linkId = SettingLinkIds.TEXT_INPUT_AUTO_SHOW_RESPECT_APP_VISIBILITY,
                     onCheckedChange = { enabled ->
                         autoShowRespectAppVisibility = enabled
@@ -554,142 +529,45 @@ fun TextInputSettingsScreen(
                 )
             }
 
-            SettingsSectionLabel(text = stringResource(R.string.text_input_section_delete))
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.delete_alternatives_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .settingRow(SettingLinkIds.TEXT_INPUT_SHIFT_BACKSPACE_DELETE),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.shift_backspace_delete_title),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Switch(
-                            checked = shiftBackspaceDelete,
-                            onCheckedChange = { enabled ->
-                                shiftBackspaceDelete = enabled
-                                SettingsManager.setShiftBackspaceDelete(context, enabled)
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .settingRow(SettingLinkIds.TEXT_INPUT_ALT_BACKSPACE_DELETE),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.alt_backspace_delete_title),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Switch(
-                            checked = altBackspaceDelete,
-                            onCheckedChange = { enabled ->
-                                altBackspaceDelete = enabled
-                                SettingsManager.setAltBackspaceDelete(context, enabled)
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .settingRow(SettingLinkIds.TEXT_INPUT_BACKSPACE_AT_START_DELETE),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.backspace_at_start_delete_title),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Switch(
-                            checked = backspaceAtStartDelete,
-                            onCheckedChange = { enabled ->
-                                backspaceAtStartDelete = enabled
-                                SettingsManager.setBackspaceAtStartDelete(context, enabled)
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = stringResource(R.string.delete_alternatives_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    SettingsNavigationRow(
-                        title = stringResource(R.string.delete_alternatives_nav_mode_title),
-                        description = stringResource(R.string.settings_nav_mode_configure),
-                        iconInset = 0.dp,
-                        linkId = SettingLinkIds.TEXT_INPUT_DELETE_NAV_MODE,
-                        onClick = onNavModeSettingsClick
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = stringResource(R.string.delete_alternatives_selection_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
+            SettingsSectionDivider(stringResource(R.string.text_input_section_delete))
+            SettingsSupportingText(stringResource(R.string.delete_alternatives_description))
+            SettingsSwitchRow(
+                title = stringResource(R.string.shift_backspace_delete_title),
+                checked = shiftBackspaceDelete,
+                linkId = SettingLinkIds.TEXT_INPUT_SHIFT_BACKSPACE_DELETE,
+                onCheckedChange = { enabled ->
+                    shiftBackspaceDelete = enabled
+                    SettingsManager.setShiftBackspaceDelete(context, enabled)
                 }
-            }
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.alt_backspace_delete_title),
+                checked = altBackspaceDelete,
+                linkId = SettingLinkIds.TEXT_INPUT_ALT_BACKSPACE_DELETE,
+                onCheckedChange = { enabled ->
+                    altBackspaceDelete = enabled
+                    SettingsManager.setAltBackspaceDelete(context, enabled)
+                }
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.backspace_at_start_delete_title),
+                checked = backspaceAtStartDelete,
+                linkId = SettingLinkIds.TEXT_INPUT_BACKSPACE_AT_START_DELETE,
+                onCheckedChange = { enabled ->
+                    backspaceAtStartDelete = enabled
+                    SettingsManager.setBackspaceAtStartDelete(context, enabled)
+                }
+            )
+            SettingsSupportingText(stringResource(R.string.delete_alternatives_selection_hint))
+            SettingsNavigationRow(
+                title = stringResource(R.string.delete_alternatives_nav_mode_title),
+                description = stringResource(R.string.settings_nav_mode_configure),
+                linkId = SettingLinkIds.TEXT_INPUT_DELETE_NAV_MODE,
+                onClick = onNavModeSettingsClick
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-}
-
-@Composable
-private fun SettingsRowFrame(
-    modifier: Modifier = Modifier,
-    minHeight: androidx.compose.ui.unit.Dp = 64.dp,
-    inset: androidx.compose.ui.unit.Dp = 16.dp,
-    content: @Composable RowScope.() -> Unit
-) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = minHeight)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = inset, end = 16.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            content = content
-        )
     }
 }
 
@@ -698,85 +576,23 @@ private fun SettingsSwitchRow(
     title: String,
     description: String? = null,
     checked: Boolean,
-    /** Refines the row above: no icon of its own, text aligned with that row's title. */
+    /** Refines the row above: text aligned with that row's title. */
     dependent: Boolean = false,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
     linkId: String? = null,
     status: FeatureStatus? = null
 ) {
-    SettingsRowFrame(
-        modifier = Modifier.settingRow(linkId),
-        inset = if (dependent) 52.dp else 16.dp,
-        minHeight = if (description == null) 64.dp else 72.dp
-    ) {
-        if (!dependent) Icon(
-            imageVector = Icons.Filled.TextFields,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2
-            )
-            if (description != null) {
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        status?.let { FeatureStatusIcon(it) }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-@Composable
-private fun SettingsNavigationRow(
-    title: String,
-    description: String,
-    iconInset: androidx.compose.ui.unit.Dp = 16.dp,
-    linkId: String? = null,
-    onClick: () -> Unit
-) {
-    SettingsRowFrame(
-        modifier = Modifier.settingRow(linkId, onClick),
-        minHeight = 72.dp,
-        inset = iconInset
-    ) {
-        Icon(
-            imageVector = Icons.Filled.TextFields,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
-        )
-    }
+    SettingsToggleRow(
+        enabled = enabled,
+        title = title,
+        description = description,
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        dependent = dependent,
+        linkId = linkId,
+        extra = status?.let { { FeatureStatusIcon(it) } }
+    )
 }
 
 @Composable
@@ -793,64 +609,34 @@ private fun SettingsDropdownSwitchRow(
     onOptionSelected: (String) -> Unit,
     linkId: String? = null
 ) {
-    SettingsRowFrame(
-        modifier = Modifier.settingRow(linkId),
-        minHeight = 88.dp
+    SettingsToggleRow(title = title, checked = checked, onCheckedChange = onCheckedChange, linkId = linkId)
+    // The style stays visible while the switch is off; it is natively disabled then.
+    ExposedDropdownMenuBox(
+        expanded = expanded && checked,
+        onExpandedChange = { if (checked) onExpandedChange(!expanded) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = SettingsSpace.textInsetWithIcon, end = SettingsSpace.edge, bottom = SettingsSpace.rowVertical)
     ) {
-        Icon(
-            imageVector = Icons.Filled.TextFields,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            enabled = checked,
+            label = { Text(stringResource(R.string.settings_style_label)) },
+            textStyle = SettingsTypography.rowDescription(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = checked)
         )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2
-            )
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { onExpandedChange(!expanded) }
-            ) {
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = {},
-                    readOnly = true,
-                    singleLine = true,
-                    enabled = checked,
-                    textStyle = MaterialTheme.typography.bodySmall,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .menuAnchor(
-                            type = MenuAnchorType.PrimaryNotEditable,
-                            enabled = checked
-                        )
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { onExpandedChange(false) }
-                ) {
-                    options.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(optionLabel(option)) },
-                            onClick = { onOptionSelected(option) },
-                            enabled = checked
-                        )
-                    }
-                }
+        ExposedDropdownMenu(expanded = expanded && checked, onDismissRequest = { onExpandedChange(false) }) {
+            options.forEach { option ->
+                DropdownMenuItem(text = { Text(optionLabel(option)) }, onClick = { onOptionSelected(option) })
             }
         }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
     }
 }
 
@@ -910,7 +696,7 @@ private fun autoSpacePunctuationSummary(
             add("$afterLabel: ${it.map(::autoSpacePunctuationLabel).joinToString(" ")}")
         }
     }
-    return parts.joinToString(" · ").ifEmpty { offLabel }
+    return parts.joinToString(", ").ifEmpty { offLabel }
 }
 
 internal fun autoSpacePunctuationLabel(punctuation: Char): String {

@@ -15,6 +15,7 @@ import rocks.pkb.plektra.commands.CommandSurface
 import rocks.pkb.plektra.commands.PlektraCommandSource
 import rocks.pkb.plektra.core.Punctuation
 import rocks.pkb.plektra.data.layout.BundledLayoutAssets
+import rocks.pkb.plektra.data.layout.LayoutFileStore
 import rocks.pkb.plektra.inputmethod.DeviceSpecific
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils
 import rocks.pkb.plektra.inputmethod.subtype.AdditionalSubtypeUtils.localeString
@@ -28,6 +29,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.UUID
 import java.util.zip.ZipInputStream
 
 /**
@@ -216,6 +218,8 @@ object SettingsManager {
     const val KEY_APP_THEME_MODE = "app_theme_mode"
     const val KEY_APP_DARK_SURFACE_STYLE = "app_dark_surface_style"
     const val KEY_APP_DYNAMIC_COLOR = "app_dynamic_color"
+    const val KEY_APP_SETTINGS_FULLSCREEN = "app_settings_fullscreen"
+    const val KEY_APP_SETTINGS_STYLE = "app_settings_style"
     private const val KEY_APP_ENTER_BEHAVIOR_ENABLED = "app_enter_behavior_enabled"
     private const val KEY_APP_ENTER_BEHAVIOR_PRESET = "app_enter_behavior_preset"
     private const val KEY_APP_ENTER_BEHAVIOR_OVERRIDES = "app_enter_behavior_overrides"
@@ -250,6 +254,7 @@ object SettingsManager {
     private const val KEY_STATUS_BAR_VARIATIONS_VISIBLE = "status_bar_variations_visible"
     private const val KEY_DYNAMIC_VARIATION_BAR_SLOT_COUNT = "dynamic_variation_bar_slot_count"
     private const val KEY_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT = "dynamic_variation_bar_resize_to_content"
+    private const val KEY_SHARED_ROW_VARIATIONS_FIRST = "shared_row_variations_first"
     const val KEY_MODIFIER_INDICATOR_MODE = "modifier_indicator_mode"
     
     // Public constants for button IDs
@@ -307,6 +312,7 @@ object SettingsManager {
     private const val DEFAULT_STATUS_BAR_VARIATIONS_VISIBLE = true
     private const val DEFAULT_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 7
     private const val DEFAULT_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT = false
+    private const val DEFAULT_SHARED_ROW_VARIATIONS_FIRST = false
     private val DEFAULT_MODIFIER_INDICATORS = setOf(MODIFIER_INDICATOR_BOTTOM_STRIP)
     const val MIN_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 1
     const val MAX_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 9
@@ -621,6 +627,17 @@ object SettingsManager {
             .apply()
     }
 
+    fun getAppSettingsStyle(context: Context): rocks.pkb.plektra.ui.theme.AppSettingsStyle =
+        rocks.pkb.plektra.ui.theme.AppSettingsStyle.fromStorage(
+            getPreferences(context).getString(KEY_APP_SETTINGS_STYLE, null)
+        )
+
+    fun setAppSettingsStyle(context: Context, style: rocks.pkb.plektra.ui.theme.AppSettingsStyle) {
+        getPreferences(context).edit()
+            .putString(KEY_APP_SETTINGS_STYLE, style.storageValue)
+            .apply()
+    }
+
     fun getAppAppearancePreferences(context: Context): rocks.pkb.plektra.ui.theme.AppAppearancePreferences {
         val prefs = getPreferences(context)
         return rocks.pkb.plektra.ui.theme.AppAppearancePreferences(
@@ -630,8 +647,16 @@ object SettingsManager {
             darkSurfaceStyle = rocks.pkb.plektra.ui.theme.AppDarkSurfaceStyle.fromStorage(
                 prefs.getString(KEY_APP_DARK_SURFACE_STYLE, null)
             ),
-            dynamicColor = prefs.getBoolean(KEY_APP_DYNAMIC_COLOR, true)
+            dynamicColor = prefs.getBoolean(KEY_APP_DYNAMIC_COLOR, true),
+            settingsFullscreen = prefs.getBoolean(KEY_APP_SETTINGS_FULLSCREEN, false),
+            settingsStyle = rocks.pkb.plektra.ui.theme.AppSettingsStyle.fromStorage(
+                prefs.getString(KEY_APP_SETTINGS_STYLE, null)
+            )
         )
+    }
+
+    fun setSettingsFullscreenEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_APP_SETTINGS_FULLSCREEN, enabled).apply()
     }
 
     fun setAppAppearancePreferences(
@@ -642,6 +667,7 @@ object SettingsManager {
             .putString(KEY_APP_THEME_MODE, preferences.themeMode.storageValue)
             .putString(KEY_APP_DARK_SURFACE_STYLE, preferences.darkSurfaceStyle.storageValue)
             .putBoolean(KEY_APP_DYNAMIC_COLOR, preferences.dynamicColor)
+            .putString(KEY_APP_SETTINGS_STYLE, preferences.settingsStyle.storageValue)
             .apply()
     }
 
@@ -2608,10 +2634,8 @@ object SettingsManager {
         val choiceId = preferences.getString(choiceKey, null)?.takeIf(String::isNotBlank) ?: return null
         val encodedOutput = preferences.getString(outputKey, null) ?: return null
         val output = encodedOutput.decodeClicksRemapOutput() ?: return null
-        // Bindings stored before the pending marker existed, or restored from a backup, have no
-        // marker for their output. They count as applied so Plektra never replaces a firmware
-        // assignment that was changed in the Clicks app in the meantime.
-        val pending = preferences.getString(clicksPendingButtonBindingKey(target), null) == encodedOutput
+        val marker = preferences.getString(clicksPendingButtonBindingKey(target), null)
+        val pending = isLocalClicksPendingMarker(context, marker, encodedOutput)
         return ClicksDesiredButtonBinding(choiceId, output, pending)
     }
 
@@ -2627,7 +2651,12 @@ object SettingsManager {
         val editor = getPreferences(context).edit()
             .putString(choiceKey, binding.choiceId)
             .putString(outputKey, encodedOutput)
-        if (binding.pending) editor.putString(pendingKey, encodedOutput) else editor.remove(pendingKey)
+        if (binding.pending) {
+            val installationId = requireNotNull(clicksBindingInstallationId(context, create = true))
+            editor.putString(pendingKey, "$installationId:$encodedOutput")
+        } else {
+            editor.remove(pendingKey)
+        }
         editor.apply()
     }
 
@@ -2639,8 +2668,24 @@ object SettingsManager {
     ) {
         val pendingKey = clicksPendingButtonBindingKey(target)
         val preferences = getPreferences(context)
-        if (preferences.getString(pendingKey, null) == output.encodeClicksRemapOutput()) {
+        if (isLocalClicksPendingMarker(context, preferences.getString(pendingKey, null), output.encodeClicksRemapOutput())) {
             preferences.edit().remove(pendingKey).apply()
+        }
+    }
+
+    // Android can restore the complete preference file. Only the installation that stored a
+    // pending selection may write it to firmware. Old, unscoped markers cannot prove ownership.
+    private fun isLocalClicksPendingMarker(context: Context, marker: String?, encodedOutput: String): Boolean =
+        marker?.endsWith(":$encodedOutput") == true &&
+            clicksBindingInstallationId(context) == marker.substringBefore(':')
+
+    @Synchronized
+    private fun clicksBindingInstallationId(context: Context, create: Boolean = false): String? {
+        val file = File(context.noBackupFilesDir, "clicks_button_binding_installation")
+        val existing = if (file.isFile) file.readText().takeIf(String::isNotBlank) else null
+        if (existing != null || !create) return existing
+        return UUID.randomUUID().toString().also { id ->
+            LayoutFileStore.writeAtomically(file, id.toByteArray())
         }
     }
 
@@ -6582,6 +6627,18 @@ object SettingsManager {
         getPreferences(context).edit()
             .putBoolean(KEY_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT, enabled)
             .apply()
+    }
+
+    /**
+     * In the combined keyboard bar row, whether character variations of the last typed letter
+     * take precedence over word suggestions. Off: suggestions stay and variations fill the row
+     * only when there are none.
+     */
+    fun getSharedRowVariationsFirst(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SHARED_ROW_VARIATIONS_FIRST, DEFAULT_SHARED_ROW_VARIATIONS_FIRST)
+
+    fun setSharedRowVariationsFirst(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SHARED_ROW_VARIATIONS_FIRST, enabled).apply()
     }
 
     fun getDefaultKeyboardBarProfile(slim: Boolean): KeyboardBarProfile = KeyboardBarProfile(

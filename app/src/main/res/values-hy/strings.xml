@@ -809,7 +809,7 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="debug_recorder_share">Կիսվել</string>
     <string name="debug_recorder_share_chooser">Կիսվել debug հաշվետվությամբ</string>
     <string name="debug_recorder_copied">Debug հաշվետվությունը պատճենվեց (%1$d իրադարձություն)</string>
-    <string name="debug_recorder_status">Գրանցիչ՝ %1$s · Իրադարձություններ՝ %2$d</string>
+    <string name="debug_recorder_status">Գրանցիչ՝ %1$s, Իրադարձություններ՝ %2$d</string>
     <string name="debug_recorder_status_recording">գրանցում</string>
     <string name="debug_recorder_status_stopped">կանգնեցված</string>
     <string name="debug_recorder_started_at">Սկսվել է՝ </string>
@@ -878,6 +878,8 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="dynamic_variation_slot_count_description">Փորձել ցույց տալ %1$d դինամիկ տարր կարգավիճակի գոտու կոճակների միջև։</string>
     <string name="dynamic_variation_resize_to_content_title">Փոխել դինամիկ տարբերակների չափը</string>
     <string name="dynamic_variation_resize_to_content_description">Միացված լինելու դեպքում դինամիկ տարրերը լրացնում են հասանելի շարքը՝ ըստ ցուցադրվող քանակի։ Անջատված լինելու դեպքում դրանք պահում են սահիկի տեղամասի չափը և մնում ձախից հավասարեցված։</string>
+    <string name="shared_row_variations_first_title">Տարբերակները՝ առաջարկներից առաջ</string>
+    <string name="shared_row_variations_first_description">Ցուցադրում է վերջին տառի տարբերակները բառերի առաջարկների փոխարեն, քանի դեռ դրանք կան։ Անջատված՝ տարբերակները հայտնվում են միայն առաջարկների բացակայության դեպքում։</string>
     <string name="keyboard_theme_tab_colors">Գույներ</string>
     <string name="keyboard_theme_tab_keys">Ստեղներ</string>
 
@@ -946,6 +948,10 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="kw_auto_correction_starter_words">սկզբնական բառեր, դատարկ դաշտ, նոր նախադասություն, առաջին բառ, հաճախակի բառեր, բառարան, առաջարկներ</string>
     <string name="clicks_button_binding_reading">Ընթացիկ նշանակումը կարդացվում է ստեղնաշարից…</string>
     <string name="clicks_button_binding_last_known">Վերջին հայտնի նշանակումը․ ստեղնաշարը միացված չէ։</string>
+    <string name="app_appearance_settings_fullscreen_title">Կարգավորումներ ամբողջ էկրանով</string>
+    <string name="app_appearance_settings_fullscreen_description">Կարգավորումներում թաքցնում է կարգավիճակի գոտին։ Էջի վերնագիրը և գործողություններն օգտագործում են վերին տողը։ Վերին եզրից ներքև սահեցրեք՝ կարգավիճակի գոտին կարճ ցուցադրելու համար։</string>
+    <string name="kw_app_appearance_settings_fullscreen">ամբողջ էկրան, կարգավիճակի գոտի, թաքցնել, վերնագիր, վերին տող, խցիկի անցք</string>
+    <string name="settings_search_close">Փակել որոնումը</string>
     <string name="keyboard_backlight_section_title">Ստեղնաշարի լուսավորություն</string>
     <string name="keyboard_backlight_follows_display_title">Լուսավորությունը հետևում է էկրանին</string>
     <string name="keyboard_backlight_follows_display_description">Ստեղնաշարի լույսը վառ է պահում մինչև էկրանի անջատումը և նորից վառում էկրանի հետ։ Օգտագործում է սարքի կարգավորումը. Plektra-ն դրա համար ֆոնում չի աշխատում։</string>

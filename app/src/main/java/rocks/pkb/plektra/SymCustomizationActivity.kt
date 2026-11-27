@@ -39,7 +39,7 @@ class SymCustomizationActivity : LocalizedComponentActivity() {
         settingId = intent.getStringExtra(EXTRA_SETTING_ID)
         enableEdgeToEdge()
         setContent {
-            PlektraTheme {
+            PlektraTheme(settingsWindow = true) {
                 var linkSheetEntry by remember { mutableStateOf<SettingEntry?>(null) }
                 var highlightId by remember { mutableStateOf<String?>(null) }
                 LaunchedEffect(settingId, settingRequestSerial) {

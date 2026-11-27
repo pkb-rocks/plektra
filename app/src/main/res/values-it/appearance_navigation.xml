@@ -82,4 +82,19 @@
     <string name="quick_launcher_animation_duration_title">Durata dell’animazione di apertura</string>
     <string name="titan2_elite_rounded_corners_description">Arrotonda gli angoli inferiori della barra della tastiera per adattarli a quelli dello schermo.</string>
     <string name="titan2_elite_rounded_corners_title">Angoli dello schermo arrotondati</string>
+    <string name="app_appearance_layout_style_title">Stile di layout</string>
+    <string name="app_appearance_layout_style_description">Passa tra divisori compatti e superfici Material morbide.</string>
+    <string name="app_appearance_layout_style_compact_dividers">Compatto con divisori</string>
+    <string name="app_appearance_layout_style_compact_dividers_description">Intestazioni a sinistra con linee sottili</string>
+    <string name="app_appearance_layout_style_material">Material</string>
+    <string name="app_appearance_layout_style_material_description">Icone tonali e superfici di sezione morbide</string>
+    <string name="app_appearance_summary_material">Material</string>
+    <string name="kw_app_appearance_settings_style">Stile di layout, compatto, divisori, layout style, compact, dividers, material</string>
+    <string name="settings_section_expanded">Espanso</string>
+    <string name="settings_section_collapsed">Compresso</string>
+    <string name="settings_info_content_description">Dettagli per %1$s</string>
+    <string name="custom_input_styles_list_title">Lingue di input</string>
+    <string name="quick_launcher_choose_color">Colore voce</string>
+    <string name="quick_launcher_entry_appearance_title">Aspetto voci</string>
+    <string name="settings_style_label">Stile</string>
 </resources>

@@ -19,6 +19,8 @@
     <item name="notes_redo_button" type="id" />
     <item name="notes_both_toggle" type="id" />
     <item name="notes_preview_toggle" type="id" />
+    <item name="notes_header" type="id" />
+    <item name="notes_format_bar" type="id" />
     <string name="notes_markdown">Markdown</string>
     <string name="notes_both">Both</string>
     <string name="notes_new">New note</string>

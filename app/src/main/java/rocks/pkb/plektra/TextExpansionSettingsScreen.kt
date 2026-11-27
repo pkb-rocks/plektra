@@ -86,7 +86,7 @@ fun TextExpansionSettingsScreen(onBack: () -> Unit) {
             modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            SectionTitle(stringResource(R.string.snippets_title))
+            SettingsSectionDivider(stringResource(R.string.snippets_title))
             SwitchSettingRow(
                 title = stringResource(R.string.snippets_enable_title),
                 linkId = "text_expansion.snippets.enabled",
@@ -207,7 +207,7 @@ fun TextExpansionSettingsScreen(onBack: () -> Unit) {
                     SettingsManager.setSnippetsActivationPolicy(context, policy)
                 }
             )
-            SectionTitle(stringResource(R.string.emoji_symbols_title))
+            SettingsSectionDivider(stringResource(R.string.emoji_symbols_title))
             SwitchSettingRow(
                 title = stringResource(R.string.emoji_shortcodes_enable_title),
                 linkId = "text_expansion.emoji.enabled",
@@ -433,33 +433,9 @@ private fun SettingsScaffold(
 ) {
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.settings_back_content_description))
-                    }
-                    Text(title, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
-                    action()
-                }
-            }
+            PlektraSettingsHeader(title = title, onBack = onBack) { action() }
         },
         content = content
-    )
-}
-
-@Composable
-private fun SectionTitle(title: String) {
-    Text(
-        title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)
     )
 }
 
@@ -471,19 +447,8 @@ private fun SwitchSettingRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().settingRow(linkId) { onCheckedChange(!checked) }.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Medium)
-                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Spacer(Modifier.width(12.dp))
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
-        }
-    }
+    SettingsToggleRow(title = title, description = description, checked = checked,
+        onCheckedChange = onCheckedChange, linkId = linkId)
 }
 
 @Composable

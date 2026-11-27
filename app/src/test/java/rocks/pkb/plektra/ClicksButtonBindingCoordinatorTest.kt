@@ -1,6 +1,8 @@
 package rocks.pkb.plektra
 
 import android.content.Context
+import android.content.ContextWrapper
+import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -175,6 +177,50 @@ class ClicksButtonBindingCoordinatorTest {
         assertTrue(keyboard.writes.isEmpty())
     }
 
+    @Test
+    fun restoredPreferencesKeepTheChoiceWithoutWritingItOnAnotherInstallation() {
+        val binding = ClicksDesiredButtonBinding("alt_toggle_keyboard_mode", plektraAction)
+        SettingsManager.setClicksDesiredButtonBinding(context, target, binding)
+        val reopenedStore = SettingsClicksButtonBindingStore(ContextWrapper(context))
+        assertTrue(reopenedStore.desired(target)!!.pending)
+
+        // Android restores all of the preferences, but not the installation's no-backup directory.
+        val restoredContext = object : ContextWrapper(context) {
+            override fun getNoBackupFilesDir() = File(cacheDir, "restored-installation").apply { mkdirs() }
+        }
+        val restoredStore = SettingsClicksButtonBindingStore(restoredContext)
+        val restoredBinding = requireNotNull(restoredStore.desired(target))
+        assertEquals(binding.choiceId, restoredBinding.choiceId)
+        assertTrue(binding.firmwareOutput.contentEquals(restoredBinding.firmwareOutput))
+        assertFalse(restoredBinding.pending)
+
+        ClicksButtonBindingCoordinator(restoredStore, { keyboard.state }, { keyboard }).reconcile()
+
+        assertTrue(keyboard.writes.isEmpty())
+    }
+
+    @Test
+    fun nativeSelectionWithUnreadFlagsRemainsPending() {
+        val unread = ClicksPowerKeyboardState()
+        val offlineCoordinator = ClicksButtonBindingCoordinator(SettingsClicksButtonBindingStore(context), { unread }, { null })
+        val native = ClicksDesiredButtonBinding("alt_native", ClicksPowerKeyboardProtocol.nativeRemapOutput())
+
+        assertEquals(ClicksButtonBindingRequestStatus.PENDING_CONNECTION, offlineCoordinator.request(target, native) {})
+        assertTrue(desired().pending)
+    }
+
+    @Test
+    fun selectionMatchingCachedOutputWaitsForAValidatedRead() {
+        keyboard.state = keyboard.state.copy(stale = true, sessionValidated = false)
+        val status = coordinator.request(target, ClicksDesiredButtonBinding("alt_alt", alt)) {}
+
+        assertEquals(ClicksButtonBindingRequestStatus.PENDING_CONNECTION, status)
+        assertTrue(desired().pending)
+        keyboard.readAgain()
+        assertFalse(desired().pending)
+        assertTrue(keyboard.writes.isEmpty())
+    }
+
     private fun startAutomaticPlektraActionWrite() {
         // An offline selection of the Plektra action is synced automatically on reconnect while the
         // firmware still holds Alt.
@@ -254,6 +300,7 @@ class ClicksButtonBindingCoordinatorTest {
                     connected = true,
                     ready = true,
                     sessionValidated = true,
+                    stale = false,
                     specialKeyEnableFlags = if (output != null) ClicksPowerKeyboardProtocol.FLAG_ALT_REMAP_ENABLED else 0,
                     altRemap = output?.copyOf()
                 )

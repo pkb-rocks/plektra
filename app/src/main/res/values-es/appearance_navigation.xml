@@ -82,4 +82,19 @@
     <string name="quick_launcher_animation_duration_title">Duración de la animación de apertura</string>
     <string name="titan2_elite_rounded_corners_description">Redondea las esquinas inferiores de la barra del teclado para ajustarlas a las de la pantalla.</string>
     <string name="titan2_elite_rounded_corners_title">Esquinas de pantalla redondeadas</string>
+    <string name="app_appearance_layout_style_title">Estilo de diseño</string>
+    <string name="app_appearance_layout_style_description">Cambia entre líneas divisorias compactas y superficies Material suaves.</string>
+    <string name="app_appearance_layout_style_compact_dividers">Compacto con divisores</string>
+    <string name="app_appearance_layout_style_compact_dividers_description">Encabezados a la izquierda con líneas sutiles</string>
+    <string name="app_appearance_layout_style_material">Material</string>
+    <string name="app_appearance_layout_style_material_description">Iconos tonales y superficies de sección suaves</string>
+    <string name="app_appearance_summary_material">Material</string>
+    <string name="kw_app_appearance_settings_style">Estilo de diseño, compacto, divisores, layout style, compact, dividers, material</string>
+    <string name="settings_section_expanded">Expandido</string>
+    <string name="settings_section_collapsed">Contraído</string>
+    <string name="settings_info_content_description">Detalles de %1$s</string>
+    <string name="custom_input_styles_list_title">Idiomas de entrada</string>
+    <string name="quick_launcher_choose_color">Color de entrada</string>
+    <string name="quick_launcher_entry_appearance_title">Apariencia de entradas</string>
+    <string name="settings_style_label">Estilo</string>
 </resources>

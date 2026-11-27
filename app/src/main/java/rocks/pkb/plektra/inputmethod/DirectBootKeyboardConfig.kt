@@ -290,7 +290,7 @@ internal class DirectBootKeyboardConfig(private val context: Context) {
                 "bounce_keys_backspace_enabled",
                 "static_variation_bar_mode", "static_variation_bar_preset", "static_variation_bar_base_layer_enabled",
                 "static_variation_bar_modifier_hold_restoration",
-                "dynamic_variation_bar_slot_count", "dynamic_variation_bar_resize_to_content",
+                "dynamic_variation_bar_slot_count", "dynamic_variation_bar_resize_to_content", "shared_row_variations_first",
                 "nav_mode_enabled", "nav_mode_ctrl_hold_enabled",
                 "titan2_layout_enabled", "titan2_elite_rounded_corner_insets", "titan2_elite_fill_bottom_corners",
                 "titan2_elite_top_corner_multiplier", "titan2_elite_max_icon_shrink", rocks.pkb.plektra.T2eCornerCalibration.KEY,

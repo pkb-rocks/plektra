@@ -27,16 +27,30 @@ enum class AppDarkSurfaceStyle(val storageValue: String) {
     }
 }
 
+enum class AppSettingsStyle(val storageValue: String) {
+    COMPACT_DIVIDERS("compact_dividers"),
+    MATERIAL("material");
+
+    companion object {
+        fun fromStorage(value: String?): AppSettingsStyle =
+            entries.firstOrNull { it.storageValue == value } ?: COMPACT_DIVIDERS
+    }
+}
+
 data class AppAppearancePreferences(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val darkSurfaceStyle: AppDarkSurfaceStyle = AppDarkSurfaceStyle.STANDARD,
-    val dynamicColor: Boolean = true
+    val dynamicColor: Boolean = true,
+    val settingsStyle: AppSettingsStyle = AppSettingsStyle.COMPACT_DIVIDERS,
+    val settingsFullscreen: Boolean = false
 )
 
 data class ResolvedAppTheme(
     val useDarkTheme: Boolean,
     val useOledBlack: Boolean,
-    val useDynamicColor: Boolean
+    val useDynamicColor: Boolean,
+    val settingsStyle: AppSettingsStyle = AppSettingsStyle.COMPACT_DIVIDERS,
+    val settingsFullscreen: Boolean = false
 )
 
 object AppThemeResolver {
@@ -66,7 +80,9 @@ object AppThemeResolver {
         return ResolvedAppTheme(
             useDarkTheme = useDarkTheme,
             useOledBlack = useOledBlack,
-            useDynamicColor = useDynamicColor
+            useDynamicColor = useDynamicColor,
+            settingsStyle = preferences.settingsStyle,
+            settingsFullscreen = preferences.settingsFullscreen
         )
     }
 
@@ -109,5 +125,7 @@ object AppThemeResolver {
     fun isAppearancePreferenceKey(key: String?): Boolean = key == null ||
         key == SettingsManager.KEY_APP_THEME_MODE ||
         key == SettingsManager.KEY_APP_DARK_SURFACE_STYLE ||
-        key == SettingsManager.KEY_APP_DYNAMIC_COLOR
+        key == SettingsManager.KEY_APP_DYNAMIC_COLOR ||
+        key == SettingsManager.KEY_APP_SETTINGS_FULLSCREEN ||
+        key == SettingsManager.KEY_APP_SETTINGS_STYLE
 }

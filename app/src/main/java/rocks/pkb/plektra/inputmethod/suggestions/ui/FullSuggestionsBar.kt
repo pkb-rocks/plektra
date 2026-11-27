@@ -44,6 +44,7 @@ import rocks.pkb.plektra.inputmethod.statusbar.StatusBarButtonStyles
 /**
  * Renders up to three suggestions with configurable menu buttons on the left/right edges.
  * Menu buttons can keep the row visible when suggestions are unavailable or disabled.
+ * In a combined row it renders character variations instead, see [VariationSlots].
  */
 class FullSuggestionsBar(
     private val context: Context,
@@ -52,6 +53,8 @@ class FullSuggestionsBar(
 ) {
 
     companion object {
+        internal const val SUGGESTION_PADDING_DP = 12f
+        internal const val SHARED_ROW_SUGGESTION_PADDING_DP = 4f
         private val PRESSED_BLUE = Color.rgb(100, 150, 255) // Align with variation bar press state
         private val DEFAULT_SUGGESTION_COLOR = Color.argb(100, 17, 17, 17)
         private const val FLASH_DURATION_MS = 160L
@@ -94,6 +97,7 @@ class FullSuggestionsBar(
     }
     private val suggestionButtons: MutableList<TextView> = mutableListOf()
     private var previewOnly = false
+    private var variationSlots: VariationSlots? = null
     private var continuousSpeechPreview = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private var reenableSuggestionsAccessibilityRunnable: Runnable? = null
@@ -395,9 +399,21 @@ class FullSuggestionsBar(
         onSuggestionSelectedOverride: ((Int, String) -> Unit)? = null,
         reserveEmptyRow: Boolean = false,
         displayOnly: Boolean = false,
-        continuousPreview: Boolean = false
+        continuousPreview: Boolean = false,
+        variations: VariationSlots? = null
     ) {
+        if (currentInputConnection !== inputConnection) {
+            // Click listeners commit through the connection they were bound with.
+            lastSlots = emptyList()
+        }
         currentInputConnection = inputConnection
+        if (variationSlots != variations) {
+            // Labels can match across content kinds; their click bindings differ.
+            variationSlots = variations
+            lastSlots = emptyList()
+            actionCandidate = null
+            actionSlots = emptyList()
+        }
         if (previewOnly != displayOnly || continuousSpeechPreview != (displayOnly && continuousPreview)) {
             previewOnly = displayOnly
             continuousSpeechPreview = displayOnly && continuousPreview
@@ -464,6 +480,7 @@ class FullSuggestionsBar(
         // Only the labels and actions change; the row must never disappear between updates.
         val slots = when {
             !canShowSuggestions -> listOf(null, null, null)
+            variations != null -> List(variations.slotCount) { suggestions.getOrNull(it) }
             continuousSpeechPreview -> listOf(suggestions.firstOrNull())
             previewOnly -> List(3) { suggestions.getOrNull(it) }
             else -> buildSlots(suggestions, effectiveAddWordCandidate)
@@ -483,7 +500,7 @@ class FullSuggestionsBar(
             frame.alpha = 1f
             for (index in 0 until bar.childCount) {
                 bar.getChildAt(index).alpha = 1f
-                bar.getChildAt(index).visibility = View.VISIBLE
+                bar.getChildAt(index).visibility = slotVisibility(slots.getOrNull(index))
             }
             return
         }
@@ -708,13 +725,21 @@ class FullSuggestionsBar(
         val maxTextSp = (14f * heightScale).coerceIn(12f, 20f).toInt()
         val minTextSp = (7f * heightScale).coerceIn(7f, 12f).toInt()
         val padV = dpToPx(3f * heightScale)
-        val padH = dpToPx(12f)
+        // Menu buttons in the same row leave each word slot little width; wide side padding
+        // would shrink even short words to the minimum text size.
+        val padH = when {
+            variationSlots != null -> 0
+            hasMenuButtons -> dpToPx(SHARED_ROW_SUGGESTION_PADDING_DP)
+            else -> dpToPx(SUGGESTION_PADDING_DP)
+        }
 
-        val addOnly = addWordCandidate != null &&
+        val addOnly = variationSlots == null && addWordCandidate != null &&
             slots[0]?.equals(addWordCandidate, ignoreCase = true) == true &&
             slots[1] == null &&
             slots[2] == null
-        val slotOrder = if (continuousSpeechPreview) {
+        val slotOrder = if (variationSlots != null) {
+            slots
+        } else if (continuousSpeechPreview) {
             listOf(slots.firstOrNull())
         } else if (addOnly) {
             listOf(slots[0])
@@ -755,6 +780,7 @@ class FullSuggestionsBar(
                 setCompoundDrawables(null, null, null, null)
                 contentDescription = null
                 alpha = 1f
+                visibility = slotVisibility(suggestion)
                 text = (suggestion ?: "")
                 gravity = if (continuousSpeechPreview) Gravity.CENTER_VERTICAL or Gravity.END else Gravity.CENTER
                 KeyboardBarTypography.applyAutoSize(this, minTextSp, maxTextSp)
@@ -946,6 +972,10 @@ class FullSuggestionsBar(
         val onClick: () -> Unit
     )
 
+    /** An unused variation slot keeps its width, like the separate variations row. */
+    private fun slotVisibility(slot: String?): Int =
+        if (variationSlots != null && slot == null) View.INVISIBLE else View.VISIBLE
+
     private fun buildSlots(suggestions: List<String>, addWordCandidate: String?): List<String?> {
         val s0 = suggestions.getOrNull(0)
         val s1 = suggestions.getOrNull(1)
@@ -1061,3 +1091,9 @@ class FullSuggestionsBar(
         ).toInt()
     }
 }
+
+/**
+ * Character variations in a combined row: all [slotCount] slots in their own order, without the
+ * ranking and three-slot limit of word suggestions. [dynamic] distinguishes the commit behaviour.
+ */
+data class VariationSlots(val slotCount: Int, val dynamic: Boolean)

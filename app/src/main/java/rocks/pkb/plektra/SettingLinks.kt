@@ -32,6 +32,8 @@ object SettingLinkIds {
     const val APP_APPEARANCE_THEME_MODE = "app_appearance.theme_mode"
     const val APP_APPEARANCE_DARK_SURFACE = "app_appearance.dark_surface"
     const val APP_APPEARANCE_DYNAMIC_COLOR = "app_appearance.dynamic_color"
+    const val APP_APPEARANCE_SETTINGS_STYLE = "app_appearance.settings_style"
+    const val APP_APPEARANCE_SETTINGS_FULLSCREEN = "app_appearance.settings_fullscreen"
 
     // Text input screen
     const val TEXT_INPUT_TEXT_EXPANSION = "text_input.text_expansion"
@@ -89,6 +91,9 @@ object SettingLinkIds {
     const val ACCESSIBILITY_LIVE_READ = "accessibility.live_read"
     const val ACCESSIBILITY_READ_SECOND_ROW = "accessibility.read_second_row"
     const val KEYBOARD_BAR_HARDWARE_ONLY = "status_bar.hardware_only"
+    const val KEYBOARD_BAR_HIDE_IME_CAPTION = "keyboard_bar.hide_ime_caption_bar"
+    const val KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST = "keyboard_bar.shared_row_variations_first"
+    const val KEYBOARD_BAR_SYSTEM_CONTROLS = "keyboard_bar.system_controls"
     const val ACCESSIBILITY_SUGGESTIONS_DELAY = "accessibility.suggestions_delay"
     const val ACCESSIBILITY_BOUNCE_KEYS = "accessibility.bounce_keys"
     const val ACCESSIBILITY_BOUNCE_KEYS_CHARACTER_KEYS = "accessibility.bounce_keys_character_keys"
@@ -324,6 +329,18 @@ object SettingLinkRegistry {
             SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR,
             R.string.app_appearance_dynamic_color_title,
             R.string.app_appearance_dynamic_color_description,
+            destination = SettingsDestination.AppAppearance
+        ),
+        entry(
+            SettingLinkIds.APP_APPEARANCE_SETTINGS_STYLE,
+            R.string.app_appearance_layout_style_title,
+            R.string.app_appearance_layout_style_description,
+            destination = SettingsDestination.AppAppearance
+        ),
+        entry(
+            SettingLinkIds.APP_APPEARANCE_SETTINGS_FULLSCREEN,
+            R.string.app_appearance_settings_fullscreen_title,
+            R.string.app_appearance_settings_fullscreen_description,
             destination = SettingsDestination.AppAppearance
         ),
         entry(
@@ -1109,6 +1126,8 @@ object SettingLinkRegistry {
         SettingLinkIds.APP_APPEARANCE_THEME_MODE to R.string.kw_app_appearance_theme_mode,
         SettingLinkIds.APP_APPEARANCE_DARK_SURFACE to R.string.kw_app_appearance_dark_surface,
         SettingLinkIds.APP_APPEARANCE_DYNAMIC_COLOR to R.string.kw_app_appearance_dynamic_color,
+        SettingLinkIds.APP_APPEARANCE_SETTINGS_STYLE to R.string.kw_app_appearance_settings_style,
+        SettingLinkIds.APP_APPEARANCE_SETTINGS_FULLSCREEN to R.string.kw_app_appearance_settings_fullscreen,
         SettingLinkIds.MAIN_APP_LANGUAGE to R.string.kw_main_app_language,
         SettingLinkIds.MAIN_CUSTOMIZATION to R.string.kw_main_customization,
         SettingLinkIds.MAIN_ADVANCED to R.string.kw_main_advanced,

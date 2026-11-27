@@ -11,6 +11,25 @@ internal fun Context.settingsActivity(): Activity = when (this) {
     else -> error("Settings must be hosted by an Activity")
 }
 
+/**
+ * Context of a settings page shown in the detail pane of a two-pane layout. Child
+ * pages start from the page shown there, not from the list's Activity.
+ */
+internal class SettingsDetailPaneContext(base: Context, val page: SettingsPage) : ContextWrapper(base)
+
+/** The intent of the page this context shows: the detail pane's page or the hosting Activity's. */
+internal fun Context.settingsPageIntent(): Intent {
+    var current: Context? = this
+    while (current is ContextWrapper) {
+        if (current is SettingsDetailPaneContext) {
+            return Intent(current, SettingsActivity::class.java).putSettingsPage(current.page)
+        }
+        if (current is Activity) break
+        current = current.baseContext
+    }
+    return settingsActivity().intent
+}
+
 private const val EXTRA_PAGE = "rocks.pkb.plektra.SETTINGS_PAGE"
 private const val EXTRA_NAV_KEY = "rocks.pkb.plektra.SETTINGS_NAV_KEY"
 private const val EXTRA_DEVICE_PAGE = "rocks.pkb.plektra.SETTINGS_DEVICE_PAGE"
@@ -52,7 +71,7 @@ internal fun openSettingsPage(context: Context, page: SettingsPage) {
 /** A child is a new platform Activity. Android alone owns the back stack and transitions. */
 internal fun openSettingsChild(context: Context, section: String, page: String) {
     val activity = context.settingsActivity()
-    activity.startActivity(Intent(activity.intent).apply {
+    activity.startActivity(Intent(context.settingsPageIntent()).apply {
         data = null
         flags = 0
         removeExtra(SymCustomizationActivity.EXTRA_SETTING_ID)
@@ -61,4 +80,4 @@ internal fun openSettingsChild(context: Context, section: String, page: String) 
 }
 
 internal fun settingsChild(context: Context, section: String): String? =
-    context.settingsActivity().intent.getStringExtra("settings.child.$section")
+    context.settingsPageIntent().getStringExtra("settings.child.$section")

@@ -11,10 +11,10 @@ Only --reinstall uninstalls the existing app. Restore/reinstall require .env
 replacement keys for all backed-up speech providers: Android Keystore keys cannot
 be restored from app files. Speech import verifies encrypted readback, without
 contacting cloud APIs. Backups contain APKs, credential/device app data and runtime
-permission/IME metadata. Regenerable data is neither backed up nor restored: cache and
-code_cache, and the Direct Boot keyboard snapshot, which the app rebuilds from the
-restored credential-protected data on its next start after unlock. Snapshot files in
-older backups are skipped. Runtime permissions and the keyboard selection are restored
+permission/IME metadata. Archives omit caches, the local Clicks binding installation
+identity and the Direct Boot keyboard snapshot, which the app checks against the restored
+credential-protected data on its next start after unlock. These files in older backups
+are skipped. Runtime permissions and the keyboard selection are restored
 even when the app data check fails, and the failure is reported afterwards.
 """
 import argparse
@@ -38,14 +38,14 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = re.compile(r'rocks\.pkb\.plektra(?:\.unsovereign)?(?:\.nightly)?')
 PROVIDERS = {'OPENAI': 'OPENAI_API_KEY', 'OPENROUTER': 'OPENROUTER_API_KEY'}
 CREDENTIAL_DATA, DEVICE_DATA = 'credential-data.tar', 'device-data.tar'
-# Regenerable members per archive. The Direct Boot snapshot (DirectBootKeyboardConfig) is a
-# projection of credential-protected data; the app replaces and deletes its generations on
-# every start after unlock, so restoring an archived generation cannot be verified reliably.
+CLICKS_INSTALLATION_KEY = 'no_backup/clicks_button_binding_installation'
+# Local or regenerable members per archive. The Direct Boot snapshot (DirectBootKeyboardConfig) is a
+# projection of credential-protected data; the app can publish a new generation as soon as it starts.
 REGENERABLE = {
-    CREDENTIAL_DATA: ('cache', 'code_cache'),
+    CREDENTIAL_DATA: ('cache', 'code_cache', CLICKS_INSTALLATION_KEY),
     DEVICE_DATA: ('cache', 'code_cache', 'files/direct_boot_files', 'shared_prefs/direct_boot_keyboard_config.xml'),
 }
-SNAPSHOT_POINTER = 'files/direct_boot_files/current'
+SNAPSHOT_ROOT = 'files/direct_boot_files'
 
 
 def read_env(path):
@@ -260,11 +260,9 @@ class Device:
         return [(CREDENTIAL_DATA, '.'), (DEVICE_DATA, '/data/user_de/0/' + self.package)]
 
     def app_running(self):
-        """Process ids of the app; ADB exits non-zero when none runs."""
-        try:
-            return self.shell('pidof', self.package)
-        except RuntimeError:
-            return ''
+        """Process IDs, or empty output when the device reports that none is running."""
+        return self.shell('sh', '-c', 'pidof "$1"; result=$?; [ "$result" -eq 1 ] || exit "$result"',
+                          'sh', self.package)
 
     def remote_sha256(self, path):
         """Digest of an app file, or None when it does not exist."""
@@ -283,7 +281,7 @@ class Device:
             if result.returncode:
                 raise RuntimeError('App data restoration failed while writing ' + name)
             if skipped:
-                print(f'Skipped {skipped} regenerable entries of {name}; the app rebuilds them.')
+                print(f'Skipped {skipped} local or regenerable entries of {name}.')
             written += [(name, member if remote == '.' else remote + '/' + member.removeprefix('./'), expected)
                         for member, expected in files]
         for _ in range(attempts):
@@ -308,9 +306,12 @@ class Device:
         speech_payload(values)
         require_replacement_keys(backup / CREDENTIAL_DATA, values)
         failure, unfinished = None, []
+        should_verify_snapshot = metadata['ime'].startswith(self.package + '/')
+        previous_generation = None
         try:
             with self.stopped():
                 try:
+                    self.shell('run-as', self.package, 'rm', '-f', CLICKS_INSTALLATION_KEY)
                     self.restore_data(backup)
                 except RECOVERABLE as error:
                     failure = error
@@ -320,14 +321,20 @@ class Device:
                         self.shell('pm', 'grant', self.package, permission)
                     except RECOVERABLE as error:
                         unfinished.append('runtime permission ' + permission + ': ' + describe(error))
-                if not failure and not unfinished and any(name.endswith('_key') for name in speech_payload(values)):
-                    self.speech(values)
+                if not failure and not unfinished:
+                    if should_verify_snapshot:
+                        try:
+                            previous_generation = self.snapshot_generation()
+                        except RECOVERABLE as error:
+                            unfinished.append('Direct Boot snapshot verification: ' + describe(error))
+                    if any(name.endswith('_key') for name in speech_payload(values)):
+                        self.speech(values)
         except RECOVERABLE as error:
             if failure:
                 unfinished.append('app stop or restart: ' + describe(error))
             else:
                 failure = error
-        if metadata['ime'].startswith(self.package + '/'):
+        if should_verify_snapshot:
             try:
                 self.shell('ime', 'enable', metadata['ime'])
                 self.shell('ime', 'set', metadata['ime'])
@@ -342,21 +349,30 @@ class Device:
         if unfinished:
             raise RuntimeError('App data restored, but ' + str(len(unfinished)) + ' finishing step(s) failed')
         print('App data hashes, runtime permissions and keyboard selection restored.')
-        if metadata['ime'].startswith(self.package + '/'):
-            self.await_snapshot()
+        if should_verify_snapshot:
+            self.await_snapshot(previous_generation)
 
-    def await_snapshot(self, attempts=20, delay=0.5):
-        """Reports whether the selected keyboard rebuilt the Direct Boot snapshot."""
-        pointer = '/data/user_de/0/' + self.package + '/' + SNAPSHOT_POINTER
+    def snapshot_generation(self):
+        root = '/data/user_de/0/' + self.package + '/' + SNAPSHOT_ROOT
+        generation = self.shell('run-as', self.package, 'sh', '-c',
+                                'if [ -f "$1" ]; then cat "$1"; fi', 'sh', root + '/current')
+        if re.fullmatch(r'generation-[0-9a-f-]{36}', generation):
+            return generation
+        return None
+
+    def await_snapshot(self, previous_generation, attempts=20, delay=0.5):
+        """Reports a generation published after the restored files were verified."""
+        root = '/data/user_de/0/' + self.package + '/' + SNAPSHOT_ROOT
         for _ in range(attempts):
-            generation = self.shell('run-as', self.package, 'sh', '-c', 'cat "$1" 2>/dev/null || true', 'sh', pointer)
-            if re.fullmatch(r'generation-[0-9a-f-]{36}', generation) and self.remote_sha256(
-                    pointer.removesuffix('current') + generation + '/settings.json'):
+            generation = self.snapshot_generation()
+            if (generation and generation != previous_generation and
+                    self.remote_sha256(root + '/' + generation + '/settings.json')):
                 print('Direct Boot keyboard snapshot rebuilt.')
                 return True
             time.sleep(delay)
-        print('Warning: the Direct Boot keyboard snapshot has not been rebuilt yet. Before the next unlock, '
-              'the keyboard uses its previous or default settings until Plektra runs once after unlock.', file=sys.stderr)
+        print('Warning: no new Direct Boot keyboard snapshot was verified. Plektra may reuse a matching '
+              'snapshot after checking the restored data. Open Plektra after unlock to let it check the snapshot.',
+              file=sys.stderr)
         return False
 
     def install(self, apk, backup, values, reinstall=False):

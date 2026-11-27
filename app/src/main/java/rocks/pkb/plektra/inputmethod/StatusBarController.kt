@@ -3454,11 +3454,29 @@ class StatusBarController(
         val suggestionsEnabledSetting = barPresentation.suggestions
         val sharedDynamicVariations = !SettingsManager.isStaticVariationBarModeEnabled(context) &&
             !snapshot.shouldDisableVariations && snapshot.variations.isNotEmpty()
-        val sharedVariations = if (sharedRow && barPresentation.actions && !expansionActive) {
-            if (sharedDynamicVariations) snapshot.variations
-            else if (!suggestionsAvailable) variationBarView?.resolveStaticVariations(snapshot).orEmpty()
-            else emptyList()
-        } else emptyList()
+        // Sized like the separate variations row: static lists in full, dynamic ones by the
+        // configured slot count.
+        val dynamicSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
+        val sharedContent = if (sharedRow && barPresentation.actions && !expansionActive) {
+            SharedRowPriority.select(
+                suggestionsAvailable = suggestionsAvailable,
+                dynamicVariationsAvailable = sharedDynamicVariations,
+                variationsFirst = SettingsManager.getSharedRowVariationsFirst(context)
+            )
+        } else null
+        val sharedDynamicShown = sharedContent == SharedRowContent.DYNAMIC_VARIATIONS
+        val sharedVariations = when (sharedContent) {
+            SharedRowContent.DYNAMIC_VARIATIONS -> snapshot.variations.take(dynamicSlotCount)
+            SharedRowContent.STATIC_VARIATIONS -> variationBarView?.resolveStaticVariations(snapshot).orEmpty()
+            SharedRowContent.SUGGESTIONS, null -> emptyList()
+        }
+        val sharedVariationSlots = sharedVariations.takeIf { it.isNotEmpty() }?.let {
+            rocks.pkb.plektra.inputmethod.suggestions.ui.VariationSlots(
+                slotCount = if (sharedDynamicShown && !SettingsManager.getDynamicVariationBarResizeToContent(context))
+                    dynamicSlotCount else it.size,
+                dynamic = sharedDynamicShown
+            )
+        }
         val rowContent = when {
             expansionActive -> expansionSuggestions
             sharedVariations.isNotEmpty() -> sharedVariations
@@ -3495,7 +3513,7 @@ class StatusBarController(
             when {
                 expansionActive -> { _, suggestion -> onExpansionSuggestionSelected?.invoke(suggestion) }
                 sharedVariations.isNotEmpty() -> { _, variation ->
-                    val click = if (sharedDynamicVariations)
+                    val click = if (sharedDynamicShown)
                         VariationButtonHandler.createVariationClickListener(variation, inputConnection, context, onVariationSelectedListener)
                     else VariationButtonHandler.createStaticVariationClickListener(variation, inputConnection, context, onVariationSelectedListener)
                     click.onClick(fullSuggestionsBar?.ensureView())
@@ -3505,7 +3523,8 @@ class StatusBarController(
             reserveEmptyRow = isFullSoftwareKeyboardMode && suggestionsEnabledSetting,
             displayOnly = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty(),
             continuousPreview = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty() &&
-                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context)
+                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context),
+            variations = sharedVariationSlots
         )
         ledStatusView.compactOnly = fullSuggestionsBar?.ensureView()?.visibility != View.VISIBLE && !barPresentation.actions && !hasTransientSurface
         val ledOnly = ledStatusView.compactOnly && showLedStrip

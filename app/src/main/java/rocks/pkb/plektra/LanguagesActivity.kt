@@ -13,7 +13,7 @@ class LanguagesActivity : LocalizedComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PlektraTheme {
+            PlektraTheme(settingsWindow = true) {
                 LanguagesScreen(
                     modifier = Modifier.fillMaxSize()
                 )

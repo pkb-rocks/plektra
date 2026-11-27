@@ -102,41 +102,15 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars),
-                tonalElevation = 1.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_content_description)
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.virtual_keyboard_behaviour_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
+            PlektraSettingsHeader(title = stringResource(R.string.virtual_keyboard_behaviour_title), onBack = onBack)
         }
     ) { paddingValues ->
-        Column(
+        SettingsSectionScrollColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
-            VirtualKeyboardSectionTitle(stringResource(R.string.on_screen_keyboard_section_layout))
+            SettingsSectionDivider(stringResource(R.string.on_screen_keyboard_section_layout))
             fun ctrlDisplayLabel(value: SettingsManager.SoftwareCtrlShortcutDisplay) = context.getString(when (value) {
                 SettingsManager.SoftwareCtrlShortcutDisplay.ICONS_WITH_LETTERS -> R.string.software_ctrl_shortcut_icons_letters
                 SettingsManager.SoftwareCtrlShortcutDisplay.ICONS_WITH_CORNER_LETTERS -> R.string.software_ctrl_shortcut_icons_corner_letters
@@ -325,7 +299,7 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
                 )
             }
 
-            VirtualKeyboardSectionTitle(stringResource(R.string.on_screen_keyboard_section_touch))
+            SettingsSectionDivider(stringResource(R.string.on_screen_keyboard_section_touch))
 
             ModifierTapLatchRow(
                 title = stringResource(R.string.software_keyboard_nearest_key_touch_title),
@@ -363,7 +337,7 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
                 )
             }
 
-            VirtualKeyboardSectionTitle(stringResource(R.string.on_screen_keyboard_section_appearance))
+            SettingsSectionDivider(stringResource(R.string.on_screen_keyboard_section_appearance))
             ModifierTapLatchRow(
                 title = stringResource(R.string.software_keyboard_key_hints_title),
                 linkId = "on_screen.key_hints",
@@ -375,38 +349,15 @@ internal fun VirtualKeyboardBehaviorSettingsScreen(
                     SettingsManager.setSoftwareKeyboardKeyHintsEnabled(context, enabled)
                 }
             )
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(74.dp)
-                    .settingRow("on_screen.theme", onOpenKeyboardTheme)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(Icons.Filled.Keyboard, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.software_keyboard_theme_link_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                        Text(stringResource(R.string.software_keyboard_theme_link_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+            SettingsNavigationRow(
+                title = stringResource(R.string.software_keyboard_theme_link_title),
+                description = stringResource(R.string.software_keyboard_theme_link_description),
+                icon = Icons.Filled.Keyboard,
+                linkId = "on_screen.theme",
+                onClick = onOpenKeyboardTheme
+            )
         }
     }
-}
-
-@Composable
-private fun VirtualKeyboardSectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-    )
 }
 
 @Composable

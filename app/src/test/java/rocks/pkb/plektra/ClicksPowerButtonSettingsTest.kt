@@ -122,6 +122,19 @@ class ClicksPowerButtonSettingsTest {
     }
 
     @Test
+    fun legacyPendingMarkerWithoutAnInstallationIsTreatedAsApplied() {
+        SettingsManager.getPreferences(context).edit()
+            .putString("clicks_keyboard_button_binding_choice", "alt_native")
+            .putString("clicks_keyboard_button_binding_output", "0000")
+            .putString("clicks_keyboard_button_binding_pending_output", "0000")
+            .commit()
+
+        val binding = requireNotNull(SettingsManager.getClicksDesiredButtonBinding(context, ClicksButtonBindingTarget.KEYBOARD))
+        assertEquals("alt_native", binding.choiceId)
+        assertFalse(binding.pending)
+    }
+
+    @Test
     fun pendingMarkerIsClearedOnlyForTheAppliedOutput() {
         val target = ClicksButtonBindingTarget.KEYBOARD
         val alt = ClicksPowerKeyboardProtocol.leftAltRemapOutput()

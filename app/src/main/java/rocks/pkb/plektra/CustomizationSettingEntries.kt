@@ -8,13 +8,15 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("keyboard_bar.suggestions_bold", R.string.suggestions_bold_title,
         summaryRes = R.string.suggestions_bold_summary, route = SettingRoute(
             destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons")),
-    SettingEntry("keyboard_bar.hide_ime_caption_bar", R.string.keyboard_bar_hide_ime_caption_bar,
+    SettingEntry(SettingLinkIds.KEYBOARD_BAR_HIDE_IME_CAPTION, R.string.keyboard_bar_hide_ime_caption_bar,
         summaryRes = R.string.keyboard_bar_hide_ime_caption_bar_description, route = SettingRoute(
-            destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons")),
+            destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons"),
+        availabilityCheck = { ImeCaptionBarSettings.canControlCaptionBar() },
+        unavailableFallbackId = SettingLinkIds.KEYBOARD_BAR_SYSTEM_CONTROLS),
     SettingEntry("keyboard_bar.ime_switcher_in_bar", R.string.keyboard_bar_ime_switcher_in_bar,
         summaryRes = R.string.keyboard_bar_ime_switcher_in_bar_description, route = SettingRoute(
             destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons")),
-    SettingEntry(id = "keyboard_bar.system_controls", titleRes = R.string.keyboard_bar_system_controls,
+    SettingEntry(id = SettingLinkIds.KEYBOARD_BAR_SYSTEM_CONTROLS, titleRes = R.string.keyboard_bar_system_controls,
         route = SettingRoute(destination = SettingsDestination.Customization,
             customizationDestination = "status_bar_buttons")),
     SettingEntry(id = "keyboard_bar.geometry", titleRes = R.string.keyboard_bar_geometry,

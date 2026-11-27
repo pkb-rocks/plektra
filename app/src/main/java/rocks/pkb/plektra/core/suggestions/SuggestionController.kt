@@ -142,6 +142,7 @@ class SuggestionController(
         if (!preserveInputContext) {
             previousCompletedWord = null
             sentenceStartPending = true
+            neutralSentenceStart = false
             tracker.reset()
         }
         pendingAddUserWord = null
@@ -178,6 +179,7 @@ class SuggestionController(
     @Volatile private var pendingExtraRefreshAfterLoad: Boolean = false
     private val suggestionGeneration = AtomicInteger(0)
     private var sentenceStartPending: Boolean = true
+    private var neutralSentenceStart = false
 
     private data class PublishedSuggestionsSnapshot(
         val suggestions: List<SuggestionResult>,
@@ -440,6 +442,7 @@ class SuggestionController(
         if (normalizedText.isNotEmpty() && normalizedText.any { it.isLetterOrDigit() }) {
             autoReplaceController.clearRejectedWords()
             pendingAddUserWord = null
+            neutralSentenceStart = false
         }
         
         tracker.onCharacterCommitted(normalizedText)
@@ -493,14 +496,14 @@ class SuggestionController(
         } else {
             pendingAddUserWord = null
         }
-        handleCompletedWordBoundary(completedWord, boundaryChar)
+        handleCompletedWordBoundary(completedWord, boundaryChar, inputConnection)
         return result
     }
 
     /**
      * Reads the word at cursor immediately without debounce.
      * Use this when entering a text field to show suggestions right away.
-     * If dictionary is not ready yet, does nothing - normal typing/cursor flow will handle it.
+     * If the dictionary is still loading, reads the latest context once it is ready.
      */
     fun readInitialContext(inputConnection: InputConnection?) {
         if (!isEnabled()) return
@@ -510,14 +513,19 @@ class SuggestionController(
             ensureDictionaryLoaded(refreshAfterLoad = true)
             return
         }
-        
+        publishInitialContext(inputConnection)
+    }
+
+    private fun publishInitialContext(inputConnection: InputConnection): Boolean {
         val word = extractWordAtCursor(inputConnection)
         if (!word.isNullOrBlank()) {
             tracker.setWord(word)
         } else if (previousCompletedWord == null) {
-            if (!settingsProvider().personalizationEnabled) updateSentenceStart(inputConnection)
-            publishSentenceStartPredictionsOrStarter()
+            publishSentenceStartPredictionsOrStarter(inputConnection)
+        } else {
+            return false
         }
+        return true
     }
 
     fun onCursorMoved(inputConnection: InputConnection?) {
@@ -525,9 +533,11 @@ class SuggestionController(
         ensureDictionaryLoaded()
         cursorRunnable?.let { cursorHandler.removeCallbacks(it) }
         if (inputConnection == null) {
+            pendingInitialContextConnection = null
             tracker.reset()
             previousCompletedWord = null
             sentenceStartPending = true
+            neutralSentenceStart = false
             publishEmptySuggestions()
             return
         }
@@ -536,6 +546,8 @@ class SuggestionController(
             if (!dictionaryRepository.isReady) {
                 tracker.reset()
                 previousCompletedWord = null
+                pendingInitialContextConnection = inputConnection
+                ensureDictionaryLoaded(refreshAfterLoad = true)
                 publishEmptySuggestions()
                 return@Runnable
             }
@@ -550,10 +562,8 @@ class SuggestionController(
                     publishNextWordPredictions(previous)
                 } else {
                     previousCompletedWord = null
-                    // Without personalization no previous word is kept; the text tells where the cursor is.
-                    sentenceStartPending = settingsProvider().personalizationEnabled ||
-                        (sentenceStartAt(inputConnection) ?: true)
-                    publishSentenceStartPredictionsOrStarter()
+                    sentenceStartPending = true
+                    publishSentenceStartPredictionsOrStarter(inputConnection)
                 }
             }
         }
@@ -569,6 +579,7 @@ class SuggestionController(
         pendingAddUserWord = null
         previousCompletedWord = null
         sentenceStartPending = true
+        neutralSentenceStart = false
         publishEmptySuggestions()
     }
 
@@ -577,6 +588,7 @@ class SuggestionController(
         tracker.onContextChanged()
         previousCompletedWord = null
         sentenceStartPending = true
+        neutralSentenceStart = false
     }
 
     fun addUserWord(word: String) {
@@ -771,6 +783,7 @@ class SuggestionController(
                 latestSuggestions.set(emptyList())
             }
         }
+        ensureDictionaryLoaded(refreshAfterLoad = true)
         val activeWord = tracker.currentWord.takeIf { it.isNotBlank() }
             ?: extractWordAtCursor(inputConnection)?.takeIf { it.isNotBlank() }
         if (activeWord != null) {
@@ -784,8 +797,7 @@ class SuggestionController(
         } else {
             pendingAddUserWord = null
             if (!settings.personalizationEnabled) {
-                updateSentenceStart(inputConnection)
-                publishSentenceStartPredictionsOrStarter()
+                publishSentenceStartPredictionsOrStarter(inputConnection)
             } else if (previousCompletedWord != null) {
                 publishNextWordPredictions(previousCompletedWord!!)
             } else if (dictionaryRepository.isReady) {
@@ -812,7 +824,11 @@ class SuggestionController(
         nextWordPredictor.destroy()
     }
 
-    private fun handleCompletedWordBoundary(completedWord: String?, boundaryChar: Char?) {
+    private fun handleCompletedWordBoundary(
+        completedWord: String?,
+        boundaryChar: Char?,
+        inputConnection: InputConnection?
+    ) {
         val settings = settingsProvider()
         if (!isEnabled() || !settings.suggestionsEnabled || !isStorageAvailable()) {
             previousCompletedWord = null
@@ -822,9 +838,15 @@ class SuggestionController(
 
         if (!settings.personalizationEnabled) {
             previousCompletedWord = null
-            // Only a confirmed sentence end starts a new sentence; "/", "(" or quotes stay within it.
-            sentenceStartPending = isSentenceEnd(boundaryChar)
-            if (sentenceStartPending) publishNeutralStarterSuggestions(suggestionGeneration.get()) else publishEmptySuggestions()
+            neutralSentenceStart = when {
+                isSentenceEnd(boundaryChar) -> true
+                isSentencePadding(boundaryChar) -> completedWord.isNullOrBlank() &&
+                    (sentenceStartAt(inputConnection) ?: neutralSentenceStart)
+                else -> false
+            }
+            sentenceStartPending = neutralSentenceStart
+            if (neutralSentenceStart && settings.starterWordsEnabled) ensureDictionaryLoaded(refreshAfterLoad = true)
+            publishSentenceStartPredictionsOrStarter()
             return
         }
 
@@ -884,7 +906,7 @@ class SuggestionController(
         }
     }
 
-    private fun publishSentenceStartPredictionsOrStarter() {
+    private fun publishSentenceStartPredictionsOrStarter(inputConnection: InputConnection? = null) {
         val generation = suggestionGeneration.get()
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled) {
@@ -892,8 +914,11 @@ class SuggestionController(
             return
         }
         if (!settings.personalizationEnabled) {
-            // Start words belong to an empty field or a new sentence, not after a word within one.
-            if (sentenceStartPending) publishNeutralStarterSuggestions(generation) else publishEmptySuggestions()
+            if (inputConnection != null) {
+                neutralSentenceStart = sentenceStartAt(inputConnection) == true
+                sentenceStartPending = neutralSentenceStart
+            }
+            if (neutralSentenceStart) publishNeutralStarterSuggestions(generation) else publishEmptySuggestions()
             return
         }
         val primary = nextWordPredictor.predictSentenceStart(currentLocale, settings.maxSuggestions)
@@ -1095,15 +1120,13 @@ class SuggestionController(
         } catch (_: Exception) {
             null
         } ?: return null
-        val last = before.trimEnd { it == ' ' || it == '\t' || it == '\u00A0' }.lastOrNull() ?: return true
-        return isSentenceEnd(last)
+        val last = before.trimEnd(::isSentencePadding).lastOrNull()
+        return if (last == null) before.length < SENTENCE_CONTEXT_CHARS else isSentenceEnd(last)
     }
 
     private fun isSentenceEnd(char: Char?): Boolean = char != null && char in SENTENCE_ENDS
 
-    private fun updateSentenceStart(inputConnection: InputConnection?) {
-        sentenceStartAt(inputConnection)?.let { sentenceStartPending = it }
-    }
+    private fun isSentencePadding(char: Char?): Boolean = char == ' ' || char == '\t' || char == '\u00A0'
 
     private fun lastCharBeforeCursor(inputConnection: InputConnection?): Char? {
         return try {
@@ -1219,15 +1242,7 @@ class SuggestionController(
 
         pendingInitialContextConnection?.let { inputConnection ->
             pendingInitialContextConnection = null
-            val word = extractWordAtCursor(inputConnection)
-            if (!word.isNullOrBlank()) {
-                tracker.setWord(word)
-                return
-            }
-            if (previousCompletedWord == null) {
-                publishSentenceStartPredictionsOrStarter()
-                return
-            }
+            if (publishInitialContext(inputConnection)) return
         }
 
         val word = tracker.currentWord

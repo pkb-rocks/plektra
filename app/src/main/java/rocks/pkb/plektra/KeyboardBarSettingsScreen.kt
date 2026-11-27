@@ -1,6 +1,5 @@
 package rocks.pkb.plektra
 
-import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -234,7 +233,10 @@ internal fun KeyboardBarSettingsScreen(
             }
             KeyboardTextScaleSettingsCard()
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_layout_section))
-            KeyboardBarArrangementField(arrangement, displayedSuggestions && displayedActions) {
+            // Slim always combines its rows (KeyboardBarConfiguration.presentation).
+            KeyboardBarArrangementField(if (editingSlim) KeyboardBarArrangement.SHARED else arrangement,
+                !editingSlim && displayedSuggestions && displayedActions,
+                showBehavior = displayedSuggestions && displayedActions) {
                 arrangement = it
                 KeyboardBarConfiguration.setArrangement(context, it)
             }
@@ -248,9 +250,9 @@ internal fun KeyboardBarSettingsScreen(
                 stringResource(R.string.keyboard_bar_variations_summary), "keyboard_bar.variations") {
                 openSettingsChild(context, "customization", "KeyboardBarVariations")
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (ImeCaptionBarSettings.canControlCaptionBar()) {
                 KeyboardBarCheckRow(stringResource(R.string.keyboard_bar_hide_ime_caption_bar), hideImeCaptionBar,
-                    "keyboard_bar.hide_ime_caption_bar", stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
+                    SettingLinkIds.KEYBOARD_BAR_HIDE_IME_CAPTION, stringResource(R.string.keyboard_bar_hide_ime_caption_bar_description)) {
                     hideImeCaptionBar = it
                     SettingsManager.setHideImeCaptionBar(context, it)
                 }
@@ -261,7 +263,7 @@ internal fun KeyboardBarSettingsScreen(
                 SettingsManager.setImeSwitcherInBar(context, it)
             }
             KeyboardBarNavigationRow(Icons.Filled.Tune, stringResource(R.string.keyboard_bar_system_controls),
-                stringResource(R.string.keyboard_bar_system_controls_description), "keyboard_bar.system_controls") {
+                stringResource(R.string.keyboard_bar_system_controls_description), SettingLinkIds.KEYBOARD_BAR_SYSTEM_CONTROLS) {
                 ImeCaptionBarSettings.open(context)
             }
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_visibility_section))
@@ -462,7 +464,8 @@ internal fun KeyboardBarSettingsScreen(
 
 }
 @Composable
-private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, onChange: (KeyboardBarArrangement) -> Unit) {
+private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, showBehavior: Boolean = enabled,
+    onChange: (KeyboardBarArrangement) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     fun label(choice: KeyboardBarArrangement) = when (choice) {
         KeyboardBarArrangement.SUGGESTIONS_FIRST -> R.string.keyboard_bar_suggestions_first
@@ -476,7 +479,7 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
             colors = ListItemDefaults.colors(headlineColor = if (enabled) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)))
-        if (enabled && value == KeyboardBarArrangement.SHARED) {
+        if (showBehavior && value == KeyboardBarArrangement.SHARED) {
             Text(stringResource(R.string.keyboard_bar_shared_behavior), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

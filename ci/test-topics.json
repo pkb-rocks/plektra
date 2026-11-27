@@ -79,6 +79,7 @@
       "rocks.pkb.plektra.KeyboardThemeModelTest",
       "rocks.pkb.plektra.KeyboardThemeTextureTest",
       "rocks.pkb.plektra.MainBackgroundTest",
+      "rocks.pkb.plektra.MainKeyboardEventFlowTest",
       "rocks.pkb.plektra.MainStatusBarScrollTest",
       "rocks.pkb.plektra.NavModeKeyMappingDialogTest",
       "rocks.pkb.plektra.NotesAppearanceTest",

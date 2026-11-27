@@ -3454,11 +3454,21 @@ class StatusBarController(
         val suggestionsEnabledSetting = barPresentation.suggestions
         val sharedDynamicVariations = !SettingsManager.isStaticVariationBarModeEnabled(context) &&
             !snapshot.shouldDisableVariations && snapshot.variations.isNotEmpty()
+        // Sized like the separate variations row: static lists in full, dynamic ones by the
+        // configured slot count.
+        val dynamicSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
         val sharedVariations = if (sharedRow && barPresentation.actions && !expansionActive) {
-            if (sharedDynamicVariations) snapshot.variations
+            if (sharedDynamicVariations) snapshot.variations.take(dynamicSlotCount)
             else if (!suggestionsAvailable) variationBarView?.resolveStaticVariations(snapshot).orEmpty()
             else emptyList()
         } else emptyList()
+        val sharedVariationSlots = sharedVariations.takeIf { it.isNotEmpty() }?.let {
+            rocks.pkb.plektra.inputmethod.suggestions.ui.VariationSlots(
+                slotCount = if (sharedDynamicVariations && !SettingsManager.getDynamicVariationBarResizeToContent(context))
+                    dynamicSlotCount else it.size,
+                dynamic = sharedDynamicVariations
+            )
+        }
         val rowContent = when {
             expansionActive -> expansionSuggestions
             sharedVariations.isNotEmpty() -> sharedVariations
@@ -3505,7 +3515,8 @@ class StatusBarController(
             reserveEmptyRow = isFullSoftwareKeyboardMode && suggestionsEnabledSetting,
             displayOnly = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty(),
             continuousPreview = snapshot.speechPreviewActive && !expansionActive && sharedVariations.isEmpty() &&
-                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context)
+                rocks.pkb.plektra.inputmethod.speech.SpeechSettings.continuousPreview(context),
+            variations = sharedVariationSlots
         )
         ledStatusView.compactOnly = fullSuggestionsBar?.ensureView()?.visibility != View.VISIBLE && !barPresentation.actions && !hasTransientSurface
         val ledOnly = ledStatusView.compactOnly && showLedStrip

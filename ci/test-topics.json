@@ -63,7 +63,9 @@
       "rocks.pkb.plektra.clipboard.ClipboardHistoryPrivacyTest",
       "rocks.pkb.plektra.clipboard.ClipboardHistoryTest",
       "rocks.pkb.plektra.clipboard.ClipboardUnreadableClipTest",
-      "rocks.pkb.plektra.share.ShareContentTest"
+      "rocks.pkb.plektra.share.ShareContentTest",
+      "rocks.pkb.plektra.share.ShareImageVerificationTest",
+      "rocks.pkb.plektra.share.ShareReviewRegressionTest"
     ],
     "ui-settings": [
       "rocks.pkb.plektra.AccessibilitySettingsLauncherTest",
@@ -86,6 +88,7 @@
       "rocks.pkb.plektra.SettingLinkCoverageTest",
       "rocks.pkb.plektra.SettingLinkRegistryTest",
       "rocks.pkb.plektra.SettingsManagerKeyboardThemeAssignmentTest",
+      "rocks.pkb.plektra.ShareDestinationSettingsThreadTest",
       "rocks.pkb.plektra.TextInputSettingsScreenTest",
       "rocks.pkb.plektra.ThemePhotoPickerRecreationTest",
       "rocks.pkb.plektra.ThemeTextureRenderingTest",

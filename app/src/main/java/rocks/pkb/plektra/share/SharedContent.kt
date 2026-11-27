@@ -108,7 +108,10 @@ internal object ShareIntentParser {
      */
     fun isReadableForeignContentUri(context: Context, uri: Uri): Boolean {
         if (uri.scheme != ContentResolver.SCHEME_CONTENT) return false
-        val authority = uri.authority?.takeIf { it.isNotBlank() } ?: return false
+        // ContentResolver drops a "<userId>@" prefix before it opens the provider; Android 13's
+        // PackageManager does not. Both checks must see the authority the resolver will use.
+        // The prefix itself stays allowed: shares from a work profile use it legitimately.
+        val authority = uri.authority?.let(::authorityWithoutUserId)?.takeIf { it.isNotBlank() } ?: return false
         val ownPackage = context.packageName
         if (authority.split(';').any { it == ownPackage || it.startsWith("$ownPackage.") }) return false
         val owner = runCatching {
@@ -116,6 +119,9 @@ internal object ShareIntentParser {
         }.getOrNull()
         return owner != ownPackage
     }
+
+    /** Mirrors `ContentProvider.getAuthorityWithoutUserId`. */
+    fun authorityWithoutUserId(authority: String): String = authority.substring(authority.lastIndexOf('@') + 1)
 
     private fun describeStream(
         resolver: ContentResolver,

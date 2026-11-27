@@ -106,9 +106,9 @@ internal object ShareOperations {
         output.flush()
     }
 
-    /** Copies [item] to [target]; source failures and write failures stay distinguishable. */
-    private suspend fun writeItem(resolver: ContentResolver, item: SharedItem, target: Uri) {
-        openSource(resolver, item).use { input ->
+    /** Copies the stream from [openInput] to [target]; source and write failures stay distinguishable. */
+    private suspend fun writeTo(resolver: ContentResolver, openInput: () -> InputStream, target: Uri) {
+        openInput().use { input ->
             val output = try {
                 resolver.openOutputStream(target, "w")
             } catch (e: FileNotFoundException) {
@@ -150,14 +150,26 @@ internal object ShareOperations {
     }
 
     /**
+     * Records a freshly created target before any byte is written, so a target abandoned by a
+     * killed process can still be removed later (see [ShareTargetJournal.recover]).
+     */
+    private fun journal(context: Context, kind: ShareTargetJournal.Kind, target: Uri): ShareTargetJournal.Entry =
+        try {
+            ShareTargetJournal.begin(context, kind, target)
+        } catch (e: IOException) {
+            ShareTargetJournal.deleteTarget(context, kind, target)
+            throw ShareOperationException(ShareFailure.WriteFailed, e)
+        }
+
+    /**
      * Writes a MediaStore row as pending and publishes it only after every byte arrived, so other
-     * apps never see a partial file. Failed or cancelled rows are deleted.
+     * apps never see a partial file. Failed or cancelled rows are deleted, now or on recovery.
      */
     private suspend fun insertIntoMediaStore(
         context: Context,
         collection: Uri,
         relativePath: String,
-        item: SharedItem,
+        openInput: () -> InputStream,
         name: String,
         mimeType: String
     ): String {
@@ -170,16 +182,18 @@ internal object ShareOperations {
         }
         val row = guarded { resolver.insert(collection, values) }
             ?: throw ShareOperationException(ShareFailure.WriteFailed)
+        val entry = journal(context, ShareTargetJournal.Kind.MediaStore, row)
         var published = false
         try {
-            guarded { writeItem(resolver, item, row) }
+            guarded { writeTo(resolver, openInput, row) }
             guarded {
                 resolver.update(row, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
             }
             published = true
+            ShareTargetJournal.complete(context, entry)
             return displayNameOf(resolver, row, name)
         } finally {
-            if (!published) runCatching { resolver.delete(row, null, null) }
+            if (!published) ShareTargetJournal.discard(context, entry)
         }
     }
 
@@ -189,7 +203,7 @@ internal object ShareOperations {
             context,
             MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
             Environment.DIRECTORY_DOWNLOADS + "/",
-            item,
+            { openSource(context.contentResolver, item) },
             name,
             mimeOf(item)
         )
@@ -220,37 +234,67 @@ internal object ShareOperations {
             } catch (e: IllegalStateException) {
                 throw ShareOperationException(ShareFailure.FolderUnavailable, e)
             } ?: throw ShareOperationException(ShareFailure.FolderUnavailable)
+            val entry = journal(context, ShareTargetJournal.Kind.Document, document)
             var complete = false
             try {
-                guarded { writeItem(resolver, item, document) }
+                guarded { writeTo(resolver, { openSource(resolver, item) }, document) }
                 complete = true
+                ShareTargetJournal.complete(context, entry)
             } finally {
-                if (!complete) runCatching { DocumentsContract.deleteDocument(resolver, document) }
+                if (!complete) ShareTargetJournal.discard(context, entry)
             }
             ShareItemResult.Saved(displayNameOf(resolver, document, name), folderLabel)
         }
 
-    /** The decoded format, or null when Android cannot decode [item] as a picture. */
-    private suspend fun decodedImageType(context: Context, item: SharedItem.Stream): String? {
-        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        guarded { openSource(context.contentResolver, item).use { BitmapFactory.decodeStream(it, null, options) } }
-        return options.outMimeType?.let(ShareMimeTypes::normalize)
-            ?.takeIf { it.startsWith("image/") && options.outWidth > 0 && options.outHeight > 0 }
+    /** Largest edge of the bitmap decoded to prove a picture is readable; bounds its memory. */
+    private const val VERIFY_MAX_EDGE = 2048
+
+    /**
+     * The format of [file] when Android can decode its pixels, otherwise null. Bounds alone only
+     * prove a valid header, so the picture is decoded for real, subsampled to limit memory.
+     */
+    internal fun decodableImageType(file: File): String? {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.path, bounds)
+        val mimeType = bounds.outMimeType?.let(ShareMimeTypes::normalize)
+            ?.takeIf { it.startsWith("image/") && bounds.outWidth > 0 && bounds.outHeight > 0 }
+            ?: return null
+        var sampleSize = 1
+        while (maxOf(bounds.outWidth, bounds.outHeight) / sampleSize > VERIFY_MAX_EDGE) sampleSize *= 2
+        val bitmap = BitmapFactory.decodeFile(file.path, BitmapFactory.Options().apply { inSampleSize = sampleSize })
+            ?: return null
+        bitmap.recycle()
+        return mimeType
     }
 
     suspend fun saveToGallery(context: Context, item: SharedItem): ShareItemResult = runOperation {
         if (item !is SharedItem.Stream || !item.isImage) throw ShareOperationException(ShareFailure.NotAnImage)
-        val mimeType = decodedImageType(context, item) ?: throw ShareOperationException(ShareFailure.NotAnImage)
-        val relativePath = ShareSettings.galleryRelativePath(context)
-        val finalName = insertIntoMediaStore(
-            context,
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-            relativePath,
-            item,
-            ShareFileNames.sanitize(item.displayName, mimeType, context.getString(R.string.share_image_fallback_name)),
-            mimeType
-        )
-        ShareItemResult.Saved(finalName, relativePath.trimEnd('/'))
+        // The verified bytes are the ones published: a second read of the sender's URI could differ.
+        val staged = guarded { ShareStaging.newFile(context) }
+        try {
+            guarded {
+                openSource(context.contentResolver, item).use { input ->
+                    staged.outputStream().use { output -> copyStream(input, output) }
+                }
+            }
+            val mimeType = try {
+                decodableImageType(staged)
+            } catch (e: OutOfMemoryError) {
+                throw ShareOperationException(ShareFailure.WriteFailed, e)
+            } ?: throw ShareOperationException(ShareFailure.NotAnImage)
+            val relativePath = ShareSettings.galleryRelativePath(context)
+            val finalName = insertIntoMediaStore(
+                context,
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                relativePath,
+                { staged.inputStream() },
+                ShareFileNames.sanitize(item.displayName, mimeType, context.getString(R.string.share_image_fallback_name)),
+                mimeType
+            )
+            ShareItemResult.Saved(finalName, relativePath.trimEnd('/'))
+        } finally {
+            ShareStaging.release(staged)
+        }
     }
 
     suspend fun copyToClipboard(context: Context, item: SharedItem): ShareItemResult = runOperation {
@@ -264,13 +308,12 @@ internal object ShareOperations {
                 }
                 val clip = item.html?.let { ClipData.newHtmlText(label, item.text, it) }
                     ?: ClipData.newPlainText(label, item.text)
-                setClip(clipboard, clip)
-                ShareClipboardCache.prune(context, clip)
+                ShareClipboardCache.place(context, null) { setClip(clipboard, clip); clip }
                 ShareItemResult.Copied
             }
             is SharedItem.Stream -> {
-                val file = guarded { ShareClipboardCache.newFile(context, suggestedName(context, item)) }
-                var handedOver = false
+                val file = guarded { ShareClipboardCache.newCopy(context, suggestedName(context, item), item.mimeType) }
+                var placed = false
                 try {
                     guarded {
                         openSource(context.contentResolver, item).use { input ->
@@ -280,12 +323,12 @@ internal object ShareOperations {
                     val uri = FileProvider.getUriForFile(context, ShareClipboardCache.authority(context), file)
                     // Readers get a temporary grant from the clipboard service until the clip changes.
                     val clip = ClipData(ClipDescription(label, arrayOf(item.mimeType)), ClipData.Item(uri))
-                    setClip(clipboard, clip)
-                    handedOver = true
-                    ShareClipboardCache.prune(context, clip)
+                    ShareClipboardCache.place(context, file) { setClip(clipboard, clip); clip }
+                    placed = true
+                    ShareCleanupWorker.schedule(context)
                     ShareItemResult.Copied
                 } finally {
-                    if (!handedOver) file.parentFile?.deleteRecursively()
+                    if (!placed) ShareClipboardCache.release(file)
                 }
             }
         }
@@ -307,45 +350,145 @@ internal object ShareOperations {
 }
 
 /**
- * Private copies that back file clips. Each copy lives in its own directory so names never
- * collide. Copies no longer referenced by the primary clip are removed when Plektra places
- * the next clip and whenever the keyboard observes a clipboard change.
+ * Private copies that back file clips. Each copy lives in its own directory with a sidecar that
+ * holds its MIME type, so names never collide and [PlektraFileProvider] reports the type the clip
+ * announces. A copy is deleted as soon as Plektra knows the clipboard no longer references it, and
+ * in any case after [MAX_AGE_MILLIS]. Copies still being written are registered and never pruned.
  */
 internal object ShareClipboardCache {
     private const val DIRECTORY = "share-clipboard"
+    private const val MIME_SIDECAR = ".mime"
+    const val MAX_AGE_MILLIS = 24L * 60 * 60 * 1000
 
-    /** Copies younger than this survive a prune so one that is just being placed is kept. */
-    private const val GRACE_MILLIS = 60_000L
+    private val uuidPattern = Regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+
+    /** Guards the copy registry and makes "place the clip" and "prune against the clip" atomic. */
+    private val lock = Any()
+    private val inFlight = mutableSetOf<String>()
 
     fun authority(context: Context): String = "${context.packageName}.fileprovider"
 
     fun root(context: Context): File = File(context.cacheDir, DIRECTORY)
 
-    fun newFile(context: Context, name: String): File {
+    /** Creates the file for a new copy; it stays protected from pruning until placed or released. */
+    fun newCopy(context: Context, name: String, mimeType: String): File {
         val directory = File(root(context), UUID.randomUUID().toString())
-        if (!directory.mkdirs()) throw IOException("Cannot create clipboard copy directory")
+        synchronized(lock) {
+            if (!directory.mkdirs()) throw IOException("Cannot create clipboard copy directory")
+            inFlight += directory.name
+        }
+        try {
+            File(directory, MIME_SIDECAR).writeText(mimeType)
+        } catch (e: IOException) {
+            release(File(directory, name))
+            throw e
+        }
         return File(directory, name)
+    }
+
+    /** Drops a copy that will not be placed. */
+    fun release(file: File) {
+        val directory = file.parentFile ?: return
+        synchronized(lock) {
+            inFlight -= directory.name
+            directory.deleteRecursively()
+        }
+    }
+
+    /**
+     * Runs [setClip] and prunes against the clip it placed, both under the lock, so no concurrent
+     * prune can see the new copy as unreferenced. [file] is the copy the clip refers to, if any.
+     */
+    fun place(context: Context, file: File?, setClip: () -> ClipData) {
+        synchronized(lock) {
+            try {
+                val clip = setClip()
+                pruneLocked(context, clip, clipKnown = true, now = System.currentTimeMillis())
+            } finally {
+                file?.parentFile?.let { inFlight -= it.name }
+            }
+        }
     }
 
     fun hasCopies(context: Context): Boolean = root(context).list()?.isNotEmpty() == true
 
-    /** Deletes copies that [currentClip] no longer references. */
-    fun prune(context: Context, currentClip: ClipData?, now: Long = System.currentTimeMillis()) {
+    /**
+     * Deletes copies that are expired or, when [clipKnown], no longer referenced by the clip that
+     * [readClip] returns. The clip is read under the lock so it cannot be stale against [place].
+     * Without a readable clip (a background job of an app that is not the keyboard) only expired
+     * copies go.
+     */
+    fun prune(
+        context: Context,
+        clipKnown: Boolean,
+        now: Long = System.currentTimeMillis(),
+        readClip: () -> ClipData?
+    ) {
+        synchronized(lock) {
+            pruneLocked(context, readClip(), clipKnown, now)
+        }
+    }
+
+    private fun pruneLocked(context: Context, currentClip: ClipData?, clipKnown: Boolean, now: Long) {
         val referenced = buildSet {
             if (currentClip != null) {
                 val authority = authority(context)
                 for (index in 0 until currentClip.itemCount) {
                     val uri = currentClip.getItemAt(index).uri ?: continue
-                    if (uri.authority != authority) continue
+                    if (uri.authority?.let(ShareIntentParser::authorityWithoutUserId) != authority) continue
                     // FileProvider paths are <name>/<directory>/<file>.
                     uri.pathSegments.getOrNull(1)?.let(::add)
                 }
             }
         }
         root(context).listFiles()?.forEach { directory ->
-            if (directory.name in referenced) return@forEach
-            if (now - directory.lastModified() < GRACE_MILLIS) return@forEach
+            if (directory.name in inFlight) return@forEach
+            val expired = now - directory.lastModified() >= MAX_AGE_MILLIS
+            val unreferenced = (clipKnown || currentClip != null) && directory.name !in referenced
+            if (expired || unreferenced) directory.deleteRecursively()
+        }
+    }
+
+    /** The MIME type recorded for a clipboard copy URI, or null for any other URI. */
+    fun mimeTypeFor(context: Context, uri: Uri): String? {
+        if (uri.authority != authority(context)) return null
+        val segments = uri.pathSegments
+        if (segments.size != 3 || segments[0] != "share_clipboard" || !uuidPattern.matches(segments[1])) return null
+        return runCatching { File(File(root(context), segments[1]), MIME_SIDECAR).readText() }
+            .getOrNull()
+            ?.let(ShareMimeTypes::normalize)
+    }
+}
+
+/** Private copies of shared pictures while they are verified and added to the gallery. */
+internal object ShareStaging {
+    private const val DIRECTORY = "share-staging"
+    private val lock = Any()
+    private val inFlight = mutableSetOf<String>()
+
+    fun root(context: Context): File = File(context.cacheDir, DIRECTORY)
+
+    fun newFile(context: Context): File {
+        val directory = File(root(context), UUID.randomUUID().toString())
+        synchronized(lock) {
+            if (!directory.mkdirs()) throw IOException("Cannot create staging directory")
+            inFlight += directory.name
+        }
+        return File(directory, "picture")
+    }
+
+    fun release(file: File) {
+        val directory = file.parentFile ?: return
+        synchronized(lock) {
+            inFlight -= directory.name
             directory.deleteRecursively()
+        }
+    }
+
+    /** Removes staging copies left behind by a process that ended during a gallery save. */
+    fun recover(context: Context) {
+        synchronized(lock) {
+            root(context).listFiles()?.forEach { if (it.name !in inFlight) it.deleteRecursively() }
         }
     }
 }

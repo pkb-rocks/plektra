@@ -54,7 +54,11 @@ class ShareReceiverViewModel(application: Application) : AndroidViewModel(applic
         if (loaded) return
         loaded = true
         viewModelScope.launch {
-            val payload = withContext(Dispatchers.IO) { ShareIntentParser.parse(context, intent) }
+            val payload = withContext(Dispatchers.IO) {
+                // Leftovers of a process that ended mid-save, and expired clipboard copies.
+                runCatching { ShareCleanupWorker.cleanUp(context, clipKnown = false) }
+                ShareIntentParser.parse(context, intent)
+            }
             state = state.copy(loading = false, payload = payload)
             refreshDestinations()
         }

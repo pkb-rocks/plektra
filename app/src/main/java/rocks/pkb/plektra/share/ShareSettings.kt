@@ -2,13 +2,18 @@ package rocks.pkb.plektra.share
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.provider.DocumentsContract
 import rocks.pkb.plektra.SettingsManager
 
 /** Where the share target stores files and pictures. */
 object ShareSettings {
-    /** Device-local and therefore absent from BackupContract: a restored tree URI carries no grant. */
+    /**
+     * The folder grant belongs to this installation, so its URI lives in its own preferences
+     * file, which Android backup, device transfer and Plektra's backup all leave out.
+     */
+    const val LOCAL_PREFERENCES = "share_local"
     const val KEY_SAVE_FOLDER_URI = "share_save_folder_uri"
     const val KEY_GALLERY_ALBUM = "share_gallery_album"
 
@@ -26,7 +31,7 @@ object ShareSettings {
     }
 
     fun saveFolder(context: Context): SaveFolder {
-        val stored = SettingsManager.getPreferences(context).getString(KEY_SAVE_FOLDER_URI, null)
+        val stored = localPreferences(context).getString(KEY_SAVE_FOLDER_URI, null)
             ?: return SaveFolder.Downloads
         val uri = runCatching { Uri.parse(stored) }.getOrNull() ?: return SaveFolder.Downloads
         val accessible = hasPersistedWriteAccess(context, uri)
@@ -38,7 +43,7 @@ object ShareSettings {
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         context.contentResolver.takePersistableUriPermission(treeUri, flags)
         val previous = (saveFolder(context) as? SaveFolder.Tree)?.uri
-        SettingsManager.getPreferences(context).edit()
+        localPreferences(context).edit()
             .putString(KEY_SAVE_FOLDER_URI, treeUri.toString())
             .apply()
         if (previous != null && previous != treeUri) releaseGrant(context, previous)
@@ -46,7 +51,7 @@ object ShareSettings {
 
     fun useDownloads(context: Context) {
         val previous = (saveFolder(context) as? SaveFolder.Tree)?.uri
-        SettingsManager.getPreferences(context).edit().remove(KEY_SAVE_FOLDER_URI).apply()
+        localPreferences(context).edit().remove(KEY_SAVE_FOLDER_URI).apply()
         if (previous != null) releaseGrant(context, previous)
     }
 
@@ -62,6 +67,9 @@ object ShareSettings {
     } ?: DocumentsContract.buildDocumentUri(EXTERNAL_STORAGE_AUTHORITY, "primary:Documents")
 
     private const val EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents"
+
+    fun localPreferences(context: Context): SharedPreferences =
+        context.getSharedPreferences(LOCAL_PREFERENCES, Context.MODE_PRIVATE)
 
     fun galleryAlbumEnabled(context: Context): Boolean =
         SettingsManager.getPreferences(context).getBoolean(KEY_GALLERY_ALBUM, false)

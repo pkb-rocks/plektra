@@ -26,6 +26,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,44 +35,63 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rocks.pkb.plektra.share.ShareSettings
 
 /** Destinations of Android's share menu target: the file folder and the optional gallery album. */
 @Composable
 internal fun ShareDestinationSettings() {
     val context = LocalContext.current
-    var folder by remember { mutableStateOf(ShareSettings.saveFolder(context)) }
+    // Folder metadata comes from another app's DocumentsProvider and may be slow: never on main.
+    var folder by remember { mutableStateOf<ShareSettings.SaveFolder?>(null) }
     var albumEnabled by remember { mutableStateOf(ShareSettings.galleryAlbumEnabled(context)) }
     var showFolderDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val prefs = remember { SettingsManager.getPreferences(context) }
+    val localPrefs = remember { ShareSettings.localPreferences(context) }
 
-    DisposableEffect(prefs) {
+    fun reloadFolder() {
+        scope.launch { folder = withContext(Dispatchers.IO) { ShareSettings.saveFolder(context) } }
+    }
+
+    DisposableEffect(prefs, localPrefs) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
-                ShareSettings.KEY_SAVE_FOLDER_URI -> folder = ShareSettings.saveFolder(context)
+                ShareSettings.KEY_SAVE_FOLDER_URI -> reloadFolder()
                 ShareSettings.KEY_GALLERY_ALBUM -> albumEnabled = ShareSettings.galleryAlbumEnabled(context)
             }
         }
         prefs.registerOnSharedPreferenceChangeListener(listener)
-        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+        localPrefs.registerOnSharedPreferenceChangeListener(listener)
+        onDispose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+            localPrefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
     }
     // A folder grant can be revoked or its folder deleted while Plektra is in the background.
     LifecycleResumeEffect(Unit) {
-        folder = ShareSettings.saveFolder(context)
+        reloadFolder()
         onPauseOrDispose { }
     }
 
     val folderPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
-            val kept = runCatching { ShareSettings.selectSaveFolder(context, uri) }.isSuccess
-            if (!kept) {
-                Toast.makeText(context, R.string.share_save_folder_choose_failed, Toast.LENGTH_LONG).show()
+            scope.launch {
+                val kept = withContext(Dispatchers.IO) {
+                    runCatching { ShareSettings.selectSaveFolder(context, uri) }.isSuccess
+                }
+                if (!kept) {
+                    Toast.makeText(context, R.string.share_save_folder_choose_failed, Toast.LENGTH_LONG).show()
+                }
+                reloadFolder()
             }
-            folder = ShareSettings.saveFolder(context)
         }
     }
     val currentFolder = folder
     val folderSummary = when (currentFolder) {
+        null -> null
         ShareSettings.SaveFolder.Downloads -> stringResource(R.string.share_folder_downloads)
         is ShareSettings.SaveFolder.Tree -> when {
             !currentFolder.accessible -> stringResource(R.string.share_folder_access_lost)
@@ -85,10 +105,11 @@ internal fun ShareDestinationSettings() {
         modifier = Modifier
             .fillMaxWidth()
             .settingRow(SettingLinkIds.ADVANCED_SHARE_SAVE_FOLDER) {
-                if (currentFolder is ShareSettings.SaveFolder.Downloads) {
-                    folderPicker.launch(ShareSettings.pickerStartUri(currentFolder))
-                } else {
-                    showFolderDialog = true
+                when (currentFolder) {
+                    null -> Unit
+                    ShareSettings.SaveFolder.Downloads ->
+                        folderPicker.launch(ShareSettings.pickerStartUri(currentFolder))
+                    is ShareSettings.SaveFolder.Tree -> showFolderDialog = true
                 }
             }
     ) {
@@ -116,11 +137,13 @@ internal fun ShareDestinationSettings() {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = folderSummary,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (folderInaccessible) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                )
+                if (folderSummary != null) {
+                    Text(
+                        text = folderSummary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (folderInaccessible) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -173,7 +196,7 @@ internal fun ShareDestinationSettings() {
         }
     }
 
-    if (showFolderDialog) {
+    if (showFolderDialog && currentFolder != null && folderSummary != null) {
         AlertDialog(
             onDismissRequest = { showFolderDialog = false },
             title = { Text(stringResource(R.string.share_save_folder_title)) },
@@ -192,8 +215,10 @@ internal fun ShareDestinationSettings() {
             dismissButton = {
                 TextButton(onClick = {
                     showFolderDialog = false
-                    ShareSettings.useDownloads(context)
-                    folder = ShareSettings.saveFolder(context)
+                    scope.launch {
+                        withContext(Dispatchers.IO) { ShareSettings.useDownloads(context) }
+                        reloadFolder()
+                    }
                 }) { Text(stringResource(R.string.share_save_folder_use_downloads)) }
             }
         )

@@ -31,11 +31,11 @@ Plektra focuses on efficient text input on Android devices with physical keyboar
 
 Plektra appears in Android's share menu for text, links, pictures and other files, including several at once. It offers only the actions that fit the shared items:
 
-- **Copy to clipboard** for a single item. Text is copied as text. A file or picture is copied as a private copy that other apps can read with its type until the clipboard changes; Plektra then removes the copy. Very long text is refused with a hint to save it as a file.
+- **Copy to clipboard** for a single item. Text is copied as text. A file or picture is copied as a private copy that other apps can read with its type. Plektra removes the copy when it sees that the clipboard has changed, and after 24 hours in any case; after that the clip can no longer be pasted. Very long text is refused with a hint to save it as a file.
 - **Save as file** keeps the original bytes and name. Files go to Downloads unless Settings → Advanced → Location for shared files points to a folder you chose. If that folder becomes unavailable, Plektra says so and offers Downloads instead. Existing names are kept; the new file gets a numbered name.
-- **Add to gallery** for pictures Android can decode. They appear as the newest entries in Pictures, or in Pictures/Plektra with Settings → Advanced → Own album for shared pictures.
+- **Add to gallery** for pictures whose pixels Android can decode; exactly the checked bytes are added. They appear as the newest entries in Pictures, or in Pictures/Plektra with Settings → Advanced → Own album for shared pictures.
 
-Plektra reads only the items the sharing app grants it and needs no storage permission. Each item reports its own result, and a running copy can be cancelled without leaving partial files.
+Plektra reads only the items the sharing app grants it and needs no storage permission. Each item reports its own result. A cancelled or failed save leaves no partial file; if Plektra is closed during a save, the incomplete file is removed on the next share or cleanup run. The chosen folder is not part of any backup because its access belongs to this installation.
 
 ## Languages
 

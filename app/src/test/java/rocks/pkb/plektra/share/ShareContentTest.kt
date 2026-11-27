@@ -37,6 +37,7 @@ class ShareContentTest {
     @Before
     fun reset() {
         SettingsManager.getPreferences(context).edit().clear().commit()
+        ShareSettings.localPreferences(context).edit().clear().commit()
         ShareClipboardCache.root(context).deleteRecursively()
         context.getSystemService(ClipboardManager::class.java).clearPrimaryClip()
         // Robolectric starts with an empty extension table.
@@ -190,27 +191,9 @@ class ShareContentTest {
     }
 
     @Test
-    fun pruneKeepsTheCurrentClipAndYoungCopiesOnly() {
-        val now = System.currentTimeMillis()
-        val current = ShareClipboardCache.newFile(context, "current.png").apply { writeText("a") }
-        val replaced = ShareClipboardCache.newFile(context, "replaced.png").apply { writeText("b") }
-        val young = ShareClipboardCache.newFile(context, "young.png").apply { writeText("c") }
-        listOf(current, replaced).forEach { it.parentFile!!.setLastModified(now - 3_600_000) }
-        val currentUri = Uri.parse(
-            "content://${ShareClipboardCache.authority(context)}/share_clipboard/${current.parentFile!!.name}/current.png"
-        )
-
-        ShareClipboardCache.prune(context, ClipData.newRawUri("", currentUri), now)
-
-        assertTrue(current.exists())
-        assertFalse(replaced.exists())
-        assertTrue(young.exists())
-    }
-
-    @Test
     fun revokedFolderIsReportedWithoutWriting() = runBlocking {
         val tree = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AShared")
-        SettingsManager.getPreferences(context).edit().putString(ShareSettings.KEY_SAVE_FOLDER_URI, tree.toString()).commit()
+        ShareSettings.localPreferences(context).edit().putString(ShareSettings.KEY_SAVE_FOLDER_URI, tree.toString()).commit()
 
         val folder = ShareSettings.saveFolder(context) as ShareSettings.SaveFolder.Tree
         assertFalse(folder.accessible)

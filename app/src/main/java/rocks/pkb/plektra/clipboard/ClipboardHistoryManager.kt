@@ -131,13 +131,10 @@ class ClipboardHistoryManager internal constructor(
     /** Files the share target placed on the clipboard are only kept while they are the current clip. */
     private fun releaseReplacedShareCopies() {
         if (!ShareClipboardCache.hasCopies(context)) return
-        val clip = try {
-            clipboardManager.primaryClip
-        } catch (e: RuntimeException) {
-            return
-        }
+        val clipboard = clipboardManager
         thread(name = "share-clipboard-prune") {
-            runCatching { ShareClipboardCache.prune(context, clip) }
+            // The keyboard may read the clipboard, so an empty result means an empty clipboard.
+            runCatching { ShareClipboardCache.prune(context, clipKnown = true) { clipboard.primaryClip } }
         }
     }
 

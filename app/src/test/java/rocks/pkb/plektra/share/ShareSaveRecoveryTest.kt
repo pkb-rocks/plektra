@@ -112,7 +112,7 @@ class ShareSaveRecoveryTest {
     fun recoveryDeletesADocumentThatStillCarriesItsTemporaryName() {
         val documents = installProvider(AUTHORITY, FakeDocumentsProvider())
         val partial = documents.add(".plektra-partial-x")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-x", FOLDER)
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-x")
         ShareTargetJournal.forgetActiveForTest() // The process ended before finally ran.
 
         ShareTargetJournal.recover(context)
@@ -127,17 +127,22 @@ class ShareSaveRecoveryTest {
         // Completed: renamed away from its temporary name, then the process died before unlinking.
         documents.add("report.pdf")
         val renamedAway = DocumentsContract.buildDocumentUri(AUTHORITY, ".plektra-partial-a")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, renamedAway, ".plektra-partial-a", FOLDER)
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, renamedAway, ".plektra-partial-a")
         // Replaced: a path-based URI that now points to a different file.
         val replaced = documents.add("replaced.bin", id = "slot")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, replaced, ".plektra-partial-b", FOLDER)
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, replaced, ".plektra-partial-b")
         ShareTargetJournal.forgetActiveForTest()
 
         ShareTargetJournal.recover(context)
 
         assertTrue(documents.deleted.isEmpty())
         assertEquals(setOf("report.pdf", "replaced.bin"), documents.names())
+        // The replaced file answered with another name; the renamed one gave no answer at all,
+        // which stays unknown until the record ages out.
+        assertEquals(1, records().size)
+        ShareTargetJournal.recover(context, now = System.currentTimeMillis() + ShareTargetJournal.MAX_RECORD_AGE_MILLIS)
         assertTrue(records().isEmpty())
+        assertTrue(documents.deleted.isEmpty())
     }
 
     @Test
@@ -156,8 +161,7 @@ class ShareSaveRecoveryTest {
             context,
             ShareTargetJournal.Kind.Document,
             DocumentsContract.buildDocumentUri("org.example.unmounted", "x"),
-            ".plektra-partial-y",
-            DocumentsContract.buildDocumentUri("org.example.unmounted", "root")
+            ".plektra-partial-y"
         )
         ShareTargetJournal.forgetActiveForTest()
         ShareTargetJournal.recover(context)
@@ -229,8 +233,7 @@ class ShareSaveRecoveryTest {
             context,
             ShareTargetJournal.Kind.Document,
             DocumentsContract.buildDocumentUri(AUTHORITY, ".plektra-partial-slow"),
-            ".plektra-partial-slow",
-            FOLDER
+            ".plektra-partial-slow"
         )
         ShareTargetJournal.forgetActiveForTest()
         val viewModel = ShareReceiverViewModel(context as Application)
@@ -326,26 +329,63 @@ class ShareSaveRecoveryTest {
 
     // Pre-check round, finding 2: unanswered lookups, false deletes and dead providers are retried.
     @Test
-    fun unansweredLookupIsRetriedUnlessTheFolderStillAnswers() {
-        val documents = installProvider(AUTHORITY, FakeDocumentsProvider().apply { folderAnswers = false })
-        val missing = DocumentsContract.buildDocumentUri(AUTHORITY, ".plektra-partial-gone")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, missing, ".plektra-partial-gone", FOLDER)
+    fun unansweredLookupStaysRecordedEvenWhileTheFolderAnswers() {
+        val documents = installProvider(AUTHORITY, FakeDocumentsProvider().apply { nullForDocuments = true })
+        val partial = documents.add(".plektra-partial-n")
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-n")
         ShareTargetJournal.forgetActiveForTest()
 
         ShareTargetJournal.recover(context)
-        assertEquals("No answer from document and folder: keep for retry", 1, records().size)
-
-        documents.folderAnswers = true
-        ShareTargetJournal.recover(context)
-        assertTrue("The folder answers, so the document is gone", records().isEmpty())
+        assertEquals("No answer for an existing document: keep for retry", 1, records().size)
         assertTrue(documents.deleted.isEmpty())
+
+        documents.nullForDocuments = false
+        ShareTargetJournal.recover(context)
+        assertEquals(listOf(".plektra-partial-n"), documents.deleted)
+        assertTrue(records().isEmpty())
+    }
+
+    @Test
+    fun deleteWithoutAProviderAnswerIsRetried() {
+        val documents = installProvider(AUTHORITY, FakeDocumentsProvider().apply { deleteAnswersNull = true })
+        val partial = documents.add(".plektra-partial-d")
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-d")
+        ShareTargetJournal.forgetActiveForTest()
+
+        ShareTargetJournal.recover(context)
+        assertEquals("A delete without answer must not count as done", 1, records().size)
+        assertEquals(setOf(".plektra-partial-d"), documents.names())
+
+        documents.deleteAnswersNull = false
+        ShareTargetJournal.recover(context)
+        assertEquals(listOf(".plektra-partial-d"), documents.deleted)
+        assertTrue(records().isEmpty())
+    }
+
+    @Test
+    fun fallbackRecordsItsTemporaryDocumentBeforeTryingToDeleteIt() = runBlocking {
+        val documents = FakeDocumentsProvider().apply {
+            supportsRename = false
+            failDeletes = true
+        }
+        val tree = grantedTree(documents)
+        val item = SharedItem.Stream(0, source("fb.bin", byteArrayOf(5)), "application/octet-stream", "fb.bin", null)
+
+        assertEquals(ShareItemResult.Saved("fb.bin", "Folder"), ShareOperations.saveToFolder(context, item, tree, "Folder"))
+        assertEquals("The undeletable temporary document stays recorded", 1, records().size)
+
+        documents.failDeletes = false
+        ShareTargetJournal.recover(context)
+        assertEquals(setOf("fb.bin"), documents.names())
+        assertTrue(documents.deleted.single().startsWith(".plektra-partial-"))
+        assertTrue(records().isEmpty())
     }
 
     @Test
     fun deleteReportingFalseIsRetried() {
         val documents = installProvider(AUTHORITY, FakeDocumentsProvider().apply { deleteFailsSilently = true })
         val partial = documents.add(".plektra-partial-f")
-        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-f", FOLDER)
+        ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, partial, ".plektra-partial-f")
         ShareTargetJournal.forgetActiveForTest()
 
         ShareTargetJournal.recover(context)
@@ -362,7 +402,7 @@ class ShareSaveRecoveryTest {
         val documents = installProvider(AUTHORITY, FakeDocumentsProvider().apply { dead = true })
         val names = listOf(".plektra-partial-1", ".plektra-partial-2", ".plektra-partial-3")
         names.forEach { name ->
-            ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, documents.add(name), name, FOLDER)
+            ShareTargetJournal.begin(context, ShareTargetJournal.Kind.Document, documents.add(name), name)
         }
         ShareTargetJournal.forgetActiveForTest()
 
@@ -375,7 +415,8 @@ class ShareSaveRecoveryTest {
         assertTrue(records().isEmpty())
     }
 
-    // Pre-check round, finding 3: the job runs again while records remain or a save started meanwhile.
+    // Pre-check round, finding 3: the job runs again while records remain, and a new request
+    // is never dropped while a run is in progress.
     @Test
     fun cleanupJobAsksForAnotherRunWhileWorkRemains() {
         installProvider(AUTHORITY, FakeDocumentsProvider().apply { dead = true })
@@ -383,18 +424,16 @@ class ShareSaveRecoveryTest {
             context,
             ShareTargetJournal.Kind.Document,
             DocumentsContract.buildDocumentUri(AUTHORITY, ".plektra-partial-r"),
-            ".plektra-partial-r",
-            FOLDER
+            ".plektra-partial-r"
         )
         ShareTargetJournal.forgetActiveForTest()
-        assertTrue("A record kept for retry needs another run", ShareCleanupWorker.runOnce(context, System.nanoTime()))
+        assertTrue("A record kept for retry needs another run", ShareCleanupWorker.runOnce(context))
 
         ShareTargetJournal.root(context).deleteRecursively()
-        assertFalse(ShareCleanupWorker.runOnce(context, System.nanoTime()))
+        assertFalse(ShareCleanupWorker.runOnce(context))
 
-        val startedAt = System.nanoTime()
-        ShareCleanupWorker.scheduleRecovery(context) // A save begins while the job runs.
-        assertTrue("A save that began during the run needs another run", ShareCleanupWorker.runOnce(context, startedAt))
+        // KEEP drops a request while the unique work runs; REPLACE enqueues a fresh run.
+        assertEquals(androidx.work.ExistingWorkPolicy.REPLACE, ShareCleanupWorker.Run.Recovery.policy)
     }
 
     private fun <T : ContentProvider> installProvider(authority: String, provider: T): T {
@@ -411,6 +450,8 @@ class ShareSaveRecoveryTest {
         val deleted: MutableList<String> = Collections.synchronizedList(mutableListOf())
         var failDeletes = false
         var deleteFailsSilently = false
+        var deleteAnswersNull = false
+        var nullForDocuments = false
         var supportsRename = true
         var renameFailsSilently = false
         var renameIgnored = false
@@ -458,6 +499,7 @@ class ShareSaveRecoveryTest {
                 "android:deleteDocument" -> {
                     if (failDeletes) throw IllegalStateException("synthetic transient failure")
                     if (deleteFailsSilently) throw IOException("synthetic delete failure") // -> false
+                    if (deleteAnswersNull) return null
                     val doc = docs.remove(DocumentsContract.getDocumentId(uri))
                         ?: throw IllegalArgumentException("Missing document")
                     deleted += doc.name
@@ -482,6 +524,7 @@ class ShareSaveRecoveryTest {
                 return if (folderAnswers) MatrixCursor(arrayOf(Document.COLUMN_DISPLAY_NAME)).apply { addRow(arrayOf("root")) }
                 else null
             }
+            if (nullForDocuments) return null
             // Like DocumentsProvider, a missing document yields no cursor at all.
             val doc = docs[id] ?: return null
             val flags = Document.FLAG_SUPPORTS_WRITE or Document.FLAG_SUPPORTS_DELETE or
@@ -531,6 +574,5 @@ class ShareSaveRecoveryTest {
 
     private companion object {
         const val AUTHORITY = "org.example.documents"
-        val FOLDER: Uri = DocumentsContract.buildDocumentUri(AUTHORITY, "root")
     }
 }

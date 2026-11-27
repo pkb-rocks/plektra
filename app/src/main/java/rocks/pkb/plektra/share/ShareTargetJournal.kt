@@ -1,5 +1,6 @@
 package rocks.pkb.plektra.share
 
+import android.content.ContentProviderClient
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -31,21 +32,21 @@ internal object ShareTargetJournal {
     private const val DIRECTORY = "share-pending"
     private const val TEMPORARY_SUFFIX = ".tmp"
 
+    // Values of the hidden DocumentsContract constants used by DocumentsContract.deleteDocument().
+    private const val METHOD_DELETE_DOCUMENT = "android:deleteDocument"
+    private const val EXTRA_URI = "uri"
+
     /** Records that still cannot be resolved after this long are dropped. */
     const val MAX_RECORD_AGE_MILLIS = 30L * 24 * 60 * 60 * 1000
 
     enum class Kind { MediaStore, Document }
 
-    /**
-     * [temporaryName] identifies a [Kind.Document] target and [parent] is its folder; both are
-     * null for MediaStore rows.
-     */
+    /** [temporaryName] identifies a [Kind.Document] target; it is null for MediaStore rows. */
     data class Entry(
         val id: String,
         val kind: Kind,
         val target: Uri,
         val temporaryName: String?,
-        val parent: Uri?,
         val createdAt: Long
     )
 
@@ -63,19 +64,16 @@ internal object ShareTargetJournal {
         kind: Kind,
         target: Uri,
         temporaryName: String? = null,
-        parent: Uri? = null,
         now: Long = System.currentTimeMillis()
     ): Entry {
-        require((kind == Kind.Document) == (temporaryName != null && parent != null)) {
-            "Documents need their temporary name and folder"
-        }
-        val entry = Entry(UUID.randomUUID().toString(), kind, target, temporaryName, parent, now)
+        require((kind == Kind.Document) == (temporaryName != null)) { "Documents need their temporary name" }
+        val entry = Entry(UUID.randomUUID().toString(), kind, target, temporaryName, now)
         synchronized(lock) {
             val directory = root(context)
             if (!directory.isDirectory && !directory.mkdirs()) throw IOException("Cannot create $directory")
             val temporary = File(directory, entry.id + TEMPORARY_SUFFIX)
             temporary.writeText(
-                listOf(kind.name, target.toString(), now.toString(), temporaryName.orEmpty(), parent?.toString().orEmpty())
+                listOf(kind.name, target.toString(), now.toString(), temporaryName.orEmpty())
                     .joinToString("\n")
             )
             if (!temporary.renameTo(File(directory, entry.id))) {
@@ -139,7 +137,6 @@ internal object ShareTargetJournal {
             kind,
             Uri.parse(lines[1]),
             lines.getOrNull(3)?.takeIf { it.isNotEmpty() },
-            lines.getOrNull(4)?.takeIf { it.isNotEmpty() }?.let(Uri::parse),
             lines[2].toLong()
         )
     }.getOrNull()
@@ -193,18 +190,14 @@ internal object ShareTargetJournal {
             } catch (e: FileNotFoundException) {
                 Lookup.Missing
             }
-            var answer = lookUp(target)
-            // Document providers also answer null for a missing document. When the folder still
-            // answers, the document is gone; when neither answers, the provider is unavailable.
-            if (answer == Lookup.NoAnswer && entry.parent != null && lookUp(entry.parent) is Lookup.Found) {
-                answer = Lookup.Missing
-            }
-            when (answer) {
+            // No cursor is no answer, even though DocumentsProvider also returns null for a
+            // missing file: such a record stays until it ages out rather than risk a wrong guess.
+            when (val answer = lookUp(target)) {
                 Lookup.NoAnswer -> Outcome.Retry
                 Lookup.Missing -> Outcome.Resolved // Gone, for example renamed when complete.
                 is Lookup.Found -> when {
                     temporaryName == null || answer.name != temporaryName -> Outcome.Resolved // Not the partial file.
-                    DocumentsContract.deleteDocument(context.contentResolver, target) -> Outcome.Resolved
+                    deleteConfirmed(client, target) -> Outcome.Resolved
                     else -> Outcome.Retry
                 }
             }
@@ -212,6 +205,14 @@ internal object ShareTargetJournal {
             client.close()
         }
     }
+
+    /**
+     * Deletes through the provider directly: DocumentsContract.deleteDocument() also reports
+     * success when the provider call returned nothing. DocumentsProvider answers a completed
+     * delete with a (possibly empty) bundle.
+     */
+    private fun deleteConfirmed(client: ContentProviderClient, target: Uri): Boolean =
+        client.call(METHOD_DELETE_DOCUMENT, null, Bundle().apply { putParcelable(EXTRA_URI, target) }) != null
 
     private sealed interface Lookup {
         data object NoAnswer : Lookup

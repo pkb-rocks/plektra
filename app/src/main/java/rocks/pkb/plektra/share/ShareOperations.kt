@@ -159,10 +159,9 @@ internal object ShareOperations {
         context: Context,
         kind: ShareTargetJournal.Kind,
         target: Uri,
-        temporaryName: String? = null,
-        parent: Uri? = null
+        temporaryName: String? = null
     ): ShareTargetJournal.Entry = try {
-        ShareTargetJournal.begin(context, kind, target, temporaryName, parent)
+        ShareTargetJournal.begin(context, kind, target, temporaryName)
     } catch (e: IOException) {
         // Not recorded, so remove it now: this process knows it is incomplete.
         runCatching {
@@ -284,7 +283,12 @@ internal object ShareOperations {
         // Recovery may only ever delete by this name, so it must carry our random token.
         val identifiable = temporaryName != null && token in temporaryName
         if (!identifiable || flags and DocumentsContract.Document.FLAG_SUPPORTS_RENAME == 0) {
-            runCatching { DocumentsContract.deleteDocument(resolver, temporary) }
+            if (identifiable) {
+                // Recorded before the delete attempt, so a failed delete is retried by recovery.
+                ShareTargetJournal.discard(context, journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName))
+            } else {
+                runCatching { DocumentsContract.deleteDocument(resolver, temporary) }
+            }
             // Document providers resolve name collisions themselves, e.g. "name (1).ext".
             val document = createDocument(resolver, parent, mimeType, name)
             var complete = false
@@ -296,7 +300,7 @@ internal object ShareOperations {
             }
             return document
         }
-        val entry = journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName, parent)
+        val entry = journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName)
         var complete = false
         try {
             write(temporary)

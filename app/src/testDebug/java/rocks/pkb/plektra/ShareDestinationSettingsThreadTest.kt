@@ -108,6 +108,29 @@ class ShareDestinationSettingsThreadTest {
         assertFalse("A late answer for the previous folder replaced the newest", shown("Folder a"))
     }
 
+    @Test
+    fun downloadsAndANewChoiceNeverWaitForTheOldFolder() {
+        provider.gates["a"] = CountDownLatch(1)
+        choose("a")
+        compose.setContent { Column { ShareDestinationSettings() } }
+        compose.waitUntil(timeoutMillis = 5_000) { provider.started.contains("a") }
+
+        compose.onNodeWithText(context.getString(R.string.share_save_folder_title)).performClick()
+        compose.onNodeWithText(context.getString(R.string.share_save_folder_use_downloads)).performClick()
+        compose.waitUntil(timeoutMillis = 5_000) { ShareSettings.storedFolderUri(context) == null }
+        compose.waitUntil(timeoutMillis = 5_000) { shown(context.getString(R.string.share_folder_downloads)) }
+        assertFalse("The slow folder answered meanwhile", provider.finished.contains("a"))
+
+        // Choosing another folder only reads the stored URI as well: with every query of the old
+        // folder blocked, the choice still completes at once.
+        choose("a")
+        val b = DocumentsContract.buildTreeDocumentUri(AUTHORITY, "b")
+        val selection = Thread { ShareSettings.selectSaveFolder(context, b) }.apply { start() }
+        selection.join(2_000)
+        assertFalse("Choosing a folder waited for the old folder's provider", selection.isAlive)
+        assertTrue(ShareSettings.storedFolderUri(context) == b)
+    }
+
     class RecordingDocumentsProvider : ContentProvider() {
         val queryThreads: MutableList<Thread> = Collections.synchronizedList(mutableListOf())
         val gates: MutableMap<String, CountDownLatch> = Collections.synchronizedMap(mutableMapOf())

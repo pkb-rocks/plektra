@@ -45,7 +45,8 @@ object ShareSettings {
     fun selectSaveFolder(context: Context, treeUri: Uri) {
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         context.contentResolver.takePersistableUriPermission(treeUri, flags)
-        val previous = (saveFolder(context) as? SaveFolder.Tree)?.uri
+        // Only the stored URI: never wait for the previous folder's provider.
+        val previous = storedFolderUri(context)
         localPreferences(context).edit()
             .putString(KEY_SAVE_FOLDER_URI, treeUri.toString())
             .apply()
@@ -53,7 +54,7 @@ object ShareSettings {
     }
 
     fun useDownloads(context: Context) {
-        val previous = (saveFolder(context) as? SaveFolder.Tree)?.uri
+        val previous = storedFolderUri(context)
         localPreferences(context).edit().remove(KEY_SAVE_FOLDER_URI).apply()
         if (previous != null) releaseGrant(context, previous)
     }

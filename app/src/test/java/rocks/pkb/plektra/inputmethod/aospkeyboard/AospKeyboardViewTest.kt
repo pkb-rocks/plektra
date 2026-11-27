@@ -376,6 +376,20 @@ class AospKeyboardViewTest {
     }
 
     @Test
+    fun keyPreviewWiderThanAVeryNarrowKeyboard_startsAtItsEdgeInsteadOfCrashing() {
+        val listener = RecordingListener()
+        // Narrower than a key preview (52dp at least): clamping to an empty range used to throw
+        val view = measuredKeyboard(width = 40).apply { this.listener = listener }
+        val (x, y) = centerOfLabel(view, "a")
+
+        view.dispatchTouchEvent(motion(MotionEvent.ACTION_DOWN, x, y, 0L))
+
+        val preview = field<Any?>(view, "previewPopupState")
+        assertTrue(preview != null)
+        assertEquals(0f, field<RectF>(preview!!, "rect").left, 0f)
+    }
+
+    @Test
     fun touchDown_emitsKeyPressSoundImmediately() {
         val listener = RecordingListener()
         val view = measuredKeyboard().apply {
@@ -1020,21 +1034,21 @@ class AospKeyboardViewTest {
         assertEquals(listOf("("), listener.texts)
     }
 
-    private fun measuredKeyboard(): AospKeyboardView {
+    private fun measuredKeyboard(width: Int = 1000): AospKeyboardView {
         val context = RuntimeEnvironment.getApplication()
         val parent = FrameLayout(context)
         val view = AospKeyboardView(context)
         parent.addView(view, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         parent.measure(
-            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
             View.MeasureSpec.makeMeasureSpec(240, View.MeasureSpec.EXACTLY)
         )
-        parent.layout(0, 0, 1000, 240)
+        parent.layout(0, 0, width, 240)
         view.measure(
-            View.MeasureSpec.makeMeasureSpec(1000, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
             View.MeasureSpec.makeMeasureSpec(240, View.MeasureSpec.EXACTLY)
         )
-        view.layout(0, 0, 1000, 240)
+        view.layout(0, 0, width, 240)
         return view
     }
 

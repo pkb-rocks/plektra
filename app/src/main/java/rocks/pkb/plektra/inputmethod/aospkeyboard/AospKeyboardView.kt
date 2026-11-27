@@ -1837,7 +1837,8 @@ class AospKeyboardView @JvmOverloads constructor(
         val placeLayerBelowKey = longPressLayerPopupBelowKey && layerKeys.isNotEmpty()
         val popupStackGap = if (layerKeys.isNotEmpty() && !placeLayerBelowKey) dp(4f) else 0
         val popupLeft = if (moreKeys.isNotEmpty()) {
-            (key.visualRect.centerX() - popupWidth / 2f).coerceIn(0f, width - popupWidth.toFloat())
+            // Never an empty range: a popup wider than the keyboard starts at its left edge
+            (key.visualRect.centerX() - popupWidth / 2f).coerceIn(0f, maxOf(0f, width - popupWidth.toFloat()))
         } else {
             0f
         }
@@ -1853,7 +1854,7 @@ class AospKeyboardView @JvmOverloads constructor(
         val windowBottomInView = windowTopInView + rootView.height
         var visiblePopupTop = popupTop.coerceIn(windowTopInView, (windowBottomInView - popupHeight).coerceAtLeast(windowTopInView))
         val layerPopupLeft = (key.visualRect.centerX() - layerPopupWidth / 2f)
-            .coerceIn(0f, width - layerPopupWidth.toFloat())
+            .coerceIn(0f, maxOf(0f, width - layerPopupWidth.toFloat()))
         var layerPopupTop = if (placeLayerBelowKey) {
             key.visualRect.bottom + popupVerticalOffset(themeOverride)
         } else {
@@ -1913,7 +1914,7 @@ class AospKeyboardView @JvmOverloads constructor(
         if (key.spec.type != KeyType.CHAR && key.spec.type != KeyType.COMMA && key.spec.type != KeyType.PERIOD) return
         val previewWidth = maxOf(key.visualRect.width() + dp(18f), dp(52f).toFloat())
         val previewHeight = dp(72f).toFloat()
-        val popupLeft = (key.visualRect.centerX() - previewWidth / 2f).coerceIn(0f, width - previewWidth)
+        val popupLeft = (key.visualRect.centerX() - previewWidth / 2f).coerceIn(0f, maxOf(0f, width - previewWidth))
         val popupTop = key.visualRect.top - previewHeight - popupVerticalOffset(themeOverride)
         val symLabel = symPageLabelFor(key)
         previewPopupState = PreviewPopupState(
@@ -2052,6 +2053,7 @@ class AospKeyboardView @JvmOverloads constructor(
     private fun selectedLayerKeyIndex(x: Float, y: Float, panel: MoreKeysPanelState): Int {
         if (panel.popupRectInView?.contains(x, y) == true) return -1
         val rect = panel.layerPopupRectInView ?: return -1
+        if (panel.layerKeys.isEmpty()) return -1
         val verticalSlop = dp(20f)
         if (y < rect.top - verticalSlop || y > rect.bottom + verticalSlop) return -1
         val relativeX = (x - rect.left - panel.padding).coerceIn(0f, panel.layerKeys.size * panel.layerKeyWidth - 1f)
@@ -2418,7 +2420,7 @@ class AospKeyboardView @JvmOverloads constructor(
                 rect.width() * if (classic) 0.34f else 0.38f
             )
             val tailHeight = dp(if (classic) 34f else 18f).toFloat()
-            val centerX = anchorX.coerceIn(rect.left + radius, rect.right - radius)
+            val centerX = anchorX.coerceIn(rect.left + radius, maxOf(rect.left + radius, rect.right - radius))
             val sideCurveDivisor = if (classic) 2.0f else 2.4f
             val tail = Path().apply {
                 if (tailOnTop) {

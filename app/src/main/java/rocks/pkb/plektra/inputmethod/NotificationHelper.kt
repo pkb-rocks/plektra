@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.update.normalizeGitHubReleaseUrl
 import rocks.pkb.plektra.update.plektraReleasesPage
 
 /**
@@ -281,7 +282,7 @@ object NotificationHelper {
         } else {
             plektraReleasesPage()
         }
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl)).apply {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(normalizeGitHubReleaseUrl(targetUrl))).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         

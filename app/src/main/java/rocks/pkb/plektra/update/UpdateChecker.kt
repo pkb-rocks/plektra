@@ -198,7 +198,7 @@ fun showUpdateDialog(
         .setTitle(R.string.successor_dialog_title)
         .setMessage(context.getString(R.string.successor_dialog_message, displayName))
         .setPositiveButton(R.string.successor_dialog_open_release) { _, _ ->
-            openUrl(context, releasePageUrl ?: plektraReleasesPage())
+            openUrl(context, normalizeGitHubReleaseUrl(releasePageUrl ?: plektraReleasesPage()))
             onClosed()
         }
         .setNeutralButton(R.string.successor_dialog_later) { _, _ ->
@@ -224,7 +224,7 @@ private fun showPlektraStableUpdateDialog(
         .setTitle(R.string.plektra_stable_update_title)
         .setMessage(context.getString(R.string.plektra_stable_update_message, displayName))
         .setPositiveButton(R.string.plektra_stable_update_open) { _, _ ->
-            openUrl(context, releasePageUrl ?: plektraReleasesPage())
+            openUrl(context, normalizeGitHubReleaseUrl(releasePageUrl ?: plektraReleasesPage()))
             onClosed()
         }
         .setNeutralButton(R.string.successor_dialog_later) { _, _ ->
@@ -261,7 +261,7 @@ internal fun showReleaseNotice(context: Context, result: UpdateCheckResult) {
         .setTitle(R.string.nightly_update_title)
         .setMessage(context.getString(R.string.nightly_update_message, name))
         .setPositiveButton(R.string.nightly_update_open) { _, _ ->
-            openUrl(context, result.releasePageUrl ?: plektraReleasesPage())
+            openUrl(context, normalizeGitHubReleaseUrl(result.releasePageUrl ?: plektraReleasesPage()))
             showFollowUp()
         }
         .setNeutralButton(R.string.successor_dialog_later) { _, _ ->

@@ -3,6 +3,7 @@ package rocks.pkb.plektra.update
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.NotificationManager
+import android.content.Intent
 import android.content.Context
 import android.os.Looper
 import android.util.TypedValue
@@ -74,6 +75,90 @@ class UpdateAnnouncementUiTest {
 
         notification.contentIntent.send()
         assertEquals(releaseUrl, shadowOf(activity).nextStartedActivity.data.toString())
+    }
+
+    @Test
+    fun allReleaseDialogsEncodeNightlyTagsAndKeepFallbacks() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val prefix = "https://github.com/pkb-rocks/plektra/releases/tag/"
+        val cases = listOf(
+            "${prefix}nightly/v26.10?source=dialog#assets" to "${prefix}nightly%2Fv26.10?source=dialog#assets",
+            "${prefix}nightly%2Fv26.10" to "${prefix}nightly%2Fv26.10",
+            "${prefix}v26.10" to "${prefix}v26.10",
+            null to plektraReleasesPage()
+        )
+        for ((url, expected) in cases) {
+            for (kind in listOf("successor", "stable", "nightly")) {
+                showReleaseNotice(
+                    activity,
+                    UpdateCheckResult(
+                        successful = true,
+                        hasAnnouncement = true,
+                        releaseTag = "nightly/v26.10",
+                        displayName = "Plektra release",
+                        releasePageUrl = url,
+                        isNightlyUpdate = kind == "nightly",
+                        isPlektraStableUpdate = kind == "stable"
+                    )
+                )
+                ShadowAlertDialog.getLatestAlertDialog().getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+                shadowOf(Looper.getMainLooper()).idle()
+                val intent = shadowOf(activity).nextStartedActivity
+                assertEquals("$kind: $url", expected, intent.data.toString())
+                assertEquals(Intent.ACTION_VIEW, intent.action)
+                assertTrue(intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+            }
+        }
+    }
+
+    @Test
+    fun updateNotificationPendingIntentsEncodeNightlyTagsAndKeepFallbacks() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val manager = activity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val prefix = "https://github.com/pkb-rocks/plektra/releases/tag/"
+        val cases = listOf(
+            "${prefix}nightly/v26.10?source=notification#assets" to "${prefix}nightly%2Fv26.10?source=notification#assets",
+            "${prefix}nightly%2Fv26.10" to "${prefix}nightly%2Fv26.10",
+            "${prefix}v26.10" to "${prefix}v26.10",
+            null to plektraReleasesPage()
+        )
+        for ((url, expected) in cases) {
+            for (kind in listOf("successor", "stable", "nightly")) {
+                manager.cancelAll()
+                NotificationHelper.showUpdateAvailableNotification(
+                    activity, "Plektra release", url,
+                    isNightlyUpdate = kind == "nightly",
+                    isPlektraStableUpdate = kind == "stable"
+                )
+                val pendingIntent = shadowOf(manager).allNotifications.single().contentIntent
+                assertTrue(shadowOf(pendingIntent).isImmutable)
+                pendingIntent.send()
+                val intent = shadowOf(activity).nextStartedActivity
+                assertEquals("$kind: $url", expected, intent.data.toString())
+                assertEquals(Intent.ACTION_VIEW, intent.action)
+                assertTrue(intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+            }
+        }
+    }
+
+    @Test
+    fun nightlyDownloadUrlIsPassedThroughUnchanged() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val downloadUrl = "https://github.com/pkb-rocks/plektra/releases/download/nightly/v26.10/Plektra.apk?download=1#asset"
+        showReleaseNotice(
+            activity,
+            UpdateCheckResult(
+                successful = true,
+                hasAnnouncement = true,
+                releaseTag = "nightly/v26.10",
+                displayName = "Plektra Nightly",
+                isNightlyUpdate = true,
+                downloadUrl = downloadUrl
+            )
+        )
+        ShadowAlertDialog.getLatestAlertDialog().getButton(AlertDialog.BUTTON_NEGATIVE).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(downloadUrl, shadowOf(activity).nextStartedActivity.data.toString())
     }
 
     private fun isLightDialogTheme(context: Context): Boolean {

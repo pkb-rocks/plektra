@@ -578,8 +578,11 @@ class EmojiPagesSurfacesTest {
         assertEquals(all, results(picker))
 
         // Recents: the results among the recently used emoji
-        idleUntil("the typed emoji in the recents") {
-            animals.first().entry.base in rocks.pkb.plektra.data.emoji.RecentEmojiManager.getRecentEmojis(activity)
+        // Saving it and the tab row picking it up are separate background steps: wait for both
+        idleUntil("the typed emoji in the recents tab") {
+            animals.first().entry.base in rocks.pkb.plektra.data.emoji.RecentEmojiManager.getRecentEmojis(activity) &&
+                rocks.pkb.plektra.data.emoji.EmojiRepository.RECENTS_CATEGORY_ID in
+                (field(picker, "tabCategoryIds") as List<*>)
         }
         tab(rocks.pkb.plektra.data.emoji.EmojiRepository.RECENTS_CATEGORY_ID).performClick()
         showingResults(picker)

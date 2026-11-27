@@ -129,7 +129,8 @@ class ClipboardHistoryTest {
 
         assertTrue(connection.committedTexts.isEmpty())
         assertEquals(listOf(ClipboardTestStore.Row(id, "stored", pinned = false, sensitive = false)), store.rows())
-        assertTrue(visibleTexts(view).contains("stored"))
+        // The list diffs on a background thread once one has been shown: wait for it to land
+        layoutUntil(view, "the stored clip") { visibleTexts(view).contains("stored") }
     }
 
     @Test
@@ -504,6 +505,16 @@ class ClipboardHistoryTest {
         store.settle()
         assertEquals(big, restarted.getHistoryEntries().single().text)
         assertEquals(big, manager.getHistoryEntries().single().text)
+    }
+
+    private fun layoutUntil(view: View, what: String, condition: () -> Boolean) {
+        val deadline = System.currentTimeMillis() + 10_000
+        layout(view)
+        while (!condition()) {
+            check(System.currentTimeMillis() < deadline) { "timed out waiting for $what" }
+            Thread.sleep(10)
+            layout(view)
+        }
     }
 
     private fun layout(view: View) {

@@ -215,6 +215,7 @@
       "rocks.pkb.plektra.core.suggestions.UserNGramStoreTest",
       "rocks.pkb.plektra.core.suggestions.UserOnlyDictionaryTest",
       "rocks.pkb.plektra.core.suggestions.WordNormalizationTest",
+      "rocks.pkb.plektra.dictionaries.RomanianDictionaryImportTest",
       "rocks.pkb.plektra.dictionaries.StreamingDictionaryValidatorTest",
       "rocks.pkb.plektra.inputmethod.AddWordCommitHelperTest",
       "rocks.pkb.plektra.inputmethod.suggestions.SuggestionSpacingBehaviorTest",

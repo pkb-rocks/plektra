@@ -2,6 +2,13 @@
 
 Run scripts from the repository root.
 
+## Custom dictionaries
+
+[Build and import a Romanian dictionary](../docs/romanian-dictionary-import.md) with
+`python3 convert_dictionaries.py INPUT OUTPUT --scale-frequencies` and
+`python3 scripts/preprocess_dictionaries.py INPUT --output-dir DIRECTORY`.
+Both tools retain their existing batch behavior when run without arguments.
+
 ## Nightly
 
 Create CalVer metadata:

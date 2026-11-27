@@ -4,12 +4,11 @@ Pre-process JSON dictionaries into serialized format for faster loading.
 Converts *_base.json files to *_base.dict files (JSON serialized format).
 """
 
+import argparse
 import json
-import os
 import sys
 from pathlib import Path
 import unicodedata
-import re
 
 def normalize(word, locale='it'):
     """Normalize word: lowercase, remove accents, keep only letters."""
@@ -107,6 +106,23 @@ def process_dictionary(json_file_path, output_dir):
 
 def main():
     """Main function."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input", nargs="?", type=Path, help="A single *_base.json file")
+    parser.add_argument("--output-dir", type=Path, help="Destination for the serialized .dict")
+    args = parser.parse_args()
+    if args.input is not None:
+        if not args.input.name.endswith("_base.json"):
+            parser.error("input name must end in _base.json, e.g. ro_base.json")
+        output_dir = args.output_dir or args.input.parent
+        output_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            process_dictionary(args.input, output_dir)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            parser.exit(1, f"Error: {error}\n")
+        return
+    if args.output_dir is not None:
+        parser.error("--output-dir requires an input file")
+
     print("=" * 60)
     print("Dictionary Pre-processing Script (Python)")
     print("=" * 60)

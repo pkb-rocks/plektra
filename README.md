@@ -78,6 +78,8 @@ Choose ortholinear or staggered rows for the software keyboard.
 
 Complete words from suggestions as you type. Dictionaries and locally learned next words are supported.
 
+[Build and import a Romanian dictionary](docs/romanian-dictionary-import.md) from a UTF-8 word/frequency list.
+
 ![Word suggestions for a partly typed word](docs/showcase/exports/stable/visuals/06-suggestions.png)
 
 ### Contextual character variations

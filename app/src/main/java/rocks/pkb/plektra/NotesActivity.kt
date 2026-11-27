@@ -137,7 +137,7 @@ open class NotesActivity : Activity() {
         header.start = iconAction(R.drawable.ic_notes_back, R.string.settings_back_content_description) { finish() }
         heading = EditText(this).apply {
             id = R.id.notes_heading
-            textSize = 20f
+            textSize = 18f
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             setTextColor(inkColor)
             setHintTextColor(mutedInkColor)
@@ -149,7 +149,7 @@ open class NotesActivity : Activity() {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
             setText(selectedNote.title)
-            setPadding(dp(8), 0, dp(8), 0)
+            setPadding(dp(4), 0, dp(4), 0)
         }
         header.middle = heading
         if (resources.configuration.screenWidthDp >= 600) {
@@ -163,10 +163,7 @@ open class NotesActivity : Activity() {
         }
         root.addView(header, LinearLayout.LayoutParams(-1, -2))
         modeTabGroup = LinearLayout(this).apply {
-            background = GradientDrawable().apply {
-                cornerRadius = dp(6).toFloat()
-                setStroke(dp(1), dividerColor)
-            }
+            setInsetBackground(modeGroupBackground())
             clipToOutline = true
         }
         val modes = listOf(
@@ -178,9 +175,13 @@ open class NotesActivity : Activity() {
             if (index > 0) {
                 val divider = View(this).apply { setBackgroundColor(dividerColor) }
                 modeTabDividers += divider
-                modeTabGroup.addView(divider, LinearLayout.LayoutParams(dp(1), -1))
+                modeTabGroup.addView(divider, LinearLayout.LayoutParams(dp(1), -1).apply {
+                    topMargin = dp(MODE_VISUAL_INSET)
+                    bottomMargin = dp(MODE_VISUAL_INSET)
+                })
             }
-            val tab = iconAction(icon, label, width = MODE_TAB_WIDTH, height = MODE_TAB_HEIGHT) { setViewMode(mode, showInput = true) }
+            val tab = iconAction(icon, label) { setViewMode(mode, showInput = true) }
+            tab.setInsetBackground(modeTabBackground())
             tab.id = when (mode) {
                 ViewMode.MARKDOWN -> R.id.notes_markdown_toggle
                 ViewMode.BOTH -> R.id.notes_both_toggle
@@ -189,12 +190,12 @@ open class NotesActivity : Activity() {
             modeTabs += mode to tab
             modeTabGroup.addView(tab)
         }
-        header.addEnd(modeTabGroup.apply { layoutParams = ViewGroup.LayoutParams(-2, dp(MODE_TAB_HEIGHT)) })
-        header.addEnd(iconAction(R.drawable.ic_notes_add, R.string.notes_new, width = END_ACTION_WIDTH) {
+        header.addEnd(modeTabGroup.apply { layoutParams = ViewGroup.LayoutParams(-2, dp(ACTION_SIZE)) })
+        header.addEnd(iconAction(R.drawable.ic_notes_add, R.string.notes_new) {
             switchNote(notes.create(), focusHeading = true)
         }
             .apply { id = R.id.notes_new })
-        header.addEnd(iconAction(R.drawable.ic_notes_more, R.string.notes_title, width = END_ACTION_WIDTH) { showNotes() })
+        header.addEnd(iconAction(R.drawable.ic_notes_more, R.string.notes_title) { showNotes() })
         var titleOnSeparateLine = false
         // A title squeezed by the actions moves to its own line below them.
         root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
@@ -429,10 +430,7 @@ open class NotesActivity : Activity() {
         heading.setTextColor(inkColor)
         heading.setHintTextColor(mutedInkColor)
         savedIndicator?.setTextColor(mutedInkColor)
-        modeTabGroup.background = GradientDrawable().apply {
-            cornerRadius = dp(6).toFloat()
-            setStroke(dp(1), dividerColor)
-        }
+        modeTabGroup.setInsetBackground(modeGroupBackground())
         modeTabDividers.forEach { it.setBackgroundColor(dividerColor) }
         editor.setTextColor(inkColor)
         editor.setHintTextColor(mutedInkColor)
@@ -444,7 +442,8 @@ open class NotesActivity : Activity() {
         val selectedModeTab = modeTabs.firstOrNull { it.first == viewMode }?.second
         actionIcons.forEach { (button, glyph) ->
             button.setTextColor(inkColor)
-            button.background = actionBackground()
+            if (modeTabs.any { it.second === button }) button.setInsetBackground(modeTabBackground())
+            else button.background = actionBackground()
             glyph.setTint(if (button === selectedModeTab) accentColor else inkColor)
         }
 
@@ -585,11 +584,49 @@ open class NotesActivity : Activity() {
         val dialogTheme = rocks.pkb.plektra.ui.theme.AppThemeResolver.platformAlertDialogThemeRes(
             rocks.pkb.plektra.ui.theme.AppThemeResolver.resolve(this).useDarkTheme
         )
-        AlertDialog.Builder(this, dialogTheme).setTitle(R.string.notes_title)
-            .setItems(items.map { it.title.ifBlank { getString(R.string.notes_untitled) } }.toTypedArray()) { _, index ->
-                switchNote(items[index])
-            }.setPositiveButton(R.string.notes_new) { _, _ -> switchNote(notes.create(), focusHeading = true) }
+        val builder = AlertDialog.Builder(this, dialogTheme)
+        val dialogContext = builder.context
+        val title = TextView(dialogContext).apply {
+            text = getString(R.string.notes_title)
+            textSize = 18f
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            setTextColor(themeColor(dialogContext, android.R.attr.textColorPrimary))
+            setPadding(dp(20), dp(16), dp(20), dp(8))
+            ViewCompat.setAccessibilityHeading(this, true)
+        }
+        val activeId = selectedNote.id
+        val adapter = object : android.widget.BaseAdapter() {
+            override fun getCount() = items.size
+            override fun getItem(position: Int) = items[position]
+            override fun getItemId(position: Int) = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val note = items[position]
+                val active = note.id == activeId
+                return ((convertView as? TextView) ?: TextView(dialogContext)).apply {
+                    text = note.title.ifBlank { getString(R.string.notes_untitled) }
+                    textSize = 16f
+                    maxLines = 2
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    gravity = Gravity.CENTER_VERTICAL
+                    minHeight = dp(48)
+                    setPadding(dp(20), dp(6), dp(20), dp(6))
+                    // The open note is marked, as the selected row in settings lists.
+                    isActivated = active
+                    typeface = Typeface.create(if (active) "sans-serif-medium" else "sans-serif", Typeface.NORMAL)
+                    setTextColor(if (active) accentColor else themeColor(dialogContext, android.R.attr.textColorPrimary))
+                }
+            }
+        }
+        builder.setCustomTitle(title)
+            .setAdapter(adapter) { _, index -> switchNote(items[index]) }
+            .setPositiveButton(R.string.notes_new) { _, _ -> switchNote(notes.create(), focusHeading = true) }
             .setNegativeButton(android.R.string.cancel, null).show()
+    }
+
+    private fun themeColor(context: android.content.Context, attr: Int): Int {
+        val value = android.util.TypedValue()
+        if (!context.theme.resolveAttribute(attr, value, true)) return inkColor
+        return if (value.resourceId != 0) context.getColor(value.resourceId) else value.data
     }
 
     private fun switchNote(note: NotesRepository.Note, focusHeading: Boolean = note.headingFocused) {
@@ -652,9 +689,25 @@ open class NotesActivity : Activity() {
             }
         }
 
-    /** A formatting tool: denser than the header actions, like a compact toolbar. */
+    /** A formatting tool: a smaller glyph than the header actions on the same touch target. */
     private fun tool(icon: Int, description: Int, onClick: () -> Unit): TextView =
         iconAction(icon, description, width = TOOL_SIZE, height = TOOL_SIZE, iconSize = 20, onClick = onClick)
+
+    /** An inset background only draws smaller; the view keeps its full size and touch target. */
+    private fun View.setInsetBackground(drawable: Drawable) {
+        background = drawable
+        setPadding(0, 0, 0, 0)
+    }
+
+    private fun modeGroupBackground(): Drawable = android.graphics.drawable.InsetDrawable(
+        GradientDrawable().apply {
+            cornerRadius = dp(6).toFloat()
+            setStroke(dp(1), dividerColor)
+        }, 0, dp(MODE_VISUAL_INSET), 0, dp(MODE_VISUAL_INSET)
+    )
+
+    private fun modeTabBackground(): Drawable =
+        android.graphics.drawable.InsetDrawable(actionBackground(), 0, dp(MODE_VISUAL_INSET), 0, dp(MODE_VISUAL_INSET))
 
     private fun actionBackground(): Drawable {
         val selected = GradientDrawable().apply {
@@ -722,11 +775,10 @@ open class NotesActivity : Activity() {
         const val EDGE = 4
         const val HEADER_HEIGHT = 48
         const val ACTION_SIZE = 48
-        /** Narrower than Back, so the title keeps room between them on small phones. */
-        const val END_ACTION_WIDTH = 44
-        const val MODE_TAB_WIDTH = 40
-        const val MODE_TAB_HEIGHT = 40
-        const val TOOL_SIZE = 40
+        /** The mode switch looks 40 dp tall; each tab still takes 48 dp touches. */
+        const val MODE_VISUAL_INSET = 4
+        /** Formatting tools: small glyphs, full 48 dp touch targets. */
+        const val TOOL_SIZE = 48
         /** Below this width the title moves to its own line under the header. */
         const val TITLE_MIN_WIDTH = 96
     }

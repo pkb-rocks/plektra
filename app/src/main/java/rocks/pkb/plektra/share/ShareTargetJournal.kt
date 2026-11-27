@@ -36,12 +36,16 @@ internal object ShareTargetJournal {
 
     enum class Kind { MediaStore, Document }
 
-    /** [temporaryName] identifies a [Kind.Document] target; it is null for MediaStore rows. */
+    /**
+     * [temporaryName] identifies a [Kind.Document] target and [parent] is its folder; both are
+     * null for MediaStore rows.
+     */
     data class Entry(
         val id: String,
         val kind: Kind,
         val target: Uri,
         val temporaryName: String?,
+        val parent: Uri?,
         val createdAt: Long
     )
 
@@ -59,15 +63,21 @@ internal object ShareTargetJournal {
         kind: Kind,
         target: Uri,
         temporaryName: String? = null,
+        parent: Uri? = null,
         now: Long = System.currentTimeMillis()
     ): Entry {
-        require((kind == Kind.Document) == (temporaryName != null)) { "Documents need their temporary name" }
-        val entry = Entry(UUID.randomUUID().toString(), kind, target, temporaryName, now)
+        require((kind == Kind.Document) == (temporaryName != null && parent != null)) {
+            "Documents need their temporary name and folder"
+        }
+        val entry = Entry(UUID.randomUUID().toString(), kind, target, temporaryName, parent, now)
         synchronized(lock) {
             val directory = root(context)
             if (!directory.isDirectory && !directory.mkdirs()) throw IOException("Cannot create $directory")
             val temporary = File(directory, entry.id + TEMPORARY_SUFFIX)
-            temporary.writeText(listOf(kind.name, target.toString(), now.toString(), temporaryName.orEmpty()).joinToString("\n"))
+            temporary.writeText(
+                listOf(kind.name, target.toString(), now.toString(), temporaryName.orEmpty(), parent?.toString().orEmpty())
+                    .joinToString("\n")
+            )
             if (!temporary.renameTo(File(directory, entry.id))) {
                 temporary.delete()
                 throw IOException("Cannot record pending share target")
@@ -103,28 +113,47 @@ internal object ShareTargetJournal {
             files.filter { !it.name.endsWith(TEMPORARY_SUFFIX) && it.name !in active && it.name !in recovering }
                 .onEach { recovering += it.name }
         }
-        for (file in claimed) {
-            try {
+        try {
+            for (file in claimed) {
                 // Provider calls happen outside the lock so a new save is never held up.
                 val entry = read(file)
                 val outcome = if (entry == null) Outcome.Resolved else resolve(context, entry, now)
                 if (outcome == Outcome.Resolved) synchronized(lock) { file.delete() }
-            } finally {
-                synchronized(lock) { recovering -= file.name }
             }
+        } finally {
+            // Every claimed record is released, also when a provider call failed unexpectedly.
+            synchronized(lock) { claimed.forEach { recovering -= it.name } }
         }
+    }
+
+    /** True while any record exists, including those of saves still running. */
+    fun hasRecords(context: Context): Boolean = synchronized(lock) {
+        root(context).listFiles()?.any { !it.name.endsWith(TEMPORARY_SUFFIX) } == true
     }
 
     private fun read(file: File): Entry? = runCatching {
         val lines = file.readLines()
         val kind = Kind.valueOf(lines[0])
-        Entry(file.name, kind, Uri.parse(lines[1]), lines.getOrNull(3)?.takeIf { it.isNotEmpty() }, lines[2].toLong())
+        Entry(
+            file.name,
+            kind,
+            Uri.parse(lines[1]),
+            lines.getOrNull(3)?.takeIf { it.isNotEmpty() },
+            lines.getOrNull(4)?.takeIf { it.isNotEmpty() }?.let(Uri::parse),
+            lines[2].toLong()
+        )
     }.getOrNull()
 
     private fun resolve(context: Context, entry: Entry, now: Long): Outcome {
-        val outcome = when (entry.kind) {
-            Kind.MediaStore -> resolveMediaStore(context, entry.target)
-            Kind.Document -> resolveDocument(context, entry.target, entry.temporaryName)
+        val outcome = try {
+            when (entry.kind) {
+                Kind.MediaStore -> resolveMediaStore(context, entry.target)
+                Kind.Document -> resolveDocument(context, entry)
+            }
+        } catch (e: Exception) {
+            // A dead provider process (RemoteException) or any other surprise: try again later.
+            Log.w(TAG, "Cleanup deferred (${e.javaClass.simpleName})")
+            Outcome.Retry
         }
         return if (outcome == Outcome.Retry && now - entry.createdAt >= MAX_RECORD_AGE_MILLIS) {
             Outcome.Resolved
@@ -150,36 +179,44 @@ internal object ShareTargetJournal {
     }
 
     /** Deletes the document only while it still carries its unique temporary name. */
-    private fun resolveDocument(context: Context, target: Uri, temporaryName: String?): Outcome {
+    private fun resolveDocument(context: Context, entry: Entry): Outcome {
+        val target = entry.target
+        val temporaryName = entry.temporaryName
         val authority = target.authority ?: return Outcome.Resolved
         val client = context.contentResolver.acquireUnstableContentProviderClient(authority)
             ?: return Outcome.Retry // Provider not reachable now, e.g. removable storage.
         return try {
-            val name = try {
-                client.query(target, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
-                    ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+            fun lookUp(uri: Uri): Lookup = try {
+                client.query(uri, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
+                    ?.use { if (it.moveToFirst()) Lookup.Found(it.getString(0)) else Lookup.Missing }
+                    ?: Lookup.NoAnswer
             } catch (e: FileNotFoundException) {
-                null
-            } catch (e: IllegalArgumentException) {
-                null // Document providers report a missing document this way too.
+                Lookup.Missing
             }
-            when {
-                name == null -> Outcome.Resolved // Gone, for example renamed when complete.
-                name != temporaryName -> Outcome.Resolved // Not the partial file anymore.
-                else -> {
-                    DocumentsContract.deleteDocument(context.contentResolver, target)
-                    Outcome.Resolved
+            var answer = lookUp(target)
+            // Document providers also answer null for a missing document. When the folder still
+            // answers, the document is gone; when neither answers, the provider is unavailable.
+            if (answer == Lookup.NoAnswer && entry.parent != null && lookUp(entry.parent) is Lookup.Found) {
+                answer = Lookup.Missing
+            }
+            when (answer) {
+                Lookup.NoAnswer -> Outcome.Retry
+                Lookup.Missing -> Outcome.Resolved // Gone, for example renamed when complete.
+                is Lookup.Found -> when {
+                    temporaryName == null || answer.name != temporaryName -> Outcome.Resolved // Not the partial file.
+                    DocumentsContract.deleteDocument(context.contentResolver, target) -> Outcome.Resolved
+                    else -> Outcome.Retry
                 }
             }
-        } catch (e: FileNotFoundException) {
-            Outcome.Resolved
-        } catch (e: RuntimeException) {
-            // Includes a temporarily revoked grant; the record is retried until it ages out.
-            Log.w(TAG, "Document cleanup deferred (${e.javaClass.simpleName})")
-            Outcome.Retry
         } finally {
             client.close()
         }
+    }
+
+    private sealed interface Lookup {
+        data object NoAnswer : Lookup
+        data object Missing : Lookup
+        data class Found(val name: String?) : Lookup
     }
 
     /** Only for tests: makes recorded targets look as if their process had ended. */

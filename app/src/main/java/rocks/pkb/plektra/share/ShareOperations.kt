@@ -159,9 +159,10 @@ internal object ShareOperations {
         context: Context,
         kind: ShareTargetJournal.Kind,
         target: Uri,
-        temporaryName: String? = null
+        temporaryName: String? = null,
+        parent: Uri? = null
     ): ShareTargetJournal.Entry = try {
-        ShareTargetJournal.begin(context, kind, target, temporaryName)
+        ShareTargetJournal.begin(context, kind, target, temporaryName, parent)
     } catch (e: IOException) {
         // Not recorded, so remove it now: this process knows it is incomplete.
         runCatching {
@@ -277,9 +278,12 @@ internal object ShareOperations {
         write: suspend (Uri) -> Unit
     ): Uri {
         val resolver = context.contentResolver
-        val temporary = createDocument(resolver, parent, mimeType, ".plektra-partial-${UUID.randomUUID()}")
+        val token = UUID.randomUUID().toString()
+        val temporary = createDocument(resolver, parent, mimeType, "$TEMPORARY_PREFIX$token")
         val (temporaryName, flags) = documentNameAndFlags(resolver, temporary)
-        if (temporaryName == null || flags and DocumentsContract.Document.FLAG_SUPPORTS_RENAME == 0) {
+        // Recovery may only ever delete by this name, so it must carry our random token.
+        val identifiable = temporaryName != null && token in temporaryName
+        if (!identifiable || flags and DocumentsContract.Document.FLAG_SUPPORTS_RENAME == 0) {
             runCatching { DocumentsContract.deleteDocument(resolver, temporary) }
             // Document providers resolve name collisions themselves, e.g. "name (1).ext".
             val document = createDocument(resolver, parent, mimeType, name)
@@ -292,11 +296,15 @@ internal object ShareOperations {
             }
             return document
         }
-        val entry = journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName)
+        val entry = journal(context, ShareTargetJournal.Kind.Document, temporary, temporaryName, parent)
         var complete = false
         try {
             write(temporary)
-            val renamed = guarded { DocumentsContract.renameDocument(resolver, temporary, name) } ?: temporary
+            // Android returns the (possibly unchanged) document URI on success and null on failure.
+            val renamed = guarded { DocumentsContract.renameDocument(resolver, temporary, name) }
+                ?: throw ShareOperationException(ShareFailure.WriteFailed)
+            val (finalName, _) = documentNameAndFlags(resolver, renamed)
+            if (finalName == null || token in finalName) throw ShareOperationException(ShareFailure.WriteFailed)
             complete = true
             ShareTargetJournal.complete(context, entry)
             return renamed
@@ -304,6 +312,8 @@ internal object ShareOperations {
             if (!complete) ShareTargetJournal.discard(context, entry)
         }
     }
+
+    private const val TEMPORARY_PREFIX = ".plektra-partial-"
 
     /** Largest edge of the bitmap decoded to prove a picture is readable; bounds its memory. */
     private const val VERIFY_MAX_EDGE = 2048

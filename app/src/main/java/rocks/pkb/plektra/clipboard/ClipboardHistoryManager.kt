@@ -15,6 +15,8 @@ import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import rocks.pkb.plektra.R
 import rocks.pkb.plektra.SettingsManager
+import rocks.pkb.plektra.share.ShareClipboardCache
+import kotlin.concurrent.thread
 
 /**
  * Connects the Android clipboard and the history UI to [ClipboardHistory].
@@ -121,8 +123,19 @@ class ClipboardHistoryManager internal constructor(
     }
 
     override fun onPrimaryClipChanged() {
+        releaseReplacedShareCopies()
         if (!isEnabled || !isHistoryAccessible()) return
         fetchPrimaryClip()
+    }
+
+    /** Files the share target placed on the clipboard are only kept while they are the current clip. */
+    private fun releaseReplacedShareCopies() {
+        if (!ShareClipboardCache.hasCopies(context)) return
+        val clipboard = clipboardManager
+        thread(name = "share-clipboard-prune") {
+            // A null clip is unknown (no access, locked device): then only expired copies go.
+            runCatching { ShareClipboardCache.prune(context) { clipboard.primaryClip } }
+        }
     }
 
     /**

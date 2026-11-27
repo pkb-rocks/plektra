@@ -388,6 +388,8 @@ fun AdvancedSettingsScreen(
                             }
                         )
 
+                        ShareDestinationSettings()
+
                         // Swipe Incremental Threshold
                         Surface(
                             modifier = Modifier

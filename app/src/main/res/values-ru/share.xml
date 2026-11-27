@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Поделиться с Plektra</string>
+    <string name="share_nothing_received">Нечего принять. Plektra читает только то содержимое, к которому даёт доступ отправляющее приложение.</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d общий элемент</item>
+        <item quantity="few">%d общих элемента</item>
+        <item quantity="many">%d общих элементов</item>
+        <item quantity="other">%d общего элемента</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">%d элемент пропущен: он передан не через систему разрешений Android.</item>
+        <item quantity="few">%d элемента пропущено: они переданы не через систему разрешений Android.</item>
+        <item quantity="many">%d элементов пропущено: они переданы не через систему разрешений Android.</item>
+        <item quantity="other">%d элемента пропущено: они переданы не через систему разрешений Android.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Текст · %d символ</item>
+        <item quantity="few">Текст · %d символа</item>
+        <item quantity="many">Текст · %d символов</item>
+        <item quantity="other">Текст · %d символа</item>
+    </plurals>
+    <string name="share_action_clipboard">Копировать в буфер обмена</string>
+    <string name="share_action_save_file">Сохранить как файл</string>
+    <string name="share_action_save_files">Сохранить как файлы</string>
+    <string name="share_action_gallery_one">Добавить изображение в галерею</string>
+    <string name="share_action_gallery_many">Добавить изображения в галерею</string>
+    <string name="share_action_save_downloads_instead">Сохранить в «Загрузки»</string>
+    <string name="share_destination">Куда: %s</string>
+    <string name="share_gallery_partial">Изображений: %1$d из %2$d · куда: %3$s</string>
+    <string name="share_change_destinations">Изменить места сохранения</string>
+    <string name="share_folder_downloads">Загрузки</string>
+    <string name="share_folder_unnamed">Выбранная папка</string>
+    <string name="share_folder_access_lost">У Plektra больше нет доступа к выбранной папке. Выберите её снова в «Изменить места сохранения».</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">Не удалось обработать %d элемент. Подробности в списке ниже.</item>
+        <item quantity="few">Не удалось обработать %d элемента. Подробности в списке ниже.</item>
+        <item quantity="many">Не удалось обработать %d элементов. Подробности в списке ниже.</item>
+        <item quantity="other">Не удалось обработать %d элемента. Подробности в списке ниже.</item>
+    </plurals>
+    <string name="share_progress">Готово: %1$d из %2$d</string>
+    <string name="share_cancel">Отмена</string>
+    <string name="share_close">Закрыть</string>
+    <string name="share_cancelled">Отменено. Элементы, отмеченные как сохранённые, остаются сохранёнными.</string>
+    <string name="share_result_saved">Сохранено как %1$s в %2$s</string>
+    <string name="share_result_copied">Скопировано в буфер обмена</string>
+    <string name="share_done_clipboard">Скопировано в буфер обмена</string>
+    <plurals name="share_done_files">
+        <item quantity="one">%1$d файл сохранён в %2$s</item>
+        <item quantity="few">%1$d файла сохранено в %2$s</item>
+        <item quantity="many">%1$d файлов сохранено в %2$s</item>
+        <item quantity="other">%1$d файла сохранено в %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">%1$d изображение добавлено в %2$s</item>
+        <item quantity="few">%1$d изображения добавлено в %2$s</item>
+        <item quantity="many">%1$d изображений добавлено в %2$s</item>
+        <item quantity="other">%1$d изображения добавлено в %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">Отправляющее приложение больше не разрешает читать этот элемент.</string>
+    <string name="share_error_folder_access_revoked">Нет доступа к выбранной папке. Выберите её снова или сохраните в «Загрузки».</string>
+    <string name="share_error_folder_unavailable">Выбранная папка недоступна.</string>
+    <string name="share_error_not_an_image">Android не может прочитать этот элемент как изображение.</string>
+    <string name="share_error_too_large_for_clipboard">Слишком большой объём для буфера обмена. Сохраните как файл.</string>
+    <string name="share_error_clipboard_rejected">Буфер обмена не принял этот элемент.</string>
+    <string name="share_error_write_failed">Не удалось сохранить. Возможно, память заполнена или недоступна для записи.</string>
+    <string name="share_clip_label">Передано в Plektra</string>
+    <string name="share_text_file_name">Общий текст %s</string>
+    <string name="share_file_fallback_name">Общий файл</string>
+    <string name="share_image_fallback_name">Общее изображение</string>
+    <string name="share_save_folder_title">Место для полученных файлов</string>
+    <string name="share_save_folder_description">Сюда сохраняются файлы из меню «Поделиться» Android</string>
+    <string name="share_save_folder_choose">Выбрать папку…</string>
+    <string name="share_save_folder_use_downloads">Использовать «Загрузки»</string>
+    <string name="share_save_folder_dialog_message">Полученные файлы сейчас сохраняются в %s.</string>
+    <string name="share_save_folder_choose_failed">Plektra не удалось сохранить доступ к этой папке. Выберите другую папку.</string>
+    <string name="share_gallery_album_title">Отдельный альбом для полученных изображений</string>
+    <string name="share_gallery_album_description">Сохраняет изображения в Pictures/Plektra вместо Pictures</string>
+    <string name="kw_share_save_folder">поделиться сохранить файл папка загрузки место каталог share downloads</string>
+    <string name="kw_share_gallery_album">поделиться изображения фото галерея альбом share gallery</string>
+</resources>

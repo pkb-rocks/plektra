@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Կիսվել Plektra-ի հետ</string>
+    <string name="share_nothing_received">Ընդունելու բան չկա։ Plektra-ն կարդում է միայն այն բովանդակությունը, որը կիսվող հավելվածը թույլ է տալիս։</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d կիսված տարր</item>
+        <item quantity="other">%d կիսված տարր</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">%d տարր անտեսվեց, քանի որ այն կիսվել է ոչ Android-ի թույլտվությունների համակարգով։</item>
+        <item quantity="other">%d տարր անտեսվեց, քանի որ դրանք կիսվել են ոչ Android-ի թույլտվությունների համակարգով։</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Տեքստ · %d նիշ</item>
+        <item quantity="other">Տեքստ · %d նիշ</item>
+    </plurals>
+    <string name="share_action_clipboard">Պատճենել սեղմատախտակին</string>
+    <string name="share_action_save_file">Պահել որպես ֆայլ</string>
+    <string name="share_action_save_files">Պահել որպես ֆայլեր</string>
+    <string name="share_action_gallery_one">Ավելացնել պատկերը պատկերասրահ</string>
+    <string name="share_action_gallery_many">Ավելացնել պատկերները պատկերասրահ</string>
+    <string name="share_action_save_downloads_instead">Պահել Ներբեռնումներում</string>
+    <string name="share_destination">Նպատակակետ՝ %s</string>
+    <string name="share_gallery_partial">%2$d տարրից %1$d-ը պատկեր է · նպատակակետ՝ %3$s</string>
+    <string name="share_change_destinations">Փոխել տեղերը</string>
+    <string name="share_folder_downloads">Ներբեռնումներ</string>
+    <string name="share_folder_unnamed">Ընտրված թղթապանակ</string>
+    <string name="share_folder_access_lost">Plektra-ն այլևս մուտք չունի ընտրված թղթապանակ։ Կրկին ընտրեք այն «Փոխել տեղերը» բաժնում։</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">%d տարր չհաջողվեց մշակել։ Մանրամասները ստորև ցանկում են։</item>
+        <item quantity="other">%d տարր չհաջողվեց մշակել։ Մանրամասները ստորև ցանկում են։</item>
+    </plurals>
+    <string name="share_progress">Պատրաստ է %1$d / %2$d</string>
+    <string name="share_cancel">Չեղարկել</string>
+    <string name="share_close">Փակել</string>
+    <string name="share_cancelled">Չեղարկվեց։ Պահված նշված տարրերը մնում են պահված։</string>
+    <string name="share_result_saved">Պահվեց որպես %1$s՝ %2$s-ում</string>
+    <string name="share_result_copied">Պատճենվեց սեղմատախտակին</string>
+    <string name="share_done_clipboard">Պատճենվեց սեղմատախտակին</string>
+    <plurals name="share_done_files">
+        <item quantity="one">%1$d ֆայլ պահվեց %2$s-ում</item>
+        <item quantity="other">%1$d ֆայլ պահվեց %2$s-ում</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">%1$d պատկեր ավելացվեց %2$s</item>
+        <item quantity="other">%1$d պատկեր ավելացվեց %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">Կիսվող հավելվածն այլևս թույլ չի տալիս կարդալ այս տարրը։</string>
+    <string name="share_error_folder_access_revoked">Ընտրված թղթապանակ մուտք չկա։ Կրկին ընտրեք այն կամ պահեք Ներբեռնումներում։</string>
+    <string name="share_error_folder_unavailable">Ընտրված թղթապանակը հասանելի չէ։</string>
+    <string name="share_error_not_an_image">Android-ը չի կարող կարդալ այս տարրը որպես պատկեր։</string>
+    <string name="share_error_too_large_for_clipboard">Չափազանց մեծ է սեղմատախտակի համար։ Պահեք որպես ֆայլ։</string>
+    <string name="share_error_clipboard_rejected">Սեղմատախտակը չընդունեց այս տարրը։</string>
+    <string name="share_error_write_failed">Չհաջողվեց պահել։ Հնարավոր է՝ հիշողությունը լի է կամ գրման համար անհասանելի։</string>
+    <string name="share_clip_label">Կիսված Plektra-ի հետ</string>
+    <string name="share_text_file_name">Կիսված տեքստ %s</string>
+    <string name="share_file_fallback_name">Կիսված ֆայլ</string>
+    <string name="share_image_fallback_name">Կիսված պատկեր</string>
+    <string name="share_save_folder_title">Կիսված ֆայլերի տեղը</string>
+    <string name="share_save_folder_description">Android-ի կիսվելու ընտրացանկից պահված ֆայլերը հայտնվում են այստեղ</string>
+    <string name="share_save_folder_choose">Ընտրել թղթապանակ…</string>
+    <string name="share_save_folder_use_downloads">Օգտագործել Ներբեռնումները</string>
+    <string name="share_save_folder_dialog_message">Կիսված ֆայլերն այժմ պահվում են %s-ում։</string>
+    <string name="share_save_folder_choose_failed">Plektra-ին չհաջողվեց պահպանել մուտքը այս թղթապանակ։ Ընտրեք այլ թղթապանակ։</string>
+    <string name="share_gallery_album_title">Առանձին ալբոմ կիսված պատկերների համար</string>
+    <string name="share_gallery_album_description">Պահում է պատկերները Pictures/Plektra-ում՝ Pictures-ի փոխարեն</string>
+    <string name="kw_share_save_folder">կիսվել պահել ֆայլ թղթապանակ ներբեռնումներ տեղ share downloads</string>
+    <string name="kw_share_gallery_album">կիսվել պատկերներ լուսանկարներ պատկերասրահ ալբոմ share gallery</string>
+</resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Share with Plektra</string>
+    <string name="share_nothing_received">Nothing to take over. Plektra only reads content that the sharing app releases to it.</string>
+    <plurals name="share_item_count">
+        <item quantity="one">%d shared item</item>
+        <item quantity="other">%d shared items</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="one">%d item was ignored because it is not shared through Android\'s permission system.</item>
+        <item quantity="other">%d items were ignored because they are not shared through Android\'s permission system.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="one">Text · %d character</item>
+        <item quantity="other">Text · %d characters</item>
+    </plurals>
+    <string name="share_action_clipboard">Copy to clipboard</string>
+    <string name="share_action_save_file">Save as file</string>
+    <string name="share_action_save_files">Save as files</string>
+    <string name="share_action_gallery_one">Add picture to gallery</string>
+    <string name="share_action_gallery_many">Add pictures to gallery</string>
+    <string name="share_action_save_downloads_instead">Save in Downloads instead</string>
+    <string name="share_destination">Destination: %s</string>
+    <string name="share_gallery_partial">%1$d of %2$d items are pictures · destination: %3$s</string>
+    <string name="share_change_destinations">Change locations</string>
+    <string name="share_folder_downloads">Downloads</string>
+    <string name="share_folder_unnamed">Selected folder</string>
+    <string name="share_folder_access_lost">Plektra can no longer access the selected folder. Choose it again under Change locations.</string>
+    <plurals name="share_failed_count">
+        <item quantity="one">%d item could not be handled. See the list below.</item>
+        <item quantity="other">%d items could not be handled. See the list below.</item>
+    </plurals>
+    <string name="share_progress">%1$d of %2$d done</string>
+    <string name="share_cancel">Cancel</string>
+    <string name="share_close">Close</string>
+    <string name="share_cancelled">Cancelled. Items marked as saved remain saved.</string>
+    <string name="share_result_saved">Saved as %1$s in %2$s</string>
+    <string name="share_result_copied">Copied to the clipboard</string>
+    <string name="share_done_clipboard">Copied to the clipboard</string>
+    <plurals name="share_done_files">
+        <item quantity="one">%1$d file saved in %2$s</item>
+        <item quantity="other">%1$d files saved in %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="one">%1$d picture added to %2$s</item>
+        <item quantity="other">%1$d pictures added to %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">The sharing app no longer allows reading this item.</string>
+    <string name="share_error_folder_access_revoked">No access to the selected folder. Choose it again or save in Downloads.</string>
+    <string name="share_error_folder_unavailable">The selected folder is not available.</string>
+    <string name="share_error_not_an_image">Android cannot read this item as a picture.</string>
+    <string name="share_error_too_large_for_clipboard">Too large for the clipboard. Save it as a file instead.</string>
+    <string name="share_error_clipboard_rejected">The clipboard did not accept this item.</string>
+    <string name="share_error_write_failed">Could not save. The storage may be full or not writable.</string>
+    <string name="share_clip_label">Shared with Plektra</string>
+    <string name="share_text_file_name">Shared text %s</string>
+    <string name="share_file_fallback_name">Shared file</string>
+    <string name="share_image_fallback_name">Shared picture</string>
+    <string name="share_save_folder_title">Location for shared files</string>
+    <string name="share_save_folder_description">Files saved from Android\'s share menu go here</string>
+    <string name="share_save_folder_choose">Choose folder…</string>
+    <string name="share_save_folder_use_downloads">Use Downloads</string>
+    <string name="share_save_folder_dialog_message">Shared files currently go to %s.</string>
+    <string name="share_save_folder_choose_failed">Plektra could not keep access to this folder. Choose another folder.</string>
+    <string name="share_gallery_album_title">Own album for shared pictures</string>
+    <string name="share_gallery_album_description">Adds pictures to Pictures/Plektra instead of Pictures</string>
+    <string name="kw_share_save_folder">share sharing share menu save file folder downloads location directory storage</string>
+    <string name="kw_share_gallery_album">share sharing pictures photos images gallery album</string>
+</resources>

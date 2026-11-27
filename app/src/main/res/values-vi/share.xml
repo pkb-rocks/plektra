@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Chia sẻ với Plektra</string>
+    <string name="share_nothing_received">Không có gì để nhận. Plektra chỉ đọc nội dung mà ứng dụng chia sẻ cho phép.</string>
+    <plurals name="share_item_count">
+        <item quantity="other">%d mục được chia sẻ</item>
+    </plurals>
+    <plurals name="share_items_rejected">
+        <item quantity="other">Đã bỏ qua %d mục vì chúng không được chia sẻ qua hệ thống quyền của Android.</item>
+    </plurals>
+    <plurals name="share_text_detail">
+        <item quantity="other">Văn bản · %d ký tự</item>
+    </plurals>
+    <string name="share_action_clipboard">Sao chép vào bộ nhớ tạm</string>
+    <string name="share_action_save_file">Lưu thành tệp</string>
+    <string name="share_action_save_files">Lưu thành tệp</string>
+    <string name="share_action_gallery_one">Thêm ảnh vào thư viện</string>
+    <string name="share_action_gallery_many">Thêm ảnh vào thư viện</string>
+    <string name="share_action_save_downloads_instead">Lưu vào Tải xuống</string>
+    <string name="share_destination">Đích: %s</string>
+    <string name="share_gallery_partial">%1$d trong %2$d mục là ảnh · đích: %3$s</string>
+    <string name="share_change_destinations">Đổi vị trí lưu</string>
+    <string name="share_folder_downloads">Tải xuống</string>
+    <string name="share_folder_unnamed">Thư mục đã chọn</string>
+    <string name="share_folder_access_lost">Plektra không còn quyền truy cập thư mục đã chọn. Hãy chọn lại trong Đổi vị trí lưu.</string>
+    <plurals name="share_failed_count">
+        <item quantity="other">Không thể xử lý %d mục. Xem danh sách bên dưới.</item>
+    </plurals>
+    <string name="share_progress">Đã xong %1$d/%2$d</string>
+    <string name="share_cancel">Hủy</string>
+    <string name="share_close">Đóng</string>
+    <string name="share_cancelled">Đã hủy. Các mục được đánh dấu đã lưu vẫn được giữ.</string>
+    <string name="share_result_saved">Đã lưu thành %1$s trong %2$s</string>
+    <string name="share_result_copied">Đã sao chép vào bộ nhớ tạm</string>
+    <string name="share_done_clipboard">Đã sao chép vào bộ nhớ tạm</string>
+    <plurals name="share_done_files">
+        <item quantity="other">Đã lưu %1$d tệp vào %2$s</item>
+    </plurals>
+    <plurals name="share_done_gallery">
+        <item quantity="other">Đã thêm %1$d ảnh vào %2$s</item>
+    </plurals>
+    <string name="share_error_source_unreadable">Ứng dụng chia sẻ không còn cho phép đọc mục này.</string>
+    <string name="share_error_folder_access_revoked">Không có quyền truy cập thư mục đã chọn. Hãy chọn lại hoặc lưu vào Tải xuống.</string>
+    <string name="share_error_folder_unavailable">Thư mục đã chọn không khả dụng.</string>
+    <string name="share_error_not_an_image">Android không thể đọc mục này dưới dạng ảnh.</string>
+    <string name="share_error_too_large_for_clipboard">Quá lớn cho bộ nhớ tạm. Hãy lưu thành tệp.</string>
+    <string name="share_error_clipboard_rejected">Bộ nhớ tạm không chấp nhận mục này.</string>
+    <string name="share_error_write_failed">Không thể lưu. Bộ nhớ có thể đã đầy hoặc không ghi được.</string>
+    <string name="share_clip_label">Đã chia sẻ với Plektra</string>
+    <string name="share_text_file_name">Văn bản chia sẻ %s</string>
+    <string name="share_file_fallback_name">Tệp chia sẻ</string>
+    <string name="share_image_fallback_name">Ảnh chia sẻ</string>
+    <string name="share_save_folder_title">Vị trí lưu tệp được chia sẻ</string>
+    <string name="share_save_folder_description">Tệp lưu từ menu chia sẻ của Android sẽ nằm ở đây</string>
+    <string name="share_save_folder_choose">Chọn thư mục…</string>
+    <string name="share_save_folder_use_downloads">Dùng Tải xuống</string>
+    <string name="share_save_folder_dialog_message">Tệp được chia sẻ hiện được lưu vào %s.</string>
+    <string name="share_save_folder_choose_failed">Plektra không giữ được quyền truy cập thư mục này. Hãy chọn thư mục khác.</string>
+    <string name="share_gallery_album_title">Album riêng cho ảnh được chia sẻ</string>
+    <string name="share_gallery_album_description">Lưu ảnh vào Pictures/Plektra thay vì Pictures</string>
+    <string name="kw_share_save_folder">chia sẻ lưu tệp thư mục tải xuống vị trí share downloads</string>
+    <string name="kw_share_gallery_album">chia sẻ ảnh hình thư viện album share gallery</string>
+</resources>

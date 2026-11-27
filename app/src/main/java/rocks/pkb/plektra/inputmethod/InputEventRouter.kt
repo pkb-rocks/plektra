@@ -677,6 +677,10 @@ class InputEventRouter(
                 val shouldTrackImmediately = longPressMode == "shift"
                 if (shouldTrackImmediately && trackedChar.isNotEmpty() && trackedChar[0].isLetter()) {
                     suggestionController?.onCharacterCommitted(trackedChar, ic)
+                } else if (trackedChar.isNotEmpty()) {
+                    // The word tracker follows these by the cursor (a long press may still swap
+                    // the character), but a replacement's undo has to hear of them now
+                    suggestionController?.onTypingContinued(trackedChar)
                 }
                 Handler(Looper.getMainLooper()).postDelayed({
                     callbacks.updateStatusBar()
@@ -908,10 +912,9 @@ class InputEventRouter(
             AutoSpaceTracker.clear()
         }
 
-        // Try new dictionary-based auto-replace undo first (if experimental suggestions enabled)
-        if (keyCode == KeyEvent.KEYCODE_DEL && 
-            SettingsManager.isExperimentalSuggestionsEnabled(context) &&
-            SettingsManager.getAutoReplaceOnSpaceEnter(context)) {
+        // Any replacement can be undone: an auto-replace, and a text replacement, which applies with
+        // auto-replace and the suggestion engine off too
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
             
             val sc = suggestionController
             if (sc != null) {

@@ -220,7 +220,8 @@ class SuggestionControllerReplacementReadinessTest {
         assertTrue(controller.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, input).replaced)
         assertTrue(controller.handleBackspaceUndo(KeyEvent.KEYCODE_DEL, input))
 
-        assertEquals("im", input.text)
+        // The space after the word stays (palsoftware/pastiera#316)
+        assertEquals("im ", input.text)
     }
 
     @Test

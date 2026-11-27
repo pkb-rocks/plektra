@@ -340,6 +340,16 @@ class AutoReplaceController(
         val lookupWord = apostropheSplit?.root ?: word
         val wordLower = word.lowercase()
 
+        // A word whose replacement was undone stays as typed only until typing moves on: once
+        // another word is finished, it is replaced again. Not every way of typing reports its
+        // letters (SuggestionController.onCharacterCommitted), and an undone word that was only
+        // forgiven there was never replaced again until the keyboard restarted.
+        if (rejectedWords.isNotEmpty() &&
+            wordLower !in rejectedWords && lookupWord.lowercase() !in rejectedWords
+        ) {
+            rejectedWords.clear()
+        }
+
         val exactReplacement = if (settings.textReplacementsEnabled) {
             exactReplacementProvider?.invoke(word, boundaryChar)
         } else {
@@ -573,8 +583,9 @@ class AutoReplaceController(
         keyCode: Int,
         inputConnection: InputConnection?
     ): Boolean {
-        val settings = settingsProvider()
-        if (!settings.autoReplaceOnSpaceEnter || keyCode != KeyEvent.KEYCODE_DEL || inputConnection == null) {
+        // Any replacement can be undone: auto-replace, and text replacements (which apply with
+        // auto-replace off), so no settings check here
+        if (keyCode != KeyEvent.KEYCODE_DEL || inputConnection == null) {
             return false
         }
 
@@ -590,40 +601,41 @@ class AutoReplaceController(
             return false
         }
 
-        // Check if text ends with replaced word (with or without boundary char)
-        val lastChars = textBeforeCursor.substring(
-            maxOf(0, textBeforeCursor.length - replacement.replacedWord.length - 1)
-        )
+        // Find the shortest trailing suffix of whitespace / boundary punctuation after replacedWord.
+        // Stopping on the first match avoids stripping trailing punctuation that belongs to
+        // replacement.replacedWord itself (for example, "etc." followed by a space).
+        val trailingLength = run {
+            var suffixLen = 0
+            val maxSuffix = minOf(2, textBeforeCursor.length - replacement.replacedWord.length)
+            while (suffixLen <= maxSuffix) {
+                val prefixEnd = textBeforeCursor.length - suffixLen
+                if (textBeforeCursor.subSequence(0, prefixEnd).endsWith(replacement.replacedWord)) {
+                    return@run suffixLen
+                }
+                if (suffixLen == maxSuffix) break
+                val trailingChar = textBeforeCursor[prefixEnd - 1]
+                if (!trailingChar.isWhitespace() &&
+                    trailingChar !in rocks.pkb.plektra.core.Punctuation.BOUNDARY
+                ) {
+                    break
+                }
+                suffixLen++
+            }
+            -1
+        }
 
-        val matchesReplacement = lastChars.endsWith(replacement.replacedWord) ||
-            lastChars.trimEnd().endsWith(replacement.replacedWord)
-
-        if (!matchesReplacement) {
+        if (trailingLength < 0) {
             return false
         }
 
-        // Calculate chars to delete: replaced word + potential boundary char
-        val charsToDelete = if (lastChars.endsWith(replacement.replacedWord)) {
-            // No boundary char after, just delete the word
-            replacement.replacedWord.length
-        } else {
-            // There's whitespace/punctuation after, include it in deletion
-            var deleteCount = replacement.replacedWord.length
-            var i = textBeforeCursor.length - 1
-            while (i >= 0 &&
-                i >= textBeforeCursor.length - deleteCount - 1 &&
-                (textBeforeCursor[i].isWhitespace() ||
-                        textBeforeCursor[i] in rocks.pkb.plektra.core.Punctuation.BOUNDARY)
-            ) {
-                deleteCount++
-                i--
-            }
-            deleteCount
-        }
+        val charsToDelete = replacement.replacedWord.length + trailingLength
+        // Keep the space (or punctuation) typed after the word: undo brings the word back, and
+        // typing carries on where it was (palsoftware/pastiera#316)
+        val trailing = textBeforeCursor.takeLast(trailingLength)
 
         inputConnection.beginBatchEdit()
         inputConnection.deleteSurroundingText(charsToDelete, 0)
-        inputConnection.commitText(replacement.originalWord, 1)
+        inputConnection.commitText(replacement.originalWord + trailing, 1)
         inputConnection.endBatchEdit()
         
         // Mark word as rejected so it won't be auto-corrected again

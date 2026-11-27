@@ -429,7 +429,22 @@ class SuggestionController(
     }
     var suggestionsListener: ((List<SuggestionResult>) -> Unit)? = onSuggestionsUpdated
 
+    /**
+     * Something was typed that the word tracker follows by the cursor: a letter on a key with a
+     * long-press layer, which with the default long press is nearly every letter. What a
+     * replacement's undo keeps follows it here: typing accepts the last replacement, and a letter
+     * lets a word whose replacement was undone be replaced again.
+     */
+    fun onTypingContinued(text: CharSequence) {
+        // With the suggestion engine off too: text replacements, and their undo, still work then
+        autoReplaceController.clearLastReplacement()
+        if (text.any { it.isLetterOrDigit() }) {
+            autoReplaceController.clearRejectedWords()
+        }
+    }
+
     fun onCharacterCommitted(text: CharSequence, inputConnection: InputConnection?) {
+        onTypingContinued(text)
         if (!isEnabled()) return
         if (debugLogging) {
             val caller = Throwable().stackTrace.getOrNull(1)?.let { "${it.className}#${it.methodName}:${it.lineNumber}" }
@@ -443,17 +458,13 @@ class SuggestionController(
             .replace("'", "'")
             .replace("'", "'")
             .replace("ʼ", "'")
-        
-        // Clear last replacement if user types new characters
-        autoReplaceController.clearLastReplacement()
-        
-        // Clear rejected words when user types a new letter (allows re-correction)
-        if (normalizedText.isNotEmpty() && normalizedText.any { it.isLetterOrDigit() }) {
-            autoReplaceController.clearRejectedWords()
+
+        // A new letter also withdraws the offer to add the word before it
+        if (normalizedText.any { it.isLetterOrDigit() }) {
             pendingAddUserWord = null
             neutralSentenceStart = false
         }
-        
+
         tracker.onCharacterCommitted(normalizedText)
     }
 
@@ -757,7 +768,7 @@ class SuggestionController(
     }
 
     fun handleBackspaceUndo(keyCode: Int, inputConnection: InputConnection?): Boolean {
-        if (!isEnabled()) return false
+        // Text replacements apply with the suggestion engine off too, so their undo does as well
         val undone = autoReplaceController.handleBackspaceUndo(keyCode, inputConnection)
         if (undone) {
             val original = autoReplaceController.consumeLastUndoOriginalWord()

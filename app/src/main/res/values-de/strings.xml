@@ -2012,7 +2012,7 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="kw_text_input_smooth_caret">Cursor, Schreibmarke, weich, Animation, Overlay, experimentell</string>
     <string name="kw_auto_correction_exact_typing">exaktes Tippen, roh, pro App, Terminal, Termux, SSH, Autokorrektur aus, automatische Großschreibung</string>
     <string name="app_appearance_settings_fullscreen_title">Einstellungen im Vollbild</string>
-    <string name="app_appearance_settings_fullscreen_description">Blendet in den Einstellungen die Statusleiste aus. Seitentitel und Aktionen nutzen die oberste Zeile. Vom oberen Rand nach unten wischen zeigt die Statusleiste kurz an.</string>
+    <string name="app_appearance_settings_fullscreen_description">Blendet in den Einstellungen und Notizen die Statusleiste aus. Seitentitel und Aktionen nutzen die oberste Zeile. Vom oberen Rand nach unten wischen zeigt die Statusleiste kurz an.</string>
     <string name="kw_app_appearance_settings_fullscreen">Vollbild, Statusleiste, ausblenden, immersiv, Kopfzeile, oberste Zeile, Notch, Kameraaussparung</string>
     <string name="settings_search_close">Suche schließen</string>
 </resources>

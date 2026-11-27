@@ -71,6 +71,14 @@ class TextInputController(
             return false
         }
 
+        // Only after something typed: not at the start of the field or a line, and not after
+        // other punctuation ("Hello, " never becomes "Hello,. ")
+        val beforeSpaces = textBeforeCursor.trimEnd(' ').lastOrNull()
+        if (beforeSpaces == null || beforeSpaces.isWhitespace() || beforeSpaces in NO_FULL_STOP_AFTER) {
+            lastSpacePressTime = currentTime
+            return false
+        }
+
         val endsWithSingleSpace = textBeforeCursor.length < 2 ||
             textBeforeCursor[textBeforeCursor.length - 2] != ' '
 
@@ -316,3 +324,6 @@ class TextInputController(
         }
     }
 }
+
+/** Characters after which a double space adds no full stop: they continue the sentence. */
+private const val NO_FULL_STOP_AFTER = ",;:-–—([{/\\"

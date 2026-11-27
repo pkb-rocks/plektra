@@ -67,6 +67,58 @@ class TextInputControllerTest {
     }
 
     @Test
+    fun doubleSpaceToPeriod_addsNoFullStopWhereNothingWasTyped() {
+        SettingsManager.setDoubleSpaceToPeriod(context, true)
+        // The field's start, a new line, and only spaces before
+        for (start in listOf("", "First line\n", "   ")) {
+            val inputConnection = FakeInputConnection(context, start)
+
+            assertFalse(typeTwoSpaces(inputConnection))
+            assertEquals(start + "  ", inputConnection.text)
+        }
+    }
+
+    @Test
+    fun doubleSpaceToPeriod_addsNoFullStopAfterPunctuationThatContinuesTheSentence() {
+        SettingsManager.setDoubleSpaceToPeriod(context, true)
+        for (before in listOf("Hello,", "Note:", "see (", "red/")) {
+            val inputConnection = FakeInputConnection(context, before)
+
+            assertFalse(typeTwoSpaces(inputConnection))
+            assertEquals(before + "  ", inputConnection.text)
+        }
+    }
+
+    @Test
+    fun doubleSpaceToPeriod_stillEndsTheSentenceAfterAWordOrClosingBracket() {
+        SettingsManager.setDoubleSpaceToPeriod(context, true)
+        for (before in listOf("hello", "(see above)", "42")) {
+            val inputConnection = FakeInputConnection(context, before)
+
+            assertTrue(typeTwoSpaces(inputConnection))
+            assertEquals("$before. ", inputConnection.text)
+        }
+    }
+
+    /** Two presses of Space, each committed as the IME does when the controller doesn't handle it. */
+    private fun typeTwoSpaces(inputConnection: FakeInputConnection): Boolean {
+        var handled = false
+        repeat(2) {
+            handled = controller.handleDoubleSpaceToPeriod(
+                keyCode = KeyEvent.KEYCODE_SPACE,
+                inputConnection = inputConnection,
+                shouldDisableDoubleSpaceToPeriod = false,
+                shouldDisableAutoCapitalize = true,
+                onStatusBarUpdate = {}
+            )
+            if (!handled) inputConnection.commitText(" ", 1)
+        }
+        // A fresh controller state for the next sample
+        controller = TextInputController(context, modifierStateController, 500L)
+        return handled
+    }
+
+    @Test
     fun doubleSpaceToPeriod_settingDisabled_keepsVirtualKeyboardSpaces() {
         SettingsManager.setDoubleSpaceToPeriod(context, false)
         val inputConnection = FakeInputConnection(context, "hello")

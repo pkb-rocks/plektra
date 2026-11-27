@@ -34,6 +34,20 @@ private enum class KeyboardBarEditorMode { Normal, Slim }
 
 internal enum class KeyboardBarSettingsPage { Contents, Buttons, Variations, Indicators }
 
+internal object KeyboardBarSharedRowSettings {
+    /** The precedence between suggestions and variations only matters when both share one row. */
+    fun precedenceApplies(suggestions: Boolean, actions: Boolean, arrangement: KeyboardBarArrangement): Boolean =
+        suggestions && actions && arrangement == KeyboardBarArrangement.SHARED
+
+    /** Mirrors the profile the settings page opens with. */
+    fun precedenceApplies(context: android.content.Context): Boolean {
+        val configuration = KeyboardBarConfiguration.read(context)
+        return if (SettingsManager.getStatusBarPresentationMode(context) == SettingsManager.StatusBarPresentationMode.SLIM) {
+            precedenceApplies(configuration.slimProfile.suggestions, configuration.slimProfile.actions, KeyboardBarArrangement.SHARED)
+        } else precedenceApplies(configuration.suggestions, configuration.actions, configuration.arrangement)
+    }
+}
+
 @Composable
 internal fun KeyboardBarCheckRow(label: String, checked: Boolean, linkId: String,
     description: String? = null, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
@@ -82,6 +96,7 @@ internal fun KeyboardBarSettingsScreen(
     var dynamicVariationsResizeToContent by remember {
         mutableStateOf(SettingsManager.getDynamicVariationBarResizeToContent(context))
     }
+    var sharedRowVariationsFirst by remember { mutableStateOf(SettingsManager.getSharedRowVariationsFirst(context)) }
     var editorMode by rememberSaveable {
         mutableStateOf(
             if (
@@ -115,6 +130,7 @@ internal fun KeyboardBarSettingsScreen(
             hardwareOnly = SettingsManager.getHardwareOnlyMode(context)
             dynamicVariationSlotCount = SettingsManager.getDynamicVariationBarSlotCount(context)
             dynamicVariationsResizeToContent = SettingsManager.getDynamicVariationBarResizeToContent(context)
+            sharedRowVariationsFirst = SettingsManager.getSharedRowVariationsFirst(context)
         }
         preferences.registerOnSharedPreferenceChangeListener(listener)
         onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -235,10 +251,18 @@ internal fun KeyboardBarSettingsScreen(
             SettingsSectionDivider(stringResource(R.string.keyboard_bar_layout_section))
             // Slim always combines its rows (KeyboardBarConfiguration.presentation).
             KeyboardBarArrangementField(if (editingSlim) KeyboardBarArrangement.SHARED else arrangement,
-                !editingSlim && displayedSuggestions && displayedActions,
-                showBehavior = displayedSuggestions && displayedActions) {
+                !editingSlim && displayedSuggestions && displayedActions) {
                 arrangement = it
                 KeyboardBarConfiguration.setArrangement(context, it)
+            }
+            if (KeyboardBarSharedRowSettings.precedenceApplies(displayedSuggestions, displayedActions,
+                    if (editingSlim) KeyboardBarArrangement.SHARED else arrangement)) {
+                KeyboardBarCheckRow(stringResource(R.string.shared_row_variations_first_title), sharedRowVariationsFirst,
+                    SettingLinkIds.KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST,
+                    stringResource(R.string.shared_row_variations_first_description)) {
+                    sharedRowVariationsFirst = it
+                    SettingsManager.setSharedRowVariationsFirst(context, it)
+                }
             }
             KeyboardBarNavigationRow(Icons.Filled.SmartButton, stringResource(R.string.status_bar_buttons_section),
                 stringResource(R.string.keyboard_bar_buttons_summary,
@@ -464,7 +488,7 @@ internal fun KeyboardBarSettingsScreen(
 
 }
 @Composable
-private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean, showBehavior: Boolean = enabled,
+private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: Boolean,
     onChange: (KeyboardBarArrangement) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     fun label(choice: KeyboardBarArrangement) = when (choice) {
@@ -479,10 +503,6 @@ private fun KeyboardBarArrangementField(value: KeyboardBarArrangement, enabled: 
             trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) },
             colors = ListItemDefaults.colors(headlineColor = if (enabled) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)))
-        if (showBehavior && value == KeyboardBarArrangement.SHARED) {
-            Text(stringResource(R.string.keyboard_bar_shared_behavior), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
     }
     if (expanded) AlertDialog(onDismissRequest = { expanded = false },
         title = { Text(stringResource(R.string.keyboard_bar_arrangement)) },

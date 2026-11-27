@@ -14,7 +14,10 @@ class AutoReplaceController(
     private val suggestionEngine: SuggestionEngine,
     private val settingsProvider: () -> SuggestionSettings,
     private val knownWordProvider: ((String) -> Boolean)? = null,
-    private val exactReplacementProvider: ((String, Char?) -> String?)? = null
+    private val exactReplacementProvider: ((String, Char?) -> String?)? = null,
+    private val accentPromotionAllowed: (String, Boolean) -> Boolean = { word, personalized ->
+        repository.getExactWordFrequency(word, personalized) == 0
+    }
 ) {
     private fun triggerFromBoundaryChar(boundaryChar: Char?): DebugCaptureStore.AutoCorrectionTrigger {
         return when (boundaryChar) {
@@ -92,6 +95,21 @@ class AutoReplaceController(
             val normalizedCandidate = WordNormalization.normalizeForDictionary(candidate, Locale.ROOT)
             return normalizedInput == normalizedCandidate
         }
+
+        /**
+         * The most frequent dictionary word that differs from [word] only in accents and has its
+         * length ("tres" → "très"). Auto-correction commits it for unknown words, and the
+         * suggestion ranking puts it first, so both agree.
+         */
+        internal fun orthographicVariant(
+            repository: DictionaryRepository,
+            word: String,
+            usePersonalization: Boolean
+        ): DictionaryEntry? = repository.topByNormalized(
+            WordNormalization.normalizeForDictionary(word, Locale.ROOT),
+            limit = 8,
+            usePersonalization = usePersonalization
+        ).firstOrNull { entry -> entry.word.length == word.length && isAccentOnlyVariant(word, entry.word) }
 
         internal fun isCaseOnlyVariant(input: String, candidate: String): Boolean {
             if (input.isEmpty() || candidate.isEmpty()) return false
@@ -404,14 +422,10 @@ class AutoReplaceController(
             }
         }
 
-        val orthographicEntry = if (settings.accentMatching) {
-            repository.topByNormalized(
-                WordNormalization.normalizeForDictionary(lookupWord, Locale.ROOT),
-                limit = 8,
-                usePersonalization = settings.personalizationEnabled
-            ).firstOrNull { entry ->
-                entry.word.length == lookupWord.length && isAccentOnlyVariant(lookupWord, entry.word)
-            }
+        val promoteAccent = settings.accentMatching && accentPromotionAllowed(word, settings.personalizationEnabled) &&
+            (word == lookupWord || accentPromotionAllowed(lookupWord, settings.personalizationEnabled))
+        val orthographicEntry = if (promoteAccent) {
+            orthographicVariant(repository, lookupWord, settings.personalizationEnabled)
         } else null
         val topRaw = orthographicEntry?.let { entry ->
             SuggestionResult(entry.word, 0, Double.MAX_VALUE, entry.source, SuggestionKind.CURRENT_WORD)
@@ -421,7 +435,8 @@ class AutoReplaceController(
             includeAccentMatching = settings.accentMatching,
             useKeyboardProximity = settings.useKeyboardProximity,
             useEditTypeRanking = settings.useEditTypeRanking,
-            usePersonalization = settings.personalizationEnabled
+            usePersonalization = settings.personalizationEnabled,
+            allowAccentPromotion = promoteAccent
         ).firstOrNull()
         // Suggestion ranking can assign zero distance to completions. Replacement safety
         // uses the actual distance of the dictionary root before restoring its prefix.
@@ -464,6 +479,7 @@ class AutoReplaceController(
         )
 
         val shouldReplace = top != null
+            && (!isOrthographicVariant || promoteAccent)
             && (!isKnownWord || (isCaseVariant && !hasExactPrimaryCase) || (isOrthographicVariant && !isExactKnownWord)) // Allow case/orthographic fixes
             && !isRejected // Don't auto-correct if user has rejected this word
             && isSafeCandidate

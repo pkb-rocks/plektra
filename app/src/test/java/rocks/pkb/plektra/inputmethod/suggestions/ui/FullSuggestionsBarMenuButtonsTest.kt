@@ -62,6 +62,22 @@ class FullSuggestionsBarMenuButtonsTest {
         assertTrue(visibleViews(frame).any { it is android.widget.TextView && it.text == "Alpha" })
     }
 
+    @Test fun menuButtonsInTheRowNarrowTheSuggestionPadding() {
+        fun padding(menuButtons: Boolean): Int {
+            val bar = FullSuggestionsBar(context)
+            val frame = bar.ensureView()
+            bar.setContentEnabled(suggestions = true, menuButtons = menuButtons)
+            update(bar, listOf("Alpha", "Beta", "Gamma"))
+            val slot = visibleViews(frame).filterIsInstance<android.widget.TextView>().single { it.text == "Alpha" }
+            assertEquals(slot.paddingLeft, slot.paddingRight)
+            return slot.paddingLeft
+        }
+        fun px(dp: Float) = android.util.TypedValue.applyDimension(
+            android.util.TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics).toInt()
+        assertEquals(px(FullSuggestionsBar.SUGGESTION_PADDING_DP), padding(menuButtons = false))
+        assertEquals(px(FullSuggestionsBar.SHARED_ROW_SUGGESTION_PADDING_DP), padding(menuButtons = true))
+    }
+
     @Test fun emptySlimSlotsDoNotLeaveAnEmptyRow() {
         SettingsManager.setSlimStatusBarSlotsLeft(context, listOf("none"))
         val bar = FullSuggestionsBar(context)

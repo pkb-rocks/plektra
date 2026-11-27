@@ -220,6 +220,26 @@ class SettingLinkCoverageTest {
     }
 
     @Test
+    fun sharedRowPrecedenceLinkTargetsItsSwitchOnlyWhileBothShareOneRow() {
+        val entry = requireNotNull(SettingLinkRegistry.byId(SettingLinkIds.KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST))
+        SettingsManager.setStatusBarPresentationMode(context, SettingsManager.StatusBarPresentationMode.FULL_STATUS_BAR)
+        SettingsManager.setSuggestionsEnabled(context, true)
+        SettingsManager.setStatusBarVariationsEnabled(context, true)
+        KeyboardBarConfiguration.setArrangement(context, KeyboardBarArrangement.SUGGESTIONS_FIRST)
+        assertFalse(entry.isAvailable(context))
+        assertEquals("keyboard_bar.row_layout", SettingLinkRegistry.visibleTarget(context, entry).id)
+
+        KeyboardBarConfiguration.setArrangement(context, KeyboardBarArrangement.SHARED)
+        assertTrue(entry.isAvailable(context))
+        val target = SettingLinkRegistry.visibleTarget(context, entry)
+        assertEquals(entry.id, target.id)
+        assertEquals("status_bar_buttons", target.route.toSettingsPage().customizationDestination)
+
+        SettingsManager.setSuggestionsEnabled(context, false)
+        assertFalse(entry.isAvailable(context))
+    }
+
+    @Test
     fun keyboardBarLinksOpenTheActualEditorsEvenWhenSlimIsActive() {
         SettingsManager.setStatusBarPresentationMode(context, SettingsManager.StatusBarPresentationMode.SLIM)
         SettingsManager.setStatusBarVariationsEnabled(context, false)

@@ -1189,6 +1189,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="dynamic_variation_slot_count_description">Versucht, %1$d dynamische Einträge zwischen den Tastaturleisten-Buttons anzuzeigen.</string>
     <string name="dynamic_variation_resize_to_content_title">Dynamische Variationen skalieren</string>
     <string name="dynamic_variation_resize_to_content_description">Wenn aktiviert, füllen dynamische Einträge die verfügbare Zeile anhand der aktuell angezeigten Anzahl. Wenn deaktiviert, behalten Einträge die Slotgröße des Sliders und bleiben linksbündig.</string>
+    <string name="shared_row_variations_first_title">Varianten vor Vorschlägen</string>
+    <string name="shared_row_variations_first_description">Zeigt die Varianten des letzten Buchstabens statt der Wortvorschläge, solange es welche gibt. Aus: Varianten erscheinen nur, wenn es keine Vorschläge gibt.</string>
     <string name="modifier_indicators_title">Modifier-Anzeigen</string>
     <string name="modifier_indicators_description">Wähle, wo Shift-, Ctrl-, Alt- und SYM-Zustand für die Hardwaretastatur erscheinen.</string>
     <string name="modifier_indicators_bottom_strip">Bottom-Strip-LEDs</string>
@@ -1589,7 +1591,6 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_bar_swap">Zeilenreihenfolge tauschen</string>
     <string name="keyboard_bar_drag">Zum Umordnen ziehen; zum Tauschen tippen</string>
     <string name="keyboard_bar_arrange_help">Griff gedrückt halten und ziehen, um Zeilen umzuordnen. Menüicon antippen, um es zu bearbeiten.</string>
-    <string name="keyboard_bar_shared_behavior">Verfügbare Zeichenvarianten ersetzen die Vorschläge.</string>
     <string name="keyboard_bar_sample_suggestions">Vorschläge zeigen</string>
     <string name="keyboard_bar_sample_variations">Zeichenvariationen zeigen</string>
     <string name="keyboard_bar_buttons_shared">Icon antippen, um es zu ändern oder zu entfernen. Beide Profile verwenden diese Menütasten.</string>

@@ -252,6 +252,7 @@ object SettingsManager {
     private const val KEY_STATUS_BAR_VARIATIONS_VISIBLE = "status_bar_variations_visible"
     private const val KEY_DYNAMIC_VARIATION_BAR_SLOT_COUNT = "dynamic_variation_bar_slot_count"
     private const val KEY_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT = "dynamic_variation_bar_resize_to_content"
+    private const val KEY_SHARED_ROW_VARIATIONS_FIRST = "shared_row_variations_first"
     const val KEY_MODIFIER_INDICATOR_MODE = "modifier_indicator_mode"
     
     // Public constants for button IDs
@@ -309,6 +310,7 @@ object SettingsManager {
     private const val DEFAULT_STATUS_BAR_VARIATIONS_VISIBLE = true
     private const val DEFAULT_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 7
     private const val DEFAULT_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT = false
+    private const val DEFAULT_SHARED_ROW_VARIATIONS_FIRST = false
     private val DEFAULT_MODIFIER_INDICATORS = setOf(MODIFIER_INDICATOR_BOTTOM_STRIP)
     const val MIN_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 1
     const val MAX_DYNAMIC_VARIATION_BAR_SLOT_COUNT = 9
@@ -6603,6 +6605,18 @@ object SettingsManager {
         getPreferences(context).edit()
             .putBoolean(KEY_DYNAMIC_VARIATION_BAR_RESIZE_TO_CONTENT, enabled)
             .apply()
+    }
+
+    /**
+     * In the combined keyboard bar row, whether character variations of the last typed letter
+     * take precedence over word suggestions. Off: suggestions stay and variations fill the row
+     * only when there are none.
+     */
+    fun getSharedRowVariationsFirst(context: Context): Boolean =
+        getPreferences(context).getBoolean(KEY_SHARED_ROW_VARIATIONS_FIRST, DEFAULT_SHARED_ROW_VARIATIONS_FIRST)
+
+    fun setSharedRowVariationsFirst(context: Context, enabled: Boolean) {
+        getPreferences(context).edit().putBoolean(KEY_SHARED_ROW_VARIATIONS_FIRST, enabled).apply()
     }
 
     fun getDefaultKeyboardBarProfile(slim: Boolean): KeyboardBarProfile = KeyboardBarProfile(

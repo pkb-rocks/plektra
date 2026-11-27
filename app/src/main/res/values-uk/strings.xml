@@ -878,6 +878,8 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="dynamic_variation_slot_count_description">Прагнути показувати %1$d динамічних елементів між кнопками панелі стану.</string>
     <string name="dynamic_variation_resize_to_content_title">Змінювати розмір динамічних варіацій</string>
     <string name="dynamic_variation_resize_to_content_description">Якщо ввімкнено, динамічні елементи заповнюють доступний рядок залежно від їх кількості. Якщо вимкнено, вони зберігають розмір слота зі слайдера й лишаються вирівняними ліворуч.</string>
+    <string name="shared_row_variations_first_title">Варіації перед підказками</string>
+    <string name="shared_row_variations_first_description">Показує варіації останньої літери замість підказок слів, поки вони є. Вимкнено: варіації з’являються, лише якщо підказок немає.</string>
     <string name="keyboard_theme_tab_colors">Кольори</string>
     <string name="keyboard_theme_tab_keys">Клавіші</string>
 

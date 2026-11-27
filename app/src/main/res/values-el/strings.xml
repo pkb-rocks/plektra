@@ -1630,6 +1630,8 @@ QWERTZ σε φυσικό QWERTY
     <string name="dynamic_variation_slot_count_description">Στόχος εμφάνισης %1$d δυναμικών καταχωρίσεων ανάμεσα στα κουμπιά γραμμής κατάστασης.</string>
     <string name="dynamic_variation_resize_to_content_title">Αλλαγή μεγέθους δυναμικών παραλλαγών</string>
     <string name="dynamic_variation_resize_to_content_description">Όταν είναι ενεργό, οι δυναμικές καταχωρίσεις γεμίζουν τη διαθέσιμη γραμμή με βάση το πόσες εμφανίζονται. Όταν είναι ανενεργό, οι καταχωρίσεις κρατούν το μέγεθος slot από τον slider και μένουν στοιχισμένες αριστερά.</string>
+    <string name="shared_row_variations_first_title">Παραλλαγές πριν από τις προτάσεις</string>
+    <string name="shared_row_variations_first_description">Εμφανίζει τις παραλλαγές του τελευταίου γράμματος αντί για προτάσεις λέξεων όσο υπάρχουν. Απενεργοποιημένο: εμφανίζονται μόνο όταν δεν υπάρχουν προτάσεις.</string>
     <string name="modifier_indicators_title">Ενδείξεις τροποποιητών</string>
     <string name="modifier_indicators_description">Επιλέξτε πού εμφανίζεται η κατάσταση Shift, Ctrl, Alt και SYM για το hardware πληκτρολόγιο.</string>
     <string name="modifier_indicators_bottom_strip">LED κάτω λωρίδας</string>

@@ -31,6 +31,11 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry(id = "keyboard_bar.row_layout", titleRes = R.string.keyboard_bar_arrangement,
         route = SettingRoute(destination = SettingsDestination.Customization,
             customizationDestination = "status_bar_buttons")),
+    SettingEntry(SettingLinkIds.KEYBOARD_BAR_SHARED_ROW_VARIATIONS_FIRST, R.string.shared_row_variations_first_title,
+        summaryRes = R.string.shared_row_variations_first_description, route = SettingRoute(
+            destination = SettingsDestination.Customization, customizationDestination = "status_bar_buttons"),
+        availabilityCheck = { KeyboardBarSharedRowSettings.precedenceApplies(it) },
+        unavailableFallbackId = "keyboard_bar.row_layout"),
     SettingEntry(
         id = "quick_launcher.top_match_color",
         titleRes = R.string.setting_link_quick_launcher_top_match_color,

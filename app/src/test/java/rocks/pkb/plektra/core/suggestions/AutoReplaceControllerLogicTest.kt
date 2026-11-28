@@ -858,6 +858,44 @@ class AutoReplaceControllerLogicTest {
         assertEquals("und ", inputConnection.text)
     }
 
+    @Test
+    fun suggestionsOnlyMode_leavesLowercaseNamesAbbreviationsAndTyposUnchanged() {
+        val context = RuntimeEnvironment.getApplication()
+        val repository = FakeDictionaryRepository().apply {
+            isReady = true
+            addTestEntry("John", frequency = 200, source = SuggestionSource.MAIN)
+            addTestEntry("BC", frequency = 180, source = SuggestionSource.MAIN)
+            addTestEntry("BlackBerry", frequency = 160, source = SuggestionSource.MAIN)
+            addTestEntry("the", frequency = 250, source = SuggestionSource.MAIN)
+        }
+        val controller = AutoReplaceController(
+            repository = repository,
+            suggestionEngine = SuggestionEngine(repository),
+            settingsProvider = {
+                SuggestionSettings(
+                    suggestionsEnabled = true,
+                    textReplacementsEnabled = false,
+                    autoReplaceOnSpaceEnter = false,
+                    maxAutoReplaceDistance = 1
+                )
+            }
+        )
+
+        for (typed in listOf("john", "bc", "gdf", "blackberry", "teh")) {
+            val tracker = CurrentWordTracker(onWordChanged = {}, onWordReset = {})
+            tracker.setWord(typed)
+            val inputConnection = FakeInputConnection(context, typed)
+            val result = controller.handleBoundary(
+                keyCode = KeyEvent.KEYCODE_SPACE,
+                event = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE),
+                tracker = tracker,
+                inputConnection = inputConnection
+            )
+            assertFalse("Expected no replacement for '$typed'", result.replaced)
+            assertEquals("$typed ", inputConnection.text)
+        }
+    }
+
     private class FakeInputConnection(
         context: Context,
         initialText: String

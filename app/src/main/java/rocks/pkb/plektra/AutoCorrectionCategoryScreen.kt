@@ -167,75 +167,6 @@ fun AutoCorrectionCategoryScreen(
                             )
                         }
 
-                        // Automatic correction: dictionary/suggestion based guessing on boundaries.
-                        SettingsToggleRow(
-                            title = stringResource(R.string.auto_correct_auto_replace_title),
-                            description = stringResource(R.string.auto_correct_auto_replace_description),
-                            icon = Icons.Filled.TextFields,
-                            checked = autoReplaceOnSpaceEnter,
-                            enabled = experimentalSuggestionsEnabled,
-                            linkId = SettingLinkIds.AUTO_CORRECTION_AUTO_REPLACE,
-                            onCheckedChange = { enabled ->
-                                autoReplaceOnSpaceEnter = enabled
-                                SettingsManager.setAutoReplaceOnSpaceEnter(context, enabled)
-                            }
-                        )
-
-                        // Max auto-replace distance slider (only shown when automatic correction is enabled)
-                        if (autoReplaceOnSpaceEnter) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                                    .settingRow(SettingLinkIds.AUTO_CORRECTION_MAX_DISTANCE)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.auto_correct_max_distance_title),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Text(
-                                            text = if (maxAutoReplaceDistance == 0) {
-                                                stringResource(R.string.auto_correct_max_distance_off)
-                                            } else {
-                                                maxAutoReplaceDistance.toString()
-                                            },
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    }
-                                    Slider(
-                                        value = maxAutoReplaceDistance.toFloat(),
-                                        onValueChange = { value ->
-                                            val newValue = value.toInt().coerceIn(0, 3)
-                                            maxAutoReplaceDistance = newValue
-                                            SettingsManager.setMaxAutoReplaceDistance(context, newValue)
-                                        },
-                                        valueRange = 0f..3f,
-                                        steps = 2,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.auto_correct_max_distance_description),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-
                         SettingsNavigationRow(
                             title = stringResource(R.string.auto_correct_manage_user_dict_title),
                             description = stringResource(R.string.auto_correct_manage_user_dict_description),
@@ -304,6 +235,82 @@ fun AutoCorrectionCategoryScreen(
                                     )
                                 }
                             }
+
+                        // Automatic correction: dictionary/suggestion based guessing on boundaries.
+                        // Placed directly under Experimental suggestions so its dependency is explicit.
+                        AutoCorrectionSwitchRow(
+                            icon = Icons.Filled.TextFields,
+                            title = stringResource(R.string.auto_correct_auto_replace_title),
+                            description = stringResource(
+                                if (experimentalSuggestionsEnabled) {
+                                    R.string.auto_correct_auto_replace_description
+                                } else {
+                                    R.string.auto_correct_auto_replace_requires_suggestions
+                                }
+                            ),
+                            checked = autoReplaceOnSpaceEnter,
+                            enabled = experimentalSuggestionsEnabled,
+                            linkId = SettingLinkIds.AUTO_CORRECTION_AUTO_REPLACE,
+                            onCheckedChange = { enabled ->
+                                autoReplaceOnSpaceEnter = enabled
+                                SettingsManager.setAutoReplaceOnSpaceEnter(context, enabled)
+                            }
+                        )
+
+                        // Max auto-replace distance slider (only shown when both suggestions and automatic correction are enabled)
+                        if (experimentalSuggestionsEnabled && autoReplaceOnSpaceEnter) {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .settingRow(SettingLinkIds.AUTO_CORRECTION_MAX_DISTANCE)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.auto_correct_max_distance_title),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = if (maxAutoReplaceDistance == 0) {
+                                                stringResource(R.string.auto_correct_max_distance_off)
+                                            } else {
+                                                maxAutoReplaceDistance.toString()
+                                            },
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                    Slider(
+                                        value = maxAutoReplaceDistance.toFloat(),
+                                        onValueChange = { value ->
+                                            val newValue = value.toInt().coerceIn(0, 3)
+                                            maxAutoReplaceDistance = newValue
+                                            SettingsManager.setMaxAutoReplaceDistance(context, newValue)
+                                        },
+                                        valueRange = 0f..3f,
+                                        steps = 2,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.auto_correct_max_distance_description),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
 
                         AutoCorrectionSwitchRow(
                             icon = Icons.Filled.Lightbulb,

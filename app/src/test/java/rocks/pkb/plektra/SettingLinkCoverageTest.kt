@@ -264,4 +264,22 @@ class SettingLinkCoverageTest {
         }
     }
 
+    @Test
+    fun maxAutoReplaceDistanceRequiresBothSuggestionsAndAutoReplace() {
+        val entry = requireNotNull(SettingLinkRegistry.byId(SettingLinkIds.AUTO_CORRECTION_MAX_DISTANCE))
+
+        SettingsManager.setExperimentalSuggestionsEnabled(context, false)
+        SettingsManager.setAutoReplaceOnSpaceEnter(context, true)
+        assertFalse(entry.isAvailable(context))
+        assertEquals(SettingLinkIds.AUTO_CORRECTION_AUTO_REPLACE, SettingLinkRegistry.visibleTarget(context, entry).id)
+
+        SettingsManager.setExperimentalSuggestionsEnabled(context, true)
+        SettingsManager.setAutoReplaceOnSpaceEnter(context, false)
+        assertFalse(entry.isAvailable(context))
+
+        SettingsManager.setAutoReplaceOnSpaceEnter(context, true)
+        assertTrue(entry.isAvailable(context))
+        assertEquals(SettingLinkIds.AUTO_CORRECTION_MAX_DISTANCE, SettingLinkRegistry.visibleTarget(context, entry).id)
+    }
+
 }

@@ -121,6 +121,7 @@
     <string name="auto_correct_edit_type_ranking_title">Ранжування за типом редагування</string>
     <string name="auto_correct_edit_type_ranking_description">Сортувати пропозиції за типом редагування (вставка &gt; заміна &gt; видалення)</string>
     <string name="clear">Очистити</string>
+    <string name="auto_correct_auto_replace_requires_suggestions">Потрібно ввімкнути Експериментальні пропозиції вище.</string>
     <string name="experimental_suggestions_title">Експериментальні пропозиції</string>
     <string name="experimental_suggestions_subtitle">Увімкнути новий рушій словника/пропозицій (бета)</string>
     <string name="user_dict_title">Словник користувача</string>

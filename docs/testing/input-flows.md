@@ -71,6 +71,21 @@ Screen-only flows need no built-in keyboard and run on phones and foldables with
 
 The accessibility action `ACTION_CLICK` is a separate code path (`performAccessibilityKeyClick`) without holds, gestures or multi-touch; these flows do not exercise it.
 
+## UI selectors for other device tests
+
+Use the installed variant’s package name with these Android resource IDs, for example `rocks.pkb.plektra.nightly:id/plektra_toolbar_emoji`. The keyboard and picker controls are present when their corresponding surfaces are visible.
+
+| Resource ID | Control |
+| --- | --- |
+| `notes_new` | Create a test note |
+| `notes_heading`, `notes_body` | Note heading and body |
+| `plektra_key_*` | Virtual accessibility nodes for the visible software keys |
+| `plektra_toolbar_emoji` | Open the full emoji picker from the keyboard toolbar, when that button is configured |
+| `plektra_emoji_search_toggle` | Show or hide the search field in the full IME emoji picker |
+| `plektra_emoji_search_field` | Search field in the full IME emoji picker |
+
+The emoji controls keep their localized accessibility labels. Tests can select them by resource ID across languages.
+
 ## Limits
 
 - Only the Notes editor is a target. Paths that depend on the target app, such as the Google calculator's key-event output, need their own device check.

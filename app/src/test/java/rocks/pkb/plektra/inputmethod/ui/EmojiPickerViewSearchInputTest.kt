@@ -1,6 +1,7 @@
 package rocks.pkb.plektra.inputmethod.ui
 
 import android.view.KeyEvent
+import android.view.View
 import android.widget.EditText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -9,10 +10,24 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import rocks.pkb.plektra.R
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class EmojiPickerViewSearchInputTest {
+
+    @Test
+    fun searchControlsCanBeFoundByResourceId() {
+        val view = EmojiPickerView(RuntimeEnvironment.getApplication())
+        val searchToggle = view.findViewById<View>(R.id.plektra_emoji_search_toggle)
+        val searchField = view.findViewById<EditText>(R.id.plektra_emoji_search_field)
+
+        val searchPanel = searchField.parent as View
+
+        assertEquals(View.GONE, searchPanel.visibility)
+        assertTrue(searchToggle.performClick())
+        assertEquals(View.VISIBLE, searchPanel.visibility)
+    }
 
     @Test
     fun searchKeyDownUsesLayoutResolvedTextBeforeRawUnicode() {

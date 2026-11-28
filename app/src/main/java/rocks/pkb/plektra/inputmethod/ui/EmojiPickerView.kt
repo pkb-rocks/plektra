@@ -154,6 +154,7 @@ class EmojiPickerView(
         }
 
         searchField = EditText(context).apply {
+            id = R.id.plektra_emoji_search_field
             hint = context.getString(R.string.emoji_picker_search_placeholder)
             textSize = 14f
             setSingleLine(true)
@@ -323,6 +324,7 @@ class EmojiPickerView(
         // Tabs at bottom (above LEDs) - full width, no scroll
         val tabHeight = dpToPx(32f) // Height cap
         searchToggleButton = ImageView(context).apply {
+            id = R.id.plektra_emoji_search_toggle
             setImageResource(R.drawable.ic_search_24)
             contentDescription = context.getString(R.string.emoji_picker_search_label)
             background = createTabBackground(false)

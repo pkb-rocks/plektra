@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Animate swiped suggestions</string>
+    <string name="suggestion_swipe_animation_description">When you swipe to accept a suggestion, its word rises above the bar and fades out. Typing continues immediately.</string>
+</resources>

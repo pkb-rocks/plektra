@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Animuj podpowiedzi wybierane gestem</string>
+    <string name="suggestion_swipe_animation_description">Po zaakceptowaniu podpowiedzi gestem słowo unosi się nad paskiem i zanika. Pisanie jest od razu kontynuowane.</string>
+</resources>

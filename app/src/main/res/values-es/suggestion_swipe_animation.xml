@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Animar sugerencias al deslizar</string>
+    <string name="suggestion_swipe_animation_description">Al aceptar una sugerencia deslizando, la palabra sube sobre la barra y se desvanece. La escritura continúa al instante.</string>
+</resources>

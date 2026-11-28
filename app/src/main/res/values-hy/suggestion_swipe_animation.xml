@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Անիմացնել սահեցմամբ ընտրված բառերը</string>
+    <string name="suggestion_swipe_animation_description">Սահեցմամբ առաջարկն ընդունելիս բառը բարձրանում է գոտուց վեր և անհետանում։ Մուտքագրումն անմիջապես շարունակվում է։</string>
+</resources>

@@ -72,6 +72,7 @@ class FullSuggestionsBar(
         }
     }
 
+    private val swipeAnimation = SuggestionSwipeAnimation(context)
     private var container: LinearLayout? = null
     private var frameContainer: FrameLayout? = null
     private var minimalLeftButtonsContainer: LinearLayout? = null
@@ -1050,7 +1051,8 @@ class FullSuggestionsBar(
             2 -> 0 // left
             else -> return
         }
-        flashSlot(slotIndex)
+        val button = suggestionButtons.getOrNull(slotIndex) ?: return
+        if (!swipeAnimation.show(button)) flashSlot(slotIndex)
     }
 
     private fun flashSlot(slotIndex: Int) {

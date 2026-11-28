@@ -389,6 +389,7 @@ internal object BackupPreferenceContract {
             "clipboard_history_enabled" to PreferenceValueType.BOOLEAN,
             "clipboard_retention_time" to PreferenceValueType.LONG,
             "sensitive_clipboard_retention_time" to PreferenceValueType.LONG,
+            "suggestion_swipe_animation" to PreferenceValueType.BOOLEAN,
             "trackpad_gestures_enabled" to PreferenceValueType.BOOLEAN,
             "trackpad_gesture_add_word_enabled" to PreferenceValueType.BOOLEAN,
             "trackpad_gesture_add_word_full_width_enabled" to PreferenceValueType.BOOLEAN,

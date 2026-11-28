@@ -1,0 +1,4 @@
+<resources>
+    <string name="suggestion_swipe_animation_title">Hiệu ứng gợi ý khi vuốt</string>
+    <string name="suggestion_swipe_animation_description">Khi vuốt để chọn gợi ý, từ sẽ bay lên trên thanh rồi mờ dần. Bạn có thể tiếp tục gõ ngay.</string>
+</resources>

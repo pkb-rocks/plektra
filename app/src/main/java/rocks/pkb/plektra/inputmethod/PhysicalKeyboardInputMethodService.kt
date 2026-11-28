@@ -340,6 +340,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
     private var variationInteractedDuringHold: Boolean = false
     private var modifierDownTimes = mutableMapOf<Int, Long>()
     private var otherKeyInteractedDuringHold: Boolean = false
+    private var keyUsedDuringShiftHold: Boolean = false
     private var shiftLayerLatched: Boolean = false
     private var altModifierLayerLatched: Boolean = false
     private var lastShiftTapUpTime: Long = 0L
@@ -5523,6 +5524,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             modifierStateBeforeHold = modifierStateController.captureLogicalState()
             variationInteractedDuringHold = false
             otherKeyInteractedDuringHold = false
+            if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT) {
+                keyUsedDuringShiftHold = false
+            }
             modifierDownTimes[keyCode] = event.eventTime
         } else if (!isModifierKey && event?.repeatCount == 0) {
             if (
@@ -5540,6 +5544,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             ) {
                 modifierStateBeforeHold?.let(modifierStateController::restoreLogicalState)
                 updateStatusBarText()
+            } else if (shiftPhysicallyPressed) {
+                keyUsedDuringShiftHold = true
             }
             otherKeyInteractedDuringHold = true
             lastShiftTapUpTime = 0L
@@ -6163,6 +6169,21 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                         lastShiftTapUpTime = 0L
                     }
                 }
+                // The one-shot Shift armed on press must not outlive a chord it was used in; it also
+                // blocked auto-capitalization from arming during the chord, so that is re-evaluated.
+                if (keyUsedDuringShiftHold && modifierStateController.consumeShiftOneShot()) {
+                    AutoCapitalizeHelper.maybeEnableSmartShift(
+                        this,
+                        currentInputConnection,
+                        shouldDisableAutoCapitalize,
+                        enableShift = { requestAutoCapShiftOneShot() },
+                        disableShift = { modifierStateController.clearAutomaticShiftOneShot() },
+                        onUpdateStatusBar = { updateStatusBarText() },
+                        inputContextState = inputContextState
+                    )
+                    updateStatusBarText()
+                }
+                keyUsedDuringShiftHold = false
                 variationInteractedDuringHold = false
                 otherKeyInteractedDuringHold = false
                 modifierDownTimes.remove(keyCode)
